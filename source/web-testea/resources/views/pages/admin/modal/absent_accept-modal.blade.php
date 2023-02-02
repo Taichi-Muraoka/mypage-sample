@@ -1,0 +1,43 @@
+@extends('pages.common.modal')
+
+@section('modal-body')
+
+
+{{-- テーブル --}}
+<x-bs.table :hover=false :vHeader=true>
+    <tr>
+        <th width="35%">申請日</th>
+        <td>@{{item.apply_time|formatYmd}}</td>
+    </tr>
+    <tr>
+        <th>生徒名</th>
+        <td>@{{item.sname}}</td>
+    </tr>
+    <tr>
+        <th>授業種別</th>
+        <td>@{{item.lesson_name}}</td>
+    </tr>
+    <tr v-show="item.lesson_type == {{ App\Consts\AppConst::CODE_MASTER_8_1 }}">
+        <th>教室</th>
+        <td>@{{item.room_name}}</td>
+    </tr>
+    <tr>
+        <th>授業日時</th>
+        <td>@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</td>
+    </tr>
+    <tr>
+        <th>教師名</th>
+        <td>@{{item.tname}}</td>
+    </tr>
+    <tr>
+        <th>欠席理由</th>
+        <td class="nl2br">@{{item.absent_reason}}</td>
+    </tr>
+    <tr>
+        <th>ステータス</th>
+        <td>@{{item.status}}</td>
+    </tr>
+
+</x-bs.table>
+
+@overwrite

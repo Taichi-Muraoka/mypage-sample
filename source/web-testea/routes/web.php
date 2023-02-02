@@ -1,0 +1,1274 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+//===============================================
+// リダイレクト
+//===============================================
+
+use App\Http\Controllers\HomeController;
+
+// 権限によってリダイレクト
+// ここではログインユーザが取れずコントローラで制御した
+// Route::redirect('/', '/member_mng');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+//===============================================
+// 認証機能
+//===============================================
+
+// 会員登録は無効
+Auth::routes(['register' => false]);
+
+//===============================================
+// マイページ共通
+//===============================================
+
+use App\Http\Controllers\MypageCommon\NoticeController;
+use App\Http\Controllers\MypageCommon\CalendarController;
+use App\Http\Controllers\MypageCommon\PasswordChangeController;
+
+Route::group(['middleware' => ['auth', 'can:mypage-common']], function () {
+
+    //---------------------
+    // お知らせ
+    //---------------------
+
+    // 一覧
+    Route::get('/notice', [NoticeController::class, 'index'])->name('notice');
+
+    // 検索結果取得
+    Route::post('/notice/search', [NoticeController::class, 'search'])->name('notice-search');
+
+    // 詳細取得用
+    Route::post('/notice/get_data', [NoticeController::class, 'getData'])->name('notice-get_data');
+
+    //---------------------
+    // カレンダー
+    //---------------------
+
+    // カレンダー画面表示
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
+
+    // 詳細取得用
+    Route::post('/calendar/get_calendar', [CalendarController::class, 'getCalendar'])->name('calendar-get_calendar');
+
+    //---------------------
+    // パスワード変更
+    //---------------------
+
+    // 新規登録画面
+    Route::get('/password_change', [PasswordChangeController::class, 'index'])->name('password_change');
+
+    // 編集処理
+    Route::post('/password_change/update', [PasswordChangeController::class, 'update'])->name('password_change-update');
+
+    // バリデーション(登録用)
+    Route::post('/password_change/vd_input', [PasswordChangeController::class, 'validationForInput'])->name('password_change-vd_input');
+});
+
+//===============================================
+// 生徒向け
+//===============================================
+
+use App\Http\Controllers\Student\ContactController;
+use App\Http\Controllers\Student\AbsentController;
+use App\Http\Controllers\Student\ReportController;
+use App\Http\Controllers\Student\GradesController;
+use App\Http\Controllers\Student\EventController;
+use App\Http\Controllers\Student\CardController;
+use App\Http\Controllers\Student\AgreementController;
+use App\Http\Controllers\Student\CourseController;
+use App\Http\Controllers\Student\InvoiceController;
+use App\Http\Controllers\Student\LeaveController;
+
+Route::group(['middleware' => ['auth', 'can:student']], function () {
+
+    //---------------------
+    // 問い合わせ
+    //---------------------
+
+    // 一覧
+    Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+
+    // 検索結果取得
+    Route::post('/contact/search', [ContactController::class, 'search'])->name('contact-search');
+
+    // 詳細取得用
+    Route::post('/contact/get_data', [ContactController::class, 'getData'])->name('contact-get_data');
+
+    // 問い合わせ登録
+    Route::get('/contact/new', [ContactController::class, 'new'])->name('contact-new');
+
+    // 新規登録処理
+    Route::post('/contact/create', [ContactController::class, 'create'])->name('contact-create');
+
+    // バリデーション(登録用)
+    Route::post('/contact/vd_input', [ContactController::class, 'validationForInput'])->name('contact-vd_input');
+
+    //---------------------
+    // 欠席申請
+    //---------------------
+
+    // 申請
+    Route::get('/absent', [AbsentController::class, 'index'])->name('absent');
+
+    // 申請(直接ID付きで選択された状態にする)
+    Route::get('/absent/{scheduleId}', [AbsentController::class, 'direct'])->name('absent-direct');
+
+    // 授業日時プルダウンを選択された際に教室・教師の情報を返却する
+    Route::post('/absent/get_data_select', [AbsentController::class, 'getDataSelect'])->name('absent-get_data_select');
+
+    // 新規登録処理
+    Route::post('/absent/create', [AbsentController::class, 'create'])->name('absent-create');
+
+    // バリデーション(登録用)
+    Route::post('/absent/vd_input', [AbsentController::class, 'validationForInput'])->name('absent-vd_input');
+
+    //---------------------
+    // 授業報告書
+    //---------------------
+
+    // 一覧
+    Route::get('/report', [ReportController::class, 'index'])->name('report');
+
+    // 検索結果取得
+    Route::post('/report/search', [ReportController::class, 'search'])->name('report-search');
+
+    // 詳細取得用
+    Route::post('/report/get_data', [ReportController::class, 'getData'])->name('report-get_data');
+
+    // 授業報告書 コメント登録
+    Route::get('/report/edit/{reportId}', [ReportController::class, 'edit'])->name('report-edit');
+
+    // バリデーション(登録用)
+    Route::post('/report/vd_input', [ReportController::class, 'validationForInput'])->name('report-vd_input');
+
+    // 編集処理
+    Route::post('/report/update', [ReportController::class, 'update'])->name('report-update');
+
+    //---------------------
+    // 生徒成績
+    //---------------------
+
+    // 一覧
+    Route::get('/grades', [GradesController::class, 'index'])->name('grades');
+
+    // 検索結果取得
+    Route::post('/grades/search', [GradesController::class, 'search'])->name('grades-search');
+
+    // 詳細取得用
+    Route::post('/grades/get_data', [GradesController::class, 'getData'])->name('grades-get_data');
+
+    // 生徒成績登録
+    Route::get('/grades/new', [GradesController::class, 'new'])->name('grades-new');
+
+    // 新規登録処理
+    Route::post('/grades/create', [GradesController::class, 'create'])->name('grades-create');
+
+    // 生徒成績編集
+    Route::get('/grades/edit/{gradesId}', [GradesController::class, 'edit'])->name('grades-edit');
+
+    // 編集処理
+    Route::post('/grades/update', [GradesController::class, 'update'])->name('grades-update');
+
+    // バリデーション(登録用)
+    Route::post('/grades/vd_input', [GradesController::class, 'validationForInput'])->name('grades-vd_input');
+
+    // 削除処理
+    Route::post('/grades/delete', [GradesController::class, 'delete'])->name('grades-delete');
+
+    //---------------------
+    // 模試・イベント申込
+    //---------------------
+
+    // 申込
+    Route::get('/event', [EventController::class, 'index'])->name('event');
+
+    // 申込(直接ID付きで選択された状態にする)
+    Route::get('/event/{type}/{tmidEventId}', [EventController::class, 'direct'])->name('event-direct');
+
+    // 新規登録処理
+    Route::post('/event/create', [EventController::class, 'create'])->name('event-create');
+
+    // バリデーション(登録用)
+    Route::post('/event/vd_input', [EventController::class, 'validationForInput'])->name('event-vd_input');
+
+    //---------------------
+    // ギフトカード
+    //---------------------
+
+    // 一覧
+    Route::get('/card', [CardController::class, 'index'])->name('card');
+
+    // 検索結果取得
+    Route::post('/card/search', [CardController::class, 'search'])->name('card-search');
+
+    // 詳細取得用
+    Route::post('/card/get_data', [CardController::class, 'getData'])->name('card-get_data');
+
+    // ギフトカード使用申請
+    Route::get('/card/use/{cardId}', [CardController::class, 'use'])->name('card-use');
+
+    // 編集処理
+    Route::post('/card/update', [CardController::class, 'update'])->name('card-update');
+
+    // バリデーション(登録用)
+    Route::post('/card/vd_input', [CardController::class, 'validationForInput'])->name('card-vd_input');
+
+    //---------------------
+    // 契約内容
+    //---------------------
+
+    // 一覧
+    Route::get('/agreement', [AgreementController::class, 'index'])->name('agreement');
+
+    // 詳細取得用
+    Route::post('/agreement/get_data', [AgreementController::class, 'getData'])->name('agreement-get_data');
+
+    //---------------------
+    // コース変更・授業追加申請
+    //---------------------
+
+    // 申請
+    Route::get('/course', [CourseController::class, 'index'])->name('course');
+
+    // お知らせからの短期講習申込
+    Route::get('/course/short-term', [CourseController::class, 'direct'])->name('course-direct');
+
+    // 編集処理
+    Route::post('/course/update', [CourseController::class, 'update'])->name('course-update');
+
+    // バリデーション(登録用)
+    Route::post('/course/vd_input', [CourseController::class, 'validationForInput'])->name('course-vd_input');
+
+    //---------------------
+    // 請求情報
+    //---------------------
+
+    // 一覧
+    Route::get('/invoice', [InvoiceController::class, 'index'])->name('invoice');
+
+    // 検索結果取得
+    Route::post('/invoice/search', [InvoiceController::class, 'search'])->name('invoice-search');
+
+    // 詳細画面
+    Route::get('/invoice/detail/{date}', [InvoiceController::class, 'detail'])->name('invoice-detail');
+
+    // PDF出力
+    Route::get('/invoice/pdf/{date}', [InvoiceController::class, 'pdf'])->name('invoice-pdf');
+
+    //---------------------
+    // 退会
+    //---------------------
+
+    // 申請
+    Route::get('/leave', [LeaveController::class, 'index'])->name('leave');
+
+    // 退会処理
+    Route::post('/leave/update', [LeaveController::class, 'update'])->name('leave-update');
+
+    // バリデーション(退会用)
+    Route::post('/leave/vd_input', [LeaveController::class, 'validationForInput'])->name('leave-vd_input');
+});
+
+//===============================================
+// 教師向け(共通)
+//===============================================
+
+use App\Http\Controllers\Tutor\TransferController;
+use App\Http\Controllers\Tutor\ReportRegistController;
+use App\Http\Controllers\Tutor\WeeklyShiftController;
+use App\Http\Controllers\Tutor\TimesRegistController;
+use App\Http\Controllers\Tutor\GradesCheckController;
+use App\Http\Controllers\Tutor\SalaryController;
+use App\Http\Controllers\Tutor\TrainingController;
+
+Route::group(['middleware' => ['auth', 'can:tutor']], function () {
+
+    //---------------------
+    // 振替申請
+    //---------------------
+
+    // 申請
+    Route::get('/transfer', [TransferController::class, 'index'])->name('transfer');
+
+    // 新規登録処理
+    Route::post('/transfer/create', [TransferController::class, 'create'])->name('transfer-create');
+
+    // カレンダーを選択された際に教室・教師の情報を返却する
+    Route::post('/transfer/get_data_select', [TransferController::class, 'getDataSelect'])->name('transfer-get_data_select');
+
+    // バリデーション(登録用)
+    Route::post('/transfer/vd_input', [TransferController::class, 'validationForInput'])->name('transfer-vd_input');
+
+    //---------------------
+    // 授業報告書
+    //---------------------
+
+    // 一覧
+    Route::get('/report_regist', [ReportRegistController::class, 'index'])->name('report_regist');
+
+    // 詳細取得用
+    Route::post('/report_regist/get_data', [ReportRegistController::class, 'getData'])->name('report_regist-get_data');
+
+    // 検索結果取得
+    Route::post('/report_regist/search', [ReportRegistController::class, 'search'])->name('report_regist-search');
+
+    // バリデーション(検索用)
+    Route::post('/report_regist/vd_search', [ReportRegistController::class, 'validationForSearch'])->name('report_regist-vd_search');
+
+    // 教室選択プルダウンを選択された際に生徒プルダウンの情報を返却する
+    Route::post('/report_regist/get_data_select_search', [ReportRegistController::class, 'getDataSelectSearch'])->name('report_regist-get_data_select_search');
+
+    // カレンダーを選択された際に教室・教師の情報を返却する
+    Route::post('/report_regist/get_data_select', [ReportRegistController::class, 'getDataSelect'])->name('report_regist-get_data_select');
+
+    // 授業報告書登録
+    Route::get('/report_regist/new', [ReportRegistController::class, 'new'])->name('report_regist-new');
+
+    // 新規登録処理
+    Route::post('/report_regist/create', [ReportRegistController::class, 'create'])->name('report_regist-create');
+
+    // 授業報告書編集
+    Route::get('/report_regist/edit/{reportId}', [ReportRegistController::class, 'edit'])->name('report_regist-edit');
+
+    // 編集処理
+    Route::post('/report_regist/update', [ReportRegistController::class, 'update'])->name('report_regist-update');
+
+    // バリデーション(登録用)
+    Route::post('/report_regist/vd_input', [ReportRegistController::class, 'validationForInput'])->name('report_regist-vd_input');
+
+    // 削除処理
+    Route::post('/report_regist/delete', [ReportRegistController::class, 'delete'])->name('report_regist-delete');
+
+    //---------------------
+    // 空き時間
+    //---------------------
+
+    // 登録
+    Route::get('/weekly_shift', [WeeklyShiftController::class, 'index'])->name('weekly_shift');
+
+    // 編集処理
+    Route::post('/weekly_shift/update', [WeeklyShiftController::class, 'update'])->name('weekly_shift-update');
+
+    // バリデーション(登録用)
+    Route::post('/weekly_shift/vd_input', [WeeklyShiftController::class, 'validationForInput'])->name('weekly_shift-vd_input');
+
+    //---------------------
+    // 回数報告
+    //---------------------
+
+    // 登録
+    Route::get('/times_regist', [TimesRegistController::class, 'index'])->name('times_regist');
+
+    // カレンダーを選択された際に詳細を表示
+    Route::post('/times_regist/get_data_select', [TimesRegistController::class, 'getDataSelect'])->name('times_regist-get_data_select');
+
+    // 新規登録処理
+    Route::post('/times_regist/create', [TimesRegistController::class, 'create'])->name('times_regist-create');
+
+    // バリデーション(登録用)
+    Route::post('/times_regist/vd_input', [TimesRegistController::class, 'validationForInput'])->name('times_regist-vd_input');
+
+    //---------------------
+    // 生徒成績
+    //---------------------
+
+    // 一覧
+    Route::get('/grades_check', [GradesCheckController::class, 'index'])->name('grades_check');
+
+    // 詳細取得用
+    Route::post('/grades_check/get_data', [GradesCheckController::class, 'getData'])->name('grades_check-get_data');
+
+    // バリデーション(検索用)
+    Route::post('/grades_check/vd_search', [GradesCheckController::class, 'validationForSearch'])->name('grades_check-vd_search');
+
+    // 検索結果取得
+    Route::post('/grades_check/search', [GradesCheckController::class, 'search'])->name('grades_check-search');
+
+    // 教室選択プルダウンを選択された際に生徒プルダウンの情報を返却する
+    Route::post('/grades_check/get_data_select', [GradesCheckController::class, 'getDataSelect'])->name('grades_check-get_data_select');
+
+    //---------------------
+    // 給与明細
+    //---------------------
+
+    // 一覧
+    Route::get('/salary', [SalaryController::class, 'index'])->name('salary');
+
+    // 検索結果取得
+    Route::post('/salary/search', [SalaryController::class, 'search'])->name('salary-search');
+
+    // 詳細画面
+    Route::get('/salary/detail/{date}', [SalaryController::class, 'detail'])->name('salary-detail');
+
+    // PDF出力
+    Route::get('/salary/pdf/{date}', [SalaryController::class, 'pdf'])->name('salary-pdf');
+
+    //---------------------
+    // 研修受講
+    //---------------------
+
+    // 一覧
+    Route::get('/training', [TrainingController::class, 'index'])->name('training');
+
+    // 検索結果取得
+    Route::post('/training/search', [TrainingController::class, 'search'])->name('training-search');
+
+    // 受講詳細
+    Route::get('/training/detail/{trnId}', [TrainingController::class, 'detail'])->name('training-detail');
+
+    // 動画の閲覧履歴を更新
+    Route::post('/training/movie_browse', [TrainingController::class, 'movieBrowse'])->name('training-movie_browse');
+
+    // 資料のダウンロード
+    Route::get('/training/download/{trnId}', [TrainingController::class, 'download'])->name('training-download');
+});
+
+//===============================================
+// 管理者向け
+//===============================================
+
+use App\Http\Controllers\Admin\MemberMngController;
+use App\Http\Controllers\Admin\CourseMngController;
+use App\Http\Controllers\Admin\MemberImportController;
+use App\Http\Controllers\Admin\LeaveAcceptController;
+use App\Http\Controllers\Admin\TutorMngController;
+use App\Http\Controllers\Admin\TutorRegistController;
+use App\Http\Controllers\Admin\TimesCheckController;
+use App\Http\Controllers\Admin\AbsentAcceptController;
+use App\Http\Controllers\Admin\TransferAcceptController;
+use App\Http\Controllers\Admin\ReportCheckController;
+use App\Http\Controllers\Admin\GradesMngController;
+use App\Http\Controllers\Admin\ScheduleImportController;
+use App\Http\Controllers\Admin\TrialMngController;
+use App\Http\Controllers\Admin\EventMngController;
+use App\Http\Controllers\Admin\CardMngController;
+use App\Http\Controllers\Admin\ContactMngController;
+use App\Http\Controllers\Admin\TrainingMngController;
+use App\Http\Controllers\Admin\InvoiceImportController;
+use App\Http\Controllers\Admin\SalaryImportController;
+use App\Http\Controllers\Admin\NoticeRegistController;
+use App\Http\Controllers\Admin\NoticeTemplateController;
+use App\Http\Controllers\Admin\AllMemberImportController;
+use App\Http\Controllers\Admin\YearScheduleImportController;
+use App\Http\Controllers\Admin\RoomHolidayController;
+use App\Http\Controllers\Admin\MasterMngController;
+use App\Http\Controllers\Admin\AccountMngController;
+use App\Http\Controllers\Admin\DataMngController;
+
+Route::group(['middleware' => ['auth', 'can:admin']], function () {
+
+    //---------------------
+    // 会員管理
+    //---------------------
+
+    // 会員一覧
+    Route::get('/member_mng', [MemberMngController::class, 'index'])->name('member_mng');
+
+    // バリデーション(検索用)
+    Route::post('/member_mng/vd_search', [MemberMngController::class, 'validationForSearch'])->name('member_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/member_mng/search', [MemberMngController::class, 'search'])->name('member_mng-search');
+
+    // 会員情報詳細
+    Route::get('/member_mng/detail/{sid}', [MemberMngController::class, 'detail'])->name('member_mng-detail');
+
+    // 会員情報詳細 - 詳細取得用
+    Route::post('/member_mng/get_data_detail', [MemberMngController::class, 'getDataDetail'])->name('member_mng-get_data_detail');
+
+    // カレンダー
+    Route::get('/member_mng/calendar/{sid}', [MemberMngController::class, 'calendar'])->name('member_mng-calendar');
+
+    // カレンダー - 詳細取得用
+    Route::post('/member_mng/get_calendar', [MemberMngController::class, 'getCalendar'])->name('member_mng-get_calendar');
+
+    // 請求情報一覧
+    Route::get('/member_mng/invoice/{sid}', [MemberMngController::class, 'invoice'])->name('member_mng-invoice');
+
+    // 請求情報一覧 - 詳細画面
+    Route::get('/member_mng/invoice/{sid}/detail/{date}', [MemberMngController::class, 'detailInvoice'])->name('member_mng-invoice_detail');
+
+    // 請求情報一覧 - 検索結果取得
+    Route::post('/member_mng/search_invoice', [MemberMngController::class, 'searchInvoice'])->name('member_mng-search_invoice');
+
+    // PDF出力
+    Route::get('/member_mng/invoice/{sid}/pdf/{date}', [MemberMngController::class, 'pdf'])->name('member_mng-pdf_invoice');
+
+    //---------------------
+    // コース変更・授業追加受付
+    //---------------------
+
+    // 一覧画面
+    Route::get('/course_mng', [CourseMngController::class, 'index'])->name('course_mng');
+
+    // バリデーション(検索用)
+    Route::post('/course_mng/vd_search', [CourseMngController::class, 'validationForSearch'])->name('course_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/course_mng/search', [CourseMngController::class, 'search'])->name('course_mng-search');
+
+    // 詳細取得用
+    Route::post('/course_mng/get_data', [CourseMngController::class, 'getData'])->name('course_mng-get_data');
+
+    // モーダル処理
+    Route::post('/course_mng/exec_modal', [CourseMngController::class, 'execModal'])->name('course_mng-exec_modal');
+
+    // 編集画面
+    Route::get('/course_mng/edit/{changeId}', [CourseMngController::class, 'edit'])->name('course_mng-edit');
+
+    // 編集処理
+    Route::post('/course_mng/update', [CourseMngController::class, 'update'])->name('course_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/course_mng/vd_input', [CourseMngController::class, 'validationForInput'])->name('course_mng-vd_input');
+
+    // 削除処理
+    Route::post('/course_mng/delete', [CourseMngController::class, 'delete'])->name('course_mng-delete');
+
+    //---------------------
+    // 会員情報取込
+    //---------------------
+
+    // 登録
+    Route::get('/member_import', [MemberImportController::class, 'index'])->name('member_import');
+
+    // バリデーション(登録用)
+    Route::post('/member_import/vd_input', [MemberImportController::class, 'validationForInput'])->name('member_import-vd_input');
+
+    // 新規登録処理
+    Route::post('/member_import/create', [MemberImportController::class, 'create'])->name('member_import-create');
+
+    //---------------------
+    // 退会申請受付
+    //---------------------
+
+    // 一覧画面
+    Route::get('/leave_accept', [LeaveAcceptController::class, 'index'])->name('leave_accept');
+
+    // バリデーション(検索用)
+    Route::post('/leave_accept/vd_search', [LeaveAcceptController::class, 'validationForSearch'])->name('leave_accept-vd_search');
+
+    // 検索結果取得
+    Route::post('/leave_accept/search', [LeaveAcceptController::class, 'search'])->name('leave_accept-search');
+
+    // 詳細取得用
+    Route::post('/leave_accept/get_data', [LeaveAcceptController::class, 'getData'])->name('leave_accept-get_data');
+
+    // モーダル処理
+    Route::post('/leave_accept/exec_modal', [LeaveAcceptController::class, 'execModal'])->name('leave_accept-exec_modal');
+
+    // 退会申請編集
+    Route::get('/leave_accept/edit/{leaveApplyId}', [LeaveAcceptController::class, 'edit'])->name('leave_accept-edit');
+
+    // 編集処理
+    Route::post('/leave_accept/update', [LeaveAcceptController::class, 'update'])->name('leave_accept-update');
+
+    // バリデーション(登録用)
+    Route::post('/leave_accept/vd_input', [LeaveAcceptController::class, 'validationForInput'])->name('leave_accept-vd_input');
+
+    // 削除処理
+    Route::post('/leave_accept/delete', [LeaveAcceptController::class, 'delete'])->name('leave_accept-delete');
+
+    //---------------------
+    // 教師情報
+    //---------------------
+
+    // 教師一覧
+    Route::get('/tutor_mng', [TutorMngController::class, 'index'])->name('tutor_mng');
+
+    // バリデーション(検索用)
+    Route::post('/tutor_mng/vd_search', [TutorMngController::class, 'validationForSearch'])->name('tutor_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/tutor_mng/search', [TutorMngController::class, 'search'])->name('tutor_mng-search');
+
+    // 教師情報詳細
+    Route::get('/tutor_mng/detail/{tid}', [TutorMngController::class, 'detail'])->name('tutor_mng-detail');
+
+    // 教師情報詳細 - 削除処理
+    Route::post('/tutor_mng/delete_detail', [TutorMngController::class, 'deleteDetail'])->name('tutor_mng-delete_detail');
+
+    // 給料明細一覧
+    Route::get('/tutor_mng/salary/{tid}', [TutorMngController::class, 'salary'])->name('tutor_mng-salary');
+
+    // 給料明細一覧 - 検索結果取得
+    Route::post('/tutor_mng/search_salary', [TutorMngController::class, 'searchSalary'])->name('tutor_mng-search_salary');
+
+    // 給料明細一覧 - 詳細画面
+    Route::get('/tutor_mng/salary/{tid}/detail/{date}', [TutorMngController::class, 'detailSalary'])->name('tutor_mng-detail_salary');
+
+    // PDF出力
+    Route::get('/tutor_mng/salary/{tid}/pdf/{date}', [TutorMngController::class, 'pdf'])->name('tutor_mng-pdf_salary');
+
+    // 教師空き時間
+    Route::get('/tutor_mng/weekly_shift/{tid}', [TutorMngController::class, 'weeklyShift'])->name('tutor_mng-weekly_shift');
+
+    // 教師カレンダー
+    Route::get('/tutor_mng/calendar/{tid}', [TutorMngController::class, 'calendar'])->name('tutor_mng-calendar');
+
+    // 教師カレンダー 打ち合わせ新規登録
+    Route::get('/tutor_mng/calendar/{tid}/new', [TutorMngController::class, 'new'])->name('tutor_mng-calendar-new');
+
+    // 新規登録処理
+    Route::post('/tutor_mng/create', [TutorMngController::class, 'create'])->name('tutor_mng-create');
+
+    // 教師カレンダー 打ち合わせ更新
+    Route::get('/tutor_mng/calendar/{tid}/edit/{tutorScheduleId}', [TutorMngController::class, 'edit'])->name('tutor_mng-calendar-edit');
+
+    // 編集処理
+    Route::post('/tutor_mng/update', [TutorMngController::class, 'update'])->name('tutor_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/tutor_mng/vd_input', [TutorMngController::class, 'validationForInput'])->name('tutor_mng-vd_input');
+
+    // 詳細取得用
+    Route::post('/tutor_mng/get_calendar', [TutorMngController::class, 'getCalendar'])->name('tutor_mng-get_calendar');
+
+    // 削除処理
+    Route::post('/tutor_mng/delete', [TutorMngController::class, 'delete'])->name('tutor_mng-delete');
+
+    //---------------------
+    // 教師登録
+    //---------------------
+
+    // 登録
+    Route::get('/tutor_regist', [TutorRegistController::class, 'index'])->name('tutor_regist');
+
+    // バリデーション(登録用)
+    Route::post('/tutor_regist/vd_input', [TutorRegistController::class, 'validationForInput'])->name('tutor_regist-vd_input');
+
+    // 新規登録処理
+    Route::post('/tutor_regist/create', [TutorRegistController::class, 'create'])->name('tutor_regist-create');
+
+    //---------------------
+    // 回数報告
+    //---------------------
+
+    // 一覧画面
+    Route::get('/times_check', [TimesCheckController::class, 'index'])->name('times_check');
+
+    // バリデーション(検索用)
+    Route::post('/times_check/vd_search', [TimesCheckController::class, 'validationForSearch'])->name('times_check-vd_search');
+
+    // 検索結果取得
+    Route::post('/times_check/search', [TimesCheckController::class, 'search'])->name('times_check-search');
+
+    // 詳細取得用
+    Route::post('/times_check/get_data', [TimesCheckController::class, 'getData'])->name('times_check-get_data');
+
+    // 回数報告編集
+    Route::get('/times_check/edit/{timesReportId}', [TimesCheckController::class, 'edit'])->name('times_check-edit');
+
+    // 授業日時プルダウンを選択された際に授業日時・生徒名・教科の情報を返却する
+    Route::post('/times_check/get_data_select', [TimesCheckController::class, 'getDataSelect'])->name('times_check-get_data_select');
+
+    // 編集処理
+    Route::post('/times_check/update', [TimesCheckController::class, 'update'])->name('times_check-update');
+
+    // バリデーション(登録用)
+    Route::post('/times_check/vd_input', [TimesCheckController::class, 'validationForInput'])->name('times_check-vd_input');
+
+    // 削除処理
+    Route::post('/times_check/delete', [TimesCheckController::class, 'delete'])->name('times_check-delete');
+
+    //----------------------
+    // 欠席申請受付
+    //----------------------
+
+    // 一覧画面
+    Route::get('/absent_accept', [AbsentAcceptController::class, 'index'])->name('absent_accept');
+
+    // バリデーション(検索用)
+    Route::post('/absent_accept/vd_search', [AbsentAcceptController::class, 'validationForSearch'])->name('absent_accept-vd_search');
+
+    // 検索結果取得
+    Route::post('/absent_accept/search', [AbsentAcceptController::class, 'search'])->name('absent_accept-search');
+
+    // 詳細取得用
+    Route::post('/absent_accept/get_data', [AbsentAcceptController::class, 'getData'])->name('absent_accept-get_data');
+
+    // モーダル処理
+    Route::post('/absent_accept/exec_modal', [AbsentAcceptController::class, 'execModal'])->name('absent_accept-exec_modal');
+
+    // 欠席申請編集
+    Route::get('/absent_accept/edit/{absentApplyId}', [AbsentAcceptController::class, 'edit'])->name('absent_accept-edit');
+
+    // 授業日時プルダウンを選択された際に教室・教師の情報を返却する
+    Route::post('/absent_accept/get_data_select', [AbsentAcceptController::class, 'getDataSelect'])->name('absent_accept-get_data_select');
+
+    // 編集処理
+    Route::post('/absent_accept/update', [AbsentAcceptController::class, 'update'])->name('absent_accept-update');
+
+    // バリデーション(登録用)
+    Route::post('/absent_accept/vd_input', [AbsentAcceptController::class, 'validationForInput'])->name('absent_accept-vd_input');
+
+    // 削除処理
+    Route::post('/absent_accept/delete', [AbsentAcceptController::class, 'delete'])->name('absent_accept-delete');
+
+    //---------------------
+    // 振替連絡受付
+    //---------------------
+
+    // 一覧画面
+    Route::get('/transfer_accept', [TransferAcceptController::class, 'index'])->name('transfer_accept');
+
+    // バリデーション(検索用)
+    Route::post('/transfer_accept/vd_search', [TransferAcceptController::class, 'validationForSearch'])->name('transfer_accept-vd_search');
+
+    // 検索結果取得
+    Route::post('/transfer_accept/search', [TransferAcceptController::class, 'search'])->name('transfer_accept-search');
+
+    // 詳細取得用
+    Route::post('/transfer_accept/get_data', [TransferAcceptController::class, 'getData'])->name('transfer_accept-get_data');
+
+    // モーダル処理
+    Route::post('/transfer_accept/exec_modal', [TransferAcceptController::class, 'execModal'])->name('transfer_accept-exec_modal');
+
+    // 振替連絡編集
+    Route::get('/transfer_accept/edit/{transferApplyId}', [TransferAcceptController::class, 'edit'])->name('transfer_accept-edit');
+
+    // カレンダーを選択された際に教室・教師の情報を返却する
+    Route::post('/transfer_accept/get_data_select', [TransferAcceptController::class, 'getDataSelect'])->name('transfer_accept-get_data_select');
+
+    // 編集処理
+    Route::post('/transfer_accept/update', [TransferAcceptController::class, 'update'])->name('transfer_accept-update');
+
+    // バリデーション(登録用)
+    Route::post('/transfer_accept/vd_input', [TransferAcceptController::class, 'validationForInput'])->name('transfer_accept-vd_input');
+
+    // 削除処理
+    Route::post('/transfer_accept/delete', [TransferAcceptController::class, 'delete'])->name('transfer_accept-delete');
+
+    //---------------------
+    // 授業報告
+    //---------------------
+
+    // 一覧画面
+    Route::get('/report_check', [ReportCheckController::class, 'index'])->name('report_check');
+
+    // バリデーション(検索用)
+    Route::post('/report_check/vd_search', [ReportCheckController::class, 'validationForSearch'])->name('report_check-vd_search');
+
+    // 検索結果取得
+    Route::post('/report_check/search', [ReportCheckController::class, 'search'])->name('report_check-search');
+
+    // 詳細取得用
+    Route::post('/report_check/get_data', [ReportCheckController::class, 'getData'])->name('report_check-get_data');
+
+    // 授業報告編集
+    Route::get('/report_check/edit/{reportId}', [ReportCheckController::class, 'edit'])->name('report_check-edit');
+
+    // カレンダーを選択された際に教室・教師の情報を返却する
+    Route::post('/report_check/get_data_select', [ReportCheckController::class, 'getDataSelect'])->name('report_check-get_data_select');
+
+    // 編集処理
+    Route::post('/report_check/update', [ReportCheckController::class, 'update'])->name('report_check-update');
+
+    // バリデーション(登録用)
+    Route::post('/report_check/vd_input', [ReportCheckController::class, 'validationForInput'])->name('report_check-vd_input');
+
+    // 削除処理
+    Route::post('/report_check/delete', [ReportCheckController::class, 'delete'])->name('report_check-delete');
+
+    //---------------------
+    // 生徒成績
+    //---------------------
+
+    // 一覧画面
+    Route::get('/grades_mng', [GradesMngController::class, 'index'])->name('grades_mng');
+
+    // バリデーション(検索用)
+    Route::post('/grades_mng/vd_search', [GradesMngController::class, 'validationForSearch'])->name('grades_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/grades_mng/search', [GradesMngController::class, 'search'])->name('grades_mng-search');
+
+    // 詳細取得用
+    Route::post('/grades_mng/get_data', [GradesMngController::class, 'getData'])->name('grades_mng-get_data');
+
+    // 生徒成績編集
+    Route::get('/grades_mng/edit/{gradesId}', [GradesMngController::class, 'edit'])->name('grades_mng-edit');
+
+    // 編集処理
+    Route::post('/grades_mng/update', [GradesMngController::class, 'update'])->name('grades_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/grades_mng/vd_input', [GradesMngController::class, 'validationForInput'])->name('grades_mng-vd_input');
+
+    // 削除処理
+    Route::post('/grades_mng/delete', [GradesMngController::class, 'delete'])->name('grades_mng-delete');
+
+    //---------------------
+    // スケジュール取込
+    //---------------------
+
+    // 取込
+    Route::get('/schedule_import', [ScheduleImportController::class, 'index'])->name('schedule_import');
+
+    // バリデーション(取込用)
+    Route::post('/schedule_import/vd_input', [ScheduleImportController::class, 'validationForInput'])->name('schedule_import-vd_input');
+
+    // 取込処理
+    Route::post('/schedule_import/create', [ScheduleImportController::class, 'create'])->name('schedule_import-create');
+
+    //---------------------
+    // 模試管理
+    //---------------------
+
+    // 模試一覧
+    Route::get('/trial_mng', [TrialMngController::class, 'index'])->name('trial_mng');
+
+    // バリデーション(検索用)
+    Route::post('/trial_mng/vd_search', [TrialMngController::class, 'validationForSearch'])->name('trial_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/trial_mng/search', [TrialMngController::class, 'search'])->name('trial_mng-search');
+
+    // 詳細取得用
+    Route::post('/trial_mng/get_data', [TrialMngController::class, 'getData'])->name('trial_mng-get_data');
+
+    // 模試申込者一覧
+    Route::get('/trial_mng/entry/{tmid}', [TrialMngController::class, 'entry'])->name('trial_mng-entry');
+
+    // 模試申込者一覧 - 検索結果取得
+    Route::post('/trial_mng/search_entry', [TrialMngController::class, 'searchEntry'])->name('trial_mng-search_entry');
+
+    // 模試申込者一覧 - 詳細取得用
+    Route::post('/trial_mng/get_data_entry', [TrialMngController::class, 'getDataEntry'])->name('trial_mng-get_data_entry');
+
+    // モーダル処理
+    Route::post('/trial_mng/exec_modal_entry', [TrialMngController::class, 'execModalEntry'])->name('trial_mng-exec_modal_entry');
+
+    // 模試登録
+    Route::get('/trial_mng/new', [TrialMngController::class, 'new'])->name('trial_mng-new');
+
+    // バリデーション(登録用)
+    Route::post('/trial_mng/vd_input', [TrialMngController::class, 'validationForInput'])->name('trial_mng-vd_input');
+
+    // 新規登録処理
+    Route::post('/trial_mng/create', [TrialMngController::class, 'create'])->name('trial_mng-create');
+
+    // 模試申込者情報変更
+    Route::get('/trial_mng/entry/{tmid}/edit/{trialApplyId}', [TrialMngController::class, 'entryEdit'])->name('trial_mng-entry-edit');
+
+    // 編集処理
+    Route::post('/trial_mng/update_entry', [TrialMngController::class, 'updateEntry'])->name('trial_mng-update_entry');
+
+    // バリデーション(登録用)
+    Route::post('/trial_mng/vd_input_entry', [TrialMngController::class, 'validationForInputEntry'])->name('trial_mng-vd_input_entry');
+
+    // 削除処理
+    Route::post('/trial_mng/delete_entry', [TrialMngController::class, 'deleteEntry'])->name('trial_mng-delete_entry');
+
+    //---------------------
+    // イベント管理
+    //---------------------
+
+    // イベント一覧
+    Route::get('/event_mng', [EventMngController::class, 'index'])->name('event_mng');
+
+    // バリデーション(検索用)
+    Route::post('/event_mng/vd_search', [EventMngController::class, 'validationForSearch'])->name('event_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/event_mng/search', [EventMngController::class, 'search'])->name('event_mng-search');
+
+    // 詳細取得用
+    Route::post('/event_mng/get_data', [EventMngController::class, 'getData'])->name('event_mng-get_data');
+
+    // イベント登録
+    Route::get('/event_mng/new', [EventMngController::class, 'new'])->name('event_mng-new');
+
+    // 新規登録処理
+    Route::post('/event_mng/create', [EventMngController::class, 'create'])->name('event_mng-create');
+
+    // イベント編集
+    Route::get('/event_mng/edit/{eventId}', [EventMngController::class, 'edit'])->name('event_mng-edit');
+
+    // 編集処理
+    Route::post('/event_mng/update', [EventMngController::class, 'update'])->name('event_mng-update');
+
+    // 削除処理
+    Route::post('/event_mng/delete', [EventMngController::class, 'delete'])->name('event_mng-delete');
+
+    // イベント申込者一覧
+    Route::get('/event_mng/entry/{eventId}', [EventMngController::class, 'entry'])->name('event_mng-entry');
+
+    // イベント申込者一覧 - 検索結果取得
+    Route::post('/event_mng/search_entry', [EventMngController::class, 'searchEntry'])->name('event_mng-search_entry');
+
+    // イベント申込者一覧 - 詳細取得用
+    Route::post('/event_mng/get_data_entry', [EventMngController::class, 'getDataEntry'])->name('event_mng-get_data_entry');
+
+    // モーダル処理
+    Route::post('/event_mng/exec_modal_entry', [EventMngController::class, 'execModalEntry'])->name('event_mng-exec_modal_entry');
+
+    // バリデーション(登録用)
+    Route::post('/event_mng/vd_input', [EventMngController::class, 'validationForInput'])->name('event_mng-vd_input');
+
+    // イベント申込編集画面
+    Route::get('/event_mng/entry/{eventId}/edit/{cid}', [EventMngController::class, 'entryEdit'])->name('event_mng-entry-edit');
+
+    // イベント申込編集 - 編集処理
+    Route::post('/event_mng/update_entry', [EventMngController::class, 'updateEntry'])->name('event_mng-update_entry');
+
+    // イベント申込編集 - 削除処理
+    Route::post('/event_mng/delete_entry', [EventMngController::class, 'deleteEntry'])->name('event_mng-delete_entry');
+
+    // イベント申込編集 - バリデーション(登録用)
+    Route::post('/event_mng/vd_input_entry', [EventMngController::class, 'validationForInputEntry'])->name('event_mng-vd_input_entry');
+
+    //---------------------
+    // ギフトカード管理
+    //---------------------
+
+    // 一覧画面
+    Route::get('/card_mng', [CardMngController::class, 'index'])->name('card_mng');
+
+    // バリデーション(検索用)
+    Route::post('/card_mng/vd_search', [CardMngController::class, 'validationForSearch'])->name('card_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/card_mng/search', [CardMngController::class, 'search'])->name('card_mng-search');
+
+    // 詳細取得用
+    Route::post('/card_mng/get_data', [CardMngController::class, 'getData'])->name('card_mng-get_data');
+
+    // モーダル処理
+    Route::post('/card_mng/exec_modal', [CardMngController::class, 'execModal'])->name('card_mng-exec_modal');
+
+    // ギフトカード付与
+    Route::get('/card_mng/new', [CardMngController::class, 'new'])->name('card_mng-new');
+
+    // 新規登録処理
+    Route::post('/card_mng/create_new', [CardMngController::class, 'create'])->name('card_mng-create_new');
+
+    // 詳細取得用
+    Route::post('/card_mng/get_data_select_new', [CardMngController::class, 'getDataSelectNew'])->name('card_mng-get_data_select_new');
+
+    // ギフトカード付与情報編集
+    Route::get('/card_mng/edit/{cardId}', [CardMngController::class, 'edit'])->name('card_mng-edit');
+
+    // 編集処理
+    Route::post('/card_mng/update_edit', [CardMngController::class, 'update'])->name('card_mng-update_edit');
+
+    // バリデーション(登録用)
+    Route::post('/card_mng/vd_input_new', [CardMngController::class, 'validationForInputNew'])->name('card_mng-vd_input_new');
+
+    // // バリデーション(更新用)
+    Route::post('/card_mng/vd_input_edit', [CardMngController::class, 'validationForInputEdit'])->name('card_mng-vd_input_edit');
+
+    // 削除処理
+    Route::post('/card_mng/delete_edit', [CardMngController::class, 'delete'])->name('card_mng-delete_edit');
+
+    //---------------------
+    // 問い合わせ管理
+    //---------------------
+
+    // 一覧画面
+    Route::get('/contact_mng', [ContactMngController::class, 'index'])->name('contact_mng');
+
+    // バリデーション(検索用)
+    Route::post('/contact_mng/vd_search', [ContactMngController::class, 'validationForSearch'])->name('contact_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/contact_mng/search', [ContactMngController::class, 'search'])->name('contact_mng-search');
+
+    // 詳細取得用
+    Route::post('/contact_mng/get_data', [ContactMngController::class, 'getData'])->name('contact_mng-get_data');
+
+    // 問い合わせ管理 変更
+    Route::get('/contact_mng/edit/{contactId}', [ContactMngController::class, 'edit'])->name('contact_mng-edit');
+
+    // 編集処理
+    Route::post('/contact_mng/update', [ContactMngController::class, 'update'])->name('contact_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/contact_mng/vd_input', [ContactMngController::class, 'validationForInput'])->name('contact_mng-vd_input');
+
+    // 削除処理
+    Route::post('/contact_mng/delete', [ContactMngController::class, 'delete'])->name('contact_mng-delete');
+
+    //---------------------
+    // 研修管理
+    //---------------------
+
+    // 一覧画面
+    Route::get('/training_mng', [TrainingMngController::class, 'index'])->name('training_mng');
+
+    // バリデーション(検索用)
+    Route::post('/training_mng/vd_search', [TrainingMngController::class, 'validationForSearch'])->name('training_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/training_mng/search', [TrainingMngController::class, 'search'])->name('training_mng-search');
+
+    // 研修教材登録
+    Route::get('/training_mng/new', [TrainingMngController::class, 'new'])->name('training_mng-new');
+
+    // 新規登録処理
+    Route::post('/training_mng/create', [TrainingMngController::class, 'create'])->name('training_mng-create');
+
+    // 研修教材編集
+    Route::get('/training_mng/edit/{trnId}', [TrainingMngController::class, 'edit'])->name('training_mng-edit');
+
+    // 編集処理
+    Route::post('/training_mng/update', [TrainingMngController::class, 'update'])->name('training_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/training_mng/vd_input', [TrainingMngController::class, 'validationForInput'])->name('training_mng-vd_input');
+
+    // 削除処理
+    Route::post('/training_mng/delete', [TrainingMngController::class, 'delete'])->name('training_mng-delete');
+
+    // 研修閲覧状況確認
+    Route::get('/training_mng/state/{trnId}', [TrainingMngController::class, 'state'])->name('training_mng-state');
+
+    // 検索結果取得
+    Route::post('/training_mng/search_state', [TrainingMngController::class, 'searchState'])->name('training_mng-search_state');
+
+    //---------------------
+    // 請求情報取込
+    //---------------------
+
+    // 一覧画面
+    Route::get('/invoice_import', [InvoiceImportController::class, 'index'])->name('invoice_import');
+
+    // 検索結果取得
+    Route::post('/invoice_import/search', [InvoiceImportController::class, 'search'])->name('invoice_import-search');
+
+    // 取込画面
+    Route::get('/invoice_import/import/{invoiceDate}', [InvoiceImportController::class, 'import'])->name('invoice_import-import');
+
+    // 新規登録処理
+    Route::post('/invoice_import/create', [InvoiceImportController::class, 'create'])->name('invoice_import-create');
+
+    // バリデーション(登録用)
+    Route::post('/invoice_import/vd_input', [InvoiceImportController::class, 'validationForInput'])->name('invoice_import-vd_input');
+
+    //----------------------
+    // 給与情報取込
+    //----------------------
+
+    // 一覧画面
+    Route::get('/salary_import', [SalaryImportController::class, 'index'])->name('salary_import');
+
+    // 検索結果取得
+    Route::post('/salary_import/search', [SalaryImportController::class, 'search'])->name('salary_import-search');
+
+    // 給与情報取込画面
+    Route::get('/salary_import/import/{salaryDate}', [SalaryImportController::class, 'import'])->name('salary_import-import');
+
+    // 新規登録処理
+    Route::post('/salary_import/create', [SalaryImportController::class, 'create'])->name('salary_import-create');
+
+    // バリデーション(登録用)
+    Route::post('/salary_import/vd_input', [SalaryImportController::class, 'validationForInput'])->name('salary_import-vd_input');
+
+    //----------------------
+    // お知らせ通知
+    //----------------------
+
+    // 一覧画面
+    Route::get('/notice_regist', [NoticeRegistController::class, 'index'])->name('notice_regist');
+
+    // バリデーション(検索用)
+    Route::post('/notice_regist/vd_search', [NoticeRegistController::class, 'validationForSearch'])->name('notice_regist-vd_search');
+
+    // 検索結果取得
+    Route::post('/notice_regist/search', [NoticeRegistController::class, 'search'])->name('notice_regist-search');
+
+    // 詳細取得用
+    Route::post('/notice_regist/get_data', [NoticeRegistController::class, 'getData'])->name('notice_regist-get_data');
+
+    // お知らせ登録
+    Route::get('/notice_regist/new', [NoticeRegistController::class, 'new'])->name('notice_regist-new');
+
+    // 新規登録処理
+    Route::post('/notice_regist/create', [NoticeRegistController::class, 'create'])->name('notice_regist-create');
+
+    // お知らせ詳細
+    Route::get('/notice_regist/detail/{noticeId}', [NoticeRegistController::class, 'detail'])->name('notice_regist-detail');
+
+    // 定型文選択プルダウンを選択された際にタイトル・内容の情報を返却する
+    Route::post('/notice_regist/get_data_select_template', [NoticeRegistController::class, 'getDataSelectTemplate'])->name('notice_regist-get_data_select_template');
+
+    // 宛先種別プルダウンを選択
+    Route::post('/notice_regist/get_data_select', [NoticeRegistController::class, 'getDataSelect'])->name('notice_regist-get_data_select');
+
+    // バリデーション(登録用)
+    Route::post('/notice_regist/vd_input', [NoticeRegistController::class, 'validationForInput'])->name('notice_regist-vd_input');
+
+    // 削除処理
+    Route::post('/notice_regist/delete', [NoticeRegistController::class, 'delete'])->name('notice_regist-delete');
+
+    //----------------------
+    // お知らせ定型文登録
+    //----------------------
+
+    // 一覧画面
+    Route::get('/notice_template', [NoticeTemplateController::class, 'index'])->name('notice_template');
+
+    // 検索結果取得
+    Route::post('/notice_template/search', [NoticeTemplateController::class, 'search'])->name('notice_template-search');
+
+    // 詳細取得用
+    Route::post('/notice_template/get_data', [NoticeTemplateController::class, 'getData'])->name('notice_template-get_data');
+
+    // お知らせ定型文登録
+    Route::get('/notice_template/new', [NoticeTemplateController::class, 'new'])->name('notice_template-new');
+
+    // 新規登録処理
+    Route::post('/notice_template/create', [NoticeTemplateController::class, 'create'])->name('notice_template-create');
+
+    // お知らせ定型文編集
+    Route::get('/notice_template/edit/{templateId}', [NoticeTemplateController::class, 'edit'])->name('notice_template-edit');
+
+    // 編集処理
+    Route::post('/notice_template/update', [NoticeTemplateController::class, 'update'])->name('notice_template-update');
+
+    // バリデーション(登録用)
+    Route::post('/notice_template/vd_input', [NoticeTemplateController::class, 'validationForInput'])->name('notice_template-vd_input');
+
+    // 削除処理
+    Route::post('/notice_template/delete', [NoticeTemplateController::class, 'delete'])->name('notice_template-delete');
+
+    //----------------------
+    // 学年情報取込
+    //----------------------
+
+    // 取込
+    Route::get('/all_member_import', [AllMemberImportController::class, 'index'])->name('all_member_import');
+
+    // 取込処理
+    Route::post('/all_member_import/create', [AllMemberImportController::class, 'create'])->name('all_member_import-create');
+
+    // バリデーション(取込用)
+    Route::post('/all_member_import/vd_input', [AllMemberImportController::class, 'validationForInput'])->name('all_member_import-vd_input');
+
+    // 検索結果取得
+    Route::post('/all_member_import/search', [AllMemberImportController::class, 'search'])->name('all_member_import-search');
+
+    //----------------------
+    // 年度スケジュール取込
+    //----------------------
+
+    // 取込
+    Route::get('/year_schedule_import', [YearScheduleImportController::class, 'index'])->name('year_schedule_import');
+
+    // 取込処理
+    Route::post('/year_schedule_import/create', [YearScheduleImportController::class, 'create'])->name('year_schedule_import-create');
+
+    // バリデーション(取込用)
+    Route::post('/year_schedule_import/vd_input', [YearScheduleImportController::class, 'validationForInput'])->name('year_schedule_import-vd_input');
+
+    // 検索結果取得
+    Route::post('/year_schedule_import/search', [YearScheduleImportController::class, 'search'])->name('year_schedule_import-search');
+
+    //----------------------
+    // 休業日登録
+    //----------------------
+
+    // 一覧
+    Route::get('/room_holiday', [RoomHolidayController::class, 'index'])->name('room_holiday');
+
+    // バリデーション(検索用)
+    Route::post('/room_holiday/vd_search', [RoomHolidayController::class, 'validationForSearch'])->name('room_holiday-vd_search');
+
+    // 検索結果取得
+    Route::post('/room_holiday/search', [RoomHolidayController::class, 'search'])->name('room_holiday-search');
+
+    // 休業日登録
+    Route::get('/room_holiday/new', [RoomHolidayController::class, 'new'])->name('room_holiday-new');
+
+    // 新規登録処理
+    Route::post('/room_holiday/create', [RoomHolidayController::class, 'create'])->name('room_holiday-create');
+
+    // 休業日編集
+    Route::get('/room_holiday/edit/{roomHolidayId}', [RoomHolidayController::class, 'edit'])->name('room_holiday-edit');
+
+    // 編集処理
+    Route::post('/room_holiday/update', [RoomHolidayController::class, 'update'])->name('room_holiday-update');
+
+    // バリデーション(登録用)
+    Route::post('/room_holiday/vd_input', [RoomHolidayController::class, 'validationForInput'])->name('room_holiday-vd_input');
+
+    // 削除処理
+    Route::post('/room_holiday/delete', [RoomHolidayController::class, 'delete'])->name('room_holiday-delete');
+
+    //---------------------
+    // マスタ管理
+    //---------------------
+
+    // 一覧画面
+    Route::get('/master_mng', [MasterMngController::class, 'index'])->name('master_mng');
+
+    // バリデーション(検索用)
+    Route::post('/master_mng/vd_search', [MasterMngController::class, 'validationForSearch'])->name('master_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/master_mng/search', [MasterMngController::class, 'search'])->name('master_mng-search');
+
+    // 取込画面
+    Route::get('/master_mng/import', [MasterMngController::class, 'import'])->name('master_mng-import');
+
+    // 新規登録処理
+    Route::post('/master_mng/create', [MasterMngController::class, 'create'])->name('master_mng-create');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng/vd_input', [MasterMngController::class, 'validationForInput'])->name('master_mng-vd_input');
+
+    //---------------------
+    // 事務局アカウント管理
+    //---------------------
+
+    // 一覧画面
+    Route::get('/account_mng', [AccountMngController::class, 'index'])->name('account_mng');
+
+    // バリデーション(検索用)
+    Route::post('/account_mng/vd_search', [AccountMngController::class, 'validationForSearch'])->name('account_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/account_mng/search', [AccountMngController::class, 'search'])->name('account_mng-search');
+
+    // 詳細取得用
+    Route::post('/account_mng/get_data', [AccountMngController::class, 'getData'])->name('account_mng-get_data');
+
+    // 登録画面
+    Route::get('/account_mng/new', [AccountMngController::class, 'new'])->name('account_mng-new');
+
+    // 新規登録処理
+    Route::post('/account_mng/create', [AccountMngController::class, 'create'])->name('account_mng-create');
+
+    // 編集画面
+    Route::get('/account_mng/edit/{admId}', [AccountMngController::class, 'edit'])->name('account_mng-edit');
+
+    // 編集処理
+    Route::post('/account_mng/update', [AccountMngController::class, 'update'])->name('account_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/account_mng/vd_input', [AccountMngController::class, 'validationForInput'])->name('account_mng-vd_input');
+
+    // 削除処理
+    Route::post('/account_mng/delete', [AccountMngController::class, 'delete'])->name('account_mng-delete');
+
+    //---------------------
+    // データ管理
+    //---------------------
+
+    Route::get('/data_mng', [DataMngController::class, 'index'])->name('data_mng');
+});

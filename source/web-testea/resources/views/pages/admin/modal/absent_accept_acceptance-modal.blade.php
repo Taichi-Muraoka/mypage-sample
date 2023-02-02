@@ -1,0 +1,34 @@
+@extends('pages.common.modal')
+
+@section('modal-body')
+
+<p>以下の欠席申請を受付し、以下の処理を行います。<br>
+    よろしいですか？</p>
+
+<ul>
+    <li>生徒への受付メッセージ自動送信</li>
+    <li>担当教師への通知メッセージ自動送信</li>
+    <li>担当教師へのメール通知</li>
+</ul>
+
+<x-bs.table :hover=false :vHeader=true>
+    <tr>
+        <th width="35%">生徒名</th>
+        <td>@{{item.sname}}</td>
+    </tr>
+    <tr>
+        <th>授業日時</th>
+        <td>@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</td>
+    </tr>
+    <tr>
+        <th>教室</th>
+        <td>@{{item.room_name}}</td>
+    </tr>
+    <tr>
+        <th>教師名</th>
+        <td>@{{item.tname}}</td>
+    </tr>
+</x-bs.table>
+
+
+@overwrite

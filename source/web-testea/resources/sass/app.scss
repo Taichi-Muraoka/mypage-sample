@@ -1,0 +1,689 @@
+/* 変数 ------------------------*/
+
+// button
+/*@import "button.scss";*/
+
+// アップル様カラー
+$apple-color: #1f4d98;
+
+// メイン背景色
+$main-bg-color: #f4f6f9;
+
+/* 全体共通 */
+body {
+    font-family: "Noto Sans JP", helvetica, arial, "hiragino kaku gothic pro",
+        meiryo, "ms pgothic", sans-serif;
+    /*font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
+        "Hiragino Sans", Meiryo, sans-serif;*/
+    /*font-family: "Noto Sans JP", sans-serif !important;*/
+    /*font-family: 'Noto Serif JP', serif !important;*/
+    /*font-family: 'M PLUS 1p', sans-serif;*/
+    /*font-family: 'M PLUS Rounded 1c', sans-serif;*/
+    background-color: $main-bg-color;
+}
+
+/*
+  ページタイトル
+*/
+.content-header {
+    /*margin-bottom: 5px;*/
+    padding: 15px 0.8rem;
+}
+
+/* コンテンツのタイトル。文字を小さくした */
+.content-header h1 {
+    font-size: 1.4rem;
+}
+
+/**
+  * 改行を表示
+  */
+.nl2br {
+    white-space: pre-wrap;
+}
+
+/* サイドバー ------------------------*/
+
+/**
+  サイドバーの選択時の色
+*/
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active,
+.sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active {
+    background-color: $apple-color;
+    color: #fff;
+}
+
+/* 
+  サイドバー アイコンとテキストのマージン
+*/
+.sidebar .nav-link > i {
+    margin-right: 5px;
+    display: inline-block;
+    width: 18px;
+    text-align: center;
+}
+
+.sidebar .has-treeview .nav-link > i {
+    width: 20px;
+}
+
+.sidebar .nav-treeview .nav-link > i {
+    width: 18px;
+}
+
+/* メニューのリンク */
+.nav-link {
+    padding: 0.5rem 0.7rem;
+    /*font-size: .875rem !important;*/
+}
+
+/* 管理画面階層メニューのパディング */
+.text-sm .nav-link {
+    padding: 0.4rem 0.8rem 0.4rem 1.5rem;
+}
+
+/* テーブルタグ ------------------------*/
+
+/* テーブル。最後の列がボタンの場合 */
+.table-button td:last-child {
+    width: 1px;
+    white-space: nowrap;
+}
+
+/* テーブルのタイトル行。それと太字にしない */
+.table th {
+    /*background-color: rgba(0, 0, 0, 0.03);*/
+    background-color: rgba(181, 179, 179, 0.18);
+    /*font-weight: normal;*/
+}
+
+/* tdの背景は白にする */
+/* ホバーが効かなくなるのでコメント
+.table td {
+     background-color: white; 
+}
+*/
+
+/* tableの中にtableを書くと線が出てしまう対応 */
+.noborder-only-top th {
+    border-left-style: none;
+    border-right-style: none;
+    border-bottom-style: none;
+    border-top: none;
+    background: none;
+}
+.noborder-only-top td {
+    border-left-style: none;
+    border-right-style: none;
+    border-bottom-style: none;
+    border-top: 1px solid #dee2e6;
+}
+
+/* 線を完全に非表示 */
+.noborder td,
+.noborder th {
+    border-style: none;
+}
+
+/* タイトル行のインデント */
+.title-indent {
+    text-indent: 1em;
+}
+
+/* 表示項目のインデント(生徒名など) */
+.edit-disp-indent {
+    text-indent: 1em;
+}
+
+/* ヘッダ行が縦の場合 幅を統一する */
+@media (min-width: 992px) {
+    .table-v-header tr:nth-of-type(1) th:nth-of-type(1) {
+        width: 200px;
+    }
+}
+
+@media (min-width: 668px) {
+    .table-v-header.fix tr:nth-of-type(1) th:nth-of-type(1) {
+        width: 200px;
+    }
+}
+
+/*欠席申請の授業日時等のテーブルの幅固定*/
+@media (max-width: 414px) {
+    .table-v-header tr:nth-of-type(1) th.t-minimum:nth-of-type(1) {
+        width: 1px;
+        white-space: nowrap;
+    }
+}
+
+/* カードタグ ------------------------*/
+
+/* 
+  カードの枠に線を表示。
+  影も外す
+  下にマージンを取る。
+ */
+.card {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    box-shadow: none;
+}
+
+.card-title {
+    /*color: gray;*/
+    margin-bottom: 0;
+}
+
+/* カードのローディング */
+.card .overlay {
+    opacity: 0.6;
+}
+
+/* ページネータ ------------------------*/
+
+/* アクティブ時の色 */
+.page-item.active .page-link {
+    background-color: $apple-color;
+    border-color: $apple-color;
+}
+
+/* 非アクティブ時の色 */
+.page-link {
+    color: $apple-color;
+}
+
+/* bootboxのローディング ------------------------*/
+
+.modal-dialog .overlay-spin {
+    background-color: #fff;
+    display: block;
+    height: 50px;
+    left: 0;
+    opacity: 0.6;
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    z-index: 1052;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+.modal-dialog .overlay-text {
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+    margin-top: 45px;
+}
+/* ローディングの回転スピード */
+.fast-spin {
+    -webkit-animation: fa-spin 1s infinite linear;
+    animation: fa-spin 1s infinite linear;
+}
+
+/* モーダルのローディング ------------------------*/
+
+.modal-dialog .overlay {
+    background-color: #fff;
+    display: block;
+    height: 100%;
+    left: 0;
+    opacity: 0.6;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1052;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+
+/* ログイン画面 ------------------------*/
+
+/* ログイン画面音背景など */
+/*
+.login-page,
+.register-page {
+    background: #fff;
+}
+*/
+
+/* ログイン画面のタイトルなどの幅 */
+/*
+.login-box,
+.register-box {
+    width: 430px;
+}
+*/
+
+/* ログインを記憶するなど。その他チェックボックスなどすべてのlabelだった */
+label:not(.form-check-label):not(.custom-file-label) {
+    font-weight: 400;
+}
+
+/* ログイン画面のロゴ */
+.login-logo {
+    font-size: 1.9rem;
+}
+
+/* ログイン画面のロゴの色 */
+.login-logo a {
+    color: $apple-color;
+}
+
+/* ログイン画面のロゴ画像 */
+.login-logo-img {
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+/* コールアウト */
+
+.callout {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-left: 5px solid #e9ecef;
+    box-shadow: none;
+}
+.callout > p {
+    font-size: 0.9em;
+}
+
+/* メッセージ ------------------------*/
+
+/* エラーメッセージ */
+.err-list {
+    margin-top: 0.25rem;
+    font-size: 80%;
+    color: #dc3545;
+}
+
+/* エラー時のボタン(ファイル) */
+.error-btn {
+    border-color: #dc3545;
+}
+
+/* Vue ------------------------*/
+
+/* 非表示 */
+[v-cloak] {
+    display: none !important;
+}
+
+/* select2のエラー ------------------------*/
+
+.is-invalid .select2-selection {
+    border-color: rgb(185, 74, 72) !important;
+}
+
+/* 編集・登録画面 ------------------------*/
+
+/* タイトル */
+.card-form .input-title {
+    font-size: 1.2rem;
+    /*font-weight: bold;*/
+}
+
+/* カレンダー ----------------------------*/
+
+/* 当日の背景色 */
+#calendar .fc-dayGridMonth-view .fc-today,
+#calendar .fc-timeGridWeek-view .fc-today,
+#calendar .fc-timeGridDay-view .fc-today {
+    background: rgb(255, 245, 196);
+}
+
+/* 当日の文字色 */
+#calendar .fc-today .fc-day-number {
+    color: #000 !important;
+}
+
+/* 個別授業の予定の背景色 */
+#calendar .cal_class {
+    background: #f39c12;
+    border-color: #f39c12;
+}
+
+/* 個別授業 振替日の予定の背景色 */
+#calendar .cal_class_furikae {
+    background: #8b9b00;
+    border-color: #8b9b00;
+}
+
+/* 個別授業 後日振替の予定の背景色（短期講習も同様） */
+#calendar .cal_class_gojitsu_furikae {
+    background: #9e9e9e;
+    border-color: #9e9e9e;
+}
+
+/* 短期講習の予定の背景色 */
+#calendar .cal_tanki_koshu {
+    background: #7507b4;
+    border-color: #7507b4;
+}
+
+/* 短期講習 振替日の予定の背景色 */
+#calendar .cal_tanki_koshu_furikae {
+    background: #007932;
+    border-color: #007932;
+}
+
+/* 模試の予定の背景色 */
+#calendar .cal_tanki_moshi {
+    background: #af0058;
+    border-color: #af0058;
+}
+
+/* イベントの予定の背景色 */
+#calendar .cal_event {
+    background: #0073b7;
+    border-color: #0073b7;
+}
+
+/* 打ち合わせの予定の背景色 */
+#calendar .cal_meeting {
+    background: #0073b7;
+    border-color: #0073b7;
+}
+
+/* 休業日の予定の背景色 */
+#calendar .cal_closed {
+    background: #474747;
+    border-color: #474747;
+}
+
+/*空き時間*/
+.table-checked th {
+    text-align: center;
+}
+
+.table-checked .tt {
+    padding: 0.75rem;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+.table-checked td {
+    padding: 0;
+}
+
+.table-checked td div {
+    height: 47px;
+    width: 100%;
+}
+
+.chk-wt {
+    display: none;
+}
+
+.chk-wt:checked + div {
+    background-color: rgb(201, 233, 143);
+}
+
+/*テーブルごとの個別調整*/
+.table > thead > tr > th.t-minimum {
+    width: 1px;
+    white-space: nowrap;
+    padding: 0.75rem 1.25rem 0.75rem 0.75rem;
+}
+
+.table > tbody > tr > td.t-minimum {
+    width: 1px;
+    white-space: nowrap;
+    padding: 0.75rem 1.25rem 0.75rem 0.75rem;
+}
+
+/* 金額の右寄せ */
+.table > tbody > tr > td.t-price {
+    text-align: right;
+}
+
+/* 一覧テーブルのスマホ対応 */
+.card-body > .table > tbody > tr > td > span.resp-th {
+    display: none;
+}
+
+.table.smart-phone-modal.modal-fix > tbody > tr > td > span.resp-th {
+    display: none;
+}
+
+.table.smart-phone-modal.modal-fix > tbody > tr > td.resp-clear {
+    clear: both;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: none;
+}
+
+@media (max-width: 414px) {
+    //メールアドレスが枠を突き抜けるのを防ぐ
+    .table > tbody > tr > td {
+        word-break: break-all;
+    }
+
+    .card-body > .table.smart-phone {
+        margin: 0;
+        display: block;
+        padding: 6px;
+        background-color: rgba(181, 179, 179, 0.18);
+    }
+
+    .card-body > .table.smart-phone.mb-small {
+        margin: 0 0 1rem;
+    }
+
+    .card-body > .table.smart-phone > thead,
+    .card-body > .table.smart-phone > thead > tr,
+    .card-body > .table.smart-phone > thead > tr > th {
+        display: none;
+    }
+
+    .card-body > .table.smart-phone > tbody {
+        width: 100%;
+        display: block;
+    }
+
+    .card-body > .table.smart-phone > tbody > tr {
+        width: 100%;
+        display: block;
+        margin: 0 auto 6px;
+        padding: 6px;
+        background-color: #fff;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+    }
+
+    .card-body > .table.smart-phone > tbody > tr:last-of-type {
+        margin: 0 auto;
+    }
+
+    .card-body > .table.smart-phone > tbody > tr > td {
+        width: 100%;
+        display: block;
+        padding: 6px 12px;
+        border: none;
+        border-bottom: dashed 1px#dee2e6;
+        white-space: normal;
+    }
+
+    .card-body > .table.smart-phone > tbody > tr > td > span.resp-th {
+        font-size: 0.725rem;
+        font-weight: bold;
+        display: block;
+        margin-left: -6px;
+    }
+
+    /*打消し*/
+    .card-body .table.smart-phone tbody > tr > td:first-of-type {
+        padding: 6px 12px;
+        border: none;
+        border-bottom: dashed 1px#dee2e6;
+    }
+
+    .card-body .table.smart-phone tbody > tr > td:last-of-type {
+        border: 1px solid #dee2e6;
+        text-align: center;
+        border: none;
+        padding: 6px 12px;
+    }
+
+    .card-body .table.smart-phone tbody > tr > td.not-center:last-of-type {
+        text-align: left;
+    }
+
+    .card-footer > ul.pagination {
+        max-width: 100%;
+        overflow-x: scroll;
+    }
+
+    /*theadがないタイプ*/
+    .table.table-v-header > tbody > tr > th,
+    .table.table-v-header > tbody > tr > td {
+        font-size: 0.875rem;
+    }
+
+    /*カード内配置タイプ*/
+    .card-body > .table.smart-phone.inner-card {
+        background-color: rgba(181, 179, 179, 0.18);
+        border: 1px solid #dee2e6;
+    }
+
+    /*空き時間*/
+    .table-checked .tt {
+        font-size: 0.875rem;
+        padding: 0.25rem;
+        vertical-align: middle;
+    }
+    .table > thead > tr > th.t-week {
+        width: 14%;
+        font-size: 0.725rem;
+        padding: 0.25rem;
+    }
+
+    /* 金額の右寄せの打消し */
+    .card-body .table.smart-phone > tbody > tr > td.t-price {
+        text-align: left;
+    }
+}
+
+/* モーダルテーブルのスマホ用の調整 */
+
+@media (max-width: 414px) {
+    .table.smart-phone-modal > thead > tr > th,
+    .table.smart-phone-modal > tbody > tr > th,
+    .table.smart-phone-modal > tbody > tr > td {
+        word-break: break-all;
+        font-size: 0.875rem;
+    }
+
+    /*モーダルでの変形*/
+    .table.smart-phone-modal.modal-fix {
+        margin: 0;
+        display: block;
+        padding: 6px;
+        background-color: rgba(181, 179, 179, 0.18);
+    }
+
+    .table.smart-phone-modal.modal-fix.mb-small {
+        margin: 0 0 1rem;
+    }
+
+    .table.smart-phone-modal.modal-fix > thead,
+    .table.smart-phone-modal.modal-fix > thead > tr,
+    .table.smart-phone-modal.modal-fix > thead > tr > th {
+        display: none;
+    }
+
+    .table.smart-phone-modal.modal-fix > tbody {
+        width: 100%;
+        display: block;
+    }
+
+    .table.smart-phone-modal.modal-fix > tbody > tr {
+        width: 100%;
+        display: block;
+        margin: 0 auto 6px;
+        padding: 6px;
+        background-color: #fff;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+    }
+
+    .table.smart-phone-modal.modal-fix > tbody > tr:last-of-type {
+        margin: 0 auto;
+    }
+
+    .table.smart-phone-modal.modal-fix > tbody > tr > td {
+        width: 100%;
+        display: block;
+        padding: 6px 12px;
+        border: none;
+        border-bottom: dashed 1px#dee2e6;
+        white-space: normal;
+    }
+
+    .table.smart-phone-modal.modal-fix > tbody > tr > td > span.resp-th {
+        font-size: 0.725rem;
+        font-weight: bold;
+        display: block;
+        margin-left: -6px;
+    }
+
+    /*打消し*/
+    .table.smart-phone-modal.modal-fix tbody > tr > td:first-of-type {
+        padding: 6px 12px;
+        border: none;
+        border-bottom: dashed 1px#dee2e6;
+    }
+
+    .table.smart-phone-modal.modal-fix tbody > tr > td:last-of-type {
+        border: 1px solid #dee2e6;
+        text-align: center;
+        border: none;
+        padding: 6px 12px;
+    }
+
+    .table.smart-phone-modal.modal-fix tbody > tr > td.not-center:last-of-type {
+        text-align: left;
+    }
+
+    /*カラム集約*/
+    .table.smart-phone-modal.modal-fix tbody > tr > td.resp-column {
+        width: 33.3%;
+        float: left;
+    }
+
+    .table.smart-phone-modal.modal-fix tbody > tr > td.resp-column.wide {
+        width: 66.6%;
+    }
+
+    .table.smart-phone-modal.modal-fix tbody > tr > td.resp-column.no-border {
+        border-bottom: none;
+    }
+
+    .table.smart-phone-modal.modal-fix > tbody > tr > td.resp-clear {
+        display: block;
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+}
+
+/*カレンダーの調整*/
+@media (max-width: 414px) {
+    .fc-toolbar h2 {
+        font-size: 1.25rem;
+    }
+    .table-bordered thead th.fc-day-header {
+        font-size: 0.875rem;
+    }
+    .table-bordered tbody td.fc-day-top > .fc-day-number {
+        font-size: 0.875rem;
+    }
+}

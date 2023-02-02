@@ -1,0 +1,143 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+/**
+ * 欠席申請 - モデル
+ */
+class AbsentApply extends Model
+{
+
+    // モデルの共通処理
+    use \App\Traits\ModelTrait;
+
+    // 論理削除
+    use SoftDeletes;
+
+    /**
+     * モデルと関連しているテーブル
+     *
+     * @var string
+     */
+    protected $table = 'absent_apply';
+
+    /**
+     * テーブルの主キー
+     *
+     * @var array
+     */
+    protected $primaryKey = 'absent_apply_id';
+
+    /**
+     * IDが自動増分されるか
+     *
+     * @var bool
+     */
+    public $incrementing = true;
+
+    /**
+     * 複数代入する属性
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'apply_time',
+        'lesson_type',
+        'id',
+        'absent_reason',
+        'state'
+    ];
+
+    /**
+     * 日付項目の定義
+     *
+     * @var array
+     */
+    protected $dates = [
+        'start_time',
+        'lesson_date'
+    ];
+
+    /**
+     * 属性に対するモデルのデフォルト値
+     *
+     * @var array
+     */
+    protected $attributes = [];
+
+    /**
+     * 配列に含めない属性
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'created_at', 'updated_at', 'deleted_at'
+    ];
+
+    /**
+     * モデルの「初期起動」メソッド
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        // 更新時、空白をnullに変換する処理
+        self::whenSaveEmptyToNull();
+
+        // テーブル操作時、ログを残す処理
+        self::saveToLog();
+    }
+
+    //-------------------------------
+    // 項目定義
+    //-------------------------------
+
+    /**
+     * テーブル項目の定義
+     *
+     * @return array
+     */
+    protected static function getFieldRules()
+    {
+        static $_fieldRules = [
+            'absent_apply_id' => ['integer'],
+            'lesson_type' => ['integer'],
+            'tid' => ['integer'],
+            'roomcd' => ['string'],
+            'lesson_type' => ['integer'],
+            'lesson_date' => ['date_format:Y-m-d'],
+            'start_time' => ['vdTime'],
+            'absent_reason' => ['string', 'max:1000'],
+            'state' => ['integer'],
+            'apply_time' => ['date_format:Y-m-d'],
+            'tname' => ['string', 'max:50']
+        ];
+        return $_fieldRules;
+    }
+
+    /**
+     * 検索 欠席申請状態
+     */
+    public function scopeSearchState($query, $obj)
+    {
+        $key = 'state';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, '=', $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 生徒(sid)に紐づく教室
+     */
+    public function scopeSearchRoom($query, $obj)
+    {
+        $key = 'roomcd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+}

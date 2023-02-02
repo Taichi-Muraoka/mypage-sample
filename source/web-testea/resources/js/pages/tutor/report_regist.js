@@ -1,0 +1,51 @@
+"use strict";
+
+/*
+ * 授業報告書一覧
+ */
+export default class AppClass extends PageBase {
+    /**
+     * コンストラクタ
+     */
+    constructor() {
+        super();
+    }
+
+    /**
+     * 開始処理
+     */
+    start() {
+        // Vue: モーダル
+        this.getVueModal();
+
+        // Vue: 検索フォーム
+        this.getVueSearchForm({
+            // 画面読み込み時
+            vueMounted: function($vue, option) {
+                // 初期表示時に、生徒プルダウンを初期化する。
+                // -1の場合、自分の受け持ちの生徒だけに絞り込み
+                $vue.selectChangeGetRoom();
+            },
+            // Vueにメソッド追加
+            vueMethods: {
+                // 教室プルダウン変更イベント
+                selectChangeGetRoom: function(event) {
+                    // 生徒プルダウンをクリア
+                    this.form.sid = "";
+                    Vue.set(this, "selectGetItem", {});
+
+                    // チェンジイベントを発生させる
+                    var selected = this.form.roomcd;
+                    self._selectChangeGet(
+                        this,
+                        selected,
+                        // URLを検索用とする
+                        {
+                            urlSuffix: "search"
+                        }
+                    );
+                }
+            }
+        });
+    }
+}
