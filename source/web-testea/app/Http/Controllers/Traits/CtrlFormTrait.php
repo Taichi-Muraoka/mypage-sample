@@ -93,6 +93,47 @@ trait CtrlFormTrait
         return ['paginator' => $paginator, 'elements' => $elements];
     }
 
+    /**
+     * 検索結果一覧をページャ付きで取得する(モック用)
+     * 
+     * @return array ページャの結果
+     */
+    protected function getListAndPaginatorMock()
+    {
+        // 1ページあたりの件数
+        $countPage = config('appconf.page_count');
+
+        // ページャへのパラメータを固定で設定
+        $page = 1;
+        $items = null;
+        $itemCount = 1;
+
+        // ページャ取得
+        $paginator = new LengthAwarePaginator(
+            // 表示するデータ
+            $items,
+            // 件数
+            $itemCount,
+            // 1ページあたりの件数
+            $countPage,
+            // 現在のページ数
+            $page,
+        );
+
+        // ページャを取得する
+        $window = UrlWindow::make($paginator);
+        $elements = array_filter([
+            $window['first'],
+            is_array($window['slider']) ? '...' : null,
+            $window['slider'],
+            is_array($window['last']) ? '...' : null,
+            $window['last'],
+        ]);
+
+        // 結果を返却
+        return ['paginator' => $paginator, 'elements' => $elements];
+    }
+
     //------------------------------
     // バリデーション
     //------------------------------

@@ -43,4 +43,7 @@
 
 @section('modal-button')
 
+{{-- 更新ボタンを表示 --}}
+<x-button.edit vueHref="'{{ route('member_mng-calendar-edit',[$editData['sid'], '']) }}/' + item.id" icon="" caption="スケジュール更新" />
+
 @overwrite

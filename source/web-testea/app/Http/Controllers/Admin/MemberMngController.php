@@ -303,6 +303,68 @@ class MemberMngController extends Controller
     }
 
     //==========================
+    // 授業スケジュール登録
+    //==========================
+
+    /**
+     * 登録画面
+     *
+     * @param int  $sid 生徒ID
+     * @return view
+     */
+    public function new($sid)
+    {
+
+        // IDのバリデーション
+        $this->validateIds($sid);
+
+        // 生徒名を取得する
+
+        // 生徒のidを渡しておく
+        $editData = [
+            'sid' => $sid
+        ];
+
+        // 教室リストを取得
+        $rooms = $this->mdlGetRoomList();
+
+        return view('pages.admin.member_mng-calendar-input', [
+            'name' => null,
+            'rooms' => $rooms,
+            'editData' => $editData
+        ]);
+    }
+
+    /**
+     * 編集画面
+     *
+     * @param int $sid 生徒ID
+     * @param int $scheduleId スケジュールID
+     * @return view
+     */
+    public function edit($sid, $scheduleId)
+    {
+
+        // IDのバリデーション
+        $this->validateIds($sid, $scheduleId);
+
+        // 教室リストを取得
+        $rooms = $this->mdlGetRoomList();
+
+        $editData = [
+            'sid' => $sid
+        ];
+
+        return view('pages.admin.member_mng-calendar-input', [
+            'name' => null,
+            'rooms' => $rooms,
+            'editData' => $editData,
+            //'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+
+    //==========================
     // 請求情報
     //==========================
 

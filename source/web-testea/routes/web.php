@@ -469,6 +469,8 @@ use App\Http\Controllers\Admin\RoomHolidayController;
 use App\Http\Controllers\Admin\MasterMngController;
 use App\Http\Controllers\Admin\AccountMngController;
 use App\Http\Controllers\Admin\DataMngController;
+use App\Http\Controllers\Admin\SeasonShiftController;
+use App\Http\Controllers\Admin\KarteController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -1271,4 +1273,88 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     //---------------------
 
     Route::get('/data_mng', [DataMngController::class, 'index'])->name('data_mng');
+
+    //---------------------
+    // 季節講習コマ組み モック
+    //---------------------
+
+    // 登録画面
+    Route::get('/season_shift', [SeasonShiftController::class, 'index'])->name('season_shift');
+
+    // 教室プルダウンを選択された際に生徒の情報を返却する
+    //Route::post('/season_shift/get_data_select', [SeasonShiftController::class, 'getDataSelect'])->name('season_shift-get_data_select');
+
+    // 生徒プルダウンを選択された際に担当教師の情報を返却する
+    //Route::post('/season_shift/get_data_select2', [SeasonShiftController::class, 'getDataSelect2'])->name('season_shift-get_data_select2');
+
+    // 新規登録処理
+    Route::post('/season_shift/create', [SeasonShiftController::class, 'create'])->name('season_shift-create');
+
+    // バリデーション(登録用)
+    Route::post('/season_shift/vd_input', [SeasonShiftController::class, 'validationForInput'])->name('season_shift-vd_input');
+
+    //---------------------
+    // 生徒カルテ モック
+    //---------------------
+
+    // 生徒カルテ一覧
+    Route::get('/karte', [KarteController::class, 'index'])->name('karte');
+
+    // 詳細取得用
+    Route::post('/karte/get_data', [KarteController::class, 'getData'])->name('karte-get_data');
+
+    // 検索結果取得
+    Route::post('/karte/search', [KarteController::class, 'search'])->name('karte-search');
+
+    // バリデーション(検索用)
+    Route::post('/karte/vd_search', [KarteController::class, 'validationForSearch'])->name('karte-vd_search');
+
+    // 生徒カルテ登録画面
+    Route::get('/karte/new', [KarteController::class, 'new'])->name('karte-new');
+
+    // 新規登録処理
+    Route::post('/karte/create', [KarteController::class, 'create'])->name('karte-create');
+
+    // 生徒カルテ編集画面
+    Route::get('/karte/edit/{karteId}', [KarteController::class, 'edit'])->name('karte-edit');
+
+    // 編集処理
+    Route::post('/karte/update', [KarteController::class, 'update'])->name('karte-update');
+
+    // バリデーション(登録用)
+    Route::post('/karte/vd_input', [KarteController::class, 'validationForInput'])->name('karte-vd_input');
+
+    // 削除処理
+    Route::post('/karte/delete', [KarteController::class, 'delete'])->name('karte-delete');
+
+    //---------------------
+    // 生徒スケジュール登録 モック
+    //---------------------
+
+    // カレンダー
+    //Route::get('/member_mng/calendar/{sid}', [MemberMngController::class, 'calendar'])->name('member_mng-calendar');
+
+    // 生徒カレンダー スケジュール新規登録
+    Route::get('/member_mng/calendar/{sid}/new', [MemberMngController::class, 'new'])->name('member_mng-calendar-new');
+
+    // 新規登録処理
+    //Route::post('/member_mng/create', [MemberMngController::class, 'create'])->name('member_mng-create');
+
+    // 生徒カレンダー スケジュール更新
+    Route::get('/member_mng/calendar/{sid}/edit/{ScheduleId}', [MemberMngController::class, 'edit'])->name('member_mng-calendar-edit');
+
+    // 編集処理
+    //Route::post('/member_mng/update', [MemberMngController::class, 'update'])->name('member_mng-update');
+
+    // バリデーション(登録用)
+    //Route::post('/member_mng/vd_input', [MemberMngController::class, 'validationForInput'])->name('member_mng-vd_input');
+
+    // 詳細取得用
+    //Route::post('/member_mng/get_calendar', [MemberMngController::class, 'getCalendar'])->name('member_mng-get_calendar');
+
+    // 削除処理
+    //Route::post('/member_mng/delete', [MemberMngController::class, 'delete'])->name('member_mng-delete');
+
+
+
 });

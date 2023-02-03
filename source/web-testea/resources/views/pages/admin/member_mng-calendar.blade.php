@@ -9,6 +9,11 @@
 
 {{-- IDはローディング用 --}}
 <x-bs.card :p0=true id="card-calendar">
+    {{-- カードヘッダ右 --}}
+    <x-slot name="tools">
+        <x-button.new href="{{ route('member_mng-calendar-new', $editData['sid']) }}" caption="授業スケジュール登録" :small=true />
+    </x-slot>
+
     <x-slot name="card_title">
         {{ $name }}
     </x-slot>
