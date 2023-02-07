@@ -18,7 +18,7 @@ use App\Http\Controllers\Traits\FuncAbsentTrait;
 use Illuminate\Support\Carbon;
 
 /**
- * 欠席申請 - コントローラ
+ * 面談日程調整 - コントローラ
  */
 class ConferenceController extends Controller
 {

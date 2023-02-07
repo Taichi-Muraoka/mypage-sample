@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 欠席申請
+ * 面談日程連絡
  */
 export default class AppClass extends PageBase {
     /**
