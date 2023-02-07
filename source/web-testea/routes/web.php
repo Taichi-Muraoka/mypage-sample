@@ -93,6 +93,7 @@ use App\Http\Controllers\Student\AgreementController;
 use App\Http\Controllers\Student\CourseController;
 use App\Http\Controllers\Student\InvoiceController;
 use App\Http\Controllers\Student\LeaveController;
+use App\Http\Controllers\Student\ConferenceController;
 
 Route::group(['middleware' => ['auth', 'can:student']], function () {
 
@@ -282,6 +283,24 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
 
     // バリデーション(退会用)
     Route::post('/leave/vd_input', [LeaveController::class, 'validationForInput'])->name('leave-vd_input');
+
+    //---------------------
+    // 面談日程調整
+    //---------------------
+
+    // 申請
+    Route::get('/conference', [ConferenceController::class, 'index'])->name('conference');
+
+    // 申請(直接ID付きで選択された状態にする)
+    Route::get('/conference/{scheduleId}', [ConferenceController::class, 'direct'])->name('conference-direct');
+
+    // 授業日時プルダウンを選択された際に教室・教師の情報を返却する →不要？
+
+    // 新規登録処理
+    Route::post('/conference/create', [ConferenceController::class, 'create'])->name('conference-create');
+
+    // バリデーション(登録用)
+    Route::post('/conference/vd_input', [ConferenceController::class, 'validationForInput'])->name('conference-vd_input');
 });
 
 //===============================================
