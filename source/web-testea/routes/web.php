@@ -94,6 +94,7 @@ use App\Http\Controllers\Student\CourseController;
 use App\Http\Controllers\Student\InvoiceController;
 use App\Http\Controllers\Student\LeaveController;
 use App\Http\Controllers\Student\ConferenceController;
+use App\Http\Controllers\Student\TransferStudentController;
 
 Route::group(['middleware' => ['auth', 'can:student']], function () {
 
@@ -301,6 +302,34 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
 
     // バリデーション(登録用)
     Route::post('/conference/vd_input', [ConferenceController::class, 'validationForInput'])->name('conference-vd_input');
+
+    //---------------------
+    // 振替調整
+    //---------------------
+
+    // 一覧
+    Route::get('/transfer_student', [TransferStudentController::class, 'index'])->name('transfer_student');
+
+    // 検索結果取得
+    Route::post('/transfer_student/search', [TransferStudentController::class, 'search'])->name('transfer_student-search');
+
+    // 詳細取得用
+    Route::post('/transfer_student/get_data', [TransferStudentController::class, 'getData'])->name('transfer_student-get_data');
+
+    // 振替希望日登録
+    Route::get('/transfer_student/new', [TransferStudentController::class, 'new'])->name('transfer_student-new');
+
+    // 新規登録処理
+    Route::post('/transfer_student/create', [TransferStudentController::class, 'create'])->name('transfer_student-create');
+
+    // 振替日承認
+    Route::get('/transfer_student/edit/{transferId}', [TransferStudentController::class, 'edit'])->name('transfer_student-edit');
+
+    // 編集処理
+    Route::post('/transfer_student/update', [TransferStudentController::class, 'update'])->name('transfer_student-update');
+
+    // バリデーション(登録用)
+    Route::post('/transfer_student/vd_input', [TransferStudentController::class, 'validationForInput'])->name('transfer_student-vd_input');
 });
 
 //===============================================
@@ -314,6 +343,8 @@ use App\Http\Controllers\Tutor\TimesRegistController;
 use App\Http\Controllers\Tutor\GradesCheckController;
 use App\Http\Controllers\Tutor\SalaryController;
 use App\Http\Controllers\Tutor\TrainingController;
+use App\Http\Controllers\Tutor\TransferTutorController;
+
 
 Route::group(['middleware' => ['auth', 'can:tutor']], function () {
 
@@ -455,6 +486,37 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
 
     // 資料のダウンロード
     Route::get('/training/download/{trnId}', [TrainingController::class, 'download'])->name('training-download');
+
+    //---------------------
+    // 振替調整
+    //---------------------
+
+    // 一覧
+    Route::get('/transfer_tutor', [TransferTutorController::class, 'index'])->name('transfer_tutor');
+
+    // 検索結果取得
+    Route::post('/transfer_tutor/search', [TransferTutorController::class, 'search'])->name('transfer_tutor-search');
+
+    // バリデーション(検索用)
+    Route::post('/transfer_tutor/vd_search', [TransferTutorController::class, 'validationForSearch'])->name('transfer_tutor-vd_search');
+
+    // 詳細取得用
+    Route::post('/transfer_tutor/get_data', [TransferTutorController::class, 'getData'])->name('transfer_tutor-get_data');
+
+    // 振替希望日登録
+    Route::get('/transfer_tutor/new', [TransferTutorController::class, 'new'])->name('transfer_tutor-new');
+
+    // 新規登録処理
+    Route::post('/transfer_tutor/create', [TransferTutorController::class, 'create'])->name('transfer_tutor-create');
+
+    // 振替日承認
+    Route::get('/transfer_tutor/edit/{transferId}', [TransferTutorController::class, 'edit'])->name('transfer_tutor-edit');
+
+    // 編集処理
+    Route::post('/transfer_tutor/update', [TransferTutorController::class, 'update'])->name('transfer_tutor-update');
+
+    // バリデーション(登録用)
+    Route::post('/transfer_tutor/vd_input', [TransferTutorController::class, 'validationForInput'])->name('transfer_tutor-vd_input');
 });
 
 //===============================================
