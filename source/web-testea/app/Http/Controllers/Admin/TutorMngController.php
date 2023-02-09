@@ -506,7 +506,7 @@ class TutorMngController extends Controller
      * @param int  $tid 教師ID
      * @return view
      */
-    public function new($tid)
+    public function calendarNew($tid)
     {
 
         // IDのバリデーション
@@ -537,7 +537,7 @@ class TutorMngController extends Controller
      * @param \Illuminate\Http\Request $request リクエスト
      * @return void
      */
-    public function create(Request $request)
+    public function calendarCreate(Request $request)
     {
 
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
@@ -568,7 +568,7 @@ class TutorMngController extends Controller
      * @param int $tutorScheduleId スケジュールID
      * @return view
      */
-    public function edit($tid, $tutorScheduleId)
+    public function calendarEdit($tid, $tutorScheduleId)
     {
 
         // IDのバリデーション
@@ -614,7 +614,7 @@ class TutorMngController extends Controller
      * @param \Illuminate\Http\Request $request リクエスト
      * @return void
      */
-    public function update(Request $request)
+    public function calendarUpdate(Request $request)
     {
 
         // IDのバリデーション
@@ -790,6 +790,60 @@ class TutorMngController extends Controller
         $rules += TutorSchedule::fieldRules('roomcd', ['required', $validationRoomList]);
 
         return $rules;
+    }
+
+    //==========================
+    // 教師登録・編集
+    //==========================
+
+    /**
+     * 登録画面
+     *
+     * @return view
+     */
+    public function new()
+    {
+        // テンプレートは編集と同じ
+        return view('pages.admin.tutor_mng-input', [
+            'editData' => null,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 登録処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function create(Request $request)
+    {
+        return;
+    }
+
+    /**
+     * 編集画面
+     *
+     * @param int $tid 教師ID
+     * @return void
+     */
+    public function edit($tid)
+    {
+        return view('pages.admin.tutor_mng-input', [
+            'editData' => null,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 編集処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function update(Request $request)
+    {
+        return;
     }
 
     //==========================

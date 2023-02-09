@@ -705,16 +705,16 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::get('/tutor_mng/calendar/{tid}', [TutorMngController::class, 'calendar'])->name('tutor_mng-calendar');
 
     // 教師カレンダー 打ち合わせ新規登録
-    Route::get('/tutor_mng/calendar/{tid}/new', [TutorMngController::class, 'new'])->name('tutor_mng-calendar-new');
+    Route::get('/tutor_mng/calendar/{tid}/new', [TutorMngController::class, 'calendarNew'])->name('tutor_mng-calendar-new');
 
-    // 新規登録処理
-    Route::post('/tutor_mng/create', [TutorMngController::class, 'create'])->name('tutor_mng-create');
+    // 教師カレンダー 打ち合わせ新規登録処理
+    Route::post('/tutor_mng/calendar/create', [TutorMngController::class, 'calendarCreate'])->name('tutor_mng-calendar-create');
 
-    // 教師カレンダー 打ち合わせ更新
-    Route::get('/tutor_mng/calendar/{tid}/edit/{tutorScheduleId}', [TutorMngController::class, 'edit'])->name('tutor_mng-calendar-edit');
+    // 教師カレンダー 打ち合わせ編集
+    Route::get('/tutor_mng/calendar/{tid}/edit/{tutorScheduleId}', [TutorMngController::class, 'calendarEdit'])->name('tutor_mng-calendar-edit');
 
-    // 編集処理
-    Route::post('/tutor_mng/update', [TutorMngController::class, 'update'])->name('tutor_mng-update');
+    // 教師カレンダー 打ち合わせ編集処理
+    Route::post('/tutor_mng/calendar/update', [TutorMngController::class, 'calendarUpdate'])->name('tutor_mng-calendar-update');
 
     // バリデーション(登録用)
     Route::post('/tutor_mng/vd_input', [TutorMngController::class, 'validationForInput'])->name('tutor_mng-vd_input');
@@ -724,6 +724,18 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/tutor_mng/delete', [TutorMngController::class, 'delete'])->name('tutor_mng-delete');
+
+    // 教師 新規登録
+    Route::get('/tutor_mng/new', [TutorMngController::class, 'new'])->name('tutor_mng-new');
+
+    // 教師 新規登録処理
+    Route::post('/tutor_mng/create', [TutorMngController::class, 'create'])->name('tutor_mng-create');
+
+    // 教師 編集
+    Route::get('/tutor_mng/edit/{tid}', [TutorMngController::class, 'edit'])->name('tutor_mng-edit');
+
+    // 教師 編集処理
+    Route::post('/tutor_mng/update', [TutorMngController::class, 'update'])->name('tutor_mng-update');
 
     //---------------------
     // 教師登録
