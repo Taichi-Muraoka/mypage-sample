@@ -49,7 +49,7 @@
             <td>
                 <x-button.list-dtl />
                 {{-- 申請者種別が生徒のため更新ボタン非活性 --}}
-                <x-button.list-edit href="{{ route('karte-edit', 2) }}" disabled=true/>
+                <x-button.list-edit href="{{ route('transfer_student-edit', 2) }}" disabled=true/>
             </td>
         </tr>
     </x-bs.table>

@@ -19,12 +19,12 @@
             <td>教師１</td>
         </tr>
         <tr>
-            <th>授業日・時限</th>
-            <td>2023/01/30 4限</td>
+            <th>授業日時</th>
+            <td>2023/01/30 4限 15:00</td>
         </tr>
         <tr>
-            <th>振替日・時限</th>
-            <td>2023/02/06 4限</td>
+            <th>振替日時</th>
+            <td>2023/02/06 4限 15:00</td>
         </tr>
         <tr>
             <th>振替理由</th>
@@ -63,6 +63,8 @@
         <option value="6">6限</option>
         <option value="7">7限</option>
     </x-input.select>
+
+    <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules />
 
     <x-input.textarea caption="振替理由" id="transfer_reason" :rules=$rules />
 
