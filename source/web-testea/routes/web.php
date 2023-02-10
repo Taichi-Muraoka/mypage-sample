@@ -1431,13 +1431,13 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     //Route::get('/member_mng/calendar/{sid}', [MemberMngController::class, 'calendar'])->name('member_mng-calendar');
 
     // 生徒カレンダー スケジュール新規登録
-    Route::get('/member_mng/calendar/{sid}/new', [MemberMngController::class, 'new'])->name('member_mng-calendar-new');
+    Route::get('/member_mng/calendar/{sid}/new', [MemberMngController::class, 'calendarNew'])->name('member_mng-calendar-new');
 
     // 新規登録処理
     //Route::post('/member_mng/create', [MemberMngController::class, 'create'])->name('member_mng-create');
 
     // 生徒カレンダー スケジュール更新
-    Route::get('/member_mng/calendar/{sid}/edit/{ScheduleId}', [MemberMngController::class, 'edit'])->name('member_mng-calendar-edit');
+    Route::get('/member_mng/calendar/{sid}/edit/{ScheduleId}', [MemberMngController::class, 'calendarEdit'])->name('member_mng-calendar-edit');
 
     // 編集処理
     //Route::post('/member_mng/update', [MemberMngController::class, 'update'])->name('member_mng-update');
@@ -1451,6 +1451,24 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 削除処理
     //Route::post('/member_mng/delete', [MemberMngController::class, 'delete'])->name('member_mng-delete');
 
+    //---------------------
+    // 会員管理 生徒登録 モック
+    //---------------------
+
+    // 生徒カレンダー スケジュール新規登録
+    Route::get('/member_mng/new', [MemberMngController::class, 'new'])->name('member_mng-new');
+
+    // 新規登録処理
+    Route::post('/member_mng/create', [MemberMngController::class, 'create'])->name('member_mng-create');
+
+    // 生徒カレンダー スケジュール更新
+    Route::get('/member_mng/edit/{sid}', [MemberMngController::class, 'edit'])->name('member_mng-edit');
+
+    // 編集処理
+    Route::post('/member_mng/update', [MemberMngController::class, 'update'])->name('member_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/member_mng/vd_input', [MemberMngController::class, 'validationForInput'])->name('member_mng-vd_input');
 
 
 });

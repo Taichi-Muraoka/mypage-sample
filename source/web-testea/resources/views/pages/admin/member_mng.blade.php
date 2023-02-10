@@ -32,7 +32,13 @@
 
 </x-bs.card>
 
+{{-- 結果リスト --}}
 <x-bs.card-list>
+
+    {{-- カードヘッダ右 --}}
+    <x-slot name="tools">
+        <x-button.new href="{{ route('member_mng-new') }}" :small=true />
+    </x-slot>
 
     {{-- テーブル --}}
     <x-bs.table :button=true>
@@ -56,6 +62,7 @@
                 <x-button.list-dtl vueHref="'{{ route('member_mng-detail', '') }}/' + item.sid" caption="会員情報" />
                 <x-button.list-edit vueHref="'{{ route('member_mng-calendar', '') }}/' + item.sid" caption="カレンダー" />
                 <x-button.list-dtl vueHref="'{{ route('member_mng-invoice', '') }}/' + item.sid" caption="請求情報" />
+                <x-button.list-edit href="{{ route('member_mng-edit', 1) }}" />
             </td>
         </tr>
 

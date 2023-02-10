@@ -312,7 +312,7 @@ class MemberMngController extends Controller
      * @param int  $sid 生徒ID
      * @return view
      */
-    public function new($sid)
+    public function calendarNew($sid)
     {
 
         // IDのバリデーション
@@ -342,7 +342,7 @@ class MemberMngController extends Controller
      * @param int $scheduleId スケジュールID
      * @return view
      */
-    public function edit($sid, $scheduleId)
+    public function calendarEdit($sid, $scheduleId)
     {
 
         // IDのバリデーション
@@ -504,6 +504,116 @@ class MemberMngController extends Controller
 
         // 特になし
         return;
+    }
+
+    //==========================
+    // 会員登録・編集
+    //==========================
+
+    /**
+     * 登録画面
+     *
+     * @return view
+     */
+    public function new()
+    {
+        // 学年リストを取得
+        $classes = $this->mdlMenuFromExtGenericMaster(AppConst::EXT_GENERIC_MASTER_112);
+
+        // 教室リストを取得
+        $rooms = $this->mdlGetRoomList();
+
+        return view('pages.admin.member_mng-input', [
+            'classes' => $classes,
+            'editData' => null,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 登録処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function create(Request $request)
+    {
+        return;
+    }
+
+    /**
+     * 編集画面
+     *
+     * @param int $sid 生徒ID
+     * @return view
+     */
+    public function edit($sid)
+    {
+        // IDのバリデーション
+        $this->validateIds($sid);
+
+        // 学年リストを取得
+        $classes = $this->mdlMenuFromExtGenericMaster(AppConst::EXT_GENERIC_MASTER_112);
+
+        // 生徒情報を取得する
+        $query = ExtStudentKihon::query();
+        $student = $query
+            ->select(
+                'name',
+                'cls_cd',
+                'mailaddress1'
+            )
+            ->where('ext_student_kihon.sid', '=', $sid)
+            ->firstOrFail();
+
+        $editData = [
+            'sid' => $sid,
+            'name' => $student['name'],
+            'cls_cd' => $student['cls_cd'],
+            'email_student' => $student['mailaddress1'],
+        ];
+
+        return view('pages.admin.member_mng-input', [
+            'classes' => $classes,
+            'editData' => $editData,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 編集処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function update(Request $request)
+    {
+        return;
+    }
+
+    /**
+     * バリデーション(登録用)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed バリデーション結果
+     */
+    public function validationForInput(Request $request)
+    {
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForInput($request));
+        return $validator->errors();
+    }
+
+    /**
+     * バリデーションルールを取得(登録用)
+     *
+     * @return array ルール
+     */
+    private function rulesForInput(?Request $request)
+    {
+        $rules = array();
+
+        return $rules;
     }
 
     //==========================
