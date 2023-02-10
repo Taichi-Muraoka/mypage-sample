@@ -13,16 +13,36 @@
     @if (request()->routeIs('tutor_mng-edit'))
     {{-- 編集時 --}}
     <p>以下の教師について、編集を行います。</p>
-    <x-input.text caption="教師No" id="tno" :rules=$rules />
-    <x-input.text caption="教師名" id="tname" :rules=$rules />
-    <x-input.text caption="メールアドレス" id="tmail" :rules=$rules />
+    <x-bs.table :hover=false :vHeader=true>
+        <tr>
+            <th width="15%">教師No</th>
+            <td>101</td>
+        </tr>
+    </x-bs.table>
+    {{-- 余白 --}}
+    <div class="mb-3"></div>
+    <x-input.text caption="教師名" id="name" :rules=$rules :editData=$editData/>
+    <x-input.text caption="メールアドレス" id="email" :rules=$rules :editData=$editData/>
+    <x-input.text caption="電話番号" id="tel" :rules=$rules :editData=$editData/>
+    <x-input.text caption="基本給" id="basepay" :rules=$rules :editData=$editData/>
+    <x-input.text caption="交通費" id="transportation_cost" :rules=$rules :editData=$editData/>
+    <x-input.select caption="表示フラグ" id="display_flag" :select2=true :blank=false :editData=$editData>
+        <option value="1">表示</option>
+        <option value="2">非表示</option>
+    </x-input.select>
 
     @else
     {{-- 登録時 --}}
     <p>教師の登録を行います。</p>
-    <x-input.text caption="教師No" id="tno" :rules=$rules />
-    <x-input.text caption="教師名" id="tname" :rules=$rules />
-    <x-input.text caption="メールアドレス" id="tmail" :rules=$rules />
+    <x-input.text caption="教師名" id="name" :rules=$rules />
+    <x-input.text caption="メールアドレス" id="email" :rules=$rules />
+    <x-input.text caption="電話番号" id="tel" :rules=$rules />
+    <x-input.text caption="基本給" id="basepay" :rules=$rules />
+    <x-input.text caption="交通費" id="transportation_cost" :rules=$rules />
+    <x-input.select caption="表示フラグ" id="display_flag" :select2=true :blank=false :editData=$editData>
+        <option value="1">表示</option>
+        <option value="2">非表示</option>
+    </x-input.select>
 
     @endif
 

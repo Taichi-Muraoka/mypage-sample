@@ -717,7 +717,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/tutor_mng/calendar/update', [TutorMngController::class, 'calendarUpdate'])->name('tutor_mng-calendar-update');
 
     // バリデーション(登録用)
-    Route::post('/tutor_mng/vd_input', [TutorMngController::class, 'validationForInput'])->name('tutor_mng-vd_input');
+    Route::post('/tutor_mng/calendar/vd_input', [TutorMngController::class, 'calendarValidationForInput'])->name('tutor_mng-calendar-vd_input');
 
     // 詳細取得用
     Route::post('/tutor_mng/get_calendar', [TutorMngController::class, 'getCalendar'])->name('tutor_mng-get_calendar');
@@ -736,6 +736,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 教師 編集処理
     Route::post('/tutor_mng/update', [TutorMngController::class, 'update'])->name('tutor_mng-update');
+
+    // バリデーション(登録用)（教師登録）
+    Route::post('/tutor_mng/vd_input', [TutorMngController::class, 'validationForInput'])->name('tutor_mng-vd_input');
 
     //---------------------
     // 教師登録

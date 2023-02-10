@@ -527,7 +527,7 @@ class TutorMngController extends Controller
             'name' => $teacher->name,
             'rooms' => $rooms,
             'editData' => $editData,
-            'rules' => $this->rulesForInput(null)
+            'rules' => $this->calendarRulesForInput(null)
         ]);
     }
 
@@ -541,7 +541,7 @@ class TutorMngController extends Controller
     {
 
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForInput($request))->validate();
+        Validator::make($request->all(), $this->calendarRulesForInput($request))->validate();
 
         // フォームから受け取った値を格納
         $form = $request->only(
@@ -604,7 +604,7 @@ class TutorMngController extends Controller
             'name' => $teacher->name,
             'rooms' => $rooms,
             'editData' => $editData,
-            'rules' => $this->rulesForInput(null)
+            'rules' => $this->calendarRulesForInput(null)
         ]);
     }
 
@@ -621,7 +621,7 @@ class TutorMngController extends Controller
         $this->validateIdsFromRequest($request, 'tutor_schedule_id');
 
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForInput($request))->validate();
+        Validator::make($request->all(), $this->calendarRulesForInput($request))->validate();
 
         // フォームから受け取った値を格納
         $form = $request->only(
@@ -677,10 +677,10 @@ class TutorMngController extends Controller
      * @param \Illuminate\Http\Request $request リクエスト
      * @return mixed バリデーション結果
      */
-    public function validationForInput(Request $request)
+    public function calendarValidationForInput(Request $request)
     {
         // リクエストデータチェック
-        $validator = Validator::make($request->all(), $this->rulesForInput($request));
+        $validator = Validator::make($request->all(), $this->calendarRulesForInput($request));
         return $validator->errors();
     }
 
@@ -689,7 +689,7 @@ class TutorMngController extends Controller
      *
      * @return array ルール
      */
-    private function rulesForInput(?Request $request)
+    private function calendarRulesForInput(?Request $request)
     {
         $rules = array();
 
@@ -822,7 +822,7 @@ class TutorMngController extends Controller
     }
 
     /**
-     * 編集画面
+     * 編集画面,
      *
      * @param int $tid 教師ID
      * @return void
@@ -830,7 +830,13 @@ class TutorMngController extends Controller
     public function edit($tid)
     {
         return view('pages.admin.tutor_mng-input', [
-            'editData' => null,
+            'editData' => [
+                'name' => "教師101",
+                'email' => "teacher0101@mp-sample.rulez.jp",
+                'tel' => '070-1111-2222',
+                'basepay' => 1400,
+                'transportation_cost' => 800,
+            ],
             'rules' => $this->rulesForInput(null)
         ]);
     }
@@ -845,6 +851,32 @@ class TutorMngController extends Controller
     {
         return;
     }
+
+    /**
+     * バリデーション(登録用)（教師登録）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed バリデーション結果
+     */
+    public function validationForInput(Request $request)
+    {
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForInput($request));
+        return $validator->errors();
+    }
+
+    /**
+     * バリデーションルールを取得(登録用)（教師登録）
+     *
+     * @return array ルール
+     */
+    private function rulesForInput(?Request $request)
+    {
+        $rules = array();
+
+        return $rules;
+    }
+
 
     //==========================
     // クラス内共通処理

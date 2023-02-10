@@ -46,7 +46,7 @@
                 <x-button.list-edit vueHref="'{{ route('tutor_mng-calendar', '') }}/' + item.tid" caption="カレンダー" />
                 <x-button.list-dtl vueHref="'{{ route('tutor_mng-weekly_shift', '') }}/' + item.tid" caption="空き時間" />
                 <x-button.list-dtl vueHref="'{{ route('tutor_mng-salary', '') }}/' + item.tid" caption="給与明細" />
-                <x-button.list-dtl vueHref="'{{ route('tutor_mng-edit', '') }}/' + item.tid" caption="更新" />
+                <x-button.list-edit href="{{ route('tutor_mng-edit', 1) }}" />
             </td>
         </tr>
 
