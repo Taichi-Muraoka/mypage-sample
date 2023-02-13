@@ -552,6 +552,7 @@ use App\Http\Controllers\Admin\AccountMngController;
 use App\Http\Controllers\Admin\DataMngController;
 use App\Http\Controllers\Admin\SeasonShiftController;
 use App\Http\Controllers\Admin\KarteController;
+use App\Http\Controllers\Admin\TransferRegistController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -1470,5 +1471,38 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // バリデーション(登録用)
     Route::post('/member_mng/vd_input', [MemberMngController::class, 'validationForInput'])->name('member_mng-vd_input');
 
+    //---------------------
+    // 管理者向け 振替調整一覧 モック
+    //---------------------
+
+    // 一覧画面
+    Route::get('/transfer_regist', [TransferRegistController::class, 'index'])->name('transfer_regist');
+
+    // バリデーション(検索用)
+    Route::post('/transfer_regist/vd_search', [TransferRegistController::class, 'validationForSearch'])->name('transfer_regist-vd_search');
+
+    // 検索結果取得
+    Route::post('/transfer_regist/search', [TransferRegistController::class, 'search'])->name('transfer_regist-search');
+
+    // // 詳細取得用
+    // Route::post('/transfer_regist/get_data', [TransferRegistController::class, 'getData'])->name('transfer_regist-get_data');
+
+    // // モーダル処理
+    // Route::post('/transfer_regist/exec_modal', [TransferRegistController::class, 'execModal'])->name('transfer_regist-exec_modal');
+
+    // 振替連絡編集
+    Route::get('/transfer_regist/edit/{transferApplyId}', [TransferRegistController::class, 'edit'])->name('transfer_regist-edit');
+
+    // // カレンダーを選択された際に教室・教師の情報を返却する
+    // Route::post('/transfer_regist/get_data_select', [TransferRegistController::class, 'getDataSelect'])->name('transfer_regist-get_data_select');
+
+    // 編集処理
+    Route::post('/transfer_regist/update', [TransferRegistController::class, 'update'])->name('transfer_regist-update');
+
+    // バリデーション(登録用)
+    Route::post('/transfer_regist/vd_input', [TransferRegistController::class, 'validationForInput'])->name('transfer_regist-vd_input');
+
+    // // 削除処理
+    // Route::post('/transfer_regist/delete', [TransferRegistController::class, 'delete'])->name('transfer_regist-delete');
 
 });
