@@ -340,6 +340,13 @@ return [
             'active' => ['absent/*']
         ],
         [
+            'text' => '振替授業調整',
+            'route'  => 'transfer_student',
+            'icon' => 'fas fa-money-check',
+            'can'  => 'student',
+            'active' => ['transfer_student/*']
+        ],
+        [
             'text' => '生徒成績',
             'route'  => 'grades',
             'icon' => 'fas fa-chart-line',
@@ -371,6 +378,13 @@ return [
             'icon' => 'fas fa-file-signature',
             'can'  => 'student',
             'active' => ['course/*']
+        ],
+        [
+            'text' => '面談日程連絡',
+            'route'  => 'conference',
+            'icon' => 'fas fa-file-signature',
+            'can'  => 'student',
+            'active' => ['conference/*']
         ],
         [
             'text' => '請求情報',
@@ -474,13 +488,20 @@ return [
             'can'  => 'tutor',
             'active' => ['training/*']
         ],
+        // [
+        //     // 個別指導向け
+        //     'text' => '振替連絡',
+        //     'route'  => 'transfer',
+        //     'icon' => 'fas fa-money-check',
+        //     'can'  => 'tutor',
+        //     'active' => ['transfer/*']
+        // ],
         [
-            // 個別指導向け
-            'text' => '振替連絡',
-            'route'  => 'transfer',
+            'text' => '振替授業調整',
+            'route'  => 'transfer_tutor',
             'icon' => 'fas fa-money-check',
             'can'  => 'tutor',
-            'active' => ['transfer/*']
+            'active' => ['transfer_tutor/*']
         ],
         [
             'header' => 'アカウント設定',
@@ -509,6 +530,11 @@ return [
                     'route' => 'member_mng',
                     // サブメニューの場合、'member_mng/*'と指定するとうまくactiveにならないので以下にした
                     'active' => ['member_mng*']
+                ],
+                [
+                    'text' => '生徒カルテ',
+                    'route' => 'karte',
+                    'active' => ['karte*']
                 ],
                 [
                     'text' => 'コース変更・授業追加',
@@ -564,11 +590,17 @@ return [
                     'active' => ['absent_accept*'],
                     'menuid' => 'id_absent_accept',
                 ],
+                // [
+                //     'text' => '振替連絡受付',
+                //     'route' => 'transfer_accept',
+                //     'active' => ['transfer_accept*'],
+                //     'menuid' => 'id_transfer_accept',
+                // ],
                 [
                     'text' => '振替連絡受付',
-                    'route' => 'transfer_accept',
-                    'active' => ['transfer_accept*'],
-                    'menuid' => 'id_transfer_accept',
+                    'route' => 'transfer_regist',
+                    'active' => ['transfer_regist*'],
+                    'menuid' => 'id_transfer_regist',
                 ],
                 [
                     'text' => '授業報告',
