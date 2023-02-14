@@ -553,6 +553,7 @@ use App\Http\Controllers\Admin\DataMngController;
 use App\Http\Controllers\Admin\SeasonShiftController;
 use App\Http\Controllers\Admin\KarteController;
 use App\Http\Controllers\Admin\TransferRegistController;
+use App\Http\Controllers\Admin\ConferenceAcceptController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -1485,7 +1486,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/transfer_regist/search', [TransferRegistController::class, 'search'])->name('transfer_regist-search');
 
     // // 詳細取得用
-    // Route::post('/transfer_regist/get_data', [TransferRegistController::class, 'getData'])->name('transfer_regist-get_data');
+    Route::post('/transfer_regist/get_data', [TransferRegistController::class, 'getData'])->name('transfer_regist-get_data');
 
     // // モーダル処理
     // Route::post('/transfer_regist/exec_modal', [TransferRegistController::class, 'execModal'])->name('transfer_regist-exec_modal');
@@ -1504,5 +1505,39 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // // 削除処理
     // Route::post('/transfer_regist/delete', [TransferRegistController::class, 'delete'])->name('transfer_regist-delete');
+
+    //---------------------
+    // 管理者向け 面談日程連絡一覧 モック
+    //---------------------
+
+    // 一覧画面
+    Route::get('/conference_accept', [ConferenceAcceptController::class, 'index'])->name('conference_accept');
+
+    // バリデーション(検索用)
+    Route::post('/conference_accept/vd_search', [ConferenceAcceptController::class, 'validationForSearch'])->name('conference_accept-vd_search');
+
+    // 検索結果取得
+    Route::post('/conference_accept/search', [ConferenceAcceptController::class, 'search'])->name('conference_accept-search');
+
+    // // 詳細取得用
+    Route::post('/conference_accept/get_data', [ConferenceAcceptController::class, 'getData'])->name('conference_accept-get_data');
+
+    // // モーダル処理
+    // Route::post('/conference_accept/exec_modal', [ConferenceAcceptController::class, 'execModal'])->name('conference_accept-exec_modal');
+
+    // 振替連絡編集
+    Route::get('/conference_accept/edit/{transferApplyId}', [ConferenceAcceptController::class, 'edit'])->name('conference_accept-edit');
+
+    // // カレンダーを選択された際に教室・教師の情報を返却する
+    // Route::post('/conference_accept/get_data_select', [ConferenceAcceptController::class, 'getDataSelect'])->name('conference_accept-get_data_select');
+
+    // 編集処理
+    Route::post('/conference_accept/update', [ConferenceAcceptController::class, 'update'])->name('conference_accept-update');
+
+    // バリデーション(登録用)
+    Route::post('/conference_accept/vd_input', [ConferenceAcceptController::class, 'validationForInput'])->name('conference_accept-vd_input');
+
+    // // 削除処理
+    // Route::post('/conference_accept/delete', [ConferenceAcceptController::class, 'delete'])->name('conference_accept-delete');
 
 });

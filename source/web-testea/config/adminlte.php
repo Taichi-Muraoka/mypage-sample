@@ -537,6 +537,11 @@ return [
                     'active' => ['karte*']
                 ],
                 [
+                    'text' => '面談日程連絡受付',
+                    'route' => 'conference_accept',
+                    'active' => ['conference_accept*']
+                ],
+                [
                     'text' => 'コース変更・授業追加',
                     'route' => 'course_mng',
                     'active' => ['course_mng*'],
