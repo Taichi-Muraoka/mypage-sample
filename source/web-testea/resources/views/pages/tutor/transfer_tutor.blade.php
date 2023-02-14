@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '振替調整一覧')
+@section('title', '振替授業調整一覧')
 
 @section('content')
 
@@ -45,7 +45,7 @@
             <td>2023/01/10 17:00</td>
             <td>教師</td>
             <td>2023/01/30 4限</td>
-            <td></td>
+            <td>CWテスト生徒１</td>
             <td>承認待ち</td>
             <td>未対応</td>
             <td>

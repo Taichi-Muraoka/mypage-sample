@@ -347,6 +347,13 @@ return [
             'active' => ['transfer_student/*']
         ],
         [
+            'text' => '面談日程連絡',
+            'route'  => 'conference',
+            'icon' => 'fas fa-file-signature',
+            'can'  => 'student',
+            'active' => ['conference/*']
+        ],
+        [
             'text' => '生徒成績',
             'route'  => 'grades',
             'icon' => 'fas fa-chart-line',
@@ -378,13 +385,6 @@ return [
             'icon' => 'fas fa-file-signature',
             'can'  => 'student',
             'active' => ['course/*']
-        ],
-        [
-            'text' => '面談日程連絡',
-            'route'  => 'conference',
-            'icon' => 'fas fa-file-signature',
-            'can'  => 'student',
-            'active' => ['conference/*']
         ],
         [
             'text' => '請求情報',
@@ -602,7 +602,7 @@ return [
                 //     'menuid' => 'id_transfer_accept',
                 // ],
                 [
-                    'text' => '振替連絡受付',
+                    'text' => '振替調整一覧',
                     'route' => 'transfer_regist',
                     'active' => ['transfer_regist*'],
                     'menuid' => 'id_transfer_regist',

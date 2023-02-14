@@ -35,7 +35,7 @@
     <div class="mb-3"></div>
 
     <x-input.select caption="承認ステータス" id="transfer_id" :select2=true :editData="$editData">
-        <option value="1">承認待ち</option>
+        <option value="1" selected>承認待ち</option>
         <option value="2">承認</option>
         <option value="3">却下</option>
     </x-input.select>

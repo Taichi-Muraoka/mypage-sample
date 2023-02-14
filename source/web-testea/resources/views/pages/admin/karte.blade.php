@@ -22,6 +22,16 @@
         </x-bs.col2>
     </x-bs.row>
 
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.select id="kinds" caption="カルテ種別" :select2=true :editData=$editData>
+                <option value="1">面談記録</option>
+                <option value="2">電話記録</option>
+                <option value="3">その他</option>
+            </x-input.select>
+        </x-bs.col2>
+    </x-bs.row>
+
 </x-bs.card>
 
 {{-- 結果リスト --}}

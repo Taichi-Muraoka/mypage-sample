@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '振替調整一覧')
+@section('title', '振替授業調整一覧')
 
 @section('content')
 
@@ -17,9 +17,6 @@
             <x-input.select id="roomcd" caption="教室" :select2=true :mastrData=$rooms :editData=$editData />
             @endcan
         </x-bs.col2>
-        <x-bs.col2>
-            <x-input.select id="state" caption="ステータス" :select2=true :mastrData=$states />
-        </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>
@@ -28,6 +25,15 @@
         </x-bs.col2>
         <x-bs.col2>
             <x-input.text caption="教師名" id="teacher_name" :rules=$rules />
+        </x-bs.col2>
+    </x-bs.row>
+
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.select id="approval_state" caption="承認ステータス" :select2=true :mastrData=$states />
+        </x-bs.col2>
+        <x-bs.col2>
+            <x-input.select id="secretariat_state" caption="事務局ステータス" :select2=true :mastrData=$states />
         </x-bs.col2>
     </x-bs.row>
 
@@ -43,6 +49,7 @@
         <x-slot name="thead">
             <th>申請日</th>
             <th>申請者種別</th>
+            <th>教室</th>
             <th>授業日時</th>
             <th>生徒名</th>
             <th>教師名</th>
@@ -55,6 +62,7 @@
         <tr>
             <td>2023/01/16</td>
             <td>生徒</td>
+            <td>久我山</td>
             <td>2023/01/30 4限</td>
             <td>CWテスト生徒１</td>
             <td>CWテスト教師１０１</td>
@@ -68,6 +76,7 @@
         <tr>
             <td>2023/01/17</td>
             <td>教師</td>
+            <td>久我山</td>
             <td>2023/01/31 4限</td>
             <td>CWテスト生徒１</td>
             <td>CWテスト教師１０１</td>

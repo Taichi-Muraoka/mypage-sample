@@ -17,6 +17,14 @@
 
     <x-bs.table :hover=false :vHeader=true>
         <tr>
+            <th>申請者種別</th>
+            <td>生徒</td>
+        </tr>
+        <tr>
+            <th>教室</th>
+            <td>久我山</td>
+        </tr>
+        <tr>
             <th width="35%">生徒名</th>
             <td>CWテスト生徒１</td>
         </tr>
