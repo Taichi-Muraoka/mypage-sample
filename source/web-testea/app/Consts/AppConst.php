@@ -435,6 +435,12 @@ class AppConst
      */
     const CODE_MASTER_14_4 = 4;
 
+    /**
+     * お知らせ種別 面談
+     */
+    const CODE_MASTER_14_5 = 5;
+
+
     //-----------
     // 宛先種別
     //-----------

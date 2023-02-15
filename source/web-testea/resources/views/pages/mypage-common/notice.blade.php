@@ -38,6 +38,8 @@
 @include('pages.mypage-common.modal.notice_event-modal', ['modal_id' => 'modal-dtl-event'])
 {{-- 短期個別講習案内 --}}
 @include('pages.mypage-common.modal.notice_course-modal', ['modal_id' => 'modal-dtl-course'])
+{{-- 面談案内 --}}
+@include('pages.mypage-common.modal.notice_conference-modal', ['modal_id' => 'modal-dtl-conference'])
 {{-- それ以外 --}}
 @include('pages.mypage-common.modal.notice_absent-modal', ['modal_id' => 'modal-dtl-absent'])
 

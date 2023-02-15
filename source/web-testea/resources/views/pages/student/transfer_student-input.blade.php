@@ -54,7 +54,7 @@
 
     <x-input.date-picker caption="振替希望日" id="transfer_date" />
 
-    <x-input.select caption="時限" id="transfer_time" :select2=true onChange="selectChangeGetMulti" :editData=$editData>
+    <x-input.select caption="時限" id="transfer_time" :select2=true :editData=$editData>
         <option value="1">1限</option>
         <option value="2">2限</option>
         <option value="3">3限</option>

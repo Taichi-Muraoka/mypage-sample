@@ -25,5 +25,7 @@ export default class AppClass extends PageBase {
         this.getVueModal({ id: "#modal-dtl-course" });
         // Vue: モーダル(欠席申請)
         this.getVueModal({ id: "#modal-dtl-absent" });
+        // Vue: モーダル(面談日程連絡)
+        this.getVueModal({ id: "#modal-dtl-conference" });
     }
 }

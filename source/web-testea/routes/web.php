@@ -344,6 +344,7 @@ use App\Http\Controllers\Tutor\GradesCheckController;
 use App\Http\Controllers\Tutor\SalaryController;
 use App\Http\Controllers\Tutor\TrainingController;
 use App\Http\Controllers\Tutor\TransferTutorController;
+use App\Http\Controllers\Tutor\AttendanceController;
 
 
 Route::group(['middleware' => ['auth', 'can:tutor']], function () {
@@ -517,6 +518,23 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
 
     // バリデーション(登録用)
     Route::post('/transfer_tutor/vd_input', [TransferTutorController::class, 'validationForInput'])->name('transfer_tutor-vd_input');
+
+    //---------------------
+    // 授業実施登録
+    //---------------------
+
+    // 一覧
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance');
+
+    // 検索結果取得
+    Route::post('/attendance/search', [AttendanceController::class, 'search'])->name('attendance-search');
+
+    // 詳細取得用
+    Route::post('/attendance/get_data', [AttendanceController::class, 'getData'])->name('attendance-get_data');
+
+    // モーダル処理
+    Route::post('/attendance/exec_modal', [AttendanceController::class, 'execModal'])->name('attendance-exec_modal');
+
 });
 
 //===============================================

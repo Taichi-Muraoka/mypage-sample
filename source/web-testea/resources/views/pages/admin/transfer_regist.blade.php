@@ -30,10 +30,14 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="approval_state" caption="承認ステータス" :select2=true :mastrData=$states />
+            <x-input.select id="approval_state" caption="承認ステータス" :select2=false >
+                <option value="1">承認待ち</option>
+                <option value="2">承認</option>
+                <option value="3">却下</option>
+            </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="secretariat_state" caption="事務局ステータス" :select2=true :mastrData=$states />
+            <x-input.select id="secretariat_state" caption="事務局ステータス" :select2=false :mastrData=$states />
         </x-bs.col2>
     </x-bs.row>
 

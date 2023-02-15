@@ -153,6 +153,8 @@ class NoticeController extends Controller
                         $item['flg'] = 'event';
                     } else if ($item->notice_type == AppConst::CODE_MASTER_14_3) {
                         $item['flg'] = 'course';
+                    } else if ($item->notice_type == AppConst::CODE_MASTER_14_5) {
+                        $item['flg'] = 'conference';
                     } else {
                         $item['flg'] = 'absent';
                     }
@@ -293,6 +295,32 @@ class NoticeController extends Controller
             case "#modal-dtl-course":
                 //---------------
                 // 個別講習
+                //---------------
+
+                // お知らせIDからお知らせを取得する。
+                $query = Notice::query();
+                $notice = $query
+                    ->select(
+                        'regist_time AS date',
+                        'title',
+                        'text AS body',
+                        'office.name AS sender',
+                        'room_name'
+                    )
+                    // 送信者名の取得
+                    ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+                    // 教室名の取得
+                    ->leftJoinSub($room_names, 'room_names', function ($join) {
+                        $join->on('notice.roomcd', '=', 'room_names.code');
+                    })
+                    ->where('notice.notice_id', '=', $notice_id)
+                    ->firstOrFail();
+
+                return $notice;
+
+            case "#modal-dtl-conference":
+                //---------------
+                // 面談
                 //---------------
 
                 // お知らせIDからお知らせを取得する。

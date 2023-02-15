@@ -349,7 +349,7 @@ return [
         [
             'text' => '面談日程連絡',
             'route'  => 'conference',
-            'icon' => 'fas fa-file-signature',
+            'icon' => 'fas fa-users',
             'can'  => 'student',
             'active' => ['conference/*']
         ],
@@ -447,6 +447,20 @@ return [
             'can'  => 'tutor',
         ],
         [
+            'text' => '授業実施登録',
+            'route'  => 'attendance',
+            'icon' => 'fas fa-check-square',
+            'can'  => 'tutor',
+            'active' => ['attendance/*']
+        ],
+        [
+            'text' => '振替授業調整',
+            'route'  => 'transfer_tutor',
+            'icon' => 'fas fa-money-check',
+            'can'  => 'tutor',
+            'active' => ['transfer_tutor/*']
+        ],
+        [
             'text' => '授業報告書',
             'route'  => 'report_regist',
             'icon' => 'fas fa-chalkboard-teacher',
@@ -496,13 +510,6 @@ return [
         //     'can'  => 'tutor',
         //     'active' => ['transfer/*']
         // ],
-        [
-            'text' => '振替授業調整',
-            'route'  => 'transfer_tutor',
-            'icon' => 'fas fa-money-check',
-            'can'  => 'tutor',
-            'active' => ['transfer_tutor/*']
-        ],
         [
             'header' => 'アカウント設定',
             'can'  => 'tutor',
@@ -602,7 +609,7 @@ return [
                 //     'menuid' => 'id_transfer_accept',
                 // ],
                 [
-                    'text' => '振替調整一覧',
+                    'text' => '振替授業調整',
                     'route' => 'transfer_regist',
                     'active' => ['transfer_regist*'],
                     'menuid' => 'id_transfer_regist',
