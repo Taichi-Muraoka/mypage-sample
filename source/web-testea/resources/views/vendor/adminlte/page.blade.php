@@ -58,8 +58,14 @@
                         <ol class="breadcrumb float-sm-right">
                             {{-- 一覧は固定 --}}
                             <li class="breadcrumb-item">
-                                <a href="{{ Request::root()}}/{{ Request::segment(1) }}">一覧</a>
-                            </li>                            
+                                <a href="{{ Request::root()}}/{{ Request::segment(1) }}">
+                                    @hasSection('base_page_title')
+                                    @yield('base_page_title')
+                                    @else
+                                    一覧
+                                    @endif
+                                </a>
+                            </li>
                             {{-- 三階層目のページの場合 --}}
                             @hasSection('parent_page')
                             <li class="breadcrumb-item">
