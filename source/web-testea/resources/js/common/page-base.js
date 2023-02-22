@@ -441,6 +441,205 @@ export default class PageBase {
         );
     }
 
+    /**
+     * カレンダー処理（教室カレンダー）
+     */
+    roomCalendar(initDate) {
+        // Vue: モーダル
+        var $vueModal = this.getVueModal({ useShowEvent: false });
+        // カレンダーの作成
+        CalendarCom.createForRoom(
+            //-----------------
+            // 初期表示日付
+            //-----------------
+            initDate,
+            //-----------------
+            // 表示イベント
+            //-----------------
+            (info, successCallback, failureCallback) => {
+                // カレンダーのカードタグのID
+                var cardId = "#card-calendar";
+
+                $.when()
+                    .then(() => {
+                        // カードのローディング開始
+                        self._loadingForCardOn(cardId);
+
+                        // カードカレンダーの中のHidden値を取得。会員管理のように子画面にカレンダーがある場合
+                        //console.log("into calendar disp event CurDate");
+                        //console.log(info.start.valueOf());
+                        $('#curDate').val(info.start.valueOf());
+                        var formData = this._getVueFormData(cardId);
+                        //console.log(formData);
+
+                        // カレンダーの条件を送信
+                        var sendData = Object.assign(formData, {
+                            start: info.start.valueOf(),
+                            end: info.end.valueOf(),
+                            curDate: info.start.valueOf()
+                    });
+
+                        // 詳細データを取得
+                        var url = self._getFuncUrl() + "/get_calendar";
+                        return axios.post(url, sendData);
+                    })
+                    .then(response => {
+                        //console.log(response.data);
+
+                        // コールバックで更新(eventプロパティにセットする)
+                        successCallback(response.data);
+
+                        // カードのローディング終了
+                        self._loadingForCardOff(cardId);
+                    })
+                    .fail(AjaxCom.fail);
+            },
+            //-----------------
+            // クリックイベント
+            //-----------------
+            e => {
+                // 時間割のスケジュールはモーダル表示しない
+                if (e.event._def.resourceIds[0] !== '000') {
+                    // モーダルの中身を更新
+                    Vue.set(
+                        $vueModal,
+                        "item",
+                        Object.assign(
+                            {
+                                // ついでにIDも足しておく
+                                id: e.event._def.publicId
+                            },
+                            // 送信データがe.event.extendedPropsに入ってくるのでそれを参照する
+                            e.event.extendedProps
+                        )
+                    );
+
+                    // モーダルを開く
+                    $vueModal.show();
+                    }
+
+            },
+            //-----------------
+            // Viewエリアクリック
+            //-----------------
+            (info) => {
+                //console.log(info);
+                // 登録画面に遷移
+                var url = self._getFuncUrl() + "/new?"
+                        + "roomcd=" + "110"
+                        + "&date=" + moment(info.start).format("YYYYMMDD")
+                        + "&start_time=" + moment(info.start).format("HHmm")
+                        + "&end_time=" + moment(info.end).format("HHmm");
+                location.href = url;
+            }
+        );
+    }
+
+    /**
+     * カレンダー処理（defaultWeekカレンダー）
+     */
+    defaultWeekCalendar() {
+        // Vue: モーダル
+        var $vueModal = this.getVueModal({ useShowEvent: false });
+        // カレンダーの作成
+        // モック用に仮の日付を設定（日曜にする）
+        var curDate = new Date("2023/02/12");
+
+        for( var i = 1; i < 7; i++ ) {
+            curDate.setDate(curDate.getDate() + 1);
+            CalendarCom.createForDefaultWeek(
+                //-----------------
+                // カレンダーNo（月曜始まり）
+                //-----------------
+                i,
+                //-----------------
+                // 表示日付
+                //-----------------
+                curDate,
+                //-----------------
+                // 表示イベント
+                //-----------------
+                (info, successCallback, failureCallback) => {
+                    // カレンダーのカードタグのID
+                    var cardId = "#card-calendar";
+
+                    $.when()
+                        .then(() => {
+                            // カードのローディング開始
+                            self._loadingForCardOn(cardId);
+
+                            // カードカレンダーの中のHidden値を取得。会員管理のように子画面にカレンダーがある場合
+                            //console.log("into calendar disp event CurDate");
+                            //console.log(info.start.valueOf());
+                            var formData = this._getVueFormData(cardId);
+                            //console.log(formData);
+
+                            // カレンダーの条件を送信
+                            var sendData = Object.assign(formData, {
+                                start: info.start.valueOf(),
+                                end: info.end.valueOf(),
+                                day: i
+                            });
+
+                            // 詳細データを取得
+                            var url = self._getFuncUrl() + "/get_calendar";
+                            return axios.post(url, sendData);
+                        })
+                        .then(response => {
+                            //console.log(response.data);
+
+                            // コールバックで更新(eventプロパティにセットする)
+                            successCallback(response.data);
+
+                            // カードのローディング終了
+                            self._loadingForCardOff(cardId);
+                        })
+                        .fail(AjaxCom.fail);
+                },
+                //-----------------
+                // クリックイベント
+                //-----------------
+                e => {
+                    // 時間割のスケジュールはモーダル表示しない
+                    if (e.event._def.resourceIds[0] !== '000') {
+                        // モーダルの中身を更新
+
+                        Vue.set(
+                            $vueModal,
+                            "item",
+                            Object.assign(
+                                {
+                                    // ついでにIDも足しておく
+                                    id: e.event._def.publicId
+                                },
+                                // 送信データがe.event.extendedPropsに入ってくるのでそれを参照する
+                                e.event.extendedProps
+                            )
+                        );
+
+                        // モーダルを開く
+                        $vueModal.show();
+                    }
+
+                },
+                //-----------------
+                // Viewエリアクリック
+                //-----------------
+                (info, successCallback, failureCallback) => {
+                    //console.log(info);
+
+                    // 詳細データを取得
+                    var url = self._getFuncUrl() + "/new?"
+                            + "roomcd=" + "110"
+                            + "&day=" + moment(info.start).format("d")
+                            + "&start_time=" + moment(info.start).format("HHmm")
+                            + "&end_time=" + moment(info.end).format("HHmm");
+                    location.href = url;
+                }
+            );
+        }
+    }
+
     //--------------------------------------------
     // モーダル処理
     //--------------------------------------------
@@ -1824,4 +2023,5 @@ export default class PageBase {
             })
             .catch(AjaxCom.fail);
     }
+
 }

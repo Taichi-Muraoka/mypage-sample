@@ -333,70 +333,98 @@ label:not(.form-check-label):not(.custom-file-label) {
 /* カレンダー ----------------------------*/
 
 /* 当日の背景色 */
-#calendar .fc-dayGridMonth-view .fc-today,
-#calendar .fc-timeGridWeek-view .fc-today,
-#calendar .fc-timeGridDay-view .fc-today {
+[id^="calendar"] .fc-dayGridMonth-view .fc-today,
+[id^="calendar"] .fc-timeGridWeek-view .fc-today{
+//#calendar .fc-timeGridWeek-view .fc-today,
+//#calendar .fc-timeGridDay-view .fc-today {
     background: rgb(255, 245, 196);
 }
 
 /* 当日の文字色 */
-#calendar .fc-today .fc-day-number {
+[id^="calendar"] .fc-today .fc-day-number {
     color: #000 !important;
+}
+[id^="calendar"] .fc-timegrid-event {
+    font-size: .8em !important;
+}
+
+[id^="calendar"] .fc-daygrid-event {
+    font-size: .8em !important;
+}
+
+[id^="calendar"] .fc-event-time {
+    overflow: visible !important;
+}
+
+[id^="calendar"] .fc-timegrid-slot {
+    height: 1.5em !important;
+}
+
+/* 時間割の背景色 */
+[id^="calendar"] .cal_period {
+    background: #0073b7;
+    border-color: #0073b7;
+    font-size: 1em !important;
 }
 
 /* 個別授業の予定の背景色 */
-#calendar .cal_class {
+[id^="calendar"] .cal_class {
     background: #f39c12;
     border-color: #f39c12;
+//    background: #aabbee;
+//    border-color: #aabbee;
 }
 
 /* 個別授業 振替日の予定の背景色 */
-#calendar .cal_class_furikae {
+[id^="calendar"] .cal_class_furikae {
     background: #8b9b00;
     border-color: #8b9b00;
 }
 
 /* 個別授業 後日振替の予定の背景色（短期講習も同様） */
-#calendar .cal_class_gojitsu_furikae {
-    background: #9e9e9e;
-    border-color: #9e9e9e;
+[id^="calendar"] .cal_class_gojitsu_furikae {
+    //background: #9e9e9e;
+    //border-color: #9e9e9e;
+    background: #6c757d;
+    border-color: #6c757d;
 }
 
 /* 短期講習の予定の背景色 */
-#calendar .cal_tanki_koshu {
+[id^="calendar"] .cal_tanki_koshu {
     background: #7507b4;
     border-color: #7507b4;
 }
 
 /* 短期講習 振替日の予定の背景色 */
-#calendar .cal_tanki_koshu_furikae {
+[id^="calendar"] .cal_tanki_koshu_furikae {
     background: #007932;
     border-color: #007932;
 }
 
 /* 模試の予定の背景色 */
-#calendar .cal_tanki_moshi {
+[id^="calendar"] .cal_tanki_moshi {
     background: #af0058;
     border-color: #af0058;
 }
 
 /* イベントの予定の背景色 */
-#calendar .cal_event {
+[id^="calendar"] .cal_event {
     background: #0073b7;
     border-color: #0073b7;
 }
 
 /* 打ち合わせの予定の背景色 */
-#calendar .cal_meeting {
+[id^="calendar"] .cal_meeting {
     background: #0073b7;
     border-color: #0073b7;
 }
 
 /* 休業日の予定の背景色 */
-#calendar .cal_closed {
+[id^="calendar"] .cal_closed {
     background: #474747;
     border-color: #474747;
 }
+
 
 /*空き時間*/
 .table-checked th {

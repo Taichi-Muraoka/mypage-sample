@@ -526,6 +526,24 @@ return [
         // 管理者
         //----------------
         [
+            'text' => '教室カレンダー',
+            'route'  => 'room_calendar',
+            'icon' => 'far fa-calendar-alt',
+            'can'  => 'admin',
+            'submenu' => [
+                [
+                    'text' => '教室カレンダー',
+                    'route' => 'room_calendar',
+                    'active' => ['room_calendar*']
+                ],
+                [
+                    'text' => 'Default Week',
+                    'route' => 'regular_schedule',
+                    'active' => ['regular_schedule*']
+                ],
+            ],
+        ],
+        [
             'text' => '会員管理',
             'icon' => 'fa fa-user-cog',
             'can'  => 'admin',

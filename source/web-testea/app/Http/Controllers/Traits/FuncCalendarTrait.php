@@ -18,6 +18,7 @@ use App\Models\TutorRelate;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Auth;
 use App\Libs\AuthEx;
+use Illuminate\Support\Facades\Log;
 
 /**
  * カレンダー - 機能共通処理
@@ -118,7 +119,7 @@ trait FuncCalendarTrait
         foreach ($regular_schedules as $schedule) {
 
             $schedule_type = $this->getScheduleType($schedule);
-            $schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdTitleVal'];
+            $schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdSubject'];
             if ($schedule_type['mdFurikae'] != '') {
                 $schedule['title'] = $schedule['title'] . ' ' . $schedule_type['mdFurikae'];
             }
@@ -704,6 +705,236 @@ trait FuncCalendarTrait
 
         $schedules = collect($schedules)->merge($room_holiday_schedules);
 
+        return $schedules;
+    }
+
+    /**
+     * 教室のカレンダーを取得
+     *
+     * @param int $roomcd 教室cd
+     */
+    private function getRoomCalendar(Request $request, $roomcd, $flg)
+    {
+
+        // リクエストから日付を取得(カレンダーの表示範囲)
+        // MEMO: Y-m-dで比較するので、条件絞り込み対象の項目が「Date型」であることに注意(DateTimeの場合はうまく行かない)
+        $start_date = date('Y-m-d', $request->input('start') / 1000);
+        $end_date = date('Y-m-d', $request->input('end') / 1000 - 1);
+
+        // 翌日日付取得
+        $tomorrow = date("Y-m-d", strtotime('+1 day'));
+        // 教室名取得のサブクエリ
+        $room_names = $this->mdlGetRoomQuery();
+
+        // コードマスタからスケジュール種別を取得する
+        $query = CodeMaster::query();
+        $schedule_type_names = $query
+            ->select(
+                'code',
+                'name'
+            )
+            ->where('data_type', '=', AppConst::CODE_MASTER_21)
+            ->orderBy('code', 'asc')
+            ->get()
+            ->keyBy('code');
+
+        // 個別授業の取得
+        $query = ExtSchedule::query();
+        $regular_schedules = $query
+            ->select(
+                'id',
+                'ext_student_kihon.name AS name',
+                'lesson_type',
+                'lesson_date',
+                'ext_schedule.start_time',
+                'ext_schedule.end_time',
+                'atd_status_cd',
+                'create_kind_cd',
+                'transefer_kind_cd',
+                'room_name AS mdClassName',
+                'room_name_symbol AS symbol',
+                'ext_rirekisho.name AS mdTitleVal',
+                'ext_generic_master.name1 AS mdSubject'
+            )
+            // 生徒名の取得
+            ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
+                $join->on('ext_student_kihon.sid', '=', 'ext_schedule.sid');
+            })
+            // 教室名の取得
+            ->leftJoinSub($room_names, 'room_names', function ($join) {
+                $join->on('ext_schedule.roomcd', '=', 'room_names.code');
+            })
+            // 履歴書の取得
+            ->sdLeftJoin(ExtRirekisho::class, function ($join) {
+                $join->on('ext_rirekisho.tid', '=', 'ext_schedule.tid');
+            })
+            // 教科の取得
+            ->sdLeftJoin(ExtGenericMaster::class, function ($join) {
+                $join->on('ext_generic_master.code', '=', 'ext_schedule.curriculumcd')
+                    ->where('ext_generic_master.codecls', '=', AppConst::EXT_GENERIC_MASTER_000_114);
+            })
+            ->where('ext_schedule.roomcd', '=', $roomcd)
+            ->where('ext_schedule.lesson_type', '=', AppConst::EXT_GENERIC_MASTER_109_0)
+            // カレンダーの表示範囲で絞る
+            ->whereBetween('ext_schedule.lesson_date', [$start_date, $end_date])
+            ->orderBy('ext_schedule.lesson_date', 'asc')
+            ->orderBy('ext_schedule.start_time', 'asc')
+            ->get();
+
+        foreach ($regular_schedules as $schedule) {
+
+            $schedule_type = $this->getScheduleType($schedule);
+            $schedule['title'] = $schedule['start_time']->format('H:i') . '-'
+             . $schedule['end_time']->format('H:i') . '<br>個別指導コース<br>' . $schedule['mdSubject']
+             . '<br>stu：' . $schedule['name'] . '<br>tea：' . $schedule['mdTitleVal'];
+             if ($schedule_type['mdFurikae'] != '') {
+                $schedule['title'] = $schedule['title'] . '<br>' . $schedule_type['mdFurikae'];
+            }
+            $schedule['start'] = $schedule['lesson_date']->format('Y-m-d') . ' ' . $schedule['start_time']->format('H:i');
+            $schedule['end'] = $schedule['lesson_date']->format('Y-m-d') . ' ' . $schedule['end_time']->format('H:i');
+            $schedule['classNames'] = $schedule_type['className'];
+            if ($schedule_type['mdFurikae'] === '後日振替・未' || $schedule_type['mdFurikae'] === '後日振替・済') {
+                $schedule['resourceId'] = "999";
+            } else {
+                $schedule['resourceId'] = "001";
+            }
+
+            // モーダル表示用
+            $schedule['mdType'] = $schedule_type['type'];
+            $schedule['mdTypeName'] = $schedule_type_names[(string) $schedule_type['type']]['name'];
+            $schedule['mdDt'] = $schedule['lesson_date'];
+            $schedule['mdStartTime'] = $schedule['start_time'];
+            $schedule['mdEndTime'] = $schedule['end_time'];
+            $schedule['mdTitle'] = '教師名';
+            $schedule['mdFurikae'] = $schedule_type['mdFurikae'];
+            $schedule['mdBtn'] = false;
+            if ($schedule['lesson_date'] >= $tomorrow && $schedule['atd_status_cd'] != AppConst::ATD_STATUS_CD_2) {
+                // 欠席申請のボタンを表示する
+                $schedule['mdBtn'] = true;
+            }
+
+            // 不要な要素の削除
+            unset($schedule['name']);
+            unset($schedule['lesson_type']);
+            unset($schedule['symbol']);
+            unset($schedule['lesson_date']);
+            unset($schedule['start_time']);
+            unset($schedule['end_time']);
+            unset($schedule['atd_status_cd']);
+            unset($schedule['create_kind_cd']);
+        }
+
+        if ( $flg ) {
+            $schedules = $regular_schedules->filter(function ($schedule) {
+                return $schedule->mdFurikae == '';
+            });
+        } else {
+            $schedules = $regular_schedules;
+        }
+
+        // 休業日の取得
+        $query = RoomHoliday::query();
+        $room_holiday_schedules = $query
+            ->select(
+                'room_holiday_id AS id',
+                'holiday_date',
+                'room_name AS mdClassName',
+                'room_name_symbol AS symbol'
+            )
+            // 教室名の取得
+            ->leftJoinSub($room_names, 'room_names', function ($join) {
+                $join->on('room_holiday.roomcd', '=', 'room_names.code');
+            })
+            // 自分の教室のみ取得
+            //->whereIn('room_holiday.roomcd', $roomcds)
+            ->where('room_holiday.roomcd', $roomcd)
+            // カレンダーの表示範囲で絞る
+            ->whereBetween('room_holiday.holiday_date', [$start_date, $end_date])
+            ->orderBy('room_holiday.holiday_date', 'asc')
+            ->get();
+
+        foreach ($room_holiday_schedules as $schedule) {
+
+            $schedule_type = ['type' => AppConst::CODE_MASTER_21_5, 'className' => 'cal_closed', 'mdFurikae' => ''];
+            $schedule['title'] = "休業日";
+            $schedule['start'] = $schedule['holiday_date']->format('Y-m-d') . ' 00:00';
+            $schedule['end'] = $schedule['holiday_date']->format('Y-m-d') . ' 24:00';
+            $schedule['classNames'] = $schedule_type['className'];
+            $schedule['resourceId'] = "000";
+
+            // モーダル表示用
+            $schedule['mdType'] = AppConst::CODE_MASTER_21_5;
+            $schedule['mdTypeName'] = $schedule_type_names[(string) $schedule_type['type']]['name'];
+            $schedule['mdDt'] = $schedule['holiday_date'];
+            $schedule['mdStartTime'] = '';
+            $schedule['mdEndTime'] = '';
+            $schedule['mdTitle'] = '';
+            $schedule['mdTitleVal'] = '';
+            $schedule['mdSubject'] = '';
+            $schedule['mdFurikae'] = $schedule_type['mdFurikae'];
+
+            // 不要な要素の削除
+            unset($schedule['holiday_date']);
+        }
+
+        $schedules = collect($schedules)->merge($room_holiday_schedules);
+
+        if ($room_holiday_schedules->count() === 0) {
+        // 時間割データ
+        $pd_schedules =[
+            ['title' => '<br>0時限目<br>08:00-09:00',
+             'start' => $start_date . ' 08:00',
+             'end' => $start_date . ' 09:00',
+             'classNames' => 'cal_period',
+             'textColor' => 'white',
+             'resourceId' => '000'],
+            ['title' => '<br>1時限目<br>09:00-10:30',
+             'start' => $start_date . ' 09:00',
+             'end' => $start_date . ' 10:30',
+             'textColor' => 'white',
+             'classNames' => 'cal_period',
+             'textColor' => 'white',
+             'resourceId' => '000'],
+             ['title' => '<br>2時限目<br>10:45-12:15',
+             'start' => $start_date . ' 10:45',
+             'end' => $start_date . ' 12:15',
+             'classNames' => 'cal_period',
+             'textColor' => 'white',
+             'resourceId' => '000'],
+             ['title' => '<br>3時限目<br>13:15-14:45',
+             'start' => $start_date . ' 13:15',
+             'end' => $start_date . ' 14:45',
+             'classNames' => 'cal_period',
+             'textColor' => 'white',
+             'resourceId' => '000'],
+             ['title' => '<br>4時限目<br>15:00-16:30',
+             'start' => $start_date . ' 15:00',
+             'end' => $start_date . ' 16:30',
+             'classNames' => 'cal_period',
+             'textColor' => 'white',
+             'resourceId' => '000'],
+             ['title' => '<br>5時限目<br>16:45-18:15',
+             'start' => $start_date . ' 16:45',
+             'end' => $start_date . ' 18:15',
+             'classNames' => 'cal_period',
+             'textColor' => 'white',
+             'resourceId' => '000'],
+             ['title' => '<br>6時限目<br>18:30-20:00',
+             'start' => $start_date . ' 18:30',
+             'end' => $start_date . ' 20:00',
+             'classNames' => 'cal_period',
+             'textColor' => 'white',
+             'resourceId' => '000'],
+             ['title' => '<br>7時限目<br>20:15-21:45',
+             'start' => $start_date . ' 20:15',
+             'end' => $start_date . ' 21:45',
+             'classNames' => 'cal_period',
+             'textColor' => 'white',
+             'resourceId' => '000'],
+        ];
+        $schedules = collect($schedules)->merge($pd_schedules);
+            
+        }
         return $schedules;
     }
 
