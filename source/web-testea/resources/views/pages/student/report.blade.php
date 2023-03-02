@@ -13,18 +13,16 @@
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
             <th width="20%">授業日時</th>
-            <th width="15%">教室</th>
+            <th width="15%">校舎</th>
             <th width="20%">教師名</th>
-            <th>授業時間数</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr v-for="item in paginator.data" v-cloak>
             <x-bs.td-sp caption="授業日時">@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</x-bs.td-sp>
-            <x-bs.td-sp caption="教室">@{{item.room_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="校舎">@{{item.room_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="教師名">@{{item.tname}}</x-bs.td-sp>
-            <x-bs.td-sp caption="授業時間数">@{{item.r_minutes}}</x-bs.td-sp>
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />

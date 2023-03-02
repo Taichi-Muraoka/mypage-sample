@@ -9,8 +9,8 @@
 
     <x-bs.row>
         <x-bs.col2>
-            {{-- 教室リスト選択時、onChangeによる生徒リストの絞り込みを行う。-1の場合は自分の受け持ちの生徒だけに絞り込み --}}
-            <x-input.select caption="在籍教室" id="roomcd" :select2=true onChange="selectChangeGetRoom" :editData=$editData
+            {{-- 校舎リスト選択時、onChangeによる生徒リストの絞り込みを行う。-1の場合は自分の受け持ちの生徒だけに絞り込み --}}
+            <x-input.select caption="在籍校舎" id="roomcd" :select2=true onChange="selectChangeGetRoom" :editData=$editData
                 :mastrData=$rooms :select2Search=false emptyValue="-1" />
         </x-bs.col2>
         <x-bs.col2>
@@ -19,6 +19,15 @@
                 <option v-for="item in selectGetItem.selectItems" :value="item.id">
                     @{{ item.value }}
                 </option>
+            </x-input.select>
+        </x-bs.col2>
+    </x-bs.row>
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.select caption="承認ステータス" id="status" :select2=true :editData=$editData>
+                <option value="1">承認待ち</option>
+                <option value="2">承認</option>
+                <option value="3">却下</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
@@ -39,18 +48,20 @@
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
             <th width="20%">授業日時</th>
-            <th width="20%">教室</th>
+            <th>時限</th>
+            <th width="20%">校舎</th>
             <th>生徒名</th>
-            <th width="15%">授業時間数</th>
+            <th width="15%">承認ステータス</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr v-for="item in paginator.data" v-cloak>
             <x-bs.td-sp caption="授業日時">@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</x-bs.td-sp>
-            <x-bs.td-sp caption="教室">@{{item.room_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="時限"></x-bs.td-sp>
+            <x-bs.td-sp caption="校舎">@{{item.room_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="生徒名">@{{item.sname}}</x-bs.td-sp>
-            <x-bs.td-sp caption="授業時間数">@{{item.r_minutes}}</x-bs.td-sp>
+            <x-bs.td-sp caption="承認ステータス"></x-bs.td-sp>
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />

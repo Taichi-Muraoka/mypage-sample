@@ -11,10 +11,10 @@
         <x-bs.col2>
             @can('roomAdmin')
             {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-            <x-input.select id="roomcd" caption="在籍教室" :select2=true :mastrData=$rooms :editData=$editData
+            <x-input.select id="roomcd" caption="在籍校舎" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false :blank=false />
             @else
-            <x-input.select id="roomcd" caption="在籍教室" :select2=true :mastrData=$rooms :editData=$editData />
+            <x-input.select id="roomcd" caption="在籍校舎" :select2=true :mastrData=$rooms :editData=$editData />
             @endcan
         </x-bs.col2>
         <x-bs.col2>
@@ -31,6 +31,16 @@
         </x-bs.col2>
     </x-bs.row>
 
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.select caption="承認ステータス" id="status" :select2=true :editData=$editData>
+                <option value="1">承認待ち</option>
+                <option value="2">承認</option>
+                <option value="3">却下</option>
+            </x-input.select>
+        </x-bs.col2>
+    </x-bs.row>
+
 </x-bs.card>
 
 {{-- 結果リスト --}}
@@ -44,9 +54,10 @@
             <th class="t-minimum">登録日</th>
             <th>教師名</th>
             <th width="20%">授業日時</th>
-            <th width="15%">教室</th>
+            <th width="15%">時限</th>
+            <th width="15%">校舎</th>
             <th>生徒名</th>
-            <th width="15%">授業時間数</th>
+            <th>承認ステータス</th>
             <th></th>
         </x-slot>
 
@@ -55,9 +66,10 @@
             <x-bs.td-sp caption="登録日">@{{item.regist_time|formatYmd}}</x-bs.td-sp>
             <x-bs.td-sp caption="教師名">@{{item.tname}}</x-bs.td-sp>
             <x-bs.td-sp caption="授業日時">@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</x-bs.td-sp>
-            <x-bs.td-sp caption="教室">@{{item.room_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="時限"></x-bs.td-sp>
+            <x-bs.td-sp caption="校舎">@{{item.room_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="生徒名">@{{item.sname}}</x-bs.td-sp>
-            <x-bs.td-sp caption="授業時間数">@{{item.r_minutes}}</x-bs.td-sp>
+            <x-bs.td-sp caption="承認ステータス"></x-bs.td-sp>
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />

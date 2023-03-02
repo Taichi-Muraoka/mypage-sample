@@ -25,10 +25,6 @@
             <td>{{$editData->tname}}</td>
         </tr>
         <tr>
-            <th>授業時間数</th>
-            <td>{{$editData->r_minutes}}</td>
-        </tr>
-        <tr>
             <th>学習内容</th>
             {{-- nl2br: 改行 --}}
             <td class="nl2br">{{$editData->content}}</td>

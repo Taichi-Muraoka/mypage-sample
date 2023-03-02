@@ -9,16 +9,12 @@
         <td>@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</td>
     </tr>
     <tr>
-        <th>教室</th>
+        <th>校舎</th>
         <td>@{{item.room_name}}</td>
     </tr>
     <tr>
         <th>教師名</th>
         <td>@{{item.tname}}</td>
-    </tr>
-    <tr>
-        <th>授業時間数</th>
-        <td>@{{item.r_minutes}}</td>
     </tr>
     <tr>
         <th>学習内容</th>
