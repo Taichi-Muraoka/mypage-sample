@@ -541,6 +541,10 @@ return [
                     'route' => 'regular_schedule',
                     'active' => ['regular_schedule*']
                 ],
+                [
+                    'text' => 'イベントカレンダー',
+                    'url' => 'under_construction',
+                ],
             ],
         ],
         [

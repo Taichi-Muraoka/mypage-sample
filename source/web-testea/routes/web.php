@@ -664,6 +664,12 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 削除処理
     Route::post('/regular_schedule/delete', [RoomCalendarController::class, 'delete'])->name('regular_schedule-delete');
 
+    // イベントカレンダー（仮）
+    Route::get('/event_calendar', [RoomCalendarController::class, 'calendar'])->name('event_calendar');
+
+    // イベントカレンダー（仮） - 詳細取得用
+    Route::post('/event_calendar/get_calendar', [RoomCalendarController::class, 'getCalendar'])->name('event_calendar-get_calendar');
+
     //---------------------
     // コース変更・授業追加受付
     //---------------------
@@ -1610,4 +1616,23 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // // 削除処理
     // Route::post('/conference_accept/delete', [ConferenceAcceptController::class, 'delete'])->name('conference_accept-delete');
 
+    //---------------------
+    // 授業情報検索 モック
+    //---------------------
+
+    //// 授業情報一覧
+    ////Route::get('/class', [ClassController::class, 'index'])->name('class');
+    //Route::get('/class', function () {
+    //    return view('pages.admin.class');
+    //})->name('class');
+
 });
+    //---------------------
+    // 画面未作成のメニュー用（後で削除する）
+    //---------------------
+
+    // 準備中ページ
+    Route::get('/under_construction', function () {
+        return view('pages.mypage-common.under_construction');
+    })->name('class');
+
