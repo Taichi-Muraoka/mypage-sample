@@ -326,13 +326,6 @@ return [
             'can'  => 'student',
         ],
         [
-            'text' => '授業報告書',
-            'route'  => 'report',
-            'icon' => 'fas fa-chalkboard-teacher',
-            'can'  => 'student',
-            'active' => ['report/*']
-        ],
-        [
             'text' => '欠席申請',
             'route'  => 'absent',
             'icon' => 'far fa-times-circle',
@@ -347,11 +340,16 @@ return [
             'active' => ['transfer_student/*']
         ],
         [
-            'text' => '面談日程連絡',
-            'route'  => 'conference',
-            'icon' => 'fas fa-users',
+            'text' => '追加授業依頼',
+            'url' => 'under_construction',
             'can'  => 'student',
-            'active' => ['conference/*']
+        ],
+        [
+            'text' => '授業報告書',
+            'route'  => 'report',
+            'icon' => 'fas fa-chalkboard-teacher',
+            'can'  => 'student',
+            'active' => ['report/*']
         ],
         [
             'text' => '生徒成績',
@@ -361,11 +359,23 @@ return [
             'active' => ['grades/*']
         ],
         [
-            'text' => '模試・イベント申込',
+            'text' => 'イベント申込',
             'route'  => 'event',
             'icon' => 'fas fa-edit',
             'can'  => 'student',
             'active' => ['event/*']
+        ],
+        [
+            'text' => '面談日程連絡',
+            'route'  => 'conference',
+            'icon' => 'fas fa-users',
+            'can'  => 'student',
+            'active' => ['conference/*']
+        ],
+        [
+            'text' => '特別期間講習日程連絡',
+            'url' => 'under_construction',
+            'can'  => 'student',
         ],
 
         [
@@ -380,7 +390,7 @@ return [
             'active' => ['agreement/*']
         ],
         [
-            'text' => 'コース変更・授業追加申請',
+            'text' => '契約変更申請',
             'route'  => 'course',
             'icon' => 'fas fa-file-signature',
             'can'  => 'student',
@@ -394,17 +404,17 @@ return [
             'active' => ['invoice/*']
         ],
 
-        [
-            'header' => 'ギフトカード',
-            'can'  => 'student',
-        ],
-        [
-            'text' => 'ギフトカード',
-            'route'  => 'card',
-            'icon' => 'fas fa-gift',
-            'can'  => 'student',
-            'active' => ['card/*']
-        ],
+        // [
+        //     'header' => 'ギフトカード',
+        //     'can'  => 'student',
+        // ],
+        // [
+        //     'text' => 'ギフトカード',
+        //     'route'  => 'card',
+        //     'icon' => 'fas fa-gift',
+        //     'can'  => 'student',
+        //     'active' => ['card/*']
+        // ],
 
         [
             'header' => 'アカウント設定',
@@ -426,7 +436,7 @@ return [
         ],
 
         //----------------
-        // 教師
+        // 講師
         //----------------
         [
             'text' => 'お知らせ',
@@ -443,16 +453,16 @@ return [
             'active' => ['calendar/*']
         ],
         [
-            'header' => '教師向け',
+            'header' => '講師向け',
             'can'  => 'tutor',
         ],
-        [
-            'text' => '授業実施登録',
-            'route'  => 'attendance',
-            'icon' => 'fas fa-check-square',
-            'can'  => 'tutor',
-            'active' => ['attendance/*']
-        ],
+        // [
+        //     'text' => '授業実施登録',
+        //     'route'  => 'attendance',
+        //     'icon' => 'fas fa-check-square',
+        //     'can'  => 'tutor',
+        //     'active' => ['attendance/*']
+        // ],
         [
             'text' => '振替授業調整',
             'route'  => 'transfer_tutor',
@@ -474,19 +484,29 @@ return [
             'can'  => 'tutor',
             'active' => ['weekly_shift/*']
         ],
-        [
-            'text' => '回数報告',
-            'route'  => 'times_regist',
-            'icon' => 'fas fa-history',
-            'can'  => 'tutor',
-            'active' => ['times_regist/*']
-        ],
+        // [
+        //     'text' => '回数報告',
+        //     'route'  => 'times_regist',
+        //     'icon' => 'fas fa-history',
+        //     'can'  => 'tutor',
+        //     'active' => ['times_regist/*']
+        // ],
         [
             'text' => '生徒成績',
             'route'  => 'grades_check',
             'icon' => 'fas fa-chart-line',
             'can'  => 'tutor',
             'active' => ['grades_check/*']
+        ],
+        [
+            'text' => '特別期間講習日程連絡',
+            'url' => 'under_construction',
+            'can'  => 'tutor',
+        ],
+        [
+            'text' => '追加請求申請',
+            'url' => 'under_construction',
+            'can'  => 'tutor',
         ],
         [
             'text' => '給与明細',
@@ -526,7 +546,7 @@ return [
         // 管理者
         //----------------
         [
-            'text' => '教室カレンダー',
+            'text' => 'カレンダー',
             'route'  => 'room_calendar',
             'icon' => 'far fa-calendar-alt',
             'can'  => 'admin',
@@ -555,60 +575,42 @@ return [
             'menuid' => 'id_member',
             'submenu' => [
                 [
-                    'text' => '会員管理',
+                    'text' => '生徒管理',
                     'route' => 'member_mng',
                     // サブメニューの場合、'member_mng/*'と指定するとうまくactiveにならないので以下にした
                     'active' => ['member_mng*']
                 ],
+                // [
+                //     'text' => '生徒カルテ',
+                //     'route' => 'karte',
+                //     'active' => ['karte*']
+                // ],
                 [
-                    'text' => '生徒カルテ',
-                    'route' => 'karte',
-                    'active' => ['karte*']
+                    'text' => '見込客管理',
+                    'url' => 'under_construction',
                 ],
                 [
-                    'text' => '面談日程連絡受付',
+                    'text' => '面談日程受付',
                     'route' => 'conference_accept',
                     'active' => ['conference_accept*']
                 ],
                 [
-                    'text' => 'コース変更・授業追加',
+                    'text' => 'コース変更受付',
                     'route' => 'course_mng',
                     'active' => ['course_mng*'],
                     'menuid' => 'id_course_accept',
                 ],
-                [
-                    'text' => '会員情報取込',
-                    'route'  => 'member_import',
-                    'active' => ['member_import*']
-                ],
+                // [
+                //     'text' => '会員情報取込',
+                //     'route'  => 'member_import',
+                //     'active' => ['member_import*']
+                // ],
                 [
                     'text' => '退会申請受付',
                     'route'  => 'leave_accept',
                     'active' => ['leave_accept*'],
                     // 以下、AppMenuFilterでカウントを出す場合の目印とした。textやrouteが変わった時にMenuFilterも直さないといけないのを防ぐ
                     'menuid' => 'id_leave_accept',
-                ],
-            ]
-        ],
-        [
-            'text' => '教師管理',
-            'icon' => 'fa fa-user-tie',
-            'can'  => 'admin',
-            'submenu' => [
-                [
-                    'text' => '教師情報',
-                    'route' => 'tutor_mng',
-                    'active' => ['tutor_mng*']
-                ],
-                [
-                    'text' => '教師登録',
-                    'route' => 'tutor_regist',
-                    'active' => ['tutor_regist*']
-                ],
-                [
-                    'text' => '回数報告',
-                    'route' => 'times_check',
-                    'active' => ['times_check*']
                 ],
             ]
         ],
@@ -637,34 +639,74 @@ return [
                     'menuid' => 'id_transfer_regist',
                 ],
                 [
-                    'text' => '授業報告',
+                    'text' => '振替残数管理',
+                    'url' => 'under_construction',
+                ],
+                [
+                    'text' => '追加授業申請受付',
+                    'url' => 'under_construction',
+                ],
+                [
+                    'text' => '授業報告書',
                     'route' => 'report_check',
                     'active' => ['report_check*']
                 ],
                 [
-                    'text' => '生徒成績',
-                    'route' => 'grades_mng',
-                    'active' => ['grades_mng*']
+                    'text' => '生徒授業実施状況検索',
+                    'url' => 'under_construction',
+                ],
+                // [
+                //     'text' => 'スケジュール取込',
+                //     'route' => 'schedule_import',
+                //     'active' => ['schedule_import*']
+                // ],
+            ]
+        ],
+        [
+            'text' => '特別期間講習管理',
+            'icon' => 'fa fa-edit',
+            'can'  => 'admin',
+            'menuid' => '',
+            'submenu' => [
+                [
+                    'text' => '日程連絡確認',
+                    'url' => 'under_construction',
                 ],
                 [
-                    'text' => 'スケジュール取込',
-                    'route' => 'schedule_import',
-                    'active' => ['schedule_import*']
+                    'text' => '講習コマ割り',
+                    'url' => 'under_construction',
                 ],
             ]
         ],
         [
-            'text' => '模試・イベント管理',
+            'text' => '成績管理',
+            'icon' => 'fas fa-chart-line',
+            'can'  => 'admin',
+            'menuid' => '',
+            'submenu' => [
+                [
+                    'text' => '生徒成績管理',
+                    'route' => 'grades_mng',
+                    'active' => ['grades_mng*']
+                ],
+                [
+                    'text' => '成績事例検索',
+                    'url' => 'under_construction',
+                ],
+            ]
+        ],
+        [
+            'text' => 'イベント管理',
             'icon' => 'fa fa-edit',
             'can'  => 'admin',
             'menuid' => 'id_trial_event',
             'submenu' => [
-                [
-                    'text' => '模試管理',
-                    'route' => 'trial_mng',
-                    'active' => ['trial_mng*'],
-                    'menuid' => 'id_trial_mng',
-                ],
+                // [
+                //     'text' => '模試管理',
+                //     'route' => 'trial_mng',
+                //     'active' => ['trial_mng*'],
+                //     'menuid' => 'id_trial_mng',
+                // ],
                 [
                     'text' => 'イベント管理',
                     'route' => 'event_mng',
@@ -673,20 +715,20 @@ return [
                 ],
             ]
         ],
-        [
-            'text' => 'ギフトカード管理',
-            'icon' => 'fa fas fa-gift',
-            'can'  => 'admin',
-            'menuid' => 'id_card',
-            'submenu' => [
-                [
-                    'text' => 'ギフトカード管理',
-                    'route' => 'card_mng',
-                    'active' => ['card_mng*'],
-                    'menuid' => 'id_card_mng'
-                ],
-            ]
-        ],
+        // [
+        //     'text' => 'ギフトカード管理',
+        //     'icon' => 'fa fas fa-gift',
+        //     'can'  => 'admin',
+        //     'menuid' => 'id_card',
+        //     'submenu' => [
+        //         [
+        //             'text' => 'ギフトカード管理',
+        //             'route' => 'card_mng',
+        //             'active' => ['card_mng*'],
+        //             'menuid' => 'id_card_mng'
+        //         ],
+        //     ]
+        // ],
         [
             'text' => '問い合わせ管理',
             'icon' => 'fa fa-envelope',
@@ -698,42 +740,6 @@ return [
                     'route' => 'contact_mng',
                     'active' => ['contact_mng*'],
                     'menuid' => 'id_contact_mng',
-                ],
-            ]
-        ],
-        [
-            'text' => '研修管理',
-            'icon' => 'fa fa-book-open',
-            'can'  => 'admin',
-            'submenu' => [
-                [
-                    'text' => '研修管理',
-                    'route' => 'training_mng',
-                    'active' => ['training_mng*']
-                ],
-            ]
-        ],
-        [
-            'text' => '請求情報管理',
-            'icon' => 'fa fa-file',
-            'can'  => 'admin',
-            'submenu' => [
-                [
-                    'text' => '請求情報取込',
-                    'route' => 'invoice_import',
-                    'active' => ['invoice_import*']
-                ],
-            ]
-        ],
-        [
-            'text' => '給与情報管理',
-            'icon' => 'fa fa-wallet',
-            'can'  => 'admin',
-            'submenu' => [
-                [
-                    'text' => '給与情報取込',
-                    'route' => 'salary_import',
-                    'active' => ['salary_import*']
                 ],
             ]
         ],
@@ -755,31 +761,99 @@ return [
             ]
         ],
         [
-            'text' => '年次更新',
-            'icon' => 'fa fa-calendar-check',
+            'text' => '講師管理',
+            'icon' => 'fa fa-user-tie',
             'can'  => 'admin',
             'submenu' => [
                 [
-                    'text' => '学年情報取込',
-                    'route' => 'all_member_import',
-                    'active' => ['all_member_import*']
+                    'text' => '講師管理',
+                    'route' => 'tutor_mng',
+                    'active' => ['tutor_mng*']
                 ],
                 [
-                    'text' => '年度スケジュール取込',
-                    'route' => 'year_schedule_import',
-                    'active' => ['year_schedule_import*']
+                    'text' => '講師授業検索',
+                    'url' => 'under_construction',
+                ],
+                [
+                    'text' => '空き講師検索',
+                    'url' => 'under_construction',
+                ],
+                // [
+                //     'text' => '教師登録',
+                //     'route' => 'tutor_regist',
+                //     'active' => ['tutor_regist*']
+                // ],
+                // [
+                //     'text' => '回数報告',
+                //     'route' => 'times_check',
+                //     'active' => ['times_check*']
+                // ],
+            ]
+        ],
+        [
+            'text' => '講師研修管理',
+            'icon' => 'fa fa-book-open',
+            'can'  => 'admin',
+            'submenu' => [
+                [
+                    'text' => '講師研修管理',
+                    'route' => 'training_mng',
+                    'active' => ['training_mng*']
                 ],
             ]
         ],
         [
-            'text' => '休業日管理',
-            'icon' => 'fa fa-calendar-alt',
+            'text' => '講師出社管理',
+            'icon' => 'fas fa-history',
             'can'  => 'admin',
             'submenu' => [
                 [
-                    'text' => '休業日登録',
-                    'route' => 'room_holiday',
-                    'active' => ['room_holiday*']
+                    'text' => '出社情報取込',
+                    'url' => 'under_construction',
+                ],
+                [
+                    'text' => '出社情報管理',
+                    'url' => 'under_construction',
+                ],
+            ]
+        ],
+        [
+            'text' => '給与情報管理',
+            'icon' => 'fa fa-wallet',
+            'can'  => 'admin',
+            'submenu' => [
+                [
+                    'text' => '追加請求受付',
+                    'url' => 'under_construction',
+                ],
+                [
+                    'text' => '給与情報算出',
+                    'url' => 'under_construction',
+                ],
+                [
+                    'text' => '給与明細取込',
+                    'route' => 'salary_import',
+                    'active' => ['salary_import*']
+                ],
+            ]
+        ],
+        [
+            'text' => '請求情報管理',
+            'icon' => 'fa fa-file',
+            'can'  => 'admin',
+            'submenu' => [
+                [
+                    'text' => '請求情報算出',
+                    'url' => 'under_construction',
+                ],
+                [
+                    'text' => '追加・割引費用情報',
+                    'url' => 'under_construction',
+                ],
+                [
+                    'text' => '請求書情報取込',
+                    'route' => 'invoice_import',
+                    'active' => ['invoice_import*']
                 ],
             ]
         ],
@@ -800,6 +874,43 @@ return [
                 ],
             ]
         ],
+        [
+            'text' => '年次処理',
+            'icon' => 'fa fa-calendar-check',
+            'can'  => 'admin',
+            'submenu' => [
+                [
+                    'text' => '休校日取込',
+                    'url' => 'under_construction',
+                ],
+                [
+                    'text' => '学年情報更新',
+                    'route' => 'all_member_import',
+                    'active' => ['all_member_import*']
+                ],
+                [
+                    'text' => '振替残数クリア',
+                    'url' => 'under_construction',
+                ],
+                // [
+                //     'text' => '年度スケジュール取込',
+                //     'route' => 'year_schedule_import',
+                //     'active' => ['year_schedule_import*']
+                // ],
+            ]
+        ],
+        // [
+        //     'text' => '休業日管理',
+        //     'icon' => 'fa fa-calendar-alt',
+        //     'can'  => 'admin',
+        //     'submenu' => [
+        //         [
+        //             'text' => '休業日登録',
+        //             'route' => 'room_holiday',
+        //             'active' => ['room_holiday*']
+        //         ],
+        //     ]
+        // ],
     ],
 
     /*
