@@ -9,7 +9,7 @@
         <td>@{{item.regist_time|formatYmd}}</td>
     </tr>
     <tr>
-        <th>教師名</th>
+        <th>講師名</th>
         <td>@{{item.tname}}</td>
     </tr>
     <tr>
@@ -39,14 +39,9 @@
         <td class="nl2br">@{{item.homework}}</td>
     </tr>
     <tr>
-        <th>教師よりコメント</th>
+        <th>講師よりコメント</th>
         {{-- nl2br: 改行 --}}
         <td class="nl2br">@{{item.teacher_comment}}</td>
-    </tr>
-    <tr>
-        <th>保護者よりコメント</th>
-        {{-- nl2br: 改行 --}}
-        <td class="nl2br">@{{item.parents_comment}}</td>
     </tr>
     <tr>
         <th>承認ステータス</th>

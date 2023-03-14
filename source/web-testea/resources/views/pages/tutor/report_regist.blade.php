@@ -10,7 +10,7 @@
     <x-bs.row>
         <x-bs.col2>
             {{-- 校舎リスト選択時、onChangeによる生徒リストの絞り込みを行う。-1の場合は自分の受け持ちの生徒だけに絞り込み --}}
-            <x-input.select caption="在籍校舎" id="roomcd" :select2=true onChange="selectChangeGetRoom" :editData=$editData
+            <x-input.select caption="校舎" id="roomcd" :select2=true onChange="selectChangeGetRoom" :editData=$editData
                 :mastrData=$rooms :select2Search=false emptyValue="-1" />
         </x-bs.col2>
         <x-bs.col2>
@@ -27,7 +27,7 @@
             <x-input.select caption="承認ステータス" id="status" :select2=true :editData=$editData>
                 <option value="1">承認待ち</option>
                 <option value="2">承認</option>
-                <option value="3">却下</option>
+                <option value="3">差戻し</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>

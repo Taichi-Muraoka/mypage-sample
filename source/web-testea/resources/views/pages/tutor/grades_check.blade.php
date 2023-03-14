@@ -9,8 +9,8 @@
 
     <x-bs.row>
         <x-bs.col2>
-            {{-- 教室リスト選択時、onChangeによる生徒リストの絞り込みを行う。-1の場合は自分の受け持ちの生徒だけに絞り込み --}}
-            <x-input.select caption="在籍教室" id="roomcd" :select2=true onChange="selectChangeGetRoom" :editData=$editData
+            {{-- 校舎リスト選択時、onChangeによる生徒リストの絞り込みを行う。-1の場合は自分の受け持ちの生徒だけに絞り込み --}}
+            <x-input.select caption="校舎" id="roomcd" :select2=true onChange="selectChangeGetRoom" :editData=$editData
                 :mastrData=$rooms :select2Search=false emptyValue="-1" />
         </x-bs.col2>
         <x-bs.col2>

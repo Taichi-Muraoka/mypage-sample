@@ -17,7 +17,7 @@
 
     <x-bs.table :hover=false :vHeader=true>
         <tr>
-            <th width="35%">教室</th>
+            <th width="35%">校舎</th>
             <td>久我山</td>
         </tr>
         <tr>

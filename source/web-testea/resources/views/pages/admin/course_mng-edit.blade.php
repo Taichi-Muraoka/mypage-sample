@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'コース変更・授業追加申請編集')
+@section('title', 'コース変更受付編集')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -16,8 +16,11 @@
 
     <x-bs.form-title>生徒名</x-bs.form-title>
     <p class="edit-disp-indent">{{$editData->name}}</p>
-    
-    <x-input.select caption="追加・変更種別" id="change_type" :select2=true :editData=$editData :mastrData=$changeType />
+
+    <x-input.select caption="追加・変更種別" id="change_type" :select2=true :editData=$editData >
+        <option value="1">コース変更</option>
+        <option value="2">コース追加</option>
+    </x-input.select>
 
     <x-input.textarea caption="追加・変更希望内容" id="changes_text" :editData=$editData :rules=$rules />
 

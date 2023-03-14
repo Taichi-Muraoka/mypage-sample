@@ -35,14 +35,6 @@
         {{-- nl2br: 改行 --}}
         <td class="nl2br">@{{item.teacher_comment}}</td>
     </tr>
-
-    {{-- 詳細の方は保護者よりコメントを入れる --}}
-    <tr>
-        <th>保護者よりコメント</th>
-        {{-- nl2br: 改行 --}}
-        <td class="nl2br">@{{item.parents_comment}}</td>
-    </tr>
-
     <tr>
         <th>承認ステータス</th>
         <td class="nl2br"></td>

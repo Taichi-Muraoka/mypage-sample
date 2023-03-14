@@ -11,10 +11,10 @@
         <x-bs.col2>
             @can('roomAdmin')
             {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-            <x-input.select id="roomcd" caption="在籍校舎" :select2=true :mastrData=$rooms :editData=$editData
+            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false :blank=false />
             @else
-            <x-input.select id="roomcd" caption="在籍校舎" :select2=true :mastrData=$rooms :editData=$editData />
+            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
             @endcan
         </x-bs.col2>
         <x-bs.col2>
@@ -27,7 +27,7 @@
             <x-input.text id="sname" caption="生徒名" :rules=$rules />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="tname" caption="教師名" :rules=$rules />
+            <x-input.text id="tname" caption="講師名" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
 
@@ -36,7 +36,7 @@
             <x-input.select caption="承認ステータス" id="status" :select2=true :editData=$editData>
                 <option value="1">承認待ち</option>
                 <option value="2">承認</option>
-                <option value="3">却下</option>
+                <option value="3">差戻し</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
@@ -52,7 +52,7 @@
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
             <th class="t-minimum">登録日</th>
-            <th>教師名</th>
+            <th>講師名</th>
             <th width="20%">授業日時</th>
             <th width="15%">時限</th>
             <th width="15%">校舎</th>
@@ -64,7 +64,7 @@
         {{-- テーブル行 --}}
         <tr v-for="item in paginator.data" v-cloak>
             <x-bs.td-sp caption="登録日">@{{item.regist_time|formatYmd}}</x-bs.td-sp>
-            <x-bs.td-sp caption="教師名">@{{item.tname}}</x-bs.td-sp>
+            <x-bs.td-sp caption="講師名">@{{item.tname}}</x-bs.td-sp>
             <x-bs.td-sp caption="授業日時">@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</x-bs.td-sp>
             <x-bs.td-sp caption="時限"></x-bs.td-sp>
             <x-bs.td-sp caption="校舎">@{{item.room_name}}</x-bs.td-sp>

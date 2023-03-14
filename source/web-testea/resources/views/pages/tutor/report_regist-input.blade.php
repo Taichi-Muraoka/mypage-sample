@@ -71,14 +71,6 @@
 
     <x-input.textarea caption="教師よりコメント" id="teacher_comment" :rules=$rules :editData=$editData />
 
-    <x-bs.table :hover=false :vHeader=true>
-        <tr>
-            <th>保護者よりコメント</th>
-            {{-- nl2br: 改行 --}}
-            <td class="nl2br">{{$parents_comment}}</td>
-        </tr>
-    </x-bs.table>
-
     @if (request()->routeIs('report_regist-edit'))
     {{-- 編集時 承認ステータス・事務局コメント--}}
     {{-- 余白 --}}

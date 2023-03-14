@@ -11,10 +11,10 @@
         <x-bs.col2>
             @can('roomAdmin')
             {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-            <x-input.select id="roomcd" caption="教室" :select2=true :mastrData=$rooms :editData=$editData
+            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false :blank=false />
             @else
-            <x-input.select id="roomcd" caption="教室" :select2=true :mastrData=$rooms :editData=$editData />
+            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
             @endcan
         </x-bs.col2>
         <x-bs.col2>
@@ -27,7 +27,7 @@
             <x-input.text caption="生徒名" id="name" :rules=$rules />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text caption="教師名" id="tname" :rules=$rules />
+            <x-input.text caption="講師名" id="tname" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
 
@@ -44,8 +44,8 @@
             <th class="t-minimum">申請日</th>
             <th>生徒名</th>
             <th width="20%">授業日時</th>
-            <th width="15%">教室</th>
-            <th>教師名</th>
+            <th width="15%">校舎</th>
+            <th>講師名</th>
             <th width="t-minimum">ステータス</th>
             <th></th>
         </x-slot>

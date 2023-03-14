@@ -14,14 +14,14 @@
 
     <x-input.date-picker caption="登録日" id="regist_time" :editData=$editData />
 
-    <x-bs.form-title>教師名</x-bs.form-title>
+    <x-bs.form-title>講師名</x-bs.form-title>
     <p class="edit-disp-indent">{{$editData->tname}}</p>
 
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
     <x-bs.card>
-        {{-- チェンジイベントを取得し、校舎と教師を取得する --}}
+        {{-- チェンジイベントを取得し、校舎と講師を取得する --}}
         <x-input.select caption="生徒" id="sidKobetsu" :select2=true onChange="selectChangeGetMulti"
             :mastrData=$student_kobetsu_list :editData=$editData />
 
@@ -59,14 +59,12 @@
 
     <x-input.textarea caption="次回までの宿題" id="homework" :rules=$rules :editData=$editData />
 
-    <x-input.textarea caption="教師よりコメント" id="teacher_comment" :rules=$rules :editData=$editData />
-
-    <x-input.textarea caption="保護者よりコメント" id="parents_comment" :rules=$rules :editData=$editData />
+    <x-input.textarea caption="講師よりコメント" id="teacher_comment" :rules=$rules :editData=$editData />
 
     <x-input.select caption="承認ステータス" id="status" :select2=true :editData=$editData>
         <option value="1">承認待ち</option>
         <option value="2">承認</option>
-        <option value="3">却下</option>
+        <option value="3">差戻し</option>
     </x-input.select>
 
     <x-input.textarea caption="事務局コメント" id="admin_comment" :rules=$rules :editData=$editData />

@@ -6,7 +6,7 @@
 <x-bs.table :hover=false :vHeader=true>
 
     <tr>
-        <th>教室</th>
+        <th>校舎</th>
         <td>久我山</td>
     </tr>
     <tr>

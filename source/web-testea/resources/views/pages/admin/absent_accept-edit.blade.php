@@ -18,46 +18,28 @@
     <x-bs.form-title>生徒名</x-bs.form-title>
     <p class="edit-disp-indent">{{$editData->name}}</p>
 
-    <x-bs.form-group name="lesson_type">
-        <x-input.radio caption="個別教室" id="r_room" name="lesson_type" value="{{ App\Consts\AppConst::CODE_MASTER_8_1 }}"
-            :editData=$editData />
-        <x-input.radio caption="家庭教師" id="r_tutor" name="lesson_type" value="{{ App\Consts\AppConst::CODE_MASTER_8_2 }}"
-            :editData=$editData />
-    </x-bs.form-group>
-
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    {{-- 個別教室 --}}
-    <x-bs.card vShow="form.lesson_type == {{ App\Consts\AppConst::CODE_MASTER_8_1 }}">
+    {{-- チェンジイベントを取得し、校舎と講師を取得する --}}
+    <x-input.select caption="授業日時" id="id" :select2=true onChange="selectChangeGetMulti" :editData=$editData
+        :mastrData=$scheduleMaster />
 
-        {{-- チェンジイベントを取得し、教室と教師を取得する --}}
-        <x-input.select caption="授業日時" id="id" :select2=true onChange="selectChangeGetMulti" :editData=$editData
-            :mastrData=$scheduleMaster />
-
-        {{-- 詳細を表示 --}}
-        <x-bs.table :hover=false :vHeader=true class="mb-4">
-            <tr>
-                <th width="15%">教室</th>
-                <td><span v-cloak>@{{selectGetItem.class_name}}</span></td>
-            </tr>
-            <tr>
-                <th>教師</th>
-                <td><span v-cloak>@{{selectGetItem.teacher_name}}</span></td>
-            </tr>
-        </x-bs.table>
-    </x-bs.card>
-
-    {{-- 家庭教師 --}}
-    <x-bs.card vShow="form.lesson_type == {{ App\Consts\AppConst::CODE_MASTER_8_2 }}">
-
-        <x-input.date-picker caption="授業日" id="lesson_date" :editData=$editData />
-
-        <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules :editData=$editData />
-
-        <x-input.select caption="教師名" id="tid" :select2=true :editData=$editData :mastrData=$teacherList />
-
-    </x-bs.card>
+    {{-- 詳細を表示 --}}
+    <x-bs.table :hover=false :vHeader=true class="mb-4">
+        <tr>
+            <th width="15%">校舎</th>
+            <td><span v-cloak>@{{selectGetItem.class_name}}</span></td>
+        </tr>
+        <tr>
+            <th>講師</th>
+            <td><span v-cloak>@{{selectGetItem.teacher_name}}</span></td>
+        </tr>
+        <tr>
+            <th>コース名</th>
+            <td><span v-cloak>個別指導コース</span></td>
+        </tr>
+    </x-bs.table>
 
     <x-input.textarea caption="欠席理由" id="absent_reason" :rules=$rules :editData=$editData />
 

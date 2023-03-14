@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'コース変更・授業追加申請一覧')
+@section('title', 'コース変更受付一覧')
 
 @section('content')
 
@@ -11,10 +11,10 @@
         <x-bs.col2>
             @can('roomAdmin')
             {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-            <x-input.select id="roomcd" caption="教室" :select2=true :mastrData=$rooms :editData=$editData
+            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false :blank=false />
             @else
-            <x-input.select id="roomcd" caption="教室" :select2=true :mastrData=$rooms :editData=$editData />
+            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
             @endcan
         </x-bs.col2>
         <x-bs.col2>

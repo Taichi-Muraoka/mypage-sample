@@ -14,11 +14,11 @@
         <td>@{{item.sname}}</td>
     </tr>
     <tr>
-        <th>授業種別</th>
-        <td>@{{item.lesson_name}}</td>
+        <th>コース名</th>
+        <td>個別指導コース</td>
     </tr>
     <tr v-show="item.lesson_type == {{ App\Consts\AppConst::CODE_MASTER_8_1 }}">
-        <th>教室</th>
+        <th>校舎</th>
         <td>@{{item.room_name}}</td>
     </tr>
     <tr>
@@ -26,7 +26,7 @@
         <td>@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</td>
     </tr>
     <tr>
-        <th>教師名</th>
+        <th>講師名</th>
         <td>@{{item.tname}}</td>
     </tr>
     <tr>
