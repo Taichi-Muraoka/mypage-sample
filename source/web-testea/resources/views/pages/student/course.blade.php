@@ -1,17 +1,19 @@
 @extends('adminlte::page')
 
-@section('title', 'コース変更・授業追加申請')
+@section('title', '契約変更申請')
 
 @section('content')
 
 {{-- 検索フォーム --}}
 <x-bs.card :form=true>
 
-    <p>契約コースの追加・変更や授業追加の申請を行います。<br>
-        短期個別講習の申込もこの画面から行います。
-    </p>
+    <p>契約コースの追加・変更の申請を行います。</p>
 
-    <x-input.select caption="追加・変更種別" id="change_type" :select2=true :select2Search=false :mastrData=$codeMaster :editData=$editData />
+    {{-- <x-input.select caption="追加・変更種別" id="change_type" :select2=true :select2Search=false :mastrData=$codeMaster :editData=$editData /> --}}
+    <x-input.select caption="追加・変更種別" id="change_type" :select2=true :select2Search=false :editData=$editData >
+        <option value="1">コース変更</option>
+        <option value="2">コース追加</option>
+    </x-input.select>
 
     <x-input.textarea caption="追加・変更希望内容" id="changes_text" :rules=$rules />
 
