@@ -18,9 +18,12 @@
             @endcan
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="state" caption="ステータス" :select2=true :mastrData=$states />
+            <x-input.select caption="ステータス" id="state" :select2=true :editData=$editData>
+            <option value="1">未登録</option>
+            <option value="2">登録済</option>
+        </x-input.select>
         </x-bs.col2>
-    </x-bs.row>
+</x-bs.row>
 
     <x-bs.row>
         <x-bs.col2>
@@ -50,7 +53,7 @@
             <td>2023/01/16</td>
             <td>CWテスト生徒１</td>
             <td>久我山</td>
-            <td>未対応</td>
+            <td>未登録</td>
             <td>
                 <x-button.list-dtl />
                 <x-button.list-edit href="{{ route('conference_accept-edit', 1) }}"/>
@@ -60,7 +63,7 @@
             <td>2023/01/17</td>
             <td>CWテスト生徒２</td>
             <td>久我山</td>
-            <td>未対応</td>
+            <td>未登録</td>
             <td>
                 <x-button.list-dtl />
                 <x-button.list-edit href="{{ route('conference_accept-edit', 1) }}"/>

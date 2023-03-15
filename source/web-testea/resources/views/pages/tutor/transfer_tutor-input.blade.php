@@ -12,7 +12,7 @@
 
     @if (request()->routeIs('transfer_tutor-edit'))
     {{-- 編集時 --}}
-    <p>以下の授業振替希望について、承認を行います。承認ステータスを選択してください。</p>
+    <p>以下の授業振替希望について、承認を行います。ステータスを選択してください。</p>
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="35%">生徒名</th>
@@ -37,14 +37,19 @@
     <x-input.select caption="承認ステータス" id="transfer_id" :select2=true :editData="$editData">
         <option value="1" selected>承認待ち</option>
         <option value="2">承認</option>
-        <option value="3">却下</option>
+        <option value="3">差戻し</option>
     </x-input.select>
 
     <x-input.textarea caption="コメント" id="transfer_comment" :rules=$rules />
 
+    <x-bs.callout title="登録の際の注意事項" type="warning">
+        ステータスを「承認」として送信ボタンを押下すると、
+        承認した振替日時で授業スケジュールが登録されます。
+    </x-bs.callout>
+
     @else
     {{-- 登録時 --}}
-    <p>授業の振替希望日連絡を行います。</p>
+    <p>個別指導授業の振替希望日連絡を行います。</p>
 
     <x-input.select caption="生徒名" id="student" :select2=true :editData="$editData">
         <option value="1">CWテスト生徒１</option>
@@ -89,7 +94,7 @@
             <div class="d-flex justify-content-end">
                 {{-- 削除機能なし --}}
                 {{-- <x-button.submit-delete /> --}}
-                <x-button.submit-edit />
+                <x-button.submit-edit caption="登録"/>
             </div>
             @else
             {{-- 登録時 --}}

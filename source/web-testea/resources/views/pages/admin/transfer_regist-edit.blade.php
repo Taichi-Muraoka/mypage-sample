@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '振替情報編集・スケジュール登録')
+@section('title', '振替情報編集')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -13,7 +13,7 @@
     {{-- hidden --}}
     <x-input.hidden id="transfer_apply_id" :editData=$editData />
 
-    <p>以下の授業振替について、確認・スケジュール登録を行います。</p>
+    <p>以下の授業振替について、編集を行います。</p>
 
     <x-bs.table :hover=false :vHeader=true>
         <tr>
@@ -41,7 +41,7 @@
             <td>学校行事のため</td>
         </tr>
         <tr>
-            <th>承認ステータス</th>
+            <th>ステータス</th>
             <td>承認</td>
         </tr>
     </x-bs.table>
@@ -56,14 +56,9 @@
 
     <x-input.time-picker caption="振替授業開始日時" id="start_time" :rules=$rules :editData=$editData/>
 
-    <x-input.select caption="事務局ステータス" id="status" :select2=true :blank=false :editData="$editData">
-        <option value="1" selected>未対応</option>
-        <option value="2">対応済</option>
-    </x-input.select>
-
     <x-bs.callout title="登録の際の注意事項" type="warning">
-        事務局ステータスを「対応済」として送信ボタンを押下すると、
-        指定した振替日時でスケジュールが登録されます。
+        ステータスが「承認」となっている場合、振替スケジュールが登録済みとなっています。
+        変更登録の際はご注意ください。
     </x-bs.callout>
 
     {{-- フッター --}}

@@ -44,13 +44,13 @@
 
     <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules :editData=$editData/>
 
-    <x-input.select caption="事務局ステータス" id="status" :select2=true :blank=false :editData="$editData">
-        <option value="1" selected>未対応</option>
-        <option value="2">対応済</option>
+    <x-input.select caption="ステータス" id="status" :select2=true :blank=false :editData="$editData">
+        <option value="1" selected>未登録</option>
+        <option value="2">登録済</option>
     </x-input.select>
 
     <x-bs.callout title="登録の際の注意事項" type="warning">
-        ステータスを「対応済」として送信ボタンを押下すると、指定した日時で面談スケジュールが登録されます。
+        ステータスを「登録済」として送信ボタンを押下すると、指定した日時で面談スケジュールが登録されます。
     </x-bs.callout>
 
     {{-- フッター --}}
@@ -61,7 +61,7 @@
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
                 {{-- <x-button.submit-delete /> --}}
-                <x-button.submit-edit />
+                <x-button.submit-edit caption="登録"/>
             </div>
 
         </div>

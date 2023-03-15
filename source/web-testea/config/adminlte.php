@@ -341,7 +341,7 @@ return [
         ],
         [
             'text' => '追加授業依頼',
-            'url' => 'under_construction',
+            'route' => 'under_construction',
             'can'  => 'student',
         ],
         [
@@ -374,7 +374,7 @@ return [
         ],
         [
             'text' => '特別期間講習日程連絡',
-            'url' => 'under_construction',
+            'route' => 'under_construction',
             'can'  => 'student',
         ],
 
@@ -500,12 +500,12 @@ return [
         ],
         [
             'text' => '特別期間講習日程連絡',
-            'url' => 'under_construction',
+            'route' => 'under_construction',
             'can'  => 'tutor',
         ],
         [
             'text' => '追加請求申請',
-            'url' => 'under_construction',
+            'route' => 'under_construction',
             'can'  => 'tutor',
         ],
         [
@@ -588,8 +588,8 @@ return [
                 // ],
                 [
                     'text' => '見込客管理',
-                    'url' => 'under_construction',
-                ],
+                    'route' => 'under_construction',
+            ],
                 [
                     'text' => '面談日程受付',
                     'route' => 'conference_accept',
@@ -641,11 +641,11 @@ return [
                 ],
                 [
                     'text' => '振替残数管理',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
                 [
                     'text' => '追加授業申請受付',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
                 [
                     'text' => '授業報告書',
@@ -654,7 +654,7 @@ return [
                 ],
                 [
                     'text' => '生徒授業実施状況検索',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
                 // [
                 //     'text' => 'スケジュール取込',
@@ -671,11 +671,11 @@ return [
             'submenu' => [
                 [
                     'text' => '日程連絡確認',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
                 [
                     'text' => '講習コマ割り',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
             ]
         ],
@@ -692,7 +692,7 @@ return [
                 ],
                 [
                     'text' => '成績事例検索',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
             ]
         ],
@@ -773,11 +773,11 @@ return [
                 ],
                 [
                     'text' => '講師授業検索',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
                 [
                     'text' => '空き講師検索',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
                 // [
                 //     'text' => '教師登録',
@@ -810,11 +810,11 @@ return [
             'submenu' => [
                 [
                     'text' => '出社情報取込',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
                 [
                     'text' => '出社情報管理',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
             ]
         ],
@@ -825,11 +825,11 @@ return [
             'submenu' => [
                 [
                     'text' => '追加請求受付',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
                 [
                     'text' => '給与情報算出',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
                 [
                     'text' => '給与明細取込',
@@ -845,11 +845,11 @@ return [
             'submenu' => [
                 [
                     'text' => '請求情報算出',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
                 [
                     'text' => '追加・割引費用情報',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
                 [
                     'text' => '請求書情報取込',
@@ -882,17 +882,17 @@ return [
             'submenu' => [
                 [
                     'text' => '休校日取込',
-                    'url' => 'under_construction',
+                    'route' => 'under_construction',
                 ],
                 [
                     'text' => '学年情報更新',
                     'route' => 'all_member_import',
                     'active' => ['all_member_import*']
                 ],
-                [
-                    'text' => '振替残数クリア',
-                    'url' => 'under_construction',
-                ],
+                //[
+                //    'text' => '振替残数クリア',
+                //    'route' => 'under_construction',
+                //],
                 // [
                 //     'text' => '年度スケジュール取込',
                 //     'route' => 'year_schedule_import',

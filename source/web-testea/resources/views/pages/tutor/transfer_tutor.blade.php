@@ -9,10 +9,19 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="roomcd" caption="在籍教室" :select2=true :mastrData=$rooms :editData=$editData />
+            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
         </x-bs.col2>
         <x-bs.col2>
             <x-input.text id="name" caption="生徒名" :rules=$rules />
+        </x-bs.col2>
+    </x-bs.row>
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.select id="approval_state" caption="ステータス" :select2=false >
+                <option value="1">承認待ち</option>
+                <option value="2">承認</option>
+                <option value="3">差戻し</option>
+            </x-input.select>
         </x-bs.col2>
     </x-bs.row>
 
@@ -35,19 +44,19 @@
             <th>申請者種別</th>
             <th>授業日・時限</th>
             <th>生徒名</th>
-            <th>承認ステータス</th>
-            <th>事務局ステータス</th>
+            <th>校舎</th>
+            <th>ステータス</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
             <td>2023/01/10 17:00</td>
-            <td>教師</td>
+            <td>講師</td>
             <td>2023/01/30 4限</td>
             <td>CWテスト生徒１</td>
+            <td>久我山</td>
             <td>承認待ち</td>
-            <td>未対応</td>
             <td>
                 <x-button.list-dtl />
                 {{-- 申請者種別が教師のため更新ボタン非活性 --}}
@@ -59,8 +68,8 @@
             <td>生徒</td>
             <td>2023/01/29 3限</td>
             <td>CWテスト生徒１</td>
+            <td>久我山</td>
             <td>承認待ち</td>
-            <td>未対応</td>
             <td>
                 <x-button.list-dtl />
                 <x-button.list-edit href="{{ route('transfer_tutor-edit', 2) }}"/>

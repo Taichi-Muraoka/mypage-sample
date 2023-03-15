@@ -1640,5 +1640,5 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 準備中ページ
     Route::get('/under_construction', function () {
         return view('pages.mypage-common.under_construction');
-    })->name('class');
+    })->name('under_construction');
 
