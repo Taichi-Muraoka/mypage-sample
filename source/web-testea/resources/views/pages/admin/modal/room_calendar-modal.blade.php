@@ -12,9 +12,17 @@
         <th width="35%">指導スペース</th>
         <td>Aテーブル</td>
     </tr>
-    <tr>
+    <tr v-Show="item.lesson_type == 0">
         <th width="35%">コース名</th>
         <td>個別指導コース</td>
+    </tr>
+    <tr v-Show="item.lesson_type == 1">
+        <th width="35%">コース名</th>
+        <td>集団授業</td>
+    </tr>
+    <tr v-Show="item.lesson_type == 3">
+        <th width="35%">コース名</th>
+        <td>自習・その他</td>
     </tr>
     <tr>
         <th>日付</th>
@@ -29,21 +37,41 @@
         <th>終了時刻</th>
         <td>@{{item.mdEndTime|formatHm}}</td>
     </tr>
-    <tr>
+    <tr v-Show="item.lesson_type != 3">
         <th>教師名</th>
         <td>CWテスト教師１０１</td>
     </tr>
-    <tr>
+    <tr v-Show="item.lesson_type != 1">
         <th>生徒名</th>
         <td>CWテスト生徒１</td>
+    </tr>
+    <tr v-Show="item.lesson_type == 1">
+        <th>参加生徒名</th>
+        <td>CWテスト生徒１<br>CWテスト生徒２<br>CWテスト生徒３</td>
     </tr>
     <tr v-show="item.mdSubject">
         <th>教科</th>
         <td>@{{item.mdSubject}}</td>
     </tr>
-    <tr v-show="item.mdFurikae">
-        <th>振替情報等</th>
-        <td>@{{item.mdFurikae}}</td>
+    <tr v-Show="item.lesson_type != 3">
+        <th>授業種別</th>
+        <td>追加</td>
+    </tr>
+    <tr v-Show="item.lesson_type != 3">
+        <th>通塾</th>
+        <td>生徒オンライン－教師通塾</td>
+    </tr>
+    <tr v-Show="item.lesson_type != 3">
+        <th>授業代講</th>
+        <td>なし</td>
+    </tr>
+    <tr v-Show="item.lesson_type != 3">
+        <th>出欠ステータス</th>
+        <td>当日欠席（講師出勤あり）</td>
+    </tr>
+    <tr>
+        <th>メモ</th>
+        <td></td>
     </tr>
 </x-bs.table>
 
@@ -53,6 +81,6 @@
 
 {{-- 更新ボタンを表示 --}}
 <x-button.edit vueHref="'{{ route('room_calendar-edit', '') }}/' + item.id" icon="" caption="スケジュール編集" />
-<x-button.edit vueHref="'{{ route('room_calendar-edit', '') }}/' + item.id" icon="" caption="コピー登録" />
+<x-button.edit vueHref="'{{ route('room_calendar-copy', '') }}/' + item.id" icon="" caption="コピー登録" />
 
 @overwrite

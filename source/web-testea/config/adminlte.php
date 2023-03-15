@@ -563,7 +563,8 @@ return [
                 ],
                 [
                     'text' => 'イベントカレンダー',
-                    'url' => 'under_construction',
+                    'route' => 'event_calendar',
+                    'active' => ['event_calendar*']
                 ],
             ],
         ],

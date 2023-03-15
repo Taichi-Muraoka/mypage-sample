@@ -13,10 +13,11 @@
   blank: 選択してくださいを表示するかどうか
   vShow: Vue.jsのv-show
   emptyValue: 選択してくださいの値
+  multiple: 複数選択指定
 --}}
 @props(['caption' => '', 'id' => '', 'select2' => false, 'select2Search' => true,
     'mastrData' => [], 'editData' => [], 'onChange' => '', 'blank' => true, 'vShow' => '',
-    'emptyValue' => ''])
+    'emptyValue' => '', 'multiple' => ''])
 
 {{-- バリデーションエラー時のスクロール先 --}}
 <span class="form-validation" data-id="{{ $id }}"></span>
@@ -58,6 +59,12 @@
     @if ($select2 && !$select2Search)
     data-minimum-results-for-search="Infinity"
     @endif
+
+    {{-- 検索を無効にする場合 --}}
+    @if ($multiple)
+    multiple
+    @endif
+
     >
 
     {{-- デフォルトの項目 --}}

@@ -106,6 +106,41 @@ class RoomCalendarController extends Controller
     }
 
     /**
+     * カレンダー
+     *
+     * @param int $sid 生徒Id
+     * @return view
+     */
+    public function eventCalendar()
+    {
+
+//        // IDのバリデーション
+//        $this->validateIds($roomcd);
+
+        // 教室リストを取得
+        $rooms = $this->mdlGetRoomList(false);
+
+        // 当日日付を取得
+        $today = null;
+        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        //$this->guardRoomAdminRoomcd($roomcd);
+        //$roomcd = $rooms[0]->roomcd;
+        $roomcd = 110;
+        // 教室名を取得する
+        $roomName = $this->getRoomName($roomcd);
+
+        return view('pages.admin.event_calendar', [
+            'rooms' => $rooms,
+            'name' => $roomName,
+            // カレンダー用にIDを渡す
+            'editData' => [
+                'roomcd' => $roomcd,
+                'curDate' => $today
+            ]
+        ]);
+    }
+
+    /**
      * カレンダー取得
      *
      * @param \Illuminate\Http\Request $request リクエスト
@@ -149,6 +184,29 @@ class RoomCalendarController extends Controller
         //$this->guardRoomAdminRoomcd($roomcd);
 
         return $this->getRoomCalendar($request, $roomcd, true);
+    }
+
+    /**
+     * カレンダー取得
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return int 生徒Id
+     */
+    public function getCalendarEvent(Request $request)
+    {
+
+        // バリデーション。NGの場合はレスポンスコード422を返却
+        //Validator::make($request->all(), $this->rulesForCalendar())->validate();
+
+        // IDのバリデーション
+        //$this->validateIdsFromRequest($request, 'sid');
+
+        $roomcd = $request->input('roomcd');
+
+        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        //$this->guardRoomAdminRoomcd($roomcd);
+
+        return $this->getEventCalendar($request, $roomcd, false);
     }
 
     //==========================
@@ -283,6 +341,47 @@ class RoomCalendarController extends Controller
             'rules' => $this->rulesForInput(null)
         ]);
     }
+    /**
+     * コピー登録画面
+     *
+     * @param int $scheduleId スケジュールID
+     * @return view
+     */
+    public function copy($scheduleId)
+    {
+
+        // IDのバリデーション
+        $this->validateIds($scheduleId);
+
+        // 教室リストを取得
+        $rooms = $this->mdlGetRoomList();
+
+        // スケジュールを取得
+        $extSchedule = ExtSchedule::select(
+            'lesson_date',
+            'start_time',
+            'end_time',
+            'sid',
+            'tid',
+            'roomcd'
+        )
+            ->where('id', $scheduleId)
+            ->firstOrFail();
+
+        $editData = [
+            'roomcd' => $extSchedule['roomcd'],
+            'curDate' => $extSchedule['lesson_date'],
+            'start_time' => $extSchedule['start_time'],
+            'end_time' => $extSchedule['end_time'],
+        ];
+
+        return view('pages.admin.room_calendar-input', [
+            'rooms' => $rooms,
+            'editData' => $editData,
+            'rules' => $this->rulesForInput(null)
+        ]);
+
+    }
 
     /**
      * 編集画面（レギュラー）
@@ -291,6 +390,47 @@ class RoomCalendarController extends Controller
      * @return view
      */
     public function weekEdit($scheduleId)
+    {
+
+        // IDのバリデーション
+        $this->validateIds($scheduleId);
+
+        // 教室リストを取得
+        $rooms = $this->mdlGetRoomList();
+
+        // スケジュールを取得
+        $extSchedule = ExtSchedule::select(
+            'lesson_date',
+            'start_time',
+            'end_time',
+            'sid',
+            'tid',
+            'roomcd'
+        )
+            ->where('id', $scheduleId)
+            ->firstOrFail();
+
+        $editData = [
+            'roomcd' => $extSchedule['roomcd'],
+            'curDate' => $extSchedule['lesson_date'],
+            'start_time' => $extSchedule['start_time'],
+            'end_time' => $extSchedule['end_time'],
+        ];
+
+        return view('pages.admin.regular_schedule-input', [
+            'rooms' => $rooms,
+            'editData' => $editData,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 編集画面（レギュラー）
+     *
+     * @param int $scheduleId スケジュールID
+     * @return view
+     */
+    public function weekCopy($scheduleId)
     {
 
         // IDのバリデーション

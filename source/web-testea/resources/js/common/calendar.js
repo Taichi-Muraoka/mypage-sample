@@ -72,10 +72,39 @@ export default class CalendarCom {
         var calendar = new Calendar(calendarEl, {
             initialView: "resourceTimeGridDay",
             initialDate: initDate,
+            customButtons: {
+                datePickerButton: {
+                    text: 'datepicker',
+                    click: function () {
+    
+                        var $btnCustom = $('.fc-datePickerButton-button'); // name of custom  button in the generated code
+                        $btnCustom.after('<input type="hidden" id="hiddenDate" class="datepicker"/>');
+    
+                        $("#hiddenDate").datepicker({
+                            showOn: "button",
+    
+                            dateFormat:"yy-mm-dd",
+                            onSelect: function (dateText, inst) {
+                                $('#calendar').fullCalendar('gotoDate', dateText);
+                            },
+                        });
+    
+                        var $btnDatepicker = $(".ui-datepicker-trigger"); // name of the generated datepicker UI 
+                        //Below are required for manipulating dynamically created datepicker on custom button click
+                        $("#hiddenDate").show().focus().hide();
+                        $btnDatepicker.trigger("click"); //dynamically generated button for datepicker when clicked on input textbox
+                        $btnDatepicker.hide();
+                        $btnDatepicker.remove();
+                        $("input.datepicker").not(":first").remove();//dynamically appended every time on custom button click
+    
+                    }
+                }
+            },
             headerToolbar: {
                 left: "prev,next today",
                 center: "title",
                 right: ""
+                //right: "datePickerButton,timeGridWeek,resourceTimeGridDay"
             },
             themeSystem: "bootstrap",
             locale: "ja",
@@ -98,12 +127,8 @@ export default class CalendarCom {
                 { id: "002", title: "Bテーブル"},
                 { id: "003", title: "Cテーブル"},
                 { id: "004", title: "Dテーブル"},
-                { id: "005", title: "Eテーブル"},
-                { id: "006", title: "Fテーブル"},
-                { id: "007", title: "Gテーブル"},
-                { id: "008", title: "Hテーブル"},
-                { id: "009", title: "Iテーブル"},
-                { id: "010", title: "Jテーブル"},
+                { id: "005", title: "E教室"},
+                { id: "800", title: "面談ブース"},
                 { id: "999", title: "後日振替"},
             ],
             // データの読み込み処理。呼び出し元で定義する
@@ -172,12 +197,8 @@ export default class CalendarCom {
                 { id: "002", title: "Bテーブル"},
                 { id: "003", title: "Cテーブル"},
                 { id: "004", title: "Dテーブル"},
-                { id: "005", title: "Eテーブル"},
-                { id: "006", title: "Fテーブル"},
-                { id: "007", title: "Gテーブル"},
-                { id: "008", title: "Hテーブル"},
-                { id: "009", title: "Iテーブル"},
-                { id: "010", title: "Jテーブル"},
+                { id: "005", title: "E教室"},
+                //{ id: "800", title: "面談ブース"},
                 //{ id: "999", title: "後日振替"},
             ],
             // データの読み込み処理。呼び出し元で定義する

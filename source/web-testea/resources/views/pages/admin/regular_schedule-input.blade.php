@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', (request()->routeIs('regular_schedule-edit')) ? 'レギュラースケジュール編集' : 'レギュラースケジュール登録')
+@section('title', (request()->routeIs('regular_schedule-edit')) ? 'レギュラースケジュール編集' : ((request()->routeIs('regular_schedule-new')) ? 'レギュラースケジュール登録' : 'レギュラースケジュールコピー登録'))
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -15,17 +15,17 @@
     <x-input.hidden id="roomcd" :editData=$editData />
     <x-input.hidden id="schedule_id" :editData=$editData />
 
-    <p>レギュラースケジュールの{{(request()->routeIs('regular_schedule-edit')) ? '変更' : '登録'}}を行います。</p>
+    <p>レギュラースケジュールの{{(request()->routeIs('regular_schedule-edit')) ? '変更' : ((request()->routeIs('regular_schedule-new')) ? '登録' : 'コピー登録')}}を行います。</p>
 
-    <x-input.select id="roomcd" caption="教室" :select2=true :mastrData=$rooms :editData=$editData />
+    <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
 
-    <x-input.select caption="テーブル" id="classroomcd" :select2=true :editData="$editData">
+    <x-input.select caption="指導スペース" id="classroomcd" :select2=true :editData="$editData">
         <option value="1" selected>Aテーブル</option>
         <option value="2">Bテーブル</option>
         <option value="3">Cテーブル</option>
     </x-input.select>
 
-    <x-input.select caption="曜日" id="day_no" :select2=true :rules=$rules :editData="$editData">
+    <x-input.select caption="曜日" id="day_no" :select2=true :select2Search=false :rules=$rules :editData="$editData">
         <option value="1" selected>月</option>
         <option value="2">火</option>
         <option value="3">水</option>
@@ -38,25 +38,32 @@
 
     <x-input.time-picker caption="終了時刻" id="end_time" :rules=$rules :editData=$editData />
 
-    <x-input.select caption="コース名" id="course_cd" :select2=true :editData="$editData">
+    <x-input.select caption="コース名" id="course_cd" :select2=true :select2Search=false :editData="$editData">
         <option value="1">個別指導コース</option>
-        <option value="2">1対2コース</option>
-        <option value="3">1対3コース</option>
         <option value="4">集団指導</option>
         <option value="5">その他・自習</option>
     </x-input.select>
 
-    <x-input.select caption="生徒" id="sid" :select2=true :editData="$editData">
-        <option value="1">CWテスト生徒１</option>
-        <option value="2">CWテスト生徒２</option>
-    </x-input.select>
-
-    <x-input.select caption="教師" id="tid" :select2=true :editData="$editData">
+    <x-input.select caption="講師" id="tid" :select2=true :editData="$editData">
         <option value="1">CWテスト教師１</option>
         <option value="2">CWテスト教師２</option>
     </x-input.select>
 
-    <x-input.select caption="教科" id="subject_cd" :select2=true :editData="$editData">
+    <div v-cloak>
+        <x-input.select vShow="form.course_cd != 4" caption="生徒" id="sid" :select2=true :editData="$editData">
+            <option value="1">CWテスト生徒１</option>
+            <option value="2">CWテスト生徒２</option>
+            <option value="3">CWテスト生徒３</option>
+        </x-input.select>
+
+        <x-input.select vShow="form.course_cd == 4" caption="参加生徒選択" id="sid2" :select2=true :editData="$editData" multiple>
+            <option value="1">CWテスト生徒１</option>
+            <option value="2">CWテスト生徒２</option>
+            <option value="3">CWテスト生徒３</option>
+        </x-input.select>
+    </div>
+
+    <x-input.select caption="教科" id="subject_cd" :select2=true :select2Search=false :editData="$editData">
         <option value="1" selected>国語</option>
         <option value="2">数学</option>
         <option value="3">理科</option>
@@ -64,10 +71,10 @@
         <option value="5">英語</option>
     </x-input.select>
 
-    <x-input.select caption="通塾" id="howto" :select2=true :editData="$editData">
+    <x-input.select caption="通塾" id="howto" :select2=true :select2Search=false :editData="$editData">
         <option value="1" selected>両者通塾</option>
         <option value="2">生徒通塾－教師オンライン</option>
-        <option value="3">生徒オンライン－教師オンライン</option>
+        <option value="3">生徒オンライン－教師通塾</option>
         <option value="4">両者オンライン</option>
     </x-input.select>
 

@@ -628,6 +628,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 教室カレンダー編集画面
     Route::get('/room_calendar/edit/{scheduleId}', [RoomCalendarController::class, 'edit'])->name('room_calendar-edit');
 
+    // 教室カレンダーコピー登録画面
+    Route::get('/room_calendar/copy/{scheduleId}', [RoomCalendarController::class, 'copy'])->name('room_calendar-copy');
+
     // 編集処理
     Route::post('/room_calendar/update', [RoomCalendarController::class, 'update'])->name('room_calendar-update');
 
@@ -644,10 +647,13 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/regular_schedule/get_calendar', [RoomCalendarController::class, 'getCalendarRegular'])->name('regular_schedule-get_calendar');
 
     // defaultWeekカレンダー登録画面
-    Route::get('/regular_schedule/new', [RoomCalendarController::class, 'weekNew'])->name('regular_schedule-weekNew');
+    Route::get('/regular_schedule/new', [RoomCalendarController::class, 'weekNew'])->name('regular_schedule-new');
 
-    // 教室カレンダー編集画面
+    // defaultWeekカレンダー編集画面
     Route::get('/regular_schedule/edit/{scheduleId}', [RoomCalendarController::class, 'weekEdit'])->name('regular_schedule-edit');
+
+    // defaultWeekカレンダーコピー登録画面
+    Route::get('/regular_schedule/copy/{scheduleId}', [RoomCalendarController::class, 'weekCopy'])->name('regular_schedule-copy');
 
     // バリデーション(登録用)
     Route::post('/regular_schedule/vd_input', [RoomCalendarController::class, 'validationForInput'])->name('regular_schedule-vd_input');
@@ -665,10 +671,10 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/regular_schedule/delete', [RoomCalendarController::class, 'delete'])->name('regular_schedule-delete');
 
     // イベントカレンダー（仮）
-    Route::get('/event_calendar', [RoomCalendarController::class, 'calendar'])->name('event_calendar');
+    Route::get('/event_calendar', [RoomCalendarController::class, 'eventCalendar'])->name('event_calendar');
 
     // イベントカレンダー（仮） - 詳細取得用
-    Route::post('/event_calendar/get_calendar', [RoomCalendarController::class, 'getCalendar'])->name('event_calendar-get_calendar');
+    Route::post('/event_calendar/get_calendar', [RoomCalendarController::class, 'getCalendarEvent'])->name('event_calendar-get_calendar');
 
     //---------------------
     // コース変更・授業追加受付

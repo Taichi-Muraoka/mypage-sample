@@ -499,7 +499,7 @@ export default class PageBase {
             //-----------------
             e => {
                 // 時間割のスケジュールはモーダル表示しない
-                if (e.event._def.resourceIds[0] !== '000') {
+                if (e.event._def.resourceIds[0] !== '000' && e.event._def.resourceIds[0] !== '800') {
                     // モーダルの中身を更新
                     Vue.set(
                         $vueModal,
@@ -524,13 +524,15 @@ export default class PageBase {
             //-----------------
             (info) => {
                 //console.log(info);
-                // 登録画面に遷移
-                var url = self._getFuncUrl() + "/new?"
-                        + "roomcd=" + "110"
-                        + "&date=" + moment(info.start).format("YYYYMMDD")
-                        + "&start_time=" + moment(info.start).format("HHmm")
-                        + "&end_time=" + moment(info.end).format("HHmm");
-                location.href = url;
+                if (info.resource._resource.id !== '000' && info.resource._resource.id !== '800') {
+                    // 登録画面に遷移
+                    var url = self._getFuncUrl() + "/new?"
+                            + "roomcd=" + "110"
+                            + "&date=" + moment(info.start).format("YYYYMMDD")
+                            + "&start_time=" + moment(info.start).format("HHmm")
+                            + "&end_time=" + moment(info.end).format("HHmm");
+                    location.href = url;
+                }
             }
         );
     }
@@ -543,7 +545,7 @@ export default class PageBase {
         var $vueModal = this.getVueModal({ useShowEvent: false });
         // カレンダーの作成
         // モック用に仮の日付を設定（日曜にする）
-        var curDate = new Date("2023/02/12");
+        var curDate = new Date("2023/03/19");
 
         for( var i = 1; i < 7; i++ ) {
             curDate.setDate(curDate.getDate() + 1);

@@ -391,32 +391,38 @@ label:not(.form-check-label):not(.custom-file-label) {
 
 /* 短期講習の予定の背景色 */
 [id^="calendar"] .cal_tanki_koshu {
-    background: #7507b4;
-    border-color: #7507b4;
-}
-
-/* 短期講習 振替日の予定の背景色 */
-[id^="calendar"] .cal_tanki_koshu_furikae {
-    background: #007932;
-    border-color: #007932;
-}
-
-/* 模試の予定の背景色 */
-[id^="calendar"] .cal_tanki_moshi {
+    //background: #7507b4;
+    //border-color: #7507b4;
     background: #af0058;
     border-color: #af0058;
 }
 
+/* 短期講習 振替日の予定の背景色 */
+[id^="calendar"] .cal_tanki_koshu_furikae {
+//    background: #007932;
+//    border-color: #007932;
+    background: #af0058;
+    border-color: #af0058;
+}
+
+/* 模試の予定の背景色 */
+[id^="calendar"] .cal_tanki_moshi {
+    //background: #af0058;
+    //border-color: #af0058;
+    background: green;
+    border-color: green;
+}
+
 /* イベントの予定の背景色 */
 [id^="calendar"] .cal_event {
-    background: #0073b7;
-    border-color: #0073b7;
+    background: orangered;
+    border-color: orangered;
 }
 
 /* 打ち合わせの予定の背景色 */
 [id^="calendar"] .cal_meeting {
-    background: #0073b7;
-    border-color: #0073b7;
+    background: #7507b4;
+    border-color: #7507b4;
 }
 
 /* 休業日の予定の背景色 */

@@ -41,9 +41,9 @@
         <th>教科</th>
         <td>@{{item.mdSubject}}</td>
     </tr>
-    <tr v-show="item.mdFurikae">
-        <th>振替情報等</th>
-        <td>@{{item.mdFurikae}}</td>
+    <tr>
+        <th>通塾</th>
+        <td>生徒オンライン－教師通塾</td>
     </tr>
 </x-bs.table>
 
@@ -53,6 +53,6 @@
 
 {{-- 更新ボタンを表示 --}}
 <x-button.edit vueHref="'{{ route('regular_schedule-edit', '') }}/' + item.id" icon="" caption="スケジュール編集" />
-<x-button.edit vueHref="'{{ route('regular_schedule-edit', '') }}/' + item.id" icon="" caption="コピー登録" />
+<x-button.edit vueHref="'{{ route('regular_schedule-copy', '') }}/' + item.id" icon="" caption="コピー登録" />
 
 @overwrite
