@@ -1626,11 +1626,11 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 授業情報検索 モック
     //---------------------
 
-    //// 授業情報一覧
-    ////Route::get('/class', [ClassController::class, 'index'])->name('class');
-    //Route::get('/class', function () {
-    //    return view('pages.admin.class');
-    //})->name('class');
+    // 生徒授業情報一覧
+    //Route::get('/student_class', [StudentClassController::class, 'index'])->name('student_class');
+    Route::get('/student_class', function () {
+        return view('pages.admin.student_class');
+    })->name('student_class');
 
 });
     //---------------------

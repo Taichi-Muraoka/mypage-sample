@@ -653,8 +653,9 @@ return [
                     'active' => ['report_check*']
                 ],
                 [
-                    'text' => '生徒授業実施状況検索',
-                    'route' => 'under_construction',
+                    'text' => '生徒授業情報検索',
+                    'route' => 'student_class',
+                    'active' => ['student_class*']
                 ],
                 // [
                 //     'text' => 'スケジュール取込',
