@@ -573,6 +573,7 @@ use App\Http\Controllers\Admin\KarteController;
 use App\Http\Controllers\Admin\TransferRegistController;
 use App\Http\Controllers\Admin\ConferenceAcceptController;
 use App\Http\Controllers\Admin\RoomCalendarController;
+use App\Http\Controllers\Admin\ProspectController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -1632,6 +1633,39 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     //    return view('pages.admin.class');
     //})->name('class');
 
+    //---------------------
+    // 見込み客管理 モック
+    //---------------------
+
+    // 一覧画面
+    Route::get('/prospect', [ProspectController::class, 'index'])->name('prospect');
+
+    // バリデーション(検索用)
+    Route::post('/prospect/vd_search', [ProspectController::class, 'validationForSearch'])->name('prospect-vd_search');
+
+    // 検索結果取得
+    Route::post('/prospect/search', [ProspectController::class, 'search'])->name('prospect-search');
+
+    // 詳細取得用
+    Route::post('/prospect/get_data', [ProspectController::class, 'getData'])->name('prospect-get_data');
+
+    // 新規登録
+    Route::get('/prospect/new', [ProspectController::class, 'new'])->name('prospect-new');
+
+    // 新規登録処理
+    Route::post('/prospect/create', [ProspectController::class, 'create'])->name('prospect-create');
+
+    // 編集画面
+    Route::get('/prospect/edit/{changeId}', [ProspectController::class, 'edit'])->name('prospect-edit');
+
+    // 編集処理
+    Route::post('/prospect/update', [ProspectController::class, 'update'])->name('prospect-update');
+
+    // バリデーション(登録用)
+    Route::post('/prospect/vd_input', [ProspectController::class, 'validationForInput'])->name('prospect-vd_input');
+
+    // 削除処理
+    Route::post('/prospect/delete', [ProspectController::class, 'delete'])->name('prospect-delete');
 });
     //---------------------
     // 画面未作成のメニュー用（後で削除する）
