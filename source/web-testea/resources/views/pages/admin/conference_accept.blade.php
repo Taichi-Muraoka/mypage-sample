@@ -44,6 +44,8 @@
             <th>申請日</th>
             <th>生徒名</th>
             <th>校舎</th>
+            <th>面談日</th>
+            <th>開始時刻</th>
             <th>ステータス</th>
             <th></th>
         </x-slot>
@@ -53,7 +55,9 @@
             <td>2023/01/16</td>
             <td>CWテスト生徒１</td>
             <td>久我山</td>
-            <td>未登録</td>
+            <td>2023/01/30</td>
+            <td>16:00</td>
+            <td>登録済</td>
             <td>
                 <x-button.list-dtl />
                 <x-button.list-edit href="{{ route('conference_accept-edit', 1) }}"/>
@@ -63,6 +67,8 @@
             <td>2023/01/17</td>
             <td>CWテスト生徒２</td>
             <td>久我山</td>
+            <td></td>
+            <td></td>
             <td>未登録</td>
             <td>
                 <x-button.list-dtl />
