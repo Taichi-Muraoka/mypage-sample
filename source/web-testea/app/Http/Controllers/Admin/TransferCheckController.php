@@ -23,7 +23,7 @@ use App\Http\Controllers\Traits\FuncTransferTrait;
 /**
  * 振替調整一覧 - コントローラ
  */
-class TransferRegistController extends Controller
+class TransferCheckController extends Controller
 {
 
     // 機能共通処理：振替申請
@@ -43,7 +43,7 @@ class TransferRegistController extends Controller
     //==========================
 
     /**
-     * 初期画面
+     * 初期画面transfer_check
      *
      * @return view
      */
@@ -55,7 +55,7 @@ class TransferRegistController extends Controller
         // ステータスプルダウン
         $states = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_1);
 
-        return view('pages.admin.transfer_regist', [
+        return view('pages.admin.transfer_check', [
             'rules' => $this->rulesForSearch(),
             'rooms' => $rooms,
             'states' => $states,
@@ -115,8 +115,35 @@ class TransferRegistController extends Controller
     }
 
     //==========================
-    // 編集
+    // 登録・編集・削除
     //==========================
+
+    /**
+     * 登録画面
+     *
+     * @return view
+     */
+    public function new()
+    {
+
+        // テンプレートは編集と同じ
+        return view('pages.admin.transfer_check-new', [
+            'rules' => null,
+            'editData' => null,
+        ]);
+    }
+
+    /**
+     * 登録処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function create(Request $request)
+    {
+
+        return;
+    }
 
     /**
      * 編集画面
@@ -126,7 +153,7 @@ class TransferRegistController extends Controller
      */
     public function edit($transferApplyId)
     {
-        return view('pages.admin.transfer_regist-edit', [
+        return view('pages.admin.transfer_check-edit', [
             'editData' => [
                 'start_time' => "15:00"
             ],

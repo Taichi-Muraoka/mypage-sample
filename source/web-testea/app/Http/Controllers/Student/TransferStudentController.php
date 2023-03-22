@@ -78,8 +78,8 @@ class TransferStudentController extends Controller
      */
     public function new()
     {
-        // テンプレートは編集と同じ
-        return view('pages.student.transfer_student-input', [
+        // 登録画面用テンプレートを使用
+        return view('pages.student.transfer_student-new', [
             'editData' => null,
             'rules' => $this->rulesForInput(null),
         ]);
@@ -104,7 +104,7 @@ class TransferStudentController extends Controller
      */
     public function edit($transferId)
     {
-        return view('pages.student.transfer_student-input', [
+        return view('pages.student.transfer_student-edit', [
             'editData' => null,
             'rules' => $this->rulesForInput(null),
         ]);
