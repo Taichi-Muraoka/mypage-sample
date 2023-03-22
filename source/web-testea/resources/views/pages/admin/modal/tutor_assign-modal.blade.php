@@ -18,6 +18,14 @@
     </tr>
     <tr>
         <th>担当科目</th>
+        <td>国語</td>
+    </tr>
+    <tr>
+        <th>担当科目</th>
+        <td>数学</td>
+    </tr>
+    <tr>
+        <th>担当科目</th>
         <td>英語</td>
     </tr>
 </x-bs.table>
