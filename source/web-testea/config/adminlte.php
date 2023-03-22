@@ -654,7 +654,7 @@ return [
                     'active' => ['report_check*']
                 ],
                 [
-                    'text' => '生徒授業情報検索',
+                    'text' => '授業情報検索',
                     'route' => 'student_class',
                     'active' => ['student_class*']
                 ],
@@ -774,7 +774,7 @@ return [
                     'active' => ['tutor_mng*']
                 ],
                 [
-                    'text' => '講師授業検索',
+                    'text' => '講師授業時間',
                     'route' => 'tutor_class',
                     'active' => ['tutor_class*']
                 ],

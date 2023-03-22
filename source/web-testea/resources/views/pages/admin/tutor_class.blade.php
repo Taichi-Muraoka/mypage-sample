@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '講師授業検索')
+@section('title', '講師授業時間')
 
 @section('content')
 

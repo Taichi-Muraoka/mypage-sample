@@ -1680,10 +1680,10 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     })->name('tutor_assign');
 
     //---------------------
-    // 講師授業検索 モック
+    // 講師授業時間 モック
     //---------------------
 
-    // 講師授業検索一覧
+    // 講師授業時間一覧
     Route::get('/tutor_class', function () {
         return view('pages.admin.tutor_class');
     })->name('tutor_class');
