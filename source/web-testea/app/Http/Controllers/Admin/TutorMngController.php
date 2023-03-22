@@ -400,16 +400,63 @@ class TutorMngController extends Controller
      */
     public function weeklyShift($tid)
     {
-        // MEMO: 教室管理者でも全て見れるのでガードは不要
+        //==========================
+        // 既存処理
+        //==========================
+        // // MEMO: 教室管理者でも全て見れるのでガードは不要
 
-        // IDのバリデーション
-        $this->validateIds($tid);
+        // // IDのバリデーション
+        // $this->validateIds($tid);
 
+        // // 曜日の配列を取得 コードマスタより取得
+        // $weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
+
+        // // 時間帯 コードマスタにないのでappconfに定義した。
+        // $timeList = config('appconf.weekly_shift_time');
+
+        // // コロンを除いた値をIDとして扱う
+        // // 管理画面では送信しないが、教師画面と統一した
+        // $timeIdList = [];
+        // foreach ($timeList as $time) {
+        //     $timeId = str_replace(":", "", $time);
+        //     array_push($timeIdList, $timeId);
+        // }
+
+        // // 教師の空き時間を取得する
+        // $weeklyShift = WeeklyShift::where('tid', $tid)
+        //     ->get();
+
+        // // チェックボックスをセットするための値を生成
+        // // 例：['1_1030', '2_1030']
+        // $editData = [];
+        // foreach ($weeklyShift as $ws) {
+        //     // 配列に追加
+        //     array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
+        // }
+
+        // // 教師名を取得する
+        // $teacher = $this->getTeacherName($tid);
+
+        // return view('pages.admin.tutor_mng-weekly_shift', [
+        //     'weekdayList' => $weekdayList,
+        //     'timeList' => $timeList,
+        //     'timeIdList' => $timeIdList,
+        //     'editData' => [
+        //         'chkWs' => $editData
+        //     ],
+        //     'extRirekisho' => $teacher,
+        // ]);
+
+        //==========================
+        // モック用処理
+        //==========================
         // 曜日の配列を取得 コードマスタより取得
         $weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
 
-        // 時間帯 コードマスタにないのでappconfに定義した。
-        $timeList = config('appconf.weekly_shift_time');
+        // 時間帯
+        $timeList = array(
+            '0時限目','1時限目','2時限目','3時限目','4時限目','5時限目','6時限目','7時限目','授業後',
+        );
 
         // コロンを除いた値をIDとして扱う
         // 管理画面では送信しないが、教師画面と統一した

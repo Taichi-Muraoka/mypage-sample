@@ -7,7 +7,7 @@
 {{-- フォーム --}}
 <x-bs.card :form=true>
 
-  <p>空き時間を選択してください。</p>
+  <p>現在入っているレギュラー授業以外で、授業実施可能なコマ（空き時間）を登録してください。</p>
 
   {{-- チェックボックスのエラー時のメッセージ --}}
   <x-bs.form-group name="chkWs" />
@@ -40,7 +40,7 @@
       @endforeach
 
       </tr>
-      @endfor
+    @endfor
 
   </x-bs.table>
 
