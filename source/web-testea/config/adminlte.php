@@ -588,7 +588,8 @@ return [
                 // ],
                 [
                     'text' => '見込客管理',
-                    'route' => 'under_construction',
+                    'route' => 'prospect',
+                    'active' => ['prospect*']
             ],
                 [
                     'text' => '面談日程受付',
