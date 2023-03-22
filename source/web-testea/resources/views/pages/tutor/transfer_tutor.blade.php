@@ -40,7 +40,7 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th>登録日時</th>
+            <th>申請日時</th>
             <th>申請者種別</th>
             <th>授業日・時限</th>
             <th>生徒名</th>
@@ -60,7 +60,7 @@
             <td>
                 <x-button.list-dtl />
                 {{-- 申請者種別が教師のため更新ボタン非活性 --}}
-                <x-button.list-edit href="{{ route('transfer_tutor-edit', 1) }}" disabled="true"/>
+                <x-button.list-edit href="{{ route('transfer_tutor-edit', 1) }}" caption="承認" disabled=true/>
             </td>
         </tr>
         <tr>
@@ -72,7 +72,7 @@
             <td>承認待ち</td>
             <td>
                 <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('transfer_tutor-edit', 2) }}"/>
+                <x-button.list-edit href="{{ route('transfer_tutor-edit', 2) }}" caption="承認" />
             </td>
         </tr>
     </x-bs.table>

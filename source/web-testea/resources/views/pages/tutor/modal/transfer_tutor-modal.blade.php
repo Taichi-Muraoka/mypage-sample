@@ -5,7 +5,7 @@
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true :smartPhoneModal=true>
     <tr>
-        <th>登録日時</th>
+        <th>申請日時</th>
         <td>2023/01/10 17:00</td>
     </tr>
     <tr>
@@ -17,12 +17,20 @@
         <td>2023/01/30 4限 15:00</td>
     </tr>
     <tr>
-        <th>振替希望日時</th>
-        <td>2023/02/06 4限 15:00</td>
-    </tr>
-    <tr>
         <th>生徒名</th>
         <td>CWテスト生徒１</td>
+    </tr>
+    <tr>
+        <th>振替希望日時１</th>
+        <td>2023/02/03 5限 16:00</td>
+    </tr>
+    <tr>
+        <th>振替希望日時２</th>
+        <td>2023/02/04 6限 17:30</td>
+    </tr>
+    <tr>
+        <th>振替希望日時３</th>
+        <td>2023/02/06 5限 16:00</td>
     </tr>
     <tr>
         <th>振替理由</th>
@@ -31,6 +39,10 @@
     <tr>
         <th>ステータス</th>
         <td>承認待ち</td>
+    </tr>
+    <tr>
+        <th>振替日時（確定）</th>
+        <td></td>
     </tr>
 </x-bs.table>
 

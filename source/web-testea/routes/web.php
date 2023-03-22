@@ -570,7 +570,7 @@ use App\Http\Controllers\Admin\AccountMngController;
 use App\Http\Controllers\Admin\DataMngController;
 use App\Http\Controllers\Admin\SeasonShiftController;
 use App\Http\Controllers\Admin\KarteController;
-use App\Http\Controllers\Admin\TransferRegistController;
+use App\Http\Controllers\Admin\TransferCheckController;
 use App\Http\Controllers\Admin\ConferenceAcceptController;
 use App\Http\Controllers\Admin\RoomCalendarController;
 use App\Http\Controllers\Admin\ProspectController;
@@ -1560,34 +1560,37 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     //---------------------
 
     // 一覧画面
-    Route::get('/transfer_regist', [TransferRegistController::class, 'index'])->name('transfer_regist');
+    Route::get('/transfer_check', [TransferCheckController::class, 'index'])->name('transfer_check');
 
     // バリデーション(検索用)
-    Route::post('/transfer_regist/vd_search', [TransferRegistController::class, 'validationForSearch'])->name('transfer_regist-vd_search');
+    Route::post('/transfer_check/vd_search', [TransferCheckController::class, 'validationForSearch'])->name('transfer_check-vd_search');
 
     // 検索結果取得
-    Route::post('/transfer_regist/search', [TransferRegistController::class, 'search'])->name('transfer_regist-search');
+    Route::post('/transfer_check/search', [TransferCheckController::class, 'search'])->name('transfer_check-search');
 
     // // 詳細取得用
-    Route::post('/transfer_regist/get_data', [TransferRegistController::class, 'getData'])->name('transfer_regist-get_data');
+    Route::post('/transfer_check/get_data', [TransferCheckController::class, 'getData'])->name('transfer_check-get_data');
 
     // // モーダル処理
-    // Route::post('/transfer_regist/exec_modal', [TransferRegistController::class, 'execModal'])->name('transfer_regist-exec_modal');
+    // Route::post('/transfer_check/exec_modal', [TransferCheckController::class, 'execModal'])->name('transfer_check-exec_modal');
+
+    // 振替調整登録画面
+    Route::get('/transfer_check/new', [TransferCheckController::class, 'new'])->name('transfer_check-new');
 
     // 振替連絡編集
-    Route::get('/transfer_regist/edit/{transferApplyId}', [TransferRegistController::class, 'edit'])->name('transfer_regist-edit');
+    Route::get('/transfer_check/edit/{transferApplyId}', [TransferCheckController::class, 'edit'])->name('transfer_check-edit');
 
     // // カレンダーを選択された際に教室・教師の情報を返却する
-    // Route::post('/transfer_regist/get_data_select', [TransferRegistController::class, 'getDataSelect'])->name('transfer_regist-get_data_select');
+    // Route::post('/transfer_check/get_data_select', [TransferCheckController::class, 'getDataSelect'])->name('transfer_check-get_data_select');
 
     // 編集処理
-    Route::post('/transfer_regist/update', [TransferRegistController::class, 'update'])->name('transfer_regist-update');
+    Route::post('/transfer_check/update', [TransferCheckController::class, 'update'])->name('transfer_check-update');
 
     // バリデーション(登録用)
-    Route::post('/transfer_regist/vd_input', [TransferRegistController::class, 'validationForInput'])->name('transfer_regist-vd_input');
+    Route::post('/transfer_check/vd_input', [TransferCheckController::class, 'validationForInput'])->name('transfer_check-vd_input');
 
     // // 削除処理
-    // Route::post('/transfer_regist/delete', [TransferRegistController::class, 'delete'])->name('transfer_regist-delete');
+    // Route::post('/transfer_check/delete', [TransferCheckController::class, 'delete'])->name('transfer_check-delete');
 
     //---------------------
     // 管理者向け 面談日程連絡一覧 モック

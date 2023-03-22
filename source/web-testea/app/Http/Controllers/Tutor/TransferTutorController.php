@@ -110,8 +110,8 @@ class TransferTutorController extends Controller
      */
     public function new()
     {
-        // テンプレートは編集と同じ
-        return view('pages.tutor.transfer_tutor-input', [
+        // 希望日登録のテンプレートを使用
+        return view('pages.tutor.transfer_tutor-new', [
             'editData' => null,
             'rules' => $this->rulesForInput(null),
         ]);
@@ -136,7 +136,8 @@ class TransferTutorController extends Controller
      */
     public function edit($transferId)
     {
-        return view('pages.tutor.transfer_tutor-input', [
+        // 振替日承認のテンプレートを使用
+        return view('pages.tutor.transfer_tutor-edit', [
             'editData' => null,
             'rules' => $this->rulesForInput(null),
         ]);

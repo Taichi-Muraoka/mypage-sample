@@ -636,9 +636,9 @@ return [
                 // ],
                 [
                     'text' => '振替授業調整',
-                    'route' => 'transfer_regist',
-                    'active' => ['transfer_regist*'],
-                    'menuid' => 'id_transfer_regist',
+                    'route' => 'transfer_check',
+                    'active' => ['transfer_check*'],
+                    'menuid' => 'id_transfer_check',
                 ],
                 [
                     'text' => '振替残数管理',

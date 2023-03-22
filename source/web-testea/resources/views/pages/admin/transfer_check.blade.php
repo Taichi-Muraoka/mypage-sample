@@ -40,6 +40,11 @@
 {{-- 結果リスト --}}
 <x-bs.card-list>
 
+    {{-- カードヘッダ右 --}}
+    <x-slot name="tools">
+        <x-button.new href="{{ route('transfer_check-new') }}" :small=true />
+    </x-slot>
+
     {{-- テーブル --}}
     <x-bs.table :button=true>
 
@@ -66,7 +71,7 @@
             <td>承認</td>
             <td>
                 <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('transfer_regist-edit', 1) }}"/>
+                <x-button.list-edit href="{{ route('transfer_check-edit', 1) }}"/>
             </td>
         </tr>
         <tr>
@@ -79,7 +84,7 @@
             <td>承認待ち</td>
             <td>
                 <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('transfer_regist-edit', 1) }}"/>
+                <x-button.list-edit href="{{ route('transfer_check-edit', 1) }}"/>
             </td>
         </tr>
 
@@ -88,6 +93,6 @@
 </x-bs.card-list>
 
 {{-- 詳細 --}}
-@include('pages.admin.modal.transfer_regist-modal')
+@include('pages.admin.modal.transfer_check-modal')
 
 @stop

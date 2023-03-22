@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 振替調整登録・承認
+ * 振替調整承認
  */
 export default class AppClass extends PageBase {
     /**
