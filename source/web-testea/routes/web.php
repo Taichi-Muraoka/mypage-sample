@@ -1669,6 +1669,15 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/prospect/delete', [ProspectController::class, 'delete'])->name('prospect-delete');
+
+    //---------------------
+    // 空き講師検索 モック
+    //---------------------
+
+    // 空き講師検索一覧
+    Route::get('/tutor_assign', function () {
+        return view('pages.admin.tutor_assign');
+    })->name('tutor_assign');
 });
     //---------------------
     // 画面未作成のメニュー用（後で削除する）

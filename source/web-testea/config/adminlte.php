@@ -779,7 +779,8 @@ return [
                 ],
                 [
                     'text' => '空き講師検索',
-                    'route' => 'under_construction',
+                    'route' => 'tutor_assign',
+                    'active' => ['tutor_assign*']
                 ],
                 // [
                 //     'text' => '教師登録',
