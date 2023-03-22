@@ -1678,6 +1678,15 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::get('/tutor_assign', function () {
         return view('pages.admin.tutor_assign');
     })->name('tutor_assign');
+
+    //---------------------
+    // 講師授業検索 モック
+    //---------------------
+
+    // 講師授業検索一覧
+    Route::get('/tutor_class', function () {
+        return view('pages.admin.tutor_class');
+    })->name('tutor_class');
 });
     //---------------------
     // 画面未作成のメニュー用（後で削除する）

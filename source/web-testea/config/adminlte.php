@@ -775,7 +775,8 @@ return [
                 ],
                 [
                     'text' => '講師授業検索',
-                    'route' => 'under_construction',
+                    'route' => 'tutor_class',
+                    'active' => ['tutor_class*']
                 ],
                 [
                     'text' => '空き講師検索',
