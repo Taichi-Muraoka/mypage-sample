@@ -345,6 +345,7 @@ use App\Http\Controllers\Tutor\SalaryController;
 use App\Http\Controllers\Tutor\TrainingController;
 use App\Http\Controllers\Tutor\TransferTutorController;
 use App\Http\Controllers\Tutor\AttendanceController;
+use App\Http\Controllers\Tutor\SurchargeController;
 
 
 Route::group(['middleware' => ['auth', 'can:tutor']], function () {
@@ -535,6 +536,28 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // モーダル処理
     Route::post('/attendance/exec_modal', [AttendanceController::class, 'execModal'])->name('attendance-exec_modal');
 
+    //---------------------
+    // 追加請求申請 モック
+    //---------------------
+
+    // 一覧
+    Route::get('/surcharge', [SurchargeController::class, 'index'])->name('surcharge');
+
+    // 検索結果取得
+    Route::post('/surcharge/search', [SurchargeController::class, 'search'])->name('surcharge-search');
+
+    // 詳細取得用
+    Route::post('/surcharge/get_data', [SurchargeController::class, 'getData'])->name('surcharge-get_data');
+
+    // 新規登録
+    Route::get('/surcharge/new', [SurchargeController::class, 'new'])->name('surcharge-new');
+
+    // 新規登録処理
+    Route::post('/surcharge/create', [SurchargeController::class, 'create'])->name('surcharge-create');
+
+    // バリデーション(登録用)
+    Route::post('/surcharge/vd_input', [SurchargeController::class, 'validationForInput'])->name('surcharge-vd_input');
+
 });
 
 //===============================================
@@ -574,6 +597,7 @@ use App\Http\Controllers\Admin\TransferCheckController;
 use App\Http\Controllers\Admin\ConferenceAcceptController;
 use App\Http\Controllers\Admin\RoomCalendarController;
 use App\Http\Controllers\Admin\ProspectController;
+use App\Http\Controllers\Admin\SurchargeAcceptController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -1687,6 +1711,35 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::get('/tutor_class', function () {
         return view('pages.admin.tutor_class');
     })->name('tutor_class');
+
+    //---------------------
+    // 追加請求申請受付 モック
+    //---------------------
+
+    // 一覧画面
+    Route::get('/surcharge_accept', [SurchargeAcceptController::class, 'index'])->name('surcharge_accept');
+
+    // バリデーション(検索用)
+    Route::post('/surcharge_acceptg/vd_search', [SurchargeAcceptController::class, 'validationForSearch'])->name('surcharge_accept-vd_search');
+
+    // 検索結果取得
+    Route::post('/surcharge_accept/search', [SurchargeAcceptController::class, 'search'])->name('surcharge_accept-search');
+
+    // 詳細取得用
+    Route::post('/surcharge_accept/get_data', [SurchargeAcceptController::class, 'getData'])->name('surcharge_accept-get_data');
+
+    // 編集
+    Route::get('/surcharge_accept/edit/{gradesId}', [SurchargeAcceptController::class, 'edit'])->name('surcharge_accept-edit');
+
+    // 編集処理
+    Route::post('/surcharge_accept/update', [SurchargeAcceptController::class, 'update'])->name('surcharge_accept-update');
+
+    // バリデーション(登録用)
+    Route::post('/surcharge_accept/vd_input', [SurchargeAcceptController::class, 'validationForInput'])->name('surcharge_accept-vd_input');
+
+    // 削除処理
+    Route::post('/surcharge_accept/delete', [SurchargeAcceptController::class, 'delete'])->name('surcharge_accept-delete');
+
 });
     //---------------------
     // 画面未作成のメニュー用（後で削除する）

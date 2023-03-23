@@ -505,8 +505,10 @@ return [
         ],
         [
             'text' => '追加請求申請',
-            'route' => 'under_construction',
+            'route'  => 'surcharge',
+            'icon' => '',
             'can'  => 'tutor',
+            'active' => ['surcharge/*']
         ],
         [
             'text' => '給与明細',
@@ -829,7 +831,8 @@ return [
             'submenu' => [
                 [
                     'text' => '追加請求受付',
-                    'route' => 'under_construction',
+                    'route' => 'surcharge_accept',
+                    'active' => ['surcharge_accept*']
                 ],
                 [
                     'text' => '給与情報算出',
