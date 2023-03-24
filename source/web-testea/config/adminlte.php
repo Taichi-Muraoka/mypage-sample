@@ -335,13 +335,14 @@ return [
         [
             'text' => '振替授業調整',
             'route'  => 'transfer_student',
-            'icon' => 'fas fa-money-check',
+            'icon' => 'fas fa-exchange-alt',
             'can'  => 'student',
             'active' => ['transfer_student/*']
         ],
         [
             'text' => '追加授業依頼',
             'route' => 'under_construction',
+            'icon' => 'fas fa-plus-circle',
             'can'  => 'student',
         ],
         [
@@ -375,6 +376,7 @@ return [
         [
             'text' => '特別期間講習日程連絡',
             'route' => 'under_construction',
+            'icon' => 'fas fa-chalkboard',
             'can'  => 'student',
         ],
 
@@ -466,7 +468,7 @@ return [
         [
             'text' => '振替授業調整',
             'route'  => 'transfer_tutor',
-            'icon' => 'fas fa-money-check',
+            'icon' => 'fas fa-exchange-alt',
             'can'  => 'tutor',
             'active' => ['transfer_tutor/*']
         ],
@@ -501,12 +503,13 @@ return [
         [
             'text' => '特別期間講習日程連絡',
             'route' => 'under_construction',
+            'icon' => 'fas fa-chalkboard',
             'can'  => 'tutor',
         ],
         [
             'text' => '追加請求申請',
             'route'  => 'surcharge',
-            'icon' => '',
+            'icon' => 'fas fa-file-invoice-dollar',
             'can'  => 'tutor',
             'active' => ['surcharge/*']
         ],
@@ -669,7 +672,7 @@ return [
         ],
         [
             'text' => '特別期間講習管理',
-            'icon' => 'fa fa-edit',
+            'icon' => 'fas fa-chalkboard',
             'can'  => 'admin',
             'menuid' => '',
             'submenu' => [
