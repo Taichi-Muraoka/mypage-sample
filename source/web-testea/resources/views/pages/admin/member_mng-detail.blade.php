@@ -47,7 +47,7 @@
 
 <x-bs.card>
     <x-slot name="tools">
-        <x-button.edit href="{{ route('member_mng-edit', $student->sid) }}" caption="受験校管理" icon="" :small=true />
+        <x-button.edit href="{{ route('desired_mng', $student->sid) }}" caption="受験校管理" icon="" :small=true />
     </x-slot>
 
     <x-slot name="card_title">
@@ -98,7 +98,7 @@
 
 <x-bs.card>
     <x-slot name="tools">
-        <x-button.edit href="{{ route('member_mng-invoice', $student->sid) }}" caption="契約管理" icon="" :small=true />
+        <x-button.edit href="{{ route('agreement_mng', $student->sid) }}" caption="契約管理" icon="" :small=true />
         <x-button.edit href="{{ route('member_mng-invoice', $student->sid) }}" caption="請求管理" icon="" :small=true />
     </x-slot>
 

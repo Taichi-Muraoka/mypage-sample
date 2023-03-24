@@ -598,6 +598,8 @@ use App\Http\Controllers\Admin\ConferenceAcceptController;
 use App\Http\Controllers\Admin\RoomCalendarController;
 use App\Http\Controllers\Admin\ProspectController;
 use App\Http\Controllers\Admin\SurchargeAcceptController;
+use App\Http\Controllers\Admin\DesiredMngController;
+use App\Http\Controllers\Admin\AgreementMngController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -637,6 +639,74 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // PDF出力
     Route::get('/member_mng/invoice/{sid}/pdf/{date}', [MemberMngController::class, 'pdf'])->name('member_mng-pdf_invoice');
+
+    //---------------------
+    // 受験校管理 モック
+    //---------------------
+
+    // 受験校管理一覧
+    Route::get('/member_mng/desired_mng/{sid}', [DesiredMngController::class, 'index'])->name('desired_mng');
+
+    // 詳細取得用
+    Route::post('/member_mng/get_data_desired_mng', [DesiredMngController::class, 'getData'])->name('desired_mng-get_data');
+
+    // 検索結果取得
+    Route::post('/member_mng/search_desired_mng', [DesiredMngController::class, 'search'])->name('desired_mng-search');
+
+    // バリデーション(検索用)
+    Route::post('/member_mng/vd_search_desired_mng', [DesiredMngController::class, 'validationForSearch'])->name('desired_mng-vd_search');
+
+    // 受験校登録画面
+    Route::get('/member_mng/desired_mng/{sid}/new', [DesiredMngController::class, 'new'])->name('desired_mng-new');
+
+    // 新規登録処理
+    Route::post('/member_mng/create_desired_mng', [DesiredMngController::class, 'create'])->name('desired_mng-create');
+
+    // 受験校編集画面
+    Route::get('/member_mng/desired_mng/edit/{desiredId}', [DesiredMngController::class, 'edit'])->name('desired_mng-edit');
+
+    // 編集処理
+    Route::post('/member_mng/update_desired_mng', [DesiredMngController::class, 'update'])->name('desired_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/member_mng/vd_input_desired_mng', [DesiredMngController::class, 'validationForInput'])->name('desired_mng-vd_input');
+
+    // 削除処理
+    Route::post('/member_mng/delete_desired_mng', [DesiredMngController::class, 'delete'])->name('desired_mng-delete');
+
+    //---------------------
+    // 契約管理 モック
+    //---------------------
+
+    // 契約管理一覧
+    Route::get('/member_mng/agreement_mng/{sid}', [AgreementMngController::class, 'index'])->name('agreement_mng');
+
+    // 詳細取得用
+    Route::post('/member_mng/get_data_agreement_mng', [AgreementMngController::class, 'getData'])->name('agreement_mng-get_data');
+
+    // 検索結果取得
+    Route::post('/member_mng/search_agreement_mng', [AgreementMngController::class, 'search'])->name('agreement_mng-search');
+
+    // バリデーション(検索用)
+    Route::post('/member_mng/vd_search_agreement_mng', [AgreementMngController::class, 'validationForSearch'])->name('agreement_mng-vd_search');
+
+    // 契約登録画面
+    Route::get('/member_mng/agreement_mng/{sid}/new', [AgreementMngController::class, 'new'])->name('agreement_mng-new');
+
+    // 新規登録処理
+    Route::post('/member_mng/create_agreement_mng', [AgreementMngController::class, 'create'])->name('agreement_mng-create');
+
+    // 契約編集画面
+    Route::get('/member_mng/agreement_mng/edit/{agreementId}', [AgreementMngController::class, 'edit'])->name('agreement_mng-edit');
+
+    // 編集処理
+    Route::post('/member_mng/update_agreement_mng', [AgreementMngController::class, 'update'])->name('agreement_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/member_mng/vd_input_agreement_mng', [AgreementMngController::class, 'validationForInput'])->name('agreement_mng-vd_input');
+
+    // 削除処理
+    Route::post('/member_mng/delete_agreement_mng', [AgreementMngController::class, 'delete'])->name('agreement_mng-delete');
 
     //---------------------
     // 連絡記録
