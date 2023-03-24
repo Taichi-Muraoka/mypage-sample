@@ -689,11 +689,11 @@ return [
             'can'  => 'admin',
             'menuid' => '',
             'submenu' => [
-                [
-                    'text' => '生徒成績管理',
-                    'route' => 'grades_mng',
-                    'active' => ['grades_mng*']
-                ],
+                //[
+                //    'text' => '生徒成績管理',
+                //    'route' => 'grades_mng',
+                //    'active' => ['grades_mng*']
+                //],
                 [
                     'text' => '成績事例検索',
                     'route' => 'under_construction',

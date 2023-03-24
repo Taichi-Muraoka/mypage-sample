@@ -5,19 +5,19 @@
 <x-bs.table :hover=false :vHeader=true>
     <tr>
         <th width="35%">登録日</th>
-        <td>@{{item.regist_time|formatYmd}}</td>
+        <td>@2023/03/18</td>
     </tr>
     <tr>
         <th>生徒名</th>
-        <td>@{{item.sname}}</td>
+        <td>CWテスト生徒１</td>
     </tr>
     <tr>
         <th>試験種別</th>
-        <td>@{{item.type_name}}</td>
+        <td>模擬試験</td>
     </tr>
     <tr>
         <th>試験名</th>
-        <td>@{{item.teiki_name}}@{{item.moshi_name}}</td>
+        <td>全国統一模試</td>
     </tr>
     <tr>
         <th colspan="2">試験成績</th>
@@ -28,18 +28,54 @@
             {{-- tableの中にtableを書くと線が出てしまう noborder-only-topを指定した --}}
             <x-bs.table :bordered=false :hover=false class="noborder-only-top">
                 <x-slot name="thead">
-                    <th width="25%">教科</th>
-                    <th width="25%">得点</th>
-                    <th width="25%">前回比</th>
-                    <th width="25%">学年平均</th>
+                    <th width="20%">教科</th>
+                    <th width="20%">得点</th>
+                    <th width="20%">前回比</th>
+                    <th width="20%">学年平均</th>
+                    <th width="20%">偏差値</th>
                 </x-slot>
 
-                <tr v-for="gradesDetail in item.gradesDetails" v-cloak>
-                    <x-bs.td-sp>@{{gradesDetail.curriculum_name}}</x-bs.td-sp>
-                    <x-bs.td-sp>@{{gradesDetail.score}}点</x-bs.td-sp>
-                    <x-bs.td-sp>@{{gradesDetail.updown}}</x-bs.td-sp>
-                    <x-bs.td-sp vShow="gradesDetail.average != null">@{{gradesDetail.average}}点</x-bs.td-sp>
-                    <x-bs.td-sp vShow="gradesDetail.average == null"></x-bs.td-sp>
+                <tr>
+                    <x-bs.td-sp>国語</x-bs.td-sp>
+                    <x-bs.td-sp>80点</x-bs.td-sp>
+                    <x-bs.td-sp>↑</x-bs.td-sp>
+                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>62</x-bs.td-sp>
+                </tr>
+                <tr>
+                    <x-bs.td-sp>国語</x-bs.td-sp>
+                    <x-bs.td-sp>80点</x-bs.td-sp>
+                    <x-bs.td-sp>↑</x-bs.td-sp>
+                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>62</x-bs.td-sp>
+                </tr>
+                <tr>
+                    <x-bs.td-sp>数学</x-bs.td-sp>
+                    <x-bs.td-sp>75点</x-bs.td-sp>
+                    <x-bs.td-sp>↑</x-bs.td-sp>
+                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>62</x-bs.td-sp>
+                </tr>
+                <tr>
+                    <x-bs.td-sp>理科</x-bs.td-sp>
+                    <x-bs.td-sp>75点</x-bs.td-sp>
+                    <x-bs.td-sp>↑</x-bs.td-sp>
+                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>62</x-bs.td-sp>
+                </tr>
+                <tr>
+                    <x-bs.td-sp>社会</x-bs.td-sp>
+                    <x-bs.td-sp>75点</x-bs.td-sp>
+                    <x-bs.td-sp>↑</x-bs.td-sp>
+                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>62</x-bs.td-sp>
+                </tr>
+                <tr>
+                    <x-bs.td-sp>英語</x-bs.td-sp>
+                    <x-bs.td-sp>75点</x-bs.td-sp>
+                    <x-bs.td-sp>↑</x-bs.td-sp>
+                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
 
             </x-bs.table>
@@ -50,7 +86,7 @@
         <th colspan="2">次回の試験に向けての抱負</th>
     </tr>
     {{-- nl2br: 改行 --}}
-    <td colspan="2" class="nl2br">@{{item.student_comment}}</td>
+    <td colspan="2" class="nl2br">次回もがんばります</td>
 </x-bs.table>
 
 @overwrite

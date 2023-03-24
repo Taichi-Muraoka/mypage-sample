@@ -141,6 +141,10 @@
         @hasSection('parent_page')
         , parent: '@yield("parent_page")'
         @endif
+        {{-- 四階層目のページの場合。親のURLを保持しておく。戻るボタンに使用する --}}
+        @hasSection('parent_page')
+        , parent2: '@yield("parent_page2")'
+        @endif
         };
     </script>
 

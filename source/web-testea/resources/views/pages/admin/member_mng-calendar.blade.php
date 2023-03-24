@@ -2,6 +2,12 @@
 
 @section('title', 'カレンダー')
 
+{{-- 三階層目の場合：親ページを指定(URLとタイトル) --}}
+@section('parent_page', route('member_mng-detail', $editData['sid']))
+
+@section('parent_page_title', '生徒カルテ')
+
+
 {{-- 子ページ --}}
 @section('child_page', true)
 
@@ -9,10 +15,6 @@
 
 {{-- IDはローディング用 --}}
 <x-bs.card :p0=true id="card-calendar">
-    {{-- カードヘッダ右 --}}
-    <x-slot name="tools">
-        <x-button.new href="{{ route('member_mng-calendar-new', $editData['sid']) }}" caption="授業スケジュール登録" :small=true />
-    </x-slot>
 
     <x-slot name="card_title">
         {{ $name }}
@@ -26,7 +28,8 @@
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
-            <x-button.back />
+            {{-- 二階層目に戻る --}}
+            <x-button.back url="{{route('member_mng-detail', $editData['sid'])}}" />
         </div>
     </x-slot>
 

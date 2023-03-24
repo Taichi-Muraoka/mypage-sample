@@ -32,19 +32,13 @@
     <x-input.text caption="生徒名" id="name" :rules=$rules :editData=$editData/>
     <x-input.text caption="生徒名カナ" id="name_kana" :rules=$rules :editData=$editData/>
     <x-input.select caption="学年" id="cls_cd" :select2=true :blank=false :editData=$editData :mastrData=$classes/>
-    <x-input.text caption="年齢" id="age" :rules=$rules :editData=$editData/>
     <x-input.text caption="電話番号（生徒）" id="tel_student" :rules=$rules :editData=$editData/>
     <x-input.text caption="電話番号（保護者）" id="tel_guardian" :rules=$rules :editData=$editData/>
     <x-input.text caption="Email（生徒）" id="email_student" :rules=$rules :editData=$editData/>
     <x-input.text caption="Email（保護者）" id="email_guardian" :rules=$rules :editData=$editData/>
     <x-input.select caption="受講コース" id="courses" :select2=true :blank=false :editData=$editData>
-        <option value="1">オンライン個別指導</option>
-        <option value="2">小学生：基礎学力向上コース</option>
-        <option value="3">小学生：中学受験コース</option>
-        <option value="4">中学生：定期試験対策コース</option>
-        <option value="5">中学生：高校受験対策コース</option>
-        <option value="6">高校生：大学受験対策コース</option>
-        <option value="7">高校生：定期試験対策コース</option>
+        <option value="1">個別指導コース</option>
+        <option value="2">集団授業</option>
     </x-input.select>
     <x-input.select caption="所属校舎" id="schools" :select2=true :blank=false :editData=$editData>
         <option value="1">久我山</option>

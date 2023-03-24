@@ -43,10 +43,13 @@ class GradesMngController extends Controller
     /**
      * 初期画面
      *
+     * @param int $sid 生徒ID
      * @return view
      */
-    public function index()
+    public function index($sid)
     {
+        // IDのバリデーション
+        $this->validateIds($sid);
 
         // 教室リストを取得
         $rooms = $this->mdlGetRoomList(false);
@@ -56,8 +59,10 @@ class GradesMngController extends Controller
 
         return view('pages.admin.grades_mng', [
             'rules' => $this->rulesForSearch(),
+            'name' => "CWテスト生徒１",
+            'sid' => $sid,
             'rooms' => $rooms,
-            'classes' => $classes,
+            //'classes' => $classes,
             'editData' => null
         ]);
     }

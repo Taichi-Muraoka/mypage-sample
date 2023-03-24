@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 生徒成績一覧
+ * 生徒カルテ一覧
  */
 export default class AppClass extends PageBase {
     /**
@@ -19,7 +19,7 @@ export default class AppClass extends PageBase {
         //this.getVueModal();
         this.getVueModal({
             // 別画面でもモーダルを使用するのでURLを変更
-            urlSuffix: "grades_mng"
+            urlSuffix: "record"
         });
 
         // Vue: 検索フォーム
@@ -27,7 +27,7 @@ export default class AppClass extends PageBase {
         // 検索一覧の表示
         var $vueSearchList = this.getVueSearchList({
             // 別画面でも検索を使用するのでURLを変更
-            urlSuffix: "grades_mng"
+            urlSuffix: "record"
         });
         $vueSearchList.search();
     }

@@ -72,6 +72,12 @@
                                 <a href="@yield('parent_page')">@yield('parent_page_title')</a>
                             </li>
                             @endif
+                            {{-- 四階層目のページの場合 --}}
+                            @hasSection('parent_page2')
+                            <li class="breadcrumb-item">
+                                <a href="@yield('parent_page2')">@yield('parent_page_title2')</a>
+                            </li>
+                            @endif
                             {{-- タイトル --}}
                             <li class="breadcrumb-item active">@yield('title')</li>
                         </ol>

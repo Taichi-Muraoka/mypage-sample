@@ -5,6 +5,16 @@
 {{-- 子ページ --}}
 @section('child_page', true)
 
+{{-- 四階層目の場合：親ページ（二・三階層目）を指定(URLとタイトル) --}}
+@section('parent_page', route('member_mng-detail', $editData['sid']))
+
+@section('parent_page_title', '生徒カルテ')
+
+@section('parent_page2', route('grades_mng', $editData['sid']))
+
+@section('parent_page_title2', '生徒成績一覧')
+
+
 @section('content')
 
 {{-- formを指定 --}}
@@ -73,7 +83,8 @@
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
-            <x-button.back />
+            {{-- 前の階層に戻る --}}
+            <x-button.back url="{{route('grades_mng', $editData['sid'])}}" />
 
             <div class="d-flex justify-content-end">
                 <x-button.submit-delete />

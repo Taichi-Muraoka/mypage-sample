@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '会員情報詳細')
+@section('title', '生徒カルテ')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -8,6 +8,14 @@
 @section('content')
 
 <x-bs.card>
+    {{-- カードヘッダ右 --}}
+    <x-slot name="tools">
+		<x-button.edit href="{{ route('member_mng-edit', $student->sid) }}" caption="生徒情報編集" icon="" :small=true />
+    </x-slot>
+
+    <x-slot name="card_title">
+        生徒情報
+    </x-slot>
 
     <x-bs.table :hover=false :vHeader=true class="mb-4 fix">
         <tr>
@@ -27,13 +35,76 @@
             <td>{{$student->cls_name}}</td>
         </tr>
         <tr>
-            <th>所属教室</th>
+            <th>所属校舎</th>
             <td>{{$roomcds}}</td>
         </tr>
+        <tr>
+            <th>所属学校</th>
+            <td>渋谷第一中学校</td>
+        </tr>
     </x-bs.table>
+</x-bs.card>
 
-    @if(count($regular) > 0)
-    <x-bs.form-title>規定情報</x-bs.form-title>
+<x-bs.card>
+    <x-slot name="tools">
+        <x-button.edit href="{{ route('member_mng-edit', $student->sid) }}" caption="受験校管理" icon="" :small=true />
+    </x-slot>
+
+    <x-slot name="card_title">
+        受験校情報
+    </x-slot>
+
+    {{-- テーブル --}}
+    <x-bs.table :button=true class="inner-card">
+
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th width="10%">志望順</th>
+            <th>学校名</th>
+            <th>学部・学科名</th>
+            <th>受験日</th>
+            <th>合否</th>
+            <th></th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
+        <tr>
+            <td>1</td>
+            <td>青山高等学校</td>
+            <td>普通科</td>
+            <td>2023/03/03</td>
+            <td>合格</td>
+            @php
+            $ids = ['roomcd' => 110, 'seq' => 1, 'sid' => 1];
+            @endphp
+            <td>
+                <x-button.list-dtl dataTarget="#modal-dtl-regulation" :dataAttr="$ids" />
+            </td>
+        </tr>
+            <td>2</td>
+            <td>成城第二高等学校</td>
+            <td>特進科</td>
+            <td>2023/02/01</td>
+            <td>合格</td>
+            @php
+            $ids = ['roomcd' => 110, 'seq' => 1, 'sid' => 1];
+            @endphp
+            <td>
+                <x-button.list-dtl dataTarget="#modal-dtl-regulation" :dataAttr="$ids" />
+            </td>
+        </tr>
+    </x-bs.table>
+</x-bs.card>
+
+<x-bs.card>
+    <x-slot name="tools">
+        <x-button.edit href="{{ route('member_mng-invoice', $student->sid) }}" caption="契約管理" icon="" :small=true />
+        <x-button.edit href="{{ route('member_mng-invoice', $student->sid) }}" caption="請求管理" icon="" :small=true />
+    </x-slot>
+
+    <x-slot name="card_title">
+        契約情報
+    </x-slot>
 
     {{-- テーブル --}}
     <x-bs.table :button=true class="inner-card">
@@ -62,74 +133,177 @@
             </tr>
             @endfor
     </x-bs.table>
-    @endif
+</x-bs.card>
 
-    @if(count($home_teacher_std) > 0)
-    {{-- 余白 --}}
-    <div class="mb-3"></div>
+<x-bs.card>
+    <x-slot name="tools">
+        <x-button.edit href="{{ route('member_mng-calendar', $student->sid) }}" caption="カレンダー" icon="" :small=true />
+    </x-slot>
 
-    <x-bs.form-title>家庭教師標準情報</x-bs.form-title>
+    <x-slot name="card_title">
+        受講情報
+    </x-slot>
 
     {{-- テーブル --}}
     <x-bs.table :button=true class="inner-card">
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">開始日</th>
-            <th width="15%">終了日</th>
-            <th width="15%">月額</th>
-            <th>家庭教師標準</th>
+            <th width="15%">授業日</th>
+            <th>時限</th>
+            <th>校舎</th>
+            <th>講師名</th>
+            <th>コース名</th>
+            <th>教科</th>
+            <th>授業種別</th>
+            <th>出欠ステータス</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
-        @for ($i = 0; $i < count($home_teacher_std); $i++) <tr>
-            <td>{{$home_teacher_std[$i]->startdate->format('Y/m/d')}}</td>
-            <td>{{$home_teacher_std[$i]->enddate->format('Y/m/d')}}</td>
-            <td class="t-price">{{number_format($home_teacher_std[$i]->tuition)}}</td>
-            <td>{{$home_teacher_std[$i]->std_summary}}</td>
-            @php
-            $ids = ['roomcd' => $home_teacher_std[$i]->roomcd, 'seq' => $home_teacher_std[$i]->std_seq, 'sid' => $home_teacher_std[$i]->sid];
-            @endphp
+        <tr>
+            <td>2023/03/03</td>
+            <td>6</td>
+            <td>久我山</td>
+            <td>CWテスト教師１０１</td>
+            <td>個別指導コース</td>
+            <td>数学</td>
+            <td>初回授業（入会金無料）</td>
+            <td>出席</td>
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-tutor" :dataAttr="$ids" />
+                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
             </td>
-            </tr>
-            @endfor
+        </tr>
+        <tr>
+            <td>2023/03/10</td>
+            <td>6</td>
+            <td>久我山</td>
+            <td>CWテスト教師１０１</td>
+            <td>個別指導コース</td>
+            <td>英語</td>
+            <td>通常</td>
+            <td>出席</td>
+            <td>
+                <x-button.list-dtl />
+            </td>
+        </tr>
+        <tr>
+            <td>2023/03/17</td>
+            <td>6</td>
+            <td>久我山</td>
+            <td>CWテスト教師１０１</td>
+            <td>個別指導コース</td>
+            <td>英語</td>
+            <td>通常</td>
+            <td>後日振替（振替日未定）</td>
+            <td>
+                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
+            </td>
+        </tr>
+        <tr>
+            <td>2023/03/24</td>
+            <td>5</td>
+            <td>久我山</td>
+            <td>CWテスト教師１０２</td>
+            <td>個別指導コース</td>
+            <td>数学</td>
+            <td>通常</td>
+            <td>実施前</td>
+            <td>
+                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
+            </td>
+        </tr>
     </x-bs.table>
-    @endif
 
-    @if(count($extra_individual) > 0)
-    {{-- 余白 --}}
-    <div class="mb-3"></div>
+</x-bs.card>
 
-    <x-bs.form-title>短期個別講習情報</x-bs.form-title>
+<x-bs.card>
+    <x-slot name="tools">
+        <x-button.edit href="{{ route('grades_mng', $student->sid) }}" caption="成績管理" icon="" :small=true />
+    </x-slot>
+
+    <x-slot name="card_title">
+        成績情報<span  style='color: red'>&emsp;<i class="fas fa-exclamation-triangle"></i>&nbsp;成績未登録あり</span>
+    </x-slot>
 
     {{-- テーブル --}}
     <x-bs.table :button=true class="inner-card">
+
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">教室</th>
-            <th width="15%">講習料</th>
-            <th>講習名</th>
+            <th width="15%">登録日</th>
+            <th width="15%">試験種別</th>
+            <th>試験名</th>
+            <th>合計点</th>
+            <th>偏差値</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
-        @for ($i = 0; $i < count($extra_individual); $i++) <tr>
-            <td>{{$extra_individual[$i]->room_name}}</td>
-            <td class="t-price">{{number_format($extra_individual[$i]->price)}}</td>
-            <td>{{$extra_individual[$i]->name}}</td>
-            @php
-            $ids = ['roomcd' => $extra_individual[$i]->roomcd, 'seq' => $extra_individual[$i]->i_seq, 'sid' => $extra_individual[$i]->sid];
-            @endphp
+        <tr>
+            <td>2023/03/18</td>
+            <td>模擬試験</td>
+            <td>全国統一模試</td>
+            <td>391</td>
+            <td>62</td>
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-course" :dataAttr="$ids" />
+                <x-button.list-dtl dataTarget="#modal-dtl-grades_mng" />
             </td>
-            </tr>
-            @endfor
+        </tr>
+        <tr>
+            <td>2023/02/28</td>
+            <td>定期考査</td>
+            <td>学年末考査</td>
+            <td>380</td>
+            <td></td>
+            <td>
+                <x-button.list-dtl dataTarget="#modal-dtl-grades_mng" />
+            </td>
+        </tr>
     </x-bs.table>
-    @endif
+
+</x-bs.card>
+
+<x-bs.card>
+    <x-slot name="tools">
+        <x-button.edit href="{{ route('record', $student->sid) }}" caption="記録管理" icon="" :small=true />
+    </x-slot>
+
+    <x-slot name="card_title">
+        連絡記録
+    </x-slot>
+
+    {{-- テーブル --}}
+    <x-bs.table :button=true class="inner-card">
+
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th width="20%">対応日時</th>
+            <th>記録種別</th>
+            <th>校舎</th>
+            <th>担当者名</th>
+            <th></th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
+        <tr>
+            <td>2023/01/10 17:00</td>
+            <td>面談記録</td>
+            <td>久我山</td>
+            <td>山田　太郎</td>
+            <td>
+                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
+            </td>
+        <tr>
+            <td>2023/01/09 19:30</td>
+            <td>電話記録</td>
+            <td>久我山</td>
+            <td>鈴木　花子</td>
+            <td>
+                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
+            </td>
+        </tr>
+    </x-bs.table>
 
     {{-- フッター --}}
     <x-slot name="footer">
@@ -143,9 +317,9 @@
 {{-- モーダル --}}
 {{-- 規定情報 --}}
 @include('pages.admin.modal.member_mng_regulation-modal', ['modal_id' => 'modal-dtl-regulation'])
-{{-- 家庭教師標準情報 --}}
-@include('pages.admin.modal.member_mng_tutor-modal', ['modal_id' => 'modal-dtl-tutor'])
-{{-- 短期個別講習 --}}
-@include('pages.admin.modal.member_mng_course-modal', ['modal_id' => 'modal-dtl-course'])
+{{-- 生徒成績 --}}
+@include('pages.admin.modal.grades_mng-modal', ['modal_id' => 'modal-dtl-grades_mng'])
+{{-- 電話・面談記録 --}}
+@include('pages.admin.modal.record-modal', ['modal_id' => 'modal-dtl-record'])
 
 @stop

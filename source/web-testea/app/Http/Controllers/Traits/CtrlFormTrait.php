@@ -89,6 +89,7 @@ trait CtrlFormTrait
             $window['last'],
         ]);
 
+        $this->debug($items);
         // 結果を返却
         return ['paginator' => $paginator, 'elements' => $elements];
     }

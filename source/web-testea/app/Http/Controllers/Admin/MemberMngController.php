@@ -106,6 +106,7 @@ class MemberMngController extends Controller
             ->select(
                 'sid',
                 'name',
+                'mailaddress1',
                 'ext_generic_master.name1 AS cls_name',
                 'enter_date'
             )
@@ -242,7 +243,12 @@ class MemberMngController extends Controller
                 // 短期個別講習を取得する
                 return $this->getStudentExtraIndividual($sid, $roomcd, $seq);
 
-            default:
+                case "#modal-dtl-grades_mng":
+
+                    // 家庭教師標準情報を取得する
+                    return $this->getStudentHomeTeacherStd($sid, $roomcd, $seq);
+    
+                default:
                 // 該当しない場合
                 $this->illegalResponseErr();
         }

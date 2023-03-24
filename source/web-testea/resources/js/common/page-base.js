@@ -366,6 +366,13 @@ export default class PageBase {
         // MEMO: bladeで@yield('parent_page')を指定する。
         location.href = appInfo.parent;
     }
+    /**
+     * 親ページへリダイレクト
+     */
+    redirectToParent2() {
+        // MEMO: bladeで@yield('parent_page2')を指定する。
+        location.href = appInfo.parent2;
+    }
 
     //--------------------------------------------
     // カレンダー処理

@@ -24,18 +24,18 @@ export default class AppClass extends PageBase {
         });
 
         // Vue: モーダル(家庭教師標準情報)
-        this.getVueModal({
-            id: "#modal-dtl-tutor",
-            // 別画面でもモーダルを使用するのでURLを変更
-            urlSuffix: "detail",
-        });
+        //this.getVueModal({
+        //    id: "#modal-dtl-tutor",
+        //    // 別画面でもモーダルを使用するのでURLを変更
+        //    urlSuffix: "detail",
+        //});
 
         // Vue: モーダル(短期個別講習)
-        this.getVueModal({
-            id: "#modal-dtl-course",
-            // 別画面でもモーダルを使用するのでURLを変更
-            urlSuffix: "detail",
-        });
+        //this.getVueModal({
+        //    id: "#modal-dtl-course",
+        //    // 別画面でもモーダルを使用するのでURLを変更
+        //    urlSuffix: "detail",
+        //});
 
     }
 }

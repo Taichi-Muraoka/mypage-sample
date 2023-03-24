@@ -592,7 +592,7 @@ use App\Http\Controllers\Admin\MasterMngController;
 use App\Http\Controllers\Admin\AccountMngController;
 use App\Http\Controllers\Admin\DataMngController;
 use App\Http\Controllers\Admin\SeasonShiftController;
-use App\Http\Controllers\Admin\KarteController;
+use App\Http\Controllers\Admin\RecordController;
 use App\Http\Controllers\Admin\TransferCheckController;
 use App\Http\Controllers\Admin\ConferenceAcceptController;
 use App\Http\Controllers\Admin\RoomCalendarController;
@@ -614,7 +614,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/member_mng/search', [MemberMngController::class, 'search'])->name('member_mng-search');
 
-    // 会員情報詳細
+    // 会員情報詳細（生徒カルテ）
     Route::get('/member_mng/detail/{sid}', [MemberMngController::class, 'detail'])->name('member_mng-detail');
 
     // 会員情報詳細 - 詳細取得用
@@ -637,6 +637,69 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // PDF出力
     Route::get('/member_mng/invoice/{sid}/pdf/{date}', [MemberMngController::class, 'pdf'])->name('member_mng-pdf_invoice');
+
+    //---------------------
+    // 連絡記録
+    //---------------------
+
+    // 連絡記録一覧
+    Route::get('/member_mng/record/{sid}', [RecordController::class, 'index'])->name('record');
+
+    // 詳細取得用
+    Route::post('/member_mng/get_data_record', [RecordController::class, 'getData'])->name('record-get_data');
+
+    // 検索結果取得
+    Route::post('/member_mng/search_record', [RecordController::class, 'search'])->name('record-search');
+
+    // バリデーション(検索用)
+    Route::post('/member_mng/vd_search_record', [RecordController::class, 'validationForSearch'])->name('record-vd_search');
+
+    // 連絡記録登録画面
+    Route::get('/member_mng/record/{sid}/new', [RecordController::class, 'new'])->name('record-new');
+
+    // 新規登録処理
+    Route::post('/member_mng/create_record', [RecordController::class, 'create'])->name('record-create');
+
+    // 連絡記録編集画面
+    Route::get('/member_mng/record/edit/{recordId}', [RecordController::class, 'edit'])->name('record-edit');
+
+    // 編集処理
+    Route::post('/member_mng/update_record', [RecordController::class, 'update'])->name('record-update');
+
+    // バリデーション(登録用)
+    Route::post('/member_mng/vd_input_record', [RecordController::class, 'validationForInput'])->name('record-vd_input');
+
+    // 削除処理
+    Route::post('/member_mng/delete_record', [RecordController::class, 'delete'])->name('record-delete');
+
+    //---------------------
+    // 生徒成績
+    //---------------------
+
+    // 一覧画面
+    Route::get('/member_mng/grades_mng/{sid}', [GradesMngController::class, 'index'])->name('grades_mng');
+
+    // 検索結果取得
+    Route::post('/member_mng/search_grades_mng', [GradesMngController::class, 'search'])->name('grades_mng-search');
+
+    // 詳細取得用
+    Route::post('/member_mng/get_data_grades_mng', [GradesMngController::class, 'getData'])->name('grades_mng-get_data');
+
+    // 生徒成績編集
+    Route::get('/member_mng/grades_mng/edit/{gradesId}', [GradesMngController::class, 'edit'])->name('grades_mng-edit');
+
+    // 編集処理
+    Route::post('/member_mng/update_grades_mng', [GradesMngController::class, 'update'])->name('grades_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/member_mng/vd_input_grades_mng', [GradesMngController::class, 'validationForInput'])->name('grades_mng-vd_input');
+
+    // 削除処理
+    Route::post('/member_mng/delete_grades_mng', [GradesMngController::class, 'delete'])->name('grades_mng-delete');
+
+    //---------------------
+    // 教室カレンダー
+    //---------------------
 
     // 教室カレンダー（モック）
     Route::get('/room_calendar', [RoomCalendarController::class, 'calendar'])->name('room_calendar');
@@ -664,6 +727,10 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/room_calendar/delete', [RoomCalendarController::class, 'delete'])->name('room_calendar-delete');
+
+    //---------------------
+    // レギュラーカレンダー
+    //---------------------
 
     // defaultWeekカレンダー（モック）
     Route::get('/regular_schedule', [RoomCalendarController::class, 'defaultweek'])->name('regular_schedule');
@@ -694,6 +761,10 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/regular_schedule/delete', [RoomCalendarController::class, 'delete'])->name('regular_schedule-delete');
+
+    //---------------------
+    // イベントカレンダー
+    //---------------------
 
     // イベントカレンダー（仮）
     Route::get('/event_calendar', [RoomCalendarController::class, 'eventCalendar'])->name('event_calendar');
@@ -997,28 +1068,28 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     //---------------------
 
     // 一覧画面
-    Route::get('/grades_mng', [GradesMngController::class, 'index'])->name('grades_mng');
+    //Route::get('/grades_mng', [GradesMngController::class, 'index'])->name('grades_mng');
 
     // バリデーション(検索用)
-    Route::post('/grades_mng/vd_search', [GradesMngController::class, 'validationForSearch'])->name('grades_mng-vd_search');
+    //Route::post('/grades_mng/vd_search', [GradesMngController::class, 'validationForSearch'])->name('grades_mng-vd_search');
 
     // 検索結果取得
-    Route::post('/grades_mng/search', [GradesMngController::class, 'search'])->name('grades_mng-search');
+    //Route::post('/grades_mng/search', [GradesMngController::class, 'search'])->name('grades_mng-search');
 
     // 詳細取得用
-    Route::post('/grades_mng/get_data', [GradesMngController::class, 'getData'])->name('grades_mng-get_data');
+    //Route::post('/grades_mng/get_data', [GradesMngController::class, 'getData'])->name('grades_mng-get_data');
 
     // 生徒成績編集
-    Route::get('/grades_mng/edit/{gradesId}', [GradesMngController::class, 'edit'])->name('grades_mng-edit');
+    //Route::get('/grades_mng/edit/{gradesId}', [GradesMngController::class, 'edit'])->name('grades_mng-edit');
 
     // 編集処理
-    Route::post('/grades_mng/update', [GradesMngController::class, 'update'])->name('grades_mng-update');
+    //Route::post('/grades_mng/update', [GradesMngController::class, 'update'])->name('grades_mng-update');
 
     // バリデーション(登録用)
-    Route::post('/grades_mng/vd_input', [GradesMngController::class, 'validationForInput'])->name('grades_mng-vd_input');
+    //Route::post('/grades_mng/vd_input', [GradesMngController::class, 'validationForInput'])->name('grades_mng-vd_input');
 
     // 削除処理
-    Route::post('/grades_mng/delete', [GradesMngController::class, 'delete'])->name('grades_mng-delete');
+    //Route::post('/grades_mng/delete', [GradesMngController::class, 'delete'])->name('grades_mng-delete');
 
     //---------------------
     // スケジュール取込
@@ -1497,40 +1568,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // バリデーション(登録用)
     Route::post('/season_shift/vd_input', [SeasonShiftController::class, 'validationForInput'])->name('season_shift-vd_input');
-
-    //---------------------
-    // 生徒カルテ モック
-    //---------------------
-
-    // 生徒カルテ一覧
-    Route::get('/karte', [KarteController::class, 'index'])->name('karte');
-
-    // 詳細取得用
-    Route::post('/karte/get_data', [KarteController::class, 'getData'])->name('karte-get_data');
-
-    // 検索結果取得
-    Route::post('/karte/search', [KarteController::class, 'search'])->name('karte-search');
-
-    // バリデーション(検索用)
-    Route::post('/karte/vd_search', [KarteController::class, 'validationForSearch'])->name('karte-vd_search');
-
-    // 生徒カルテ登録画面
-    Route::get('/karte/new', [KarteController::class, 'new'])->name('karte-new');
-
-    // 新規登録処理
-    Route::post('/karte/create', [KarteController::class, 'create'])->name('karte-create');
-
-    // 生徒カルテ編集画面
-    Route::get('/karte/edit/{karteId}', [KarteController::class, 'edit'])->name('karte-edit');
-
-    // 編集処理
-    Route::post('/karte/update', [KarteController::class, 'update'])->name('karte-update');
-
-    // バリデーション(登録用)
-    Route::post('/karte/vd_input', [KarteController::class, 'validationForInput'])->name('karte-vd_input');
-
-    // 削除処理
-    Route::post('/karte/delete', [KarteController::class, 'delete'])->name('karte-delete');
 
     //---------------------
     // 生徒スケジュール登録 モック

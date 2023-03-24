@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-//use App\Models\ExtStudentKihon;
+use App\Models\ExtStudentKihon;
 use App\Models\ExtSchedule;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
@@ -16,7 +16,7 @@ use Carbon\Carbon;
 /**
  * 生徒カルテ - コントローラ
  */
-class KarteController extends Controller
+class RecordController extends Controller
 {
 
     // 機能共通処理：
@@ -37,15 +37,24 @@ class KarteController extends Controller
     /**
      * 初期画面
      *
+     * @param int $sid 生徒ID
      * @return view
      */
-    public function index()
+    public function index($sid)
     {
+        // IDのバリデーション
+        $this->validateIds($sid);
+
         // 教室リストを取得
         $rooms = $this->mdlGetRoomList(false);
 
-        return view('pages.admin.karte', [
+        // 生徒名を取得する
+        $student = $this->getStudentName($sid);
+
+        return view('pages.admin.record', [
             'rules' => $this->rulesForSearch(),
+            'name' => $student->name,
+            'sid' => $sid,
             'rooms' => $rooms,
             'editData' => null
         ]);
@@ -110,14 +119,20 @@ class KarteController extends Controller
     /**
      * 登録画面
      *
+     * @param int $sid 生徒ID
      * @return view
      */
-    public function new()
+    public function new($sid)
     {
 
+        $editData = [
+            'sid' => $sid
+            //"record_kind" => 1
+        ];
+
         // テンプレートは編集と同じ
-        return view('pages.admin.karte-input', [
-            'editData' => null,
+        return view('pages.admin.record-input', [
+            'editData' => $editData,
         ]);
     }
 
@@ -136,18 +151,18 @@ class KarteController extends Controller
     /**
      * 編集画面
      *
-     * @param int $karteId 生徒カルテID
+     * @param int $recordId 生徒カルテID
      * @return view
      */
-    public function edit($karteId)
+    public function edit($recordId)
     {
 
         $editData = [
             "sid" => 1,
-            "karte_kind" => 1
+            "record_kind" => 1
         ];
 
-        return view('pages.admin.karte-input', [
+        return view('pages.admin.record-input', [
             'editData' => $editData,
             'rules' => $this->rulesForInput(null),
         ]);
@@ -201,5 +216,28 @@ class KarteController extends Controller
         $rules = array();
 
         return $rules;
+    }
+    //==========================
+    // クラス内共通処理
+    //==========================
+
+    /**
+     * 生徒名の取得
+     *
+     * @param int $sid 生徒Id
+     * @return object
+     */
+    private function getStudentName($sid)
+    {
+        // 生徒名を取得する
+        $query = ExtStudentKihon::query();
+        $student = $query
+            ->select(
+                'name'
+            )
+            ->where('ext_student_kihon.sid', '=', $sid)
+            ->firstOrFail();
+
+        return $student;
     }
 }
