@@ -600,6 +600,7 @@ use App\Http\Controllers\Admin\ProspectController;
 use App\Http\Controllers\Admin\SurchargeAcceptController;
 use App\Http\Controllers\Admin\DesiredMngController;
 use App\Http\Controllers\Admin\AgreementMngController;
+use App\Http\Controllers\Admin\TransferRequiredController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -1846,6 +1847,22 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/surcharge_accept/delete', [SurchargeAcceptController::class, 'delete'])->name('surcharge_accept-delete');
+
+    //---------------------
+    // 要振替授業管理 モック
+    //---------------------
+
+    // 一覧画面
+    Route::get('/transfer_required', [TransferRequiredController::class, 'index'])->name('transfer_required');
+
+    // バリデーション(検索用)
+    Route::post('/transfer_required/vd_search', [TransferRequiredController::class, 'validationForSearch'])->name('transfer_required-vd_search');
+
+    // 検索結果取得
+    Route::post('/transfer_required/search', [TransferRequiredController::class, 'search'])->name('transfer_required-search');
+
+    // 詳細取得用
+    Route::post('/transfer_required/get_data', [TransferRequiredController::class, 'getData'])->name('transfer_required-get_data');
 
 });
     //---------------------

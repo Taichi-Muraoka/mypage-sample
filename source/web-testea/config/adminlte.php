@@ -646,8 +646,10 @@ return [
                     'menuid' => 'id_transfer_check',
                 ],
                 [
-                    'text' => '振替残数管理',
-                    'route' => 'under_construction',
+                    'text' => '要振替授業管理',
+                    'route' => 'transfer_required',
+                    'active' => ['transfer_required*'],
+                    'menuid' => 'id_transfer_required',
                 ],
                 [
                     'text' => '追加授業申請受付',
