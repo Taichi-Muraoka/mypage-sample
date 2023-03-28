@@ -25,13 +25,17 @@
             <td>{{$student->cls_name}}</td>
         </tr>
         <tr>
-            <th>所属教室</th>
+            <th>所属校舎</th>
             <td>{{$roomcds}}</td>
+        </tr>
+        <tr>
+            <th>所属学校</th>
+            <td>渋谷第一中学校</td>
         </tr>
     </x-bs.table>
 
     @if(count($regular) > 0)
-    <x-bs.form-title>規定情報</x-bs.form-title>
+    <x-bs.form-title>契約情報</x-bs.form-title>
 
     {{-- テーブル --}}
     <x-bs.table :button=true :smartPhone=true class="inner-card">
@@ -40,7 +44,7 @@
             <th width="15%">開始日</th>
             <th width="15%">終了日</th>
             <th width="15%">月額</th>
-            <th>規定情報</th>
+            <th>契約情報</th>
             <th></th>
         </x-slot>
 
@@ -49,46 +53,12 @@
             <x-bs.td-sp caption="開始日">{{$regular[$i]->startdate->format('Y/m/d')}}</x-bs.td-sp>
             <x-bs.td-sp caption="終了日">{{$regular[$i]->enddate->format('Y/m/d')}}</x-bs.td-sp>
             <x-bs.td-sp caption="月額" class="t-price">{{number_format($regular[$i]->tuition)}}</x-bs.td-sp>
-            <x-bs.td-sp caption="規定情報">{{$regular[$i]->regular_summary}}</x-bs.td-sp>
+            <x-bs.td-sp caption="契約情報">{{$regular[$i]->regular_summary}}</x-bs.td-sp>
             @php
             $ids = ['roomcd' => $regular[$i]->roomcd, 'r_seq' => $regular[$i]->r_seq];
             @endphp
             <td>
                 <x-button.list-dtl dataTarget="#modal-dtl-regulation" :dataAttr="$ids" />
-            </td>
-            </tr>
-            @endfor
-    </x-bs.table>
-    @endif
-
-    @if(count($home_teacher_std) > 0)
-    {{-- 余白 --}}
-    <div class="mb-3"></div>
-
-    <x-bs.form-title>家庭教師標準情報</x-bs.form-title>
-
-    {{-- テーブル --}}
-    <x-bs.table :button=true :smartPhone=true class="inner-card">
-        {{-- テーブルタイトル行 --}}
-        <x-slot name="thead">
-            <th width="15%">開始日</th>
-            <th width="15%">終了日</th>
-            <th width="15%">月額</th>
-            <th>家庭教師標準</th>
-            <th></th>
-        </x-slot>
-
-        {{-- テーブル行 --}}
-        @for ($i = 0; $i < count($home_teacher_std); $i++) <tr>
-            <x-bs.td-sp caption="開始日">{{$home_teacher_std[$i]->startdate->format('Y/m/d')}}</x-bs.td-sp>
-            <x-bs.td-sp caption="終了日">{{$home_teacher_std[$i]->enddate->format('Y/m/d')}}</x-bs.td-sp>
-            <x-bs.td-sp caption="月額" class="t-price">{{number_format($home_teacher_std[$i]->tuition)}}</x-bs.td-sp>
-            <x-bs.td-sp caption="家庭教師標準">{{$home_teacher_std[$i]->std_summary}}</x-bs.td-sp>
-            @php
-            $ids = ['roomcd' => $home_teacher_std[$i]->roomcd, 'std_seq' => $home_teacher_std[$i]->std_seq];
-            @endphp
-            <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-tutor" :dataAttr="$ids" />
             </td>
             </tr>
             @endfor
@@ -130,10 +100,8 @@
 </x-bs.card>
 
 {{-- モーダル --}}
-{{-- 規定情報 --}}
+{{--契約情報 --}}
 @include('pages.student.modal.agreement_regulation-modal', ['modal_id' => 'modal-dtl-regulation'])
-{{-- 家庭教師標準情報 --}}
-@include('pages.student.modal.agreement_tutor-modal', ['modal_id' => 'modal-dtl-tutor'])
 {{-- 短期個別講習 --}}
 @include('pages.student.modal.agreement_course-modal', ['modal_id' => 'modal-dtl-course'])
 

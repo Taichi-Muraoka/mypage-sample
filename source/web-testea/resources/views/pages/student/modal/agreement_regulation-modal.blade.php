@@ -6,7 +6,7 @@
 <x-bs.table :hover=false :vHeader=true>
 
     <tr>
-        <th width="35%">教室</th>
+        <th width="35%">校舎</th>
         <td>@{{item.dtl_room_name}}</td>
     </tr>
     <tr>
@@ -22,13 +22,13 @@
         <td>@{{item.dtl_tuition|toLocaleString}}</td>
     </tr>
     <tr>
-        <th>規定情報</th>
+        <th>契約情報</th>
         <td>@{{item.dtl_regular_summary}}</td>
     </tr>
 
 </x-bs.table>
 
-<x-bs.form-title>規定詳細</x-bs.form-title>
+<x-bs.form-title>契約詳細</x-bs.form-title>
 
 {{-- 最大10件なのでページネータなし --}}
 <x-bs.table :smartPhoneModal=true class="modal-fix">
