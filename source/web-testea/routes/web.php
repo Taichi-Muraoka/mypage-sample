@@ -601,6 +601,7 @@ use App\Http\Controllers\Admin\SurchargeAcceptController;
 use App\Http\Controllers\Admin\DesiredMngController;
 use App\Http\Controllers\Admin\AgreementMngController;
 use App\Http\Controllers\Admin\TransferRequiredController;
+use App\Http\Controllers\Admin\GradeExampleController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -1863,6 +1864,22 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 詳細取得用
     Route::post('/transfer_required/get_data', [TransferRequiredController::class, 'getData'])->name('transfer_required-get_data');
+
+    //---------------------
+    // 成績事例検索 モック
+    //---------------------
+
+    // 一覧画面
+    Route::get('/grade_example', [GradeExampleController::class, 'index'])->name('grade_example');
+
+    // バリデーション(検索用)
+    Route::post('/grade_example/vd_search', [GradeExampleController::class, 'validationForSearch'])->name('grade_example-vd_search');
+
+    // 検索結果取得
+    Route::post('/grade_example/search', [GradeExampleController::class, 'search'])->name('tgrade_example-search');
+
+    // 詳細取得用
+    Route::post('/grade_example/get_data', [GradeExampleController::class, 'getData'])->name('grade_example-get_data');
 
 });
     //---------------------

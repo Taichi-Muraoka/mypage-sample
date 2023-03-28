@@ -701,7 +701,9 @@ return [
                 //],
                 [
                     'text' => '成績事例検索',
-                    'route' => 'under_construction',
+                    'route' => 'grade_example',
+                    'active' => ['grade_example*'],
+                    'menuid' => 'id_grade_example',
                 ],
             ]
         ],
