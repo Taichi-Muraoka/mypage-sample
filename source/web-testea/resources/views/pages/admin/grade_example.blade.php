@@ -9,7 +9,7 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="kinds" caption="校舎" :select2=true>
+            <x-input.select id="school" caption="校舎" :select2=true>
                 <option value="1">久我山</option>
                 <option value="2">西永福</option>
                 <option value="3">本郷</option>
@@ -17,6 +17,7 @@
         </x-bs.col2>
         <x-bs.col2>
             <x-bs.form-group name="notice_groups">
+                <x-bs.form-title>学年</x-bs.form-title>
                 {{-- 学年チェックボックス --}}
                 @for ($i = 0; $i < count($noticeGroup); $i++)
                 <x-input.checkbox :caption="$noticeGroup[$i]"
@@ -60,6 +61,7 @@
     <x-bs.row>
         <x-bs.col2>
             <x-bs.form-group name="subject_groups">
+                <x-bs.form-title>教科</x-bs.form-title>
                 {{-- 教科チェックボックス --}}
                 @for ($i = 0; $i < count($subjectGroup); $i++)
                 <x-input.checkbox :caption="$subjectGroup[$i]"
@@ -69,7 +71,12 @@
             </x-bs.form-group>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text caption="成績条件" id="grade_conditions" />
+            <x-bs.form-title>成績条件</x-bs.form-title>
+            <x-input.radio caption="点数" id="score" name="kinds"
+                value="1" :editData=$editData />
+            <x-input.radio caption="偏差値" id="deviation" name="kinds"
+                value="2" :editData=$editData />
+            <x-input.text id="grade_conditions" />
             <x-input.radio caption="UP" id="up" name="conditions"
                 value="1" :editData=$editData />
             <x-input.radio caption="DOWN" id="down" name="conditions"
