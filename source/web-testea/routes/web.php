@@ -95,6 +95,7 @@ use App\Http\Controllers\Student\InvoiceController;
 use App\Http\Controllers\Student\LeaveController;
 use App\Http\Controllers\Student\ConferenceController;
 use App\Http\Controllers\Student\TransferStudentController;
+use App\Http\Controllers\Student\ExtraLessonController;
 
 Route::group(['middleware' => ['auth', 'can:student']], function () {
 
@@ -330,6 +331,20 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
 
     // バリデーション(登録用)
     Route::post('/transfer_student/vd_input', [TransferStudentController::class, 'validationForInput'])->name('transfer_student-vd_input');
+
+    //---------------------
+    // 追加授業依頼 モック
+    //---------------------
+
+    // 申請
+    Route::get('/extra_lesson', [ExtraLessonController::class, 'index'])->name('extra_lesson');
+
+    // 新規登録処理
+    Route::post('/extra_lesson/create', [ExtraLessonController::class, 'create'])->name('extra_lesson-create');
+
+    // バリデーション(登録用)
+    Route::post('/extra_lesson/vd_input', [ExtraLessonController::class, 'validationForInput'])->name('extra_lesson-vd_input');
+
 });
 
 //===============================================
@@ -602,6 +617,7 @@ use App\Http\Controllers\Admin\DesiredMngController;
 use App\Http\Controllers\Admin\AgreementMngController;
 use App\Http\Controllers\Admin\TransferRequiredController;
 use App\Http\Controllers\Admin\GradeExampleController;
+use App\Http\Controllers\Admin\ExtraLessonMngController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -1880,6 +1896,43 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 詳細取得用
     Route::post('/grade_example/get_data', [GradeExampleController::class, 'getData'])->name('grade_example-get_data');
+
+    //---------------------
+    // 追加授業申請受付
+    //---------------------
+
+    // 一覧画面
+    Route::get('/extra_lesson_mng', [ExtraLessonMngController::class, 'index'])->name('extra_lesson_mng');
+
+    // バリデーション(検索用)
+    Route::post('/extra_lesson_mng/vd_search', [ExtraLessonMngController::class, 'validationForSearch'])->name('extra_lesson_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/extra_lesson_mng/search', [ExtraLessonMngController::class, 'search'])->name('extra_lesson_mng-search');
+
+    // 詳細取得用
+    Route::post('/extra_lesson_mng/get_data', [ExtraLessonMngController::class, 'getData'])->name('extra_lesson_mng-get_data');
+
+    // モーダル処理
+    Route::post('/extra_lesson_mng/exec_modal', [ExtraLessonMngController::class, 'execModal'])->name('extra_lesson_mng-exec_modal');
+
+    // 新規登録
+    Route::get('/extra_lesson_mng/new', [ExtraLessonMngController::class, 'new'])->name('extra_lesson_mng-new');
+
+    // 新規登録処理
+    Route::post('/extra_lesson_mng/create', [ExtraLessonMngController::class, 'create'])->name('extra_lesson_mng-create');
+
+    // 編集画面
+    Route::get('/extra_lesson_mng/edit/{changeId}', [ExtraLessonMngController::class, 'edit'])->name('extra_lesson_mng-edit');
+
+    // 編集処理
+    Route::post('/extra_lesson_mng/update', [ExtraLessonMngController::class, 'update'])->name('extra_lesson_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/extra_lesson_mng/vd_input', [ExtraLessonMngController::class, 'validationForInput'])->name('extra_lesson_mng-vd_input');
+
+    // 削除処理
+    Route::post('/extra_lesson_mng/delete', [ExtraLessonMngController::class, 'delete'])->name('extra_lesson_mng-delete');
 
 });
     //---------------------

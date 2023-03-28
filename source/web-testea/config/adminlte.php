@@ -341,9 +341,10 @@ return [
         ],
         [
             'text' => '追加授業依頼',
-            'route' => 'under_construction',
+            'route' => 'extra_lesson',
             'icon' => 'fas fa-plus-circle',
             'can'  => 'student',
+            'active' => ['extra_lesson/*']
         ],
         [
             'text' => '授業報告書',
@@ -653,7 +654,9 @@ return [
                 ],
                 [
                     'text' => '追加授業申請受付',
-                    'route' => 'under_construction',
+                    'route' => 'extra_lesson_mng',
+                    'active' => ['extra_lesson_mng*'],
+                    'menuid' => 'id_extra_lesson_mng',
                 ],
                 [
                     'text' => '授業報告書',
