@@ -5,7 +5,7 @@
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true>
     <tr v-show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_4 }}">
-        <th width="35%">教室</th>
+        <th width="35%">校舎</th>
         <td>@{{item.mdClassName}}</td>
     </tr>
     <tr>
