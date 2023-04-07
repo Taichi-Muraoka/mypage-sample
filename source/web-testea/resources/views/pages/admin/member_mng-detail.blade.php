@@ -114,7 +114,7 @@
             <th width="15%">開始日</th>
             <th width="15%">終了日</th>
             <th width="15%">月額</th>
-            <th>規定情報</th>
+            <th>契約情報</th>
             <th></th>
         </x-slot>
 
