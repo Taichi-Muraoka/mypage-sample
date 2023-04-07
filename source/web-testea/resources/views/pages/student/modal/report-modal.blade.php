@@ -13,6 +13,10 @@
         <td>@{{item.room_name}}</td>
     </tr>
     <tr>
+        <th>コース</th>
+        <td></td>
+    </tr>
+    <tr>
         <th>講師名</th>
         <td>@{{item.tname}}</td>
     </tr>

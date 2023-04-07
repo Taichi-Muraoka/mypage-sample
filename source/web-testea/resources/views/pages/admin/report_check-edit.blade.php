@@ -21,6 +21,14 @@
     <div class="mb-3"></div>
 
     <x-bs.card>
+        {{-- 個別指導・集団授業の選択 --}}
+        <x-bs.form-group>
+            <x-input.radio caption="個別指導" id="lesson_type-1" name="lesson_type" value="1" :checked=true :editData=$editData />
+            <x-input.radio caption="集団授業" id="lesson_type-2" name="lesson_type" value="2" :editData=$editData />
+        </x-bs.form-group>
+        {{-- 余白 --}}
+        <div class="mb-3"></div>
+
         {{-- チェンジイベントを取得し、校舎と講師を取得する --}}
         <x-input.select caption="生徒" id="sidKobetsu" :select2=true onChange="selectChangeGetMulti"
             :mastrData=$student_kobetsu_list :editData=$editData />

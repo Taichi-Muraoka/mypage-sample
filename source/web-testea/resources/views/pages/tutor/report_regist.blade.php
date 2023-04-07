@@ -24,6 +24,12 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
+            <x-input.select caption="コース" id="course" :select2=true :editData=$editData>
+                <option value="1">個別指導</option>
+                <option value="2">集団授業</option>
+            </x-input.select>
+        </x-bs.col2>
+        <x-bs.col2>
             <x-input.select caption="承認ステータス" id="status" :select2=true :editData=$editData>
                 <option value="1">承認待ち</option>
                 <option value="2">承認</option>
@@ -50,6 +56,7 @@
             <th width="20%">授業日時</th>
             <th>時限</th>
             <th width="20%">校舎</th>
+            <th>コース</th>
             <th>生徒名</th>
             <th width="15%">承認ステータス</th>
             <th></th>
@@ -60,6 +67,7 @@
             <x-bs.td-sp caption="授業日時">@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</x-bs.td-sp>
             <x-bs.td-sp caption="時限"></x-bs.td-sp>
             <x-bs.td-sp caption="校舎">@{{item.room_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="コース">個別指導</x-bs.td-sp>
             <x-bs.td-sp caption="生徒名">@{{item.sname}}</x-bs.td-sp>
             <x-bs.td-sp caption="承認ステータス"></x-bs.td-sp>
             <td>
