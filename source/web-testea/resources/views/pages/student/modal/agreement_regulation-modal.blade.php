@@ -34,7 +34,7 @@
 <x-bs.table :smartPhoneModal=true class="modal-fix">
 
     <x-slot name="thead">
-        <th>教師名</th>
+        <th>講師名</th>
         <th>曜日</th>
         <th>開始時刻</th>
         <th>授業時間</th>
@@ -43,7 +43,7 @@
     </x-slot>
 
     <tr v-for="regular_detail in item.regular_details" v-cloak>
-        <x-bs.td-sp caption="教師名">@{{regular_detail.teacher_name}}</x-bs.td-sp>
+        <x-bs.td-sp caption="講師名">@{{regular_detail.teacher_name}}</x-bs.td-sp>
         <x-bs.td-sp caption="曜日" class="resp-column">@{{regular_detail.weekday}}</x-bs.td-sp>
         <x-bs.td-sp caption="開始時刻" class="resp-column">@{{regular_detail.start_time|formatHm}}</x-bs.td-sp>
         <x-bs.td-sp caption="授業時間" class="resp-column">@{{regular_detail.r_minutes}}分</x-bs.td-sp>

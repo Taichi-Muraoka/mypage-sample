@@ -69,13 +69,13 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-bs.form-title>短期個別講習情報</x-bs.form-title>
+    <x-bs.form-title>特別期間講習情報</x-bs.form-title>
 
     {{-- テーブル --}}
     <x-bs.table :button=true :smartPhone=true class="inner-card">
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">教室</th>
+            <th width="15%">校舎</th>
             <th width="15%">講習料</th>
             <th>講習名</th>
             <th></th>
@@ -83,9 +83,9 @@
 
         {{-- テーブル行 --}}
         @for ($i = 0; $i < count($extra_individual); $i++) <tr>
-            <x-bs.td-sp caption="教室">{{$extra_individual[$i]->room_name}}</x-bs.td-sp>
-            <x-bs.td-sp caption="月額" class="t-price">{{number_format($extra_individual[$i]->price)}}</x-bs.td-sp>
-            <x-bs.td-sp caption="短期個別講習">{{$extra_individual[$i]->name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="校舎">{{$extra_individual[$i]->room_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="講習料" class="t-price">{{number_format($extra_individual[$i]->price)}}</x-bs.td-sp>
+            <x-bs.td-sp caption="特別期間講習情報">{{$extra_individual[$i]->name}}</x-bs.td-sp>
             @php
             $ids = ['roomcd' => $extra_individual[$i]->roomcd, 'i_seq' => $extra_individual[$i]->i_seq];
             @endphp
@@ -102,7 +102,7 @@
 {{-- モーダル --}}
 {{--契約情報 --}}
 @include('pages.student.modal.agreement_regulation-modal', ['modal_id' => 'modal-dtl-regulation'])
-{{-- 短期個別講習 --}}
+{{-- 特別期間講習 --}}
 @include('pages.student.modal.agreement_course-modal', ['modal_id' => 'modal-dtl-course'])
 
 @stop

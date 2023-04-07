@@ -22,19 +22,19 @@
         <td>16,390</td>
     </tr>
     <tr>
-        <th>規定情報</th>
+        <th>契約情報</th>
         <td>月4回 60分 個別（中学1･2年生）料金</td>
     </tr>
 
 </x-bs.table>
 
-<x-bs.form-title>規定詳細</x-bs.form-title>
+<x-bs.form-title>契約詳細</x-bs.form-title>
 
 {{-- 最大10件なのでページネータなし --}}
 <x-bs.table :smartPhoneModal=true>
 
     <x-slot name="thead">
-        <th>教師名</th>
+        <th>講師名</th>
         <th width="10%">曜日</th>
         <th width="15%">開始時刻</th>
         <th width="15%">授業時間</th>
