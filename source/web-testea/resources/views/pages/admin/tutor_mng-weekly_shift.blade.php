@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '教師空き時間')
+@section('title', '講師空き時間')
 
 {{-- 子ページ --}}
 @section('child_page', true)
