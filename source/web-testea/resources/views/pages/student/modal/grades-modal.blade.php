@@ -20,10 +20,11 @@
             {{-- tableの中にtableを書くと線が出てしまう noborder-only-topを指定した --}}
             <x-bs.table :bordered=false :hover=false class="noborder-only-top">
                 <x-slot name="thead">
-                    <th width="25%">教科</th>
-                    <th width="25%">得点</th>
-                    <th width="25%">前回比</th>
-                    <th width="25%">学年平均</th>
+                    <th width="20%">教科</th>
+                    <th width="20%">得点</th>
+                    <th width="20%">前回比</th>
+                    <th width="20%">学年平均</th>
+                    <th width="20%">偏差値</th>
                 </x-slot>
 
                 <tr v-for="gradesDetail in item.gradesDetails" v-cloak>
@@ -32,6 +33,7 @@
                     <x-bs.td-sp>@{{gradesDetail.updown}}</x-bs.td-sp>
                     <x-bs.td-sp vShow="gradesDetail.average != null">@{{gradesDetail.average}}点</x-bs.td-sp>
                     <x-bs.td-sp vShow="gradesDetail.average == null"></x-bs.td-sp>
+                    <x-bs.td-sp>50</x-bs.td-sp>
                 </tr>
             
             </x-bs.table>

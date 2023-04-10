@@ -34,6 +34,7 @@
             <td>得点</td>
             <td>前回比</td>
             <td>学年平均</td>
+            <td>偏差値</td>
         </x-slot>
 
         @for ($i = 0; $i < 10; $i++) <tr v-cloak>
@@ -61,6 +62,10 @@
 
             <x-bs.td-sp caption="学年平均" class="not-center">
                 <x-input.text id="average_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
+            </x-bs.td-sp>
+
+            <x-bs.td-sp caption="偏差値">
+                <x-input.text id="deviation_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
             </x-bs.td-sp>
             </tr>
             @endfor
