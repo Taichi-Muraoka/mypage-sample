@@ -6,50 +6,53 @@
 <x-bs.table :hover=false :vHeader=true>
 
     <tr>
-        <th width="35%">教室</th>
-        <td>@{{item.dtl_room_name}}</td>
+        <th width="35%">校舎</th>
+        <td>久我山</td>
     </tr>
     <tr>
         <th>開始日</th>
-        <td>@{{item.dtl_startdate|formatYmd}}</td>
+        <td>2022/04/01</td>
     </tr>
     <tr>
         <th>終了日</th>
-        <td>@{{item.dtl_enddate|formatYmd}}</td>
+        <td>2023/03/31</td>
     </tr>
     <tr>
         <th>月額</th>
-        <td>@{{item.dtl_tuition|toLocaleString}}</td>
+        <td>16,390</td>
     </tr>
     <tr>
-        <th>規定情報</th>
-        <td>@{{item.dtl_regular_summary}}</td>
+        <th>契約情報</th>
+        <td>月4回 60分 個別（中学1･2年生）料金</td>
     </tr>
 
 </x-bs.table>
 
-<x-bs.form-title>規定詳細</x-bs.form-title>
+<x-bs.form-title>契約詳細</x-bs.form-title>
 
 {{-- 最大10件なのでページネータなし --}}
-<x-bs.table :smartPhoneModal=true>
+<x-bs.table :smartPhoneModal=true class="modal-fix">
 
     <x-slot name="thead">
-        <th>教師名</th>
-        <th width="10%">曜日</th>
-        <th width="15%">開始時刻</th>
-        <th width="15%">授業時間</th>
-        <th width="10%">回数</th>
-        <th width="10%">教科</th>
+        <th>講師名</th>
+        <th>曜日</th>
+        <th>開始時刻</th>
+        <th>授業時間</th>
+        <th>回数</th>
+        <th>教科</th>
     </x-slot>
 
-    <tr v-for="regular_detail in item.regular_details" v-cloak>
-        <td>@{{regular_detail.teacher_name}}</td>
-        <td>@{{regular_detail.weekday}}</td>
-        <td>@{{regular_detail.start_time|formatHm}}</td>
-        <td>@{{regular_detail.r_minutes}}分</td>
-        <td>@{{regular_detail.r_count}}</td>
-        <td>@{{regular_detail.curriculum_name}}</td>
+    <tr>
+        <x-bs.td-sp caption="講師名">CWテスト教師１０１</x-bs.td-sp>
+        <x-bs.td-sp caption="曜日" class="resp-column">月</x-bs.td-sp>
+        <x-bs.td-sp caption="開始時刻" class="resp-column">16:00</x-bs.td-sp>
+        <x-bs.td-sp caption="授業時間" class="resp-column">60分</x-bs.td-sp>
+        <td class="resp-clear"></td>
+        <x-bs.td-sp caption="回数" class="resp-column no-border">4</x-bs.td-sp>
+        <x-bs.td-sp caption="教科" class="not-center resp-column no-border wide">数学</x-bs.td-sp>
+        <td class="resp-clear"></td>
     </tr>
+
 </x-bs.table>
 
 @overwrite

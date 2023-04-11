@@ -211,47 +211,54 @@ class MemberMngController extends Controller
      */
     public function getDataDetail(Request $request)
     {
+        //==========================
+        // モック用処理
+        //==========================
+        return;
 
-        // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'sid', 'seq', 'roomcd');
+        //==========================
+        // 本番処理
+        //==========================
+        // // IDのバリデーション
+        // $this->validateIdsFromRequest($request, 'sid', 'seq', 'roomcd');
 
-        // 生徒ID
-        $sid = $request->input('sid');
+        // // 生徒ID
+        // $sid = $request->input('sid');
 
-        // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
-        $this->guardRoomAdminSid($sid);
+        // // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
+        // $this->guardRoomAdminSid($sid);
 
-        $roomcd = $request->input('roomcd');
-        $seq = $request->input('seq');
+        // $roomcd = $request->input('roomcd');
+        // $seq = $request->input('seq');
 
-        // モーダルによって処理を行う
-        $modal = $request->input('target');
+        // // モーダルによって処理を行う
+        // $modal = $request->input('target');
 
-        switch ($modal) {
-            case "#modal-dtl-regulation":
+        // switch ($modal) {
+        //     case "#modal-dtl-regulation":
 
-                // 規定情報を取得する
-                return $this->getStudentRegular($sid, $roomcd, $seq);
+        //         // 規定情報を取得する
+        //         return $this->getStudentRegular($sid, $roomcd, $seq);
 
-            case "#modal-dtl-tutor":
+        //     case "#modal-dtl-tutor":
 
-                // 家庭教師標準情報を取得する
-                return $this->getStudentHomeTeacherStd($sid, $roomcd, $seq);
+        //         // 家庭教師標準情報を取得する
+        //         return $this->getStudentHomeTeacherStd($sid, $roomcd, $seq);
 
-            case "#modal-dtl-course":
+        //     case "#modal-dtl-course":
 
-                // 短期個別講習を取得する
-                return $this->getStudentExtraIndividual($sid, $roomcd, $seq);
+        //         // 短期個別講習を取得する
+        //         return $this->getStudentExtraIndividual($sid, $roomcd, $seq);
 
-                case "#modal-dtl-grades_mng":
+        //         case "#modal-dtl-grades_mng":
 
-                    // 家庭教師標準情報を取得する
-                    return $this->getStudentHomeTeacherStd($sid, $roomcd, $seq);
+        //             // 家庭教師標準情報を取得する
+        //             return $this->getStudentHomeTeacherStd($sid, $roomcd, $seq);
     
-                default:
-                // 該当しない場合
-                $this->illegalResponseErr();
-        }
+        //         default:
+        //         // 該当しない場合
+        //         $this->illegalResponseErr();
+        // }
     }
 
     //==========================

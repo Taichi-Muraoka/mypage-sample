@@ -34,6 +34,67 @@
         </tr>
     </x-bs.table>
 
+    {{----------------------------}}
+    {{-- モック用 @if,@forなしver--}}
+    {{----------------------------}}
+    <x-bs.form-title>契約情報</x-bs.form-title>
+
+    {{-- テーブル --}}
+    <x-bs.table :button=true :smartPhone=true class="inner-card">
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th width="15%">開始日</th>
+            <th width="15%">終了日</th>
+            <th width="15%">月額</th>
+            <th>契約情報</th>
+            <th></th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
+        <tr>
+            <x-bs.td-sp caption="開始日">2022/04/01</x-bs.td-sp>
+            <x-bs.td-sp caption="終了日">2023/03/31</x-bs.td-sp>
+            <x-bs.td-sp caption="月額" class="t-price">16,390</x-bs.td-sp>
+            <x-bs.td-sp caption="契約情報">月4回 60分 個別（中学1･2年生）料金</x-bs.td-sp>
+
+            <td>
+                <x-button.list-dtl dataTarget="#modal-dtl-regulation" />
+            </td>
+        </tr>
+    </x-bs.table>
+
+    {{-- 余白 --}}
+    <div class="mb-3"></div>
+
+    <x-bs.form-title>特別期間講習情報</x-bs.form-title>
+
+    {{-- テーブル --}}
+    <x-bs.table :button=true :smartPhone=true class="inner-card">
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th width="15%">開始日</th>
+            <th width="15%">終了日</th>
+            <th width="15%">講習料</th>
+            <th>講習名</th>
+            <th></th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
+        <tr>
+            <x-bs.td-sp caption="開始日">2023/07/24</x-bs.td-sp>
+            <x-bs.td-sp caption="終了日">2023/08/26</x-bs.td-sp>
+            <x-bs.td-sp caption="講習料" class="t-price">40,970</x-bs.td-sp>
+            <x-bs.td-sp caption="講習名">夏季特別期間講習</x-bs.td-sp>
+            <td>
+                <x-button.list-dtl dataTarget="#modal-dtl-course"/>
+            </td>
+        </tr>
+    </x-bs.table>
+
+
+    {{------------}}
+    {{-- 本番用 --}}
+    {{------------}}
     @if(count($regular) > 0)
     <x-bs.form-title>契約情報</x-bs.form-title>
 

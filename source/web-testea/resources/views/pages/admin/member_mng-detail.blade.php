@@ -119,19 +119,16 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        @for ($i = 0; $i < count($regular); $i++) <tr>
-            <td>{{$regular[$i]->startdate->format('Y/m/d')}}</td>
-            <td>{{$regular[$i]->enddate->format('Y/m/d')}}</td>
-            <td class="t-price">{{number_format($regular[$i]->tuition)}}</td>
-            <td>{{$regular[$i]->regular_summary}}</td>
-            @php
-            $ids = ['roomcd' => $regular[$i]->roomcd, 'seq' => $regular[$i]->r_seq, 'sid' => $regular[$i]->sid];
-            @endphp
+        <tr>
+            <x-bs.td-sp caption="開始日">2022/04/01</x-bs.td-sp>
+            <x-bs.td-sp caption="終了日">2023/03/31</x-bs.td-sp>
+            <x-bs.td-sp caption="月額" class="t-price">16,390</x-bs.td-sp>
+            <x-bs.td-sp caption="契約情報">月4回 60分 個別（中学1･2年生）料金</x-bs.td-sp>
+
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-regulation" :dataAttr="$ids" />
+                <x-button.list-dtl dataTarget="#modal-dtl-regulation" />
             </td>
-            </tr>
-            @endfor
+        </tr>
     </x-bs.table>
 </x-bs.card>
 
