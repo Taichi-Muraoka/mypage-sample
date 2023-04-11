@@ -39,6 +39,8 @@
         <option value="2">2</option>
         <option value="3">3</option>
     </x-input.select>
+
+    <x-button.list-dtl caption="学校検索"/>
     <x-input.text caption="学校名" id="school" :rules=$rules :editData=$editData/>
     <x-input.text caption="学部・学科名" id="faculty_department" :rules=$rules :editData=$editData/>
     <x-input.date-picker caption="受験日" id="exam_date" :editData=$editData />
@@ -74,5 +76,8 @@
     </x-slot>
 
 </x-bs.card>
+
+{{-- モーダル --}}
+@include('pages.admin.modal.school_search-modal')
 
 @stop
