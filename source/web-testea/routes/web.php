@@ -618,6 +618,7 @@ use App\Http\Controllers\Admin\AgreementMngController;
 use App\Http\Controllers\Admin\TransferRequiredController;
 use App\Http\Controllers\Admin\GradeExampleController;
 use App\Http\Controllers\Admin\ExtraLessonMngController;
+use App\Http\Controllers\Admin\SalaryCalculationController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -1933,6 +1934,19 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/extra_lesson_mng/delete', [ExtraLessonMngController::class, 'delete'])->name('extra_lesson_mng-delete');
+
+    //---------------------
+    // 給与算出 モック
+    //---------------------
+
+    // 給与算出一覧
+    Route::get('/salary_calculation', [SalaryCalculationController::class, 'index'])->name('salary_calculation');
+
+    // 検索結果取得
+    Route::post('/salary_calculation/search', [SalaryCalculationController::class, 'search'])->name('salary_calculation-search');
+
+    // 給与算出情報一覧（対象月の詳細）
+    Route::get('/salary_calculation/detail/{date}', [SalaryCalculationController::class, 'detail'])->name('salary_calculation-detail');
 
 });
     //---------------------

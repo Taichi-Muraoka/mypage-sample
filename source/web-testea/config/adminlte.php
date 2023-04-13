@@ -846,7 +846,8 @@ return [
                 ],
                 [
                     'text' => '給与情報算出',
-                    'route' => 'under_construction',
+                    'route' => 'salary_calculation',
+                    'active' => ['salary_calculation*']
                 ],
                 [
                     'text' => '給与明細取込',
