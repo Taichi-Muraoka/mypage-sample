@@ -25,19 +25,23 @@
 
     <x-slot name="thead">
         <th width="25%">内訳</th>
+        <th width="10%">回数</th>
         <th width="25%">金額</th>
     </x-slot>
 
     <tr>
         <td>月4回 60分 個別（中学1･2年生）</td>
+        <td></td>
         <td>16,390</td>
     </tr>
     <tr>
         <td>春季特別講習（中学１・２年生 ４回）</td>
+        <td>4</td>
         <td>12,000</td>
     </tr>
     <tr>
         <td>追加授業（中学１・２年生 ２回）</td>
+        <td>2</td>
         <td>7,000</td>
     </tr>
 </x-bs.table>
