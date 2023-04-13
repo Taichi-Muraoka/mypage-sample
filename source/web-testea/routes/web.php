@@ -619,6 +619,7 @@ use App\Http\Controllers\Admin\TransferRequiredController;
 use App\Http\Controllers\Admin\GradeExampleController;
 use App\Http\Controllers\Admin\ExtraLessonMngController;
 use App\Http\Controllers\Admin\SalaryCalculationController;
+use App\Http\Controllers\Admin\InvoiceCalculationController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -1947,6 +1948,19 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 給与算出情報一覧（対象月の詳細）
     Route::get('/salary_calculation/detail/{date}', [SalaryCalculationController::class, 'detail'])->name('salary_calculation-detail');
+
+    //---------------------
+    // 請求算出 モック
+    //---------------------
+
+    // 請求算出一覧
+    Route::get('/invoice_calculation', [InvoiceCalculationController::class, 'index'])->name('invoice_calculation');
+
+    // 検索結果取得
+    Route::post('/invoice_calculation/search', [InvoiceCalculationController::class, 'search'])->name('invoice_calculation-search');
+
+    // 請求算出情報一覧（対象月の詳細）
+    Route::get('/invoice_calculation/detail/{date}', [InvoiceCalculationController::class, 'detail'])->name('invoice_calculation-detail');
 
 });
     //---------------------

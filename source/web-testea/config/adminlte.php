@@ -863,7 +863,8 @@ return [
             'submenu' => [
                 [
                     'text' => '請求情報算出',
-                    'route' => 'under_construction',
+                    'route' => 'invoice_calculation',
+                    'active' => ['invoice_calculation*']
                 ],
                 [
                     'text' => '追加・割引費用情報',
