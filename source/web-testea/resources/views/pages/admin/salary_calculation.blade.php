@@ -22,7 +22,7 @@
         <tr>
             <td>2023年03月</td>
             <td>2023/03/31</td>
-            <td>未作成</td>
+            <td>集計済</td>
             <td>
                 <x-button.list-dtl href="{{ route('salary_calculation-detail', 1) }}"/>
             </td>

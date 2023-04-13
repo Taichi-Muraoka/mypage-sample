@@ -25,7 +25,7 @@
         </tr>
         <tr>
             <th>状態</th>
-            <td>未作成</td>
+            <td>集計済</td>
         </tr>
     </x-bs.table>
 
