@@ -78,15 +78,17 @@
 
     {{-- フッター --}}
     <x-slot name="footer">
-        <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-start">
             <x-button.back />
+            {{-- 教室カレンダー画面へ --}}
+            <x-button.edit href="{{ Route('room_calendar') }}" icon="" caption="教室カレンダー画面 " />
         </div>
     </x-slot>
 </x-bs.card>
 
-{{-- モーダル(申込者一覧一括受付・出力確認) 出力 --}}
+{{-- モーダル(自動コマ組み実行) --}}
 @include('pages.admin.modal.season_plan_auto-modal', ['modal_send_confirm' => true, 'modal_id' => 'modal-exec-auto'])
-{{-- モーダル(スケジュール登録確認) 登録 --}}
+{{-- モーダル(スケジュール確定) --}}
 @include('pages.admin.modal.season_plan_confirm-modal', ['modal_send_confirm' => true, 'modal_id' => 'modal-exec-confirm'])
 
 @stop

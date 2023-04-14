@@ -220,7 +220,7 @@
     </x-slot>
 
     <x-slot name="card_title">
-        成績情報<span  style='color: red'>&emsp;<i class="fas fa-exclamation-triangle"></i>&nbsp;成績未登録あり</span>
+        成績情報
     </x-slot>
 
     {{-- テーブル --}}

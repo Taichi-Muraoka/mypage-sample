@@ -21,7 +21,7 @@
 @else
 
 {{-- 普通のhref --}}
-<a href="@if (empty($href)){{ '#' }}@else{{ $href }}@endif" class="btn btn-primary @if ($small) btn-sm @endif"
+<a href="@if (empty($href)){{ '#' }}@else{{ $href }}@endif" class="btn btn-primary ml-3 @if ($small) btn-sm @endif"
     {{-- v-show --}}
     @if ($vShow)
     v-show="{{ $vShow }}"
