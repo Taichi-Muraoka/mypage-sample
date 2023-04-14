@@ -376,7 +376,7 @@ return [
         ],
         [
             'text' => '特別期間講習日程連絡',
-            'route' => 'under_construction',
+            'route' => 'season_student',
             'icon' => 'fas fa-chalkboard',
             'can'  => 'student',
         ],
@@ -503,7 +503,7 @@ return [
         ],
         [
             'text' => '特別期間講習日程連絡',
-            'route' => 'under_construction',
+            'route' => 'season_tutor',
             'icon' => 'fas fa-chalkboard',
             'can'  => 'tutor',
         ],
@@ -682,12 +682,20 @@ return [
             'menuid' => '',
             'submenu' => [
                 [
-                    'text' => '日程連絡確認',
-                    'route' => 'under_construction',
+                    'text' => '日程連絡確認（生徒）',
+                    'route' => 'season_mng_student',
                 ],
                 [
-                    'text' => '講習コマ割り',
-                    'route' => 'under_construction',
+                    'text' => '日程連絡確認（講師）',
+                    'route' => 'season_mng_tutor',
+                ],
+                [
+                    'text' => '自動コマ組み',
+                    'route' => 'season_plan',
+                ],
+                [
+                    'text' => '個別スケジュール登録',
+                    'route' => 'season_schedule',
                 ],
             ]
         ],

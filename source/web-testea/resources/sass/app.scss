@@ -460,6 +460,14 @@ label:not(.form-check-label):not(.custom-file-label) {
     background-color: rgb(201, 233, 143);
 }
 
+.chk-wt2 {
+    display: none;
+}
+
+.chk-wt2:checked + div {
+    background-color: gray;
+}
+
 /*テーブルごとの個別調整*/
 .table > thead > tr > th.t-minimum {
     width: 1px;

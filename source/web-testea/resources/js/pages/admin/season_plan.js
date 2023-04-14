@@ -1,0 +1,22 @@
+"use strict";
+
+/*
+ * 特別期間講習コマ割り状況一覧
+ */
+export default class AppClass extends PageBase {
+    /**
+     * コンストラクタ
+     */
+    constructor() {
+        super();
+    }
+
+    /**
+     * 開始処理
+     */
+    start() {
+        // 検索一覧の表示
+        var $vueSearchList = this.getVueSearchList();
+        $vueSearchList.search();
+    }
+}

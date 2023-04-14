@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\Lang;
 //use App\Http\Controllers\Traits\FuncTimesTrait;
 
 /**
- * 季節講習コマ組み - コントローラ
+ * 特別期間講習個別スケジュール登録 - コントローラ
  */
-class SeasonShiftController extends Controller
+class SeasonScheduleController extends Controller
 {
 
     // 機能共通処理：
@@ -38,7 +38,7 @@ class SeasonShiftController extends Controller
     public function index()
     {
 
-        return view('pages.admin.season_shift', [
+        return view('pages.admin.season_schedule', [
             'rules' => $this->rulesForInput(null),
             'editData' => []
         ]);

@@ -96,6 +96,7 @@ use App\Http\Controllers\Student\LeaveController;
 use App\Http\Controllers\Student\ConferenceController;
 use App\Http\Controllers\Student\TransferStudentController;
 use App\Http\Controllers\Student\ExtraLessonController;
+use App\Http\Controllers\Student\SeasonStudentController;
 
 Route::group(['middleware' => ['auth', 'can:student']], function () {
 
@@ -345,6 +346,19 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     // バリデーション(登録用)
     Route::post('/extra_lesson/vd_input', [ExtraLessonController::class, 'validationForInput'])->name('extra_lesson-vd_input');
 
+    //---------------------
+    // 特別期間講習日程連絡
+    //---------------------
+
+    // 登録
+    Route::get('/season_student', [SeasonStudentController::class, 'index'])->name('season_student');
+
+    // 編集処理
+    Route::post('/season_student/update', [SeasonStudentController::class, 'update'])->name('season_student-update');
+
+    // バリデーション(登録用)
+    Route::post('/season_student/vd_input', [SeasonStudentController::class, 'validationForInput'])->name('season_student-vd_input');
+
 });
 
 //===============================================
@@ -361,7 +375,7 @@ use App\Http\Controllers\Tutor\TrainingController;
 use App\Http\Controllers\Tutor\TransferTutorController;
 use App\Http\Controllers\Tutor\AttendanceController;
 use App\Http\Controllers\Tutor\SurchargeController;
-
+use App\Http\Controllers\Tutor\SeasonTutorController;
 
 Route::group(['middleware' => ['auth', 'can:tutor']], function () {
 
@@ -573,6 +587,19 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // バリデーション(登録用)
     Route::post('/surcharge/vd_input', [SurchargeController::class, 'validationForInput'])->name('surcharge-vd_input');
 
+    //---------------------
+    // 特別期間講習日程連絡
+    //---------------------
+
+    // 登録
+    Route::get('/season_tutor', [SeasonTutorController::class, 'index'])->name('season_tutor');
+
+    // 編集処理
+    Route::post('/season_tutor/update', [SeasonTutorController::class, 'update'])->name('season_tutor-update');
+
+    // バリデーション(登録用)
+    Route::post('/season_tutor/vd_input', [SeasonTutorController::class, 'validationForInput'])->name('season_tutor-vd_input');
+
 });
 
 //===============================================
@@ -606,7 +633,6 @@ use App\Http\Controllers\Admin\RoomHolidayController;
 use App\Http\Controllers\Admin\MasterMngController;
 use App\Http\Controllers\Admin\AccountMngController;
 use App\Http\Controllers\Admin\DataMngController;
-use App\Http\Controllers\Admin\SeasonShiftController;
 use App\Http\Controllers\Admin\RecordController;
 use App\Http\Controllers\Admin\TransferCheckController;
 use App\Http\Controllers\Admin\ConferenceAcceptController;
@@ -620,6 +646,10 @@ use App\Http\Controllers\Admin\GradeExampleController;
 use App\Http\Controllers\Admin\ExtraLessonMngController;
 use App\Http\Controllers\Admin\SalaryCalculationController;
 use App\Http\Controllers\Admin\InvoiceCalculationController;
+use App\Http\Controllers\Admin\SeasonMngStudentController;
+use App\Http\Controllers\Admin\SeasonMngTutorController;
+use App\Http\Controllers\Admin\SeasonPlanController;
+use App\Http\Controllers\Admin\SeasonscheduleController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -1641,25 +1671,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::get('/data_mng', [DataMngController::class, 'index'])->name('data_mng');
 
     //---------------------
-    // 季節講習コマ組み モック
-    //---------------------
-
-    // 登録画面
-    Route::get('/season_shift', [SeasonShiftController::class, 'index'])->name('season_shift');
-
-    // 教室プルダウンを選択された際に生徒の情報を返却する
-    //Route::post('/season_shift/get_data_select', [SeasonShiftController::class, 'getDataSelect'])->name('season_shift-get_data_select');
-
-    // 生徒プルダウンを選択された際に担当教師の情報を返却する
-    //Route::post('/season_shift/get_data_select2', [SeasonShiftController::class, 'getDataSelect2'])->name('season_shift-get_data_select2');
-
-    // 新規登録処理
-    Route::post('/season_shift/create', [SeasonShiftController::class, 'create'])->name('season_shift-create');
-
-    // バリデーション(登録用)
-    Route::post('/season_shift/vd_input', [SeasonShiftController::class, 'validationForInput'])->name('season_shift-vd_input');
-
-    //---------------------
     // 生徒スケジュール登録 モック
     //---------------------
 
@@ -1961,6 +1972,69 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 請求算出情報一覧（対象月の詳細）
     Route::get('/invoice_calculation/detail/{date}', [InvoiceCalculationController::class, 'detail'])->name('invoice_calculation-detail');
+
+    //---------------------
+    // 特別期間講習管理（生徒・講師）
+    //---------------------
+
+    // 講師提出スケジュール一覧
+    Route::get('/season_mng_tutor', [SeasonMngTutorController::class, 'index'])->name('season_mng_tutor');
+
+    // バリデーション(検索用)
+    Route::post('/season_mng_tutor/vd_search', [SeasonMngTutorController::class, 'validationForSearch'])->name('season_mng_tutor-vd_search');
+
+    // 検索結果取得
+    Route::post('/season_mng_tutor/search', [SeasonMngTutorController::class, 'search'])->name('season_mng_tutor-search');
+
+    // 講師提出スケジュール詳細
+    Route::get('/season_mng_tutor/detail/{tid}', [SeasonMngTutorController::class, 'detail'])->name('season_mng_tutor-detail');
+
+    // 生徒提出スケジュール一覧
+    Route::get('/season_mng_student', [SeasonMngStudentController::class, 'index'])->name('season_mng_student');
+
+    // バリデーション(検索用)
+    Route::post('/season_mng_student/vd_search', [SeasonMngStudentController::class, 'validationForSearch'])->name('season_mng_student-vd_search');
+
+    // 検索結果取得
+    Route::post('/season_mng_student/search', [SeasonMngStudentController::class, 'search'])->name('season_mng_student-search');
+
+    // 生徒提出スケジュール詳細
+    Route::get('/season_mng_student/detail/{sid}', [SeasonMngStudentController::class, 'detail'])->name('season_mng_student-detail');
+
+    //---------------------
+    // 特別期間講習 自動コマ組み
+    //---------------------
+
+    // コマ組み状況一覧
+    Route::get('/season_plan', [SeasonPlanController::class, 'index'])->name('season_plan');
+
+    // 実行結果取得
+    Route::post('/season_plan/search', [SeasonPlanController::class, 'search'])->name('season_plan-search');
+
+    // 自動コマ組み実行画面
+    Route::get('/season_plan/autoexec/{id}', [SeasonPlanController::class, 'autoExec'])->name('season_plan-autoexec');
+
+    // 実行結果取得
+    Route::post('/season_plan/search_autoexec', [SeasonPlanController::class, 'searchAutoExec'])->name('season_plan-search_autoexec');
+
+    // モーダル処理
+    //Route::post('/season_plan/exec_modal_exec', [SeasonPlanController::class, 'execModalExec'])->name('season_plan-exec_modal_entry');
+
+    // アンマッチリストダウンロード
+    Route::get('/season_plan/download/{csvId}', [SeasonPlanController::class, 'download'])->name('season_plan-download');
+
+    //---------------------
+    // 特別期間講習 個別スケジュール登録
+    //---------------------
+
+    // 個別スケジュール登録画面
+    Route::get('/season_schedule', [SeasonScheduleController::class, 'index'])->name('season_schedule');
+
+    // 新規登録処理
+    Route::post('/season_schedule/create', [SeasonScheduleController::class, 'create'])->name('season_schedule-create');
+
+    // バリデーション(登録用)
+    Route::post('/season_schedule/vd_input', [SeasonScheduleController::class, 'validationForInput'])->name('season_schedule-vd_input');
 
 });
     //---------------------

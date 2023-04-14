@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 季節講習コマ組み
+ * 特別期間講習スケジュール登録
  */
 export default class AppClass extends PageBase {
     /**
