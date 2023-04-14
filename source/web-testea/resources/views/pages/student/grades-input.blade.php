@@ -12,16 +12,23 @@
 
     <p>以下の試験成績の{{(request()->routeIs('grades-edit')) ? '変更' : '登録'}}を行います。</p>
 
-    <x-input.select caption="試験種別" id="exam_type" :blank=false :select2=true :select2Search=false :mastrData=$examTypes
-        :rules=$rules :editData=$editData />
+    <x-input.select caption="試験種別" id="exam_type" :blank=false :select2=true :select2Search=false :rules=$rules :editData=$editData >
+        <option value="1">模試</option>
+        <option value="2">定期考査</option>
+    </x-input.select>
 
     {{-- 模試 --}}
     <x-input.select caption="試験名" id="moshi_id" :select2=true :mastrData=$moshiNames :rules=$rules :editData=$editData
         vShow="form.exam_type == {{ App\Consts\AppConst::CODE_MASTER_9_1 }}" />
 
     {{-- 定期考査 --}}
-    <x-input.select caption="試験名" id="teiki_id" :select2=true :mastrData=$teikiNames :rules=$rules :editData=$editData
-        vShow="form.exam_type == {{ App\Consts\AppConst::CODE_MASTER_9_2 }}" />
+    <x-input.select caption="試験名" id="teiki_id" :select2=true :rules=$rules :editData=$editData
+        vShow="form.exam_type == 2">
+        <option value="1">1学期中間考査</option>
+        <option value="2">1学期末考査</option>
+        <option value="3">2学期中間考査</option>
+    </x-input.select>
+
     {{-- hidden --}}
     <x-input.hidden id="grades_id" :editData=$editData />
 
