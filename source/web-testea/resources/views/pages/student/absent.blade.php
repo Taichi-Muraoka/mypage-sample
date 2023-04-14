@@ -12,7 +12,11 @@
     <div class="mb-3"></div>
 
     {{-- チェンジイベントを取得し、校舎と講師を取得する --}}
-    <x-input.select caption="授業日時" id="id" :select2=true onChange="selectChangeGet" :mastrData=$scheduleMaster :editData=$editData />
+    <x-input.select caption="授業日時" id="id" :select2=true onChange="" :editData=$editData >
+        <option value="1">2023/04/17 16:00</option>
+        <option value="2">2023/04/24 16:00</option>
+        <option value="3">2023/05/01 16:00</option>
+    </x-input.select>
 
     {{-- 詳細を表示 --}}
     <x-bs.table :hover=false :vHeader=true class="mb-4">

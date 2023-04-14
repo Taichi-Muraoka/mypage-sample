@@ -650,6 +650,9 @@ use App\Http\Controllers\Admin\SeasonMngStudentController;
 use App\Http\Controllers\Admin\SeasonMngTutorController;
 use App\Http\Controllers\Admin\SeasonPlanController;
 use App\Http\Controllers\Admin\SeasonscheduleController;
+use App\Http\Controllers\Admin\ImportStudentController;
+use App\Http\Controllers\Admin\ImportStudentscheduleController;
+use App\Http\Controllers\Admin\ImportTutorController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -2036,6 +2039,44 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // バリデーション(登録用)
     Route::post('/season_schedule/vd_input', [SeasonScheduleController::class, 'validationForInput'])->name('season_schedule-vd_input');
 
+    //---------------------
+    // 生徒一括取込 モック
+    //---------------------
+
+    // 取込画面
+    Route::get('/import_student', [ImportStudentController::class, 'index'])->name('import_student');
+
+    // 新規登録処理
+    Route::post('/import_student/create', [ImportStudentController::class, 'create'])->name('import_student-create');
+
+    // バリデーション(登録用)
+    Route::post('/import_student/vd_input', [ImportStudentController::class, 'validationForInput'])->name('import_student-vd_input');
+
+    //---------------------
+    // 生徒スケジュール取込 モック
+    //---------------------
+
+    // 取込画面
+    Route::get('/import_student_schedule', [ImportStudentScheduleController::class, 'index'])->name('import_student_schedule');
+
+    // 新規登録処理
+    Route::post('/import_student_schedule/create', [ImportStudentScheduleController::class, 'create'])->name('import_student_schedule-create');
+
+    // バリデーション(登録用)
+    Route::post('/import_student_schedule/vd_input', [ImportStudentScheduleController::class, 'validationForInput'])->name('import_student_schedule-vd_input');
+
+    //---------------------
+    // 講師一括取込 モック
+    //---------------------
+
+    // 取込画面
+    Route::get('/import_tutor', [ImportTutorController::class, 'index'])->name('import_tutor');
+
+    // 新規登録処理
+    Route::post('/import_tutor/create', [ImportTutorController::class, 'create'])->name('import_tutor-create');
+
+    // バリデーション(登録用)
+    Route::post('/import_tutor/vd_input', [ImportTutorController::class, 'validationForInput'])->name('import_tutor-vd_input');
 });
     //---------------------
     // 画面未作成のメニュー用（後で削除する）

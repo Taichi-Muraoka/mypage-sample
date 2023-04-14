@@ -927,6 +927,28 @@ return [
                 // ],
             ]
         ],
+        [
+            'text' => '移行管理',
+            'icon' => '',
+            'can'  => 'admin',
+            'submenu' => [
+                [
+                    'text' => '生徒一括取込',
+                    'route' => 'import_student',
+                    'active' => ['import_student*']
+                ],
+                [
+                    'text' => '生徒スケジュール取込',
+                    'route' => 'import_student_schedule',
+                    'active' => ['import_student_schedule*']
+                ],
+                [
+                    'text' => '講師一括取込',
+                    'route' => 'import_tutor',
+                    'active' => ['import_tutor*']
+                ],
+            ]
+        ],
         // [
         //     'text' => '休業日管理',
         //     'icon' => 'fa fa-calendar-alt',
