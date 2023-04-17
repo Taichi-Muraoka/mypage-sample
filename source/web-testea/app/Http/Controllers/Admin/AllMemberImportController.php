@@ -84,7 +84,8 @@ class AllMemberImportController extends Controller
     {
 
         return view('pages.admin.all_member_import', [
-            'rules' => $this->rulesForInput()
+            'rules' => $this->rulesForInput(),
+            'editData' => ["this_year"=>"2022","next_year"=>"2023"]
         ]);
     }
 

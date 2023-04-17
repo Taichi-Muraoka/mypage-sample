@@ -916,6 +916,16 @@ return [
                     'route' => 'all_member_import',
                     'active' => ['all_member_import*']
                 ],
+                [
+                    'text' => '振替残数リセット処理',
+                    'route' => 'transfer_reset',
+                    'active' => ['transfer_reset*']
+                ],
+                [
+                    'text' => '保持期限データ削除',
+                    'route' => 'data_reset',
+                    'active' => ['data_reset*']
+                ],
                 //[
                 //    'text' => '振替残数クリア',
                 //    'route' => 'under_construction',

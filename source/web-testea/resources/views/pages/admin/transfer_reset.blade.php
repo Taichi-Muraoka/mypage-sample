@@ -1,17 +1,16 @@
 @extends('adminlte::page')
 
-@section('title', '学年情報更新')
+@section('title', '振替残数リセット処理')
 
 @section('content')
 
 {{-- カード --}}
 <x-bs.card :form=true>
 
-    <p>新年度の学年更新処理を実行します。</p>
+    <p>振替が実施されていない授業を無効にし、振替授業の残数をリセットします。<br>
+        対象の授業は[授業管理]>[要振替授業一覧]で確認してください。</p>
 
-    <x-input.text caption="現在の年度" id="this_year" :rules=$rules :editData=$editData/>
-
-    <x-input.text caption="更新後の年度" id="next_year" :rules=$rules :editData=$editData/>
+    <x-input.text caption="年度末年月" id="this_year" :rules=$rules :editData=$editData/>
 
     <x-bs.callout type="warning">
         送信ボタン押下後、バッググラウンドで処理されます。<br>
@@ -22,7 +21,7 @@
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-end">
-            <x-button.submit-new caption='学年更新実行'/>
+            <x-button.submit-new caption='更新実行'/>
         </div>
     </x-slot>
 
@@ -41,25 +40,27 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="25%">処理開始日時</th>
-            <th width="25%">処理終了日時</th>
-            <th width="20%">終了ステータス</th>
+            <th width="25%">年度末年月</th>
+            <th width="25%">処理日</th>
             <th width="15%">処理件数</th>
-            <th width="15%">実行者</th>
+            <th width="15%"></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <td>2023/03/10 16:00</td>
-            <td>2023/03/10 16:05</td>
-            <td>正常終了</td>
+            <td>2023年2月</td>
+            <td>2023/01/30</td>
             <td>100</td>
-            <td>久我山　教室長</td>
+            <td>
+                <x-button.list-dtl />
+            </td>
         </tr>
 
     </x-bs.table>
 
 </x-bs.card-list>
 
+{{-- モーダル --}}
+@include('pages.admin.modal.transfer_reset-modal')
 
 @stop

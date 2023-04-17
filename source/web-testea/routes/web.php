@@ -653,6 +653,8 @@ use App\Http\Controllers\Admin\SeasonscheduleController;
 use App\Http\Controllers\Admin\ImportStudentController;
 use App\Http\Controllers\Admin\ImportStudentscheduleController;
 use App\Http\Controllers\Admin\ImportTutorController;
+use App\Http\Controllers\Admin\TransferResetController;
+use App\Http\Controllers\Admin\DataResetController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -2077,6 +2079,39 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // バリデーション(登録用)
     Route::post('/import_tutor/vd_input', [ImportTutorController::class, 'validationForInput'])->name('import_tutor-vd_input');
+
+    //----------------------
+    // 振替残数リセット処理 モック
+    //----------------------
+
+    // 取込
+    Route::get('/transfer_reset', [TransferResetController::class, 'index'])->name('transfer_reset');
+
+    // 取込処理
+    Route::post('/transfer_reset/create', [TransferResetController::class, 'create'])->name('transfer_reset-create');
+
+    // バリデーション(取込用)
+    Route::post('/transfer_reset/vd_input', [TransferResetController::class, 'validationForInput'])->name('transfer_reset-vd_input');
+
+    // 検索結果取得
+    Route::post('/transfer_reset/search', [TransferResetController::class, 'search'])->name('transfer_reset-search');
+
+    //----------------------
+    // 保持期限データ削除 モック
+    //----------------------
+
+    // 取込
+    Route::get('/data_reset', [DataResetController::class, 'index'])->name('data_reset');
+
+    // 取込処理
+    Route::post('/data_reset/create', [DataResetController::class, 'create'])->name('data_reset-create');
+
+    // バリデーション(取込用)
+    Route::post('/data_reset/vd_input', [DataResetController::class, 'validationForInput'])->name('data_reset-vd_input');
+
+    // 検索結果取得
+    Route::post('/data_reset/search', [DataResetController::class, 'search'])->name('data_reset-search');
+
 });
     //---------------------
     // 画面未作成のメニュー用（後で削除する）
