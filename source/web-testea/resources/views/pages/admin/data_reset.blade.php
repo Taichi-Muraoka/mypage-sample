@@ -1,29 +1,13 @@
 @extends('adminlte::page')
 
-@section('title', '保持期限データ削除')
+@section('title', '保持期限超過データ削除管理')
 
 @section('content')
 
 {{-- カード --}}
 <x-bs.card :form=true>
 
-    <p>保持期限を超えたデータをシステムから削除します。<br>
-        削除する基準となる年月を指定してください。</p>
-
-    <x-input.text caption="基準年月" id="this_year" :rules=$rules :editData=$editData/>
-
-    <x-bs.callout type="warning">
-        送信ボタン押下後、バッググラウンドで処理されます。<br>
-        (他の処理が実行中の場合は送信できません)<br>
-        処理が正常に完了したかどうかは、下記の実行履歴よりご確認ください。
-    </x-bs.callout>
-
-    {{-- フッター --}}
-    <x-slot name="footer">
-        <div class="d-flex justify-content-end">
-            <x-button.submit-new caption='更新実行'/>
-        </div>
-    </x-slot>
+    <p>保持期限超過データ削除処理のログ情報を確認できます。</p>
 
 </x-bs.card>
 
@@ -40,27 +24,21 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="25%">年度末年月</th>
-            <th width="25%">処理日</th>
-            <th width="15%">処理件数</th>
-            <th width="15%"></th>
+            <th>処理日時</th>
+            <th>終了ステータス</th>
+            <th></th>
         </x-slot>
-
         {{-- テーブル行 --}}
         <tr>
-            <td>2023年2月</td>
-            <td>2023/01/30</td>
-            <td>100</td>
+            <td>2023/02/28 16:00</td>
+            <td>正常終了</td>
             <td>
-                <x-button.list-dtl />
+                <x-button.submit-exec caption="バックアップデータ出力" icon="fas fa-download" />
             </td>
         </tr>
 
     </x-bs.table>
 
 </x-bs.card-list>
-
-{{-- モーダル --}}
-@include('pages.admin.modal.transfer_reset-modal')
 
 @stop

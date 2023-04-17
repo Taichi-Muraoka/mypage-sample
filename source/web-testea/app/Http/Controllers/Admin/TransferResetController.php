@@ -52,7 +52,7 @@ class TransferResetController extends Controller
     {
         return view('pages.admin.transfer_reset', [
             'rules' => $this->rulesForInput(),
-            'editData' => ["this_year"=>"2023年2月"]
+            'editData' => ["this_year"=>"2022"]
         ]);
     }
 

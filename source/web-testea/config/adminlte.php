@@ -922,7 +922,7 @@ return [
                     'active' => ['transfer_reset*']
                 ],
                 [
-                    'text' => '保持期限データ削除',
+                    'text' => '保持期限超過データ削除管理',
                     'route' => 'data_reset',
                     'active' => ['data_reset*']
                 ],

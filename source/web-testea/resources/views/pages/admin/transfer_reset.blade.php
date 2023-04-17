@@ -8,9 +8,10 @@
 <x-bs.card :form=true>
 
     <p>振替が実施されていない授業を無効にし、振替授業の残数をリセットします。<br>
+        対象年度（3月～翌年2月）の授業を対象に処理を実行します。<br>
         対象の授業は[授業管理]>[要振替授業一覧]で確認してください。</p>
 
-    <x-input.text caption="年度末年月" id="this_year" :rules=$rules :editData=$editData/>
+    <x-input.text caption="対象年度" id="this_year" :rules=$rules :editData=$editData/>
 
     <x-bs.callout type="warning">
         送信ボタン押下後、バッググラウンドで処理されます。<br>
@@ -40,27 +41,28 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="25%">年度末年月</th>
-            <th width="25%">処理日</th>
-            <th width="15%">処理件数</th>
+            <th>処理日時</th>
+            <th>対象年度</th>
+            <th>終了ステータス</th>
+            <th>処理件数</th>
+            <th>実行者</th>
             <th width="15%"></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <td>2023年2月</td>
-            <td>2023/01/30</td>
+            <td>2023/02/28 16:00</td>
+            <td>2022年度</td>
+            <td>正常終了</td>
             <td>100</td>
+            <td>久我山　教室長</td>
             <td>
-                <x-button.list-dtl />
+                <x-button.submit-exec caption="更新データリスト出力" icon="fas fa-download" />
             </td>
         </tr>
 
     </x-bs.table>
 
 </x-bs.card-list>
-
-{{-- モーダル --}}
-@include('pages.admin.modal.transfer_reset-modal')
 
 @stop

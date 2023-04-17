@@ -9,9 +9,16 @@
 
     <p>新年度の学年更新処理を実行します。</p>
 
-    <x-input.text caption="現在の年度" id="this_year" :rules=$rules :editData=$editData/>
-
-    <x-input.text caption="更新後の年度" id="next_year" :rules=$rules :editData=$editData/>
+    <x-bs.table :hover=false :vHeader=true>
+        <tr>
+            <th width="35%">現在の年度</th>
+            <td>2023</td>
+        </tr>
+        <tr>
+            <th>新年度</th>
+            <td>2024</td>
+        </tr>
+    </x-bs.table>
 
     <x-bs.callout type="warning">
         送信ボタン押下後、バッググラウンドで処理されます。<br>

@@ -2097,7 +2097,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/transfer_reset/search', [TransferResetController::class, 'search'])->name('transfer_reset-search');
 
     //----------------------
-    // 保持期限データ削除 モック
+    // 保持期限超過データ削除管理 モック
     //----------------------
 
     // 取込
