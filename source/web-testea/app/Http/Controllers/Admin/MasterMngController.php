@@ -48,6 +48,11 @@ class MasterMngController extends Controller
         ]);
     }
 
+    public function indexSchool()
+    {
+        return view('pages.admin.master_mng_school');
+    }
+
     /**
      * バリデーション(検索用)
      *
@@ -146,6 +151,12 @@ class MasterMngController extends Controller
         return view('pages.admin.master_mng-import', [
             'rules' => $this->rulesForSearch()
         ]);
+    }
+
+    // 校舎マスタ取り込み
+    public function importSchool()
+    {
+        return view('pages.admin.master_mng_school-import');
     }
 
     /**

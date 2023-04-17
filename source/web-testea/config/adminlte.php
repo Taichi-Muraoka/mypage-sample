@@ -899,7 +899,7 @@ return [
         ],
         [
             'text' => 'マスタ管理',
-            'icon' => 'fa fa-datebase',
+            'icon' => 'fa fa-database',
             'can'  => 'admin',
             'submenu' => [
                 [
@@ -909,8 +909,8 @@ return [
                 ],
                 [
                     'text' => '校舎マスタ管理',
-                    'route' => 'master_mng',
-                    'active' => ['master_mng*']
+                    'route' => 'master_mng_school',
+                    'active' => ['master_mng_school*']
                 ],
             ]
         ],
