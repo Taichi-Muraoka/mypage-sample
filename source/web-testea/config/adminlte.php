@@ -891,14 +891,26 @@ return [
             'can'  => 'admin',
             'submenu' => [
                 [
+                    'text' => '事務局アカウント管理',
+                    'route' => 'account_mng',
+                    'active' => ['account_mng*']
+                ],
+            ]
+        ],
+        [
+            'text' => 'マスタ管理',
+            'icon' => 'fa fa-datebase',
+            'can'  => 'admin',
+            'submenu' => [
+                [
                     'text' => 'マスタ管理',
                     'route' => 'master_mng',
                     'active' => ['master_mng*']
                 ],
                 [
-                    'text' => '事務局アカウント管理',
-                    'route' => 'account_mng',
-                    'active' => ['account_mng*']
+                    'text' => '校舎マスタ管理',
+                    'route' => 'master_mng',
+                    'active' => ['master_mng*']
                 ],
             ]
         ],
