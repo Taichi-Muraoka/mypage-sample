@@ -9,7 +9,11 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
+            <x-input.select id="roomcd" caption="校舎" :select2=false >
+                <option value="1">久我山</option>
+                <option value="2">西永福</option>
+                <option value="3">本郷</option>
+            </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
             <x-input.text id="name" caption="生徒名" :rules=$rules />

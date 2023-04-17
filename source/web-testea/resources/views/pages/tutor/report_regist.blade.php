@@ -10,15 +10,25 @@
     <x-bs.row>
         <x-bs.col2>
             {{-- 校舎リスト選択時、onChangeによる生徒リストの絞り込みを行う。-1の場合は自分の受け持ちの生徒だけに絞り込み --}}
-            <x-input.select caption="校舎" id="roomcd" :select2=true onChange="selectChangeGetRoom" :editData=$editData
-                :mastrData=$rooms :select2Search=false emptyValue="-1" />
+            {{-- <x-input.select caption="校舎" id="roomcd" :select2=true onChange="selectChangeGetRoom" :editData=$editData
+                :mastrData=$rooms :select2Search=false emptyValue="-1" /> --}}
+            <x-input.select id="roomcd" caption="校舎" :select2=false >
+                <option value="1">久我山</option>
+                <option value="2">西永福</option>
+                <option value="3">本郷</option>
+            </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="生徒名" id="sid" :select2=true :editData=$editData>
+            {{-- <x-input.select caption="生徒名" id="sid" :select2=true :editData=$editData> --}}
                 {{-- vueで動的にプルダウンを作成 --}}
-                <option v-for="item in selectGetItem.selectItems" :value="item.id">
+                {{-- <option v-for="item in selectGetItem.selectItems" :value="item.id">
                     @{{ item.value }}
                 </option>
+            </x-input.select> --}}
+            <x-input.select caption="生徒名" id="student" :select2=true :editData="$editData">
+                <option value="1">CWテスト生徒１</option>
+                <option value="2">CWテスト生徒２</option>
+                <option value="3">CWテスト生徒３</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
