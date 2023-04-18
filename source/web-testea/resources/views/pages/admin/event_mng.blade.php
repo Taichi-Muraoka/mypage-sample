@@ -12,7 +12,15 @@
             <x-input.text caption="イベント名" id="name" :rules=$rules />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="学年" id="cls_cd" :select2=true :mastrData=$cls />
+            {{-- <x-input.select caption="学年" id="cls_cd" :select2=true :mastrData=$cls /> --}}
+            <x-input.select id="cls_cd" caption="学年" :select2=true >
+                <option value="1">高3</option>
+                <option value="2">高2</option>
+                <option value="3">高1</option>
+                <option value="4">中3</option>
+                <option value="5">中2</option>
+                <option value="6">中1</option>
+            </x-input.select>
         </x-bs.col2>
     </x-bs.row>
 

@@ -17,7 +17,15 @@
 
     <x-input.text caption="イベント名" id="name" :rules=$rules :editData=$editData />
 
-    <x-input.select caption="学年" id="cls_cd" :select2=true :mastrData=$cls :editData=$editData />
+    {{-- <x-input.select caption="学年" id="cls_cd" :select2=true :mastrData=$cls :editData=$editData /> --}}
+    <x-input.select id="cls_cd" caption="学年" :select2=true >
+        <option value="1">高3</option>
+        <option value="2">高2</option>
+        <option value="3">高1</option>
+        <option value="4">中3</option>
+        <option value="5">中2</option>
+        <option value="6">中1</option>
+    </x-input.select>
 
     <x-input.date-picker caption="開催日" id="event_date" :editData=$editData />
 
