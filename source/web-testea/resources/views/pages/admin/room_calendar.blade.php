@@ -12,16 +12,20 @@
             <x-bs.col2>
                 @can('roomAdmin')
                 {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-                <x-input.select id="roomcd" :select2=true :mastrData=$rooms :editData=$editData
-                    :select2Search=false :blank=false />
+                    <x-input.select id="roomcd" :select2=true :select2Search=false :blank=false :editData=$editData>
+                        <option value="110">久我山</option>
+                    </x-input.select>
                 @else
-                <x-input.select id="roomcd" :select2=true onChange="selectChangeRoom()" :mastrData=$rooms :editData=$editData />
+                    <x-input.select id="roomcd" :select2=true onChange="selectChangeRoom()" :editData=$editData>
+                        <option value="110">久我山</option>
+                        <option value="120">西永福</option>
+                        <option value="130">本郷</option>
+                    </x-input.select>
                 @endcan
             </x-bs.col2>
         </x-bs.row>
         {{-- hidden カレンダー用--}}
-        <x-input.hidden id="curDate" :editData=$editData />
-        <x-input.hidden id="testDate"  />
+        <x-input.hidden id="curDate" />
     </x-bs.card>
 
     <div id="calendar"></div>

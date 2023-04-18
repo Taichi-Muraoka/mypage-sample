@@ -451,9 +451,14 @@ export default class PageBase {
     /**
      * カレンダー処理（教室カレンダー）
      */
-    roomCalendar(initDate) {
+    roomCalendar(initDateText) {
         // Vue: モーダル
+        //console.log("page-base into roomCalendar");
         var $vueModal = this.getVueModal({ useShowEvent: false });
+        var initDate;
+        if (!self._isEmpty(initDateText)) {
+            initDate = new Date(initDateText);
+        }
         // カレンダーの作成
         CalendarCom.createForRoom(
             //-----------------
@@ -471,13 +476,9 @@ export default class PageBase {
                     .then(() => {
                         // カードのローディング開始
                         self._loadingForCardOn(cardId);
-
+                        //console.log("loadingForCardOn");
                         // カードカレンダーの中のHidden値を取得。会員管理のように子画面にカレンダーがある場合
-                        //console.log("into calendar disp event CurDate");
-                        //console.log(info.start.valueOf());
-                        $('#curDate').val(info.start.valueOf());
                         var formData = this._getVueFormData(cardId);
-                        //console.log(formData);
 
                         // カレンダーの条件を送信
                         var sendData = Object.assign(formData, {
@@ -533,13 +534,27 @@ export default class PageBase {
                 //console.log(info);
                 if (info.resource._resource.id !== '000' && info.resource._resource.id !== '800') {
                     // 登録画面に遷移
-                    var url = self._getFuncUrl() + "/new?"
-                            + "roomcd=" + "110"
-                            + "&date=" + moment(info.start).format("YYYYMMDD")
-                            + "&start_time=" + moment(info.start).format("HHmm")
-                            + "&end_time=" + moment(info.end).format("HHmm");
+                    //var url = self._getFuncUrl() + "/new?"
+                    //        + "roomcd=" + "110"
+                    //        + "&date=" + moment(info.start).format("YYYYMMDD")
+                    //        + "&start_time=" + moment(info.start).format("HHmm")
+                    //        + "&end_time=" + moment(info.end).format("HHmm");
+                    var url = self._getFuncUrl() + "/new"
+                            + "/" + "110"
+                            + "/" + moment(info.start).format("YYYYMMDD")
+                            + "/" + moment(info.start).format("HHmm")
+                            + "/" + moment(info.end).format("HHmm");
                     location.href = url;
                 }
+            },
+            //-----------------
+            // 日付変更時イベント
+            //-----------------
+            (dateInfo) => {
+                //console.log("date change!!");
+                //console.log(dateInfo.start);
+                $('#curDate').val(dateInfo.start);
+                //console.log($('#curDate').val());
             }
         );
     }

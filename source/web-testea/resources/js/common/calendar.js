@@ -62,7 +62,7 @@ export default class CalendarCom {
         calendar.render();
     }
 
-    static createForRoom(initDate, eventFunc, eventClick, selectFunc) {
+    static createForRoom(initDate, eventFunc, eventClick, selectFunc, dateChangeFunc) {
         // 固定にした
         var calendarId = "calendar";
 
@@ -71,40 +71,60 @@ export default class CalendarCom {
 
         var calendar = new Calendar(calendarEl, {
             initialView: "resourceTimeGridDay",
+            datesSet: dateChangeFunc,
             initialDate: initDate,
             customButtons: {
                 datePickerButton: {
-                    text: 'datepicker',
+                    text: '日付選択',
                     click: function () {
-    
-                        var $btnCustom = $('.fc-datePickerButton-button'); // name of custom  button in the generated code
-                        $btnCustom.after('<input type="hidden" id="hiddenDate" class="datepicker"/>');
-    
-                        $("#hiddenDate").datepicker({
-                            showOn: "button",
-    
-                            dateFormat:"yy-mm-dd",
-                            onSelect: function (dateText, inst) {
-                                $('#calendar').fullCalendar('gotoDate', dateText);
-                            },
+                        //var currentDate = calendar.getDate();
+                        //var newDate = moment(currentDate).add(7, 'days').format();
+                        //calendar.gotoDate(newDate);
+
+                        $(this).daterangepicker({
+                                singleDatePicker: true,
+                                locale: {
+                                    format: "YYYY/MM/DD",
+                                    applyLabel: "適用",
+                                    cancelLabel: "キャンセル"
+                                },
+                                startDate: calendar.getDate(),
+                                // カレンダーの範囲
+                                minYear: new Date().getFullYear() - 2,
+                                maxYear: new Date().getFullYear() + 5, // とりあえず5年後くらい
+                                // 最初から自動で日付が入ってしまうので手動で格納
+                                //autoUpdateInput: false,
+                                // カレンダーのポップアップ位置を自動で調整
+                                // 下の方にテキストボックスがあれば、カレンダーは上にポップアップされる
+                                drops: "auto"
+                            //}, function(start, end, label) {
+                                //console.log(start);
+                                //var currentDate = calendar.getDate();
+                                //var newDate = moment(currentDate).add(7, 'days').format();
+                                //calendar.gotoDate(newDate);
+                        })
+                        .on("apply.daterangepicker", function(ev, picker) {
+                            // 適用ボタンクリックイベントで取得
+                            var newDate = moment(picker.startDate).format();
+                            calendar.gotoDate(newDate);
+                        })
+                        .on("cancel.daterangepicker", function(ev, picker) {
+                            // キャンセルボタンはクリアとした
+                            $(this).val("");
                         });
-    
-                        var $btnDatepicker = $(".ui-datepicker-trigger"); // name of the generated datepicker UI 
-                        //Below are required for manipulating dynamically created datepicker on custom button click
-                        $("#hiddenDate").show().focus().hide();
-                        $btnDatepicker.trigger("click"); //dynamically generated button for datepicker when clicked on input textbox
-                        $btnDatepicker.hide();
-                        $btnDatepicker.remove();
-                        $("input.datepicker").not(":first").remove();//dynamically appended every time on custom button click
-    
+
+                        $(this).data('daterangepicker').show();
                     }
                 }
             },
             headerToolbar: {
                 left: "prev,next today",
+                //left: "prev,next today datePickerButton",
+                //left: "",
                 center: "title",
-                right: ""
-                //right: "datePickerButton,timeGridWeek,resourceTimeGridDay"
+                //right: ""
+                //right: "datePickerButton timeGridWeek,resourceTimeGridDay"
+                right: "datePickerButton"
             },
             themeSystem: "bootstrap",
             locale: "ja",
