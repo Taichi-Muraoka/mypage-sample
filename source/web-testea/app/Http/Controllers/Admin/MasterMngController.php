@@ -48,9 +48,59 @@ class MasterMngController extends Controller
         ]);
     }
 
+    // 校舎マスタ表示
     public function indexSchool()
     {
         return view('pages.admin.master_mng_school');
+    }
+
+    /**
+     * 校舎マスタ登録画面
+     *
+     * @return view
+     */
+    public function newSchool()
+    {
+        return view('pages.admin.master_mng_school-input', [
+            'editData' => null,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 校舎マスタ登録処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function createSchool(Request $request)
+    {
+        return;
+    }
+
+    /**
+     * 校舎マスタ編集画面
+     *
+     * @param int $sid 生徒ID
+     * @return view
+     */
+    public function editSchool()
+    {
+        return view('pages.admin.master_mng_school-input', [
+            'editData' => null,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 校舎マスタ編集処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function updateSchool(Request $request)
+    {
+        return;
     }
 
     /**
