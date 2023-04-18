@@ -1636,6 +1636,25 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // バリデーション(登録用)
     Route::post('/master_mng/vd_input', [MasterMngController::class, 'validationForInput'])->name('master_mng-vd_input');
 
+    // 校舎マスタ
+    // 一覧画面
+    Route::get('/master_mng_school', [MasterMngController::class, 'indexSchool'])->name('master_mng_school');
+
+    // バリデーション(検索用)
+    Route::post('/master_mng/vd_search', [MasterMngController::class, 'validationForSearch'])->name('master_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/master_mng/search', [MasterMngController::class, 'search'])->name('master_mng-search');
+
+    // 取込画面
+    Route::get('/master_mng_school/import', [MasterMngController::class, 'importSchool'])->name('master_mng_school-import');
+
+    // 新規登録処理
+    Route::post('/master_mng/create', [MasterMngController::class, 'create'])->name('master_mng-create');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng/vd_input', [MasterMngController::class, 'validationForInput'])->name('master_mng-vd_input');
+
     //---------------------
     // 事務局アカウント管理
     //---------------------

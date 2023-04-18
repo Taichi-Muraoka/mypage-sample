@@ -40,7 +40,15 @@
         <option value="8">算数道場</option>
         <option value="9">未定</option>
     </x-input.select>
-    <x-input.select caption="学年" id="cls_cd" :select2=true :editData=$editData :mastrData=$classes/>
+    {{-- <x-input.select caption="学年" id="cls_cd" :select2=true :editData=$editData :mastrData=$classes/> --}}
+    <x-input.select id="cls_cd" caption="学年" :select2=true >
+        <option value="1">高3</option>
+        <option value="2">高2</option>
+        <option value="3">高1</option>
+        <option value="4">中3</option>
+        <option value="5">中2</option>
+        <option value="6">中1</option>
+    </x-input.select>
     <x-input.text caption="生徒名" id="name" :rules=$rules :editData=$editData/>
     <x-input.text caption="生徒名カナ" id="name_kana" :rules=$rules :editData=$editData/>
     <x-input.text caption="メールアドレス" id="email" :rules=$rules :editData=$editData/>

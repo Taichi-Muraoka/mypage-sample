@@ -31,7 +31,15 @@
     {{-- 共通フォーム --}}
     <x-input.text caption="生徒名" id="name" :rules=$rules :editData=$editData/>
     <x-input.text caption="生徒名カナ" id="name_kana" :rules=$rules :editData=$editData/>
-    <x-input.select caption="学年" id="cls_cd" :select2=true :blank=false :editData=$editData :mastrData=$classes/>
+    {{-- <x-input.select caption="学年" id="cls_cd" :select2=true :blank=false :editData=$editData :mastrData=$classes/> --}}
+    <x-input.select id="cls_cd" caption="学年" :select2=true >
+        <option value="1">高3</option>
+        <option value="2">高2</option>
+        <option value="3">高1</option>
+        <option value="4">中3</option>
+        <option value="5">中2</option>
+        <option value="6">中1</option>
+    </x-input.select>
     <x-input.text caption="電話番号（生徒）" id="tel_student" :rules=$rules :editData=$editData/>
     <x-input.text caption="電話番号（保護者）" id="tel_guardian" :rules=$rules :editData=$editData/>
     <x-input.text caption="Email（生徒）" id="email_student" :rules=$rules :editData=$editData/>
@@ -43,10 +51,10 @@
     <x-input.select caption="所属校舎" id="schools" :select2=true :blank=false :editData=$editData>
         <option value="1">久我山</option>
         <option value="2">西永福</option>
-        <option value="2">下高井戸</option>
-        <option value="2">駒込</option>
-        <option value="2">日吉</option>
-        <option value="2">自由が丘</option>
+        <option value="3">下高井戸</option>
+        <option value="4">駒込</option>
+        <option value="5">日吉</option>
+        <option value="6">自由が丘</option>
     </x-input.select>
     <x-input.select caption="受験生フラグ" id="jukensei" :select2=true :blank=false :editData=$editData>
         <option value="1">非受験生</option>
