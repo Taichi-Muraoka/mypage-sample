@@ -972,7 +972,7 @@ return [
                 [
                     'text' => '生徒一括取込',
                     'route' => 'import_student',
-                    'active' => ['import_student*']
+                    'active' => ['import_student_information*']
                 ],
                 [
                     'text' => '生徒スケジュール取込',
