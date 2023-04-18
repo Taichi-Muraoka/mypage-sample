@@ -9,10 +9,13 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="kinds" caption="校舎" :select2=true>
+            <x-input.select id="roomcd" caption="校舎" :select2=true >
                 <option value="1">久我山</option>
                 <option value="2">西永福</option>
-                <option value="3">本郷</option>
+                <option value="3">下高井戸</option>
+                <option value="4">駒込</option>
+                <option value="5">日吉</option>
+                <option value="6">自由が丘</option>
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
