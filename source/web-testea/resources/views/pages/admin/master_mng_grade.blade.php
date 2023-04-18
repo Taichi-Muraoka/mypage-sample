@@ -27,7 +27,7 @@
 
 		{{-- テーブル行 --}}
 		<tr>
-			<td>112</td>
+			<td>01</td>
 			<td>小</td>
 			<td>小学1年</td>
 			<td>小1</td>
@@ -39,11 +39,11 @@
 			</td>
 		</tr>
 		<tr>
-			<td>112</td>
+			<td>02</td>
 			<td>小</td>
-			<td>小学1年</td>
-			<td>小1</td>
-			<td>36</td>
+			<td>小学2年</td>
+			<td>小2</td>
+			<td>35</td>
 			<td></td>
 			<td>
 				<x-button.list-dtl />
@@ -51,11 +51,11 @@
 			</td>
 		</tr>
 		<tr>
-			<td>112</td>
+			<td>03</td>
 			<td>小</td>
-			<td>小学1年</td>
-			<td>小1</td>
-			<td>36</td>
+			<td>小学3年</td>
+			<td>小3</td>
+			<td>34</td>
 			<td></td>
 			<td>
 				<x-button.list-dtl />

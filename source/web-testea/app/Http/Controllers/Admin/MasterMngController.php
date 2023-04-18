@@ -212,7 +212,7 @@ class MasterMngController extends Controller
     public function editGrade()
     {
         $editData = [
-            'code' => 110,
+            'code' => 01,
             'classification_school' => "小",
             'name_grade' => "小学1年",
             'name_grade_abbreviation' => "小1",
