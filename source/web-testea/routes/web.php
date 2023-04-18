@@ -655,6 +655,7 @@ use App\Http\Controllers\Admin\ImportStudentscheduleController;
 use App\Http\Controllers\Admin\ImportTutorController;
 use App\Http\Controllers\Admin\TransferResetController;
 use App\Http\Controllers\Admin\DataResetController;
+use App\Http\Controllers\Admin\ImportSchoolCodeController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -2153,6 +2154,19 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 検索結果取得
     Route::post('/data_reset/search', [DataResetController::class, 'search'])->name('data_reset-search');
+
+    //---------------------
+    // 学校コード取込 モック
+    //---------------------
+
+    // 取込画面
+    Route::get('/import_school_code', [ImportSchoolCodeController::class, 'index'])->name('import_school_code');
+
+    // 新規登録処理
+    Route::post('/import_school_code/create', [ImportSchoolCodeController::class, 'create'])->name('import_school_code-create');
+
+    // バリデーション(登録用)
+    Route::post('/import_school_code/vd_input', [ImportSchoolCodeController::class, 'validationForInput'])->name('import_school_code-vd_input');
 
 });
     //---------------------
