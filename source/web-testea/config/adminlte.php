@@ -827,21 +827,21 @@ return [
                 ],
             ]
         ],
-        [
-            'text' => '講師出社管理',
-            'icon' => 'fas fa-history',
-            'can'  => 'admin',
-            'submenu' => [
-                [
-                    'text' => '出社情報取込',
-                    'route' => 'under_construction',
-                ],
-                [
-                    'text' => '出社情報管理',
-                    'route' => 'under_construction',
-                ],
-            ]
-        ],
+        //[
+        //    'text' => '講師出社管理',
+        //    'icon' => 'fas fa-history',
+        //    'can'  => 'admin',
+        //    'submenu' => [
+        //        [
+        //            'text' => '出社情報取込',
+        //            'route' => 'under_construction',
+        //        ],
+        //        [
+        //            'text' => '出社情報管理',
+        //            'route' => 'under_construction',
+        //        ],
+        //    ]
+        //],
         [
             'text' => '給与情報管理',
             'icon' => 'fa fa-wallet',
@@ -874,10 +874,10 @@ return [
                     'route' => 'invoice_calculation',
                     'active' => ['invoice_calculation*']
                 ],
-                [
-                    'text' => '追加・割引費用情報',
-                    'route' => 'under_construction',
-                ],
+                //[
+                //    'text' => '追加・割引費用情報',
+                //    'route' => 'under_construction',
+                //],
                 [
                     'text' => '請求書情報取込',
                     'route' => 'invoice_import',
@@ -919,10 +919,10 @@ return [
             'icon' => 'fa fa-calendar-check',
             'can'  => 'admin',
             'submenu' => [
-                [
-                    'text' => '休校日取込',
-                    'route' => 'under_construction',
-                ],
+                //[
+                //    'text' => '休校日取込',
+                //    'route' => 'under_construction',
+                //],
                 [
                     'text' => '学年情報更新',
                     'route' => 'all_member_import',
