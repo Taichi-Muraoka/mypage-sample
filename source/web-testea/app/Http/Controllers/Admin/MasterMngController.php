@@ -111,6 +111,68 @@ class MasterMngController extends Controller
         return;
     }
 
+    // 教科マスタ表示
+    public function indexSubject()
+    {
+        return view('pages.admin.master_mng_subject');
+    }
+
+    /**
+     * 教科マスタ登録画面
+     *
+     * @return view
+     */
+    public function newSubject()
+    {
+        return view('pages.admin.master_mng_subject-input', [
+            'editData' => null,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 教科マスタ登録処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function createSubject(Request $request)
+    {
+        return;
+    }
+
+    /**
+     * 教科マスタ編集画面
+     *
+     * @param int $sid 生徒ID
+     * @return view
+     */
+    public function editSubject()
+    {
+        $editData = [
+            'code' => 110,
+            'classification_school' => "小",
+            'name_subject' => "国語",
+            'display_order' => 1,
+        ];
+
+        return view('pages.admin.master_mng_subject-input', [
+            'editData' => $editData,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 教科マスタ編集処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function updateSubject(Request $request)
+    {
+        return;
+    }
+
     /**
      * バリデーション(検索用)
      *

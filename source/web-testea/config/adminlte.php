@@ -912,6 +912,11 @@ return [
                     'route' => 'master_mng_school',
                     'active' => ['master_mng_school*']
                 ],
+                [
+                    'text' => '教科マスタ管理',
+                    'route' => 'master_mng_subject',
+                    'active' => ['master_mng_subject*']
+                ],
             ]
         ],
         [
