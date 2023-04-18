@@ -114,7 +114,7 @@ class MasterMngController extends Controller
     // 教科マスタ表示
     public function indexSubject()
     {
-        return view('pages.admin.master_mng_subject');
+        return view('pages.admin.master_mng_grade');
     }
 
     /**
@@ -169,6 +169,69 @@ class MasterMngController extends Controller
      * @return void
      */
     public function updateSubject(Request $request)
+    {
+        return;
+    }
+
+    // 学年マスタ表示
+    public function indexGrade()
+    {
+        return view('pages.admin.master_mng_grade');
+    }
+
+    /**
+     * 学年マスタ登録画面
+     *
+     * @return view
+     */
+    public function newGrade()
+    {
+        return view('pages.admin.master_mng_grade-input', [
+            'editData' => null,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 学年マスタ登録処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function createGrade(Request $request)
+    {
+        return;
+    }
+
+    /**
+     * 学年マスタ編集画面
+     *
+     * @param int $sid 生徒ID
+     * @return view
+     */
+    public function editGrade()
+    {
+        $editData = [
+            'code' => 110,
+            'classification_school' => "小",
+            'name_grade' => "小学1年",
+            'name_grade_abbreviation' => "小1",
+            'display_order' => 36,
+        ];
+
+        return view('pages.admin.master_mng_grade-input', [
+            'editData' => $editData,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 学年マスタ編集処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function updateGrade(Request $request)
     {
         return;
     }

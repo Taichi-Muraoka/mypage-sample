@@ -1678,6 +1678,26 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/master_mng_subject/delete', [MasterMngController::class, 'deleteSubject'])->name('master_mng_subject-delete');
 
 
+    // 学年マスタ
+    // 一覧画面
+    Route::get('/master_mng_grade', [MasterMngController::class, 'indexGrade'])->name('master_mng_grade');
+
+    // 新規登録画面
+    Route::get('/master_mng_grade/new', [MasterMngController::class, 'newGrade'])->name('master_mng_grade-new');
+
+    // 新規登録処理
+    Route::post('/master_mng_grade/create', [MasterMngController::class, 'createGrade'])->name('master_mng_grade-create');
+
+    // 編集画面
+    Route::get('/master_mng_grade/edit', [MasterMngController::class, 'editGrade'])->name('master_mng_grade-edit');
+
+    // 編集処理
+    Route::post('/master_mng_grade/update', [MasterMngController::class, 'updateGrade'])->name('master_mng_grade-update');
+
+    // 削除処理
+    Route::post('/master_mng_grade/delete', [MasterMngController::class, 'deleteGrade'])->name('master_mng_grade-delete');
+
+
     //---------------------
     // 事務局アカウント管理
     //---------------------
