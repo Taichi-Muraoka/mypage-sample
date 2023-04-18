@@ -24,7 +24,11 @@
 
     {{-- 共通フォーム --}}
     <x-input.text caption="コード" id="code" :rules=$rules :editData=$editData/>
-    <x-input.text caption="学校区分" id="classification_school" :rules=$rules :editData=$editData/>
+    <x-input.select caption="学校区分" id="classification_school" :select2=true :editData=$editData>
+        <option value="1">小</option>
+        <option value="2">中</option>
+        <option value="3">高</option>
+    </x-input.select>
     <x-input.text caption="教科名" id="name_subject" :rules=$rules :editData=$editData/>
     <x-input.text caption="表示順" id="display_order" :rules=$rules :editData=$editData/>
 
