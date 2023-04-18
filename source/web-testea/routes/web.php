@@ -1636,6 +1636,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // バリデーション(登録用)
     Route::post('/master_mng/vd_input', [MasterMngController::class, 'validationForInput'])->name('master_mng-vd_input');
 
+
     // 校舎マスタ
     // 一覧画面
     Route::get('/master_mng_school', [MasterMngController::class, 'indexSchool'])->name('master_mng_school');
@@ -1654,6 +1655,27 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/master_mng_school/delete', [MasterMngController::class, 'deleteSchool'])->name('master_mng_school-delete');
+
+
+    // 教科マスタ
+    // 一覧画面
+    Route::get('/master_mng_subject', [MasterMngController::class, 'indexSubject'])->name('master_mng_subject');
+
+    // 新規登録画面
+    Route::get('/master_mng_subject/new', [MasterMngController::class, 'newSubject'])->name('master_mng_subject-new');
+
+    // 新規登録処理
+    Route::post('/master_mng_subject/create', [MasterMngController::class, 'createSubject'])->name('master_mng_subject-create');
+
+    // 編集画面
+    Route::get('/master_mng_subject/edit', [MasterMngController::class, 'editSubject'])->name('master_mng_subject-edit');
+
+    // 編集処理
+    Route::post('/master_mng_subject/update', [MasterMngController::class, 'updateSubject'])->name('master_mng_subject-update');
+
+    // 削除処理
+    Route::post('/master_mng_subject/delete', [MasterMngController::class, 'deleteSubject'])->name('master_mng_subject-delete');
+
 
     //---------------------
     // 事務局アカウント管理
