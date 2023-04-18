@@ -49,24 +49,23 @@ class RoomCalendarController extends Controller
 //        $this->validateIds($roomcd);
 
         // 教室リストを取得
-        $rooms = $this->mdlGetRoomList(false);
+        //$rooms = $this->mdlGetRoomList(false);
 
         // 当日日付を取得
-        $today = null;
+        //$today = null;
         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
         //$this->guardRoomAdminRoomcd($roomcd);
         //$roomcd = $rooms[0]->roomcd;
         $roomcd = 110;
         // 教室名を取得する
-        $roomName = $this->getRoomName($roomcd);
+        //$roomName = $this->getRoomName($roomcd);
 
         return view('pages.admin.room_calendar', [
-            'rooms' => $rooms,
-            'name' => $roomName,
-            // カレンダー用にIDを渡す
+            //'rooms' => $rooms,
+            //'name' => $roomName,
             'editData' => [
                 'roomcd' => $roomcd,
-                'curDate' => $today
+                'curDate' => null
             ]
         ]);
     }
@@ -219,13 +218,16 @@ class RoomCalendarController extends Controller
      * @param \Illuminate\Http\Request $request リクエスト
      * @return view
      */
-    public function new(Request $request)
+    public function new($roomcd, $date, $startTime, $endTime)
+    //public function new(Request $request)
     {
 
-        $roomcd = $request->query('roomcd');
-        $date = $request->query('date');
-        $start_time = $request->query('start_time');
-        $end_time = $request->query('end_time');
+        //$roomcd = $request->query('roomcd');
+        //$date = $request->query('date');
+        //$start_time = $request->query('start_time');
+        //$end_time = $request->query('end_time');
+        $start_time = $startTime;
+        $end_time = $endTime;
 
         // IDのバリデーション
         //$this->validateIds($roomcd);

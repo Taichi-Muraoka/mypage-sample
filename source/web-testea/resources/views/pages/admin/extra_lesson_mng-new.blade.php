@@ -12,7 +12,15 @@
 
     <p>追加授業スケジュールの登録を行います。</p>
 
-    <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
+    {{-- <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData /> --}}
+    <x-input.select id="roomcd" caption="校舎" :select2=true >
+        <option value="1">久我山</option>
+        <option value="2">西永福</option>
+        <option value="3">下高井戸</option>
+        <option value="4">駒込</option>
+        <option value="5">日吉</option>
+        <option value="6">自由が丘</option>
+    </x-input.select>
 
     <x-input.select caption="指導スペース" id="classroomcd" :select2=true :editData="$editData">
         <option value="1" selected>Aテーブル</option>

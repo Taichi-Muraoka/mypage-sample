@@ -20,15 +20,15 @@ export default class AppClass extends PageBase {
             vueMounted: function($vue, option) {
                 // カレンダー表示
                 var curDate = null;
-                if (!self._isEmpty($vue.form.curDate)) {
-                    curDate = $vue.form.curDate;
-                }
                 self.roomCalendar(curDate);
             },
             vueMethods: {
                 // 教室プルダウン変更イベント
                 selectChangeRoom: function(event) {
                     // カレンダー再表示
+                    //console.log("room change!!");
+                    // form再読み込み
+                    this.form = self._getVueFormData(this.appId);
                     var curDate = null;
                     if (!self._isEmpty(this.form.curDate)) {
                         curDate = this.form.curDate;
