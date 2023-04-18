@@ -905,7 +905,7 @@ return [
                 [
                     'text' => 'マスタ管理',
                     'route' => 'master_mng',
-                    'active' => ['master_mng*']
+                    'active' => ['master_mng_all*']
                 ],
                 [
                     'text' => '校舎マスタ管理',
