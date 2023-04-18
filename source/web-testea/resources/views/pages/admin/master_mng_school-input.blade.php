@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '校舎マスタデータ新規登録')
+@section('title', (request()->routeIs('master_mng_school-edit')) ? '校舎マスタデータ編集' : '校舎マスタデータ新規登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
