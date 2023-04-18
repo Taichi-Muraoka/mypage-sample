@@ -30,27 +30,31 @@
 
     @else
     {{-- 登録時 --}}
-    <x-input.select caption="教室" id="roomcd" :select2=true :editData="$editData">
-        <option value="1">仙台駅前</option>
-        <option value="2">定禅寺</option>
-        <option value="3">長町南</option>
+    <x-input.select id="roomcd" caption="校舎" :select2=true >
+        <option value="1">久我山</option>
+        <option value="2">西永福</option>
+        <option value="3">下高井戸</option>
+        <option value="4">駒込</option>
+        <option value="5">日吉</option>
+        <option value="6">自由が丘</option>
     </x-input.select>
 
-    <x-input.select caption="教師名" id="tid" :select2=true :editData=$editData>
-        <option value="1">CWテスト教師１</option>
-        <option value="2">CWテスト教師２</option>
+    <x-input.select caption="講師名" id="tid" :select2=true :editData=$editData>
+        <option value="1">CWテスト講師１</option>
+        <option value="2">CWテスト講師２</option>
     </x-input.select>
 
     <x-input.date-picker caption="授業日" id="start_date" :editData=$editData />
 
     <x-input.select caption="時限" id="period" :select2=true :editData="$editData">
-        <option value="1">1限（ 9:00 ～ ）</option>
-        <option value="2">2限（10:45 ～ ）</option>
-        <option value="3">3限（13:15 ～ ）</option>
-        <option value="4">4限（15:00 ～ ）</option>
-        <option value="5">5限（16:45 ～ ）</option>
-        <option value="6">6限（18:30 ～ ）</option>
-        <option value="7">7限（20:15 ～ ）</option>
+        <option value="1">1限</option>
+        <option value="2">2限</option>
+        <option value="3">3限</option>
+        <option value="4">4限</option>
+        <option value="5">5限</option>
+        <option value="6">6限</option>
+        <option value="7">7限</option>
+        <option value="8">8限</option>
     </x-input.select>
 
     <x-input.select caption="教科" id="subject" :select2=true :editData="$editData">
