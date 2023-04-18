@@ -938,6 +938,11 @@ return [
                     'route' => 'data_reset',
                     'active' => ['data_reset*']
                 ],
+                [
+                    'text' => '学校コード取込',
+                    'route' => 'import_school_code',
+                    'active' => ['import_school_code*']
+                ],
                 //[
                 //    'text' => '振替残数クリア',
                 //    'route' => 'under_construction',
