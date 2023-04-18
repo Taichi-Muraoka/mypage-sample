@@ -833,7 +833,8 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/room_calendar/get_calendar', [RoomCalendarController::class, 'getCalendar'])->name('room_calendar-get_calendar');
 
     // 教室カレンダー登録画面
-    Route::get('/room_calendar/new', [RoomCalendarController::class, 'new'])->name('room_calendar-new');
+    //Route::get('/room_calendar/new', [RoomCalendarController::class, 'new'])->name('room_calendar-new');
+    Route::get('/room_calendar/new/{roomcd}/{date}/{startTime}/{endTime}', [RoomCalendarController::class, 'new'])->name('room_calendar-new');
 
     // 新規登録処理
     Route::post('/room_calendar/create', [RoomCalendarController::class, 'create'])->name('room_calendar-create');
