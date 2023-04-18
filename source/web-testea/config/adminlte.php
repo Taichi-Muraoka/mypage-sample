@@ -956,7 +956,7 @@ return [
         ],
         [
             'text' => '移行管理',
-            'icon' => '',
+            'icon' => 'fas fa-file-import',
             'can'  => 'admin',
             'submenu' => [
                 [
