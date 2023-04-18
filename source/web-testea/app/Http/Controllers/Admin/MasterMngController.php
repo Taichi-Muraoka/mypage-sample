@@ -86,8 +86,16 @@ class MasterMngController extends Controller
      */
     public function editSchool()
     {
+        $editData = [
+            'code' => 110,
+            'name_school' => "久我山校",
+            'name_school_display' => "久我山",
+            'name_school_abbreviation' => "久",
+            'display_order' => 20,
+        ];
+
         return view('pages.admin.master_mng_school-input', [
-            'editData' => null,
+            'editData' => $editData,
             'rules' => $this->rulesForInput(null)
         ]);
     }
