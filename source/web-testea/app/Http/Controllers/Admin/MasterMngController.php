@@ -114,7 +114,7 @@ class MasterMngController extends Controller
     // 教科マスタ表示
     public function indexSubject()
     {
-        return view('pages.admin.master_mng_grade');
+        return view('pages.admin.master_mng_subject');
     }
 
     /**
