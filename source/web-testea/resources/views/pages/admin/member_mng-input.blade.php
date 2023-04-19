@@ -48,7 +48,7 @@
         <option value="1">個別指導コース</option>
         <option value="2">集団授業</option>
     </x-input.select>
-    <x-input.select caption="所属校舎" id="schools" :select2=true :blank=false :editData=$editData>
+    <x-input.select caption="所属校舎" id="roomcd" :select2=true :blank=false :editData=$editData>
         <option value="1">久我山</option>
         <option value="2">西永福</option>
         <option value="3">下高井戸</option>
@@ -56,6 +56,7 @@
         <option value="5">日吉</option>
         <option value="6">自由が丘</option>
     </x-input.select>
+    <x-input.text caption="所属学校" id="school" :rules=$rules :editData=$editData/>
     <x-input.select caption="受験生フラグ" id="jukensei" :select2=true :blank=false :editData=$editData>
         <option value="1">非受験生</option>
         <option value="2">受験生</option>
