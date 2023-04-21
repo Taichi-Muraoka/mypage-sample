@@ -168,7 +168,7 @@
             <td>初回授業（入会金無料）</td>
             <td>出席</td>
             <td>
-                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
+                <x-button.list-dtl  dataTarget="#modal-dtl-student_class" />
             </td>
         </tr>
         <tr>
@@ -181,7 +181,7 @@
             <td>通常</td>
             <td>出席</td>
             <td>
-                <x-button.list-dtl />
+                <x-button.list-dtl dataTarget="#modal-dtl-student_class" />
             </td>
         </tr>
         <tr>
@@ -194,7 +194,7 @@
             <td>通常</td>
             <td>後日振替（振替日未定）</td>
             <td>
-                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
+                <x-button.list-dtl  dataTarget="#modal-dtl-student_class" />
             </td>
         </tr>
         <tr>
@@ -207,7 +207,7 @@
             <td>通常</td>
             <td>実施前</td>
             <td>
-                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
+                <x-button.list-dtl  dataTarget="#modal-dtl-student_class" />
             </td>
         </tr>
     </x-bs.table>
@@ -314,6 +314,8 @@
 {{-- モーダル --}}
 {{-- 規定情報 --}}
 @include('pages.admin.modal.member_mng_regulation-modal', ['modal_id' => 'modal-dtl-regulation'])
+{{-- 受講情報 --}}
+@include('pages.admin.modal.student_class-modal', ['modal_id' => 'modal-dtl-student_class'])
 {{-- 生徒成績 --}}
 @include('pages.admin.modal.grades_mng-modal', ['modal_id' => 'modal-dtl-grades_mng'])
 {{-- 電話・面談記録 --}}
