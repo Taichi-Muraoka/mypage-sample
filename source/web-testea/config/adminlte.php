@@ -682,21 +682,25 @@ return [
             'menuid' => '',
             'submenu' => [
                 [
-                    'text' => '日程連絡確認（生徒）',
+                    'text' => '生徒日程コマ組み',
                     'route' => 'season_mng_student',
                 ],
                 [
-                    'text' => '日程連絡確認（講師）',
+                    'text' => '講師日程連絡確認',
                     'route' => 'season_mng_tutor',
                 ],
                 [
-                    'text' => '自動コマ組み',
-                    'route' => 'season_plan',
+                    'text' => 'コマ組み確定処理',
+                    'route' => 'season_plan_confirm',
                 ],
-                [
-                    'text' => '個別スケジュール登録',
-                    'route' => 'season_schedule',
-                ],
+                //[
+                //    'text' => '自動コマ組み',
+                //    'route' => 'season_plan',
+                //],
+                //[
+                //    'text' => '個別スケジュール登録',
+                //    'route' => 'season_schedule',
+                //],
             ]
         ],
         [

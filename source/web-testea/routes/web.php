@@ -648,6 +648,7 @@ use App\Http\Controllers\Admin\SalaryCalculationController;
 use App\Http\Controllers\Admin\InvoiceCalculationController;
 use App\Http\Controllers\Admin\SeasonMngStudentController;
 use App\Http\Controllers\Admin\SeasonMngTutorController;
+use App\Http\Controllers\Admin\SeasonPlanConfirmController;
 use App\Http\Controllers\Admin\SeasonPlanController;
 use App\Http\Controllers\Admin\SeasonscheduleController;
 use App\Http\Controllers\Admin\ImportStudentController;
@@ -1798,7 +1799,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/transfer_check/search', [TransferCheckController::class, 'search'])->name('transfer_check-search');
 
-    // // 詳細取得用
+    // 詳細取得用
     Route::post('/transfer_check/get_data', [TransferCheckController::class, 'getData'])->name('transfer_check-get_data');
 
     // // モーダル処理
@@ -2066,30 +2067,46 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/season_mng_student/search', [SeasonMngStudentController::class, 'search'])->name('season_mng_student-search');
 
-    // 生徒提出スケジュール詳細
-    Route::get('/season_mng_student/detail/{sid}', [SeasonMngStudentController::class, 'detail'])->name('season_mng_student-detail');
+    // 生徒スケジュールコマ組み
+    Route::get('/season_mng_student/plan/{sid}', [SeasonMngStudentController::class, 'plan'])->name('season_mng_student-plan');
+
+    //---------------------
+    // 特別期間講習 コマ組み確定
+    //---------------------
+
+    // コマ組み確定状況一覧
+    Route::get('/season_plan_confirm', [SeasonPlanConfirmController::class, 'index'])->name('season_plan_confirm');
+
+    // 実行結果取得
+    Route::post('/season_plan_confirm/search', [SeasonPlanConfirmController::class, 'search'])->name('season_plan_confirm-search');
+
+    // 詳細取得用
+    Route::post('/season_plan_confirm/get_data', [SeasonPlanConfirmController::class, 'getData'])->name('SeasonPlanConfirmController-get_data');
+
+    // モーダル処理
+    Route::post('/season_plan_confirm/exec_modal', [SeasonPlanConfirmController::class, 'execModal'])->name('season_plan_confirm-exec_modal');
 
     //---------------------
     // 特別期間講習 自動コマ組み
     //---------------------
 
     // コマ組み状況一覧
-    Route::get('/season_plan', [SeasonPlanController::class, 'index'])->name('season_plan');
+    //Route::get('/season_plan', [SeasonPlanController::class, 'index'])->name('season_plan');
 
     // 実行結果取得
-    Route::post('/season_plan/search', [SeasonPlanController::class, 'search'])->name('season_plan-search');
+    //Route::post('/season_plan/search', [SeasonPlanController::class, 'search'])->name('season_plan-search');
 
     // 自動コマ組み実行画面
-    Route::get('/season_plan/autoexec/{id}', [SeasonPlanController::class, 'autoExec'])->name('season_plan-autoexec');
+    //Route::get('/season_plan/autoexec/{id}', [SeasonPlanController::class, 'autoExec'])->name('season_plan-autoexec');
 
     // 実行結果取得
-    Route::post('/season_plan/search_autoexec', [SeasonPlanController::class, 'searchAutoExec'])->name('season_plan-search_autoexec');
+    //Route::post('/season_plan/search_autoexec', [SeasonPlanController::class, 'searchAutoExec'])->name('season_plan-search_autoexec');
 
     // モーダル処理
     //Route::post('/season_plan/exec_modal_exec', [SeasonPlanController::class, 'execModalExec'])->name('season_plan-exec_modal_entry');
 
     // アンマッチリストダウンロード
-    Route::get('/season_plan/download/{csvId}', [SeasonPlanController::class, 'download'])->name('season_plan-download');
+    //Route::get('/season_plan/download/{csvId}', [SeasonPlanController::class, 'download'])->name('season_plan-download');
 
     //---------------------
     // 特別期間講習 個別スケジュール登録

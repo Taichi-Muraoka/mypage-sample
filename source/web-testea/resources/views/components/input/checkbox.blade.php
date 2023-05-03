@@ -8,12 +8,13 @@
   name: チェックボックス名（他と違い、nameがFormのプロパティ名になる）
   value: 値
   checked: デフォルトのチェック状態。値がない場合などデフォルトで選択される
+  disabled: disabled（選択不可）にするかどうか
   editData: 編集データ
   class: クラス
   icheck: icheckを使うかどうか
 --}}
 @props(['caption' => '', 'id' => '', 'name' => '', 'value' => '', 'checked' => false, 
-'editData' => [], 'class' => '', 'icheck' => true])
+'disabled' => false, 'editData' => [], 'class' => '', 'icheck' => true])
 
 @if ($icheck)
 <div class="icheck-primary d-inline mr-3">
@@ -24,6 +25,11 @@
 
   {{-- クラス --}}
   class="@if (!empty($class)){{ $class }}@endif"
+
+  {{-- disabled --}}
+  @if ($disabled)
+  disabled
+  @endif
 
   {{-- チェック状態 --}}
   @if ($checked && (!isset($editData) || !isset($editData[$name])))

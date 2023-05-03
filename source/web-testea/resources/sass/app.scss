@@ -438,7 +438,11 @@ label:not(.form-check-label):not(.custom-file-label) {
 }
 
 
-/*空き時間*/
+/* 空き時間・特別期間講習 コマ枠*/
+.card.pa-table-checked {
+    overflow-x: scroll;
+}
+
 .table-checked th {
     text-align: center;
 }
@@ -458,6 +462,10 @@ label:not(.form-check-label):not(.custom-file-label) {
     width: 100%;
 }
 
+.table-checked td div .tt-button {
+    padding: 0.75rem;
+}
+
 .chk-wt {
     display: none;
 }
@@ -471,7 +479,11 @@ label:not(.form-check-label):not(.custom-file-label) {
 }
 
 .chk-wt2:checked + div {
-    background-color: gray;
+    background-color: darkslategray;
+}
+
+.chk-wt2:disabled + div {
+    background-color: rgb(201, 233, 143);
 }
 
 /*テーブルごとの個別調整*/

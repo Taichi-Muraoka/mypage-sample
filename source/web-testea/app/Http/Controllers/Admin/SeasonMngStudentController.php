@@ -115,7 +115,7 @@ class SeasonMngStudentController extends Controller
      * @param int $sid 生徒ID
      * @return view
      */
-    public function detail($sid)
+    public function plan($sid)
     {
 
         //==========================
@@ -148,16 +148,32 @@ class SeasonMngStudentController extends Controller
         //    // 配列に追加
         //    array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
         //}
-
+        array_push($editData, '1_1時限目');
+        array_push($editData, '1_2時限目');
+        array_push($editData, '1_3時限目');
+        array_push($editData, '1_4時限目');
+        array_push($editData, '1_5時限目');
+        array_push($editData, '1_6時限目');
+        array_push($editData, '1_7時限目');
+        array_push($editData, '4_1時限目');
+        array_push($editData, '5_1時限目');
+        array_push($editData, '6_1時限目');
+        array_push($editData, '6_2時限目');
+        array_push($editData, '6_3時限目');
+        array_push($editData, '6_4時限目');
+        array_push($editData, '6_5時限目');
+        array_push($editData, '6_6時限目');
+        array_push($editData, '6_7時限目');
+        array_push($editData, '11_7時限目');
         // 教師名を取得する
         //$teacher = $this->getTeacherName($tid);
 
-        return view('pages.admin.season_mng_student-detail', [
+        return view('pages.admin.season_mng_student-plan', [
             //'weekdayList' => $weekdayList,
             'timeList' => $timeList,
             'timeIdList' => $timeIdList,
             'editData' => [
-                'chkWs' => null
+                'chkWs' => $editData
             ],
             //'extRirekisho' => $teacher,
         ]);

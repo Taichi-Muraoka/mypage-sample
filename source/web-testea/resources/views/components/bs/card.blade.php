@@ -10,12 +10,13 @@
     search: 検索フォームの場合
     form: フォームの場合
     p0: card-bodyのスペースを0にする
+    class: クラス
     vShow: vueのv-showの指定
 --}}
 @props(['card_title' => '', 'tools' => '', 'footer' => '', 'id' => '', 
-    'search' => false, 'form' => false, 'p0' => false, 'vShow' => ''])
+    'search' => false, 'form' => false, 'p0' => false, 'class' => '', 'vShow' => ''])
 
-<div class="card @if ($form) card-form @endif" 
+<div class="card @if ($form) card-form @endif @if (!empty($class)){{ $class }}@endif" 
     {{-- id --}} 
     @if ($search) id="app-serch-form" @elseif ($form) id="app-form" @elseif (!empty($id)) id="{{ $id }}" @endif
 
