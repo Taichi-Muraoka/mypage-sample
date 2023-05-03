@@ -309,6 +309,12 @@ label:not(.form-check-label):not(.custom-file-label) {
     border-color: #dc3545;
 }
 
+.alert-msg {
+    margin-top: 0.25rem;
+    font-size: 120%;
+    color: #dc3545;
+}
+
 /* Vue ------------------------*/
 
 /* 非表示 */

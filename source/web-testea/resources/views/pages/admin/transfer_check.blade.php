@@ -27,9 +27,11 @@
         </x-bs.col2>
         <x-bs.col2>
             <x-input.select id="approval_state" caption="ステータス" :select2=false >
+                <option value="0">管理者承認待ち</option>
                 <option value="1">承認待ち</option>
                 <option value="2">承認</option>
                 <option value="3">差戻し</option>
+                <option value="4">管理者対応済</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
@@ -64,6 +66,7 @@
             <th>授業日・時限</th>
             <th>生徒名</th>
             <th>講師名</th>
+            <th>当月依頼回数</th>
             <th>ステータス</th>
             <th></th>
         </x-slot>
@@ -76,6 +79,7 @@
             <td>2023/01/30 4限</td>
             <td>CWテスト生徒１</td>
             <td>CWテスト教師１０１</td>
+            <td>1</td>
             <td>承認</td>
             <td>
                 <x-button.list-dtl />
@@ -89,10 +93,26 @@
             <td>2023/01/31 4限</td>
             <td>CWテスト生徒１</td>
             <td>CWテスト教師１０１</td>
+            <td>1</td>
             <td>承認待ち</td>
             <td>
                 <x-button.list-dtl />
                 <x-button.list-edit href="{{ route('transfer_check-edit', 1) }}"/>
+            </td>
+        </tr>
+        <tr>
+            <td>2023/01/08</td>
+            <td>講師</td>
+            <td>久我山</td>
+            <td>2023/01/15 6限</td>
+            <td>CWテスト生徒２</td>
+            <td>CWテスト教師１０１</td>
+            <td>2</td>
+            <td>管理者承認待ち</td>
+            <td>
+                <x-button.list-dtl />
+                <x-button.list-edit href="{{ route('transfer_check-edit', 1) }}"/>
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval" />
             </td>
         </tr>
 
@@ -102,5 +122,8 @@
 
 {{-- 詳細 --}}
 @include('pages.admin.modal.transfer_check-modal')
+{{-- モーダル(送信確認モーダル) 承認 --}}
+@include('pages.admin.modal.transfer_check_approval-modal', ['modal_send_confirm' => true, 'modal_id' =>
+'modal-dtl-approval'])
 
 @stop

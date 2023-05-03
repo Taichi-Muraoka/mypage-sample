@@ -22,9 +22,11 @@
     <x-bs.row>
         <x-bs.col2>
             <x-input.select id="approval_state" caption="ステータス" :select2=false >
+                <option value="0">管理者承認待ち</option>
                 <option value="1">承認待ち</option>
                 <option value="2">承認</option>
                 <option value="3">差戻し</option>
+                <option value="4">管理者対応済</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
@@ -77,6 +79,19 @@
             <td>
                 <x-button.list-dtl />
                 <x-button.list-edit href="{{ route('transfer_tutor-edit', 2) }}" caption="承認" />
+            </td>
+        </tr>
+        <tr>
+            <td>2023/01/08 19:30</td>
+            <td>講師</td>
+            <td>2023/01/15 6限</td>
+            <td>CWテスト生徒２</td>
+            <td>久我山</td>
+            <td>管理者承認待ち</td>
+            <td>
+                <x-button.list-dtl />
+                {{-- 申請者種別が教師のため更新ボタン非活性 --}}
+                <x-button.list-edit href="{{ route('transfer_tutor-edit', 1) }}" caption="承認" disabled=true/>
             </td>
         </tr>
     </x-bs.table>

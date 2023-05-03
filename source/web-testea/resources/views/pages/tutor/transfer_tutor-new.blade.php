@@ -18,6 +18,8 @@
         <option value="3">CWテスト生徒３</option>
     </x-input.select>
 
+    <p class="alert-msg"  v-show="form.student != ''">今月 <b>2</b> 回目の振替調整です</p>
+
     <x-input.select caption="授業日・時限" id="id" :select2=true :editData="$editData">
         <option value="1">2023/01/30 3限</option>
         <option value="2">2023/01/30 4限</option>
@@ -86,6 +88,11 @@
 
     {{-- hidden --}}
     <x-input.hidden id="transfer_tutor_id" :editData=$editData />
+
+    <x-bs.callout title="振替調整の注意事項" type="warning">
+        同一生徒への振替希望については、月１回まで管理者の承認なしで調整可能です。<br>
+        ２回目からは管理者に送られ、管理者のチェック・承認が必要となります。<br>
+    </x-bs.callout>
 
     {{-- フッター --}}
     <x-slot name="footer">
