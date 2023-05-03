@@ -17,9 +17,9 @@
 
     {{-- User menu toggler --}}
     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
-        @if(config('adminlte.usermenu_image'))
+        @if(config('adminlte.usermenu_image') && Auth::user()->adminlte_image())
             <img src="{{ Auth::user()->adminlte_image() }}"
-                 class="user-image img-circle elevation-2"
+                 class="user-image"
                  alt="{{ Auth::user()->name }}">
         @endif
         <span @if(config('adminlte.usermenu_image')) class="d-none d-md-inline" @endif>
@@ -31,12 +31,13 @@
     <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
 
         {{-- User menu header --}}
-        @if(!View::hasSection('usermenu_header') && config('adminlte.usermenu_header'))
+        {{-- @if(!View::hasSection('usermenu_header') && config('adminlte.usermenu_header')) --}}
+        @if(!View::hasSection('usermenu_header') && config('adminlte.usermenu_header') && Auth::user()->adminlte_image())
             <li class="user-header {{ config('adminlte.usermenu_header_class', 'bg-primary') }}
                 @if(!config('adminlte.usermenu_image')) h-auto @endif">
                 @if(config('adminlte.usermenu_image'))
                     <img src="{{ Auth::user()->adminlte_image() }}"
-                         class="img-circle elevation-2"
+                         class=""
                          alt="{{ Auth::user()->name }}">
                 @endif
                 <p class="@if(!config('adminlte.usermenu_image')) mt-0 @endif">

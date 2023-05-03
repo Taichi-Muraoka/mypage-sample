@@ -44,7 +44,10 @@ class AuthAccountProvider extends EloquentUserProvider
 
         // 複数キー 以下の関数のreturn stringとなっているけど今回は配列で
         $primaryKey = $model->getKeyName();
-
+        // Warning解消のため以下追加
+        if(!is_array($primaryKey)){
+            $primaryKey = explode(',', $primaryKey);
+        }
         // クエリを取得
         $query = $model->newQuery();
 

@@ -37,6 +37,30 @@
     {{----------------------------}}
     {{-- モック用 @if,@forなしver--}}
     {{----------------------------}}
+    <x-bs.form-title>ポイント・ランク情報</x-bs.form-title>
+
+    {{-- テーブル --}}
+    <x-bs.table :button=true :smartPhone=true class="inner-card">
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th width="15%">契約月数</th>
+            <th width="15%">紹介者数</th>
+            <th width="15%">ポイント数</th>
+            <th width="15%">ランク</th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
+        <tr>
+            <x-bs.td-sp>3年5ヶ月</x-bs.td-sp>
+            <x-bs.td-sp class="t-price">5</x-bs.td-sp>
+            <x-bs.td-sp class="t-price">100</x-bs.td-sp>
+            <x-bs.td-sp>ゴールド</x-bs.td-sp>
+        </tr>
+    </x-bs.table>
+
+    {{-- 余白 --}}
+    <div class="mb-3"></div>
+
     <x-bs.form-title>契約情報</x-bs.form-title>
 
     {{-- テーブル --}}
