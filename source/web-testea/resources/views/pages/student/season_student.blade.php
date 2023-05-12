@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- フォーム --}}
-<x-bs.card :form=true>
+<x-bs.card class="pa-table-checked" :form=true >
 
   <p>下記の特別期間について、<b>ご都合の悪い日程・時間</b>を選択し、受講希望科目・回数を入力してください。</p>
 
@@ -24,6 +24,12 @@
         <td>3/10</td>
     </tr>
 </x-bs.table>
+
+            <x-input.select id="roomcd" caption="受講校舎" :select2=true >
+                <option value="1">久我山</option>
+                <option value="2">西永福</option>
+                <option value="3">下高井戸</option>
+            </x-input.select>
 
   {{-- チェックボックスのエラー時のメッセージ --}}
   <x-bs.form-group name="chkWs" />

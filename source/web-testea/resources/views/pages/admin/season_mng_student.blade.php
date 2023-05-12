@@ -31,7 +31,7 @@
             <x-input.select id="status" caption="ステータス" :select2=true>
                 <option value="1">未対応</option>
                 <option value="2">対応中</option>
-                <option value="3">対応完了</option>
+                <option value="3">対応済</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
@@ -80,7 +80,7 @@
             <td>2023年春期</td>
             <td>久我山</td>
             <td>CWテスト生徒３</td>
-            <td>対応完了</td>
+            <td>対応済</td>
             <td>
                 <x-button.list-edit vueHref="'{{ route('season_mng_student-plan', '') }}/' + 1" caption="コマ組み" />
             </td>

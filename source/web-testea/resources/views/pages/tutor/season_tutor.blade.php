@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- フォーム --}}
-<x-bs.card :form=true>
+<x-bs.card class="pa-table-checked" :form=true >
 
   <p>下記の特別期間について、<b>授業に入れない日程・時間</b>を選択・登録してください。</p>
 

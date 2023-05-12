@@ -29,8 +29,7 @@
             {{-- <x-input.select id="changes_state" caption="ステータス" :select2=true :mastrData=$statusList /> --}}
             <x-input.select caption="ステータス" id="state" :select2=true :editData=$editData>
                 <option value="1">未対応</option>
-                <option value="2">受付</option>
-                <option value="3">対応済</option>
+                <option value="2">対応済</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
@@ -71,7 +70,6 @@
             <td>未対応</td>
             <td>
                 <x-button.list-dtl />
-                <x-button.list-dtl caption="受付" btn="btn-primary" dataTarget="#modal-dtl-acceptance" />
                 <x-button.list-edit href="{{ route('extra_lesson_mng-edit',1) }}" />
             </td>
         </tr>
@@ -84,7 +82,7 @@
 {{-- 詳細 --}}
 @include('pages.admin.modal.extra_lesson_mng-modal')
 {{-- モーダル(送信確認モーダル) 受付 --}}
-@include('pages.admin.modal.extra_lesson_mng_acceptance-modal', ['modal_send_confirm' => true, 'modal_id' =>
-'modal-dtl-acceptance'])
+{{--@include('pages.admin.modal.extra_lesson_mng_acceptance-modal', ['modal_send_confirm' => true, 'modal_id' =>
+'modal-dtl-acceptance']) --}}
 
 @stop

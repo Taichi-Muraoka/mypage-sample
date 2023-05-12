@@ -35,8 +35,7 @@
         :mastrData=$statusList /> --}}
     <x-input.select caption="ステータス" id="state" :select2=true :editData=$editData>
         <option value="1">未対応</option>
-        <option value="2">受付</option>
-        <option value="3">対応済</option>
+        <option value="2">対応済</option>
     </x-input.select>
 
     <x-input.textarea caption="事務局コメント" id="comment" :editData=$editData :rules=$rules />

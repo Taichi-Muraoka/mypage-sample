@@ -174,10 +174,10 @@
         @endfor
       </x-bs.table>
 
-      <x-input.select id="status" caption="ステータス" :select2=true :select2Search=false>
+      <x-input.select id="status" caption="コマ組みステータス" :select2=true :select2Search=false>
         <option value="1" selected>未対応</option>
         <option value="2">対応中</option>
-        <option value="3">対応完了</option>
+        <option value="3">対応済</option>
       </x-input.select>
 
     {{-- 余白 --}}
