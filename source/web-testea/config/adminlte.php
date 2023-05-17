@@ -131,10 +131,10 @@ return [
     */
 
     'usermenu_enabled' => true,
-    'usermenu_header' => true,
-    'usermenu_header_class' => 'bg-light',
-    'usermenu_image' => true,
-    'usermenu_desc' => true,
+    'usermenu_header' => false,
+    'usermenu_header_class' => 'bg-primary',
+    'usermenu_image' => false,
+    'usermenu_desc' => false,
     'usermenu_profile_url' => false,
 
     /*
@@ -360,13 +360,13 @@ return [
             'can'  => 'student',
             'active' => ['grades/*']
         ],
-        [
-            'text' => 'イベント申込',
-            'route'  => 'event',
-            'icon' => 'fas fa-edit',
-            'can'  => 'student',
-            'active' => ['event/*']
-        ],
+        //[
+        //    'text' => 'イベント申込',
+        //    'route'  => 'event',
+        //    'icon' => 'fas fa-edit',
+        //    'can'  => 'student',
+        //    'active' => ['event/*']
+        //],
         [
             'text' => '面談日程連絡',
             'route'  => 'conference',
@@ -392,13 +392,13 @@ return [
             'can'  => 'student',
             'active' => ['agreement/*']
         ],
-        [
-            'text' => '契約変更申請',
-            'route'  => 'course',
-            'icon' => 'fas fa-file-signature',
-            'can'  => 'student',
-            'active' => ['course/*']
-        ],
+        //[
+        //    'text' => '契約変更申請',
+        //    'route'  => 'course',
+        //    'icon' => 'fas fa-file-signature',
+        //    'can'  => 'student',
+        //    'active' => ['course/*']
+        //],
         [
             'text' => '請求情報',
             'route'  => 'invoice',
@@ -430,13 +430,13 @@ return [
             'can'  => 'student',
             'active' => ['password_change/*']
         ],
-        [
-            'text' => '退会申請',
-            'route'  => 'leave',
-            'icon' => 'fas fa-user-minus',
-            'can'  => 'student',
-            'active' => ['leave/*']
-        ],
+        //[
+        //    'text' => '退会申請',
+        //    'route'  => 'leave',
+        //    'icon' => 'fas fa-user-minus',
+        //    'can'  => 'student',
+        //    'active' => ['leave/*']
+        //],
 
         //----------------
         // 講師
@@ -481,7 +481,7 @@ return [
             'active' => ['report_regist/*']
         ],
         [
-            'text' => '空き時間',
+            'text' => '空き時間登録',
             'route'  => 'weekly_shift',
             'icon' => 'fas fa-clock',
             'can'  => 'tutor',
@@ -567,11 +567,11 @@ return [
                     'route' => 'regular_schedule',
                     'active' => ['regular_schedule*']
                 ],
-                [
-                    'text' => 'イベントカレンダー',
-                    'route' => 'event_calendar',
-                    'active' => ['event_calendar*']
-                ],
+                //[
+                //    'text' => 'イベントカレンダー',
+                //    'route' => 'event_calendar',
+                //    'active' => ['event_calendar*']
+                //],
             ],
         ],
         [
@@ -602,12 +602,12 @@ return [
                     'route' => 'conference_accept',
                     'active' => ['conference_accept*']
                 ],
-                [
-                    'text' => 'コース変更受付',
-                    'route' => 'course_mng',
-                    'active' => ['course_mng*'],
-                    'menuid' => 'id_course_accept',
-                ],
+                //[
+                //    'text' => 'コース変更受付',
+                //    'route' => 'course_mng',
+                //    'active' => ['course_mng*'],
+                //    'menuid' => 'id_course_accept',
+                //],
                 // [
                 //     'text' => '会員情報取込',
                 //     'route'  => 'member_import',
@@ -715,33 +715,33 @@ return [
                 //    'active' => ['grades_mng*']
                 //],
                 [
-                    'text' => '成績事例検索',
+                    'text' => '成績情報出力',
                     'route' => 'grade_example',
                     'active' => ['grade_example*'],
                     'menuid' => 'id_grade_example',
                 ],
             ]
         ],
-        [
-            'text' => 'イベント管理',
-            'icon' => 'fa fa-edit',
-            'can'  => 'admin',
-            'menuid' => 'id_trial_event',
-            'submenu' => [
+        //[
+        //    'text' => 'イベント管理',
+        //    'icon' => 'fa fa-edit',
+        //    'can'  => 'admin',
+        //    'menuid' => 'id_trial_event',
+        //    'submenu' => [
                 // [
                 //     'text' => '模試管理',
                 //     'route' => 'trial_mng',
                 //     'active' => ['trial_mng*'],
                 //     'menuid' => 'id_trial_mng',
                 // ],
-                [
-                    'text' => 'イベント管理',
-                    'route' => 'event_mng',
-                    'active' => ['event_mng*'],
-                    'menuid' => 'id_event_mng',
-                ],
-            ]
-        ],
+        //        [
+        //            'text' => 'イベント管理',
+        //            'route' => 'event_mng',
+        //            'active' => ['event_mng*'],
+        //            'menuid' => 'id_event_mng',
+        //        ],
+        //    ]
+        //],
         // [
         //     'text' => 'ギフトカード管理',
         //     'icon' => 'fa fas fa-gift',
@@ -798,7 +798,7 @@ return [
                     'active' => ['tutor_mng*']
                 ],
                 [
-                    'text' => '講師授業時間',
+                    'text' => '講師授業数集計',
                     'route' => 'tutor_class',
                     'active' => ['tutor_class*']
                 ],
@@ -943,7 +943,7 @@ return [
                     'active' => ['all_member_import*']
                 ],
                 [
-                    'text' => '振替残数リセット処理',
+                    'text' => '振替残数リセット',
                     'route' => 'transfer_reset',
                     'active' => ['transfer_reset*']
                 ],

@@ -146,35 +146,4 @@ class Account extends Authenticatable
         ];
         return $_fieldRules;
     }
-    public function adminlte_image()
-    {
-        $account_type = $this->account_type;
-        switch ($account_type) {
-            case AppConst::CODE_MASTER_7_1:
-                return '/img/gold.png';
-            case AppConst::CODE_MASTER_7_2:
-                return '/img/silver.png';
-            case AppConst::CODE_MASTER_7_3:
-                return;
-        }
-    }
-
-    public function adminlte_desc()
-    {
-        $account_id = $this->account_id;
-        $account_type = $this->account_type;
-        switch ($account_type) {
-            case AppConst::CODE_MASTER_7_1:
-                return 'ランク：'. 'ゴールド会員';
-            case AppConst::CODE_MASTER_7_2:
-                return 'ランク：'. 'シルバー会員';
-            case AppConst::CODE_MASTER_7_3:
-                return;
-        }
-        //$student = ExtStudentKihon::where('sid', $account_id)
-        //->firstOrFail();
-        // 名前を取得
-        //$resultAccount['name'] = $student->name;
-        //return 'ランク：ゴールド会員/' . $student->name;
-    }
 }

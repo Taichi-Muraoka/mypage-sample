@@ -32,29 +32,51 @@
             <th>所属学校</th>
             <td>渋谷第一中学校</td>
         </tr>
+        <tr>
+            <th>入会日</th>
+            <td>2020/04/01</td>
+        </tr>
+        <tr>
+            <th>契約期間</th>
+            <td>37 ヶ月</td>
+        </tr>
     </x-bs.table>
 
     {{----------------------------}}
     {{-- モック用 @if,@forなしver--}}
     {{----------------------------}}
-    <x-bs.form-title>ポイント・ランク情報</x-bs.form-title>
+    <x-bs.form-title>バッジ付与情報</x-bs.form-title>
+
+    <x-bs.table :hover=false :vHeader=true class="mb-4 fix">
+        <tr>
+            <th width="35%">バッジ</th>
+            <td>
+                @for ($i = 1; $i <= 2; $i++) 
+                <img src="/img/gold.png" class="user-image"  width="50" height="50" alt="badge">
+                @endfor
+            </td>
+        </tr>
+    </x-bs.table>
 
     {{-- テーブル --}}
     <x-bs.table :button=true :smartPhone=true class="inner-card">
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">契約月数</th>
-            <th width="15%">紹介者数</th>
-            <th width="15%">ポイント数</th>
-            <th width="15%">ランク</th>
+            <th width="15%">付与日</th>
+            <th width="15%">校舎</th>
+            <th>認定理由</th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <x-bs.td-sp>3年5ヶ月</x-bs.td-sp>
-            <x-bs.td-sp class="t-price">5</x-bs.td-sp>
-            <x-bs.td-sp class="t-price">100</x-bs.td-sp>
-            <x-bs.td-sp>ゴールド</x-bs.td-sp>
+            <x-bs.td-sp>2023/05/10</x-bs.td-sp>
+            <x-bs.td-sp>久我山</x-bs.td-sp>
+            <x-bs.td-sp>生徒紹介（佐藤次郎さん）</x-bs.td-sp>
+        </tr>
+        <tr>
+            <x-bs.td-sp>2023/04/01</x-bs.td-sp>
+            <x-bs.td-sp>久我山</x-bs.td-sp>
+            <x-bs.td-sp>契約期間が３年を超えた</x-bs.td-sp>
         </tr>
     </x-bs.table>
 

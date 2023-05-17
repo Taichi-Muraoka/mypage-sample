@@ -42,7 +42,104 @@
             <th>所属学校</th>
             <td>渋谷第一中学校</td>
         </tr>
+        <tr>
+            <th>会員ステータス</th>
+            <td>入会</td>
+        </tr>
+        <tr>
+            <th>入会日</th>
+            <td>2020/04/01</td>
+        </tr>
+        <tr>
+            <th>契約期間</th>
+            <td>37 ヶ月</td>
+        </tr>
+        <tr>
+            <th>バッジ数</th>
+            <td>2</td>
+        </tr>
     </x-bs.table>
+</x-bs.card>
+
+<x-bs.card>
+    <x-slot name="tools">
+        <x-button.edit href="{{ route('record', $student->sid) }}" caption="バッジ付与管理" icon="" :small=true />
+    </x-slot>
+
+    <x-slot name="card_title">
+        バッジ付与情報
+    </x-slot>
+
+    {{-- テーブル --}}
+    <x-bs.table :button=true class="inner-card">
+
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th width="20%">付与日</th>
+            <th width="20%">校舎</th>
+            <th width="20%">担当者名</th>
+            <th>認定理由</th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
+        <tr>
+            <td>2023/05/10</td>
+            <td>久我山</td>
+            <td>鈴木　花子</td>
+            <td>生徒紹介（佐藤次郎さん）</td>
+        </tr>
+        <tr>
+            <td>2023/04/01</td>
+            <td>久我山</td>
+            <td>鈴木　花子</td>
+            <td>契約期間が３年を超えた</td>
+        </tr>
+        </tr>
+    </x-bs.table>
+
+</x-bs.card>
+
+<x-bs.card>
+    <x-slot name="tools">
+        <x-button.edit href="{{ route('record', $student->sid) }}" caption="記録管理" icon="" :small=true />
+    </x-slot>
+
+    <x-slot name="card_title">
+        連絡記録
+    </x-slot>
+
+    {{-- テーブル --}}
+    <x-bs.table :button=true class="inner-card">
+
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th width="20%">対応日時</th>
+            <th>記録種別</th>
+            <th>校舎</th>
+            <th>担当者名</th>
+            <th></th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
+        <tr>
+            <td>2023/01/10 17:00</td>
+            <td>面談記録</td>
+            <td>久我山</td>
+            <td>山田　太郎</td>
+            <td>
+                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
+            </td>
+        <tr>
+            <td>2023/01/09 19:30</td>
+            <td>電話記録</td>
+            <td>久我山</td>
+            <td>鈴木　花子</td>
+            <td>
+                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
+            </td>
+        </tr>
+    </x-bs.table>
+
 </x-bs.card>
 
 <x-bs.card>
@@ -255,49 +352,6 @@
             <td></td>
             <td>
                 <x-button.list-dtl dataTarget="#modal-dtl-grades_mng" />
-            </td>
-        </tr>
-    </x-bs.table>
-
-</x-bs.card>
-
-<x-bs.card>
-    <x-slot name="tools">
-        <x-button.edit href="{{ route('record', $student->sid) }}" caption="記録管理" icon="" :small=true />
-    </x-slot>
-
-    <x-slot name="card_title">
-        連絡記録
-    </x-slot>
-
-    {{-- テーブル --}}
-    <x-bs.table :button=true class="inner-card">
-
-        {{-- テーブルタイトル行 --}}
-        <x-slot name="thead">
-            <th width="20%">対応日時</th>
-            <th>記録種別</th>
-            <th>校舎</th>
-            <th>担当者名</th>
-            <th></th>
-        </x-slot>
-
-        {{-- テーブル行 --}}
-        <tr>
-            <td>2023/01/10 17:00</td>
-            <td>面談記録</td>
-            <td>久我山</td>
-            <td>山田　太郎</td>
-            <td>
-                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
-            </td>
-        <tr>
-            <td>2023/01/09 19:30</td>
-            <td>電話記録</td>
-            <td>久我山</td>
-            <td>鈴木　花子</td>
-            <td>
-                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
             </td>
         </tr>
     </x-bs.table>
