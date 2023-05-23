@@ -12,6 +12,12 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
+    <x-input.select id="school" caption="校舎" :select2=true>
+        <option value="1">久我山</option>
+        <option value="2">西永福</option>
+        <option value="3">本郷</option>
+    </x-input.select>
+
     {{-- 第１希望日 --}}
     {{-- id="preferred_date" --}}
     <x-bs.card>
