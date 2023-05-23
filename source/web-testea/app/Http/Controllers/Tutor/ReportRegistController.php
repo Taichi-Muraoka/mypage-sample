@@ -209,58 +209,61 @@ class ReportRegistController extends Controller
      */
     public function getData(Request $request)
     {
-        // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'id');
+        // ==========================
+        // 本番用処理
+        // ==========================
+        // // IDのバリデーション
+        // $this->validateIdsFromRequest($request, 'id');
 
-        // IDを取得
-        $id = $request->input('id');
+        // // IDを取得
+        // $id = $request->input('id');
 
-        // クエリを作成
-        $query = Report::query();
+        // // クエリを作成
+        // $query = Report::query();
 
-        // 受け持ち生徒に限定するガードを掛ける
-        $query->where($this->guardTutorTableWithSid());
+        // // 受け持ち生徒に限定するガードを掛ける
+        // $query->where($this->guardTutorTableWithSid());
 
-        // 自分のアカウントIDでガードを掛ける（tid）
-        $query->where($this->guardTutorTableWithTid());
+        // // 自分のアカウントIDでガードを掛ける（tid）
+        // $query->where($this->guardTutorTableWithTid());
 
-        // 教室名取得のサブクエリ
-        $room_names = $this->mdlGetRoomQuery();
+        // // 教室名取得のサブクエリ
+        // $room_names = $this->mdlGetRoomQuery();
 
-        // データを取得
-        $report = $query
-            // IDを指定
-            ->where('report.report_id', $id)
-            ->select(
-                'lesson_date',
-                'start_time',
-                'room_names.room_name_full as room_name',
-                'ext_student_kihon.name as sname',
-                'r_minutes',
-                'content',
-                'homework',
-                'teacher_comment',
-                'parents_comment'
-            )
-            // 教室名の取得
-            ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('report.roomcd', '=', 'room_names.code');
-            })
-            // 生徒名の取得
-            ->sdLeftJoin(ExtStudentKihon::class, 'report.sid', '=', 'ext_student_kihon.sid')
-            ->firstOrFail();
+        // // データを取得
+        // $report = $query
+        //     // IDを指定
+        //     ->where('report.report_id', $id)
+        //     ->select(
+        //         'lesson_date',
+        //         'start_time',
+        //         'room_names.room_name_full as room_name',
+        //         'ext_student_kihon.name as sname',
+        //         'r_minutes',
+        //         'content',
+        //         'homework',
+        //         'teacher_comment',
+        //         'parents_comment'
+        //     )
+        //     // 教室名の取得
+        //     ->leftJoinSub($room_names, 'room_names', function ($join) {
+        //         $join->on('report.roomcd', '=', 'room_names.code');
+        //     })
+        //     // 生徒名の取得
+        //     ->sdLeftJoin(ExtStudentKihon::class, 'report.sid', '=', 'ext_student_kihon.sid')
+        //     ->firstOrFail();
 
-        return [
-            'lesson_date' => $report->lesson_date,
-            'start_time' => $report->start_time,
-            'room_name' => $report->room_name,
-            'sname' => $report->sname,
-            'r_minutes' => $report->r_minutes,
-            'content' => $report->content,
-            'homework' => $report->homework,
-            'teacher_comment' => $report->teacher_comment,
-            'parents_comment' => $report->parents_comment
-        ];
+        // return [
+        //     'lesson_date' => $report->lesson_date,
+        //     'start_time' => $report->start_time,
+        //     'room_name' => $report->room_name,
+        //     'sname' => $report->sname,
+        //     'r_minutes' => $report->r_minutes,
+        //     'content' => $report->content,
+        //     'homework' => $report->homework,
+        //     'teacher_comment' => $report->teacher_comment,
+        //     'parents_comment' => $report->parents_comment
+        // ];
     }
 
     //==========================

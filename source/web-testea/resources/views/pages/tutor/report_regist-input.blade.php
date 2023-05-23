@@ -73,11 +73,37 @@
     </x-bs.card>
     @endif
 
-    <x-input.textarea caption="学習内容" id="content" :rules=$rules :editData=$editData />
+    <x-input.text caption="今月の目標" id="monthly_goal" :rules=$rules :editData=$editData />
 
-    <x-input.textarea caption="次回までの宿題" id="homework" :rules=$rules :editData=$editData />
+    <x-input.text caption="授業教材１" id="lesson_text1" :rules=$rules :editData=$editData />
 
-    <x-input.textarea caption="教師よりコメント" id="teacher_comment" :rules=$rules :editData=$editData />
+    <x-input.text caption="授業単元１" id="lesson_unit1" :rules=$rules :editData=$editData />
+
+    <x-input.text caption="授業教材２" id="lesson_text2" :rules=$rules :editData=$editData />
+
+    <x-input.text caption="授業単元２" id="lesson_unit2" :rules=$rules :editData=$editData />
+
+    <x-input.text caption="確認テスト内容" id="test_contents" :rules=$rules :editData=$editData />
+
+    <x-input.text caption="確認テスト得点" id="test_score" :rules=$rules :editData=$editData />
+
+    <x-input.text caption="確認テスト満点" id="test_full_score" :rules=$rules :editData=$editData />
+
+    <x-input.text caption="宿題達成度" id="achievement" :rules=$rules :editData=$editData />
+
+    <x-input.textarea caption="達成・課題点" id="goodbad_point" :rules=$rules :editData=$editData />
+
+    <x-input.textarea caption="解決策" id="solution" :rules=$rules :editData=$editData />
+
+    <x-input.textarea caption="その他" id="others_comment" :rules=$rules :editData=$editData />
+
+    <x-input.text caption="宿題教材１" id="homework_text1" :rules=$rules :editData=$editData />
+
+    <x-input.text caption="宿題単元１" id="homework_unit1" :rules=$rules :editData=$editData />
+
+    <x-input.text caption="宿題教材２" id="homework_text2" :rules=$rules :editData=$editData />
+
+    <x-input.text caption="宿題単元２" id="homework_unit2" :rules=$rules :editData=$editData />
 
     @if (request()->routeIs('report_regist-edit'))
     {{-- 編集時 承認ステータス・事務局コメント--}}

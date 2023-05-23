@@ -9,7 +9,11 @@
         <td>@{{item.mdClassName}}</td>
     </tr>
     <tr>
-        <th width="35%">スケジュール種別</th>
+        <th width="35%">指導スペース</th>
+        <td>Aテーブル</td>
+    </tr>
+    <tr>
+        <th width="35%">コース名</th>
         <td>@{{item.mdTypeName}}</td>
     </tr>
     <tr>
@@ -25,17 +29,58 @@
         <th>終了時刻</th>
         <td>@{{item.mdEndTime|formatHm}}</td>
     </tr>
+
+    {{-- 生徒のみ表示 --}}
+    @can('student')
     <tr v-show="item.mdTitle">
         <th>@{{item.mdTitle}}</th>
         <td>@{{item.mdTitleVal}}</td>
     </tr>
+    @endcan
+
+    {{-- 講師のみ表示 --}}
+    {{-- 個別指導の場合 --}}
+    @can('tutor')
+    <tr v-show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_2 }}">
+        <th>@{{item.mdTitle}}</th>
+        <td>@{{item.mdTitleVal}}</td>
+    </tr>
+    {{-- 集団授業の場合 --}}
+    <tr v-show="item.mdType == {{ App\Consts\AppConst::CODE_MASTER_21_2 }}">
+        <th>参加生徒名</th>
+        <td>CWテスト生徒１<br>CWテスト生徒２<br>CWテスト生徒３</td>
+    </tr>
+    @endcan
+
     <tr v-show="item.mdSubject">
         <th>教科</th>
         <td>@{{item.mdSubject}}</td>
     </tr>
-    <tr v-show="item.mdFurikae">
-        <th>振替情報等</th>
-        <td>@{{item.mdFurikae}}</td>
+
+    {{-- 講師のみ表示 --}}
+    @can('tutor')
+    <tr v-Show="item.lesson_type != 3">
+        <th>授業種別</th>
+        <td>追加</td>
+    </tr>
+    @endcan
+
+    <tr v-Show="item.lesson_type != 3">
+        <th>通塾</th>
+        <td>生徒オンライン－教師通塾</td>
+    </tr>
+
+    {{-- 講師のみ表示 --}}
+    @can('tutor')
+    <tr v-Show="item.lesson_type != 3">
+        <th>授業代講</th>
+        <td>なし</td>
+    </tr>
+    @endcan
+
+    <tr v-Show="item.lesson_type != 3">
+        <th>出欠ステータス</th>
+        <td>当日欠席（講師出勤あり）</td>
     </tr>
 </x-bs.table>
 

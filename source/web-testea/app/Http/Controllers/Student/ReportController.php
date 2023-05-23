@@ -91,55 +91,58 @@ class ReportController extends Controller
      */
     public function getData(Request $request)
     {
-        // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'id');
+        //==========================
+        // 本番用処理
+        //==========================
+        // // IDのバリデーション
+        // $this->validateIdsFromRequest($request, 'id');
 
-        // IDを取得
-        $id = $request->input('id');
+        // // IDを取得
+        // $id = $request->input('id');
 
-        // クエリを作成
-        $query = Report::query();
+        // // クエリを作成
+        // $query = Report::query();
 
-        // 教室名取得のサブクエリ
-        $room_names = $this->mdlGetRoomQuery();
+        // // 教室名取得のサブクエリ
+        // $room_names = $this->mdlGetRoomQuery();
 
-        // データを取得
-        $report = $query
-            ->select(
-                'lesson_date',
-                'start_time',
-                'room_names.room_name_full as room_name',
-                'ext_rirekisho.name as tname',
-                'r_minutes',
-                'content',
-                'homework',
-                'teacher_comment',
-                'parents_comment'
-            )
-            // 教室名の取得
-            ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('report.roomcd', '=', 'room_names.code');
-            })
-            // 教師名の取得
-            ->sdLeftJoin(ExtRirekisho::class, 'report.tid', '=', 'ext_rirekisho.tid')
-            // IDを指定
-            ->where('report.report_id', $id)
-            // 自分の生徒IDのみにガードを掛ける
-            ->where($this->guardStudentTableWithSid())
-            // 取得できないエラー
-            ->firstOrFail();
+        // // データを取得
+        // $report = $query
+        //     ->select(
+        //         'lesson_date',
+        //         'start_time',
+        //         'room_names.room_name_full as room_name',
+        //         'ext_rirekisho.name as tname',
+        //         'r_minutes',
+        //         'content',
+        //         'homework',
+        //         'teacher_comment',
+        //         'parents_comment'
+        //     )
+        //     // 教室名の取得
+        //     ->leftJoinSub($room_names, 'room_names', function ($join) {
+        //         $join->on('report.roomcd', '=', 'room_names.code');
+        //     })
+        //     // 教師名の取得
+        //     ->sdLeftJoin(ExtRirekisho::class, 'report.tid', '=', 'ext_rirekisho.tid')
+        //     // IDを指定
+        //     ->where('report.report_id', $id)
+        //     // 自分の生徒IDのみにガードを掛ける
+        //     ->where($this->guardStudentTableWithSid())
+        //     // 取得できないエラー
+        //     ->firstOrFail();
 
-        return [
-            'lesson_date' => $report->lesson_date,
-            'start_time' => $report->start_time,
-            'room_name' => $report->room_name,
-            'tname' => $report->tname,
-            'r_minutes' => $report->r_minutes,
-            'content' => $report->content,
-            'homework' => $report->homework,
-            'teacher_comment' => $report->teacher_comment,
-            'parents_comment' => $report->parents_comment
-        ];
+        // return [
+        //     'lesson_date' => $report->lesson_date,
+        //     'start_time' => $report->start_time,
+        //     'room_name' => $report->room_name,
+        //     'tname' => $report->tname,
+        //     'r_minutes' => $report->r_minutes,
+        //     'content' => $report->content,
+        //     'homework' => $report->homework,
+        //     'teacher_comment' => $report->teacher_comment,
+        //     'parents_comment' => $report->parents_comment
+        // ];
     }
 
     //==========================
