@@ -65,27 +65,46 @@
         <x-slot name="thead">
             <th width="20%">授業日時</th>
             <th>時限</th>
-            <th width="20%">校舎</th>
+            <th>校舎</th>
             <th>コース</th>
+            <th>科目</th>
             <th>生徒名</th>
             <th width="15%">承認ステータス</th>
             <th></th>
         </x-slot>
 
+        {{-- モック用処理 --}}
         {{-- テーブル行 --}}
-        <tr v-for="item in paginator.data" v-cloak>
+        <tr v-cloak>
+            <x-bs.td-sp caption="授業日時">2023/05/15 16:00</x-bs.td-sp>
+            <x-bs.td-sp caption="時限">4限</x-bs.td-sp>
+            <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
+            <x-bs.td-sp caption="コース">個別指導</x-bs.td-sp>
+            <x-bs.td-sp caption="科目">数学</x-bs.td-sp>
+            <x-bs.td-sp caption="生徒名">CWテスト生徒１</x-bs.td-sp>
+            <x-bs.td-sp caption="承認ステータス">承認待ち</x-bs.td-sp>
+            <td>
+                {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
+                <x-button.list-dtl />
+                <x-button.list-edit href="{{ route('report_regist-edit', 1) }}" />
+            </td>
+        </tr>
+
+        {{-- 本番用処理 --}}
+        {{-- テーブル行 --}}
+        {{-- <tr v-for="item in paginator.data" v-cloak>
             <x-bs.td-sp caption="授業日時">@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</x-bs.td-sp>
             <x-bs.td-sp caption="時限"></x-bs.td-sp>
             <x-bs.td-sp caption="校舎">@{{item.room_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="コース">個別指導</x-bs.td-sp>
             <x-bs.td-sp caption="生徒名">@{{item.sname}}</x-bs.td-sp>
             <x-bs.td-sp caption="承認ステータス"></x-bs.td-sp>
-            <td>
+            <td> --}}
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
-                <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
+                {{-- <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
                 <x-button.list-edit vueHref="'{{ route('report_regist-edit', '') }}/' + item.id" />
             </td>
-        </tr>
+        </tr> --}}
 
     </x-bs.table>
 
