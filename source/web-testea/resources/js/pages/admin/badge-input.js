@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 生徒カルテ登録・編集
+ * バッジ付与登録・編集
  */
 export default class AppClass extends PageBase {
     /**
@@ -30,7 +30,7 @@ export default class AppClass extends PageBase {
             afterEdit: afterEdit,
             afterNew: afterNew,
             // 別画面でも更新・削除を使用するのでURLを変更
-            urlSuffix: "record",
+            urlSuffix: "badge",
         });
 
     }

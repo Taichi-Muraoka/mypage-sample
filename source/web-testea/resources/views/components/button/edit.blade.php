@@ -1,14 +1,20 @@
 {{------------------------------------------ 
     button 編集
   --------------------------------------------}}
+{{--
+  caption: ボタン表示名
+  href: リンクへの遷移
+  vueHref: vue用のhrefのbind
+  btn: buttonの色 Def: btn-primary
+--}}
 
-@props(['vueHref' => '', 'href' => '', 'caption' => '', 
+@props(['vueHref' => '', 'href' => '', 'caption' => '', 'btn' => '', 
   'small' => false, 'icon' => 'fas fa-edit', 'vShow' => ''])
 
 @if (!empty($vueHref))
 
 {{-- vue用のbindを使用 --}}
-<a :href="{{ $vueHref }}" class="btn btn-primary @if ($small) btn-sm @endif"
+<a :href="{{ $vueHref }}" class="btn @if (empty($btn)){{ 'btn-primary' }}@else{{ $btn }}@endif @if ($small) btn-sm @endif"
     {{-- v-show --}}
     @if ($vShow)
     v-show="{{ $vShow }}"
@@ -21,7 +27,7 @@
 @else
 
 {{-- 普通のhref --}}
-<a href="@if (empty($href)){{ '#' }}@else{{ $href }}@endif" class="btn btn-primary ml-3 @if ($small) btn-sm @endif"
+<a href="@if (empty($href)){{ '#' }}@else{{ $href }}@endif" class="btn @if (empty($btn)){{ 'btn-primary' }}@else{{ $btn }}@endif ml-3 @if ($small) btn-sm @endif"
     {{-- v-show --}}
     @if ($vShow)
     v-show="{{ $vShow }}"

@@ -21,54 +21,27 @@
 
     <p>以下の生徒の契約の{{(request()->routeIs('agreement_mng-edit')) ? '変更' : '登録'}}を行います。</p>
 
-    <x-bs.table :hover=false :vHeader=true>
-        <tr>
-            <th width="35%">校舎</th>
-            <td>久我山</td>
-        </tr>
-        <tr>
-            <th>生徒名</th>
-            <td>CWテスト生徒１</td>
-        </tr>
-    </x-bs.table>
+    <x-bs.form-title>生徒名</x-bs.form-title>
+    <p class="edit-disp-indent">CWテスト生徒１</p>
+
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.date-picker caption="開始日" id="start_date" :editData=$editData />
-    <x-input.date-picker caption="終了日" id="end_date" :editData=$editData />
-    <x-input.text caption="月額" id="monthly" :rules=$rules :editData=$editData/>
-    <x-input.select caption="受講コース" id="course" :select2=true>
-        <option value="1">個別指導</option>
-        <option value="2">集団授業</option>
+    <x-input.select caption="授業種別" id="lesson_kind" :select2=true>
+        <option value="1">個別</option>
+        <option value="2">集団</option>
     </x-input.select>
 
-    <x-bs.card>
-        <x-bs.form-title>コース詳細</x-bs.form-title>
-        <x-input.text caption="講師名" id="teacher" :rules=$rules :editData=$editData/>
+    <x-input.text caption="契約コース名" id="course_name" :rules=$rules :editData=$editData/>
 
-        <x-input.select caption="曜日" id="day" :select2=true>
-            <option value="1">月曜</option>
-            <option value="2">火曜</option>
-            <option value="3">水曜</option>
-            <option value="4">木曜</option>
-            <option value="5">金曜</option>
-            <option value="6">土曜</option>
-        </x-input.select>
+    <x-input.date-picker caption="契約開始日" id="start_date" :editData=$editData />
+    <x-input.date-picker caption="契約終了日" id="end_date" :editData=$editData />
 
-        <x-input.text caption="開始時刻" id="start_time" :rules=$rules :editData=$editData/>
-        <x-input.text caption="授業時間（分）" id="time" :rules=$rules :editData=$editData/>
-        <x-input.text caption="回数" id="frequency" :rules=$rules :editData=$editData/>
+    <x-input.text caption="単価" id="unit_tuition" :rules=$rules :editData=$editData/>
 
-        <x-input.select caption="教科" id="subject" :select2=true :select2Search=false>
-            <option value="1">国語</option>
-            <option value="2">数学</option>
-            <option value="3">理科</option>
-            <option value="4">社会</option>
-            <option value="5">英語</option>
-        </x-input.select>
-    </x-bs.card>
+    <x-input.text caption="回数" id="count" :rules=$rules :editData=$editData/>
 
-    <x-input.textarea caption="備考" id="remarks" :editData=$editData />
+    <x-input.text caption="金額（月額）" id="tuition" :rules=$rules :editData=$editData/>
 
     {{-- hidden --}}
     <x-input.hidden id="karte_id" :editData=$editData />

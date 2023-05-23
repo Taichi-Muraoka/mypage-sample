@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 連絡記録一覧
+ * バッジ付与一覧
  */
 export default class AppClass extends PageBase {
     /**
@@ -19,7 +19,7 @@ export default class AppClass extends PageBase {
         //this.getVueModal();
         this.getVueModal({
             // 別画面でもモーダルを使用するのでURLを変更
-            urlSuffix: "record"
+            urlSuffix: "badge"
         });
 
         // Vue: 検索フォーム
@@ -27,7 +27,7 @@ export default class AppClass extends PageBase {
         // 検索一覧の表示
         var $vueSearchList = this.getVueSearchList({
             // 別画面でも検索を使用するのでURLを変更
-            urlSuffix: "record"
+            urlSuffix: "badge"
         });
         $vueSearchList.search();
     }

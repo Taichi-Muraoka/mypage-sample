@@ -629,6 +629,57 @@ class MemberMngController extends Controller
         return $rules;
     }
 
+    /**
+     * 退会登録画面
+     *
+     * @return view
+     */
+    public function leaveEdit()
+    {
+
+        return view('pages.admin.member_mng-leave', [
+            'editData' => null,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 登録処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function leaveUpdate(Request $request)
+    {
+        return;
+    }
+
+    /**
+     * バリデーション(登録用)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed バリデーション結果
+     */
+    public function validationForInputLeave(Request $request)
+    {
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForInputLeave($request));
+        return $validator->errors();
+    }
+
+    /**
+     * バリデーションルールを取得(登録用)
+     *
+     * @return array ルール
+     */
+    private function rulesForInputLeave(?Request $request)
+    {
+        $rules = array();
+
+        return $rules;
+    }
+
+
     //==========================
     // クラス内共通処理
     //==========================

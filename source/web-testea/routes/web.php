@@ -634,6 +634,7 @@ use App\Http\Controllers\Admin\MasterMngController;
 use App\Http\Controllers\Admin\AccountMngController;
 use App\Http\Controllers\Admin\DataMngController;
 use App\Http\Controllers\Admin\RecordController;
+use App\Http\Controllers\Admin\BadgeController;
 use App\Http\Controllers\Admin\TransferCheckController;
 use App\Http\Controllers\Admin\ConferenceAcceptController;
 use App\Http\Controllers\Admin\RoomCalendarController;
@@ -798,6 +799,40 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/member_mng/delete_record', [RecordController::class, 'delete'])->name('record-delete');
+
+    //---------------------
+    // バッジ管理
+    //---------------------
+
+    // バッジ一覧
+    Route::get('/member_mng/badge/{sid}', [BadgeController::class, 'index'])->name('badge');
+
+    // 詳細取得用
+    Route::post('/member_mng/get_data_badge', [BadgeController::class, 'getData'])->name('badge-get_data');
+
+    // 検索結果取得
+    Route::post('/member_mng/search_badge', [BadgeController::class, 'search'])->name('badge-search');
+
+    // バリデーション(検索用)
+    Route::post('/member_mng/vd_search_badge', [BadgeController::class, 'validationForSearch'])->name('badge-vd_search');
+
+    // 登録画面
+    Route::get('/member_mng/badge/{sid}/new', [BadgeController::class, 'new'])->name('badge-new');
+
+    // 新規登録処理
+    Route::post('/member_mng/create_badge', [BadgeController::class, 'create'])->name('badge-create');
+
+    // 編集画面
+    Route::get('/member_mng/badge/edit/{badgeId}', [BadgeController::class, 'edit'])->name('badge-edit');
+
+    // 編集処理
+    Route::post('/member_mng/update_badge', [BadgeController::class, 'update'])->name('badge-update');
+
+    // バリデーション(登録用)
+    Route::post('/member_mng/vd_input_badge', [BadgeController::class, 'validationForInput'])->name('badge-vd_input');
+
+    // 削除処理
+    Route::post('/member_mng/delete_badge', [BadgeController::class, 'delete'])->name('badge-delete');
 
     //---------------------
     // 生徒成績
@@ -1771,13 +1806,13 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 会員管理 生徒登録 モック
     //---------------------
 
-    // 生徒カレンダー スケジュール新規登録
+    // 新規登録画面
     Route::get('/member_mng/new', [MemberMngController::class, 'new'])->name('member_mng-new');
 
     // 新規登録処理
     Route::post('/member_mng/create', [MemberMngController::class, 'create'])->name('member_mng-create');
 
-    // 生徒カレンダー スケジュール更新
+    // 更新画面
     Route::get('/member_mng/edit/{sid}', [MemberMngController::class, 'edit'])->name('member_mng-edit');
 
     // 編集処理
@@ -1785,6 +1820,15 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // バリデーション(登録用)
     Route::post('/member_mng/vd_input', [MemberMngController::class, 'validationForInput'])->name('member_mng-vd_input');
+
+    // 退会登録画面
+    Route::get('/member_mng/leave/edit/{sid}', [MemberMngController::class, 'leaveEdit'])->name('member_mng-leave-edit');
+
+    // 編集処理
+    Route::post('/member_mng/leave/update', [MemberMngController::class, 'leaveUpdate'])->name('member_mng-leave-update');
+
+    // バリデーション(登録用)
+    //Route::post('/member_mng/leave/vd_input', [MemberMngController::class, 'validationForInputLeave'])->name('member_mng-leave-vd_input');
 
     //---------------------
     // 管理者向け 振替調整一覧 モック

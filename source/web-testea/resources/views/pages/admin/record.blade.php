@@ -20,11 +20,6 @@
 {{-- 結果リスト --}}
 <x-bs.card-list>
 
-    {{-- カードヘッダ右 --}}
-    <x-slot name="tools">
-        <x-button.new href="{{ route('record-new', $sid) }}" :small=true />
-    </x-slot>
-
     {{-- テーブル --}}
     <x-bs.table :button=true>
 

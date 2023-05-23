@@ -1553,6 +1553,9 @@ export default class PageBase {
                     // 送信ボタン
                     submitNew: function() {
                         // 新規登録処理
+                        if (option["afterNew"]) {
+                            option["afterEdit"] = option["afterNew"];
+                        }
                         self._sendNew(this, option);
                     },
                     // 編集ボタン

@@ -10,6 +10,7 @@
 <x-bs.card>
     {{-- カードヘッダ右 --}}
     <x-slot name="tools">
+		<x-button.edit href="{{ route('member_mng-leave-edit', $student->sid) }}" caption="生徒退会" btn="btn-danger" icon="" :small=true />
 		<x-button.edit href="{{ route('member_mng-edit', $student->sid) }}" caption="生徒情報編集" icon="" :small=true />
     </x-slot>
 
@@ -27,8 +28,12 @@
             <td>{{$student->name}}</td>
         </tr>
         <tr>
-            <th>メールアドレス</th>
+            <th>生徒メールアドレス</th>
             <td>{{$student->email}}</td>
+        </tr>
+        <tr>
+            <th>保護者メールアドレス</th>
+            <td>parent0001@ap.jeez.jp</td>
         </tr>
         <tr>
             <th>学年</th>
@@ -36,11 +41,19 @@
         </tr>
         <tr>
             <th>所属校舎</th>
-            <td>{{$roomcds}}</td>
+            <td>久我山 日吉</td>
         </tr>
         <tr>
-            <th>所属学校</th>
+            <th>所属学校（小）</th>
+            <td>千駄谷小学校</td>
+        </tr>
+        <tr>
+            <th>所属学校（中）</th>
             <td>渋谷第一中学校</td>
+        </tr>
+        <tr>
+            <th>所属学校（高）</th>
+            <td></td>
         </tr>
         <tr>
             <th>会員ステータス</th>
@@ -50,20 +63,13 @@
             <th>入会日</th>
             <td>2020/04/01</td>
         </tr>
-        <tr>
-            <th>契約期間</th>
-            <td>37 ヶ月</td>
-        </tr>
-        <tr>
-            <th>バッジ数</th>
-            <td>2</td>
-        </tr>
     </x-bs.table>
 </x-bs.card>
 
 <x-bs.card>
     <x-slot name="tools">
-        <x-button.edit href="{{ route('record', $student->sid) }}" caption="バッジ付与管理" icon="" :small=true />
+        <x-button.new href="{{ route('badge-new', $student->sid) }}" caption="バッジ付与" :small=true />
+        <x-button.edit href="{{ route('badge', $student->sid) }}" caption="バッジ付与管理" icon="" :small=true />
     </x-slot>
 
     <x-slot name="card_title">
@@ -71,29 +77,58 @@
     </x-slot>
 
     {{-- テーブル --}}
+    {{-- 詳細を表示 --}}
+    <x-bs.table :hover=false :vHeader=true class="mb-4">
+        <tr>
+            <th width="15%">通塾バッジ数</th>
+            <td width="18%" class="t-price">1</td>
+            <th width="15%">成績バッジ数</th>
+            <td width="18%" class="t-price">1</td>
+            <th width="15%">紹介バッジ数</th>
+            <td width="18%" class="t-price">2</td>
+        </tr>
+    </x-bs.table>
+
+    {{-- テーブル --}}
     <x-bs.table :button=true class="inner-card">
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="20%">付与日</th>
-            <th width="20%">校舎</th>
-            <th width="20%">担当者名</th>
+            <th width="15%">付与日</th>
+            <th width="10%">バッジ種別</th>
+            <th width="10%">校舎</th>
+            <th width="15%">担当者名</th>
             <th>認定理由</th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
             <td>2023/05/10</td>
+            <td>紹介</td>
             <td>久我山</td>
             <td>鈴木　花子</td>
             <td>生徒紹介（佐藤次郎さん）</td>
         </tr>
         <tr>
             <td>2023/04/01</td>
+            <td>通塾</td>
             <td>久我山</td>
             <td>鈴木　花子</td>
             <td>契約期間が３年を超えた</td>
         </tr>
+        <tr>
+            <td>2022/03/20</td>
+            <td>紹介</td>
+            <td>久我山</td>
+            <td>鈴木　花子</td>
+            <td>生徒紹介（仙台太郎さん）</td>
+        </tr>
+        <tr>
+            <td>2022/02/20</td>
+            <td>成績</td>
+            <td>久我山</td>
+            <td>鈴木　花子</td>
+            <td>成績UP</td>
         </tr>
     </x-bs.table>
 
@@ -101,6 +136,7 @@
 
 <x-bs.card>
     <x-slot name="tools">
+        <x-button.new href="{{ route('record-new', $student->sid) }}" caption="記録登録" :small=true />
         <x-button.edit href="{{ route('record', $student->sid) }}" caption="記録管理" icon="" :small=true />
     </x-slot>
 
@@ -140,6 +176,52 @@
         </tr>
     </x-bs.table>
 
+</x-bs.card>
+
+<x-bs.card>
+    <x-slot name="tools">
+        <x-button.edit href="{{ route('agreement_mng', $student->sid) }}" caption="契約管理" icon="" :small=true />
+        <x-button.edit href="{{ route('member_mng-invoice', $student->sid) }}" caption="請求管理" icon="" :small=true />
+    </x-slot>
+
+    <x-slot name="card_title">
+        契約情報
+    </x-slot>
+
+    {{-- テーブル --}}
+    <x-bs.table :button=true class="inner-card">
+
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th width="10%">授業種別</th>
+            <th>契約コース名</th>
+            <th width="10%">開始日</th>
+            <th width="10%">終了日</th>
+            <th width="10%">金額</th>
+            <th width="10%">単価</th>
+            <th width="10%">回数</th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
+        <tr>
+            <x-bs.td-sp caption="授業種別">個別</x-bs.td-sp>
+            <x-bs.td-sp caption="契約コース名">個別指導 中学生コース（受験準備学年） 月4回 90分</x-bs.td-sp>
+            <x-bs.td-sp caption="開始日">2023/03/01</x-bs.td-sp>
+            <x-bs.td-sp caption="終了日">2024/02/29</x-bs.td-sp>
+            <x-bs.td-sp caption="金額" class="t-price">33,880</x-bs.td-sp>
+            <x-bs.td-sp caption="単価" class="t-price">8,470</x-bs.td-sp>
+            <x-bs.td-sp caption="回数" class="t-price">4</x-bs.td-sp>
+        </tr>
+        <tr>
+            <x-bs.td-sp caption="授業種別">集団</x-bs.td-sp>
+            <x-bs.td-sp caption="契約コース名">集団授業 中学生 英語・数学総復習パック</x-bs.td-sp>
+            <x-bs.td-sp caption="開始日">2022/07/01</x-bs.td-sp>
+            <x-bs.td-sp caption="終了日">2022/08/31</x-bs.td-sp>
+            <x-bs.td-sp caption="金額" class="t-price">50,000</x-bs.td-sp>
+            <x-bs.td-sp caption="単価" class="t-price">5,000</x-bs.td-sp>
+            <x-bs.td-sp caption="回数" class="t-price">10</x-bs.td-sp>
+        </tr>
+    </x-bs.table>
 </x-bs.card>
 
 <x-bs.card>
@@ -188,42 +270,6 @@
             @endphp
             <td>
                 <x-button.list-dtl dataTarget="#modal-dtl-regulation" :dataAttr="$ids" />
-            </td>
-        </tr>
-    </x-bs.table>
-</x-bs.card>
-
-<x-bs.card>
-    <x-slot name="tools">
-        <x-button.edit href="{{ route('agreement_mng', $student->sid) }}" caption="契約管理" icon="" :small=true />
-        <x-button.edit href="{{ route('member_mng-invoice', $student->sid) }}" caption="請求管理" icon="" :small=true />
-    </x-slot>
-
-    <x-slot name="card_title">
-        契約情報
-    </x-slot>
-
-    {{-- テーブル --}}
-    <x-bs.table :button=true class="inner-card">
-
-        {{-- テーブルタイトル行 --}}
-        <x-slot name="thead">
-            <th width="15%">開始日</th>
-            <th width="15%">終了日</th>
-            <th width="15%">月額</th>
-            <th>契約情報</th>
-            <th></th>
-        </x-slot>
-
-        {{-- テーブル行 --}}
-        <tr>
-            <x-bs.td-sp caption="開始日">2022/04/01</x-bs.td-sp>
-            <x-bs.td-sp caption="終了日">2023/03/31</x-bs.td-sp>
-            <x-bs.td-sp caption="月額" class="t-price">16,390</x-bs.td-sp>
-            <x-bs.td-sp caption="契約情報">月4回 60分 個別（中学1･2年生）料金</x-bs.td-sp>
-
-            <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-regulation" />
             </td>
         </tr>
     </x-bs.table>
