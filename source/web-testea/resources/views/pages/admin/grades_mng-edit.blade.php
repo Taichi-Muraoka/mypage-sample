@@ -28,17 +28,15 @@
     <p class="edit-disp-indent">{{$editData->sname}}</p>
 
     {{-- <x-input.select caption="試験種別" id="exam_type" :blank=false :select2=true :select2Search=false :mastrData=$examTypes :rules=$rules :editData=$editData /> --}}
-    <x-input.select caption="試験種別" id="exam_type" :blank=false :select2=true :select2Search=false :rules=$rules :editData=$editData >
+    <x-input.select caption="種別" id="exam_type" :blank=false :select2=true :select2Search=false :rules=$rules :editData=$editData >
         <option value="1">模試</option>
         <option value="2">定期考査</option>
+        <option value="3">通信票評定</option>
     </x-input.select>
 
     {{-- 模試 --}}
     {{-- <x-input.select caption="試験名" id="moshi_id" :select2=true :mastrData=$moshiNames :rules=$rules :editData=$editData  vShow="form.exam_type == {{ App\Consts\AppConst::CODE_MASTER_9_1 }}"/> --}}
-    <x-input.select caption="試験名" id="teiki_id" :select2=true :rules=$rules :editData=$editData
-        vShow="form.exam_type == 1">
-        <option value="1">全国統一模試</option>
-    </x-input.select>
+    <x-input.text caption="試験名" id="moshi_id" vShow="form.exam_type == 1"/>
 
     {{-- 定期考査 --}}
     {{-- <x-input.select caption="試験名" id="teiki_id" :select2=true :mastrData=$teikiNames :rules=$rules :editData=$editData  vShow="form.exam_type == {{ App\Consts\AppConst::CODE_MASTER_9_2 }}"/> --}}
@@ -47,43 +45,51 @@
         <option value="1">1学期中間考査</option>
         <option value="2">1学期末考査</option>
         <option value="3">2学期中間考査</option>
+        <option value="4">2学期末考査</option>
     </x-input.select>
+
+    {{-- 通信票評定 --}}
+    <x-input.select caption="学期" id="term_id" :select2=true :rules=$rules
+        vShow="form.exam_type == 3">
+        <option value="1">1学期</option>
+        <option value="2">2学期</option>
+        <option value="3">3学期</option>
+        <option value="4">学年</option>
+    </x-input.select>
+
+    <x-input.text caption="合計点" id="total" vShow="form.exam_type != 3"/>
+    <x-input.text caption="偏差値" id="total_deviation" vShow="form.exam_type == 1"/>
+    <x-input.text caption="評定値計（内申点）" id="total_grade" vShow="form.exam_type == 3"/>
+
+    {{-- 余白 --}}
+    <div class="mb-4"></div>
+
+    <x-bs.form-title>成績</x-bs.form-title>
+
     {{-- hidden --}}
     <x-input.hidden id="grades_id" :editData=$editData />
 
-    <x-bs.form-title>試験成績</x-bs.form-title>
-
     {{-- テーブル --}}
-    <x-bs.table :bordered=false :hover=false>
+    <x-bs.table :bordered=false :hover=false :smartPhone=true class="mb-small"  vShow="form.exam_type != 3">
         <x-slot name="thead">
             <td>教科</td>
             <td>得点</td>
-            <td>前回比</td>
             <td>学年平均</td>
             <td>偏差値</td>
         </x-slot>
 
-        @for ($i = 0; $i < 10; $i++)
-        <tr v-cloak>
+        @for ($i = 0; $i < 10; $i++) <tr v-cloak>
             {{-- hidden --}}
             <x-input.hidden id="grades_seq_{{$i}}" :editData=$editDataDtls[$i] />
 
             <x-bs.td-sp caption="教科">
-                @if ($i < 5)
-                    {{-- プルダウンselect2 --}}
-                    <x-input.select id="curriculumcd_{{$i}}" :select2=true :mastrData=$curriculums :rules=$rules :editData=$editDataDtls[$i] />
-                @else
-                    {{-- フリー入力 --}}
-                    <x-input.text id="curriculum_name_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
-                @endif
+                {{-- プルダウンselect2 --}}
+                <x-input.select id="curriculumcd_{{$i}}" :select2=true
+                    :mastrData=$curriculums :rules=$rules :editData=$editDataDtls[$i] />
             </x-bs.td-sp>
 
             <x-bs.td-sp caption="得点">
                 <x-input.text id="score_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
-            </x-bs.td-sp>
-
-            <x-bs.td-sp caption="前回比">
-                <x-input.select id="previoustime_{{$i}}" :blank=false :select2=true :select2Search=false :mastrData=$updownList :rules=$rules :editData=$editDataDtls[$i] />
             </x-bs.td-sp>
 
             <x-bs.td-sp caption="学年平均" class="not-center">
@@ -93,8 +99,33 @@
             <x-bs.td-sp caption="偏差値">
                 <x-input.text id="deviation_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
             </x-bs.td-sp>
-        </tr>
-        @endfor
+            </tr>
+            @endfor
+    </x-bs.table>
+
+    {{-- テーブル（評定入力用） --}}
+    <x-bs.table :bordered=false :hover=false :smartPhone=true class="mb-small"  vShow="form.exam_type == 3">
+        <x-slot name="thead">
+            <td>教科</td>
+            <td>評定値</td>
+        </x-slot>
+
+        @for ($i = 0; $i < 10; $i++) <tr v-cloak>
+            {{-- hidden --}}
+            <x-input.hidden id="grades_seq_{{$i}}" />
+
+            <x-bs.td-sp caption="教科">
+                {{-- プルダウンselect2 --}}
+                <x-input.select id="curriculumcd_{{$i}}" :select2=true
+                    :mastrData=$curriculums :rules=$rules :editData=$editDataDtls[$i] />
+            </x-bs.td-sp>
+
+            <x-bs.td-sp caption="評定値">
+                <x-input.text id="score_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
+            </x-bs.td-sp>
+
+            </tr>
+            @endfor
     </x-bs.table>
 
     <x-input.textarea caption="次回の試験に向けての抱負" id="student_comment" :editData=$editData :rules=$rules />

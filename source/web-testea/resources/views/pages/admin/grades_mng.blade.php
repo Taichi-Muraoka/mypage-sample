@@ -27,23 +27,37 @@
         <x-slot name="thead">
             <th width="15%">登録日</th>
             <th width="20%">生徒名</th>
-            <th width="15%">試験種別</th>
-            <th>試験名</th>
+            <th width="15%">種別</th>
+            <th>学期・試験名</th>
             <th></th>
         </x-slot>
 
+        {{-- モック用処理 --}}
         {{-- テーブル行 --}}
         <tr v-for="item in paginator.data" v-cloak>
+            <x-bs.td-sp caption="登録日">2023/04/10</x-bs.td-sp>
+            <x-bs.td-sp caption="生徒名">CWテスト生徒１</x-bs.td-sp>
+            <x-bs.td-sp caption="種別">定期考査</x-bs.td-sp>
+            <x-bs.td-sp caption="学期・試験名">１学期中間考査</x-bs.td-sp>
+            <td>
+                <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
+                <x-button.list-edit vueHref="'{{ route('grades_mng-edit', '') }}/' + item.id" />
+            </td>
+        </tr>
+
+        {{-- 本番用処理 --}}
+        {{-- テーブル行 --}}
+        {{-- <tr v-for="item in paginator.data" v-cloak>
             <x-bs.td-sp caption="登録日">@{{item.regist_time|formatYmd}}</x-bs.td-sp>
             <x-bs.td-sp caption="生徒名">@{{item.sname}}</x-bs.td-sp>
             <x-bs.td-sp caption="試験種別">@{{item.type_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="試験名">@{{item.teiki_name}}@{{item.moshi_name}}</x-bs.td-sp>
-            <td>
+            <td> --}}
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
-                <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
+                {{-- <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
                 <x-button.list-edit vueHref="'{{ route('grades_mng-edit', '') }}/' + item.id" />
                 </td>
-        </tr>
+        </tr> --}}
 
     </x-bs.table>
 
