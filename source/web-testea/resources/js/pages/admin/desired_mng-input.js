@@ -17,17 +17,18 @@ export default class AppClass extends PageBase {
     start() {
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            //UrlCom.redirect(self._getFuncUrl());
-            // 本画面は三階層目なので二階層目に戻る(親画面)
+            // 編集の場合は、一覧画面（三階層目）に戻る
             self.redirectToParent2();
+        };
+        var afterNew = () => {
+            // 新規登録の場合は、生徒カルテ画面（二階層目）に戻る
+            self.redirectToParent();
         };
 
         // Vue: 入力フォーム
-        //this.getVueInputForm({
-        //    afterEdit: afterEdit,
-        //});
         this.getVueInputForm({
             afterEdit: afterEdit,
+            afterNew: afterNew,
             // 別画面でも更新・削除を使用するのでURLを変更
             urlSuffix: "desired_mng",
         });

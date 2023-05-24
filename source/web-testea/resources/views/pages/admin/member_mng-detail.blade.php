@@ -227,6 +227,7 @@
 
 <x-bs.card>
     <x-slot name="tools">
+        <x-button.new href="{{ route('desired_mng-new', $student->sid) }}" caption="受験校登録" :small=true />
         <x-button.edit href="{{ route('desired_mng', $student->sid) }}" caption="受験校管理" icon="" :small=true />
     </x-slot>
 

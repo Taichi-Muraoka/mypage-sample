@@ -10,9 +10,11 @@
 
 @section('parent_page_title', '生徒カルテ')
 
+{{-- 編集画面の場合のみ、一覧を経由し四階層とする --}}
+@if (request()->routeIs('desired_mng-edit'))
 @section('parent_page2', route('desired_mng', $editData['sid']))
-
 @section('parent_page_title2', '受験校一覧')
+@endif
 
 @section('content')
 
@@ -58,8 +60,15 @@
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
+            @if (request()->routeIs('desired_mng-edit'))
+            {{-- 編集時 --}}
             {{-- 前の階層に戻る --}}
             <x-button.back url="{{route('desired_mng', $editData['sid'])}}" />
+            @else
+            {{-- 登録時 --}}
+            {{-- 生徒カルテに戻る --}}
+            <x-button.back url="{{route('member_mng-detail', $editData['sid'])}}" />
+            @endif
 
             @if (request()->routeIs('desired_mng-edit'))
             {{-- 編集時 --}}
