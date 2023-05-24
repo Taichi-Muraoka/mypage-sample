@@ -455,28 +455,42 @@ class TutorMngController extends Controller
 
         // 時間帯
         $timeList = array(
-            '0時限目','1時限目','2時限目','3時限目','4時限目','5時限目','6時限目','7時限目','授業後',
+            '1時限目','2時限目','3時限目','4時限目','5時限目','6時限目','7時限目',
         );
 
         // コロンを除いた値をIDとして扱う
         // 管理画面では送信しないが、教師画面と統一した
         $timeIdList = [];
         foreach ($timeList as $time) {
-            $timeId = str_replace(":", "", $time);
+            $timeId = str_replace("時限目", "", $time);
             array_push($timeIdList, $timeId);
         }
 
         // 教師の空き時間を取得する
-        $weeklyShift = WeeklyShift::where('tid', $tid)
-            ->get();
+        //$weeklyShift = WeeklyShift::where('tid', $tid)
+        //    ->get();
 
         // チェックボックスをセットするための値を生成
         // 例：['1_1030', '2_1030']
         $editData = [];
-        foreach ($weeklyShift as $ws) {
-            // 配列に追加
-            array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
-        }
+        //foreach ($weeklyShift as $ws) {
+        //    // 配列に追加
+        //    array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
+        //}
+        array_push($editData, '4_5');
+        array_push($editData, '4_6');
+        array_push($editData, '4_7');
+
+        // レギュラー授業情報を取得し、チェックボックスをセットするための値を生成
+        // 曜日コード_時限No 例：['1_1', '2_1']
+        $regularData = [];
+        array_push($regularData, '1_5');
+        array_push($regularData, '2_5');
+        array_push($regularData, '2_6');
+        array_push($regularData, '6_4');
+        array_push($regularData, '6_5');
+        array_push($regularData, '6_6');
+        array_push($regularData, '6_7');
 
         // 教師名を取得する
         $teacher = $this->getTeacherName($tid);
@@ -488,6 +502,7 @@ class TutorMngController extends Controller
             'editData' => [
                 'chkWs' => $editData
             ],
+            'exceptData' => $regularData,
             'extRirekisho' => $teacher,
         ]);
     }

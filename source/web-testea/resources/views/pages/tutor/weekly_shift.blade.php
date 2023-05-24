@@ -32,7 +32,7 @@
       <td>
         {{-- チェックボックス。裏でクリックされた時間帯を保持している --}}
         <x-input.checkbox id="{{$weekdayKey}}_{{$timeIdList[$i]}}" class="chk-wt" name="chkWs" :icheck=false
-          value="{{$weekdayKey}}_{{$timeIdList[$i]}}" :editData=$editData />
+          value="{{$weekdayKey}}_{{$timeIdList[$i]}}" :editData=$editData :exceptData=$exceptData />
 
         {{-- 表のDiv --}}
         <div class="chk-t" data-wt="{{$weekdayKey}}_{{$timeIdList[$i]}}" v-on:click="timeClick"></div>

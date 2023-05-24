@@ -10,11 +10,12 @@
   checked: デフォルトのチェック状態。値がない場合などデフォルトで選択される
   disabled: disabled（選択不可）にするかどうか
   editData: 編集データ
+  exceptData: チェック対象外データ
   class: クラス
   icheck: icheckを使うかどうか
 --}}
 @props(['caption' => '', 'id' => '', 'name' => '', 'value' => '', 'checked' => false, 
-'disabled' => false, 'editData' => [], 'class' => '', 'icheck' => true])
+'disabled' => false, 'editData' => [], 'exceptData' => [],'class' => '', 'icheck' => true])
 
 @if ($icheck)
 <div class="icheck-primary d-inline mr-3">
@@ -24,14 +25,19 @@
   v-model="form.{{ $name }}" 
 
   {{-- クラス --}}
-  class="@if (!empty($class)){{ $class }}@endif"
+  class="@if (!empty($class)){{ $class }}@endif @if (isset($exceptData) && in_array($value, $exceptData)) except @endif"
 
   {{-- disabled --}}
   @if ($disabled)
   disabled
   @endif
 
-  {{-- チェック状態 --}}
+  {{-- チェック対象外データのdisabled --}}
+  @if (isset($exceptData) && in_array($value, $exceptData))
+  disabled
+  @endif
+
+  {{-- チェック状態 --}} 
   @if ($checked && (!isset($editData) || !isset($editData[$name])))
   {{-- デフォルト。editDataがない場合 --}}
   checked

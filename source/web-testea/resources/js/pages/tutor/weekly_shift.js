@@ -28,19 +28,22 @@ export default class AppClass extends PageBase {
             progressShow: true,
             // Vue関数
             vueMethods: {
-                // 時間帯をクリック
+                // 時間帯のdivをクリック時
                 timeClick: function(event) {
-                    // 時間帯のdataを取得
-                    var time = $(event.target).attr("data-wt");
+                    // チェックボックスがdisableでない場合のみ
+                    if (!$(event.target).prev().prop('disabled')) {
+                        // 時間帯のdataを取得
+                        var time = $(event.target).attr("data-wt");
 
-                    // クリックされた時間帯のチェックボックスにチェックを入れる
-                    // nameは同じで配列としてセットする
+                        // クリックされた時間帯のチェックボックスにチェックを入れる
+                        // nameは同じで配列としてセットする
 
-                    var exist = this.form.chkWs.indexOf(time);
-                    if (exist >= 0) {
-                        this.form.chkWs.splice(exist, 1);
-                    } else {
-                        this.form.chkWs.push(time);
+                        var exist = this.form.chkWs.indexOf(time);
+                        if (exist >= 0) {
+                            this.form.chkWs.splice(exist, 1);
+                        } else {
+                            this.form.chkWs.push(time);
+                        }
                     }
                 }
             }

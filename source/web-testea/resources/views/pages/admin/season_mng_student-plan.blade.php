@@ -123,18 +123,18 @@
         <tr>
           <x-bs.td-sp caption="受講日">
             <x-input.select id="lesson_date_{{$i}}" :select2=true >
-              <option value="1">3/27</option>
-              <option value="2">3/28</option>
-              <option value="3">3/29</option>
-              <option value="4">3/30</option>
-              <option value="5">3/31</option>
-              <option value="6">4/1</option>
-              <option value="7">4/3</option>
-              <option value="8">4/4</option>
-              <option value="9">4/5</option>
-              <option value="10">4/6</option>
-              <option value="11">4/7</option>
-              <option value="12">4/8</option>
+              <option value="1">2023/03/27</option>
+              <option value="2">2023/03/28</option>
+              <option value="3">2023/03/29</option>
+              <option value="4">2023/03/30</option>
+              <option value="5">2023/03/31</option>
+              <option value="6">2023/04/01</option>
+              <option value="7">2023/04/03</option>
+              <option value="8">2023/04/04</option>
+              <option value="9">2023/04/05</option>
+              <option value="10">2023/04/06</option>
+              <option value="11">2023/04/07</option>
+              <option value="12">2023/04/08</option>
             </x-input.select>
           </x-bs.td-sp>
 
@@ -184,7 +184,7 @@
     <div class="mb-3"></div>
 
     <x-bs.callout type="warning">
-        当画面で登録された講習スケジュールは、仮確定の状態です。<br>
+        当画面で登録された講習スケジュールは仮確定の状態であり、生徒・講師への公開はされません。<br>
         教室カレンダーから確認・編集を行うことができます。<br>
         スケジュールを確定し、生徒・講師へ公開するには、対象生徒全員のスケジュールを登録後に確定処理を行ってください。
     </x-bs.callout>

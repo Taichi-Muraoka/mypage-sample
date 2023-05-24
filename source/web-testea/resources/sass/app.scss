@@ -474,6 +474,10 @@ label:not(.form-check-label):not(.custom-file-label) {
     background-color: rgb(201, 233, 143);
 }
 
+.chk-wt.except + div {
+    background-color: darkslategray;
+}
+
 .chk-wt2 {
     display: none;
 }
