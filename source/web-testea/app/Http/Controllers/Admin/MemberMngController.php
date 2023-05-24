@@ -58,11 +58,15 @@ class MemberMngController extends Controller
         // 学年リストを取得
         $classes = $this->mdlMenuFromExtGenericMaster(AppConst::EXT_GENERIC_MASTER_112);
 
+        // 入会状況チェックボックス
+        $statusGroup = array("在塾中","見込み客","退会済み");
+
         return view('pages.admin.member_mng', [
             'rules' => $this->rulesForSearch(),
             'rooms' => $rooms,
             'classes' => $classes,
-            'editData' => null
+            'editData' => null,
+            'statusGroup' => $statusGroup,
         ]);
     }
 

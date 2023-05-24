@@ -45,6 +45,19 @@
             <x-input.text id="name" caption="生徒名" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
+    <x-bs.row>
+        <x-bs.col2>
+            <x-bs.form-group name="status_groups">
+                <x-bs.form-title>対象生徒</x-bs.form-title>
+                {{-- 教科チェックボックス --}}
+                @for ($i = 0; $i < count($statusGroup); $i++)
+                <x-input.checkbox :caption="$statusGroup[$i]"
+                        :id="'status_group_' . $statusGroup[$i]"
+                        name="status_groups" :value="$statusGroup[$i]" />
+                @endfor
+            </x-bs.form-group>
+        </x-bs.col2>
+    </x-bs.row>
 
 </x-bs.card>
 
@@ -54,6 +67,7 @@
     {{-- カードヘッダ右 --}}
     <x-slot name="tools">
         <x-button.new href="{{ route('member_mng-new') }}" :small=true />
+        <x-button.submit-exec caption="CSVダウンロード" icon="fas fa-download" />
     </x-slot>
 
     {{-- テーブル --}}
@@ -78,6 +92,7 @@
             <td>@{{item.enter_date|formatYmd}}</td>
             <td>
                 <x-button.list-dtl vueHref="'{{ route('member_mng-detail', '') }}/' + item.sid" caption="生徒カルテ" />
+                <x-button.list-edit vueHref="'{{ route('record', '') }}/' + item.sid" caption="記録管理"/>
                 {{-- <x-button.list-edit href="{{ route('member_mng-edit', 1) }}" /> --}}
                 {{-- <x-button.list-edit vueHref="'{{ route('member_mng-calendar', '') }}/' + item.sid" caption="カレンダー" /> --}}
             </td>
