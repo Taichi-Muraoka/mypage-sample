@@ -5,11 +5,15 @@
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true>
     <tr v-show="item.mdType != {{ App\Consts\AppConst::EXT_GENERIC_MASTER_109_4 }}">
-        <th width="35%">教室</th>
+        <th width="35%">校舎</th>
         <td>@{{item.mdClassName}}</td>
     </tr>
     <tr>
-        <th width="35%">スケジュール種別</th>
+        <th width="35%">指導スペース</th>
+        <td>Aテーブル</td>
+    </tr>
+    <tr>
+        <th width="35%">コース名</th>
         <td>@{{item.mdTypeName}}</td>
     </tr>
     <tr>
@@ -25,17 +29,43 @@
         <th>終了時刻</th>
         <td>@{{item.mdEndTime|formatHm}}</td>
     </tr>
-    <tr v-show="item.mdTitle">
-        <th>@{{item.mdTitle}}</th>
-        <td>@{{item.mdTitleVal}}</td>
+    <tr v-Show="item.lesson_type != 3">
+        <th>教師名</th>
+        <td>CWテスト教師１０１</td>
+    </tr>
+    {{-- 個別指導の場合 --}}
+    <tr v-show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_2 }}">
+        <th>生徒名</th>
+        <td>CWテスト生徒１</td>
+    </tr>
+    {{-- 集団授業の場合 --}}
+    <tr v-show="item.mdType == {{ App\Consts\AppConst::CODE_MASTER_21_2 }}">
+        <th>参加生徒名</th>
+        <td>CWテスト生徒１<br>CWテスト生徒２<br>CWテスト生徒３</td>
     </tr>
     <tr v-show="item.mdSubject">
         <th>教科</th>
         <td>@{{item.mdSubject}}</td>
     </tr>
-    <tr v-show="item.mdFurikae">
-        <th>振替情報等</th>
-        <td>@{{item.mdFurikae}}</td>
+    <tr v-Show="item.lesson_type != 3">
+        <th>授業種別</th>
+        <td>追加</td>
+    </tr>
+    <tr v-Show="item.lesson_type != 3">
+        <th>通塾</th>
+        <td>生徒オンライン－教師通塾</td>
+    </tr>
+    <tr v-Show="item.lesson_type != 3">
+        <th>授業代講</th>
+        <td>なし</td>
+    </tr>
+    <tr v-Show="item.lesson_type != 3">
+        <th>出欠ステータス</th>
+        <td>当日欠席（講師出勤あり）</td>
+    </tr>
+    <tr>
+        <th>メモ</th>
+        <td></td>
     </tr>
 </x-bs.table>
 
@@ -44,6 +74,6 @@
 @section('modal-button')
 
 {{-- 更新ボタンを表示 --}}
-<x-button.edit vueHref="'{{ route('member_mng-calendar-edit',[$editData['sid'], '']) }}/' + item.id" icon="" caption="スケジュール更新" />
+<x-button.edit vueHref="'{{ route('room_calendar-edit', '') }}/' + item.id" icon="" caption="スケジュール編集" />
 
 @overwrite
