@@ -68,7 +68,7 @@
 
 <x-bs.card>
     <x-slot name="tools">
-        <x-button.new href="{{ route('badge-new', $student->sid) }}" caption="バッジ付与" :small=true />
+        <x-button.new href="{{ route('badge-new', $student->sid) }}" caption="バッジ付与登録" :small=true />
         <x-button.edit href="{{ route('badge', $student->sid) }}" caption="バッジ付与管理" icon="" :small=true />
     </x-slot>
 
@@ -180,6 +180,7 @@
 
 <x-bs.card>
     <x-slot name="tools">
+        <x-button.new href="{{ route('agreement_mng-new', $student->sid) }}" caption="契約登録" :small=true />
         <x-button.edit href="{{ route('agreement_mng', $student->sid) }}" caption="契約管理" icon="" :small=true />
         <x-button.edit href="{{ route('member_mng-invoice', $student->sid) }}" caption="請求管理" icon="" :small=true />
     </x-slot>

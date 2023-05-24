@@ -10,16 +10,18 @@
 
 @section('parent_page_title', '生徒カルテ')
 
+{{-- 編集画面の場合のみ、一覧を経由し四階層とする --}}
+@if (request()->routeIs('agreement_mng-edit'))
 @section('parent_page2', route('agreement_mng', $editData['sid']))
-
-@section('parent_page_title2', '契約一覧')
+@section('parent_page_title2', '契約情報一覧')
+@endif
 
 @section('content')
 
 {{-- formを指定 --}}
 <x-bs.card :form=true>
 
-    <p>以下の生徒の契約の{{(request()->routeIs('agreement_mng-edit')) ? '変更' : '登録'}}を行います。</p>
+    <p>以下の生徒の契約情報の{{(request()->routeIs('agreement_mng-edit')) ? '変更' : '登録'}}を行います。</p>
 
     <x-bs.form-title>生徒名</x-bs.form-title>
     <p class="edit-disp-indent">CWテスト生徒１</p>
@@ -49,8 +51,15 @@
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
+            @if (request()->routeIs('agreement_mng-edit'))
+            {{-- 編集時 --}}
             {{-- 前の階層に戻る --}}
             <x-button.back url="{{route('agreement_mng', $editData['sid'])}}" />
+            @else
+            {{-- 登録時 --}}
+            {{-- 生徒カルテに戻る --}}
+            <x-button.back url="{{route('member_mng-detail', $editData['sid'])}}" />
+            @endif
 
             @if (request()->routeIs('agreement_mng-edit'))
             {{-- 編集時 --}}

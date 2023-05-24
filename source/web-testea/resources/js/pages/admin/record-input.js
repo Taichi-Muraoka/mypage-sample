@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 生徒カルテ登録・編集
+ * 連絡記録登録・編集
  */
 export default class AppClass extends PageBase {
     /**

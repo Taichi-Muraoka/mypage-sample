@@ -20,11 +20,6 @@
 {{-- 結果リスト --}}
 <x-bs.card-list>
 
-    {{-- カードヘッダ右 --}}
-    <x-slot name="tools">
-        <x-button.new href="{{ route('agreement_mng-new', $sid) }}" :small=true />
-    </x-slot>
-
     {{-- テーブル --}}
     <x-bs.table :button=true>
 
@@ -37,26 +32,33 @@
             <th width="10%">金額</th>
             <th width="10%">単価</th>
             <th width="10%">回数</th>
+            <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <x-bs.td-sp caption="授業種別">個別</x-bs.td-sp>
-            <x-bs.td-sp caption="契約コース名">個別指導 中学生コース（受験準備学年） 月4回 90分</x-bs.td-sp>
-            <x-bs.td-sp caption="開始日">2023/03/01</x-bs.td-sp>
-            <x-bs.td-sp caption="終了日">2024/02/29</x-bs.td-sp>
-            <x-bs.td-sp caption="金額" class="t-price">33,880</x-bs.td-sp>
-            <x-bs.td-sp caption="単価" class="t-price">8,470</x-bs.td-sp>
-            <x-bs.td-sp caption="回数" class="t-price">4</x-bs.td-sp>
+            <td>個別</td>
+            <td>個別指導 中学生コース（受験準備学年） 月4回 90分</td>
+            <td>2023/03/01</td>
+            <td>2024/02/29</td>
+            <td class="t-price">33,880</td>
+            <td class="t-price">8,470</td>
+            <td class="t-price">4</td>
+            <td>
+                <x-button.list-edit href="{{ route('agreement_mng-edit', 1) }}" />
+            </td>
         </tr>
         <tr>
-            <x-bs.td-sp caption="授業種別">集団</x-bs.td-sp>
-            <x-bs.td-sp caption="契約コース名">集団授業 中学生 英語・数学総復習パック</x-bs.td-sp>
-            <x-bs.td-sp caption="開始日">2022/07/01</x-bs.td-sp>
-            <x-bs.td-sp caption="終了日">2022/08/31</x-bs.td-sp>
-            <x-bs.td-sp caption="金額" class="t-price">50,000</x-bs.td-sp>
-            <x-bs.td-sp caption="単価" class="t-price">5,000</x-bs.td-sp>
-            <x-bs.td-sp caption="回数" class="t-price">10</x-bs.td-sp>
+            <td>集団</td>
+            <td>集団授業 中学生 英語・数学総復習パック</td>
+            <td>2022/07/01</td>
+            <td>2022/08/31</td>
+            <td class="t-price">50,000</td>
+            <td class="t-price">5,000</td>
+            <td class="t-price">10</td>
+            <td>
+                <x-button.list-edit href="{{ route('agreement_mng-edit', 1) }}" />
+            </td>
         </tr>
 
     </x-bs.table>
@@ -66,7 +68,7 @@
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
             {{-- 二階層目に戻る --}}
-            <x-button.back url="{{route('member_mng-detail', $sid)}}" />
+            <x-button.back url="{{ route('member_mng-detail', 1) }}" />
         </div>
     </x-slot>
 </x-bs.card>
