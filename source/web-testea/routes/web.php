@@ -658,6 +658,7 @@ use App\Http\Controllers\Admin\ImportTutorController;
 use App\Http\Controllers\Admin\TransferResetController;
 use App\Http\Controllers\Admin\DataResetController;
 use App\Http\Controllers\Admin\ImportSchoolCodeController;
+use App\Http\Controllers\Admin\OvertimeController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -2248,6 +2249,19 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // バリデーション(登録用)
     Route::post('/import_school_code/vd_input', [ImportSchoolCodeController::class, 'validationForInput'])->name('import_school_code-vd_input');
+
+    //---------------------
+    // 超過勤務者一覧 モック
+    //---------------------
+
+    // 超過勤務者一覧
+    Route::get('/overtime', [OvertimeController::class, 'index'])->name('overtime');
+
+    // バリデーション(検索用)
+    Route::post('/overtime/vd_search', [OvertimeController::class, 'validationForSearch'])->name('overtime-vd_search');
+
+    // 検索結果取得
+    Route::post('/overtime/search', [OvertimeController::class, 'search'])->name('overtime-search');
 
 });
     //---------------------

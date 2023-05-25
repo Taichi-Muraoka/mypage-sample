@@ -857,6 +857,11 @@ return [
                     'active' => ['surcharge_accept*']
                 ],
                 [
+                    'text' => '超過勤務者一覧',
+                    'route' => 'overtime',
+                    'active' => ['overtime*']
+                ],
+                [
                     'text' => '給与情報算出',
                     'route' => 'salary_calculation',
                     'active' => ['salary_calculation*']
