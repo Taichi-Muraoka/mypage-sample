@@ -92,7 +92,6 @@
             <td>@{{item.enter_date|formatYmd}}</td>
             <td>
                 <x-button.list-dtl vueHref="'{{ route('member_mng-detail', '') }}/' + item.sid" caption="生徒カルテ" />
-                <x-button.list-edit vueHref="'{{ route('record', '') }}/' + item.sid" caption="記録管理"/>
                 {{-- <x-button.list-edit href="{{ route('member_mng-edit', 1) }}" /> --}}
                 {{-- <x-button.list-edit vueHref="'{{ route('member_mng-calendar', '') }}/' + item.sid" caption="カレンダー" /> --}}
             </td>
