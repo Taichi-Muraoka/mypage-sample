@@ -24,7 +24,7 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="kinds" caption="コース名" :select2=true>
+            <x-input.select id="course_cd" caption="コース名" :select2=true>
                 <option value="1">個別指導コース</option>
                 <option value="4">集団指導</option>
                 <option value="5">その他・自習</option>
@@ -36,28 +36,30 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="kinds" caption="授業種別" :select2=true>
+            <x-input.select id="lesson_kind" caption="授業種別" :select2=true>
                 <option value="1">通常</option>
-                <option value="2">振替</option>
-                <option value="3">初回授業（入会金無料）</option>
-                <option value="4">体験授業１回目</option>
-                <option value="5">追加</option>
+                <option value="2">特別</option>
+                <option value="3">追加</option>
+                <option value="4">初回授業（入会金無料）</option>
+                <option value="5">初回授業（入会金半額）</option>
+                <option value="6">体験授業１回目</option>
+                <option value="7">体験授業２回目</option>
+                <option value="8">体験授業３回目</option>
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="kinds" caption="出欠ステータス" :select2=true>
-                <option value="1">実施前</option>
-                <option value="2">出席</option>
-                <option value="3">当日欠席（講師出勤あり）</option>
-                <option value="4">当日欠席（講師出勤なし）</option>
-                <option value="3">後日振替（振替日未定）</option>
-                <option value="4">後日振替（振替日確定）</option>
+            <x-input.select id="absent_status" caption="出欠ステータス" :select2=true>
+                <option value="1">実施前・出席</option>
+                <option value="2">当日欠席（講師出勤あり）</option>
+                <option value="3">当日欠席（講師出勤なし）</option>
+                <option value="4">振替中（未振替）</option>
+                <option value="5">振替済</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select caption="教科" id="subject" :select2=true :select2Search=false>
+            <x-input.select caption="教科" id="subject_cd" :select2=true :select2Search=false>
                 <option value="1">国語</option>
                 <option value="2">数学</option>
                 <option value="3">理科</option>
