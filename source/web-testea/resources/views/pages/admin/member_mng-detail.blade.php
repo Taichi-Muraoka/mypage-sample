@@ -259,9 +259,10 @@
             $ids = ['roomcd' => 110, 'seq' => 1, 'sid' => 1];
             @endphp
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-regulation" :dataAttr="$ids" />
+                <x-button.list-dtl dataTarget="#modal-dtl-desired" :dataAttr="$ids" />
             </td>
         </tr>
+        <tr>
             <td>2</td>
             <td>成城第二高等学校</td>
             <td>特進科</td>
@@ -271,7 +272,7 @@
             $ids = ['roomcd' => 110, 'seq' => 1, 'sid' => 1];
             @endphp
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-regulation" :dataAttr="$ids" />
+                <x-button.list-dtl dataTarget="#modal-dtl-desired" :dataAttr="$ids" />
             </td>
         </tr>
     </x-bs.table>
@@ -422,5 +423,7 @@
 @include('pages.admin.modal.grades_mng-modal', ['modal_id' => 'modal-dtl-grades_mng'])
 {{-- 電話・面談記録 --}}
 @include('pages.admin.modal.record-modal', ['modal_id' => 'modal-dtl-record'])
+{{-- 受験校情報 --}}
+@include('pages.admin.modal.desired_mng-modal', ['modal_id' => 'modal-dtl-desired'])
 
 @stop
