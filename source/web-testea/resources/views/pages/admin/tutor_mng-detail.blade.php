@@ -15,8 +15,8 @@
 
     {{-- カードヘッダ右 --}}
     <x-slot name="tools">
-		<x-button.edit href="{{ route('tutor_mng-edit', '101') }}" caption="更新" icon="" :small=true />
 		<x-button.edit href="{{ route('tutor_mng-leave-edit', '101') }}" caption="退職処理" btn="btn-danger" icon="" :small=true />
+        <x-button.edit href="{{ route('tutor_mng-edit', '101') }}" caption="更新" icon="" :small=true />
     </x-slot>
 
     <x-slot name="card_title">
@@ -81,14 +81,14 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="20%">校舎コード</th>
+            <th width="20%">校舎</th>
             <th>交通費</th>
             <th width="10%"></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <td>110</td>
+            <td>久我山</td>
             <td>800</td>
             <td>
                 <x-button.list-edit href="{{ route('tutor_mng-campus-edit', 1) }}"/>
