@@ -12,7 +12,26 @@
 </ul>
 
 <x-bs.table :hover=false :vHeader=true>
+    {{-- モック用処理 --}}
     <tr>
+        <th width="35%">生徒名</th>
+        <td>CWテスト生徒１</td>
+    </tr>
+    <tr>
+        <th>授業日時</th>
+        <td>2023/05/22 16:00</td>
+    </tr>
+    <tr>
+        <th>校舎</th>
+        <td>久我山</td>
+    </tr>
+    <tr>
+        <th>講師名</th>
+        <td>CWテスト教師１０１</td>
+    </tr>
+
+    {{-- 本番用処理 --}}
+    {{-- <tr>
         <th width="35%">生徒名</th>
         <td>@{{item.sname}}</td>
     </tr>
@@ -27,7 +46,7 @@
     <tr>
         <th>講師名</th>
         <td>@{{item.tname}}</td>
-    </tr>
+    </tr> --}}
 </x-bs.table>
 
 

@@ -164,118 +164,118 @@ class AbsentAcceptController extends Controller
      */
     public function getData(Request $request)
     {
-        // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'absent_apply_id');
+        // // IDのバリデーション
+        // $this->validateIdsFromRequest($request, 'absent_apply_id');
 
-        // モーダルによって処理を行う
-        $modal = $request->input('target');
+        // // モーダルによって処理を行う
+        // $modal = $request->input('target');
 
-        switch ($modal) {
-            case "#modal-dtl-acceptance":
-                //---------
-                // 受付
-                //---------
+        // switch ($modal) {
+        //     case "#modal-dtl-acceptance":
+        //         //---------
+        //         // 受付
+        //         //---------
 
-                // 教室名取得のサブクエリ
-                $room = $this->mdlGetRoomQuery();
+        //         // 教室名取得のサブクエリ
+        //         $room = $this->mdlGetRoomQuery();
 
-                // IDを取得
-                $absentApplyId = $request->input('absent_apply_id');
+        //         // IDを取得
+        //         $absentApplyId = $request->input('absent_apply_id');
 
-                // クエリを作成
-                $query = AbsentApply::query();
+        //         // クエリを作成
+        //         $query = AbsentApply::query();
 
-                // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-                $query->where($this->guardRoomAdminTableWithRoomCd());
+        //         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        //         $query->where($this->guardRoomAdminTableWithRoomCd());
 
-                // データの取得
-                $absentApply = $query->select(
-                    'ext_student_kihon.name as sname',
-                    'lesson_date',
-                    'start_time',
-                    'room_names.room_name',
-                    'ext_rirekisho.name as tname',
-                )
-                    ->where('absent_apply_id', $absentApplyId)
-                    // 生徒情報
-                    ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
-                        $join->on('absent_apply.sid', '=', 'ext_student_kihon.sid');
-                    })
-                    // 教室名の取得
-                    ->leftJoinSub($room, 'room_names', function ($join) {
-                        $join->on('absent_apply.roomcd', '=', 'room_names.code');
-                    })
-                    // 教師名
-                    ->sdLeftJoin(ExtRirekisho::class, function ($join) {
-                        $join->on('absent_apply.tid', '=', 'ext_rirekisho.tid');
-                    })
-                    ->firstOrFail();
+        //         // データの取得
+        //         $absentApply = $query->select(
+        //             'ext_student_kihon.name as sname',
+        //             'lesson_date',
+        //             'start_time',
+        //             'room_names.room_name',
+        //             'ext_rirekisho.name as tname',
+        //         )
+        //             ->where('absent_apply_id', $absentApplyId)
+        //             // 生徒情報
+        //             ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
+        //                 $join->on('absent_apply.sid', '=', 'ext_student_kihon.sid');
+        //             })
+        //             // 教室名の取得
+        //             ->leftJoinSub($room, 'room_names', function ($join) {
+        //                 $join->on('absent_apply.roomcd', '=', 'room_names.code');
+        //             })
+        //             // 教師名
+        //             ->sdLeftJoin(ExtRirekisho::class, function ($join) {
+        //                 $join->on('absent_apply.tid', '=', 'ext_rirekisho.tid');
+        //             })
+        //             ->firstOrFail();
 
-                return $absentApply;
+        //         return $absentApply;
 
-                break;
-            case "#modal-dtl":
-                //---------
-                // 詳細
-                //---------
+        //         break;
+        //     case "#modal-dtl":
+        //         //---------
+        //         // 詳細
+        //         //---------
 
-                // 教室名取得のサブクエリ
-                $room = $this->mdlGetRoomQuery();
+        //         // 教室名取得のサブクエリ
+        //         $room = $this->mdlGetRoomQuery();
 
-                // IDを取得
-                $absentApplyId = $request->input('absent_apply_id');
+        //         // IDを取得
+        //         $absentApplyId = $request->input('absent_apply_id');
 
-                // クエリを作成
-                $query = AbsentApply::query();
+        //         // クエリを作成
+        //         $query = AbsentApply::query();
 
-                // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-                $query->where($this->guardRoomAdminTableWithRoomCd());
+        //         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        //         $query->where($this->guardRoomAdminTableWithRoomCd());
 
-                // データの取得
-                $absentApply = $query->select(
-                    'apply_time',
-                    'ext_student_kihon.name as sname',
-                    'lesson_type',
-                    'absent.name as lesson_name',
-                    'lesson_date',
-                    'start_time',
-                    'room_names.room_name',
-                    'ext_rirekisho.name as tname',
-                    'absent_reason',
-                    'code_master.name as status'
-                )
-                    ->where('absent_apply_id', $absentApplyId)
-                    // 生徒名の取得
-                    ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
-                        $join->on('absent_apply.sid', '=', 'ext_student_kihon.sid');
-                    })
-                    // 教室名の取得
-                    ->leftJoinSub($room, 'room_names', function ($join) {
-                        $join->on('absent_apply.roomcd', '=', 'room_names.code');
-                    })
-                    // 教師名
-                    ->sdLeftJoin(ExtRirekisho::class, function ($join) {
-                        $join->on('absent_apply.tid', '=', 'ext_rirekisho.tid');
-                    })
-                    // ステータス
-                    ->sdLeftJoin(CodeMaster::class, function ($join) {
-                        $join->on('absent_apply.state', '=', 'code_master.code')
-                            ->where('code_master.data_type', AppConst::CODE_MASTER_1);
-                    })
-                    // 授業種別
-                    ->sdLeftJoin(CodeMaster::class, function ($join) {
-                        $join->on('absent_apply.lesson_type', '=', 'absent.code')
-                            ->where('absent.data_type', AppConst::CODE_MASTER_8);
-                    }, 'absent')
-                    ->firstOrFail();
+        //         // データの取得
+        //         $absentApply = $query->select(
+        //             'apply_time',
+        //             'ext_student_kihon.name as sname',
+        //             'lesson_type',
+        //             'absent.name as lesson_name',
+        //             'lesson_date',
+        //             'start_time',
+        //             'room_names.room_name',
+        //             'ext_rirekisho.name as tname',
+        //             'absent_reason',
+        //             'code_master.name as status'
+        //         )
+        //             ->where('absent_apply_id', $absentApplyId)
+        //             // 生徒名の取得
+        //             ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
+        //                 $join->on('absent_apply.sid', '=', 'ext_student_kihon.sid');
+        //             })
+        //             // 教室名の取得
+        //             ->leftJoinSub($room, 'room_names', function ($join) {
+        //                 $join->on('absent_apply.roomcd', '=', 'room_names.code');
+        //             })
+        //             // 教師名
+        //             ->sdLeftJoin(ExtRirekisho::class, function ($join) {
+        //                 $join->on('absent_apply.tid', '=', 'ext_rirekisho.tid');
+        //             })
+        //             // ステータス
+        //             ->sdLeftJoin(CodeMaster::class, function ($join) {
+        //                 $join->on('absent_apply.state', '=', 'code_master.code')
+        //                     ->where('code_master.data_type', AppConst::CODE_MASTER_1);
+        //             })
+        //             // 授業種別
+        //             ->sdLeftJoin(CodeMaster::class, function ($join) {
+        //                 $join->on('absent_apply.lesson_type', '=', 'absent.code')
+        //                     ->where('absent.data_type', AppConst::CODE_MASTER_8);
+        //             }, 'absent')
+        //             ->firstOrFail();
 
-                return $absentApply;
+        //         return $absentApply;
 
-                break;
-            default:
-                // 該当しない場合
-                $this->illegalResponseErr();
-        }
+        //         break;
+        //     default:
+        //         // 該当しない場合
+        //         $this->illegalResponseErr();
+        // }
     }
 
     /**
@@ -286,193 +286,193 @@ class AbsentAcceptController extends Controller
      */
     public function execModal(Request $request)
     {
-        // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'absent_apply_id');
+        // // IDのバリデーション
+        // $this->validateIdsFromRequest($request, 'absent_apply_id');
 
-        // モーダルによって処理を行う
-        $modal = $request->input('target');
+        // // モーダルによって処理を行う
+        // $modal = $request->input('target');
 
-        switch ($modal) {
-            case "#modal-dtl-acceptance":
-                //--------
-                // 受付
-                //--------
+        // switch ($modal) {
+        //     case "#modal-dtl-acceptance":
+        //         //--------
+        //         // 受付
+        //         //--------
 
-                // IDのバリデーション
-                $this->validateIdsFromRequest($request, 'absent_apply_id');
+        //         // IDのバリデーション
+        //         $this->validateIdsFromRequest($request, 'absent_apply_id');
 
-                // トランザクション(例外時は自動的にロールバック)
-                DB::transaction(function () use ($request) {
+        //         // トランザクション(例外時は自動的にロールバック)
+        //         DB::transaction(function () use ($request) {
 
-                    // IDを取得
-                    $absentApplyId = $request->input('absent_apply_id');
+        //             // IDを取得
+        //             $absentApplyId = $request->input('absent_apply_id');
 
-                    // 1件取得
-                    $absentApply = AbsentApply::where('absent_apply_id', $absentApplyId)
-                        // 申請中の場合のみ
-                        ->where('state', AppConst::CODE_MASTER_1_0)
-                        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-                        ->where($this->guardRoomAdminTableWithRoomCd())
-                        // 該当データがない場合はエラーを返す
-                        ->firstOrFail();
+        //             // 1件取得
+        //             $absentApply = AbsentApply::where('absent_apply_id', $absentApplyId)
+        //                 // 申請中の場合のみ
+        //                 ->where('state', AppConst::CODE_MASTER_1_0)
+        //                 // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        //                 ->where($this->guardRoomAdminTableWithRoomCd())
+        //                 // 該当データがない場合はエラーを返す
+        //                 ->firstOrFail();
 
-                    // 受付
-                    $absentApply->state = AppConst::CODE_MASTER_1_1;
+        //             // 受付
+        //             $absentApply->state = AppConst::CODE_MASTER_1_1;
 
-                    // 保存
-                    $absentApply->save();
+        //             // 保存
+        //             $absentApply->save();
 
-                    //-------------------------
-                    // お知らせメッセージの使用データ取得
-                    //-------------------------
+        //             //-------------------------
+        //             // お知らせメッセージの使用データ取得
+        //             //-------------------------
 
-                    // 教室名取得のサブクエリ
-                    $room = $this->mdlGetRoomQuery();
+        //             // 教室名取得のサブクエリ
+        //             $room = $this->mdlGetRoomQuery();
 
-                    $acceptanceMng = AbsentApply::select(
-                        'lesson_date',
-                        'start_time',
-                        'room_names.room_name',
-                        'ext_student_kihon.name as sname',
-                        'absent_apply.tid'
-                    )
-                        ->where('absent_apply_id', $absentApplyId)
-                        // 教室名の取得
-                        ->leftJoinSub($room, 'room_names', function ($join) {
-                            $join->on('absent_apply.roomcd', '=', 'room_names.code');
-                        })
-                        // 生徒情報
-                        ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
-                            $join->on('absent_apply.sid', '=', 'ext_student_kihon.sid');
-                        })
-                        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-                        ->where($this->guardRoomAdminTableWithRoomCd())
-                        ->firstOrFail();
+        //             $acceptanceMng = AbsentApply::select(
+        //                 'lesson_date',
+        //                 'start_time',
+        //                 'room_names.room_name',
+        //                 'ext_student_kihon.name as sname',
+        //                 'absent_apply.tid'
+        //             )
+        //                 ->where('absent_apply_id', $absentApplyId)
+        //                 // 教室名の取得
+        //                 ->leftJoinSub($room, 'room_names', function ($join) {
+        //                     $join->on('absent_apply.roomcd', '=', 'room_names.code');
+        //                 })
+        //                 // 生徒情報
+        //                 ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
+        //                     $join->on('absent_apply.sid', '=', 'ext_student_kihon.sid');
+        //                 })
+        //                 // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        //                 ->where($this->guardRoomAdminTableWithRoomCd())
+        //                 ->firstOrFail();
 
-                    //-------------------------
-                    // お知らせメッセージの登録（生徒）
-                    //-------------------------
+        //             //-------------------------
+        //             // お知らせメッセージの登録（生徒）
+        //             //-------------------------
 
-                    $notice = new Notice;
+        //             $notice = new Notice;
 
-                    // タイトルと本文(Langから取得する)
-                    $notice->title = Lang::get('message.notice.absent_apply_accept_student.title');
-                    $notice->text = Lang::get(
-                        'message.notice.absent_apply_accept_student.text',
-                        [
-                            'lessonDate' => $acceptanceMng->lesson_date->format('Y/m/d'),
-                            'startTime' => $acceptanceMng->start_time->format('H:i'),
-                            'roomName' => $acceptanceMng->room_name
-                        ]
-                    );
+        //             // タイトルと本文(Langから取得する)
+        //             $notice->title = Lang::get('message.notice.absent_apply_accept_student.title');
+        //             $notice->text = Lang::get(
+        //                 'message.notice.absent_apply_accept_student.text',
+        //                 [
+        //                     'lessonDate' => $acceptanceMng->lesson_date->format('Y/m/d'),
+        //                     'startTime' => $acceptanceMng->start_time->format('H:i'),
+        //                     'roomName' => $acceptanceMng->room_name
+        //                 ]
+        //             );
 
-                    // お知らせ種別
-                    $notice->notice_type = AppConst::CODE_MASTER_14_4;
+        //             // お知らせ種別
+        //             $notice->notice_type = AppConst::CODE_MASTER_14_4;
 
-                    // 事務局ID
-                    $account = Auth::user();
-                    $notice->adm_id = $account->account_id;
-                    $notice->roomcd = $account->roomcd;
+        //             // 事務局ID
+        //             $account = Auth::user();
+        //             $notice->adm_id = $account->account_id;
+        //             $notice->roomcd = $account->roomcd;
 
-                    // 保存
-                    $notice->save();
+        //             // 保存
+        //             $notice->save();
 
-                    //-------------------------
-                    // お知らせ宛先の登録（生徒）
-                    //-------------------------
+        //             //-------------------------
+        //             // お知らせ宛先の登録（生徒）
+        //             //-------------------------
 
-                    $noticeDestination = new NoticeDestination();
+        //             $noticeDestination = new NoticeDestination();
 
-                    // 先に登録したお知らせIDをセット
-                    $noticeDestination->notice_id = $notice->notice_id;
+        //             // 先に登録したお知らせIDをセット
+        //             $noticeDestination->notice_id = $notice->notice_id;
 
-                    // 宛先連番: 1固定
-                    $noticeDestination->destination_seq = 1;
+        //             // 宛先連番: 1固定
+        //             $noticeDestination->destination_seq = 1;
 
-                    // 宛先種別（生徒）
-                    $noticeDestination->destination_type = AppConst::CODE_MASTER_15_2;
+        //             // 宛先種別（生徒）
+        //             $noticeDestination->destination_type = AppConst::CODE_MASTER_15_2;
 
-                    // 生徒No
-                    $noticeDestination->sid = $absentApply->sid;
+        //             // 生徒No
+        //             $noticeDestination->sid = $absentApply->sid;
 
-                    // 保存
-                    $noticeDestination->save();
+        //             // 保存
+        //             $noticeDestination->save();
 
-                    //-------------------------
-                    // お知らせメッセージの登録(教師)
-                    //-------------------------
+        //             //-------------------------
+        //             // お知らせメッセージの登録(教師)
+        //             //-------------------------
 
-                    $notice = new Notice;
+        //             $notice = new Notice;
 
-                    // タイトルと本文(Langから取得する)
-                    $notice->title = Lang::get('message.notice.absent_apply_accept_teacher.title');
-                    $notice->text = Lang::get(
-                        'message.notice.absent_apply_accept_teacher.text',
-                        [
-                            'sname' => $acceptanceMng->sname,
-                            'lessonDate' => $acceptanceMng->lesson_date->format('Y/m/d'),
-                            'startTime' => $acceptanceMng->start_time->format('H:i'),
-                            'roomName' => $acceptanceMng->room_name
-                        ]
-                    );
+        //             // タイトルと本文(Langから取得する)
+        //             $notice->title = Lang::get('message.notice.absent_apply_accept_teacher.title');
+        //             $notice->text = Lang::get(
+        //                 'message.notice.absent_apply_accept_teacher.text',
+        //                 [
+        //                     'sname' => $acceptanceMng->sname,
+        //                     'lessonDate' => $acceptanceMng->lesson_date->format('Y/m/d'),
+        //                     'startTime' => $acceptanceMng->start_time->format('H:i'),
+        //                     'roomName' => $acceptanceMng->room_name
+        //                 ]
+        //             );
 
-                    // お知らせ種別
-                    $notice->notice_type = AppConst::CODE_MASTER_14_4;
+        //             // お知らせ種別
+        //             $notice->notice_type = AppConst::CODE_MASTER_14_4;
 
-                    // 事務局ID
-                    $account = Auth::user();
-                    $notice->adm_id = $account->account_id;
-                    $notice->roomcd = $account->roomcd;
+        //             // 事務局ID
+        //             $account = Auth::user();
+        //             $notice->adm_id = $account->account_id;
+        //             $notice->roomcd = $account->roomcd;
 
-                    // 保存
-                    $notice->save();
+        //             // 保存
+        //             $notice->save();
 
-                    //-------------------------
-                    // お知らせ宛先の登録(教師)
-                    //-------------------------
+        //             //-------------------------
+        //             // お知らせ宛先の登録(教師)
+        //             //-------------------------
 
-                    $noticeDestination = new NoticeDestination();
+        //             $noticeDestination = new NoticeDestination();
 
-                    // 先に登録したお知らせIDをセット
-                    $noticeDestination->notice_id = $notice->notice_id;
+        //             // 先に登録したお知らせIDをセット
+        //             $noticeDestination->notice_id = $notice->notice_id;
 
-                    // 宛先連番: 1固定
-                    $noticeDestination->destination_seq = 1;
+        //             // 宛先連番: 1固定
+        //             $noticeDestination->destination_seq = 1;
 
-                    // 宛先種別（教師）
-                    $noticeDestination->destination_type = AppConst::CODE_MASTER_15_3;
+        //             // 宛先種別（教師）
+        //             $noticeDestination->destination_type = AppConst::CODE_MASTER_15_3;
 
-                    // 教師No
-                    $noticeDestination->tid = $absentApply->tid;
+        //             // 教師No
+        //             $noticeDestination->tid = $absentApply->tid;
 
-                    // 保存
-                    $res = $noticeDestination->save();
+        //             // 保存
+        //             $res = $noticeDestination->save();
 
-                    // save成功時のみ送信
-                    if ($res) {
+        //             // save成功時のみ送信
+        //             if ($res) {
 
-                        $mail_body = [
-                            'name' => $acceptanceMng->sname,
-                            'datetime' => $acceptanceMng->lesson_date->format('Y/m/d') .
-                                ' ' . $acceptanceMng->start_time->format('H:i'),
-                            'room_name' => $acceptanceMng->room_name
-                        ];
+        //                 $mail_body = [
+        //                     'name' => $acceptanceMng->sname,
+        //                     'datetime' => $acceptanceMng->lesson_date->format('Y/m/d') .
+        //                         ' ' . $acceptanceMng->start_time->format('H:i'),
+        //                     'room_name' => $acceptanceMng->room_name
+        //                 ];
 
-                        $teacherAccount = Account::select('email')
-                            ->where('account_id', $acceptanceMng->tid)
-                            ->where('account_type', AppConst::CODE_MASTER_7_2)
-                            ->firstOrFail();
+        //                 $teacherAccount = Account::select('email')
+        //                     ->where('account_id', $acceptanceMng->tid)
+        //                     ->where('account_type', AppConst::CODE_MASTER_7_2)
+        //                     ->firstOrFail();
 
-                        // 欠席申請メール送信用の、事務局用メールアドレスを設定(env)から取得
-                        $email = $teacherAccount->email;
-                        Mail::to($email)->send(new AbsentApplyToTeacher($mail_body));
-                    }
-                });
-                return;
-            default:
-                // 該当しない場合
-                $this->illegalResponseErr();
-        }
+        //                 // 欠席申請メール送信用の、事務局用メールアドレスを設定(env)から取得
+        //                 $email = $teacherAccount->email;
+        //                 Mail::to($email)->send(new AbsentApplyToTeacher($mail_body));
+        //             }
+        //         });
+        //         return;
+        //     default:
+        //         // 該当しない場合
+        //         $this->illegalResponseErr();
+        // }
     }
 
     /**
@@ -531,65 +531,65 @@ class AbsentAcceptController extends Controller
      */
     public function edit($absentApplyId)
     {
-        // IDのバリデーション
-        $this->validateIds($absentApplyId);
+        // // IDのバリデーション
+        // $this->validateIds($absentApplyId);
 
-        // 編集データの取得
-        $query = AbsentApply::query();
-        $editData = $query->select(
-            'absent_apply_id',
-            'absent_apply.sid',
-            'absent_apply.tid',
-            'lesson_type',
-            'apply_time',
-            'ext_student_kihon.name',
-            'lesson_date',
-            'start_time',
-            'absent_apply.id',
-            'absent_reason',
-            'state'
-        )
-            // 生徒情報
-            ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
-                $join->on('absent_apply.sid', '=', 'ext_student_kihon.sid');
-            })
-            // キーの指定
-            ->where('absent_apply_id', $absentApplyId)
-            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-            ->where($this->guardRoomAdminTableWithRoomCd())
-            ->firstOrFail();
+        // // 編集データの取得
+        // $query = AbsentApply::query();
+        // $editData = $query->select(
+        //     'absent_apply_id',
+        //     'absent_apply.sid',
+        //     'absent_apply.tid',
+        //     'lesson_type',
+        //     'apply_time',
+        //     'ext_student_kihon.name',
+        //     'lesson_date',
+        //     'start_time',
+        //     'absent_apply.id',
+        //     'absent_reason',
+        //     'state'
+        // )
+        //     // 生徒情報
+        //     ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
+        //         $join->on('absent_apply.sid', '=', 'ext_student_kihon.sid');
+        //     })
+        //     // キーの指定
+        //     ->where('absent_apply_id', $absentApplyId)
+        //     // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        //     ->where($this->guardRoomAdminTableWithRoomCd())
+        //     ->firstOrFail();
 
-        if ($editData->lesson_type == AppConst::CODE_MASTER_8_1) {
-            // 個別教室
-            unset($editData->lesson_date);
-            unset($editData->start_time);
-            unset($editData->tid);
-        } else if ($editData->lesson_type == AppConst::CODE_MASTER_8_2) {
-            // 家庭教師
-            unset($editData->id);
-        } else {
-            // エラー
-            $this->illegalResponseErr();
-        }
+        // if ($editData->lesson_type == AppConst::CODE_MASTER_8_1) {
+        //     // 個別教室
+        //     unset($editData->lesson_date);
+        //     unset($editData->start_time);
+        //     unset($editData->tid);
+        // } else if ($editData->lesson_type == AppConst::CODE_MASTER_8_2) {
+        //     // 家庭教師
+        //     unset($editData->id);
+        // } else {
+        //     // エラー
+        //     $this->illegalResponseErr();
+        // }
 
-        // 生徒ID
-        $sid = $editData->sid;
+        // // 生徒ID
+        // $sid = $editData->sid;
 
-        // レギュラーと個別講習のプルダウンメニューを作成
-        $scheduleMaster = $this->getScheduleMasterList($sid);
+        // // レギュラーと個別講習のプルダウンメニューを作成
+        // $scheduleMaster = $this->getScheduleMasterList($sid);
 
-        // 教師名のプルダウンメニューを作成
-        $home_teachers = $this->getTeacherList($sid);
+        // // 教師名のプルダウンメニューを作成
+        // $home_teachers = $this->getTeacherList($sid);
 
-        // ステータスプルダウン
-        $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_1);
+        // // ステータスプルダウン
+        // $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_1);
 
         return view('pages.admin.absent_accept-edit', [
-            'editData' => $editData,
+            'editData' => null,
             'rules' => $this->rulesForInput(null),
-            'statusList' => $statusList,
-            'scheduleMaster' => $scheduleMaster,
-            'teacherList' => $home_teachers,
+            'statusList' => null,
+            'scheduleMaster' => null,
+            'teacherList' => null,
         ]);
     }
 

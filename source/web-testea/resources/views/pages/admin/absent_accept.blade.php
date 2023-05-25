@@ -64,7 +64,24 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr v-for="item in paginator.data" v-cloak>
+        {{-- モック用処理 --}}
+        <tr>
+            <td>2023/05/10</td>
+            <td>CWテスト生徒１</td>
+            <td>2023/05/22 16:00</td>
+            <td>久我山</td>
+            <td>CWテスト教師１０１</td>
+            <td>未対応</td>
+            <td>
+                <x-button.list-dtl />
+                {{-- モーダルを開く詳細ボタンを使用する --}}
+                <x-button.list-dtl caption="受付" btn="btn-primary" dataTarget="#modal-dtl-acceptance"/>
+                <x-button.list-edit href="{{ route('absent_accept-edit', 1) }}" />
+            </td>
+        </tr>
+
+        {{-- 本番用処理 --}}
+        {{-- <tr v-for="item in paginator.data" v-cloak>
             <td>@{{item.apply_time|formatYmd}}</td>
             <td>@{{item.sname}}</td>
             <td>@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</td>
@@ -72,14 +89,14 @@
             <td>@{{item.tname}}</td>
             <td>@{{item.status}}</td>
             <td>
-                <x-button.list-dtl :vueDataAttr="['absent_apply_id' => 'item.absent_apply_id']" />
+                <x-button.list-dtl :vueDataAttr="['absent_apply_id' => 'item.absent_apply_id']" /> --}}
                 {{-- モーダルを開く詳細ボタンを使用する --}}
-                <x-button.list-dtl caption="受付" btn="btn-primary" dataTarget="#modal-dtl-acceptance"
+                {{-- <x-button.list-dtl caption="受付" btn="btn-primary" dataTarget="#modal-dtl-acceptance"
                     :vueDataAttr="['absent_apply_id' => 'item.absent_apply_id']"
                     vueDisabled="item.statecd != {{ App\Consts\AppConst::CODE_MASTER_1_0 }}" />
                 <x-button.list-edit vueHref="'{{ route('absent_accept-edit', '') }}/' + item.absent_apply_id" />
             </td>
-        </tr>
+        </tr> --}}
 
     </x-bs.table>
 
