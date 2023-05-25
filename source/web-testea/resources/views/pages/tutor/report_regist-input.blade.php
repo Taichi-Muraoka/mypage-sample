@@ -16,8 +16,9 @@
     {{-- 編集時 --}}
     <x-bs.table :hover=false :vHeader=true>
         <tr>
-            <th width="35%">授業日時</th>
-            <td>{{$editData->lesson_date->format('Y/m/d')}} {{$editData->start_time->format('H:i')}}</td>
+            <th width="35%">授業日・時限</th>
+            {{-- <td>{{$editData->lesson_date->format('Y/m/d')}} {{$editData->start_time->format('H:i')}}</td> --}}
+            <td>2023/05/15 4限</td>
         </tr>
         <tr>
             <th>校舎</th>
@@ -26,6 +27,10 @@
         <tr>
             <th>生徒名</th>
             <td>{{$editData->student_name}}</td>
+        </tr>
+        <tr>
+            <th>科目</th>
+            <td>数学</td>
         </tr>
     </x-bs.table>
     {{-- 余白 --}}
@@ -46,28 +51,28 @@
             :mastrData=$student_kobetsu_list :editData=$editData />
 
         {{-- チェンジイベントを取得し、授業日時と生徒名、校舎を取得する --}}
-        <x-input.select caption="授業日時" id="id" :select2=true onChange="selectChangeGetMulti" :editData=$editData>
+        {{-- <x-input.select caption="授業日時" id="id" :select2=true onChange="selectChangeGetMulti" :editData=$editData> --}}
             {{-- 生徒を選択したら動的にリストを作成する --}}
-            <option v-for="item in selectGetItem.selectItems" :value="item.id">
-                @{{ item.value }}
-            </option>
-        </x-input.select>
-
-        <x-input.select caption="時限" id="time" :select2=true onChange="selectChangeGetMulti" :editData=$editData>
-            <option value="1">1限</option>
-            <option value="2">2限</option>
-            <option value="3">3限</option>
-            <option value="4">4限</option>
-            <option value="5">5限</option>
-            <option value="6">6限</option>
-            <option value="7">7限</option>
+            {{-- <option v-for="item in selectGetItem.selectItems" :value="item.id"> --}}
+               {{-- @{{ item.value }} --}}
+            {{-- </option> --}}
+        {{-- </x-input.select> --}}
+        <x-input.select caption="授業日・時限" id="id" :select2=true  :editData=$editData>
+            <option value="1">2023/04/24 5限</option>
+            <option value="2">2023/04/17 5限</option>
+            <option value="3">2023/04/10 5限</option>
+            <option value="4">2023/04/03 5限</option>
         </x-input.select>
 
         {{-- 詳細を表示 --}}
-        <x-bs.table :hover=false :vHeader=true class="mb-4">
+        <x-bs.table vShow="form.id > 0" :hover=false :vHeader=true class="mb-4">
             <tr>
                 <th class="t-minimum">校舎</th>
-                <td><span v-cloak>@{{selectGetItem.class_name}}</span></td>
+                <td><span v-cloak>久我山</span></td>
+            </tr>
+            <tr>
+                <th class="t-minimum">科目</th>
+                <td><span v-cloak>数学</span></td>
             </tr>
         </x-bs.table>
     </x-bs.card>
@@ -75,21 +80,33 @@
 
     <x-input.text caption="今月の目標" id="monthly_goal" :rules=$rules :editData=$editData />
 
-    <x-input.text caption="授業教材１" id="lesson_text1" :rules=$rules :editData=$editData />
+    <x-bs.card>
+        <x-bs.form-title>授業内容</x-bs.form-title>
+        <x-input.text caption="教材１" id="lesson_text1" :rules=$rules :editData=$editData />
 
-    <x-input.text caption="授業単元１" id="lesson_unit1" :rules=$rules :editData=$editData />
+        <x-input.text caption="単元１" id="lesson_unit1" :rules=$rules :editData=$editData />
 
-    <x-input.text caption="授業教材２" id="lesson_text2" :rules=$rules :editData=$editData />
+        <x-input.text caption="教材２" id="lesson_text2" :rules=$rules :editData=$editData />
 
-    <x-input.text caption="授業単元２" id="lesson_unit2" :rules=$rules :editData=$editData />
+        <x-input.text caption="単元２" id="lesson_unit2" :rules=$rules :editData=$editData />
+    </x-bs.card>
 
-    <x-input.text caption="確認テスト内容" id="test_contents" :rules=$rules :editData=$editData />
+    <x-bs.card>
+    <x-bs.form-title>確認テスト</x-bs.form-title>
+    <x-input.text caption="内容" id="test_contents" :rules=$rules :editData=$editData />
+    <x-bs.row>
+        <x-bs.col3>
+            <x-input.text caption="得点" id="test_score" :rules=$rules :editData=$editData />
+        </x-bs.col3>
+            <x-bs.form-title></x-bs.form-title>
+            <p class="edit-disp-indent">／　</p>
+        <x-bs.col3>
+            <x-input.text caption="満点" id="test_full_score" :rules=$rules :editData=$editData />
+        </x-bs.col3>
+    </x-bs.row>
+    </x-bs.card>
 
-    <x-input.text caption="確認テスト得点" id="test_score" :rules=$rules :editData=$editData />
-
-    <x-input.text caption="確認テスト満点" id="test_full_score" :rules=$rules :editData=$editData />
-
-    <x-input.text caption="宿題達成度" id="achievement" :rules=$rules :editData=$editData />
+    <x-input.text caption="宿題達成度（%）" id="achievement" :rules=$rules :editData=$editData />
 
     <x-input.textarea caption="達成・課題点" id="goodbad_point" :rules=$rules :editData=$editData />
 
@@ -97,13 +114,16 @@
 
     <x-input.textarea caption="その他" id="others_comment" :rules=$rules :editData=$editData />
 
-    <x-input.text caption="宿題教材１" id="homework_text1" :rules=$rules :editData=$editData />
+    <x-bs.card>
+        <x-bs.form-title>宿題</x-bs.form-title>
+        <x-input.text caption="教材１" id="homework_text1" :rules=$rules :editData=$editData />
 
-    <x-input.text caption="宿題単元１" id="homework_unit1" :rules=$rules :editData=$editData />
+        <x-input.text caption="単元１" id="homework_unit1" :rules=$rules :editData=$editData />
 
-    <x-input.text caption="宿題教材２" id="homework_text2" :rules=$rules :editData=$editData />
+        <x-input.text caption="教材２" id="homework_text2" :rules=$rules :editData=$editData />
 
-    <x-input.text caption="宿題単元２" id="homework_unit2" :rules=$rules :editData=$editData />
+        <x-input.text caption="単元２" id="homework_unit2" :rules=$rules :editData=$editData />
+    </x-bs.card>
 
     @if (request()->routeIs('report_regist-edit'))
     {{-- 編集時 承認ステータス・事務局コメント--}}

@@ -12,20 +12,18 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th>授業日時</th>
+            <th>授業日・時限</th>
             <th>校舎</th>
             <th>コース</th>
-            <th>科目</th>
             <th>講師名</th>
             <th width="5%"></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr v-for="item in paginator.data" v-cloak>
-            <x-bs.td-sp caption="授業日時">2023/05/15 16:00</x-bs.td-sp>
+            <x-bs.td-sp caption="授業日・時限">2023/05/15 4限</x-bs.td-sp>
             <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
             <x-bs.td-sp caption="コース">個別指導</x-bs.td-sp>
-            <x-bs.td-sp caption="科目">数学</x-bs.td-sp>
             <x-bs.td-sp caption="講師名">CWテスト教師１０１</x-bs.td-sp>
             <td>
                 <x-button.list-dtl />

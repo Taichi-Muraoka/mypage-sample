@@ -5,8 +5,8 @@
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true :smartPhoneModal=true>
     <tr>
-        <th width="35%">授業日時</th>
-        <td>2023/05/15 16:00</td>
+        <th width="35%">授業日・時限</th>
+        <td>2023/05/15 4限</td>
     </tr>
     <tr>
         <th>校舎</th>

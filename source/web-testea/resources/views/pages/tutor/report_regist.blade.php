@@ -63,11 +63,9 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="20%">授業日時</th>
-            <th>時限</th>
+            <th width="20%">授業日・時限</th>
             <th>校舎</th>
             <th>コース</th>
-            <th>科目</th>
             <th>生徒名</th>
             <th width="15%">承認ステータス</th>
             <th></th>
@@ -76,11 +74,9 @@
         {{-- モック用処理 --}}
         {{-- テーブル行 --}}
         <tr v-cloak>
-            <x-bs.td-sp caption="授業日時">2023/05/15 16:00</x-bs.td-sp>
-            <x-bs.td-sp caption="時限">4限</x-bs.td-sp>
+            <x-bs.td-sp caption="授業日・時限">2023/05/15 4限</x-bs.td-sp>
             <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
             <x-bs.td-sp caption="コース">個別指導</x-bs.td-sp>
-            <x-bs.td-sp caption="科目">数学</x-bs.td-sp>
             <x-bs.td-sp caption="生徒名">CWテスト生徒１</x-bs.td-sp>
             <x-bs.td-sp caption="承認ステータス">承認待ち</x-bs.td-sp>
             <td>
