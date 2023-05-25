@@ -593,10 +593,10 @@ return [
                 //     'active' => ['karte*']
                 // ],
                 [
-                    'text' => '見込客管理',
-                    'route' => 'prospect',
-                    'active' => ['prospect*']
-            ],
+                    'text' => 'バッジ付与一覧',
+                    'route' => 'give_badge',
+                    'active' => ['give_badge*']
+                ],
                 [
                     'text' => '面談日程受付',
                     'route' => 'conference_accept',
@@ -613,13 +613,6 @@ return [
                 //     'route'  => 'member_import',
                 //     'active' => ['member_import*']
                 // ],
-                [
-                    'text' => '退会申請受付',
-                    'route'  => 'leave_accept',
-                    'active' => ['leave_accept*'],
-                    // 以下、AppMenuFilterでカウントを出す場合の目印とした。textやrouteが変わった時にMenuFilterも直さないといけないのを防ぐ
-                    'menuid' => 'id_leave_accept',
-                ],
             ]
         ],
         [
@@ -879,15 +872,6 @@ return [
             'can'  => 'admin',
             'submenu' => [
                 [
-                    'text' => '請求情報算出',
-                    'route' => 'invoice_calculation',
-                    'active' => ['invoice_calculation*']
-                ],
-                //[
-                //    'text' => '追加・割引費用情報',
-                //    'route' => 'under_construction',
-                //],
-                [
                     'text' => '請求書情報取込',
                     'route' => 'invoice_import',
                     'active' => ['invoice_import*']
@@ -911,11 +895,6 @@ return [
             'icon' => 'fa fa-database',
             'can'  => 'admin',
             'submenu' => [
-                [
-                    'text' => 'マスタ管理',
-                    'route' => 'master_mng',
-                    'active' => ['master_mng_all*']
-                ],
                 [
                     'text' => '校舎マスタ管理',
                     'route' => 'master_mng_school',

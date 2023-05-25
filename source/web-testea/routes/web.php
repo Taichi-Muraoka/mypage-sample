@@ -659,6 +659,7 @@ use App\Http\Controllers\Admin\TransferResetController;
 use App\Http\Controllers\Admin\DataResetController;
 use App\Http\Controllers\Admin\ImportSchoolCodeController;
 use App\Http\Controllers\Admin\OvertimeController;
+use App\Http\Controllers\Admin\GiveBadgeController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -2262,6 +2263,19 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 検索結果取得
     Route::post('/overtime/search', [OvertimeController::class, 'search'])->name('overtime-search');
+
+    //---------------------
+    // バッジ付与一覧 モック
+    //---------------------
+
+    // バッジ付与一覧
+    Route::get('/give_badge', [GiveBadgeController::class, 'index'])->name('give_badge');
+
+    // バリデーション(検索用)
+    Route::post('/give_badge/vd_search', [GiveBadgeController::class, 'validationForSearch'])->name('give_badge-vd_search');
+
+    // 検索結果取得
+    Route::post('/give_badge/search', [GiveBadgeController::class, 'search'])->name('give_badge-search');
 
 });
     //---------------------
