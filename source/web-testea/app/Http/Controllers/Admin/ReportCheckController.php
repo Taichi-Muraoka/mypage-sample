@@ -149,68 +149,68 @@ class ReportCheckController extends Controller
      */
     public function getData(Request $request)
     {
-        // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'id');
+        // // IDのバリデーション
+        // $this->validateIdsFromRequest($request, 'id');
 
-        // IDを取得
-        $id = $request->input('id');
+        // // IDを取得
+        // $id = $request->input('id');
 
-        // クエリを作成
-        $query = Report::query();
+        // // クエリを作成
+        // $query = Report::query();
 
-        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        $query->where($this->guardRoomAdminTableWithRoomCd());
+        // // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        // $query->where($this->guardRoomAdminTableWithRoomCd());
 
-        // 教室名取得のサブクエリ
-        $room_names = $this->mdlGetRoomQuery();
+        // // 教室名取得のサブクエリ
+        // $room_names = $this->mdlGetRoomQuery();
 
-        // データを取得
-        $report = $query
-            // IDを指定
-            ->where('report.report_id', $id)
-            ->select(
-                'regist_time',
-                'ext_rirekisho.name as tname',
-                'code_master.name as lesson_type_name',
-                'lesson_date',
-                'start_time',
-                'room_names.room_name_full as room_name',
-                'ext_student_kihon.name as sname',
-                'r_minutes',
-                'content',
-                'homework',
-                'teacher_comment',
-                'parents_comment'
-            )
-            // 教室名の取得
-            ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('report.roomcd', '=', 'room_names.code');
-            })
-            // 生徒名の取得
-            ->sdLeftJoin(ExtStudentKihon::class, 'report.sid', '=', 'ext_student_kihon.sid')
-            // 教師名の取得
-            ->sdLeftJoin(ExtRirekisho::class, 'report.tid', '=', 'ext_rirekisho.tid')
-            // 授業種別名の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('report.lesson_type', '=', 'code_master.code')
-                    ->where('code_master.data_type', AppConst::CODE_MASTER_8);
-            })
-            ->firstOrFail();
+        // // データを取得
+        // $report = $query
+        //     // IDを指定
+        //     ->where('report.report_id', $id)
+        //     ->select(
+        //         'regist_time',
+        //         'ext_rirekisho.name as tname',
+        //         'code_master.name as lesson_type_name',
+        //         'lesson_date',
+        //         'start_time',
+        //         'room_names.room_name_full as room_name',
+        //         'ext_student_kihon.name as sname',
+        //         'r_minutes',
+        //         'content',
+        //         'homework',
+        //         'teacher_comment',
+        //         'parents_comment'
+        //     )
+        //     // 教室名の取得
+        //     ->leftJoinSub($room_names, 'room_names', function ($join) {
+        //         $join->on('report.roomcd', '=', 'room_names.code');
+        //     })
+        //     // 生徒名の取得
+        //     ->sdLeftJoin(ExtStudentKihon::class, 'report.sid', '=', 'ext_student_kihon.sid')
+        //     // 教師名の取得
+        //     ->sdLeftJoin(ExtRirekisho::class, 'report.tid', '=', 'ext_rirekisho.tid')
+        //     // 授業種別名の取得
+        //     ->sdLeftJoin(CodeMaster::class, function ($join) {
+        //         $join->on('report.lesson_type', '=', 'code_master.code')
+        //             ->where('code_master.data_type', AppConst::CODE_MASTER_8);
+        //     })
+        //     ->firstOrFail();
 
-        return [
-            'regist_time' => $report->regist_time,
-            'tname' => $report->tname,
-            'lesson_type_name' => $report->lesson_type_name,
-            'lesson_date' => $report->lesson_date,
-            'start_time' => $report->start_time,
-            'room_name' => $report->room_name,
-            'sname' => $report->sname,
-            'r_minutes' => $report->r_minutes,
-            'content' => $report->content,
-            'homework' => $report->homework,
-            'teacher_comment' => $report->teacher_comment,
-            'parents_comment' => $report->parents_comment
-        ];
+        // return [
+        //     'regist_time' => $report->regist_time,
+        //     'tname' => $report->tname,
+        //     'lesson_type_name' => $report->lesson_type_name,
+        //     'lesson_date' => $report->lesson_date,
+        //     'start_time' => $report->start_time,
+        //     'room_name' => $report->room_name,
+        //     'sname' => $report->sname,
+        //     'r_minutes' => $report->r_minutes,
+        //     'content' => $report->content,
+        //     'homework' => $report->homework,
+        //     'teacher_comment' => $report->teacher_comment,
+        //     'parents_comment' => $report->parents_comment
+        // ];
     }
 
     /**
@@ -267,63 +267,63 @@ class ReportCheckController extends Controller
     public function edit($reportId)
     {
 
-        // IDのバリデーション
-        $this->validateIds($reportId);
+        // // IDのバリデーション
+        // $this->validateIds($reportId);
 
-        // クエリを作成
-        $query = Report::query();
+        // // クエリを作成
+        // $query = Report::query();
 
-        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        $query->where($this->guardRoomAdminTableWithRoomCd());
+        // // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        // $query->where($this->guardRoomAdminTableWithRoomCd());
 
-        // データを取得
-        $report = $query
-            // IDを指定
-            ->where('report.report_id', $reportId)
-            ->select(
-                'report_id',
-                'regist_time',
-                'lesson_type',
-                'id',
-                'id as _id', // hiddenに退避
-                'lesson_date',
-                'start_time',
-                'report.sid',
-                'report.tid',
-                'ext_rirekisho.name as tname',
-                'r_minutes',
-                'content',
-                'homework',
-                'teacher_comment',
-                'parents_comment'
-            )
-            // 教師名の取得
-            ->sdLeftJoin(ExtRirekisho::class, 'report.tid', '=', 'ext_rirekisho.tid')
-            ->firstOrFail();
+        // // データを取得
+        // $report = $query
+        //     // IDを指定
+        //     ->where('report.report_id', $reportId)
+        //     ->select(
+        //         'report_id',
+        //         'regist_time',
+        //         'lesson_type',
+        //         'id',
+        //         'id as _id', // hiddenに退避
+        //         'lesson_date',
+        //         'start_time',
+        //         'report.sid',
+        //         'report.tid',
+        //         'ext_rirekisho.name as tname',
+        //         'r_minutes',
+        //         'content',
+        //         'homework',
+        //         'teacher_comment',
+        //         'parents_comment'
+        //     )
+        //     // 教師名の取得
+        //     ->sdLeftJoin(ExtRirekisho::class, 'report.tid', '=', 'ext_rirekisho.tid')
+        //     ->firstOrFail();
 
-        if ($report->lesson_type == AppConst::CODE_MASTER_8_1) {
-            // 個別教室の場合、生徒IDをセットする
-            $report['sidKobetsu'] = $report->sid;
-            $report->sid = null;
-        }
+        // if ($report->lesson_type == AppConst::CODE_MASTER_8_1) {
+        //     // 個別教室の場合、生徒IDをセットする
+        //     $report['sidKobetsu'] = $report->sid;
+        //     $report->sid = null;
+        // }
 
-        // 教師の担当している生徒の一覧を取得(個別教室)
-        // このプルダウン自体は登録には使わず、個別教室のスケジュールのプルダウンを作成するために使用される
-        // 家庭教師以外
-        $studentsKobetsu = $this->mdlGetStudentListForT(null, $report->tid, AppConst::EXT_GENERIC_MASTER_101_900);
+        // // 教師の担当している生徒の一覧を取得(個別教室)
+        // // このプルダウン自体は登録には使わず、個別教室のスケジュールのプルダウンを作成するために使用される
+        // // 家庭教師以外
+        // $studentsKobetsu = $this->mdlGetStudentListForT(null, $report->tid, AppConst::EXT_GENERIC_MASTER_101_900);
 
-        // 家庭教師の受け持ち生徒名プルダウンメニューを作成
-        $students = $this->mdlGetStudentListForT(AppConst::EXT_GENERIC_MASTER_101_900, $report->tid);
+        // // 家庭教師の受け持ち生徒名プルダウンメニューを作成
+        // $students = $this->mdlGetStudentListForT(AppConst::EXT_GENERIC_MASTER_101_900, $report->tid);
 
-        // 授業時間数のプルダウンメニューを作成
-        $minutes = $this->getMenuOfMinutes();
+        // // 授業時間数のプルダウンメニューを作成
+        // $minutes = $this->getMenuOfMinutes();
 
         return view('pages.admin.report_check-edit', [
-            'editData' => $report,
+            'editData' => null,
             'rules' => $this->rulesForInput(null),
-            'student_kobetsu_list' => $studentsKobetsu,
-            'student_list' => $students,
-            'minutes_list' => $minutes
+            'student_kobetsu_list' => null,
+            'student_list' => null,
+            'minutes_list' => null
         ]);
     }
 
