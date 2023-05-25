@@ -1,0 +1,58 @@
+@extends('adminlte::page')
+
+@section('title', '講師退職処理')
+
+{{-- 子ページ --}}
+@section('child_page', true)
+
+@section('parent_page', route('tutor_mng-detail', 1))
+
+@section('parent_page_title', '講師情報')
+
+@section('content')
+
+{{-- formを指定 --}}
+<x-bs.card :form=true>
+
+    <p>講師退職処理を実行します。</p>
+    <x-bs.table :hover=false :vHeader=true>
+        <tr>
+            <th width="15%">講師No</th>
+            <td>101</td>
+        </tr>
+        <tr>
+            <th width="15%">講師名</th>
+            <td>CWテスト教師１０１</td>
+        </tr>
+    </x-bs.table>
+
+    {{-- 余白 --}}
+    <div class="mb-3"></div>
+
+    <x-input.text caption="退職日" id="leave_date" :editData=$editData />
+
+    <x-bs.callout title="講師退職処理の注意事項" type="danger">
+        退職処理を行うと、講師は退職日以降、システムにログインできなくなります。
+    </x-bs.callout>
+
+    {{-- hidden --}}
+    <x-input.hidden id="tid" :editData=$editData />
+
+    {{-- フッター --}}
+    <x-slot name="footer">
+        <div class="d-flex justify-content-between">
+            {{-- 講師情報に戻る --}}
+            <x-button.back url="{{route('tutor_mng-detail', 1)}}" />
+
+            <div class="d-flex justify-content-end">
+                {{-- 削除機能なし --}}
+                {{-- <x-button.submit-delete /> --}}
+                <x-button.submit-edit caption="登録" />
+            </div>
+
+        </div>
+    </x-slot>
+
+</x-bs.card>
+
+@stop

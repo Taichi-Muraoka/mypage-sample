@@ -21,37 +21,68 @@
     </x-bs.table>
     {{-- 余白 --}}
     <div class="mb-3"></div>
-    <x-input.text caption="講師名" id="name" :rules=$rules :editData=$editData/>
-    <x-input.text caption="メールアドレス" id="email" :rules=$rules :editData=$editData/>
-    <x-input.text caption="電話番号" id="tel" :rules=$rules :editData=$editData/>
-    <x-input.text caption="基本給：個別指導" id="basepay1" :rules=$rules :editData=$editData/>
-    <x-input.text caption="基本給：集団授業" id="basepay2" :rules=$rules :editData=$editData/>
-    <x-input.text caption="交通費１" id="transportation_cost1" :rules=$rules :editData=$editData/>
-    <x-input.text caption="交通費２" id="transportation_cost2" :rules=$rules :editData=$editData/>
-    <x-input.select caption="表示フラグ" id="display_flag" :select2=true :blank=false :editData=$editData>
-        <option value="1">表示</option>
-        <option value="2">非表示</option>
-    </x-input.select>
 
     @else
     {{-- 登録時 --}}
-    <p>講師の登録を行います。</p>
-    <x-input.text caption="講師名" id="name" :rules=$rules />
-    <x-input.text caption="メールアドレス" id="email" :rules=$rules />
-    <x-input.text caption="電話番号" id="tel" :rules=$rules />
-    <x-input.text caption="基本給：個別指導" id="basepay1" :rules=$rules :editData=$editData/>
-    <x-input.text caption="基本給：集団授業" id="basepay2" :rules=$rules :editData=$editData/>
-    <x-input.text caption="交通費１" id="transportation_cost1" :rules=$rules :editData=$editData/>
-    <x-input.text caption="交通費２" id="transportation_cost2" :rules=$rules :editData=$editData/>
-    <x-input.select caption="表示フラグ" id="display_flag" :select2=true :blank=false :editData=$editData>
-        <option value="1">表示</option>
-        <option value="2">非表示</option>
-    </x-input.select>
+    <p>講師の基本情報を登録します。</p>
+    @endif
 
+    {{-- 共通項目 --}}
+    <x-input.text caption="講師名" id="name" :rules=$rules />
+    <x-input.text caption="電話番号" id="tel" :rules=$rules />
+    <x-input.text caption="メールアドレス" id="email" :rules=$rules />
+    <x-input.text caption="授業時給（個別）" id="hourly_wage_p" :rules=$rules :editData=$editData/>
+    <x-input.text caption="授業時給（集団）" id="hourly_wage_g" :rules=$rules :editData=$editData/>
+    <x-input.date-picker caption="勤務開始日" id="enter_date" />
+
+    <x-bs.card>
+        <x-bs.form-title>科目選択（小）</x-bs.form-title>
+
+        <x-bs.form-group name="subject_groups_p">
+                {{-- 教科チェックボックス --}}
+                @for ($i = 0; $i < count($subjectGroup); $i++)
+                <x-input.checkbox :caption="$subjectGroup[$i]"
+                        :id="'subject_group_p' . $subjectGroup[$i]"
+                        name="subject_groups_p" :value="$subjectGroup[$i]" />
+                @endfor
+        </x-bs.form-group>
+    </x-bs.card>
+    <x-bs.card>
+        <x-bs.form-title>科目選択（中）</x-bs.form-title>
+
+        <x-bs.form-group name="subject_groups_j">
+                {{-- 教科チェックボックス --}}
+                @for ($i = 0; $i < count($subjectGroup); $i++)
+                <x-input.checkbox :caption="$subjectGroup[$i]"
+                        :id="'subject_group_j' . $subjectGroup[$i]"
+                        name="subject_groups_j" :value="$subjectGroup[$i]" />
+                @endfor
+        </x-bs.form-group>
+    </x-bs.card>
+    <x-bs.card>
+        <x-bs.form-title>科目選択（高）</x-bs.form-title>
+
+        <x-bs.form-group name="subject_groups_h">
+                {{-- 教科チェックボックス --}}
+                @for ($i = 0; $i < count($subjectGroup); $i++)
+                <x-input.checkbox :caption="$subjectGroup[$i]"
+                        :id="'subject_group_h' . $subjectGroup[$i]"
+                        name="subject_groups_h" :value="$subjectGroup[$i]" />
+                @endfor
+        </x-bs.form-group>
+    </x-bs.card>
+
+    @if (request()->routeIs('tutor_mng-edit'))
+    {{-- 編集時 講師ステータス--}}
+    <x-input.select id="tutor_status" caption="講師ステータス" :select2=false >
+        <option value="1">在籍</option>
+        <option value="2">退職処理中</option>
+        <option value="3">退職</option>
+    </x-input.select>
     @endif
 
     {{-- hidden --}}
-    <x-input.hidden id="tid" :editData=$editData />
+    <x-input.hidden id="tutor_id" :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">

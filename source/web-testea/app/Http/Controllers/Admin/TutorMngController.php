@@ -56,8 +56,12 @@ class TutorMngController extends Controller
      */
     public function index()
     {
+        // 入会状況チェックボックス
+        $statusGroup = array("在籍","退職処理中","退職");
+
         return view('pages.admin.tutor_mng', [
-            'rules' => $this->rulesForSearch()
+            'rules' => $this->rulesForSearch(),
+            'statusGroup' => $statusGroup,
         ]);
     }
 
@@ -146,34 +150,34 @@ class TutorMngController extends Controller
     public function detail($tid)
     {
 
-        // MEMO: 教室管理者でも全て見れるのでガードは不要
+        // // MEMO: 教室管理者でも全て見れるのでガードは不要
 
-        // IDのバリデーション
-        $this->validateIds($tid);
+        // // IDのバリデーション
+        // $this->validateIds($tid);
 
-        // 教師名を取得する
-        $extRirekisho = ExtRirekisho::select(
-            'tid',
-            'name',
-            // メールアドレス
-            'account.email',
-        )
-            // アカウントテーブルをLeftJOIN
-            ->sdLeftJoin(Account::class, function ($join) {
-                $join->on('ext_rirekisho.tid', '=', 'account.account_id')
-                    ->where('account.account_type', AppConst::CODE_MASTER_7_2);
-            })
-            // IDを指定
-            ->where('tid', $tid)
-            // MEMO: 取得できない場合はエラーとする
-            ->firstOrFail();
+        // // 教師名を取得する
+        // $extRirekisho = ExtRirekisho::select(
+        //     'tid',
+        //     'name',
+        //     // メールアドレス
+        //     'account.email',
+        // )
+        //     // アカウントテーブルをLeftJOIN
+        //     ->sdLeftJoin(Account::class, function ($join) {
+        //         $join->on('ext_rirekisho.tid', '=', 'account.account_id')
+        //             ->where('account.account_type', AppConst::CODE_MASTER_7_2);
+        //     })
+        //     // IDを指定
+        //     ->where('tid', $tid)
+        //     // MEMO: 取得できない場合はエラーとする
+        //     ->firstOrFail();
 
         return view('pages.admin.tutor_mng-detail', [
             // 削除用にIDを渡す
             'editData' => [
-                'tid' => $tid
+                'tid' => null
             ],
-            'extRirekisho' => $extRirekisho,
+            'extRirekisho' => null,
         ]);
     }
 
@@ -865,10 +869,14 @@ class TutorMngController extends Controller
      */
     public function new()
     {
+        // 教科グループチェックボックス
+        $subjectGroup = array("国語","数学","理科","社会","英語");
+
         // テンプレートは編集と同じ
         return view('pages.admin.tutor_mng-input', [
             'editData' => null,
-            'rules' => $this->rulesForInput(null)
+            'rules' => $this->rulesForInput(null),
+            'subjectGroup' => $subjectGroup,
         ]);
     }
 
@@ -891,6 +899,9 @@ class TutorMngController extends Controller
      */
     public function edit($tid)
     {
+        // 教科グループチェックボックス
+        $subjectGroup = array("国語","数学","理科","社会","英語");
+
         return view('pages.admin.tutor_mng-input', [
             'editData' => [
                 'name' => "教師101",
@@ -899,7 +910,8 @@ class TutorMngController extends Controller
                 'basepay' => 1400,
                 'transportation_cost' => 800,
             ],
-            'rules' => $this->rulesForInput(null)
+            'rules' => $this->rulesForInput(null),
+            'subjectGroup' => $subjectGroup,
         ]);
     }
 
@@ -939,6 +951,112 @@ class TutorMngController extends Controller
         return $rules;
     }
 
+    //==========================
+    // 退職処理
+    //==========================
+    /**
+     * 退職登録画面
+     *
+     * @return view
+     */
+    public function leaveEdit()
+    {
+
+        return view('pages.admin.tutor_mng-leave', [
+            'editData' => null,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 退職登録処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function leaveUpdate(Request $request)
+    {
+        return;
+    }
+
+    //==========================
+    // 所属登録・編集
+    //==========================
+
+    /**
+     * 登録画面
+     *
+     * @return view
+     */
+    public function campusNew()
+    {
+        return view('pages.admin.tutor_mng-campus-input', [
+            'classes' => null,
+            'editData' => null,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 登録処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function campusCreate(Request $request)
+    {
+        return;
+    }
+
+    /**
+     * 編集画面
+     *
+     * @param int $sid 生徒ID
+     * @return view
+     */
+    public function campusEdit($sid)
+    {
+        return view('pages.admin.tutor_mng-campus-input', [
+            'editData' => null,
+            'rules' => $this->rulesForInput(null)
+        ]);
+    }
+
+    /**
+     * 編集処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function campusUpdate(Request $request)
+    {
+        return;
+    }
+
+    /**
+     * バリデーション(登録用)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed バリデーション結果
+     */
+    public function campusValidationForInput(Request $request)
+    {
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForInput($request));
+        return $validator->errors();
+    }
+
+    /**
+     * バリデーションルールを取得(登録用)
+     *
+     * @return array ルール
+     */
+    private function campusRulesForInput(?Request $request)
+    {
+        $rules = array();
+
+        return $rules;
+    }
 
     //==========================
     // クラス内共通処理

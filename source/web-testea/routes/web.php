@@ -1085,6 +1085,30 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // バリデーション(登録用)（教師登録）
     Route::post('/tutor_mng/vd_input', [TutorMngController::class, 'validationForInput'])->name('tutor_mng-vd_input');
 
+    // 退職登録画面
+    Route::get('/tutor_mng/leave/edit/{tid}', [TutorMngController::class, 'leaveEdit'])->name('tutor_mng-leave-edit');
+
+    // 退職処理
+    Route::post('/tutor_mng/leave/update', [TutorMngController::class, 'leaveUpdate'])->name('tutor_mng-leave-update');
+
+    // 所属登録
+    Route::get('/tutor_mng/campus/new', [TutorMngController::class, 'campusNew'])->name('tutor_mng-campus-new');
+
+    // 所属登録処理
+    Route::post('/tutor_mng/campus/create', [TutorMngController::class, 'campusCreate'])->name('tutor_mng-campus-create');
+
+    // 所属編集
+    Route::get('/tutor_mng/campus/edit/{tid}', [TutorMngController::class, 'campusEdit'])->name('tutor_mng-campus-edit');
+
+    // 所属編集処理
+    Route::post('/tutor_mng/campus/update', [TutorMngController::class, 'campusUpdate'])->name('tutor_mng-campus-update');
+
+    // バリデーション(登録用)（所属登録）
+    Route::post('/tutor_mng/campus/vd_input', [TutorMngController::class, 'campusValidationForInput'])->name('tutor_mng-campus-vd_input');
+
+    // 所属削除処理
+    Route::post('/tutor_mng/campus/delete', [TutorMngController::class, 'campusDelete'])->name('tutor_mng-campus-delete');
+
     //---------------------
     // 教師登録
     //---------------------
