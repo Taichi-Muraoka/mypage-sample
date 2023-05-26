@@ -13,7 +13,7 @@
         <td>@{{item.name}}</td>
     </tr>
     <tr>
-        <th>管理教室</th>
+        <th>管理校舎</th>
         <td>@{{item.room_name}}</td>
     </tr>
 
