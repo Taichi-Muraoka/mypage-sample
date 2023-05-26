@@ -901,9 +901,29 @@ return [
                     'active' => ['master_mng_school*']
                 ],
                 [
+                    'text' => '指導ブースマスタ管理',
+                    'route' => 'master_mng_booth',
+                    'active' => ['master_mng_booth*']
+                ],
+                [
+                    'text' => '時間割マスタ管理',
+                    'route' => 'master_mng_timetable',
+                    'active' => ['master_mng_timetable*']
+                ],
+                [
                     'text' => '教科マスタ管理',
                     'route' => 'master_mng_subject',
                     'active' => ['master_mng_subject*']
+                ],
+                [
+                    'text' => 'コースマスタ管理',
+                    'route' => 'master_mng_course',
+                    'active' => ['master_mng_course*']
+                ],
+                [
+                    'text' => 'システムマスタ管理',
+                    'route' => 'master_mng_system',
+                    'active' => ['master_mng_system*']
                 ],
             ]
         ],

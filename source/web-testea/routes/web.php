@@ -660,6 +660,10 @@ use App\Http\Controllers\Admin\DataResetController;
 use App\Http\Controllers\Admin\ImportSchoolCodeController;
 use App\Http\Controllers\Admin\OvertimeController;
 use App\Http\Controllers\Admin\GiveBadgeController;
+use App\Http\Controllers\Admin\MasterMngBoothController;
+use App\Http\Controllers\Admin\MasterMngTimetableController;
+use App\Http\Controllers\Admin\MasterMngCourseController;
+use App\Http\Controllers\Admin\MasterMngSystemController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -1742,23 +1746,121 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 学年マスタ
     // 一覧画面
-    Route::get('/master_mng_grade', [MasterMngController::class, 'indexGrade'])->name('master_mng_grade');
+    // Route::get('/master_mng_grade', [MasterMngController::class, 'indexGrade'])->name('master_mng_grade');
 
-    // 新規登録画面
-    Route::get('/master_mng_grade/new', [MasterMngController::class, 'newGrade'])->name('master_mng_grade-new');
+    // // 新規登録画面
+    // Route::get('/master_mng_grade/new', [MasterMngController::class, 'newGrade'])->name('master_mng_grade-new');
 
-    // 新規登録処理
-    Route::post('/master_mng_grade/create', [MasterMngController::class, 'createGrade'])->name('master_mng_grade-create');
+    // // 新規登録処理
+    // Route::post('/master_mng_grade/create', [MasterMngController::class, 'createGrade'])->name('master_mng_grade-create');
 
-    // 編集画面
-    Route::get('/master_mng_grade/edit', [MasterMngController::class, 'editGrade'])->name('master_mng_grade-edit');
+    // // 編集画面
+    // Route::get('/master_mng_grade/edit', [MasterMngController::class, 'editGrade'])->name('master_mng_grade-edit');
+
+    // // 編集処理
+    // Route::post('/master_mng_grade/update', [MasterMngController::class, 'updateGrade'])->name('master_mng_grade-update');
+
+    // // 削除処理
+    // Route::post('/master_mng_grade/delete', [MasterMngController::class, 'deleteGrade'])->name('master_mng_grade-delete');
+
+    //---------------------
+    // 指導ブースマスタ モック
+    //---------------------
+    // 一覧
+    Route::get('/master_mng_booth', [MasterMngBoothController::class, 'index'])->name('master_mng_booth');
+
+    // 詳細取得用
+    Route::post('/master_mng_booth/get_data', [MasterMngBoothController::class, 'getData'])->name('master_mng_booth-get_data');
+
+    // 登録
+    Route::get('/master_mng_booth/new', [MasterMngBoothController::class, 'new'])->name('master_mng_booth-new');
+
+    // 登録処理
+    Route::post('/master_mng_booth/create', [MasterMngBoothController::class, 'create'])->name('master_mng_booth-create');
+
+    // 編集
+    Route::get('/master_mng_booth/edit/{boothId}', [MasterMngBoothController::class, 'edit'])->name('master_mng_booth-edit');
 
     // 編集処理
-    Route::post('/master_mng_grade/update', [MasterMngController::class, 'updateGrade'])->name('master_mng_grade-update');
+    Route::post('/master_mng_booth/update', [MasterMngBoothController::class, 'update'])->name('master_mng_booth-update');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng_booth/vd_input', [MasterMngBoothController::class, 'validationForInput'])->name('master_mng_booth-vd_input');
 
     // 削除処理
-    Route::post('/master_mng_grade/delete', [MasterMngController::class, 'deleteGrade'])->name('master_mng_grade-delete');
+    Route::post('/master_mng_booth/delete', [MasterMngBoothController::class, 'delete'])->name('master_mng_booth-delete');
 
+    //---------------------
+    // 時間割マスタ モック
+    //---------------------
+    // 一覧
+    Route::get('/master_mng_timetable', [MasterMngTimetableController::class, 'index'])->name('master_mng_timetable');
+
+    // 詳細取得用
+    Route::post('/master_mng_timetable/get_data', [MasterMngTimetableController::class, 'getData'])->name('master_mng_timetable-get_data');
+
+    // 登録
+    Route::get('/master_mng_timetable/new', [MasterMngTimetableController::class, 'new'])->name('master_mng_timetable-new');
+
+    // 登録処理
+    Route::post('/master_mng_timetable/create', [MasterMngTimetableController::class, 'create'])->name('master_mng_timetable-create');
+
+    // 編集
+    Route::get('/master_mng_timetable/edit/{timetableId}', [MasterMngTimetableController::class, 'edit'])->name('master_mng_timetable-edit');
+
+    // 編集処理
+    Route::post('/master_mng_timetable/update', [MasterMngTimetableController::class, 'update'])->name('master_mng_timetable-update');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng_timetable/vd_input', [MasterMngTimetableController::class, 'validationForInput'])->name('master_mng_timetable-vd_input');
+
+    // 削除処理
+    Route::post('/master_mng_timetable/delete', [MasterMngTimetableController::class, 'delete'])->name('master_mng_timetable-delete');
+
+    //---------------------
+    // コースマスタ モック
+    //---------------------
+    // 一覧
+    Route::get('/master_mng_course', [MasterMngCourseController::class, 'index'])->name('master_mng_course');
+
+    // 詳細取得用
+    Route::post('/master_mng_course/get_data', [MasterMngCourseController::class, 'getData'])->name('master_mng_course-get_data');
+
+    // 登録
+    Route::get('/master_mng_course/new', [MasterMngCourseController::class, 'new'])->name('master_mng_course-new');
+
+    // 登録処理
+    Route::post('/master_mng_course/create', [MasterMngCourseController::class, 'create'])->name('master_mng_course-create');
+
+    // 編集
+    Route::get('/master_mng_course/edit/{courseId}', [MasterMngCourseController::class, 'edit'])->name('master_mng_course-edit');
+
+    // 編集処理
+    Route::post('/master_mng_course/update', [MasterMngCourseController::class, 'update'])->name('master_mng_course-update');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng_course/vd_input', [MasterMngCourseController::class, 'validationForInput'])->name('master_mng_course-vd_input');
+
+    // 削除処理
+    Route::post('/master_mng_course/delete', [MasterMngCourseController::class, 'delete'])->name('master_mng_course-delete');
+
+    //---------------------
+    // システムマスタ モック
+    //---------------------
+    // 一覧
+    Route::get('/master_mng_system', [MasterMngSystemController::class, 'index'])->name('master_mng_system');
+
+    // 詳細取得用
+    Route::post('/master_mng_system/get_data', [MasterMngSystemController::class, 'getData'])->name('master_mng_system-get_data');
+
+    // 編集
+    Route::get('/master_mng_system/edit/{systemId}', [MasterMngSystemController::class, 'edit'])->name('master_mng_system-edit');
+
+    // 編集処理
+    Route::post('/master_mng_system/update', [MasterMngSystemController::class, 'update'])->name('master_mng_system-update');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng_system/vd_input', [MasterMngSystemController::class, 'validationForInput'])->name('master_mng_system-vd_input');
 
     //---------------------
     // 事務局アカウント管理
