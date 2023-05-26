@@ -6,7 +6,7 @@
 <x-bs.table :hover=false :vHeader=true>
 
     <tr>
-        <th>コード</th>
+        <th>科目コード</th>
         <td>001</td>
     </tr>
     <tr>
@@ -14,16 +14,12 @@
         <td>小</td>
     </tr>
     <tr>
-        <th>教科名</th>
+        <th>仕様種別</th>
+        <td>共通</td>
+    </tr>
+    <tr>
+        <th>名称</th>
         <td>国語</td>
-    </tr>
-    <tr>
-        <th>表示順</th>
-        <td>1</td>
-    </tr>
-    <tr>
-        <th>状態</th>
-        <td></td>
     </tr>
 
 </x-bs.table>

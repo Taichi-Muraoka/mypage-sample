@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', (request()->routeIs('master_mng_school-edit')) ? '校舎マスタデータ編集' : '校舎マスタデータ新規登録')
+@section('title', (request()->routeIs('master_mng_school-edit')) ? '校舎マスタデータ編集' : '校舎マスタデータ登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -23,14 +23,11 @@
     @endif
 
     {{-- 共通フォーム --}}
-    <x-input.text caption="コード" id="code" :rules=$rules :editData=$editData/>
-    <x-input.text caption="校舎名" id="name_school" :rules=$rules :editData=$editData/>
-    <x-input.text caption="校舎表示名" id="name_school_display" :rules=$rules :editData=$editData/>
-    <x-input.text caption="校舎略称" id="name_school_abbreviation" :rules=$rules :editData=$editData/>
-    <x-input.text caption="表示順" id="display_order" :rules=$rules :editData=$editData/>
-
-    {{-- hidden --}}
-    <x-input.hidden id="sid" :editData=$editData />
+    <x-input.text caption="校舎コード" id="campus_cd" :rules=$rules :editData=$editData/>
+    <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData/>
+    <x-input.text caption="表示名" id="disp_name" :rules=$rules :editData=$editData/>
+    <x-input.text caption="略称" id="short_name" :rules=$rules :editData=$editData/>
+    <x-input.text caption="表示順" id="disp_order" :rules=$rules :editData=$editData/>
 
     {{-- フッター --}}
     <x-slot name="footer">

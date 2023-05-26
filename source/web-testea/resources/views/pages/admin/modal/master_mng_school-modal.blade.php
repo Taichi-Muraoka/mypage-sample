@@ -6,28 +6,24 @@
 <x-bs.table :hover=false :vHeader=true>
 
     <tr>
-        <th>コード</th>
+        <th>校舎コード</th>
         <td>110</td>
     </tr>
     <tr>
-        <th>校舎名称</th>
+        <th>名称</th>
         <td>久我山校</td>
     </tr>
     <tr>
-        <th>校舎表示名称</th>
+        <th>表示名</th>
         <td>久我山</td>
     </tr>
     <tr>
-        <th>校舎略称</th>
+        <th>略称</th>
         <td>久</td>
     </tr>
     <tr>
         <th>表示順</th>
         <td>20</td>
-    </tr>
-    <tr>
-        <th>状態</th>
-        <td></td>
     </tr>
 
 </x-bs.table>

@@ -905,11 +905,6 @@ return [
                     'route' => 'master_mng_subject',
                     'active' => ['master_mng_subject*']
                 ],
-                [
-                    'text' => '学年マスタ管理',
-                    'route' => 'master_mng_grade',
-                    'active' => ['master_mng_grade*']
-                ],
             ]
         ],
         [
