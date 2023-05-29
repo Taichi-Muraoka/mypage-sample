@@ -43,7 +43,7 @@
                     <th width="25%">偏差値</th>
                 </x-slot>
 
-                <tr v-for="" v-cloak>
+                <tr>
                     <x-bs.td-sp>国語</x-bs.td-sp>
                     <x-bs.td-sp>80点</x-bs.td-sp>
                     <x-bs.td-sp></x-bs.td-sp>
@@ -121,30 +121,30 @@
                     <th width="30%">学年平均</th>
                 </x-slot>
 
-                <tr v-for="" v-cloak>
+                <tr>
                     <x-bs.td-sp>国語</x-bs.td-sp>
                     <x-bs.td-sp>80点</x-bs.td-sp>
-                    <x-bs.td-sp>62</x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>数学</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
-                    <x-bs.td-sp>62</x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>理科</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
-                    <x-bs.td-sp>62</x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>社会</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
-                    <x-bs.td-sp>62</x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>英語</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
-                    <x-bs.td-sp>62</x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                 </tr>
             </x-bs.table>
         </td>
@@ -176,10 +176,6 @@
         <th>学期</th>
         <td>１学期</td>
     </tr>
-    <tr>
-        <th>評定値計（内申点）</th>
-        <td>25</td>
-    </tr>
 
     <tr>
         <th colspan="2">成績</th>
@@ -193,7 +189,7 @@
                     <th width="50%">評定値</th>
                 </x-slot>
 
-                <tr v-for="" v-cloak>
+                <tr>
                     <x-bs.td-sp>国語</x-bs.td-sp>
                     <x-bs.td-sp>5</x-bs.td-sp>
                 </tr>

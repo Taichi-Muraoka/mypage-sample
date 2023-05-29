@@ -41,7 +41,6 @@
 
     <x-input.text caption="合計点" id="total" vShow="form.exam_type != 3"/>
     <x-input.text caption="偏差値" id="total_deviation" vShow="form.exam_type == 1"/>
-    <x-input.text caption="評定値計（内申点）" id="total_grade" vShow="form.exam_type == 3"/>
 
     {{-- 余白 --}}
     <div class="mb-4"></div>
@@ -51,8 +50,8 @@
     {{-- hidden --}}
     <x-input.hidden id="grades_id" :editData=$editData />
 
-    {{-- テーブル --}}
-    <x-bs.table :bordered=false :hover=false :smartPhone=true class="mb-small"  vShow="form.exam_type != 3">
+    {{-- テーブル（模試入力用） --}}
+    <x-bs.table :bordered=false :hover=false :smartPhone=true class="mb-small"  vShow="form.exam_type == 1">
         <x-slot name="thead">
             <td>教科</td>
             <td>得点</td>
@@ -80,6 +79,35 @@
 
             <x-bs.td-sp caption="偏差値">
                 <x-input.text id="deviation_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
+            </x-bs.td-sp>
+            </tr>
+            @endfor
+    </x-bs.table>
+
+    {{-- テーブル（定期考査入力用 --}}
+    <x-bs.table :bordered=false :hover=false :smartPhone=true class="mb-small"  vShow="form.exam_type == 2">
+        <x-slot name="thead">
+            <td>教科</td>
+            <td>得点</td>
+            <td>学年平均</td>
+        </x-slot>
+
+        @for ($i = 0; $i < 10; $i++) <tr v-cloak>
+            {{-- hidden --}}
+            <x-input.hidden id="grades_seq_{{$i}}" :editData=$editDataDtls[$i] />
+
+            <x-bs.td-sp caption="教科">
+                {{-- プルダウンselect2 --}}
+                <x-input.select id="curriculumcd_{{$i}}" :select2=true
+                    :mastrData=$curriculums :rules=$rules :editData=$editDataDtls[$i] />
+            </x-bs.td-sp>
+
+            <x-bs.td-sp caption="得点">
+                <x-input.text id="score_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
+            </x-bs.td-sp>
+
+            <x-bs.td-sp caption="学年平均" class="not-center">
+                <x-input.text id="average_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
             </x-bs.td-sp>
             </tr>
             @endfor
