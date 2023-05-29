@@ -42,8 +42,12 @@ class GradeExampleController extends Controller
      */
     public function index()
     {
-        // 学年グループチェックボックス
-        $noticeGroup = array("小1","小2","小3","小4","小5","小6","中1","中2","中3","高1","高2","高3");
+        // 小学校グループチェックボックス
+        $noticeGroup_p = array("小1","小2","小3","小4","小5","小6");
+        // 中学校グループチェックボックス
+        $noticeGroup_j = array("中1","中2","中3");
+        // 高校グループチェックボックス
+        $noticeGroup_h = array("高1","高2","高3");
 
         // 教科グループチェックボックス
         $subjectGroup = array("国語","数学","理科","社会","英語");
@@ -51,7 +55,9 @@ class GradeExampleController extends Controller
         return view('pages.admin.grade_example', [
             'rules' => $this->rulesForSearch(),
             'editData' => null,
-            'noticeGroup' => $noticeGroup,
+            'noticeGroup_p' => $noticeGroup_p,
+            'noticeGroup_j' => $noticeGroup_j,
+            'noticeGroup_h' => $noticeGroup_h,
             'subjectGroup' => $subjectGroup,
         ]);
     }
