@@ -67,6 +67,12 @@
                 <option value="5">英語</option>
             </x-input.select>
         </x-bs.col2>
+        <x-bs.col2>
+            <x-input.select caption="報告書有無" id="report" :select2=true :select2Search=false>
+                <option value="1">有</option>
+                <option value="2">無</option>
+            </x-input.select>
+        </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
@@ -96,6 +102,7 @@
             <th>教科</th>
             <th>授業種別</th>
             <th>出欠ステータス</th>
+            <th>授業報告書</th>
             <th></th>
         </x-slot>
 
@@ -110,6 +117,7 @@
             <td>英語</td>
             <td>追加</td>
             <td>実施前</td>
+            <td>〇</td>
             <td>
                 <x-button.list-dtl />
             </td>
@@ -124,6 +132,7 @@
             <td>数学</td>
             <td>通常</td>
             <td>実施前</td>
+            <td>✕</td>
             <td>
                 <x-button.list-dtl />
             </td>
@@ -138,6 +147,7 @@
             <td>理科</td>
             <td>体験授業１回目</td>
             <td>当日欠席（講師出勤あり）</td>
+            <td>〇</td>
             <td>
                 <x-button.list-dtl />
             </td>
@@ -152,6 +162,7 @@
             <td>社会</td>
             <td>通常</td>
             <td>後日振替（振替日未定）</td>
+            <td>〇</td>
             <td>
                 <x-button.list-dtl />
             </td>
@@ -166,6 +177,7 @@
             <td>英語</td>
             <td>振替</td>
             <td>出席</td>
+            <td>〇</td>
             <td>
                 <x-button.list-dtl />
             </td>

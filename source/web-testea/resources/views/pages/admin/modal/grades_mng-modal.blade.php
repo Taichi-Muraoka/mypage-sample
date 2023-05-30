@@ -3,7 +3,7 @@
 @section('modal-body')
 
 {{-- 模試 --}}
-<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true vShow="id == 1">
+<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true vShow="item.id == 1">
     <tr>
         <th width="35%">登録日</th>
         <td>2023/03/18</td>
@@ -19,14 +19,6 @@
     <tr>
         <th>試験名</th>
         <td>全国統一模試</td>
-    </tr>
-    <tr>
-        <th>合計点</th>
-        <td>380</td>
-    </tr>
-    <tr>
-        <th>偏差値</th>
-        <td>62</td>
     </tr>
 
     <tr>
@@ -44,6 +36,12 @@
                 </x-slot>
 
                 <tr>
+                    <x-bs.td-sp>全教科合計</x-bs.td-sp>
+                    <x-bs.td-sp>380点</x-bs.td-sp>
+                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>62</x-bs.td-sp>
+                </tr>
+                <tr>
                     <x-bs.td-sp>国語</x-bs.td-sp>
                     <x-bs.td-sp>80点</x-bs.td-sp>
                     <x-bs.td-sp></x-bs.td-sp>
@@ -78,7 +76,7 @@
     </tr>
 
     <tr>
-        <th colspan="2">次回の試験に向けての抱負</th>
+        <th colspan="2">次回に向けての抱負</th>
     </tr>
     {{-- nl2br: 改行 --}}
     <td colspan="2" class="nl2br">次回もがんばります</td>
@@ -86,7 +84,7 @@
 
 
 {{-- 定期考査 --}}
-<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true>
+<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true vShow="item.id == 2">
     <tr>
         <th width="35%">登録日</th>
         <td>2023/04/10</td>
@@ -103,10 +101,6 @@
         <th>試験名</th>
         <td>１学期中間考査</td>
     </tr>
-    <tr>
-        <th>合計点</th>
-        <td>380</td>
-    </tr>
 
     <tr>
         <th colspan="2">成績</th>
@@ -121,6 +115,11 @@
                     <th width="30%">学年平均</th>
                 </x-slot>
 
+                <tr>
+                    <x-bs.td-sp>全教科合計</x-bs.td-sp>
+                    <x-bs.td-sp>380点</x-bs.td-sp>
+                    <x-bs.td-sp>250点</x-bs.td-sp>
+                </tr>
                 <tr>
                     <x-bs.td-sp>国語</x-bs.td-sp>
                     <x-bs.td-sp>80点</x-bs.td-sp>
@@ -151,7 +150,7 @@
     </tr>
 
     <tr>
-        <th colspan="2">次回の試験に向けての抱負</th>
+        <th colspan="2">次回に向けての抱負</th>
     </tr>
     {{-- nl2br: 改行 --}}
     <td colspan="2" class="nl2br">次回もがんばります</td>
@@ -159,7 +158,7 @@
 
 
 {{-- 評定 --}}
-<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true vShow="id == 3">
+<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true vShow="item.id == 3">
     <tr>
         <th width="35%">登録日</th>
         <td>2023/07/21</td>
@@ -214,7 +213,7 @@
     </tr>
 
     <tr>
-        <th colspan="2">次回の試験に向けての抱負</th>
+        <th colspan="2">次回に向けての抱負</th>
     </tr>
     {{-- nl2br: 改行 --}}
     <td colspan="2" class="nl2br">次回もがんばります</td>

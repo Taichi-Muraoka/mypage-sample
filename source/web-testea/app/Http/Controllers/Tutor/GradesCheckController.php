@@ -159,6 +159,11 @@ class GradesCheckController extends Controller
      */
     public function getData(Request $request)
     {
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request, 'id');
+
+        return ['id' => $request->id];
+
     //==========================
     // 本番用処理
     //==========================
