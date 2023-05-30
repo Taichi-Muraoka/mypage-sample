@@ -28,6 +28,7 @@
         <option value="2">1学期末考査</option>
         <option value="3">2学期中間考査</option>
         <option value="4">2学期末考査</option>
+        <option value="5">3学期末考査</option>
     </x-input.select>
 
     {{-- 通信票評定 --}}
@@ -38,9 +39,6 @@
         <option value="3">3学期</option>
         <option value="4">学年</option>
     </x-input.select>
-
-    <x-input.text caption="合計点" id="total" vShow="form.exam_type != 3"/>
-    <x-input.text caption="偏差値" id="total_deviation" vShow="form.exam_type == 1"/>
 
     {{-- 余白 --}}
     <div class="mb-4"></div>
@@ -58,6 +56,24 @@
             <td>学年平均</td>
             <td>偏差値</td>
         </x-slot>
+
+        <tr v-cloak>
+            <x-bs.td-sp caption="教科">
+                全教科合計
+            </x-bs.td-sp>
+
+            <x-bs.td-sp caption="得点">
+                <x-input.text id="total_score"  :rules=$rules />
+            </x-bs.td-sp>
+
+            <x-bs.td-sp caption="学年平均" class="not-center">
+                <x-input.text id="total_average"  :rules=$rules />
+            </x-bs.td-sp>
+
+            <x-bs.td-sp caption="偏差値" vShow="form.exam_type == 1">
+                <x-input.text id="total_deviation"  :rules=$rules />
+            </x-bs.td-sp>
+        </tr>
 
         @for ($i = 0; $i < 10; $i++) <tr v-cloak>
             {{-- hidden --}}
@@ -81,7 +97,7 @@
                 <x-input.text id="deviation_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
             </x-bs.td-sp>
             </tr>
-            @endfor
+        @endfor
     </x-bs.table>
 
     {{-- テーブル（定期考査入力用 --}}
@@ -91,6 +107,20 @@
             <td>得点</td>
             <td>学年平均</td>
         </x-slot>
+
+        <tr v-cloak>
+            <x-bs.td-sp caption="教科">
+                全教科合計
+            </x-bs.td-sp>
+
+            <x-bs.td-sp caption="得点">
+                <x-input.text id="total_score"  :rules=$rules />
+            </x-bs.td-sp>
+
+            <x-bs.td-sp caption="学年平均" class="not-center">
+                <x-input.text id="total_average"  :rules=$rules />
+            </x-bs.td-sp>
+        </tr>
 
         @for ($i = 0; $i < 10; $i++) <tr v-cloak>
             {{-- hidden --}}
@@ -135,7 +165,7 @@
             </x-bs.td-sp>
 
             </tr>
-            @endfor
+        @endfor
     </x-bs.table>
 
     <x-input.textarea caption="次回に向けての抱負" id="student_comment" :editData=$editData :rules=$rules />

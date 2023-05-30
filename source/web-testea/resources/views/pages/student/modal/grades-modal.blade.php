@@ -16,14 +16,6 @@
         <th>試験名</th>
         <td>全国統一模試</td>
     </tr>
-    <tr>
-        <th>合計点</th>
-        <td>380</td>
-    </tr>
-    <tr>
-        <th>偏差値</th>
-        <td>62</td>
-    </tr>
 
     <tr>
         <th colspan="2">成績</th>
@@ -39,6 +31,12 @@
                     <th width="25%">偏差値</th>
                 </x-slot>
 
+                <tr>
+                    <x-bs.td-sp>全教科合計</x-bs.td-sp>
+                    <x-bs.td-sp>380点</x-bs.td-sp>
+                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>62</x-bs.td-sp>
+                </tr>
                 <tr>
                     <x-bs.td-sp>国語</x-bs.td-sp>
                     <x-bs.td-sp>80点</x-bs.td-sp>
@@ -99,10 +97,6 @@
         <th>試験名</th>
         <td>１学期中間考査</td>
     </tr>
-    <tr>
-        <th>合計点</th>
-        <td>380</td>
-    </tr>
 
     <tr>
         <th colspan="2">成績</th>
@@ -117,6 +111,11 @@
                     <th width="30%">学年平均</th>
                 </x-slot>
 
+                <tr>
+                    <x-bs.td-sp>全教科合計</x-bs.td-sp>
+                    <x-bs.td-sp>380点</x-bs.td-sp>
+                    <x-bs.td-sp>250点</x-bs.td-sp>
+                </tr>
                 <tr>
                     <x-bs.td-sp>国語</x-bs.td-sp>
                     <x-bs.td-sp>80点</x-bs.td-sp>
