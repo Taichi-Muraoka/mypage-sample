@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '講師授業数集計')
+@section('title', '講師授業集計')
 
 @section('content')
 
@@ -28,11 +28,11 @@
         <x-slot name="thead">
             <th width="10%">講師ID</th>
             <th width="20%">講師名</th>
-            <th width="10%">授業数</th>
-            <th width="10%">代講（受）</th>
-            <th width="10%">緊急代講（受）</th>
-            <th width="10%">代講（出）</th>
-            <th width="10%">緊急代講（出）</th>
+            <th width="10%">実施授業時間（分）</th>
+            <th width="10%">代講授業数（受）</th>
+            <th width="10%">緊急代講授業数（受）</th>
+            <th width="10%">代講授業数（出）</th>
+            <th width="10%">緊急代講授業数（出）</th>
             <th width="10%">初回授業数</th>
             <th></th>
         </x-slot>
@@ -41,12 +41,12 @@
         <tr>
             <td>100101</td>
             <td>CWテスト教師１０１</td>
-            <td>22</td>
-            <td>0</td>
-            <td>1</td>
-            <td>1</td>
-            <td>0</td>
-            <td>2</td>
+            <td class="t-price">1,980</td>
+            <td class="t-price">0</td>
+            <td class="t-price">1</td>
+            <td class="t-price">1</td>
+            <td class="t-price">0</td>
+            <td class="t-price">2</td>
             <td>
                 <x-button.list-dtl />
             </td>
@@ -54,12 +54,12 @@
         <tr>
             <td>100102</td>
             <td>CWテスト教師１０２</td>
-            <td>12</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
+            <td class="t-price">1,080</td>
+            <td class="t-price">0</td>
+            <td class="t-price">0</td>
+            <td class="t-price">0</td>
+            <td class="t-price">0</td>
+            <td class="t-price">0</td>
             <td>
                 <x-button.list-dtl  disabled/>
             </td>
