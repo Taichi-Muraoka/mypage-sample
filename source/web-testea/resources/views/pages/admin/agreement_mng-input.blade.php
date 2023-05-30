@@ -34,16 +34,44 @@
         <option value="2">集団</option>
     </x-input.select>
 
-    <x-input.text caption="契約コース名" id="course_name" :rules=$rules :editData=$editData/>
+    <x-input.select caption="契約コース名" id="course_name" :select2=true vShow="form.lesson_kind == 1">
+        <option value="1">個別指導 中学生コース（受験準備学年）</option>
+    </x-input.select>
+    <x-input.select caption="契約コース名" id="course_name" :select2=true vShow="form.lesson_kind == 2">
+        <option value="2">集団授業 中学生 英語・数学総復習パック</option>
+    </x-input.select>
 
     <x-input.date-picker caption="契約開始日" id="start_date" :editData=$editData />
     <x-input.date-picker caption="契約終了日" id="end_date" :editData=$editData />
 
-    <x-input.text caption="単価" id="unit_tuition" :rules=$rules :editData=$editData/>
-
-    <x-input.text caption="回数" id="count" :rules=$rules :editData=$editData/>
-
-    <x-input.text caption="金額（月額）" id="tuition" :rules=$rules :editData=$editData/>
+    <x-bs.table vShow="form.course_name == 1" :hover=false :vHeader=true>
+        <tr>
+            <th>単価</th>
+            <td>8,470</td>
+        </tr>
+        <tr>
+            <th>回数</th>
+            <td>4</td>
+        </tr>
+        <tr>
+            <th>金額</th>
+            <td>33,880</td>
+        </tr>
+    </x-bs.table>
+    <x-bs.table vShow="form.course_name == 2" :hover=false :vHeader=true>
+        <tr>
+            <th>単価</th>
+            <td>5,000</td>
+        </tr>
+        <tr>
+            <th>回数</th>
+            <td>10</td>
+        </tr>
+        <tr>
+            <th>金額</th>
+            <td>50,000</td>
+        </tr>
+    </x-bs.table>
 
     {{-- hidden --}}
     <x-input.hidden id="karte_id" :editData=$editData />
