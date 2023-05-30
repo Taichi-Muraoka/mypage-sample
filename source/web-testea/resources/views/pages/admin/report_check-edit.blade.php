@@ -46,13 +46,57 @@
 
     <x-bs.card>
         <x-bs.form-title>授業内容</x-bs.form-title>
-        <x-input.text caption="教材１" id="lesson_text1" :rules=$rules :editData=$editData />
+        <x-bs.row>
+            <x-bs.col3>
+                <x-input.select caption="教材１" id="lesson_text1" :select2=true  :editData=$editData>
+                    <option value="1">数学ドリル基本</option>
+                    <option value="2">数学ドリル発展</option>
+                    <option value="3">数学ドリル演習</option>
+                </x-input.select>
+            </x-bs.col3>
 
-        <x-input.text caption="単元１" id="lesson_unit1" :rules=$rules :editData=$editData />
+                <x-bs.form-title></x-bs.form-title>
+                <p class="edit-disp-indent">／　</p>
 
-        <x-input.text caption="教材２" id="lesson_text2" :rules=$rules :editData=$editData />
+                <x-input.text caption="ページ" id="lesson_page1" :rules=$rules :editData=$editData />
 
-        <x-input.text caption="単元２" id="lesson_unit2" :rules=$rules :editData=$editData />
+                <x-bs.form-title></x-bs.form-title>
+                <p class="edit-disp-indent">／　</p>
+
+            <x-bs.col3>
+                <x-input.select caption="単元１" id="lesson_unit1" :select2=true  :editData=$editData>
+                    <option value="1">正負の数</option>
+                    <option value="2">比例</option>
+                    <option value="3">連立方程式</option>
+                </x-input.select>
+            </x-bs.col3>
+        </x-bs.row>
+
+        <x-bs.row>
+            <x-bs.col3>
+                <x-input.select caption="教材２" id="lesson_text2" :select2=true  :editData=$editData>
+                    <option value="1">数学ドリル基本</option>
+                    <option value="2">数学ドリル発展</option>
+                    <option value="3">数学ドリル演習</option>
+                </x-input.select>
+            </x-bs.col3>
+
+                <x-bs.form-title></x-bs.form-title>
+                <p class="edit-disp-indent">／　</p>
+
+                <x-input.text caption="ページ" id="lesson_page2" :rules=$rules :editData=$editData />
+
+                <x-bs.form-title></x-bs.form-title>
+                <p class="edit-disp-indent">／　</p>
+
+            <x-bs.col3>
+                <x-input.select caption="単元２" id="lesson_unit2" :select2=true  :editData=$editData>
+                    <option value="1">正負の数</option>
+                    <option value="2">比例</option>
+                    <option value="3">連立方程式</option>
+                </x-input.select>
+            </x-bs.col3>
+        </x-bs.row>
     </x-bs.card>
 
     <x-bs.card>
@@ -80,13 +124,57 @@
 
     <x-bs.card>
         <x-bs.form-title>宿題</x-bs.form-title>
-        <x-input.text caption="教材１" id="homework_text1" :rules=$rules :editData=$editData />
+        <x-bs.row>
+            <x-bs.col3>
+                <x-input.select caption="教材１" id="homework_text1" :select2=true  :editData=$editData>
+                    <option value="1">数学ドリル基本</option>
+                    <option value="2">数学ドリル発展</option>
+                    <option value="3">数学ドリル演習</option>
+                </x-input.select>
+            </x-bs.col3>
 
-        <x-input.text caption="単元１" id="homework_unit1" :rules=$rules :editData=$editData />
+                <x-bs.form-title></x-bs.form-title>
+                <p class="edit-disp-indent">／　</p>
 
-        <x-input.text caption="教材２" id="homework_text2" :rules=$rules :editData=$editData />
+                <x-input.text caption="ページ" id="homework_page1" :rules=$rules :editData=$editData />
 
-        <x-input.text caption="単元２" id="homework_unit2" :rules=$rules :editData=$editData />
+                <x-bs.form-title></x-bs.form-title>
+                <p class="edit-disp-indent">／　</p>
+
+            <x-bs.col3>
+                <x-input.select caption="単元１" id="homework_unit1" :select2=true  :editData=$editData>
+                    <option value="1">正負の数</option>
+                    <option value="2">比例</option>
+                    <option value="3">連立方程式</option>
+                </x-input.select>
+            </x-bs.col3>
+        </x-bs.row>
+
+        <x-bs.row>
+            <x-bs.col3>
+                <x-input.select caption="教材２" id="homework_text2" :select2=true  :editData=$editData>
+                    <option value="1">数学ドリル基本</option>
+                    <option value="2">数学ドリル発展</option>
+                    <option value="3">数学ドリル演習</option>
+                </x-input.select>
+            </x-bs.col3>
+
+                <x-bs.form-title></x-bs.form-title>
+                <p class="edit-disp-indent">／　</p>
+
+                <x-input.text caption="ページ" id="homework_page2" :rules=$rules :editData=$editData />
+
+                <x-bs.form-title></x-bs.form-title>
+                <p class="edit-disp-indent">／　</p>
+
+            <x-bs.col3>
+                <x-input.select caption="単元２" id="homework_unit2" :select2=true  :editData=$editData>
+                    <option value="1">正負の数</option>
+                    <option value="2">比例</option>
+                    <option value="3">連立方程式</option>
+                </x-input.select>
+            </x-bs.col3>
+        </x-bs.row>
     </x-bs.card>
 
     {{-- 余白 --}}
