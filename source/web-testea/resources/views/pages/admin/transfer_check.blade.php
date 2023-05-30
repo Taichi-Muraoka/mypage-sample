@@ -52,7 +52,7 @@
 
     {{-- カードヘッダ右 --}}
     <x-slot name="tools">
-        <x-button.new href="{{ route('transfer_check-new') }}" :small=true />
+        <x-button.new href="{{ route('transfer_check-new') }}" :small=true caption="振替授業登録" />
     </x-slot>
 
     {{-- テーブル --}}
@@ -83,7 +83,8 @@
             <td>承認</td>
             <td>
                 <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('transfer_check-edit', 1) }}"/>
+                <x-button.list-edit href="{{ route('transfer_check-edit', 1) }}" disabled />
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval" disabled />
             </td>
         </tr>
         <tr>
@@ -98,6 +99,7 @@
             <td>
                 <x-button.list-dtl />
                 <x-button.list-edit href="{{ route('transfer_check-edit', 1) }}"/>
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval" disabled />
             </td>
         </tr>
         <tr>

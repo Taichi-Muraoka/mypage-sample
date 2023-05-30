@@ -56,7 +56,7 @@
             <option value="8">8限</option>
         </x-input.select>
 
-        <x-input.time-picker caption="開始時刻" id="start_time1" :rules=$rules />
+        <x-input.time-picker caption="開始時刻（変更する場合）" id="start_time1" :rules=$rules />
 
     </x-bs.card>
 
@@ -68,7 +68,7 @@
     <x-input.textarea caption="振替理由" id="transfer_reason" :rules=$rules />
 
     <x-bs.callout title="登録の際の注意事項" type="warning">
-        入力した振替日時で授業スケジュールが登録されます。<br>
+        入力した振替授業のスケジュールが登録されます。<br>
         対象の生徒・講師へお知らせが通知されます。
     </x-bs.callout>
 

@@ -4,14 +4,19 @@
 
 {{-- 
   editData: 編集用のデータ
+  vShow: Vue.jsのv-show
 --}}
 
-@props(['caption' => '', 'id' => '', 'editData' => []])
+@props(['caption' => '', 'id' => '', 'editData' => [], 'vShow' => ''])
 
 {{-- バリデーションエラー時のスクロール先 --}}
 <span class="form-validation" data-id="{{ $id }}"></span>
 
-<div class="form-group">
+<div class="form-group"
+  {{-- v-show --}}
+  @if ($vShow)
+  v-show="{{ $vShow }}"
+  @endif>
 
   {{-- ラベル --}}
   @if (!empty($caption))

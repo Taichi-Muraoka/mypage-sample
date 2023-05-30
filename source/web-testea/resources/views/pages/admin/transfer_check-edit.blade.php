@@ -13,7 +13,8 @@
     {{-- hidden --}}
     <x-input.hidden id="transfer_apply_id" :editData=$editData />
 
-    <p>以下の振替スケジュールについて変更を行います。</p>
+    <p>以下の振替調整依頼について、振替または代講スケジュールを登録します。</p>
+    <p>（管理者が振替を承認しない場合や、生徒－講師間で調整が難しい場合）</p>
 
     <x-bs.table :hover=false :vHeader=true>
         <tr>
@@ -61,28 +62,45 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.date-picker caption="振替日" id="transfer_date1" />
+    <x-bs.card>
+        {{-- 振替授業・代講授業の選択 --}}
+        <x-bs.form-group>
+            <x-input.radio caption="振替授業" id="transfer_type-1" name="transfer_type" value="1" :checked=true :editData=$editData />
+            <x-input.radio caption="代講授業" id="transfer_type-2" name="transfer_type" value="2" :editData=$editData />
+        </x-bs.form-group>
+        {{-- 余白 --}}
+        <div class="mb-3"></div>
 
-    <x-input.select caption="時限" id="period1" :select2=true :select2Search=false :editData=$editData>
-        <option value="1">1限</option>
-        <option value="2">2限</option>
-        <option value="3">3限</option>
-        <option value="4">4限</option>
-        <option value="5">5限</option>
-        <option value="6">6限</option>
-        <option value="7">7限</option>
-        <option value="8">8限</option>
-    </x-input.select>
+        {{-- 振替授業の場合 --}}
+        <x-input.date-picker caption="振替日" id="transfer_date" vShow="form.transfer_type == 1" />
 
-    <x-input.time-picker caption="開始時刻" id="start_time1" :rules=$rules />
+        <x-input.select caption="時限" id="period" :select2=true :select2Search=false :editData=$editData vShow="form.transfer_type == 1">
+            <option value="1">1限</option>
+            <option value="2">2限</option>
+            <option value="3">3限</option>
+            <option value="4">4限</option>
+            <option value="5">5限</option>
+            <option value="6">6限</option>
+            <option value="7">7限</option>
+        </x-input.select>
 
-    <x-input.select caption="講師名（変更する場合）" id="new_tid" :select2=true :editData="$editData">
-        <option value="1">CWテスト教師１</option>
-        <option value="2">CWテスト教師２</option>
-    </x-input.select>
+        <x-input.time-picker caption="開始時刻（変更する場合）" id="start_time" :rules=$rules vShow="form.transfer_type == 1"/>
+
+        <x-input.select caption="講師名（変更する場合）" id="new_tid" :select2=true :editData="$editData" vShow="form.transfer_type == 1">
+            <option value="1">CWテスト教師１</option>
+            <option value="2">CWテスト教師２</option>
+        </x-input.select>
+
+        {{-- 代講授業の場合 --}}
+        <x-input.select caption="代講講師名" id="daiko_tid" :select2=true :editData="$editData"  vShow="form.transfer_type == 2">
+            <option value="1">CWテスト教師１</option>
+            <option value="2">CWテスト教師２</option>
+        </x-input.select>
+
+    </x-bs.card>
 
     <x-bs.callout title="登録の際の注意事項" type="warning">
-        入力した振替日時で授業スケジュールが登録・更新されます。<br>
+        入力した振替授業または代講授業のスケジュールが登録・更新されます。<br>
         対象の生徒・講師へお知らせが通知されます。
     </x-bs.callout>
 
