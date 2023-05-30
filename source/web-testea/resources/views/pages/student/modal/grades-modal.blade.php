@@ -3,10 +3,10 @@
 @section('modal-body')
 
 {{-- 模試 --}}
-<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true vShow="id == 1">
+<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true vShow="item.id == 2">
     <tr>
         <th width="35%">登録日</th>
-        <td>2023/03/18</td>
+        <td>2023/03/28</td>
     </tr>
     <tr>
         <th>種別</th>
@@ -80,10 +80,10 @@
 
 
 {{-- 定期考査 --}}
-<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true>
+<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true  vShow="item.id == 1">
     <tr>
         <th width="35%">登録日</th>
-        <td>2023/04/10</td>
+        <td>2023/05/15</td>
     </tr>
     <tr>
         <th>生徒名</th>
@@ -154,7 +154,7 @@
 
 
 {{-- 評定 --}}
-<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true vShow="id == 3">
+<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true vShow="item.id == 3">
     <tr>
         <th width="35%">登録日</th>
         <td>2023/07/21</td>
@@ -169,7 +169,7 @@
     </tr>
     <tr>
         <th>学期</th>
-        <td>１学期</td>
+        <td>2学期</td>
     </tr>
 
     <tr>

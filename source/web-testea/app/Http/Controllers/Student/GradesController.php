@@ -107,52 +107,53 @@ class GradesController extends Controller
         $this->validateIdsFromRequest($request, 'id');
 
         // IDを取得
-        $id = $request->input('id');
+        //$id = $request->input('id');
 
         // クエリを作成
-        $query = Grades::query();
+        //$query = Grades::query();
 
         // データを取得（生徒成績）
-        $grades = $query
-            // IDを指定
-            ->where('grades.grades_id', $id)
-            // 自分の生徒IDのみにガードを掛ける
-            ->where($this->guardStudentTableWithSid())
-            // データを取得
-            ->select(
-                'code_master_9.name as type_name',
-                'code_master.name as teiki_name',
-                'ext_trial_master.name as moshi_name',
-                'student_comment'
-            )
-            // 試験種別名の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('grades.exam_type', '=', 'code_master_9.code')
-                    ->where('code_master_9.data_type', AppConst::CODE_MASTER_9);
-            }, 'code_master_9')
-            // 定期試験名の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('grades.exam_id', '=', 'code_master.code')
-                    ->where('code_master.data_type', AppConst::CODE_MASTER_10)
-                    ->where('grades.exam_type', AppConst::CODE_MASTER_9_2);
-            })
-            // 模擬試験名の取得
-            ->sdLeftJoin(ExtTrialMaster::class, function ($join) {
-                $join->on('grades.exam_id', '=', 'ext_trial_master.tmid')
-                    ->where('grades.exam_type', AppConst::CODE_MASTER_9_1);
-            })
-            // MEMO: 取得できない場合はエラーとする
-            ->firstOrFail();
+        //$grades = $query
+        //    // IDを指定
+        //    ->where('grades.grades_id', $id)
+        //    // 自分の生徒IDのみにガードを掛ける
+        //    ->where($this->guardStudentTableWithSid())
+        //    // データを取得
+        //    ->select(
+        //        'code_master_9.name as type_name',
+        //        'code_master.name as teiki_name',
+        //        'ext_trial_master.name as moshi_name',
+        //        'student_comment'
+        //    )
+        //    // 試験種別名の取得
+        //    ->sdLeftJoin(CodeMaster::class, function ($join) {
+        //        $join->on('grades.exam_type', '=', 'code_master_9.code')
+        //            ->where('code_master_9.data_type', AppConst::CODE_MASTER_9);
+        //    }, 'code_master_9')
+        //    // 定期試験名の取得
+        //    ->sdLeftJoin(CodeMaster::class, function ($join) {
+        //        $join->on('grades.exam_id', '=', 'code_master.code')
+        //            ->where('code_master.data_type', AppConst::CODE_MASTER_10)
+        //            ->where('grades.exam_type', AppConst::CODE_MASTER_9_2);
+        //    })
+        //    // 模擬試験名の取得
+        //    ->sdLeftJoin(ExtTrialMaster::class, function ($join) {
+        //        $join->on('grades.exam_id', '=', 'ext_trial_master.tmid')
+        //            ->where('grades.exam_type', AppConst::CODE_MASTER_9_1);
+        //    })
+        //    // MEMO: 取得できない場合はエラーとする
+        //    ->firstOrFail();
 
         // データを取得（生徒成績詳細）
-        $gradesDetails = $this->getGradesDetail($id);
+        //$gradesDetails = $this->getGradesDetail($id);
 
         return [
-            'type_name' => $grades->type_name,
-            'teiki_name' => $grades->teiki_name,
-            'moshi_name' => $grades->moshi_name,
-            'student_comment' => $grades->student_comment,
-            'gradesDetails' => $gradesDetails
+        //    'type_name' => $grades->type_name,
+        //    'teiki_name' => $grades->teiki_name,
+        //    'moshi_name' => $grades->moshi_name,
+        //    'student_comment' => $grades->student_comment,
+        //    'gradesDetails' => $gradesDetails
+            'id' => $request->id
         ];
     }
 
