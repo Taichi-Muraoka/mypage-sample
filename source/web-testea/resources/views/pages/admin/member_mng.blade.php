@@ -57,6 +57,14 @@
                 @endfor
             </x-bs.form-group>
         </x-bs.col2>
+        <x-bs.col2>
+            <x-input.select id="period" caption="通塾期間" :select2=true >
+                <option value="1">0年～1年</option>
+                <option value="2">1年～2年</option>
+                <option value="3">2年～3年</option>
+                <option value="4">3年～4年</option>
+            </x-input.select>
+        </x-bs.col2>
     </x-bs.row>
 
 </x-bs.card>
@@ -75,11 +83,14 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">生徒No</th>
+            <th>生徒No</th>
             <th>生徒名</th>
             <th>メールアドレス</th>
-            <th width="15%">学年</th>
-            <th width="15%">入会日</th>
+            <th>学年</th>
+            <th>入会日</th>
+            <th>通塾期間</th>
+            <th>通塾バッジ数</th>
+            <th>受講科目</th>
             <th></th>
         </x-slot>
 
@@ -90,6 +101,9 @@
             <td>@{{item.mailaddress1}}</td>
             <td>@{{item.cls_name}}</td>
             <td>@{{item.enter_date|formatYmd}}</td>
+            <td>3年5ヶ月</td>
+            <td>1</td>
+            <td>数学</td>
             <td>
                 <x-button.list-dtl vueHref="'{{ route('member_mng-detail', '') }}/' + item.sid" caption="生徒カルテ" />
                 {{-- <x-button.list-edit href="{{ route('member_mng-edit', 1) }}" /> --}}

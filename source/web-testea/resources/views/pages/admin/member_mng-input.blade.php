@@ -29,6 +29,7 @@
     @endif
 
     {{-- 共通フォーム --}}
+    <x-input.text caption="外部サービス顧客ID" id="external_id" :rules=$rules :editData=$editData/>
     <x-input.text caption="生徒名" id="name" :rules=$rules :editData=$editData/>
     <x-input.text caption="生徒名カナ" id="name_kana" :rules=$rules :editData=$editData/>
     {{-- <x-input.select caption="学年" id="grade_cd" :select2=true :blank=false :editData=$editData :mastrData=$classes/> --}}
