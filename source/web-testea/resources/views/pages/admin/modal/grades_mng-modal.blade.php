@@ -38,37 +38,37 @@
                 <tr>
                     <x-bs.td-sp>全教科合計</x-bs.td-sp>
                     <x-bs.td-sp>380点</x-bs.td-sp>
-                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>国語</x-bs.td-sp>
                     <x-bs.td-sp>80点</x-bs.td-sp>
-                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>数学</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
-                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>理科</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
-                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>社会</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
-                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>英語</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
-                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
             </x-bs.table>

@@ -375,10 +375,8 @@
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
             <th width="15%">登録日</th>
-            <th width="15%">試験種別</th>
-            <th>試験名</th>
-            <th>合計点</th>
-            <th>偏差値</th>
+            <th width="15%">種別</th>
+            <th>学期・試験名</th>
             <th></th>
         </x-slot>
 
@@ -387,20 +385,16 @@
             <td>2023/03/18</td>
             <td>模擬試験</td>
             <td>全国統一模試</td>
-            <td>391</td>
-            <td>62</td>
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-grades_mng" />
+                <x-button.list-dtl dataTarget="#modal-dtl-grades_mng" :dataAttr="['id' => '1']" />
             </td>
         </tr>
         <tr>
             <td>2023/02/28</td>
             <td>定期考査</td>
             <td>学年末考査</td>
-            <td>380</td>
-            <td></td>
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-grades_mng" />
+                <x-button.list-dtl dataTarget="#modal-dtl-grades_mng" :dataAttr="['id' => '2']" />
             </td>
         </tr>
     </x-bs.table>

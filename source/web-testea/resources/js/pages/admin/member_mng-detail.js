@@ -23,6 +23,12 @@ export default class AppClass extends PageBase {
             urlSuffix: "detail",
         });
 
+        this.getVueModal({
+            id: "#modal-dtl-grades_mng",
+            // 別画面でもモーダルを使用するのでURLを変更
+            urlSuffix: "grades_mng"
+        });
+
         // Vue: モーダル(家庭教師標準情報)
         //this.getVueModal({
         //    id: "#modal-dtl-tutor",
