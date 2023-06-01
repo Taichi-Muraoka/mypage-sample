@@ -34,37 +34,37 @@
                 <tr>
                     <x-bs.td-sp>全教科合計</x-bs.td-sp>
                     <x-bs.td-sp>380点</x-bs.td-sp>
-                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>国語</x-bs.td-sp>
                     <x-bs.td-sp>80点</x-bs.td-sp>
-                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>数学</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
-                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>理科</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
-                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>社会</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
-                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>英語</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
-                    <x-bs.td-sp></x-bs.td-sp>
+                    <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
             </x-bs.table>
@@ -72,7 +72,7 @@
     </tr>
 
     <tr>
-        <th colspan="2">次回の試験に向けての抱負</th>
+        <th colspan="2">次回に向けての抱負</th>
     </tr>
     {{-- nl2br: 改行 --}}
     <td colspan="2" class="nl2br">次回もがんばります</td>
@@ -84,10 +84,6 @@
     <tr>
         <th width="35%">登録日</th>
         <td>2023/05/15</td>
-    </tr>
-    <tr>
-        <th>生徒名</th>
-        <td>CWテスト生徒１</td>
     </tr>
     <tr>
         <th>種別</th>
@@ -146,7 +142,7 @@
     </tr>
 
     <tr>
-        <th colspan="2">次回の試験に向けての抱負</th>
+        <th colspan="2">次回に向けての抱負</th>
     </tr>
     {{-- nl2br: 改行 --}}
     <td colspan="2" class="nl2br">次回もがんばります</td>
@@ -158,10 +154,6 @@
     <tr>
         <th width="35%">登録日</th>
         <td>2023/07/21</td>
-    </tr>
-    <tr>
-        <th>生徒名</th>
-        <td>CWテスト生徒１</td>
     </tr>
     <tr>
         <th>種別</th>
@@ -209,7 +201,7 @@
     </tr>
 
     <tr>
-        <th colspan="2">次回の試験に向けての抱負</th>
+        <th colspan="2">次回に向けての抱負</th>
     </tr>
     {{-- nl2br: 改行 --}}
     <td colspan="2" class="nl2br">次回もがんばります</td>
