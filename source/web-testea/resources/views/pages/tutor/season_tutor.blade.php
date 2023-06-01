@@ -17,9 +17,8 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">連絡日</th>
+            <th width="20%">連絡日</th>
             <th>特別期間名</th>
-            <th>校舎</th>
             <th></th>
         </x-slot>
 
@@ -27,7 +26,6 @@
         <tr>
             <x-bs.td-sp caption="連絡日">2023/03/05</x-bs.td-sp>
             <x-bs.td-sp caption="特別期間名">2023年春期</x-bs.td-sp>
-            <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
             <td>
                 <x-button.list-dtl vueHref="'{{ route('season_tutor-detail', '') }}/' + 1" caption="詳細" />
             </td>
@@ -35,7 +33,6 @@
         <tr>
             <x-bs.td-sp caption="連絡日">2022/12/05</x-bs.td-sp>
             <x-bs.td-sp caption="特別期間名">2022年冬期</x-bs.td-sp>
-            <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
             <td>
                 <x-button.list-dtl vueHref="'{{ route('season_tutor-detail', '') }}/' + 1" caption="詳細" />
             </td>
@@ -43,7 +40,6 @@
         <tr>
             <x-bs.td-sp caption="連絡日">2022/07/05</x-bs.td-sp>
             <x-bs.td-sp caption="特別期間名">2022年夏期</x-bs.td-sp>
-            <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
             <td>
                 <x-button.list-dtl vueHref="'{{ route('season_tutor-detail', '') }}/' + 1" caption="詳細" />
             </td>
