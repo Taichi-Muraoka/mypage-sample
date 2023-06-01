@@ -458,13 +458,19 @@ label:not(.form-check-label):not(.custom-file-label) {
 }
 
 .table-checked td div {
-    height: 47px;
+    //height: 47px;
+    height: 60px;
     width: 100%;
 }
 
 .table-checked td div .tt-button {
     padding: 0.75rem;
+    font-size: 0.725rem;
 }
+
+//.table-checked td div .tt-button .select2{
+//    width: 80%!important;
+//  }
 
 .chk-wt {
     display: none;
@@ -501,6 +507,12 @@ label:not(.form-check-label):not(.custom-file-label) {
     width: 1px;
     white-space: nowrap;
     padding: 0.75rem 1.25rem 0.75rem 0.75rem;
+}
+
+.table > thead > tr > th.t-week {
+    width: 14%;
+    //font-size: 0.725rem;
+    //padding: 0.25rem;
 }
 
 /* 金額の右寄せ */

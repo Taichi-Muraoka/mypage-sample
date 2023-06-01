@@ -1,77 +1,56 @@
 @extends('adminlte::page')
 
-@section('title', '特別期間講習　日程連絡')
+@section('title', '特別期間講習　日程連絡一覧')
 
 @section('content')
 
-{{-- フォーム --}}
-<x-bs.card class="pa-table-checked" :form=true >
+{{-- 結果リスト --}}
+<x-bs.card-list>
 
-  <p>下記の特別期間について、<b>授業に入れない日程・時間</b>を選択・登録してください。</p>
-
-    {{-- 詳細を表示 --}}
-    <x-bs.table :hover=false :vHeader=true class="mb-4">
-      <tr>
-          <th class="t-minimum" width="25%">特別期間</th>
-          <td>2023年春期</td>
-      </tr>
-      <tr>
-        <th>提出締め切り</th>
-        <td>3/10</td>
-    </tr>
-</x-bs.table>
-
-  {{-- チェックボックスのエラー時のメッセージ --}}
-  <x-bs.form-group name="chkWs" />
-
-  <x-bs.table :hover=false class="table-checked">
-
-    {{-- テーブルタイトル行 --}}
-    <x-slot name="thead">
-      <th class="t-minimum t-week-time"></th>
-
-      {{-- 曜日を表示 --}}
-      <th class="t-week">3/27(月)</th>
-      <th class="t-week">3/28(火)</th>
-      <th class="t-week">3/29(水)</th>
-      <th class="t-week">3/30(木)</th>
-      <th class="t-week">3/31(金)</th>
-      <th class="t-week">4/1(土)</th>
-      <th class="t-week">4/3(月)</th>
-      <th class="t-week">4/4(火)</th>
-      <th class="t-week">4/5(水)</th>
-      <th class="t-week">4/6(木)</th>
-      <th class="t-week">4/7(金)</th>
-      <th class="t-week">4/8(土)</th>
+    {{-- カードヘッダ右 --}}
+    <x-slot name="tools">
+        <x-button.new href="{{ route('season_tutor-new') }}" :small=true />
     </x-slot>
 
-    {{-- 二重ループで組み立てる --}}
-    @for ($i = 0; $i < count($timeList); $i++) <tr>
-      <td class="tt">{{$timeList[$i]}}</td>
+    {{-- テーブル --}}
+    <x-bs.table :button=true :smartPhone=true>
 
-      @for ($j = 0; $j < 12; $j++)
-      <td>
-        {{-- チェックボックス。裏でクリックされた時間帯を保持している --}}
-        <x-input.checkbox id="{{$j}}_{{$timeIdList[$i]}}" class="chk-wt2" name="chkWs" :icheck=false
-          value="{{$j}}_{{$timeIdList[$i]}}" :editData=$editData />
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th width="15%">連絡日</th>
+            <th>特別期間名</th>
+            <th>校舎</th>
+            <th></th>
+        </x-slot>
 
-        {{-- 表のDiv --}}
-        <div class="chk-t" data-wt="{{$j}}_{{$timeIdList[$i]}}" v-on:click="timeClick"></div>
-      </td>
-      @endfor
+        {{-- テーブル行 --}}
+        <tr>
+            <x-bs.td-sp caption="連絡日">2023/03/05</x-bs.td-sp>
+            <x-bs.td-sp caption="特別期間名">2023年春期</x-bs.td-sp>
+            <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
+            <td>
+                <x-button.list-dtl vueHref="'{{ route('season_tutor-detail', '') }}/' + 1" caption="詳細" />
+            </td>
+        </tr>
+        <tr>
+            <x-bs.td-sp caption="連絡日">2022/12/05</x-bs.td-sp>
+            <x-bs.td-sp caption="特別期間名">2022年冬期</x-bs.td-sp>
+            <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
+            <td>
+                <x-button.list-dtl vueHref="'{{ route('season_tutor-detail', '') }}/' + 1" caption="詳細" />
+            </td>
+        </tr>
+        <tr>
+            <x-bs.td-sp caption="連絡日">2022/07/05</x-bs.td-sp>
+            <x-bs.td-sp caption="特別期間名">2022年夏期</x-bs.td-sp>
+            <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
+            <td>
+                <x-button.list-dtl vueHref="'{{ route('season_tutor-detail', '') }}/' + 1" caption="詳細" />
+            </td>
+        </tr>
 
-      </tr>
-    @endfor
+    </x-bs.table>
 
-  </x-bs.table>
-
-  {{-- フッター --}}
-  <x-slot name="footer">
-    <div class="d-flex justify-content-end">
-      <x-button.submit-edit caption="送信" />
-    </div>
-  </x-slot>
-
-</x-bs.card>
+</x-bs.card-list>
 
 @stop

@@ -1,18 +1,30 @@
 @extends('adminlte::page')
 
-@section('title', '特別期間講習　講師連絡内容詳細')
-
-{{-- 子ページ --}}
-@section('child_page', true)
+@section('title', '特別期間講習　日程連絡')
 
 @section('content')
 
-{{-- フォームなし --}}
-<x-bs.card>
-    <x-slot name="card_title">
-        CWテスト教師１０１
-    </x-slot>
-    <x-bs.table :hover=false class="table-checked">
+{{-- フォーム --}}
+<x-bs.card :form=true >
+
+  <p>下記の特別期間について、<b>授業に入れない日程・時間</b>を選択・登録してください。</p>
+
+    {{-- 詳細を表示 --}}
+    <x-bs.table :hover=false :vHeader=true class="mb-4">
+      <tr>
+          <th class="t-minimum" width="25%">特別期間</th>
+          <td>2023年春期</td>
+      </tr>
+      <tr>
+        <th>提出締め切り</th>
+        <td>3/10</td>
+    </tr>
+</x-bs.table>
+
+  {{-- チェックボックスのエラー時のメッセージ --}}
+  <x-bs.form-group name="chkWs" />
+
+  <x-bs.table :hover=false class="table-checked">
 
     {{-- テーブルタイトル行 --}}
     <x-slot name="thead">
@@ -36,21 +48,23 @@
           value="{{$j}}_{{$periodIdList[$i]}}" :editData=$editData />
 
         {{-- 表のDiv --}}
-        <div class="chk-t" data-wt="{{$j}}_{{$periodIdList[$i]}}"></div>
+        <div class="chk-t" data-wt="{{$j}}_{{$periodIdList[$i]}}" v-on:click="timeClick"></div>
       </td>
       @endfor
 
       </tr>
     @endfor
 
-    </x-bs.table>
+  </x-bs.table>
 
-    {{-- フッター --}}
-    <x-slot name="footer">
-        <div class="d-flex justify-content-start">
+  {{-- フッター --}}
+  <x-slot name="footer">
+        <div class="d-flex justify-content-between">
             <x-button.back />
-        </div>
-    </x-slot>
+
+      <x-button.submit-new />
+    </div>
+  </x-slot>
 
 </x-bs.card>
 

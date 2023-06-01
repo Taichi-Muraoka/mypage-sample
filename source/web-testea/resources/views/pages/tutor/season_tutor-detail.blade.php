@@ -1,18 +1,21 @@
 @extends('adminlte::page')
 
-@section('title', '特別期間講習　講師連絡内容詳細')
-
-{{-- 子ページ --}}
-@section('child_page', true)
+@section('title', '特別期間講習　連絡内容詳細')
 
 @section('content')
 
-{{-- フォームなし --}}
+{{-- フォーム --}}
 <x-bs.card>
-    <x-slot name="card_title">
-        CWテスト教師１０１
-    </x-slot>
-    <x-bs.table :hover=false class="table-checked">
+
+    {{-- 詳細を表示 --}}
+    <x-bs.table :hover=false :vHeader=true class="mb-4">
+      <tr>
+          <th class="t-minimum" width="25%">特別期間</th>
+          <td>2023年春期</td>
+      </tr>
+    </x-bs.table>
+
+  <x-bs.table :hover=false class="table-checked">
 
     {{-- テーブルタイトル行 --}}
     <x-slot name="thead">
@@ -43,14 +46,14 @@
       </tr>
     @endfor
 
-    </x-bs.table>
+  </x-bs.table>
 
-    {{-- フッター --}}
-    <x-slot name="footer">
+  {{-- フッター --}}
+  <x-slot name="footer">
         <div class="d-flex justify-content-start">
             <x-button.back />
         </div>
-    </x-slot>
+  </x-slot>
 
 </x-bs.card>
 

@@ -62,7 +62,7 @@
             <td>CWテスト生徒１</td>
             <td>未対応</td>
             <td>
-                <x-button.list-edit vueHref="'{{ route('season_mng_student-plan', '') }}/' + 1" caption="コマ組み" />
+                <x-button.list-edit vueHref="'{{ route('season_mng_student-detail', '') }}/' + 1" caption="詳細・コマ組み" />
             </td>
         </tr>
         <tr>
@@ -72,7 +72,7 @@
             <td>CWテスト生徒２</td>
             <td>未対応</td>
             <td>
-                <x-button.list-edit vueHref="'{{ route('season_mng_student-plan', '') }}/' + 1" caption="コマ組み" />
+                <x-button.list-edit vueHref="'{{ route('season_mng_student-detail', '') }}/' + 1" caption="詳細・コマ組み" />
             </td>
         </tr>
         <tr>
@@ -82,7 +82,7 @@
             <td>CWテスト生徒３</td>
             <td>対応済</td>
             <td>
-                <x-button.list-edit vueHref="'{{ route('season_mng_student-plan', '') }}/' + 1" caption="コマ組み" />
+                <x-button.list-edit vueHref="'{{ route('season_mng_student-detail', '') }}/' + 1" caption="詳細・コマ組み" />
             </td>
         </tr>
 

@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 教師空き時間
+ * 特別期間講習 日程連絡詳細
  */
 export default class AppClass extends PageBase {
     /**
@@ -14,5 +14,6 @@ export default class AppClass extends PageBase {
     /**
      * 開始処理
      */
-    start() {}
+    start() {
+    }
 }

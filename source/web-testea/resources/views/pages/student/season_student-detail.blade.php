@@ -1,18 +1,52 @@
 @extends('adminlte::page')
 
-@section('title', '特別期間講習　講師連絡内容詳細')
-
-{{-- 子ページ --}}
-@section('child_page', true)
+@section('title', '特別期間講習　連絡内容詳細')
 
 @section('content')
 
 {{-- フォームなし --}}
 <x-bs.card>
-    <x-slot name="card_title">
-        CWテスト教師１０１
-    </x-slot>
-    <x-bs.table :hover=false class="table-checked">
+
+    {{-- 詳細を表示 --}}
+    <x-bs.table :hover=false :vHeader=true class="mb-4">
+      <tr>
+          <th class="t-minimum" width="25%">特別期間</th>
+          <td>2023年春期</td>
+      </tr>
+        <tr>
+          <th>受講校舎</th>
+          <td>久我山</td>
+      </tr>
+      <tr>
+          <th>生徒コメント</th>
+          <td>今回は数学・英語の受講を希望します</td>
+      </tr>
+    </x-bs.table>
+
+    {{-- 余白 --}}
+    <div class="mb-3"></div>
+
+  <x-bs.form-title>受講希望科目・授業数</x-bs.form-title>
+
+  {{-- テーブル --}}
+    <x-bs.table class="mb-3">
+        <x-slot name="thead">
+            <th width="30%">受講希望科目</th>
+            <th>受講回数</th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
+        <tr>
+            <td>数学</td>
+            <td>2</td>
+      </tr>
+        <tr>
+            <td>英語</td>
+            <td>2</td>
+        </tr>
+    </x-bs.table>
+
+  <x-bs.table :hover=false class="table-checked">
 
     {{-- テーブルタイトル行 --}}
     <x-slot name="thead">
@@ -43,14 +77,14 @@
       </tr>
     @endfor
 
-    </x-bs.table>
+  </x-bs.table>
 
-    {{-- フッター --}}
-    <x-slot name="footer">
+  {{-- フッター --}}
+  <x-slot name="footer">
         <div class="d-flex justify-content-start">
             <x-button.back />
         </div>
-    </x-slot>
+  </x-slot>
 
 </x-bs.card>
 

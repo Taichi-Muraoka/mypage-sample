@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 特別期間講習 日程連絡一覧
+ * 特別期間講習 講師日程連絡詳細
  */
 export default class AppClass extends PageBase {
     /**
@@ -14,9 +14,5 @@ export default class AppClass extends PageBase {
     /**
      * 開始処理
      */
-    start() {
-        // 検索一覧の表示
-        var $vueSearchList = this.getVueSearchList();
-        $vueSearchList.search();
-    }
+    start() {}
 }

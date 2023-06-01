@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 特別期間講習コマ組み
+ * 特別期間講習 生徒連絡内容
  */
 export default class AppClass extends PageBase {
     /**
@@ -17,15 +17,12 @@ export default class AppClass extends PageBase {
     start() {
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            //UrlCom.redirect(self._getFuncUrl());
-            self.redirectToParent();
+            UrlCom.redirect(self._getFuncUrl());
         };
 
         // Vue: 入力フォーム
         this.getVueInputForm({
             afterEdit: afterEdit,
-            // 別画面でも更新・削除を使用するのでURLを変更
-            urlSuffix: "plan",
         });
 
     }
