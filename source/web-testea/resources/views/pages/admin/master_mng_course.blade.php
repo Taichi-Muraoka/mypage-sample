@@ -26,7 +26,7 @@
 			<td>101</td>
 			<td>個別指導</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_course-edit',1) }}" />
 			</td>
 		</tr>
@@ -34,7 +34,7 @@
 			<td>201</td>
 			<td>集団授業</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_course-edit',1) }}" />
 			</td>
 		</tr>

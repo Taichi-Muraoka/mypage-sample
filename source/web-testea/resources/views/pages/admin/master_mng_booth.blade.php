@@ -22,7 +22,7 @@
 			<th width="15%">名称</th>
 			<th width="10%">表示順</th>
 			<th width="15%">cat</th>
-			<th width="15%"></th>
+			<th width="10%"></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}
@@ -34,7 +34,7 @@
 			<td>10</td>
 			<td></td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_booth-edit',1) }}" />
 			</td>
 		</tr>
@@ -46,7 +46,7 @@
 			<td>11</td>
 			<td></td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_booth-edit',1) }}" />
 			</td>
 		</tr>
@@ -58,7 +58,7 @@
 			<td>12</td>
 			<td></td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_booth-edit',1) }}" />
 			</td>
 		</tr>

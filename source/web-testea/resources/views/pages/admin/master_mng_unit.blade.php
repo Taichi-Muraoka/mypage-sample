@@ -30,7 +30,7 @@
 			<td>国語</td>
 			<td>ひらがな</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_unit-edit',1) }}" />
 			</td>
 		</tr>
@@ -40,7 +40,7 @@
 			<td>数学</td>
 			<td>正負の数</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_unit-edit',1) }}" />
 			</td>
 		</tr>
@@ -50,7 +50,7 @@
 			<td>英語</td>
 			<td>自動詞と他動詞</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_unit-edit',1) }}" />
 			</td>
 		</tr>

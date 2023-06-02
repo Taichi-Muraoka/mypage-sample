@@ -22,7 +22,7 @@
 			<th width="15%">開始時刻</th>
 			<th width="15%">終了時刻</th>
 			<th width="15%">時間割区分</th>
-			<th width="15%"></th>
+			<th width="10%"></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}
@@ -34,7 +34,7 @@
 			<td>16:30</td>
 			<td>特別期間</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_timetable-edit',1) }}" />
 			</td>
 		</tr>
@@ -46,7 +46,7 @@
 			<td>18:15</td>
 			<td>通常</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_timetable-edit',1) }}" />
 			</td>
 		</tr>

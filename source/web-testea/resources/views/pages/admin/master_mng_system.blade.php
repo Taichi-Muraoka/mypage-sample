@@ -15,7 +15,7 @@
 			<th width="30%">名称</th>
 			<th width="20%">値（数値）</th>
 			<th width="20%">値（文字列）</th>
-			<th width="15%"></th>
+			<th width="10%"></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}
@@ -25,7 +25,7 @@
 			<td>1000</td>
 			<td></td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_system-edit',1) }}" />
 			</td>
 		</tr>
@@ -35,7 +35,7 @@
 			<td>2</td>
 			<td></td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_system-edit',1) }}" />
 			</td>
 		</tr>

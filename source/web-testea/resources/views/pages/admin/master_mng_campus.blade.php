@@ -32,7 +32,7 @@
 			<td>久</td>
 			<td>20</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_campus-edit',1) }}" />
 			</td>
 		</tr>
@@ -43,7 +43,7 @@
 			<td>西</td>
 			<td>50</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_campus-edit',1) }}" />
 			</td>
 		</tr>
@@ -54,7 +54,7 @@
 			<td>本</td>
 			<td>30</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_campus-edit',1) }}" />
 			</td>
 		</tr>
