@@ -31,6 +31,7 @@
             <x-bs.td-sp caption="学期・試験名">１学期中間考査</x-bs.td-sp>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => '1']" />
+                <x-button.list-edit href="{{ route('grades-edit', 1) }}" />
             </td>
         </tr>
         <tr>
@@ -39,6 +40,7 @@
             <x-bs.td-sp caption="学期・試験名">春期全国統一模試</x-bs.td-sp>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => '2']" />
+                <x-button.list-edit href="{{ route('grades-edit', 1) }}" />
             </td>
         </tr>
         <tr>
@@ -47,6 +49,7 @@
             <x-bs.td-sp caption="学期・試験名">２学期</x-bs.td-sp>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => '3']" />
+                <x-button.list-edit href="{{ route('grades-edit', 1) }}" />
             </td>
         </tr>
 
