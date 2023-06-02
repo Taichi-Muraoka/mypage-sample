@@ -916,9 +916,24 @@ return [
                     'active' => ['master_mng_grade_subject*']
                 ],
                 [
+                    'text' => '授業教材マスタ管理',
+                    'route' => 'master_mng_text',
+                    'active' => ['master_mng_text*']
+                ],
+                [
+                    'text' => '授業単元マスタ管理',
+                    'route' => 'master_mng_unit',
+                    'active' => ['master_mng_unit*']
+                ],
+                [
                     'text' => 'コースマスタ管理',
                     'route' => 'master_mng_course',
                     'active' => ['master_mng_course*']
+                ],
+                [
+                    'text' => '契約コースマスタ管理',
+                    'route' => 'master_mng_agreement',
+                    'active' => ['master_mng_agreement*']
                 ],
                 [
                     'text' => '時間割マスタ管理',

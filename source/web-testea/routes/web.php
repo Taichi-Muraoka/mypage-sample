@@ -688,8 +688,11 @@ use App\Http\Controllers\Admin\MasterMngCampusController;
 use App\Http\Controllers\Admin\MasterMngBoothController;
 use App\Http\Controllers\Admin\MasterMngSubjectController;
 use App\Http\Controllers\Admin\MasterMngGradeSubjectController;
-use App\Http\Controllers\Admin\MasterMngTimetableController;
+use App\Http\Controllers\Admin\MasterMngTextController;
+use App\Http\Controllers\Admin\MasterMngUnitController;
 use App\Http\Controllers\Admin\MasterMngCourseController;
+use App\Http\Controllers\Admin\MasterMngAgreementController;
+use App\Http\Controllers\Admin\MasterMngTimetableController;
 use App\Http\Controllers\Admin\MasterMngSystemController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
@@ -1839,31 +1842,58 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/master_mng_grade_subject/delete', [MasterMngGradeSubjectController::class, 'delete'])->name('master_mng_grade_subject-delete');
 
     //---------------------
-    // 時間割マスタ モック
+    // 授業教材マスタ モック
     //---------------------
     // 一覧
-    Route::get('/master_mng_timetable', [MasterMngTimetableController::class, 'index'])->name('master_mng_timetable');
+    Route::get('/master_mng_text', [MasterMngTextController::class, 'index'])->name('master_mng_text');
 
     // 詳細取得用
-    Route::post('/master_mng_timetable/get_data', [MasterMngTimetableController::class, 'getData'])->name('master_mng_timetable-get_data');
+    Route::post('/master_mng_text/get_data', [MasterMngTextController::class, 'getData'])->name('master_mng_text-get_data');
 
     // 登録
-    Route::get('/master_mng_timetable/new', [MasterMngTimetableController::class, 'new'])->name('master_mng_timetable-new');
+    Route::get('/master_mng_text/new', [MasterMngTextController::class, 'new'])->name('master_mng_text-new');
 
     // 登録処理
-    Route::post('/master_mng_timetable/create', [MasterMngTimetableController::class, 'create'])->name('master_mng_timetable-create');
+    Route::post('/master_mng_text/create', [MasterMngTextController::class, 'create'])->name('master_mng_text-create');
 
     // 編集
-    Route::get('/master_mng_timetable/edit/{timetableId}', [MasterMngTimetableController::class, 'edit'])->name('master_mng_timetable-edit');
+    Route::get('/master_mng_text/edit/{textId}', [MasterMngTextController::class, 'edit'])->name('master_mng_text-edit');
 
     // 編集処理
-    Route::post('/master_mng_timetable/update', [MasterMngTimetableController::class, 'update'])->name('master_mng_timetable-update');
+    Route::post('/master_mng_text/update', [MasterMngTextController::class, 'update'])->name('master_mng_text-update');
 
     // バリデーション(登録用)
-    Route::post('/master_mng_timetable/vd_input', [MasterMngTimetableController::class, 'validationForInput'])->name('master_mng_timetable-vd_input');
+    Route::post('/master_mng_text/vd_input', [MasterMngTextController::class, 'validationForInput'])->name('master_mng_text-vd_input');
 
     // 削除処理
-    Route::post('/master_mng_timetable/delete', [MasterMngTimetableController::class, 'delete'])->name('master_mng_timetable-delete');
+    Route::post('/master_mng_text/delete', [MasterMngTextController::class, 'delete'])->name('master_mng_text-delete');
+
+    //---------------------
+    // 授業単元マスタ モック
+    //---------------------
+    // 一覧
+    Route::get('/master_mng_unit', [MasterMngUnitController::class, 'index'])->name('master_mng_unit');
+
+    // 詳細取得用
+    Route::post('/master_mng_unit/get_data', [MasterMngUnitController::class, 'getData'])->name('master_mng_unit-get_data');
+
+    // 登録
+    Route::get('/master_mng_unit/new', [MasterMngUnitController::class, 'new'])->name('master_mng_unit-new');
+
+    // 登録処理
+    Route::post('/master_mng_unit/create', [MasterMngUnitController::class, 'create'])->name('master_mng_unit-create');
+
+    // 編集
+    Route::get('/master_mng_unit/edit/{unitId}', [MasterMngUnitController::class, 'edit'])->name('master_mng_unit-edit');
+
+    // 編集処理
+    Route::post('/master_mng_unit/update', [MasterMngUnitController::class, 'update'])->name('master_mng_unit-update');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng_unit/vd_input', [MasterMngUnitController::class, 'validationForInput'])->name('master_mng_unit-vd_input');
+
+    // 削除処理
+    Route::post('/master_mng_unit/delete', [MasterMngUnitController::class, 'delete'])->name('master_mng_unit-delete');
 
     //---------------------
     // コースマスタ モック
@@ -1891,6 +1921,60 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/master_mng_course/delete', [MasterMngCourseController::class, 'delete'])->name('master_mng_course-delete');
+
+    //---------------------
+    // 契約コースマスタ モック
+    //---------------------
+    // 一覧
+    Route::get('/master_mng_agreement', [MasterMngAgreementController::class, 'index'])->name('master_mng_agreement');
+
+    // 詳細取得用
+    Route::post('/master_mng_agreement/get_data', [MasterMngAgreementController::class, 'getData'])->name('master_mng_agreement-get_data');
+
+    // 登録
+    Route::get('/master_mng_agreement/new', [MasterMngAgreementController::class, 'new'])->name('master_mng_agreement-new');
+
+    // 登録処理
+    Route::post('/master_mng_agreement/create', [MasterMngAgreementController::class, 'create'])->name('master_mng_agreement-create');
+
+    // 編集
+    Route::get('/master_mng_agreement/edit/{agreementId}', [MasterMngAgreementController::class, 'edit'])->name('master_mng_agreement-edit');
+
+    // 編集処理
+    Route::post('/master_mng_agreement/update', [MasterMngAgreementController::class, 'update'])->name('master_mng_agreement-update');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng_agreement/vd_input', [MasterMngAgreementController::class, 'validationForInput'])->name('master_mng_agreement-vd_input');
+
+    // 削除処理
+    Route::post('/master_mng_agreement/delete', [MasterMngAgreementController::class, 'delete'])->name('master_mng_agreement-delete');
+
+    //---------------------
+    // 時間割マスタ モック
+    //---------------------
+    // 一覧
+    Route::get('/master_mng_timetable', [MasterMngTimetableController::class, 'index'])->name('master_mng_timetable');
+
+    // 詳細取得用
+    Route::post('/master_mng_timetable/get_data', [MasterMngTimetableController::class, 'getData'])->name('master_mng_timetable-get_data');
+
+    // 登録
+    Route::get('/master_mng_timetable/new', [MasterMngTimetableController::class, 'new'])->name('master_mng_timetable-new');
+
+    // 登録処理
+    Route::post('/master_mng_timetable/create', [MasterMngTimetableController::class, 'create'])->name('master_mng_timetable-create');
+
+    // 編集
+    Route::get('/master_mng_timetable/edit/{timetableId}', [MasterMngTimetableController::class, 'edit'])->name('master_mng_timetable-edit');
+
+    // 編集処理
+    Route::post('/master_mng_timetable/update', [MasterMngTimetableController::class, 'update'])->name('master_mng_timetable-update');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng_timetable/vd_input', [MasterMngTimetableController::class, 'validationForInput'])->name('master_mng_timetable-vd_input');
+
+    // 削除処理
+    Route::post('/master_mng_timetable/delete', [MasterMngTimetableController::class, 'delete'])->name('master_mng_timetable-delete');
 
     //---------------------
     // システムマスタ モック
