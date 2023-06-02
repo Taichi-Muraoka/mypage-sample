@@ -35,7 +35,7 @@
 		<tr>
 			<td>110</td>
 			<td>中</td>
-			<td>国数</td>
+			<td>国語</td>
 			<td>
 				<x-button.list-dtl />
                 <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
