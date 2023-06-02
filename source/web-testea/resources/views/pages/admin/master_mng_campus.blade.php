@@ -8,7 +8,7 @@
 
 	{{-- カードヘッダ右 --}}
     <x-slot name="tools">
-        <x-button.new href="{{ route('master_mng_school-new') }}" :small=true />
+        <x-button.new href="{{ route('master_mng_campus-new') }}" :small=true />
     </x-slot>
 
 	{{-- テーブル --}}
@@ -20,8 +20,8 @@
 			<th width="20%">名称</th>
 			<th width="15%">表示名</th>
 			<th width="15%">略称</th>
-			<th width="15%">表示順</th>
-			<th width="15%"></th>
+			<th width="10%">表示順</th>
+			<th width="10%"></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}
@@ -33,7 +33,7 @@
 			<td>20</td>
 			<td>
 				<x-button.list-dtl />
-                <x-button.list-edit href="{{ route('master_mng_school-edit') }}" />
+                <x-button.list-edit href="{{ route('master_mng_campus-edit',1) }}" />
 			</td>
 		</tr>
 		<tr>
@@ -44,7 +44,7 @@
 			<td>50</td>
 			<td>
 				<x-button.list-dtl />
-                <x-button.list-edit href="{{ route('master_mng_school-edit') }}" />
+                <x-button.list-edit href="{{ route('master_mng_campus-edit',1) }}" />
 			</td>
 		</tr>
 		<tr>
@@ -55,7 +55,7 @@
 			<td>30</td>
 			<td>
 				<x-button.list-dtl />
-                <x-button.list-edit href="{{ route('master_mng_school-edit') }}" />
+                <x-button.list-edit href="{{ route('master_mng_campus-edit',1) }}" />
 			</td>
 		</tr>
 
@@ -63,6 +63,6 @@
 </x-bs.card-list>
 
 {{-- 詳細 --}}
-@include('pages.admin.modal.master_mng_school-modal')
+@include('pages.admin.modal.master_mng_campus-modal')
 
 @stop

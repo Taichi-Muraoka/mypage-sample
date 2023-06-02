@@ -897,8 +897,8 @@ return [
             'submenu' => [
                 [
                     'text' => '校舎マスタ管理',
-                    'route' => 'master_mng_school',
-                    'active' => ['master_mng_school*']
+                    'route' => 'master_mng_campus',
+                    'active' => ['master_mng_campus*']
                 ],
                 [
                     'text' => '指導ブースマスタ管理',
@@ -906,12 +906,7 @@ return [
                     'active' => ['master_mng_booth*']
                 ],
                 [
-                    'text' => '時間割マスタ管理',
-                    'route' => 'master_mng_timetable',
-                    'active' => ['master_mng_timetable*']
-                ],
-                [
-                    'text' => '教科マスタ管理',
+                    'text' => '授業科目マスタ管理',
                     'route' => 'master_mng_subject',
                     'active' => ['master_mng_subject*']
                 ],
@@ -919,6 +914,11 @@ return [
                     'text' => 'コースマスタ管理',
                     'route' => 'master_mng_course',
                     'active' => ['master_mng_course*']
+                ],
+                [
+                    'text' => '時間割マスタ管理',
+                    'route' => 'master_mng_timetable',
+                    'active' => ['master_mng_timetable*']
                 ],
                 [
                     'text' => 'システムマスタ管理',
