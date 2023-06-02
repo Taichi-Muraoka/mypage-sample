@@ -53,8 +53,8 @@
       <th class="t-minimum t-week-time"></th>
 
       {{-- 時限を表示 --}}
-      @for ($i = 0; $i < count($periodList); $i++)
-        <th class="t-week">{{$periodList[$i]}}</th>
+      @for ($i = 0; $i < count($periodIdList); $i++)
+        <th class="t-week">{{$periodIdList[$i]}}時限目</th>
       @endfor
     </x-slot>
 
@@ -63,14 +63,14 @@
       {{-- 日付を表示 --}}
       <td class="tt">{{$dayList[$j]}}</td>
 
-      @for ($i = 0; $i < count($periodList); $i++)
+      @for ($i = 0; $i < count($periodIdList); $i++)
       <td>
         {{-- チェックボックス。裏でクリックされた時間帯を保持している --}}
-        <x-input.checkbox id="{{$j}}_{{$periodIdList[$i]}}" class="chk-wt2" name="chkWs" :icheck=false
-          value="{{$j}}_{{$periodIdList[$i]}}" :editData=$editData />
+        <x-input.checkbox id="{{$dayIdList[$j]}}_{{$periodIdList[$i]}}" class="chk-wt2" name="chkWs" :icheck=false
+          value="{{$dayIdList[$j]}}_{{$periodIdList[$i]}}" :editData=$editData />
 
         {{-- 表のDiv --}}
-        <div class="chk-t" data-wt="{{$j}}_{{$periodIdList[$i]}}"></div>
+        <div class="chk-t" data-wt="{{$dayIdList[$j]}}_{{$periodIdList[$i]}}"></div>
       </td>
       @endfor
 

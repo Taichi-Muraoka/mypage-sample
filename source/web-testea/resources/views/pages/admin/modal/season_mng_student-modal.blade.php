@@ -1,19 +1,26 @@
 @extends('pages.common.modal')
 
+@section('modal-title','講師選択')
+
 @section('modal-body')
 
-{{-- テーブル --}}
-<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true>
-    <tr>
-        <th>担当可能な講師一覧</th>
-        <td>CWテスト講師１０１<br>
-CWテスト講師１０１<br>
-CWテスト講師１０２<br>
-CWテスト講師１０３<br>
-CWテスト講師１０４<br>
-CWテスト講師１０５<br>
-        </td>
-    </tr>
-</x-bs.table>
+<p>以下のリストより、担当講師を選択してください。</p>
+
+    {{-- 講師リスト --}}
+    <x-input.select id="tid" :select2=true >
+      <option value="1">CWテスト講師１０１</option>
+      <option value="2">CWテスト講師１０２</option>
+      <option value="3">CWテスト講師１０３</option>
+      <option value="4">CWテスト講師１０４</option>
+      <option value="5">CWテスト講師１０５</option>
+    </x-input.select>
+
+@overwrite
+
+{{-- モーダルの追加のボタン --}}
+@section('modal-button')
+
+{{-- 確定ボタン --}}
+<button type="button" class="btn btn-primary" data-dismiss="modal">確定</button>
 
 @overwrite

@@ -118,33 +118,59 @@ class SeasonStudentController extends Controller
         //$weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
 
         // 時限リスト
-        $timeList = array(
-            '1時限目','2時限目','3時限目','4時限目','5時限目','6時限目','7時限目',
-        );
-
-        // 期間リスト（日付・曜日）
-        $dayList = array(
-            '03/27(月)','03/28(火)','03/29(水)','03/30(木)','03/31(金)','04/01(土)',
-            '04/03(月)','04/04(火)','04/05(水)','04/06(木)','04/07(金)','04/08(土)'
+        //$timeList = array(
+        //    '1時限目','2時限目','3時限目','4時限目','5時限目','6時限目','7時限目',
+        //);
+        $periodIdList = array(
+            1, 2, 3, 4, 5, 6, 7
         );
 
         // コロンを除いた値をIDとして扱う
         // 管理画面では送信しないが、教師画面と統一した
-        $timeIdList = [];
-        foreach ($timeList as $time) {
-            //$timeId = str_replace(":", "", $time);
-            $timeId = str_replace("時限目", "", $time);
-            array_push($timeIdList, $timeId);
+        //$timeIdList = [];
+        //foreach ($timeList as $time) {
+        //    //$timeId = str_replace(":", "", $time);
+        //    $timeId = str_replace("時限目", "", $time);
+        //    array_push($timeIdList, $timeId);
+        //}
+        //$periodList = [];
+        //foreach ($periodIdList as $periodId) {
+        //    //$timeId = str_replace(":", "", $time);
+        //    $periodStr = $periodId . "時限目";
+        //    array_push($periodList, $periodStr);
+        //}
+
+        // 期間リスト（日付・曜日）
+        //$dayList = array(
+        //    '03/27(月)','03/28(火)','03/29(水)','03/30(木)','03/31(金)','04/01(土)',
+        //    '04/03(月)','04/04(火)','04/05(水)','04/06(木)','04/07(金)','04/08(土)'
+        //);
+
+        $dayListWk = array(
+            '2023/03/27','2023/03/28','2023/03/29','2023/03/30','2023/03/31','2023/04/01',
+            '2023/04/03','2023/04/04','2023/04/05','2023/04/06','2023/04/07','2023/04/08'
+        );
+
+        $week = array( "日", "月", "火", "水", "木", "金", "土" );
+        $dayList = [];
+        foreach ($dayListWk as $day) {
+            // 配列に追加
+            array_push($dayList, 
+                date('m/d',strtotime($day)) . '(' . $week[date('w', strtotime($day))] . ')');
         }
 
+        $dayIdList = [];
+        foreach ($dayListWk as $day) {
+            array_push($dayIdList, date('md',strtotime($day)));
+        }
         // 教師の空き時間を取得する
         //$weeklyShift = WeeklyShift::where('tid', $tid)
         //    ->get();
 
         // チェックボックスをセットするための値を生成
-        // 例：['1_1030', '2_1030']
+        // 例：['0401_1', '0401_2']
+        $editData = ['0329_1', '0329_2'];
         //$editData = [];
-        $editData = ['1_1', '1_2'];
         //foreach ($weeklyShift as $ws) {
         //    // 配列に追加
         //    array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
@@ -155,9 +181,10 @@ class SeasonStudentController extends Controller
 
         return view('pages.student.season_student-detail', [
             //'weekdayList' => $weekdayList,
-            'periodList' => $timeList,
-            'periodIdList' => $timeIdList,
+            //'periodList' => $periodList,
+            'periodIdList' => $periodIdList,
             'dayList' => $dayList,
+            'dayIdList' => $dayIdList,
             'editData' => [
                 'chkWs' => $editData
             ],

@@ -13,7 +13,7 @@
 @section('content')
 
 {{-- フォームなし --}}
-<x-bs.card :form=true>
+<x-bs.card class="pa-table-checked" :form=true>
     <x-slot name="card_title">
         CWテスト生徒１
     </x-slot>
@@ -69,13 +69,13 @@
         <div class="chk-t" data-wt="{{$j}}_{{$periodIdList[$i]}}">
             @if (!in_array($j . "_" . $periodIdList[$i], $editData["chkWs"]))
             <div class="tt-button">
-              <x-input.select id="tid_{{$j}}_{{$periodIdList[$i]}}" :select2=true >
-                <option value="1">CWテスト講師１０１</option>
-                <option value="2">CWテスト講師１０２</option>
-                <option value="3">CWテスト講師１０３</option>
-                <option value="4">CWテスト講師１０４</option>
-                <option value="5">CWテスト講師１０５</option>
-              </x-input.select>
+              <x-button.list-dtl caption="講師"/>
+              @if ($i == 0 && $j== 0 )
+              <span>CWテスト講師１０１</span>
+              @endif
+              @if ($i == 1 && $j== 2 )
+              <span>CWテスト講師１０１</span>
+              @endif
             </div>
             @endif
         </div>
