@@ -911,6 +911,11 @@ return [
                     'active' => ['master_mng_subject*']
                 ],
                 [
+                    'text' => '成績科目マスタ管理',
+                    'route' => 'master_mng_grade_subject',
+                    'active' => ['master_mng_grade_subject*']
+                ],
+                [
                     'text' => 'コースマスタ管理',
                     'route' => 'master_mng_course',
                     'active' => ['master_mng_course*']

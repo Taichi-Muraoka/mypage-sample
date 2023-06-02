@@ -687,6 +687,7 @@ use App\Http\Controllers\Admin\GiveBadgeController;
 use App\Http\Controllers\Admin\MasterMngCampusController;
 use App\Http\Controllers\Admin\MasterMngBoothController;
 use App\Http\Controllers\Admin\MasterMngSubjectController;
+use App\Http\Controllers\Admin\MasterMngGradeSubjectController;
 use App\Http\Controllers\Admin\MasterMngTimetableController;
 use App\Http\Controllers\Admin\MasterMngCourseController;
 use App\Http\Controllers\Admin\MasterMngSystemController;
@@ -1809,6 +1810,33 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/master_mng_subject/delete', [MasterMngSubjectController::class, 'delete'])->name('master_mng_subject-delete');
+
+    //---------------------
+    // 成績科目マスタ モック
+    //---------------------
+    // 一覧
+    Route::get('/master_mng_grade_subject', [MasterMngGradeSubjectController::class, 'index'])->name('master_mng_grade_subject');
+
+    // 詳細取得用
+    Route::post('/master_mng_grade_subject/get_data', [MasterMngGradeSubjectController::class, 'getData'])->name('master_mng_grade_subject-get_data');
+
+    // 登録
+    Route::get('/master_mng_grade_subject/new', [MasterMngGradeSubjectController::class, 'new'])->name('master_mng_grade_subject-new');
+
+    // 登録処理
+    Route::post('/master_mng_grade_subject/create', [MasterMngGradeSubjectController::class, 'create'])->name('master_mng_grade_subject-create');
+
+    // 編集
+    Route::get('/master_mng_grade_subject/edit/{gradeSubjectId}', [MasterMngGradeSubjectController::class, 'edit'])->name('master_mng_grade_subject-edit');
+
+    // 編集処理
+    Route::post('/master_mng_grade_subject/update', [MasterMngGradeSubjectController::class, 'update'])->name('master_mng_grade_subject-update');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng_grade_subject/vd_input', [MasterMngGradeSubjectController::class, 'validationForInput'])->name('master_mng_grade_subject-vd_input');
+
+    // 削除処理
+    Route::post('/master_mng_grade_subject/delete', [MasterMngGradeSubjectController::class, 'delete'])->name('master_mng_grade_subject-delete');
 
     //---------------------
     // 時間割マスタ モック
