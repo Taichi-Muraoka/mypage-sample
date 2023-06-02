@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', (request()->routeIs('master_mng_school-edit')) ? '校舎マスタデータ編集' : '校舎マスタデータ登録')
+@section('title', (request()->routeIs('master_mng_campus-edit')) ? '校舎マスタデータ編集' : '校舎マスタデータ登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -10,7 +10,7 @@
 {{-- formを指定 --}}
 <x-bs.card :form=true>
 
-    @if (request()->routeIs('master_mng_school-edit'))
+    @if (request()->routeIs('master_mng_campus-edit'))
     {{-- 編集時 --}}
     <p>以下の校舎情報について編集を行います。</p>
     {{-- 余白 --}}
@@ -34,7 +34,7 @@
         <div class="d-flex justify-content-between">
             <x-button.back />
 
-            @if (request()->routeIs('master_mng_school-edit'))
+            @if (request()->routeIs('master_mng_campus-edit'))
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
                 <x-button.submit-delete />

@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '科目マスタ管理')
+@section('title', '授業科目マスタ管理')
 
 @section('content')
 
@@ -16,42 +16,34 @@
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
-			<th width="20%">科目コード</th>
-			<th width="20%">学校区分</th>
-			<th width="20%">使用種別</th>
-			<th width="20%">名称</th>
-			<th width="15%"></th>
+			<th width="40%">科目コード</th>
+			<th width="40%">名称</th>
+			<th width="10%"></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}
 		<tr>
 			<td>001</td>
-			<td>小</td>
-			<td>共通</td>
 			<td>国語</td>
 			<td>
 				<x-button.list-dtl />
-                <x-button.list-edit href="{{ route('master_mng_subject-edit') }}" />
+                <x-button.list-edit href="{{ route('master_mng_subject-edit',1) }}" />
 			</td>
 		</tr>
 		<tr>
-			<td>110</td>
-			<td>中</td>
-			<td>授業のみ</td>
-			<td>国数</td>
+			<td>002</td>
+			<td>数学</td>
 			<td>
 				<x-button.list-dtl />
-                <x-button.list-edit href="{{ route('master_mng_subject-edit') }}" />
+                <x-button.list-edit href="{{ route('master_mng_subject-edit',1) }}" />
 			</td>
 		</tr>
 		<tr>
-			<td>259</td>
-			<td>高</td>
-			<td>成績のみ</td>
+			<td>003</td>
 			<td>英語</td>
 			<td>
 				<x-button.list-dtl />
-                <x-button.list-edit href="{{ route('master_mng_subject-edit') }}" />
+                <x-button.list-edit href="{{ route('master_mng_subject-edit',1) }}" />
 			</td>
 		</tr>
 

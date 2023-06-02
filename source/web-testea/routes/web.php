@@ -684,7 +684,10 @@ use App\Http\Controllers\Admin\DataResetController;
 use App\Http\Controllers\Admin\ImportSchoolCodeController;
 use App\Http\Controllers\Admin\OvertimeController;
 use App\Http\Controllers\Admin\GiveBadgeController;
+use App\Http\Controllers\Admin\MasterMngCampusController;
 use App\Http\Controllers\Admin\MasterMngBoothController;
+use App\Http\Controllers\Admin\MasterMngSubjectController;
+use App\Http\Controllers\Admin\MasterMngGradeSubjectController;
 use App\Http\Controllers\Admin\MasterMngTimetableController;
 use App\Http\Controllers\Admin\MasterMngCourseController;
 use App\Http\Controllers\Admin\MasterMngSystemController;
@@ -1727,65 +1730,32 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // バリデーション(登録用)
     Route::post('/master_mng/vd_input', [MasterMngController::class, 'validationForInput'])->name('master_mng-vd_input');
 
+    //---------------------
+    // 校舎マスタ モック
+    //---------------------
+    // 一覧
+    Route::get('/master_mng_campus', [MasterMngCampusController::class, 'index'])->name('master_mng_campus');
 
-    // 校舎マスタ
-    // 一覧画面
-    Route::get('/master_mng_school', [MasterMngController::class, 'indexSchool'])->name('master_mng_school');
+    // 詳細取得用
+    Route::post('/master_mng_campus/get_data', [MasterMngCampusController::class, 'getData'])->name('master_mng_campus-get_data');
 
-    // 新規登録画面
-    Route::get('/master_mng_school/new', [MasterMngController::class, 'newSchool'])->name('master_mng_school-new');
+    // 登録
+    Route::get('/master_mng_campus/new', [MasterMngCampusController::class, 'new'])->name('master_mng_campus-new');
 
-    // 新規登録処理
-    Route::post('/master_mng_school/create', [MasterMngController::class, 'createSchool'])->name('master_mng_school-create');
+    // 登録処理
+    Route::post('/master_mng_campus/create', [MasterMngCampusController::class, 'create'])->name('master_mng_campus-create');
 
-    // 編集画面
-    Route::get('/master_mng_school/edit', [MasterMngController::class, 'editSchool'])->name('master_mng_school-edit');
-
-    // 編集処理
-    Route::post('/master_mng_school/update', [MasterMngController::class, 'updateSchool'])->name('master_mng_school-update');
-
-    // 削除処理
-    Route::post('/master_mng_school/delete', [MasterMngController::class, 'deleteSchool'])->name('master_mng_school-delete');
-
-
-    // 教科マスタ
-    // 一覧画面
-    Route::get('/master_mng_subject', [MasterMngController::class, 'indexSubject'])->name('master_mng_subject');
-
-    // 新規登録画面
-    Route::get('/master_mng_subject/new', [MasterMngController::class, 'newSubject'])->name('master_mng_subject-new');
-
-    // 新規登録処理
-    Route::post('/master_mng_subject/create', [MasterMngController::class, 'createSubject'])->name('master_mng_subject-create');
-
-    // 編集画面
-    Route::get('/master_mng_subject/edit', [MasterMngController::class, 'editSubject'])->name('master_mng_subject-edit');
+    // 編集
+    Route::get('/master_mng_campus/edit/{campusId}', [MasterMngCampusController::class, 'edit'])->name('master_mng_campus-edit');
 
     // 編集処理
-    Route::post('/master_mng_subject/update', [MasterMngController::class, 'updateSubject'])->name('master_mng_subject-update');
+    Route::post('/master_mng_campus/update', [MasterMngCampusController::class, 'update'])->name('master_mng_campus-update');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng_campus/vd_input', [MasterMngCampusController::class, 'validationForInput'])->name('master_mng_campus-vd_input');
 
     // 削除処理
-    Route::post('/master_mng_subject/delete', [MasterMngController::class, 'deleteSubject'])->name('master_mng_subject-delete');
-
-
-    // 学年マスタ
-    // 一覧画面
-    // Route::get('/master_mng_grade', [MasterMngController::class, 'indexGrade'])->name('master_mng_grade');
-
-    // // 新規登録画面
-    // Route::get('/master_mng_grade/new', [MasterMngController::class, 'newGrade'])->name('master_mng_grade-new');
-
-    // // 新規登録処理
-    // Route::post('/master_mng_grade/create', [MasterMngController::class, 'createGrade'])->name('master_mng_grade-create');
-
-    // // 編集画面
-    // Route::get('/master_mng_grade/edit', [MasterMngController::class, 'editGrade'])->name('master_mng_grade-edit');
-
-    // // 編集処理
-    // Route::post('/master_mng_grade/update', [MasterMngController::class, 'updateGrade'])->name('master_mng_grade-update');
-
-    // // 削除処理
-    // Route::post('/master_mng_grade/delete', [MasterMngController::class, 'deleteGrade'])->name('master_mng_grade-delete');
+    Route::post('/master_mng_campus/delete', [MasterMngCampusController::class, 'delete'])->name('master_mng_campus-delete');
 
     //---------------------
     // 指導ブースマスタ モック
@@ -1813,6 +1783,60 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/master_mng_booth/delete', [MasterMngBoothController::class, 'delete'])->name('master_mng_booth-delete');
+
+    //---------------------
+    // 授業科目マスタ モック
+    //---------------------
+    // 一覧
+    Route::get('/master_mng_subject', [MasterMngSubjectController::class, 'index'])->name('master_mng_subject');
+
+    // 詳細取得用
+    Route::post('/master_mng_subject/get_data', [MasterMngSubjectController::class, 'getData'])->name('master_mng_subject-get_data');
+
+    // 登録
+    Route::get('/master_mng_subject/new', [MasterMngSubjectController::class, 'new'])->name('master_mng_subject-new');
+
+    // 登録処理
+    Route::post('/master_mng_subject/create', [MasterMngSubjectController::class, 'create'])->name('master_mng_subject-create');
+
+    // 編集
+    Route::get('/master_mng_subject/edit/{subjectId}', [MasterMngSubjectController::class, 'edit'])->name('master_mng_subject-edit');
+
+    // 編集処理
+    Route::post('/master_mng_subject/update', [MasterMngSubjectController::class, 'update'])->name('master_mng_subject-update');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng_subject/vd_input', [MasterMngSubjectController::class, 'validationForInput'])->name('master_mng_subject-vd_input');
+
+    // 削除処理
+    Route::post('/master_mng_subject/delete', [MasterMngSubjectController::class, 'delete'])->name('master_mng_subject-delete');
+
+    //---------------------
+    // 成績科目マスタ モック
+    //---------------------
+    // 一覧
+    Route::get('/master_mng_grade_subject', [MasterMngGradeSubjectController::class, 'index'])->name('master_mng_grade_subject');
+
+    // 詳細取得用
+    Route::post('/master_mng_grade_subject/get_data', [MasterMngGradeSubjectController::class, 'getData'])->name('master_mng_grade_subject-get_data');
+
+    // 登録
+    Route::get('/master_mng_grade_subject/new', [MasterMngGradeSubjectController::class, 'new'])->name('master_mng_grade_subject-new');
+
+    // 登録処理
+    Route::post('/master_mng_grade_subject/create', [MasterMngGradeSubjectController::class, 'create'])->name('master_mng_grade_subject-create');
+
+    // 編集
+    Route::get('/master_mng_grade_subject/edit/{gradeSubjectId}', [MasterMngGradeSubjectController::class, 'edit'])->name('master_mng_grade_subject-edit');
+
+    // 編集処理
+    Route::post('/master_mng_grade_subject/update', [MasterMngGradeSubjectController::class, 'update'])->name('master_mng_grade_subject-update');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng_grade_subject/vd_input', [MasterMngGradeSubjectController::class, 'validationForInput'])->name('master_mng_grade_subject-vd_input');
+
+    // 削除処理
+    Route::post('/master_mng_grade_subject/delete', [MasterMngGradeSubjectController::class, 'delete'])->name('master_mng_grade_subject-delete');
 
     //---------------------
     // 時間割マスタ モック
