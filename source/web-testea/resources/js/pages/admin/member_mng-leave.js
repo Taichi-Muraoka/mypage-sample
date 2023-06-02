@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 会員登録・編集
+ * 会員退会登録
  */
 export default class AppClass extends PageBase {
     /**
@@ -17,7 +17,6 @@ export default class AppClass extends PageBase {
     start() {
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            //UrlCom.redirect(self._getFuncUrl());
             // 生徒カルテ画面（二階層目）に戻る
             self.redirectToParent();
         };

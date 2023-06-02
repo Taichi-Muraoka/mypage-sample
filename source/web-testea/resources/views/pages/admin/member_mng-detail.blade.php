@@ -240,6 +240,7 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
+            <th width="10%">年度</th>
             <th width="10%">志望順</th>
             <th>学校名</th>
             <th>学部・学科名</th>
@@ -250,6 +251,7 @@
 
         {{-- テーブル行 --}}
         <tr>
+            <td>2022</td>
             <td>1</td>
             <td>青山高等学校</td>
             <td>普通科</td>
@@ -263,6 +265,7 @@
             </td>
         </tr>
         <tr>
+            <td>2022</td>
             <td>2</td>
             <td>成城第二高等学校</td>
             <td>特進科</td>
@@ -312,7 +315,7 @@
             <td>個別指導コース</td>
             <td>数学</td>
             <td>初回授業（入会金無料）</td>
-            <td>出席</td>
+            <td>実施前・出席</td>
             <td>
                 <x-button.list-dtl  dataTarget="#modal-dtl-student_class" />
             </td>
@@ -325,7 +328,7 @@
             <td>個別指導コース</td>
             <td>英語</td>
             <td>通常</td>
-            <td>出席</td>
+            <td>実施前・出席</td>
             <td>
                 <x-button.list-dtl dataTarget="#modal-dtl-student_class" />
             </td>
@@ -338,7 +341,7 @@
             <td>個別指導コース</td>
             <td>英語</td>
             <td>通常</td>
-            <td>後日振替（振替日未定）</td>
+            <td>振替中（未振替）</td>
             <td>
                 <x-button.list-dtl  dataTarget="#modal-dtl-student_class" />
             </td>
@@ -351,7 +354,7 @@
             <td>個別指導コース</td>
             <td>数学</td>
             <td>通常</td>
-            <td>実施前</td>
+            <td>実施前・出席</td>
             <td>
                 <x-button.list-dtl  dataTarget="#modal-dtl-student_class" />
             </td>

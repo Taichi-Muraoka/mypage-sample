@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '生徒授業情報検索')
+@section('title', '授業情報検索')
 
 @section('content')
 
@@ -31,7 +31,7 @@
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="teacher" caption="担当講師名" />
+            <x-input.text id="teacher" caption="講師名" />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
@@ -93,7 +93,7 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">授業日</th>
+            <th width="10%">授業日</th>
             <th>時限</th>
             <th>校舎</th>
             <th>生徒名</th>
@@ -116,7 +116,7 @@
             <td>個別指導コース</td>
             <td>英語</td>
             <td>追加</td>
-            <td>実施前</td>
+            <td>実施前・出席</td>
             <td>〇</td>
             <td>
                 <x-button.list-dtl />
@@ -131,7 +131,7 @@
             <td>個別指導コース</td>
             <td>数学</td>
             <td>通常</td>
-            <td>実施前</td>
+            <td>実施前・出席</td>
             <td>✕</td>
             <td>
                 <x-button.list-dtl />
@@ -161,7 +161,7 @@
             <td>個別指導コース</td>
             <td>社会</td>
             <td>通常</td>
-            <td>後日振替（振替日未定）</td>
+            <td>振替中（未振替）</td>
             <td>〇</td>
             <td>
                 <x-button.list-dtl />
@@ -175,8 +175,8 @@
             <td>CWテスト教師１０２</td>
             <td>個別指導コース</td>
             <td>英語</td>
-            <td>振替</td>
-            <td>出席</td>
+            <td>追加</td>
+            <td>実施前・出席</td>
             <td>〇</td>
             <td>
                 <x-button.list-dtl />

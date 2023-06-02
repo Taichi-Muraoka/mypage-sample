@@ -48,7 +48,7 @@
     <x-bs.row>
         <x-bs.col2>
             <x-bs.form-group name="status_groups">
-                <x-bs.form-title>対象生徒</x-bs.form-title>
+                <x-bs.form-title>会員ステータス</x-bs.form-title>
                 {{-- 教科チェックボックス --}}
                 @for ($i = 0; $i < count($statusGroup); $i++)
                 <x-input.checkbox :caption="$statusGroup[$i]"
@@ -85,12 +85,12 @@
         <x-slot name="thead">
             <th>生徒No</th>
             <th>生徒名</th>
-            <th>メールアドレス</th>
             <th>学年</th>
             <th>入会日</th>
             <th>通塾期間</th>
             <th>通塾バッジ数</th>
             <th>受講科目</th>
+            <th>会員ステータス</th>
             <th></th>
         </x-slot>
 
@@ -98,12 +98,12 @@
         <tr>
             <td>1</td>
             <td>CWテスト生徒１</td>
-            <td>student0001@ap.jeez.jp</td>
             <td>中学１年</td>
             <td>2023/4/1</td>
             <td>2ヶ月</td>
             <td>0</td>
             <td>数学</td>
+            <td>入会</td>
             <td>
                 <x-button.list-dtl href="{{ route('member_mng-detail', 1) }}" caption="生徒カルテ" />
             </td>
@@ -111,12 +111,12 @@
         <tr>
             <td>2</td>
             <td>CWテスト生徒２</td>
-            <td>student0002@ap.jeez.jp</td>
             <td>中学１年</td>
             <td>2021/12/1</td>
             <td>1年6ヶ月</td>
             <td>1</td>
             <td>英語</td>
+            <td>入会</td>
             <td>
                 <x-button.list-dtl href="{{ route('member_mng-detail', 2) }}" caption="生徒カルテ" />
             </td>
@@ -124,12 +124,12 @@
         <tr>
             <td>3</td>
             <td>CWテスト生徒３</td>
-            <td>student0003@ap.jeez.jp</td>
             <td>中学２年</td>
             <td>2022/6/1</td>
             <td>1年0ヶ月</td>
             <td>0</td>
             <td>英語</td>
+            <td>入会</td>
             <td>
                 <x-button.list-dtl href="{{ route('member_mng-detail', 3) }}" caption="生徒カルテ" />
             </td>
@@ -137,12 +137,12 @@
         <tr>
             <td>4</td>
             <td>CWテスト生徒４</td>
-            <td>student0004@ap.jeez.jp</td>
             <td>中学２年</td>
             <td>2022/4/1</td>
             <td>1年2ヶ月</td>
             <td>1</td>
             <td>数学</td>
+            <td>入会</td>
             <td>
                 <x-button.list-dtl href="{{ route('member_mng-detail', 4) }}" caption="生徒カルテ" />
             </td>
@@ -150,12 +150,12 @@
         <tr>
             <td>5</td>
             <td>CWテスト生徒５</td>
-            <td>student0005@ap.jeez.jp</td>
             <td>中学３年</td>
             <td>2019/7/1</td>
             <td>3年11ヶ月</td>
             <td>3</td>
             <td>国語・数学・英語</td>
+            <td>入会</td>
             <td>
                 <x-button.list-dtl href="{{ route('member_mng-detail', 5) }}" caption="生徒カルテ" />
             </td>
@@ -163,12 +163,12 @@
         <tr>
             <td>6</td>
             <td>CWテスト生徒６</td>
-            <td>student0006@ap.jeez.jp</td>
             <td>中学３年</td>
             <td>2021/4/1</td>
             <td>2年2ヶ月</td>
             <td>2</td>
             <td>国語</td>
+            <td>退会済</td>
             <td>
                 <x-button.list-dtl href="{{ route('member_mng-detail', 6) }}" caption="生徒カルテ" />
             </td>
