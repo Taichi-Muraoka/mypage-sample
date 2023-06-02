@@ -927,6 +927,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 削除処理
     Route::post('/room_calendar/delete', [RoomCalendarController::class, 'delete'])->name('room_calendar-delete');
 
+    // 教室カレンダー欠席登録画面（集団のみ）
+    Route::get('/room_calendar/absent/{scheduleId}', [RoomCalendarController::class, 'absent'])->name('room_calendar-absent');
+
     //---------------------
     // レギュラーカレンダー
     //---------------------

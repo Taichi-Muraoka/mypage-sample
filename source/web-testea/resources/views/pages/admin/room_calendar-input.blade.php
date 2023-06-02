@@ -27,6 +27,16 @@
 
     <x-input.date-picker caption="授業日" id="curDate" :editData=$editData />
 
+    <x-input.select caption="時限" id="period" :select2=true :editData="$editData">
+        <option value="1">1限</option>
+        <option value="2">2限</option>
+        <option value="3">3限</option>
+        <option value="4">4限</option>
+        <option value="5">5限</option>
+        <option value="6">6限</option>
+        <option value="7">7限</option>
+    </x-input.select>
+
     <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules :editData=$editData />
 
     <x-input.time-picker caption="終了時刻" id="end_time" :rules=$rules :editData=$editData />
@@ -65,11 +75,11 @@
         <option value="5">英語</option>
     </x-input.select>
 
-    <x-input.select vShow="form.course_cd != 5" caption="授業種別" id="status" :select2=true :select2Search=false :editData="$editData">
+    <x-input.select vShow="form.course_cd != 5" caption="授業区分" id="status" :select2=true :select2Search=false :editData="$editData">
         <option value="1" selected>通常</option>
-        <option value="2">振替</option>
-        <option value="3">初回授業（入会金無料）</option>
-        <option value="4">体験授業１回目</option>
+        <option value="2">特別期間</option>
+        <option value="3">初回授業</option>
+        <option value="4">体験授業</option>
         <option value="5">追加</option>
     </x-input.select>
 
@@ -80,6 +90,9 @@
         <option value="4">両者オンライン</option>
     </x-input.select>
 
+
+    @if (request()->routeIs('room_calendar-edit'))
+    {{-- 編集時 --}}
     <x-input.select vShow="form.course_cd != 5" caption="授業代講" id="daiko" :select2=true :select2Search=false :editData="$editData">
         <option value="1" selected>なし</option>
         <option value="2">代講</option>
@@ -87,19 +100,24 @@
     </x-input.select>
     </div>
 
-    <x-input.textarea id="text" caption="メモ" :rules=$rules :editData=$editData />
+    <x-input.select vShow="form.course_cd != 5 && form.daiko != 1" caption="代講講師" id="daiko_tid" :select2=true :editData="$editData">
+        <option value="1">CWテスト教師１</option>
+        <option value="2">CWテスト教師２</option>
+    </x-input.select>
 
-    @if (request()->routeIs('room_calendar-edit'))
-    {{-- 編集時 --}}
-    <x-input.select vShow="form.course_cd != 5" caption="出欠ステータス" id="todayabsent" :select2=true :select2Search=false :editData="$editData">
-        <option value="0" selected>実施前</option>
+    <x-input.select vShow="form.course_cd == 1" caption="出欠ステータス" id="todayabsent" :select2=true :select2Search=false :editData="$editData">
+        <option value="0" selected>実施前・出席</option>
         <option value="1">当日欠席（講師出勤なし）</option>
         <option value="2">当日欠席（講師出勤あり）</option>
-        <option value="3">後日振替（振替日未定）</option>
-        <option value="4">後日振替（振替日決定）</option>
-        <option value="5">出席</option>
+        <option value="3">振替中（未振替）</option>
+        <option value="4">振替済</option>
     </x-input.select>
-    @else
+
+    @endif
+
+    <x-input.textarea id="text" caption="メモ" :rules=$rules :editData=$editData />
+
+    @if (request()->routeIs('room_calendar-new'))
     {{-- 登録時 --}}
     {{-- 余白 --}}
     <div class="mb-3"></div>

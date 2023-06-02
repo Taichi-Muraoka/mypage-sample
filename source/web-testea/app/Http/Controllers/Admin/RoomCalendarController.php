@@ -343,6 +343,7 @@ class RoomCalendarController extends Controller
             'rules' => $this->rulesForInput(null)
         ]);
     }
+
     /**
      * コピー登録画面
      *
@@ -383,6 +384,47 @@ class RoomCalendarController extends Controller
             'rules' => $this->rulesForInput(null)
         ]);
 
+    }
+
+    /**
+     * 欠席登録画面
+     *
+     * @param int $scheduleId スケジュールID
+     * @return view
+     */
+    public function absent($scheduleId)
+    {
+
+        // IDのバリデーション
+        $this->validateIds($scheduleId);
+
+        // 教室リストを取得
+        $rooms = $this->mdlGetRoomList();
+
+        // スケジュールを取得
+        $extSchedule = ExtSchedule::select(
+            'lesson_date',
+            'start_time',
+            'end_time',
+            'sid',
+            'tid',
+            'roomcd'
+        )
+            ->where('id', $scheduleId)
+            ->firstOrFail();
+
+        $editData = [
+            'roomcd' => $extSchedule['roomcd'],
+            'curDate' => $extSchedule['lesson_date'],
+            'start_time' => $extSchedule['start_time'],
+            'end_time' => $extSchedule['end_time'],
+        ];
+
+        return view('pages.admin.room_calendar-absent', [
+            'rooms' => $rooms,
+            'editData' => $editData,
+            'rules' => $this->rulesForInput(null)
+        ]);
     }
 
     /**

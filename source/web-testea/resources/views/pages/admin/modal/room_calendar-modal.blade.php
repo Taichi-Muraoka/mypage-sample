@@ -80,7 +80,10 @@
 @section('modal-button')
 
 {{-- 更新ボタンを表示 --}}
+<x-button.edit v-Show="item.lesson_type == 1" vueHref="'{{ route('room_calendar-absent', '') }}/' + item.id" icon="" caption="欠席登録" />
+{{-- 更新ボタンを表示 --}}
 <x-button.edit vueHref="'{{ route('room_calendar-edit', '') }}/' + item.id" icon="" caption="スケジュール編集" />
+{{-- コピー登録ボタンを表示 --}}
 <x-button.edit vueHref="'{{ route('room_calendar-copy', '') }}/' + item.id" icon="" caption="コピー登録" />
 
 @overwrite
