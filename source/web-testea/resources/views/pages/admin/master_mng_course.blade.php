@@ -18,13 +18,13 @@
 		<x-slot name="thead">
 			<th width="20%">コースコード</th>
 			<th width="60%">名称</th>
-			<th width="20%"></th>
+			<th width="10%"></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}
 		<tr>
 			<td>101</td>
-			<td>個別指導 中学生コース（受験準備学年）</td>
+			<td>個別指導</td>
 			<td>
 				<x-button.list-dtl />
                 <x-button.list-edit href="{{ route('master_mng_course-edit',1) }}" />
@@ -32,7 +32,7 @@
 		</tr>
 		<tr>
 			<td>201</td>
-			<td>集団授業 中学生 英語・数学総復習パック</td>
+			<td>集団授業</td>
 			<td>
 				<x-button.list-dtl />
                 <x-button.list-edit href="{{ route('master_mng_course-edit',1) }}" />
