@@ -30,7 +30,7 @@
 			<td>国語</td>
 			<td>国語ドリル基礎</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_text-edit',1) }}" />
 			</td>
 		</tr>
@@ -40,7 +40,7 @@
 			<td>数学</td>
 			<td>数学ドリル発展</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_text-edit',1) }}" />
 			</td>
 		</tr>
@@ -50,7 +50,7 @@
 			<td>英語</td>
 			<td>コミュニケーション英語演習</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_text-edit',1) }}" />
 			</td>
 		</tr>

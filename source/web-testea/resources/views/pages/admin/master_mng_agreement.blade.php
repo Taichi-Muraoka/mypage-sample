@@ -36,7 +36,7 @@
 			<td>8,470</td>
 			<td>4</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_agreement-edit',1) }}" />
 			</td>
 		</tr>
@@ -49,7 +49,7 @@
 			<td>5,000</td>
 			<td>10</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_agreement-edit',1) }}" />
 			</td>
 		</tr>

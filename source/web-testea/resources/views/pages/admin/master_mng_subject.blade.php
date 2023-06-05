@@ -26,7 +26,7 @@
 			<td>001</td>
 			<td>国語</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_subject-edit',1) }}" />
 			</td>
 		</tr>
@@ -34,7 +34,7 @@
 			<td>002</td>
 			<td>数学</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_subject-edit',1) }}" />
 			</td>
 		</tr>
@@ -42,7 +42,7 @@
 			<td>003</td>
 			<td>英語</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_subject-edit',1) }}" />
 			</td>
 		</tr>

@@ -16,9 +16,9 @@
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
-			<th width="20%">成績科目コード</th>
-			<th width="20%">学校区分</th>
-			<th width="20%">名称</th>
+			<th>成績科目コード</th>
+			<th>学校区分</th>
+			<th>名称</th>
 			<th width="10%"></th>
 		</x-slot>
 
@@ -28,7 +28,7 @@
 			<td>小</td>
 			<td>国語</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
 			</td>
 		</tr>
@@ -37,7 +37,7 @@
 			<td>中</td>
 			<td>国語</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
 			</td>
 		</tr>
@@ -46,7 +46,7 @@
 			<td>高</td>
 			<td>英語</td>
 			<td>
-				<x-button.list-dtl />
+				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
 			</td>
 		</tr>
