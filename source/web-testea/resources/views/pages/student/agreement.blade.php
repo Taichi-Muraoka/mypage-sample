@@ -77,7 +77,7 @@
                 @endfor
             </x-bs.td-sp>
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-badge" />
+                <x-button.list-dtl dataTarget="#" />
             </td>
         </tr>
         <tr>
@@ -107,7 +107,7 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-bs.form-title>契約・申込情報</x-bs.form-title>
+    <x-bs.form-title>契約情報</x-bs.form-title>
 
     {{-- テーブル --}}
     <x-bs.table :button=true :smartPhone=true class="inner-card">
@@ -137,18 +137,18 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-bs.form-title>特別期間講習情報</x-bs.form-title>
+    {{-- <x-bs.form-title>特別期間講習情報</x-bs.form-title> --}}
 
     {{-- テーブル --}}
-    <x-bs.table :button=true :smartPhone=true class="inner-card">
+    {{-- <x-bs.table :button=true :smartPhone=true class="inner-card"> --}}
         {{-- テーブルタイトル行 --}}
-        <x-slot name="thead">
+        {{-- <x-slot name="thead">
             <th>特別期間名</th>
             <th width="20%">回数</th>
-        </x-slot>
+        </x-slot> --}}
 
         {{-- テーブル行 --}}
-        <tr>
+        {{-- <tr>
             <x-bs.td-sp caption="特別期間名">2023年 春期</x-bs.td-sp>
             <x-bs.td-sp caption="回数" class="t-price">4</x-bs.td-sp>
         </tr>
@@ -156,28 +156,28 @@
             <x-bs.td-sp caption="特別期間名">2022年 冬期</x-bs.td-sp>
             <x-bs.td-sp caption="回数" class="t-price">4</x-bs.td-sp>
         </tr>
-    </x-bs.table>
+    </x-bs.table> --}}
 
 
     {{------------}}
     {{-- 本番用 --}}
     {{------------}}
-    @if(count($regular) > 0)
-    <x-bs.form-title>契約情報</x-bs.form-title>
+    {{-- @if(count($regular) > 0)
+    <x-bs.form-title>契約情報</x-bs.form-title> --}}
 
     {{-- テーブル --}}
-    <x-bs.table :button=true :smartPhone=true class="inner-card">
+    {{-- <x-bs.table :button=true :smartPhone=true class="inner-card"> --}}
         {{-- テーブルタイトル行 --}}
-        <x-slot name="thead">
+        {{-- <x-slot name="thead">
             <th width="15%">開始日</th>
             <th width="15%">終了日</th>
             <th width="15%">月額</th>
             <th>契約情報</th>
             <th></th>
-        </x-slot>
+        </x-slot> --}}
 
         {{-- テーブル行 --}}
-        @for ($i = 0; $i < count($regular); $i++) <tr>
+        {{-- @for ($i = 0; $i < count($regular); $i++) <tr>
             <x-bs.td-sp caption="開始日">{{$regular[$i]->startdate->format('Y/m/d')}}</x-bs.td-sp>
             <x-bs.td-sp caption="終了日">{{$regular[$i]->enddate->format('Y/m/d')}}</x-bs.td-sp>
             <x-bs.td-sp caption="月額" class="t-price">{{number_format($regular[$i]->tuition)}}</x-bs.td-sp>
@@ -191,26 +191,26 @@
             </tr>
             @endfor
     </x-bs.table>
-    @endif
+    @endif --}}
 
-    @if(count($extra_individual) > 0)
+    {{-- @if(count($extra_individual) > 0) --}}
     {{-- 余白 --}}
-    <div class="mb-3"></div>
+    {{-- <div class="mb-3"></div> --}}
 
-    <x-bs.form-title>特別期間講習情報</x-bs.form-title>
+    {{-- <x-bs.form-title>特別期間講習情報</x-bs.form-title> --}}
 
     {{-- テーブル --}}
-    <x-bs.table :button=true :smartPhone=true class="inner-card">
+    {{-- <x-bs.table :button=true :smartPhone=true class="inner-card"> --}}
         {{-- テーブルタイトル行 --}}
-        <x-slot name="thead">
+        {{-- <x-slot name="thead">
             <th width="15%">校舎</th>
             <th width="15%">講習料</th>
             <th>講習名</th>
             <th></th>
-        </x-slot>
+        </x-slot> --}}
 
         {{-- テーブル行 --}}
-        @for ($i = 0; $i < count($extra_individual); $i++) <tr>
+        {{-- @for ($i = 0; $i < count($extra_individual); $i++) <tr>
             <x-bs.td-sp caption="校舎">{{$extra_individual[$i]->room_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="講習料" class="t-price">{{number_format($extra_individual[$i]->price)}}</x-bs.td-sp>
             <x-bs.td-sp caption="特別期間講習情報">{{$extra_individual[$i]->name}}</x-bs.td-sp>
@@ -223,16 +223,16 @@
             </tr>
             @endfor
     </x-bs.table>
-    @endif
+    @endif --}}
 
 </x-bs.card>
 
 {{-- モーダル --}}
-{{--バッジ情報 --}}
+{{-- バッジ情報 --}}
 @include('pages.student.modal.agreement_badge-modal', ['modal_id' => 'modal-dtl-badge'])
-{{--契約情報 --}}
-{{--@include('pages.student.modal.agreement_regulation-modal', ['modal_id' => 'modal-dtl-regulation']) --}}
-{{-- 特別期間講習 --}}
-{{--@include('pages.student.modal.agreement_course-modal', ['modal_id' => 'modal-dtl-course']) --}}
+{{--契約情報 現時点では不要のため削除予定 --}}
+{{-- @include('pages.student.modal.agreement_regulation-modal', ['modal_id' => 'modal-dtl-regulation']) --}}
+{{-- 特別期間講習 現時点では不要のため削除予定 --}}
+{{-- @include('pages.student.modal.agreement_course-modal', ['modal_id' => 'modal-dtl-course']) --}}
 
 @stop
