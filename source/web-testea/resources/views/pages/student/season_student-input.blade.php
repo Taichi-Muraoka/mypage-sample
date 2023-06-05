@@ -20,13 +20,13 @@
           <td>4回</td>
       </tr>
       <tr>
-        <th>提出締め切り</th>
-        <td>3/10</td>
+        <th>受付終了日</th>
+        <td>2023/03/10</td>
     </tr>
 </x-bs.table>
 
-            <x-input.select id="roomcd" caption="受講校舎" :select2=true >
-                <option value="1">久我山</option>
+            <x-input.select id="roomcd" caption="受講校舎" :select2=true :select2Search=false >
+                <option value="1" selected>久我山</option>
                 <option value="2">西永福</option>
                 <option value="3">下高井戸</option>
             </x-input.select>
