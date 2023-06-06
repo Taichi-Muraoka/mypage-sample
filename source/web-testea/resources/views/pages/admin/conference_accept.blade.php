@@ -68,7 +68,7 @@
             <td>登録済</td>
             <td>
                 <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('conference_accept-edit', 1) }}"/>
+                <x-button.list-edit href="{{ route('conference_accept-edit', 1) }}" caption="日程登録" disabled/>
             </td>
         </tr>
         <tr>
@@ -80,7 +80,7 @@
             <td>未登録</td>
             <td>
                 <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('conference_accept-edit', 1) }}"/>
+                <x-button.list-edit href="{{ route('conference_accept-edit', 1) }}" caption="日程登録"/>
             </td>
         </tr>
 
