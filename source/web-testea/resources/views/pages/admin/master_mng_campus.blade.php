@@ -16,10 +16,11 @@
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
-			<th width="20%">校舎コード</th>
-			<th width="20%">名称</th>
-			<th width="15%">表示名</th>
-			<th width="15%">略称</th>
+			<th width="15%">校舎コード</th>
+			<th>名称</th>
+			<th width="10%">表示名</th>
+			<th width="10%">略称</th>
+			<th width="25%">校舎メールアドレス</th>
 			<th width="10%">表示順</th>
 			<th width="10%"></th>
 		</x-slot>
@@ -30,6 +31,7 @@
 			<td>久我山校</td>
 			<td>久我山</td>
 			<td>久</td>
+			<td>kugayama@testea.test.com</td>
 			<td>20</td>
 			<td>
 				{{-- <x-button.list-dtl /> --}}
@@ -41,6 +43,7 @@
 			<td>西永福校</td>
 			<td>西永福</td>
 			<td>西</td>
+			<td>nishieihuku@testea.test.com</td>
 			<td>50</td>
 			<td>
 				{{-- <x-button.list-dtl /> --}}
@@ -52,6 +55,7 @@
 			<td>本郷校</td>
 			<td>本郷山</td>
 			<td>本</td>
+			<td>hongo@testea.test.com</td>
 			<td>30</td>
 			<td>
 				{{-- <x-button.list-dtl /> --}}

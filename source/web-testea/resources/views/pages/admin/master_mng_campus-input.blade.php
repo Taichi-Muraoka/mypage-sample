@@ -27,6 +27,7 @@
     <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData/>
     <x-input.text caption="表示名" id="disp_name" :rules=$rules :editData=$editData/>
     <x-input.text caption="略称" id="short_name" :rules=$rules :editData=$editData/>
+    <x-input.text caption="校舎メールアドレス" id="email_campas" :rules=$rules :editData=$editData/>
     <x-input.text caption="表示順" id="disp_order" :rules=$rules :editData=$editData/>
 
     {{-- フッター --}}
