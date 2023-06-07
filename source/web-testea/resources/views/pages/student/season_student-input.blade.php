@@ -2,6 +2,9 @@
 
 @section('title', '特別期間講習　日程連絡')
 
+{{-- 子ページ --}}
+@section('child_page', true)
+
 @section('content')
 
 {{-- フォーム --}}
@@ -25,8 +28,8 @@
     </tr>
 </x-bs.table>
 
-            <x-input.select id="roomcd" caption="受講校舎" :select2=true :select2Search=false >
-                <option value="1" selected>久我山</option>
+            <x-input.select id="roomcd" caption="受講校舎" :select2=true :select2Search=false :blank=false >
+                <option value="1">久我山</option>
                 <option value="2">西永福</option>
                 <option value="3">下高井戸</option>
             </x-input.select>

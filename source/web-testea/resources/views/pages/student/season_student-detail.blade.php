@@ -4,6 +4,9 @@
 
 @section('content')
 
+{{-- 子ページ --}}
+@section('child_page', true)
+
 {{-- フォームなし --}}
 <x-bs.card>
 
