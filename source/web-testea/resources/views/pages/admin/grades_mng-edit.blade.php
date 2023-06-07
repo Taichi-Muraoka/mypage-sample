@@ -48,6 +48,9 @@
         <option value="4">2学期末考査</option>
     </x-input.select>
 
+    {{-- 模試 --}}{{-- 定期考査 --}}
+    <x-input.date-picker caption="試験日（開始日）" id="exam_date" :editData=$editData vShow="form.exam_type != 3" />
+
     {{-- 通信票評定 --}}
     <x-input.select caption="学期" id="term_id" :select2=true :rules=$rules
         vShow="form.exam_type == 3">
