@@ -9,7 +9,7 @@
 
     <p>追加授業の依頼を行います。</p>
 
-    <x-input.select id="school" caption="校舎" :select2=true>
+    <x-input.select id="school" caption="校舎" :select2=true :select2Search=false :blank=false>
         <option value="1">久我山</option>
         <option value="2">西永福</option>
         <option value="3">本郷</option>
