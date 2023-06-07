@@ -49,7 +49,7 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th>申請日</th>
+            <th>連絡日</th>
             <th>生徒名</th>
             <th>校舎</th>
             <th>面談日</th>
