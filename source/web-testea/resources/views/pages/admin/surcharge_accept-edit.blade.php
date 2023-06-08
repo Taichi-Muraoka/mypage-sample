@@ -65,7 +65,7 @@
         <option value="3">差戻し</option>
     </x-input.select>
 
-    <x-input.textarea caption="事務局コメント" id="text" :rules=$rules />
+    <x-input.textarea caption="管理者コメント" id="text" :rules=$rules />
 
     <x-input.select caption="支払い年月" id="payment" :select2=true :editData="$editData">
         <option value="1">2023/04</option>
