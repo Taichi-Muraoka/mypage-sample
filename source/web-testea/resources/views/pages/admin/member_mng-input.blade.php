@@ -68,9 +68,33 @@
         <option value="1">非受験生</option>
         <option value="2">受験生</option>
     </x-input.select>
-    <x-input.text caption="所属学校（小）" id="school_cd_e" :rules=$rules :editData=$editData/>
-    <x-input.text caption="所属学校（中）" id="school_cd_j" :rules=$rules :editData=$editData/>
-    <x-input.text caption="所属学校（高）" id="school_cd_h" :rules=$rules :editData=$editData/>
+    <x-bs.form-title>所属学校（小）</x-bs.form-title>
+    <x-bs.row>
+        <div class="edit-disp-indent">
+            <x-button.list-dtl caption="学校検索" />
+        </div>
+        <x-bs.col2>
+            <x-input.text id="school_cd_e" :editData=$editData readOnly=true />
+        </x-bs.col2>
+    </x-bs.row>
+    <x-bs.form-title>所属学校（中）</x-bs.form-title>
+    <x-bs.row>
+        <div class="edit-disp-indent">
+            <x-button.list-dtl caption="学校検索" />
+        </div>
+        <x-bs.col2>
+            <x-input.text id="school_cd_j" :editData=$editData readOnly=true />
+        </x-bs.col2>
+    </x-bs.row>
+    <x-bs.form-title>所属学校（高）</x-bs.form-title>
+    <x-bs.row>
+        <div class="edit-disp-indent">
+            <x-button.list-dtl caption="学校検索" />
+        </div>
+        <x-bs.col2>
+            <x-input.text id="school_cd_h" :editData=$editData readOnly=true />
+        </x-bs.col2>
+    </x-bs.row>
     <x-input.text caption="生徒電話番号" id="tel_stu" :rules=$rules :editData=$editData/>
     <x-input.text caption="保護者電話番号" id="tel_par" :rules=$rules :editData=$editData/>
     <x-input.text caption="生徒メールアドレス" id="email_stu" :rules=$rules :editData=$editData/>
@@ -113,5 +137,8 @@
     </x-slot>
 
 </x-bs.card>
+{{-- モーダル --}}
+{{-- 所属学校検索 --}}
+@include('pages.admin.modal.school_search-modal')
 
 @stop

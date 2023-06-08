@@ -8,7 +8,8 @@
 {{--
   editData: 編集用のデータ
 --}}
-@props(['caption' => '', 'id' => '', 'placeholder' => '', 'editData' => [], 'rules' => [], 'vShow' => ''])
+@props(['caption' => '', 'id' => '', 'placeholder' => '', 'editData' => [], 'rules' => [], 'vShow' => '',
+'readOnly' => false])
 
 {{-- バリデーションエラー時のスクロール先 --}}
 <span class="form-validation" data-id="{{ $id }}"></span>
@@ -40,6 +41,11 @@
     {{$bladeInputRule->getMaxLength($rules, $id)}}
     {{-- 数値キーボード入力に対応。以下は特別にエスケープしない！固定文字列しか来ないので。通常は!!は使わない --}}
     {!!$bladeInputRule->setNumKeyboard($rules, $id)!!}
+
+    {{-- readonly --}}
+    @if ($readOnly)
+   readonly
+    @endif
     >
 
   {{-- バリデート結果のエラー --}}
