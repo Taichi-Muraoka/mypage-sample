@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title','振替日承認')
+@section('title','振替依頼承認')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -10,7 +10,7 @@
 {{-- formを指定 --}}
 <x-bs.card :form=true>
 
-    <p>以下の授業振替希望について、振替希望日一覧から１つ選択し、承認を行います。</p>
+    <p>以下の授業振替依頼について、振替希望日一覧から１つ選択し、承認を行います。</p>
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="35%">講師名</th>
@@ -68,8 +68,9 @@
     <x-input.textarea caption="コメント" id="transfer_comment" :rules=$rules />
 
     <x-bs.callout title="登録の際の注意事項" type="warning">
-        ステータスを「承認」として送信ボタンを押下すると、
-        選択した振替日時で授業スケジュールが登録されます。
+        振替希望日のいずれも都合が合わない場合は、コメント欄に理由を入力し、
+        ステータスを「差戻」として送信してください。<br>
+        ステータスを「承認」として送信すると、選択した振替日時で授業スケジュールが登録されます。
     </x-bs.callout>
 
     {{-- hidden --}}

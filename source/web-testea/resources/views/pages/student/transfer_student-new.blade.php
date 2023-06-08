@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '振替希望日連絡')
+@section('title', '授業振替依頼')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -10,7 +10,7 @@
 {{-- formを指定 --}}
 <x-bs.card :form=true>
 
-    <p>個別指導授業の振替希望日連絡を行います。第３希望まで指定できます。</p>
+    <p>個別指導授業の振替依頼を行います。振替日は第３希望まで指定できます。</p>
 
     <x-input.select caption="授業日・時限" id="id" :select2=true :editData="$editData">
         <option value="1">2023/01/30 3限</option>
