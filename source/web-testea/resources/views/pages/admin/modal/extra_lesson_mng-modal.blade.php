@@ -6,7 +6,7 @@
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true>
     <tr>
-        <th width="35%">申請日</th>
+        <th width="35%">依頼日</th>
         <td>2023/02/20</td>
     </tr>
     <tr>
@@ -27,7 +27,7 @@
         <td>未対応</td>
     </tr>
     <tr>
-        <th>事務局コメント</th>
+        <th>管理者コメント</th>
         <td class="nl2br"></td>
     </tr>
 

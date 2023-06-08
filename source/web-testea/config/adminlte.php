@@ -646,7 +646,7 @@ return [
                     'menuid' => 'id_transfer_required',
                 ],
                 [
-                    'text' => '追加授業申請受付',
+                    'text' => '追加授業依頼受付',
                     'route' => 'extra_lesson_mng',
                     'active' => ['extra_lesson_mng*'],
                     'menuid' => 'id_extra_lesson_mng',

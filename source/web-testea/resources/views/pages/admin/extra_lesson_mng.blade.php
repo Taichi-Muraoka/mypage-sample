@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '追加授業申請一覧')
+@section('title', '追加授業依頼一覧')
 
 @section('content')
 
@@ -55,7 +55,7 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">申請日</th>
+            <th width="15%">依頼日</th>
             <th>校舎</th>
             <th width="20%">生徒名</th>
             <th width="15%">ステータス</th>
