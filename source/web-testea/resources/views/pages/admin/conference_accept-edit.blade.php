@@ -54,11 +54,6 @@
         <option value="3">Cテーブル</option>
     </x-input.select>
 
-    <x-input.select caption="ステータス" id="status" :select2=true :blank=false :editData="$editData">
-        <option value="1" selected>未登録</option>
-        <option value="2">登録済</option>
-    </x-input.select>
-
     <x-bs.callout title="登録の際の注意事項" type="warning">
         登録ボタンを押下すると、指定した日時で面談スケジュールが登録されます。
     </x-bs.callout>
