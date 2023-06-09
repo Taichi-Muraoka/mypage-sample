@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title','授業スケジュール登録')
+@section('title','追加授業スケジュール登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -30,6 +30,17 @@
 
     <x-input.date-picker caption="授業日" id="curDate" :editData=$editData />
 
+    <x-input.select caption="時限" id="period" :select2=true :editData="$editData">
+        <option value="1">1限</option>
+        <option value="2">2限</option>
+        <option value="3">3限</option>
+        <option value="4">4限</option>
+        <option value="5">5限</option>
+        <option value="6">6限</option>
+        <option value="7">7限</option>
+    </x-input.select>
+
+    {{-- 時限選択時に開始時刻・終了時刻をonChangeで設定予定（時間割マスタより取得） --}}
     <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules :editData=$editData />
 
     <x-input.time-picker caption="終了時刻" id="end_time" :rules=$rules :editData=$editData />
@@ -76,14 +87,7 @@
         </x-input.select>
     </div>
 
-    <x-input.select vShow="form.course_cd != 5" caption="出欠ステータス" id="todayabsent" :select2=true :select2Search=false :editData="$editData">
-        <option value="0" selected>実施前</option>
-        <option value="1">当日欠席（講師出勤なし）</option>
-        <option value="2">当日欠席（講師出勤あり）</option>
-        <option value="3">後日振替（振替日未定）</option>
-        <option value="4">後日振替（振替日決定）</option>
-        <option value="5">出席</option>
-    </x-input.select>
+    <x-input.textarea id="text" caption="メモ" :rules=$rules :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">
