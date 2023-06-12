@@ -45,15 +45,15 @@
 
     <x-input.time-picker caption="終了時刻" id="end_time" :rules=$rules :editData=$editData />
 
-    <x-input.select caption="講師" id="tid" :select2=true :editData="$editData">
-        <option value="1">CWテスト教師１</option>
-        <option value="2">CWテスト教師２</option>
-    </x-input.select>
-
     <x-input.select caption="生徒" id="sid" :select2=true :editData="$editData">
         <option value="1">CWテスト生徒１</option>
         <option value="2">CWテスト生徒２</option>
         <option value="3">CWテスト生徒３</option>
+    </x-input.select>
+
+    <x-input.select caption="講師" id="tid" :select2=true :editData="$editData">
+        <option value="1">CWテスト教師１</option>
+        <option value="2">CWテスト教師２</option>
     </x-input.select>
 
     <x-input.select caption="教科" id="subject_cd" :select2=true :select2Search=false :editData="$editData">
