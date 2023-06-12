@@ -2149,6 +2149,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // // モーダル処理
     // Route::post('/conference_accept/exec_modal', [ConferenceAcceptController::class, 'execModal'])->name('conference_accept-exec_modal');
 
+    // 振替調整登録画面
+    Route::get('/conference_accept/new', [ConferenceAcceptController::class, 'new'])->name('conference_accept-new');
+
     // 振替連絡編集
     Route::get('/conference_accept/edit/{transferApplyId}', [ConferenceAcceptController::class, 'edit'])->name('conference_accept-edit');
 

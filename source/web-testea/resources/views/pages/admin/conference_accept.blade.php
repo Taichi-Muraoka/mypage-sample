@@ -44,6 +44,11 @@
 {{-- 結果リスト --}}
 <x-bs.card-list>
 
+    {{-- カードヘッダ右 --}}
+    <x-slot name="tools">
+        <x-button.new href="{{ route('conference_accept-new') }}" :small=true caption="新規面談日程登録" />
+    </x-slot>
+
     {{-- テーブル --}}
     <x-bs.table :button=true>
 
