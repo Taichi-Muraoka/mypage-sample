@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', (request()->routeIs('account_mng-edit')) ? '事務局アカウント編集' : '事務局アカウント登録')
+@section('title', (request()->routeIs('account_mng-edit')) ? '管理者アカウント編集' : '管理者アカウント登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -10,15 +10,15 @@
 {{-- formを指定 --}}
 <x-bs.card :form="true">
 
-    <p>以下の事務局アカウントの{{(request()->routeIs('account_mng-edit')) ? '変更' : '登録'}}を行います。</p>
+    <p>以下の管理者アカウントの{{(request()->routeIs('account_mng-edit')) ? '変更' : '登録'}}を行います。</p>
 
     <x-input.text caption="メールアドレス" id="email" :rules=$rules :editData=$editData />
 
     <x-input.pw caption="パスワード" id="password" :editData=$editData :rules=$rules />
 
-    <x-input.text caption="氏名" id="name" :rules=$rules :editData=$editData />
+    <x-input.text caption="管理者名" id="name" :rules=$rules :editData=$editData />
 
-    <x-input.select caption="管理校舎" id="roomcd" :select2=true :mastrData=$rooms :rules=$rules :editData=$editData />
+    <x-input.select caption="校舎" id="roomcd" :select2=true :mastrData=$rooms :rules=$rules :editData=$editData />
 
     {{-- hidden --}}
     <x-input.hidden id="adm_id" :editData=$editData />
