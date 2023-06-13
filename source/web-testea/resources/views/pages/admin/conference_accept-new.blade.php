@@ -38,8 +38,6 @@
         <option value="3">CWテスト生徒３</option>
     </x-input.select>
 
-    <x-input.textarea id="text" caption="特記事項" :rules=$rules :editData=$editData />
-
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
