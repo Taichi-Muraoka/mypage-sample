@@ -36,6 +36,10 @@
             <th>第３希望日時</th>
             <td>2023/02/01 16:00</td>
         </tr>
+        <tr>
+            <th>特記事項</th>
+            <td>特記事項等あればここに記載されます。</td>
+        </tr>
     </x-bs.table>
     {{-- 余白 --}}
     <div class="mb-3"></div>
@@ -50,13 +54,8 @@
         <option value="3">Cテーブル</option>
     </x-input.select>
 
-    <x-input.select caption="ステータス" id="status" :select2=true :blank=false :editData="$editData">
-        <option value="1" selected>未登録</option>
-        <option value="2">登録済</option>
-    </x-input.select>
-
     <x-bs.callout title="登録の際の注意事項" type="warning">
-        ステータスを「登録済」として送信ボタンを押下すると、指定した日時で面談スケジュールが登録されます。
+        登録ボタンを押下すると、指定した日時で面談スケジュールが登録されます。
     </x-bs.callout>
 
     {{-- フッター --}}

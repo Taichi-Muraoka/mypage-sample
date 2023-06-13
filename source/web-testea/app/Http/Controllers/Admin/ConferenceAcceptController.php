@@ -115,8 +115,35 @@ class ConferenceAcceptController extends Controller
     }
 
     //==========================
-    // 編集
+    // 登録・編集
     //==========================
+
+    /**
+     * 登録画面
+     *
+     * @return view
+     */
+    public function new()
+    {
+
+        // テンプレートは編集と同じ
+        return view('pages.admin.conference_accept-new', [
+            'rules' => null,
+            'editData' => null,
+        ]);
+    }
+
+    /**
+     * 登録処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function create(Request $request)
+    {
+
+        return;
+    }
 
     /**
      * 編集画面
