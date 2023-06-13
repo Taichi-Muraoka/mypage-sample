@@ -186,7 +186,7 @@
         <option value="3">差戻し</option>
     </x-input.select>
 
-    <x-input.textarea caption="事務局コメント" id="admin_comment" :rules=$rules :editData=$editData />
+    <x-input.textarea caption="管理者コメント" id="admin_comment" :rules=$rules :editData=$editData />
 
     {{-- hidden --}}
     <x-input.hidden id="report_id" :editData=$editData />
