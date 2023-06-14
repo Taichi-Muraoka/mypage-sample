@@ -14,7 +14,7 @@
         <x-bs.col2>
             <x-input.select id="kinds" caption="請求種別" :select2=true>
                 <option value="1">事務作業</option>
-                <option value="2">その他費用</option>
+                <option value="2">その他経費</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
@@ -27,9 +27,9 @@
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="payment" caption="支払い状況" :select2=true>
+            <x-input.select id="payment" caption="支払状況" :select2=true>
                 <option value="1">未処理</option>
-                <option value="2">処理済</option>
+                <option value="2">支払済</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
@@ -56,9 +56,10 @@
             <th>講師名</th>
             <th>請求種別</th>
             <th>時間</th>
-            <th>費用</th>
+            <th>金額</th>
             <th>ステータス</th>
-            <th>支払い状況</th>
+            <th>支払年月</th>
+            <th>支払状況</th>
             <th></th>
         </x-slot>
 
@@ -70,9 +71,24 @@
             <td>60</td>
             <td>1000</td>
             <td>承認</td>
+            <td>2023/03</td>
             <td>未処理</td>
             <td>
-                <x-button.list-dtl />
+                <x-button.list-dtl :vueDataAttr="['id' => '1']"/>
+                <x-button.list-edit href="{{ route('surcharge_accept-edit', 1) }}" caption="承認"/>
+            </td>
+        </tr>
+        <tr>
+            <td>2023/01/09</td>
+            <td>CWテスト教師１０１</td>
+            <td>その他経費</td>
+            <td></td>
+            <td>2000</td>
+            <td>承認</td>
+            <td>2023/03</td>
+            <td>未処理</td>
+            <td>
+                <x-button.list-dtl :vueDataAttr="['id' => '2']"/>
                 <x-button.list-edit href="{{ route('surcharge_accept-edit', 1) }}" caption="承認"/>
             </td>
         </tr>

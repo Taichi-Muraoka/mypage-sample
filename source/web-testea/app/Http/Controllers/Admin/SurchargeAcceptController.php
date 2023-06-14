@@ -80,7 +80,7 @@ class SurchargeAcceptController extends Controller
      */
     public function getData(Request $request)
     {
-        return;
+        return ['id' => $request->id];
     }
 
     /**
