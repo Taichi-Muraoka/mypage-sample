@@ -439,9 +439,9 @@ label:not(.form-check-label):not(.custom-file-label) {
 
 
 /* 空き時間・特別期間講習 コマ枠*/
-.card.pa-table-checked {
-    overflow-x: scroll;
-}
+//.card.pa-table-checked {
+//    overflow-x: scroll;
+//}
 
 .table-checked th {
     text-align: center;
@@ -463,15 +463,6 @@ label:not(.form-check-label):not(.custom-file-label) {
     width: 100%;
 }
 
-.table-checked td div .tt-button {
-    padding: 0.75rem;
-    font-size: 0.725rem;
-}
-
-//.table-checked td div .tt-button .select2{
-//    width: 80%!important;
-//  }
-
 .chk-wt {
     display: none;
 }
@@ -484,6 +475,7 @@ label:not(.form-check-label):not(.custom-file-label) {
     background-color: darkslategray;
 }
 
+/* 特別期間講習 授業コマ枠 */
 .chk-wt2 {
     display: none;
 }
@@ -492,8 +484,20 @@ label:not(.form-check-label):not(.custom-file-label) {
     background-color: darkslategray;
 }
 
-.chk-wt2:disabled + div {
+/*  授業登録済みの枠 */
+//.chk-wt2:disabled + div {
+//    background-color: rgb(201, 233, 143);
+//}
+.table-checked td div .class-info {
+    padding: 0.75rem;
+    font-size: 0.875rem;
     background-color: rgb(201, 233, 143);
+}
+
+/*  生徒コマ組み 講師選択の枠 */
+.table-checked td div .sel-button {
+    padding: 0.75rem;
+    font-size: 0.725rem;
 }
 
 /*テーブルごとの個別調整*/
@@ -511,8 +515,6 @@ label:not(.form-check-label):not(.custom-file-label) {
 
 .table > thead > tr > th.t-week {
     width: 14%;
-    //font-size: 0.725rem;
-    //padding: 0.25rem;
 }
 
 /* 金額の右寄せ */

@@ -82,7 +82,7 @@
         <td class="nl2br">承認待ち</td>
     </tr>
     <tr>
-        <th>事務局コメント</th>
+        <th>管理者コメント</th>
         <td class="nl2br"></td>
     </tr>
 </x-bs.table>

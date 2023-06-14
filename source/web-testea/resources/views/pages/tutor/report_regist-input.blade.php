@@ -186,7 +186,7 @@
     </x-bs.card>
 
     @if (request()->routeIs('report_regist-edit'))
-    {{-- 編集時 承認ステータス・事務局コメント--}}
+    {{-- 編集時 承認ステータス・管理者コメント--}}
     {{-- 余白 --}}
     <div class="mb-3"></div>
     <x-bs.table :hover=false :vHeader=true>
@@ -195,7 +195,7 @@
             <td></td>
         </tr>
         <tr>
-            <th>事務局コメント</th>
+            <th>管理者コメント</th>
             {{-- nl2br: 改行 --}}
             <td class="nl2br"></td>
         </tr>

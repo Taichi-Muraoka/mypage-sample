@@ -36,7 +36,20 @@
           value="{{$j}}_{{$periodIdList[$i]}}" :editData=$editData />
 
         {{-- 表のDiv --}}
-        <div class="chk-t" data-wt="{{$j}}_{{$periodIdList[$i]}}"></div>
+        <div class="chk-t" data-wt="{{$j}}_{{$periodIdList[$i]}}">
+          @if (!in_array($j . "_" . $periodIdList[$i], $editData["chkWs"]))
+            @if ($i == 0 && $j== 0 )
+            <div class="class-info">
+              <span>CWテスト生徒１</span>
+            </div>
+            @endif
+            @if ($i == 1 && $j== 2 )
+            <div class="class-info">
+              <span>CWテスト生徒１</span>
+            </div>
+            @endif
+          @endif
+      </div>
       </td>
       @endfor
 

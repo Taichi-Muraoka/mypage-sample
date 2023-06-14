@@ -12,8 +12,7 @@
 
 @section('content')
 
-{{-- フォームなし --}}
-<x-bs.card class="pa-table-checked" :form=true>
+<x-bs.card :form=true>
     <x-slot name="card_title">
         CWテスト生徒１
     </x-slot>
@@ -68,7 +67,7 @@
         {{-- 表のDiv --}}
         <div class="chk-t" data-wt="{{$j}}_{{$periodIdList[$i]}}">
             @if (!in_array($j . "_" . $periodIdList[$i], $editData["chkWs"]))
-            <div class="tt-button">
+            <div class="sel-button">
               <x-button.list-dtl caption="講師"/>
               @if ($i == 0 && $j== 0 )
               <span>CWテスト講師１０１</span>

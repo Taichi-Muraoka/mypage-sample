@@ -9,11 +9,11 @@
         <td>@{{item.email}}</td>
     </tr>
     <tr>
-        <th>氏名</th>
+        <th>管理者名</th>
         <td>@{{item.name}}</td>
     </tr>
     <tr>
-        <th>管理校舎</th>
+        <th>校舎</th>
         <td>@{{item.room_name}}</td>
     </tr>
 

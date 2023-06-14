@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '事務局アカウント管理')
+@section('title', '管理者アカウント管理')
 
 @section('content')
 
@@ -11,15 +11,15 @@
         <x-bs.col2>
             @can('roomAdmin')
             {{-- 校舎管理者の場合、1つなので検索や未選択を非表示にする --}}
-            <x-input.select id="roomcd" caption="管理校舎" :select2=true :mastrData=$rooms :editData=$editData
+            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false :blank=false />
             @else
-            <x-input.select id="roomcd" caption="管理校舎" :select2=true :mastrData=$rooms :editData=$editData />
+            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
             @endcan
         </x-bs.col2>
 
         <x-bs.col2>
-            <x-input.text caption="氏名" id="name" :rules=$rules />
+            <x-input.text caption="管理者名" id="name" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
 
@@ -38,9 +38,9 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">事務局ID</th>
-            <th>氏名</th>
-            <th width="30%">管理校舎</th>
+            <th width="15%">管理者ID</th>
+            <th>管理者名</th>
+            <th width="30%">校舎</th>
             <th></th>
         </x-slot>
 
