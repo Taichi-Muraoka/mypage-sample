@@ -20,7 +20,7 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr v-for="item in paginator.data" v-cloak>
+        <tr v-cloak>
             <x-bs.td-sp caption="授業日・時限">2023/05/15 4限</x-bs.td-sp>
             <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
             <x-bs.td-sp caption="コース">個別指導</x-bs.td-sp>

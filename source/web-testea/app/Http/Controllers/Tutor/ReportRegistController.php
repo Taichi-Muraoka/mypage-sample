@@ -464,58 +464,59 @@ class ReportRegistController extends Controller
      * @param int $reportId 授業報告書ID
      * @return view
      */
-    public function edit($reportId)
+    public function edit()
     {
 
-        // IDのバリデーション
-        $this->validateIds($reportId);
+        // // IDのバリデーション
+        // $this->validateIds($reportId);
 
-        // 授業時間数のプルダウンメニューを作成
-        $minutes = $this->getMenuOfMinutes();
+        // // 授業時間数のプルダウンメニューを作成
+        // $minutes = $this->getMenuOfMinutes();
 
-        // クエリを作成
-        $query = Report::query();
+        // // クエリを作成
+        // $query = Report::query();
 
-        // 教室名取得のサブクエリ
-        $room_names = $this->mdlGetRoomQuery();
+        // // 教室名取得のサブクエリ
+        // $room_names = $this->mdlGetRoomQuery();
 
-        // データを取得
-        $report = $query
-            // IDを指定
-            ->where('report.report_id', $reportId)
-            ->select(
-                'report_id',
-                'lesson_type',
-                'lesson_date',
-                'start_time',
-                'room_names.room_name_full as class_name',
-                'ext_student_kihon.name as student_name',
-                'r_minutes',
-                'content',
-                'homework',
-                'teacher_comment',
-                'parents_comment'
-            )
-            // 教室名の取得
-            ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('report.roomcd', '=', 'room_names.code');
-            })
-            // 生徒名の取得
-            ->sdLeftJoin(ExtStudentKihon::class, 'report.sid', '=', 'ext_student_kihon.sid')
-            // 受け持ち生徒に限定するガードを掛ける
-            ->where($this->guardTutorTableWithSid())
-            // 自分のアカウントIDでガードを掛ける（tid）
-            ->where($this->guardTutorTableWithTid())
-            ->firstOrFail();
+        // // データを取得
+        // $report = $query
+        //     // IDを指定
+        //     ->where('report.report_id', $reportId)
+        //     ->select(
+        //         'report_id',
+        //         'lesson_type',
+        //         'lesson_date',
+        //         'start_time',
+        //         'room_names.room_name_full as class_name',
+        //         'ext_student_kihon.name as student_name',
+        //         'r_minutes',
+        //         'content',
+        //         'homework',
+        //         'teacher_comment',
+        //         'parents_comment'
+        //     )
+        //     // 教室名の取得
+        //     ->leftJoinSub($room_names, 'room_names', function ($join) {
+        //         $join->on('report.roomcd', '=', 'room_names.code');
+        //     })
+        //     // 生徒名の取得
+        //     ->sdLeftJoin(ExtStudentKihon::class, 'report.sid', '=', 'ext_student_kihon.sid')
+        //     // 受け持ち生徒に限定するガードを掛ける
+        //     ->where($this->guardTutorTableWithSid())
+        //     // 自分のアカウントIDでガードを掛ける（tid）
+        //     ->where($this->guardTutorTableWithTid())
+        //     ->firstOrFail();
 
-        return view('pages.tutor.report_regist-input', [
-            'editData' => $report,
-            'rules' => $this->rulesForInput(null),
-            'scheduleMaster' => null,
-            'student_list' => null,
-            'minutes_list' => $minutes,
-            'parents_comment' => $report->parents_comment
-        ]);
+        // return view('pages.tutor.report_regist-input', [
+        //     'editData' => $report,
+        //     'rules' => $this->rulesForInput(null),
+        //     'scheduleMaster' => null,
+        //     'student_list' => null,
+        //     'minutes_list' => $minutes,
+        //     'parents_comment' => $report->parents_comment
+        // ]);
+        return view('pages.tutor.report_regist-input');
     }
 
     /**

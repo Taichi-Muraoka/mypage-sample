@@ -22,11 +22,11 @@
         </tr>
         <tr>
             <th>校舎</th>
-            <td>{{$editData->class_name}}</td>
+            <td>久我山</td>
         </tr>
         <tr>
             <th>生徒名</th>
-            <td>{{$editData->student_name}}</td>
+            <td>CWテスト生徒１</td>
         </tr>
         <tr>
             <th>科目</th>
@@ -78,24 +78,24 @@
     </x-bs.card>
     @endif
 
-    <x-input.text caption="今月の目標" id="monthly_goal" :rules=$rules :editData=$editData />
+    <x-input.text caption="今月の目標" id="monthly_goal"/>
 
     <x-bs.card>
         <x-bs.form-title>授業内容</x-bs.form-title>
         <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="教材１" id="lesson_text1" :select2=true  :editData=$editData>
+                <x-input.select caption="教材１" id="lesson_text1" :select2=true>
                     <option value="1">数学ドリル基本</option>
                     <option value="2">数学ドリル発展</option>
                     <option value="3">数学ドリル演習</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
-                <x-input.text caption="ページ" id="lesson_page1" :rules=$rules :editData=$editData />
+                <x-input.text caption="ページ" id="lesson_page1"/>
             </x-bs.col2>
         </x-bs.row>
 
-        <x-input.select caption="単元１" id="lesson_unit1" :select2=true  :editData=$editData>
+        <x-input.select caption="単元１" id="lesson_unit1" :select2=true>
             <option value="1">正負の数</option>
             <option value="2">比例</option>
             <option value="3">連立方程式</option>
@@ -103,18 +103,18 @@
 
         <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="教材２" id="lesson_text2" :select2=true  :editData=$editData>
+                <x-input.select caption="教材２" id="lesson_text2" :select2=true>
                     <option value="1">数学ドリル基本</option>
                     <option value="2">数学ドリル発展</option>
                     <option value="3">数学ドリル演習</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
-                <x-input.text caption="ページ" id="lesson_page2" :rules=$rules :editData=$editData />
+                <x-input.text caption="ページ" id="lesson_page2"/>
             </x-bs.col2>
         </x-bs.row>
 
-        <x-input.select caption="単元２" id="lesson_unit2" :select2=true  :editData=$editData>
+        <x-input.select caption="単元２" id="lesson_unit2" :select2=true>
             <option value="1">正負の数</option>
             <option value="2">比例</option>
             <option value="3">連立方程式</option>
@@ -123,43 +123,43 @@
 
     <x-bs.card>
     <x-bs.form-title>確認テスト</x-bs.form-title>
-    <x-input.text caption="内容" id="test_contents" :rules=$rules :editData=$editData />
+    <x-input.text caption="内容" id="test_contents"/>
     <x-bs.row>
         <x-bs.col3>
-            <x-input.text caption="得点" id="test_score" :rules=$rules :editData=$editData />
+            <x-input.text caption="得点" id="test_score"/>
         </x-bs.col3>
             <x-bs.form-title></x-bs.form-title>
             <p class="edit-disp-indent">／　</p>
         <x-bs.col3>
-            <x-input.text caption="満点" id="test_full_score" :rules=$rules :editData=$editData />
+            <x-input.text caption="満点" id="test_full_score"/>
         </x-bs.col3>
     </x-bs.row>
     </x-bs.card>
 
-    <x-input.text caption="宿題達成度（%）" id="achievement" :rules=$rules :editData=$editData />
+    <x-input.text caption="宿題達成度（%）" id="achievement"/>
 
-    <x-input.textarea caption="達成・課題点" id="goodbad_point" :rules=$rules :editData=$editData />
+    <x-input.textarea caption="達成・課題点" id="goodbad_point"/>
 
-    <x-input.textarea caption="解決策" id="solution" :rules=$rules :editData=$editData />
+    <x-input.textarea caption="解決策" id="solution"/>
 
-    <x-input.textarea caption="その他" id="others_comment" :rules=$rules :editData=$editData />
+    <x-input.textarea caption="その他" id="others_comment"/>
 
     <x-bs.card>
         <x-bs.form-title>宿題</x-bs.form-title>
         <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="教材１" id="homework_text1" :select2=true  :editData=$editData>
+                <x-input.select caption="教材１" id="homework_text1" :select2=true>
                     <option value="1">数学ドリル基本</option>
                     <option value="2">数学ドリル発展</option>
                     <option value="3">数学ドリル演習</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
-                <x-input.text caption="ページ" id="homework_page1" :rules=$rules :editData=$editData />
+                <x-input.text caption="ページ" id="homework_page1"/>
             </x-bs.col2>
         </x-bs.row>
 
-        <x-input.select caption="単元１" id="homework_unit1" :select2=true  :editData=$editData>
+        <x-input.select caption="単元１" id="homework_unit1" :select2=true>
             <option value="1">正負の数</option>
             <option value="2">比例</option>
             <option value="3">連立方程式</option>
@@ -167,18 +167,18 @@
 
         <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="教材２" id="homework_text2" :select2=true  :editData=$editData>
+                <x-input.select caption="教材２" id="homework_text2" :select2=true>
                     <option value="1">数学ドリル基本</option>
                     <option value="2">数学ドリル発展</option>
                     <option value="3">数学ドリル演習</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
-                <x-input.text caption="ページ" id="homework_page2" :rules=$rules :editData=$editData />
+                <x-input.text caption="ページ" id="homework_page2"/>
             </x-bs.col2>
         </x-bs.row>
 
-        <x-input.select caption="単元２" id="homework_unit2" :select2=true  :editData=$editData>
+        <x-input.select caption="単元２" id="homework_unit2" :select2=true>
             <option value="1">正負の数</option>
             <option value="2">比例</option>
             <option value="3">連立方程式</option>
@@ -203,7 +203,7 @@
     @endif
 
     {{-- hidden --}}
-    <x-input.hidden id="report_id" :editData=$editData />
+    <x-input.hidden id="report_id"/>
 
     {{-- フッター --}}
     <x-slot name="footer">
