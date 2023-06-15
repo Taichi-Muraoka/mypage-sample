@@ -9,16 +9,26 @@
 
     <x-bs.row>
         <x-bs.col2>
+            <x-input.select id="roomcd" caption="校舎" :select2=true >
+                <option value="1">久我山</option>
+                <option value="2">西永福</option>
+                <option value="3">下高井戸</option>
+                <option value="4">駒込</option>
+                <option value="5">日吉</option>
+                <option value="6">自由が丘</option>
+            </x-input.select>
+        </x-bs.col2>
+        <x-bs.col2>
             <x-input.text id="teacher" caption="講師名" />
         </x-bs.col2>
+    </x-bs.row>
+    <x-bs.row>
         <x-bs.col2>
             <x-input.select id="kinds" caption="請求種別" :select2=true>
                 <option value="1">事務作業</option>
                 <option value="2">その他経費</option>
             </x-input.select>
         </x-bs.col2>
-    </x-bs.row>
-    <x-bs.row>
         <x-bs.col2>
             <x-input.select id="status" caption="ステータス" :select2=true>
                 <option value="1">承認待ち</option>
@@ -26,6 +36,8 @@
                 <option value="3">差戻し</option>
             </x-input.select>
         </x-bs.col2>
+    </x-bs.row>
+    <x-bs.row>
         <x-bs.col2>
             <x-input.select id="payment" caption="支払状況" :select2=true>
                 <option value="1">未処理</option>
@@ -55,6 +67,7 @@
             <th>申請日</th>
             <th>講師名</th>
             <th>請求種別</th>
+            <th>校舎</th>
             <th>時間</th>
             <th>金額</th>
             <th>ステータス</th>
@@ -68,6 +81,7 @@
             <td>2023/01/10</td>
             <td>CWテスト教師１０１</td>
             <td>事務作業</td>
+            <td>久我山</td>
             <td>60</td>
             <td>1000</td>
             <td>承認</td>
@@ -82,6 +96,7 @@
             <td>2023/01/09</td>
             <td>CWテスト教師１０１</td>
             <td>その他経費</td>
+            <td>久我山</td>
             <td></td>
             <td>2000</td>
             <td>承認</td>
