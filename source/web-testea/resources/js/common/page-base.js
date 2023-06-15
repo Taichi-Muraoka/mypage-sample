@@ -507,7 +507,8 @@ export default class PageBase {
             //-----------------
             e => {
                 // 時間割のスケジュールはモーダル表示しない
-                if (e.event._def.resourceIds[0] !== '000' && e.event._def.resourceIds[0] !== '800') {
+                //if (e.event._def.resourceIds[0] !== '000' && e.event._def.resourceIds[0] !== '800') {
+                if (e.event._def.resourceIds[0] !== '000') {
                     // モーダルの中身を更新
                     Vue.set(
                         $vueModal,
@@ -524,7 +525,7 @@ export default class PageBase {
 
                     // モーダルを開く
                     $vueModal.show();
-                    }
+                }
 
             },
             //-----------------

@@ -149,7 +149,7 @@ export default class CalendarCom {
                 { id: "004", title: "Dテーブル"},
                 { id: "005", title: "E教室"},
                 { id: "800", title: "面談ブース"},
-                { id: "999", title: "後日振替"},
+                { id: "999", title: "未振替・振替中"},
             ],
             // データの読み込み処理。呼び出し元で定義する
             events: eventFunc,

@@ -17,10 +17,14 @@
         <td>個別指導コース</td>
     </tr>
     <tr>
-        <th>日付</th>
-        <td>@{{item.mdDt|formatYmd}}</td>
+        <th>曜日</th>
+        <td>月曜</td>
     </tr>
     {{-- v-showは、スケジュール種別によって非表示の場合があるため --}}
+    <tr>
+        <th>時限</th>
+        <td>5時限</td>
+    </tr>
     <tr v-show="item.mdStartTime">
         <th>開始時刻</th>
         <td>@{{item.mdStartTime|formatHm}}</td>
@@ -30,12 +34,16 @@
         <td>@{{item.mdEndTime|formatHm}}</td>
     </tr>
     <tr>
-        <th>教師名</th>
+        <th>講師名</th>
         <td>CWテスト教師１０１</td>
     </tr>
-    <tr>
+    <tr v-Show="item.lesson_type != 1">
         <th>生徒名</th>
         <td>CWテスト生徒１</td>
+    </tr>
+    <tr v-Show="item.lesson_type == 1">
+        <th>参加生徒名</th>
+        <td>CWテスト生徒１<br>CWテスト生徒２<br>CWテスト生徒３</td>
     </tr>
     <tr v-show="item.mdSubject">
         <th>教科</th>
@@ -52,7 +60,8 @@
 @section('modal-button')
 
 {{-- 更新ボタンを表示 --}}
-<x-button.edit vueHref="'{{ route('regular_schedule-edit', '') }}/' + item.id" icon="" caption="スケジュール編集" />
-<x-button.edit vueHref="'{{ route('regular_schedule-copy', '') }}/' + item.id" icon="" caption="コピー登録" />
+<x-button.edit vueHref="'{{ route('regular_schedule-edit', ['','']) }}/' + item.lesson_type + '/' + item.id" icon="" caption="スケジュール編集" />
+{{-- コピー登録ボタンを表示 --}}
+<x-button.edit vueHref="'{{ route('regular_schedule-copy', ['','']) }}/' + item.lesson_type + '/' + item.id" icon="" caption="コピー登録" />
 
 @overwrite

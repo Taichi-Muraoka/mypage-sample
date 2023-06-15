@@ -1,6 +1,10 @@
 @extends('adminlte::page')
 
+@if (isset( $editData['kind']) && $editData['kind'] == 9)
+@section('title', '面談スケジュール編集')
+@else
 @section('title', (request()->routeIs('room_calendar-edit')) ? '授業スケジュール編集' : ((request()->routeIs('room_calendar-new')) ? '授業スケジュール登録' : '授業スケジュールコピー登録'))
+@endif
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -13,11 +17,17 @@
 
     {{-- hidden --}}
     <x-input.hidden id="roomcd" :editData=$editData />
+    <x-input.hidden id="kind" :editData=$editData />
     <x-input.hidden id="schedule_id" :editData=$editData />
 
+    @if (isset( $editData['kind']) && $editData['kind'] == 9)
+    <p>面談スケジュールの変更を行います。</p>
+    @else
     <p>授業スケジュールの{{(request()->routeIs('room_calendar-edit')) ? '変更' : ((request()->routeIs('room_calendar-new')) ? '登録' : 'コピー登録')}}を行います。</p>
+    @endif
 
-    <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
+    <x-bs.form-title>校舎</x-bs.form-title>
+    <p class="edit-disp-indent">久我山</p>
 
     <x-input.select caption="指導スペース" id="classroomcd" :select2=true :editData="$editData">
         <option value="1" selected>Aテーブル</option>
@@ -25,8 +35,9 @@
         <option value="3">Cテーブル</option>
     </x-input.select>
 
-    <x-input.date-picker caption="授業日" id="curDate" :editData=$editData />
+    <x-input.date-picker caption="日付" id="curDate" :editData=$editData />
 
+    @if (!isset( $editData['kind']) || (isset( $editData['kind']) && $editData['kind'] != 9))
     <x-input.select caption="時限" id="period" :select2=true :editData="$editData">
         <option value="1">1限</option>
         <option value="2">2限</option>
@@ -36,17 +47,26 @@
         <option value="6">6限</option>
         <option value="7">7限</option>
     </x-input.select>
+    @endif
 
     <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules :editData=$editData />
 
     <x-input.time-picker caption="終了時刻" id="end_time" :rules=$rules :editData=$editData />
 
+    @if (!isset( $editData['kind']))
     <x-input.select caption="コース名" id="course_cd" :select2=true :select2Search=false :editData="$editData">
         <option value="1" selected>個別指導コース</option>
         <option value="4">集団指導</option>
         <option value="5">その他・自習</option>
     </x-input.select>
 
+    @elseif((isset( $editData['kind']) && $editData['kind'] != 9))
+    <x-bs.form-title>コース名</x-bs.form-title>
+    <p class="edit-disp-indent">個別指導コース</p>
+    <x-input.hidden id="course_cd" :editData=$editData value="1"/>
+    @endif
+
+    @if (!isset( $editData['kind']) || (isset( $editData['kind']) && $editData['kind'] != 9))
     <x-input.select vShow="form.course_cd != 5" caption="講師" id="tid" :select2=true :editData="$editData">
         <option value="1">CWテスト教師１</option>
         <option value="2">CWテスト教師２</option>
@@ -105,16 +125,15 @@
         <option value="2">CWテスト教師２</option>
     </x-input.select>
 
-    <x-input.select vShow="form.course_cd == 1" caption="出欠ステータス" id="todayabsent" :select2=true :select2Search=false :editData="$editData">
+    <x-input.select vShow="form.course_cd != 5" caption="出欠ステータス" id="todayabsent" :select2=true :select2Search=false :editData="$editData">
         <option value="0" selected>実施前・出席</option>
         <option value="1">当日欠席（講師出勤なし）</option>
         <option value="2">当日欠席（講師出勤あり）</option>
-        <option value="3">振替中（未振替）</option>
+        <option value="3">振替中・未振替</option>
         <option value="4">振替済</option>
     </x-input.select>
 
     @endif
-
     <x-input.textarea id="text" caption="メモ" :rules=$rules :editData=$editData />
 
     @if (request()->routeIs('room_calendar-new'))
@@ -127,6 +146,15 @@
     <div class="mb-3"></div>
 
     <x-input.text vShow="form.repeat_chk == 'on'" id="kaisu" caption="繰り返し回数" />
+    @endif
+
+    @else
+    {{-- 余白 --}}
+    <x-input.select caption="生徒" id="conference_sid" :select2=true :editData="$editData">
+        <option value="1">CWテスト生徒１</option>
+        <option value="2">CWテスト生徒２</option>
+        <option value="3">CWテスト生徒３</option>
+    </x-input.select>
     @endif
 
     {{-- フッター --}}

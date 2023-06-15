@@ -16,8 +16,8 @@
                         <option value="110">久我山</option>
                     </x-input.select>
                 @else
-                    <x-input.select id="roomcd" :select2=true onChange="selectChangeRoom()" :editData=$editData>
-                        <option value="110" selected>久我山</option>
+                    <x-input.select id="roomcd" :select2=true onChange="selectChangeRoom()" :select2Search=false :blank=false :editData=$editData>
+                        <option value="110">久我山</option>
                         <option value="120">西永福</option>
                         <option value="130">本郷</option>
                     </x-input.select>

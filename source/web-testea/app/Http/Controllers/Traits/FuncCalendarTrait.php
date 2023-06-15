@@ -142,14 +142,14 @@ trait FuncCalendarTrait
             }
 
             // 不要な要素の削除
-            unset($schedule['name']);
-            unset($schedule['lesson_type']);
-            unset($schedule['symbol']);
-            unset($schedule['lesson_date']);
-            unset($schedule['start_time']);
-            unset($schedule['end_time']);
-            unset($schedule['atd_status_cd']);
-            unset($schedule['create_kind_cd']);
+            //unset($schedule['name']);
+            //unset($schedule['lesson_type']);
+            //unset($schedule['symbol']);
+            //unset($schedule['lesson_date']);
+            //unset($schedule['start_time']);
+            //unset($schedule['end_time']);
+            //unset($schedule['atd_status_cd']);
+            //unset($schedule['create_kind_cd']);
         }
 
         // 短期講習の取得
@@ -194,7 +194,8 @@ trait FuncCalendarTrait
         foreach ($tanki_schedules as $schedule) {
 
             $schedule_type = $this->getScheduleType($schedule);
-            $schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdTitleVal'];
+            //$schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdTitleVal'];
+            $schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdSubject'];
             if ($schedule_type['mdFurikae'] != '') {
                 $schedule['title'] = $schedule['title'] . ' ' . $schedule_type['mdFurikae'];
             }
@@ -217,14 +218,14 @@ trait FuncCalendarTrait
             }
 
             // 不要な要素の削除
-            unset($schedule['name']);
-            unset($schedule['lesson_type']);
-            unset($schedule['symbol']);
-            unset($schedule['lesson_date']);
-            unset($schedule['start_time']);
-            unset($schedule['end_time']);
-            unset($schedule['atd_status_cd']);
-            unset($schedule['create_kind_cd']);
+            //unset($schedule['name']);
+            //unset($schedule['lesson_type']);
+            //unset($schedule['symbol']);
+            //unset($schedule['lesson_date']);
+            //unset($schedule['start_time']);
+            //unset($schedule['end_time']);
+            //unset($schedule['atd_status_cd']);
+            //unset($schedule['create_kind_cd']);
         }
 
         $schedules = collect($regular_schedules)->merge($tanki_schedules);
@@ -282,13 +283,77 @@ trait FuncCalendarTrait
             $schedule['mdFurikae'] = $schedule_type['mdFurikae'];
 
             // 不要な要素の削除
-            unset($schedule['symbol']);
-            unset($schedule['lesson_date']);
-            unset($schedule['start_time']);
-            unset($schedule['end_time']);
+            //unset($schedule['symbol']);
+            //unset($schedule['lesson_date']);
+            //unset($schedule['start_time']);
+            //unset($schedule['end_time']);
         }
 
         $schedules = collect($schedules)->merge($trial_schedules);
+
+        // 面談スケジュールの取得
+        $query = TutorSchedule::query();
+        $tutor_schedules = $query
+            ->select(
+                'tutor_schedule_id AS id',
+                'title AS mdTitleVal',
+                'start_date',
+                'start_time',
+                'end_time',
+                'room_name AS mdClassName',
+                'room_name_symbol AS symbol',
+                'roomcd'
+            )
+            // 教科名の取得
+            ->leftJoinSub($room_names, 'room_names', function ($join) {
+                $join->on('tutor_schedule.roomcd', '=', 'room_names.code');
+            })
+            ->where('tutor_schedule.tid', '=', $sid)
+            // カレンダーの表示範囲で絞る
+            ->whereBetween('tutor_schedule.start_date', [$start_date, $end_date])
+            ->orderBy('tutor_schedule.start_date', 'asc')
+            ->orderBy('tutor_schedule.start_time', 'asc')
+            ->get();
+
+        // 教室管理者の場合、更新ボタンの有無をチェックするため
+        if (AuthEx::isRoomAdmin()) {
+            $account = Auth::user();
+        }
+
+        foreach ($tutor_schedules as $schedule) {
+
+            $schedule_type = ['type' => AppConst::CODE_MASTER_21_6, 'className' => 'cal_meeting', 'mdFurikae' => ''];
+            $schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdTitleVal'];
+            $schedule['start'] = $schedule['start_date']->format('Y-m-d') . ' ' . $schedule['start_time']->format('H:i');
+            $schedule['end'] = $schedule['start_date']->format('Y-m-d') . ' ' . $schedule['end_time']->format('H:i');
+            $schedule['classNames'] = $schedule_type['className'];
+
+            // モーダル表示用
+            $schedule['mdType'] = AppConst::CODE_MASTER_21_6;
+            $schedule['mdTypeName'] = $schedule_type_names[(string) $schedule_type['type']]['name'];
+            $schedule['mdDt'] = $schedule['start_date'];
+            $schedule['mdStartTime'] = $schedule['start_time'];
+            $schedule['mdEndTime'] = $schedule['end_time'];
+            $schedule['mdTitle'] = '面談';
+            $schedule['mdSubject'] = '';
+            $schedule['mdFurikae'] = $schedule_type['mdFurikae'];
+            $schedule['mdEditBtn'] = true;
+            if (AuthEx::isRoomAdmin()) {
+                if ($account->roomcd != $schedule->roomcd) {
+                    // 教室管理者の場合、更新ボタンの有無をチェックするため
+                    $schedule['mdEditBtn'] = false;
+                }
+            }
+
+            // 不要な要素の削除
+            unset($schedule['start_date']);
+            unset($schedule['start_time']);
+            unset($schedule['end_time']);
+            unset($schedule['symbol']);
+            unset($schedule['roomcd']);
+        }
+
+        $schedules = collect($schedules)->merge($tutor_schedules);
 
         // 生徒の所属教室の事前取得
         $query = ExtRoom::query();
@@ -496,13 +561,13 @@ trait FuncCalendarTrait
             $schedule['mdFurikae'] = $schedule_type['mdFurikae'];
 
             // 不要な要素の削除
-            unset($schedule['lesson_type']);
-            unset($schedule['symbol']);
-            unset($schedule['lesson_date']);
-            unset($schedule['start_time']);
-            unset($schedule['end_time']);
-            unset($schedule['atd_status_cd']);
-            unset($schedule['create_kind_cd']);
+            //unset($schedule['lesson_type']);
+            //unset($schedule['symbol']);
+            //unset($schedule['lesson_date']);
+            //unset($schedule['start_time']);
+            //unset($schedule['end_time']);
+            //unset($schedule['atd_status_cd']);
+            //unset($schedule['create_kind_cd']);
         }
 
         // 短期講習の取得
@@ -546,7 +611,8 @@ trait FuncCalendarTrait
         foreach ($tanki_schedules as $schedule) {
 
             $schedule_type = $this->getScheduleType($schedule);
-            $schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdTitleVal'];
+            //$schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdTitleVal'];
+            $schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdSubject'];
             if ($schedule_type['mdFurikae'] != '') {
                 $schedule['title'] = $schedule['title'] . ' ' . $schedule_type['mdFurikae'];
             }
@@ -754,6 +820,7 @@ trait FuncCalendarTrait
                 'create_kind_cd',
                 'transefer_kind_cd',
                 'status_info',
+                'diff_time',
                 'room_name AS mdClassName',
                 'room_name_symbol AS symbol',
                 'ext_rirekisho.name AS mdTitleVal',
@@ -787,19 +854,27 @@ trait FuncCalendarTrait
         foreach ($regular_schedules as $schedule) {
 
             $schedule_type = $this->getScheduleType($schedule);
-            $schedule['title'] = $schedule['start_time']->format('H:i') . '-'
-             . $schedule['end_time']->format('H:i') . '<br>個別指導コース<br>' . $schedule['mdSubject']
-             . '<br>stu：' . $schedule['name'] . '<br>tea：' . $schedule['mdTitleVal'];
-             if ($schedule_type['mdFurikae'] != '') {
-                $schedule['title'] = $schedule['title'] . '<br>' . $schedule_type['mdFurikae'];
+            $schedule['title'] = $schedule['start_time']->format('H:i') . '-' . $schedule['end_time']->format('H:i');
+            //$schedule['title'] = $schedule['title'] . '<br>通常 ';
+            if ($schedule['diff_time'] == 1) {
+                $schedule['title'] = $schedule['title'] . '<br>体験授業';
             }
+            if ($schedule['create_kind_cd'] == AppConst::CREATE_KIND_CD_2) {
+                $schedule['title'] = $schedule['title'] . '<br>振替';
+            }
+            $schedule['title'] = $schedule['title'] . '<br>個別指導コース<br>' . $schedule['mdSubject'];
+            $schedule['title'] = $schedule['title'] . '<br>stu：';
+            if ($schedule['diff_time'] == 2) {
+                $schedule['title'] = $schedule['title'] . '<span style="border: solid 2px;">' . $schedule['name'] . '</span>';
+            } else {
+                $schedule['title'] = $schedule['title'] . $schedule['name'];
+            }
+            $schedule['title'] = $schedule['title'] . '<br>tea：' . $schedule['mdTitleVal'];;
             $schedule['start'] = $schedule['lesson_date']->format('Y-m-d') . ' ' . $schedule['start_time']->format('H:i');
             $schedule['end'] = $schedule['lesson_date']->format('Y-m-d') . ' ' . $schedule['end_time']->format('H:i');
             $schedule['classNames'] = $schedule_type['className'];
-            if ($schedule_type['mdFurikae'] === '後日振替・未' || $schedule_type['mdFurikae'] === '後日振替・済') {
+            if ($schedule_type['mdFurikae'] === '後日振替・未') {
                 $schedule['resourceId'] = "999";
-            } else if ($schedule_type['mdFurikae'] === '後日振替・済'){
-                $schedule['resourceId'] = "998";
             } else if ($schedule['status_info']){
                 $schedule['resourceId'] = $schedule['status_info'];
             } else {
@@ -961,9 +1036,6 @@ trait FuncCalendarTrait
             $schedule['title'] = $schedule['start_time']->format('H:i') . '-'
              . $schedule['end_time']->format('H:i') . '<br>その他・自習<br>'
              . '<br>stu：' . $schedule['name'];
-             if ($schedule_type['mdFurikae'] != '') {
-                $schedule['title'] = $schedule['title'] . '<br>' . $schedule_type['mdFurikae'];
-            }
             $schedule_type = ['type' => AppConst::CODE_MASTER_21_3, 'className' => 'cal_tanki_moshi', 'mdFurikae' => ''];
             $schedule['start'] = $schedule['lesson_date']->format('Y-m-d') . ' ' . $schedule['start_time']->format('H:i');
             $schedule['end'] = $schedule['lesson_date']->format('Y-m-d') . ' ' . $schedule['end_time']->format('H:i');
@@ -1073,7 +1145,8 @@ trait FuncCalendarTrait
 
             $schedule_type = ['type' => AppConst::CODE_MASTER_21_6, 'className' => 'cal_meeting', 'mdFurikae' => ''];
             $schedule['title'] = $schedule['start_time']->format('H:i') . '-'
-             . $schedule['end_time']->format('H:i') . '<br>' . $schedule['mdTitleVal'];
+             . $schedule['end_time']->format('H:i') . '<br>' . '面談<br>'
+             . '<br>stu：' . 'CWテスト生徒6';
              $schedule['start'] = $schedule['start_date']->format('Y-m-d') . ' ' . $schedule['start_time']->format('H:i');
              $schedule['end'] = $schedule['start_date']->format('Y-m-d') . ' ' . $schedule['end_time']->format('H:i');
              $schedule['classNames'] = $schedule_type['className'];
@@ -1107,19 +1180,19 @@ trait FuncCalendarTrait
 
         $schedules = collect($schedules)->merge($tutor_schedules);
 
-        $this->debug($start_date);
-        $this->debug($end_date);
+        //$this->debug($start_date);
+        //$this->debug($end_date);
         $curDate = $start_date;
         while ($curDate <= $end_date) {
         if ($room_holiday_schedules->count() === 0) {
         // 時間割データ
         $pd_schedules =[
-            ['title' => '<br>0時限目<br>08:00-09:00',
-             'start' => $curDate . ' 08:00',
-             'end' => $curDate . ' 09:00',
-             'classNames' => 'cal_period',
-             'textColor' => 'white',
-             'resourceId' => '000'],
+            //['title' => '<br>0時限目<br>08:00-09:00',
+            // 'start' => $curDate . ' 08:00',
+            // 'end' => $curDate . ' 09:00',
+            // 'classNames' => 'cal_period',
+            // 'textColor' => 'white',
+            // 'resourceId' => '000'],
             ['title' => '<br>1時限目<br>09:00-10:30',
              'start' => $curDate . ' 09:00',
              'end' => $curDate . ' 10:30',

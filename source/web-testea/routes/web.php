@@ -913,10 +913,10 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/room_calendar/create', [RoomCalendarController::class, 'create'])->name('room_calendar-create');
 
     // 教室カレンダー編集画面
-    Route::get('/room_calendar/edit/{scheduleId}', [RoomCalendarController::class, 'edit'])->name('room_calendar-edit');
+    Route::get('/room_calendar/edit/{kind}/{scheduleId}', [RoomCalendarController::class, 'edit'])->name('room_calendar-edit');
 
     // 教室カレンダーコピー登録画面
-    Route::get('/room_calendar/copy/{scheduleId}', [RoomCalendarController::class, 'copy'])->name('room_calendar-copy');
+    Route::get('/room_calendar/copy/{kind}/{scheduleId}', [RoomCalendarController::class, 'copy'])->name('room_calendar-copy');
 
     // 編集処理
     Route::post('/room_calendar/update', [RoomCalendarController::class, 'update'])->name('room_calendar-update');
@@ -944,10 +944,10 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::get('/regular_schedule/new', [RoomCalendarController::class, 'weekNew'])->name('regular_schedule-new');
 
     // defaultWeekカレンダー編集画面
-    Route::get('/regular_schedule/edit/{scheduleId}', [RoomCalendarController::class, 'weekEdit'])->name('regular_schedule-edit');
+    Route::get('/regular_schedule/edit/{kind}/{scheduleId}', [RoomCalendarController::class, 'weekEdit'])->name('regular_schedule-edit');
 
     // defaultWeekカレンダーコピー登録画面
-    Route::get('/regular_schedule/copy/{scheduleId}', [RoomCalendarController::class, 'weekCopy'])->name('regular_schedule-copy');
+    Route::get('/regular_schedule/copy/{kind}/{scheduleId}', [RoomCalendarController::class, 'weekCopy'])->name('regular_schedule-copy');
 
     // バリデーション(登録用)
     Route::post('/regular_schedule/vd_input', [RoomCalendarController::class, 'validationForInput'])->name('regular_schedule-vd_input');

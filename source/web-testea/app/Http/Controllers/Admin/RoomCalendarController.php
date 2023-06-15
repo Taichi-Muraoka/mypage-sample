@@ -309,7 +309,7 @@ class RoomCalendarController extends Controller
      * @param int $scheduleId スケジュールID
      * @return view
      */
-    public function edit($scheduleId)
+    public function edit($kind, $scheduleId)
     {
 
         // IDのバリデーション
@@ -335,6 +335,7 @@ class RoomCalendarController extends Controller
             'curDate' => $extSchedule['lesson_date'],
             'start_time' => $extSchedule['start_time'],
             'end_time' => $extSchedule['end_time'],
+            'kind' => $kind,
         ];
 
         return view('pages.admin.room_calendar-input', [
@@ -350,7 +351,7 @@ class RoomCalendarController extends Controller
      * @param int $scheduleId スケジュールID
      * @return view
      */
-    public function copy($scheduleId)
+    public function copy($kind, $scheduleId)
     {
 
         // IDのバリデーション
@@ -376,6 +377,7 @@ class RoomCalendarController extends Controller
             'curDate' => $extSchedule['lesson_date'],
             'start_time' => $extSchedule['start_time'],
             'end_time' => $extSchedule['end_time'],
+            'kind' => $kind,
         ];
 
         return view('pages.admin.room_calendar-input', [
@@ -433,7 +435,8 @@ class RoomCalendarController extends Controller
      * @param int $scheduleId スケジュールID
      * @return view
      */
-    public function weekEdit($scheduleId)
+    public function weekEdit($kind, $scheduleId)
+
     {
 
         // IDのバリデーション
@@ -459,6 +462,8 @@ class RoomCalendarController extends Controller
             'curDate' => $extSchedule['lesson_date'],
             'start_time' => $extSchedule['start_time'],
             'end_time' => $extSchedule['end_time'],
+            'kind' => $kind,
+            'course_cd' => $kind,
         ];
 
         return view('pages.admin.regular_schedule-input', [
@@ -474,7 +479,7 @@ class RoomCalendarController extends Controller
      * @param int $scheduleId スケジュールID
      * @return view
      */
-    public function weekCopy($scheduleId)
+    public function weekCopy($kind, $scheduleId)
     {
 
         // IDのバリデーション
@@ -500,6 +505,8 @@ class RoomCalendarController extends Controller
             'curDate' => $extSchedule['lesson_date'],
             'start_time' => $extSchedule['start_time'],
             'end_time' => $extSchedule['end_time'],
+            'kind' => $kind,
+            'course_cd' => $kind,
         ];
 
         return view('pages.admin.regular_schedule-input', [
