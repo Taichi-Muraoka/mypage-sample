@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Lang;
 /**
  * 特別期間講習コマ組み - コントローラ
  */
-class SeasonPlanConfirmController extends Controller
+class SeasonMngController extends Controller
 {
 
     // 機能共通処理：
@@ -45,7 +45,7 @@ class SeasonPlanConfirmController extends Controller
      */
     public function index()
     {
-        return view('pages.admin.season_plan_confirm');
+        return view('pages.admin.season_mng');
     }
 
     /**
@@ -89,6 +89,60 @@ class SeasonPlanConfirmController extends Controller
      * @return void
      */
     public function execModal(Request $request)
+    {
+        return;
+    }
+
+    //==========================
+    // 編集
+    //==========================
+
+    /**
+     * 編集画面
+     *
+     * @param int $changeId コース変更・授業追加申請ID
+     * @return view
+     */
+    public function edit($changeId)
+    {
+        // ステータスのプルダウン取得
+        $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_2);
+
+        return view('pages.admin.season_mng-edit', [
+            'editData' => null,
+            //'statusList' => $statusList,
+            'rules' => $this->rulesForInput()
+        ]);
+    }
+
+    /**
+     * 編集処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function update(Request $request)
+    {
+        return;
+    }
+
+    /**
+     * バリデーション(登録用)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed バリデーション結果
+     */
+    public function validationForInput(Request $request)
+    {
+        return;
+    }
+
+    /**
+     * バリデーションルールを取得(登録用)
+     *
+     * @return array ルール
+     */
+    private function rulesForInput()
     {
         return;
     }

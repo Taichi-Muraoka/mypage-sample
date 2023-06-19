@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '特別期間講習 生徒連絡内容')
+@section('title', '特別期間講習 生徒日程詳細')
 
 {{-- 子ページ --}}
 @section('child_page', true)

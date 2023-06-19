@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 特別期間講習コマ割り状況一覧
+ * 特別期間講習 講習情報一覧
  */
 export default class AppClass extends PageBase {
     /**

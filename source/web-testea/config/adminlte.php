@@ -375,7 +375,7 @@ return [
             'active' => ['conference/*']
         ],
         [
-            'text' => '特別期間講習日程連絡',
+            'text' => '特別期間講習連絡',
             'route' => 'season_student',
             'icon' => 'fas fa-chalkboard',
             'can'  => 'student',
@@ -502,7 +502,7 @@ return [
             'active' => ['grades_check/*']
         ],
         [
-            'text' => '特別期間講習日程連絡',
+            'text' => '特別期間講習連絡',
             'route' => 'season_tutor',
             'icon' => 'fas fa-chalkboard',
             'can'  => 'tutor',
@@ -675,16 +675,19 @@ return [
             'menuid' => '',
             'submenu' => [
                 [
-                    'text' => '生徒日程コマ組み',
+                    'text' => '講習情報管理',
+                    'route' => 'season_mng',
+                    'active' => ['season_mng/*']
+                ],
+                [
+                    'text' => '生徒日程・コマ組み',
                     'route' => 'season_mng_student',
+                    'active' => ['season_mng_student*']
                 ],
                 [
-                    'text' => '講師日程連絡確認',
+                    'text' => '講師日程',
                     'route' => 'season_mng_tutor',
-                ],
-                [
-                    'text' => 'コマ組み確定処理',
-                    'route' => 'season_plan_confirm',
+                    'active' => ['season_mng_tutor*']
                 ],
                 //[
                 //    'text' => '自動コマ組み',

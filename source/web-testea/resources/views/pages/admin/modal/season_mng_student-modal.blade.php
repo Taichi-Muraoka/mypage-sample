@@ -8,11 +8,11 @@
 
     {{-- 講師リスト --}}
     <x-input.select id="tid" :select2=true >
-      <option value="1">CWテスト講師１０１</option>
-      <option value="2">CWテスト講師１０２</option>
-      <option value="3">CWテスト講師１０３</option>
-      <option value="4">CWテスト講師１０４</option>
-      <option value="5">CWテスト講師１０５</option>
+      <option value="1">CW講師１０１</option>
+      <option value="2">CW講師１０２</option>
+      <option value="3">CW講師１０３</option>
+      <option value="4">CW講師１０４</option>
+      <option value="5">CW講師１０５</option>
     </x-input.select>
 
 @overwrite

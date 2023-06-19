@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '特別期間講習 科目別コマ組み')
+@section('title', '特別期間講習 生徒科目別コマ組み')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -8,7 +8,7 @@
 {{-- 三階層目の場合：親ページを指定(URLとタイトル) --}}
 @section('parent_page', route('season_mng_student-detail', 1))
 
-@section('parent_page_title', '生徒連絡内容')
+@section('parent_page_title', '生徒日程詳細')
 
 @section('content')
 
@@ -67,15 +67,22 @@
         {{-- 表のDiv --}}
         <div class="chk-t" data-wt="{{$j}}_{{$periodIdList[$i]}}">
             @if (!in_array($j . "_" . $periodIdList[$i], $editData["chkWs"]))
-            <div class="sel-button">
-              <x-button.list-dtl caption="講師"/>
               @if ($i == 0 && $j== 0 )
-              <span>CWテスト講師１０１</span>
+              <div class="class-info">
+                <span>CW講師１０１</span>
+              </div>
+              @elseif ($i == 1 && $j== 2 )
+              <div class="class-info">
+                <span>CW講師１０１</span>
+              </div>
+              @else
+              <div class="sel-button">
+                <x-button.list-dtl caption="講師"/>
+                @if ($i == 1 && $j== 0 )
+                <span>CW講師１０２</span>
+                @endif
+              </div>
               @endif
-              @if ($i == 1 && $j== 2 )
-              <span>CWテスト講師１０１</span>
-              @endif
-            </div>
             @endif
         </div>
       </td>

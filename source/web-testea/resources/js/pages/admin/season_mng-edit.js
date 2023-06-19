@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 特別期間講習スケジュール登録
+ * 特別期間講習 受付期間登録
  */
 export default class AppClass extends PageBase {
     /**
@@ -22,7 +22,7 @@ export default class AppClass extends PageBase {
 
         // Vue: 入力フォーム
         this.getVueInputForm({
-            afterEdit: afterEdit,
+            afterEdit: afterEdit
         });
     }
 }
