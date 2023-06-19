@@ -75,7 +75,6 @@
                 <x-button.list-dtl />
                 {{-- モーダルを開く詳細ボタンを使用する --}}
                 <x-button.list-dtl caption="受付" btn="btn-primary" dataTarget="#modal-dtl-acceptance"/>
-                <x-button.list-edit href="{{ route('absent_accept-edit', 1) }}" />
             </td>
         </tr>
 
