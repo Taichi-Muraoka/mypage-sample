@@ -62,9 +62,9 @@
     </x-input.select>
     <x-input.date-picker caption="受験日" id="exam_date" :editData=$editData />
     <x-input.select caption="合否" id="pass_fail" :select2=true :editData="$editData">
-        <option value="1">合格</option>
-        <option value="2">不合格</option>
-        <option value="3">その他</option>
+        <option value="1">未</option>
+        <option value="2">合格</option>
+        <option value="3">不合格</option>
     </x-input.select>
 
     <x-input.textarea caption="備考" id="remarks" :editData=$editData />
