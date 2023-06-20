@@ -42,9 +42,24 @@
         <option value="3">3</option>
     </x-input.select>
 
-    <x-button.list-dtl caption="学校検索"/>
-    <x-input.text caption="学校名" id="school" :rules=$rules :editData=$editData/>
+    <x-bs.form-title>学校名</x-bs.form-title>
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.text id="school_cd_e" :editData=$editData readOnly=true />
+        </x-bs.col2>
+        <div style="padding-top:0.25rem;">
+            <x-button.list-dtl caption="学校検索"/>
+            <x-button.list-dtl caption="取消"/>
+        </div>
+    </x-bs.row>
+
     <x-input.text caption="学部・学科名" id="faculty_department" :rules=$rules :editData=$editData/>
+    <x-input.select caption="受験年度" id="cls_year" :select2=true :editData="$editData">
+        <option value="1">2022</option>
+        <option value="2">2023</option>
+        <option value="3">2024</option>
+        <option value="4">2025</option>
+    </x-input.select>
     <x-input.date-picker caption="受験日" id="exam_date" :editData=$editData />
     <x-input.select caption="合否" id="pass_fail" :select2=true :editData="$editData">
         <option value="1">合格</option>
