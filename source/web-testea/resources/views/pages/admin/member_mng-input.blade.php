@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', (request()->routeIs('member_mng-edit')) ? '会員編集' : '会員登録')
+@section('title', (request()->routeIs('member_mng-edit')) ? '会員情報編集' : '会員情報登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -70,30 +70,33 @@
     </x-input.select>
     <x-bs.form-title>所属学校（小）</x-bs.form-title>
     <x-bs.row>
-        <div class="edit-disp-indent">
-            <x-button.list-dtl caption="学校検索" />
-        </div>
         <x-bs.col2>
             <x-input.text id="school_cd_e" :editData=$editData readOnly=true />
         </x-bs.col2>
+        <div style="padding-top:0.25rem;">
+            <x-button.list-dtl caption="学校検索"/>
+            <x-button.list-dtl caption="取消"/>
+        </div>
     </x-bs.row>
     <x-bs.form-title>所属学校（中）</x-bs.form-title>
     <x-bs.row>
-        <div class="edit-disp-indent">
-            <x-button.list-dtl caption="学校検索" />
-        </div>
         <x-bs.col2>
             <x-input.text id="school_cd_j" :editData=$editData readOnly=true />
         </x-bs.col2>
+        <div style="padding-top:0.25rem;">
+            <x-button.list-dtl caption="学校検索"/>
+            <x-button.list-dtl caption="取消"/>
+        </div>
     </x-bs.row>
     <x-bs.form-title>所属学校（高）</x-bs.form-title>
     <x-bs.row>
-        <div class="edit-disp-indent">
-            <x-button.list-dtl caption="学校検索" />
-        </div>
         <x-bs.col2>
             <x-input.text id="school_cd_h" :editData=$editData readOnly=true />
         </x-bs.col2>
+        <div style="padding-top:0.25rem;">
+            <x-button.list-dtl caption="学校検索"/>
+            <x-button.list-dtl caption="取消"/>
+        </div>
     </x-bs.row>
     <x-input.text caption="生徒電話番号" id="tel_stu" :rules=$rules :editData=$editData/>
     <x-input.text caption="保護者電話番号" id="tel_par" :rules=$rules :editData=$editData/>
@@ -111,6 +114,7 @@
     </x-input.select>
     <x-input.date-picker caption="入会日" id="enter_date" />
     <x-input.date-picker caption="退会日" id="leave_date" />
+    <x-input.text caption="ストレージURL" id="storage_url" :rules=$rules :editData=$editData/>
 
     {{-- hidden --}}
     <x-input.hidden id="sid" :editData=$editData />

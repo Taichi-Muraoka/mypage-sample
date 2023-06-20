@@ -57,7 +57,7 @@
         </tr>
         <tr>
             <th>会員ステータス</th>
-            <td>入会</td>
+            <td>在籍</td>
         </tr>
         <tr>
             <th>入会日</th>
@@ -223,6 +223,35 @@
             <x-bs.td-sp caption="回数" class="t-price">10</x-bs.td-sp>
         </tr>
     </x-bs.table>
+
+    {{-- 余白 --}}
+    <div class="mb-3"></div>
+    <x-bs.form-title>レギュラー授業情報</x-bs.form-title>
+
+    {{-- テーブル --}}
+    <x-bs.table :button=true class="inner-card">
+
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th width="10%">校舎</th>
+            <th width="10%">曜日</th>
+            <th width="10%">時限</th>
+            <th width="10%">授業種別</th>
+            <th width="20%">講師</th>
+            <th width="20%">科目</th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
+        <tr>
+            <td>久我山</td>
+            <td>火</td>
+            <td>6</td>
+            <td>個別</td>
+            <td>CWテスト講師１０１</td>
+            <td>中学英語</td>
+        </tr>
+    </x-bs.table>
+
 </x-bs.card>
 
 <x-bs.card>
@@ -240,7 +269,7 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="10%">年度</th>
+            <th width="10%">受験年度</th>
             <th width="10%">志望順</th>
             <th>学校名</th>
             <th>学部・学科名</th>

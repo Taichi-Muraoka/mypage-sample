@@ -59,7 +59,7 @@ class MemberMngController extends Controller
         $classes = $this->mdlMenuFromExtGenericMaster(AppConst::EXT_GENERIC_MASTER_112);
 
         // 入会状況チェックボックス
-        $statusGroup = array("在塾中","見込み客","退会済み");
+        $statusGroup = array("在籍","見込客","退会処理中","退会済");
 
         return view('pages.admin.member_mng', [
             'rules' => $this->rulesForSearch(),

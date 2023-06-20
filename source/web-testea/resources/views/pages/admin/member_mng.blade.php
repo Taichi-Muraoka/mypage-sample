@@ -89,7 +89,6 @@
             <th>入会日</th>
             <th>通塾期間</th>
             <th>通塾バッジ数</th>
-            <th>受講科目</th>
             <th>会員ステータス</th>
             <th></th>
         </x-slot>
@@ -99,11 +98,10 @@
             <td>1</td>
             <td>CWテスト生徒１</td>
             <td>中学１年</td>
-            <td>2023/4/1</td>
+            <td>2023/04/01</td>
             <td>2ヶ月</td>
             <td>0</td>
-            <td>数学</td>
-            <td>入会</td>
+            <td>在籍</td>
             <td>
                 <x-button.list-dtl href="{{ route('member_mng-detail', 1) }}" caption="生徒カルテ" />
             </td>
@@ -112,11 +110,10 @@
             <td>2</td>
             <td>CWテスト生徒２</td>
             <td>中学１年</td>
-            <td>2021/12/1</td>
+            <td>2021/12/01</td>
             <td>1年6ヶ月</td>
             <td>1</td>
-            <td>英語</td>
-            <td>入会</td>
+            <td>在籍</td>
             <td>
                 <x-button.list-dtl href="{{ route('member_mng-detail', 2) }}" caption="生徒カルテ" />
             </td>
@@ -125,11 +122,10 @@
             <td>3</td>
             <td>CWテスト生徒３</td>
             <td>中学２年</td>
-            <td>2022/6/1</td>
+            <td>2022/06/01</td>
             <td>1年0ヶ月</td>
             <td>0</td>
-            <td>英語</td>
-            <td>入会</td>
+            <td>在籍</td>
             <td>
                 <x-button.list-dtl href="{{ route('member_mng-detail', 3) }}" caption="生徒カルテ" />
             </td>
@@ -138,11 +134,10 @@
             <td>4</td>
             <td>CWテスト生徒４</td>
             <td>中学２年</td>
-            <td>2022/4/1</td>
+            <td>2022/04/01</td>
             <td>1年2ヶ月</td>
             <td>1</td>
-            <td>数学</td>
-            <td>入会</td>
+            <td>在籍</td>
             <td>
                 <x-button.list-dtl href="{{ route('member_mng-detail', 4) }}" caption="生徒カルテ" />
             </td>
@@ -151,11 +146,10 @@
             <td>5</td>
             <td>CWテスト生徒５</td>
             <td>中学３年</td>
-            <td>2019/7/1</td>
+            <td>2019/07/01</td>
             <td>3年11ヶ月</td>
             <td>3</td>
-            <td>国語・数学・英語</td>
-            <td>入会</td>
+            <td>在籍</td>
             <td>
                 <x-button.list-dtl href="{{ route('member_mng-detail', 5) }}" caption="生徒カルテ" />
             </td>
@@ -164,10 +158,9 @@
             <td>6</td>
             <td>CWテスト生徒６</td>
             <td>中学３年</td>
-            <td>2021/4/1</td>
+            <td>2021/04/01</td>
             <td>2年2ヶ月</td>
             <td>2</td>
-            <td>国語</td>
             <td>退会済</td>
             <td>
                 <x-button.list-dtl href="{{ route('member_mng-detail', 6) }}" caption="生徒カルテ" />
