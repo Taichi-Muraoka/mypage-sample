@@ -55,7 +55,7 @@
         <x-slot name="thead">
             <th class="t-minimum">申請日</th>
             <th>生徒名</th>
-            <th width="20%">授業日時</th>
+            <th width="20%">授業日・時限</th>
             <th width="15%">校舎</th>
             <th>講師名</th>
             <th width="t-minimum">ステータス</th>
@@ -67,7 +67,7 @@
         <tr>
             <td>2023/05/10</td>
             <td>CWテスト生徒１</td>
-            <td>2023/05/22 16:00</td>
+            <td>2023/05/22 4限</td>
             <td>久我山</td>
             <td>CWテスト教師１０１</td>
             <td>未対応</td>
@@ -75,7 +75,6 @@
                 <x-button.list-dtl />
                 {{-- モーダルを開く詳細ボタンを使用する --}}
                 <x-button.list-dtl caption="受付" btn="btn-primary" dataTarget="#modal-dtl-acceptance"/>
-                <x-button.list-edit href="{{ route('absent_accept-edit', 1) }}" />
             </td>
         </tr>
 
