@@ -16,6 +16,10 @@
     {{-- 編集時 --}}
     <x-bs.table :hover=false :vHeader=true>
         <tr>
+            <th>登録日</th>
+            <td>2023/05/15</td>
+        </tr>
+        <tr>
             <th>授業種別</th>
             <td>個別指導</td>
         </tr>

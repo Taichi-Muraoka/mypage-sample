@@ -5,6 +5,10 @@
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true :smartPhoneModal=true>
     <tr>
+        <th>登録日</th>
+        <td>2023/05/15</td>
+    </tr>
+    <tr>
         <th width="35%">授業日・時限</th>
         <td>2023/05/15 4限</td>
     </tr>
