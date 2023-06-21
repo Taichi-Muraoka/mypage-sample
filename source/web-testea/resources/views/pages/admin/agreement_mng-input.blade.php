@@ -29,7 +29,7 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.select caption="授業種別" id="lesson_kind" :select2=true>
+    <x-input.select caption="授業種別" id="lesson_kind" :select2=true emptyValue="1">
         <option value="1">個別</option>
         <option value="2">集団</option>
     </x-input.select>
@@ -44,32 +44,24 @@
     <x-input.date-picker caption="契約開始日" id="start_date" :editData=$editData />
     <x-input.date-picker caption="契約終了日" id="end_date" :editData=$editData />
 
-    <x-bs.table vShow="form.course_name == 1" :hover=false :vHeader=true>
+    <x-bs.table :hover=false :vHeader=true>
+        <tr>
+            <th>金額</th>
+            <td><span v-cloak v-show="form.course_name == 1">33,880</span>
+                <span v-cloak v-show="form.course_name == 2">50,000</span>
+            </td>
+        </tr>
         <tr>
             <th>単価</th>
-            <td>8,470</td>
+            <td><span v-cloak v-show="form.course_name == 1">8,470</span>
+                <span v-cloak v-show="form.course_name == 2">5,000</span>
+            </td>
         </tr>
         <tr>
             <th>回数</th>
-            <td>4</td>
-        </tr>
-        <tr>
-            <th>金額</th>
-            <td>33,880</td>
-        </tr>
-    </x-bs.table>
-    <x-bs.table vShow="form.course_name == 2" :hover=false :vHeader=true>
-        <tr>
-            <th>単価</th>
-            <td>5,000</td>
-        </tr>
-        <tr>
-            <th>回数</th>
-            <td>10</td>
-        </tr>
-        <tr>
-            <th>金額</th>
-            <td>50,000</td>
+            <td><span v-cloak v-show="form.course_name == 1">4</span>
+                <span v-cloak v-show="form.course_name == 2">10</span>
+            </td>
         </tr>
     </x-bs.table>
 
