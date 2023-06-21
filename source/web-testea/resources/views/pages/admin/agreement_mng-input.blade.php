@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', (request()->routeIs('agreement_mng-edit')) ? '契約編集' : '契約登録')
+@section('title', (request()->routeIs('agreement_mng-edit')) ? '契約情報編集' : '契約情報登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -29,15 +29,8 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.select caption="授業種別" id="lesson_kind" :select2=true emptyValue="1">
-        <option value="1">個別</option>
-        <option value="2">集団</option>
-    </x-input.select>
-
-    <x-input.select caption="契約コース名" id="course_name" :select2=true vShow="form.lesson_kind == 1">
+    <x-input.select caption="契約コース名" id="course_name" :select2=true>
         <option value="1">個別指導 中学生コース（受験準備学年）</option>
-    </x-input.select>
-    <x-input.select caption="契約コース名" id="course_name" :select2=true vShow="form.lesson_kind == 2">
         <option value="2">集団授業 中学生 英語・数学総復習パック</option>
     </x-input.select>
 
@@ -45,6 +38,12 @@
     <x-input.date-picker caption="契約終了日" id="end_date" :editData=$editData />
 
     <x-bs.table :hover=false :vHeader=true>
+        <tr>
+            <th>授業種別</th>
+            <td><span v-cloak v-show="form.course_name == 1">個別</span>
+                <span v-cloak v-show="form.course_name == 2">集団</span>
+            </td>
+        </tr>
         <tr>
             <th>金額</th>
             <td><span v-cloak v-show="form.course_name == 1">33,880</span>
