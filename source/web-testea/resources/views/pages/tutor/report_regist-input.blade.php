@@ -16,6 +16,10 @@
     {{-- 編集時 --}}
     <x-bs.table :hover=false :vHeader=true>
         <tr>
+            <th>授業種別</th>
+            <td>個別指導</td>
+        </tr>
+        <tr>
             <th width="35%">授業日・時限</th>
             {{-- <td>{{$editData->lesson_date->format('Y/m/d')}} {{$editData->start_time->format('H:i')}}</td> --}}
             <td>2023/05/15 4限</td>
