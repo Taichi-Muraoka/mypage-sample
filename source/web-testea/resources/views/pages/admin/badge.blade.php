@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'バッジ付与一覧')
+@section('title', 'バッジ付与情報一覧')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -25,7 +25,7 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="20%">付与日</th>
+            <th width="20%">認定日</th>
             <th width="15%">バッジ種別</th>
             <th width="10%">校舎</th>
             <th width="15%">担当者名</th>

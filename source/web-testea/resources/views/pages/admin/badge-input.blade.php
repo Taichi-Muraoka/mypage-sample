@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', (request()->routeIs('badge-edit')) ? 'バッジ付与編集' : 'バッジ付与登録')
+@section('title', (request()->routeIs('badge-edit')) ? 'バッジ付与情報編集' : 'バッジ付与情報登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -13,7 +13,7 @@
 {{-- 編集画面の場合のみ、一覧を経由し四階層とする --}}
 @if (request()->routeIs('badge-edit'))
 @section('parent_page2', route('badge', $editData['sid']))
-@section('parent_page_title2', 'バッジ付与一覧')
+@section('parent_page_title2', 'バッジ付与情報一覧')
 @endif
 
 @section('content')
@@ -39,13 +39,6 @@
         <option value="1">久我山</option>
         <option value="2">西永福</option>
         <option value="3">本郷</option>
-    </x-input.select>
-
-    <x-input.date-picker caption="付与日" id="authorization_date" :editData=$editData />
-
-    <x-input.select caption="担当者" id="adm_user" :select2=true :editData="$editData">
-        <option value="1">鈴木　花子</option>
-        <option value="2">山田　太郎</option>
     </x-input.select>
 
     <x-input.textarea caption="認定理由" id="reason" :editData=$editData />
