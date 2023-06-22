@@ -6,6 +6,25 @@
 
 {{-- 検索フォーム --}}
 <x-bs.card :search=true>
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.select id="roomcd" caption="校舎" :select2=true >
+                <option value="1">久我山</option>
+                <option value="2">西永福</option>
+                <option value="3">下高井戸</option>
+                <option value="4">駒込</option>
+                <option value="5">日吉</option>
+                <option value="6">自由が丘</option>
+            </x-input.select>
+        </x-bs.col2>
+        <x-bs.col2>
+            <x-input.select id="exam_kinds" caption="種別" :select2=true>
+                <option value="1">模試</option>
+                <option value="2">定期考査</option>
+                <option value="3">通信票評定</option>
+            </x-input.select>
+        </x-bs.col2>
+    </x-bs.row>
 
     <x-bs.row>
         <x-bs.col2>
@@ -48,13 +67,6 @@
                 </x-bs.form-group>
             </x-bs.card>
         </x-bs.col2>
-        <x-bs.col2>
-            <x-input.select id="exam_kinds" caption="試験種別" :select2=true>
-                <option value="1">模試</option>
-                <option value="2">定期考査</option>
-                <option value="3">通信票評定</option>
-            </x-input.select>
-        </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>
@@ -81,42 +93,38 @@
 
             {{-- テーブルタイトル行 --}}
             <x-slot name="thead">
-                <th>生徒名</th>
+                <th>登録日</th>
                 <th>校舎</th>
                 <th>学年</th>
-                <th>試験種別</th>
-                <th>試験名</th>
-                <th>年度</th>
-                <th>学期</th>
+                <th>生徒名</th>
+                <th>種別</th>
+                <th>学期・試験名</th>
             </x-slot>
 
             {{-- テーブル行 --}}
             <tr>
-                <td>CWテスト生徒１</td>
+                <td>2023/07/21</td>
                 <td>久我山</td>
                 <td>中学2年</td>
-                <td>模試</td>
-                <td>全国統一模試</td>
-                <td>2023</td>
-                <td></td>
+                <td>CWテスト生徒１</td>
+                <td>通信票評定</td>
+                <td>1学期</td>
             </tr>
             <tr>
-                <td>CWテスト生徒１</td>
+                <td>2023/04/10</td>
                 <td>久我山</td>
                 <td>中学2年</td>
+                <td>CWテスト生徒１</td>
                 <td>定期考査</td>
                 <td>1学期中間考査</td>
-                <td>2023</td>
-                <td></td>
             </tr>
             <tr>
-                <td>CWテスト生徒１</td>
+                <td>2023/03/18</td>
                 <td>久我山</td>
                 <td>中学2年</td>
-                <td>通信票評定</td>
-                <td></td>
-                <td>2023</td>
-                <td>1学期</td>
+                <td>CWテスト生徒１</td>
+                <td>模試</td>
+                <td>全国統一模試</td>
             </tr>
 
         </x-bs.table>
