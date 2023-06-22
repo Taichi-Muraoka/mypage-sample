@@ -32,10 +32,10 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="対象期間 From" id="date_from" />
+            <x-input.date-picker caption="認定日 From" id="date_from" />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="対象期間 To" id="date_to" />
+            <x-input.date-picker caption="認定日 To" id="date_to" />
         </x-bs.col2>
     </x-bs.row>
 </x-bs.card>
