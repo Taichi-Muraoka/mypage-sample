@@ -110,6 +110,11 @@
         <option value="4">両者オンライン</option>
     </x-input.select>
 
+    <x-input.select vShow="form.course_cd != 5 && form.status == 2" caption="仮登録フラグ（特別期間講習のみ）" id="tentative_status" :select2=true :select2Search=false :editData="$editData">
+        <option value="0" selected>本登録</option>
+        <option value="1">仮登録</option>
+    </x-input.select>
+
 
     @if (request()->routeIs('room_calendar-edit'))
     {{-- 編集時 --}}
