@@ -42,16 +42,7 @@
         <option value="3">3</option>
     </x-input.select>
 
-    <x-bs.form-title>学校名</x-bs.form-title>
-    <x-bs.row>
-        <x-bs.col2>
-            <x-input.text id="school_cd_e" :editData=$editData readOnly=true />
-        </x-bs.col2>
-        <div style="padding-top:0.25rem;">
-            <x-button.list-dtl caption="学校検索"/>
-            <x-button.list-dtl caption="取消"/>
-        </div>
-    </x-bs.row>
+    <x-input.modal-select caption="受験校" id="school_cd" btnCaption="学校検索" />
 
     <x-input.text caption="学部・学科名" id="faculty_department" :rules=$rules :editData=$editData/>
     <x-input.select caption="受験年度" id="cls_year" :select2=true :editData="$editData">

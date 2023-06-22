@@ -68,36 +68,9 @@
         <option value="1">非受験生</option>
         <option value="2">受験生</option>
     </x-input.select>
-    <x-bs.form-title>所属学校（小）</x-bs.form-title>
-    <x-bs.row>
-        <x-bs.col2>
-            <x-input.text id="school_cd_e" :editData=$editData readOnly=true />
-        </x-bs.col2>
-        <div style="padding-top:0.25rem;">
-            <x-button.list-dtl caption="学校検索"/>
-            <x-button.list-dtl caption="取消"/>
-        </div>
-    </x-bs.row>
-    <x-bs.form-title>所属学校（中）</x-bs.form-title>
-    <x-bs.row>
-        <x-bs.col2>
-            <x-input.text id="school_cd_j" :editData=$editData readOnly=true />
-        </x-bs.col2>
-        <div style="padding-top:0.25rem;">
-            <x-button.list-dtl caption="学校検索"/>
-            <x-button.list-dtl caption="取消"/>
-        </div>
-    </x-bs.row>
-    <x-bs.form-title>所属学校（高）</x-bs.form-title>
-    <x-bs.row>
-        <x-bs.col2>
-            <x-input.text id="school_cd_h" :editData=$editData readOnly=true />
-        </x-bs.col2>
-        <div style="padding-top:0.25rem;">
-            <x-button.list-dtl caption="学校検索"/>
-            <x-button.list-dtl caption="取消"/>
-        </div>
-    </x-bs.row>
+    <x-input.modal-select caption="所属学校（小）" id="school_cd_e" btnCaption="学校検索" />
+    <x-input.modal-select caption="所属学校（中）" id="school_cd_j" btnCaption="学校検索" />
+    <x-input.modal-select caption="所属学校（高）" id="school_cd_h" btnCaption="学校検索" />
     <x-input.text caption="生徒電話番号" id="tel_stu" :rules=$rules :editData=$editData/>
     <x-input.text caption="保護者電話番号" id="tel_par" :rules=$rules :editData=$editData/>
     <x-input.text caption="生徒メールアドレス" id="email_stu" :rules=$rules :editData=$editData/>
@@ -107,8 +80,8 @@
         <option value="2">保護者</option>
     </x-input.select>
     <x-input.select caption="会員ステータス" id="stu_status" :select2=true :blank=false :editData=$editData>
-        <option value="0">見込み客</option>
-        <option value="1">入会</option>
+        <option value="0">見込客</option>
+        <option value="1">在籍</option>
         <option value="2">退会処理中</option>
         <option value="3">退会</option>
     </x-input.select>
