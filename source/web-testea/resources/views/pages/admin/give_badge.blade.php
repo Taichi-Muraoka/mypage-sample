@@ -8,13 +8,19 @@
 <x-bs.card :search=true>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="対象期間 From" id="date_from" />
+            <x-input.select id="roomcd" caption="校舎" :select2=true >
+                <option value="1">久我山</option>
+                <option value="2">西永福</option>
+                <option value="3">下高井戸</option>
+                <option value="4">駒込</option>
+                <option value="5">日吉</option>
+                <option value="6">自由が丘</option>
+            </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="対象期間 To" id="date_to" />
+            <x-input.text id="name" caption="生徒名" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
-
     <x-bs.row>
         <x-bs.col2>
             <x-input.select id="badge_type" caption="バッジ種別" :select2=true >
@@ -23,8 +29,13 @@
                 <option value="3">成績</option>
             </x-input.select>
         </x-bs.col2>
+    </x-bs.row>
+    <x-bs.row>
         <x-bs.col2>
-            <x-input.text id="name" caption="生徒名" :rules=$rules />
+            <x-input.date-picker caption="対象期間 From" id="date_from" />
+        </x-bs.col2>
+        <x-bs.col2>
+            <x-input.date-picker caption="対象期間 To" id="date_to" />
         </x-bs.col2>
     </x-bs.row>
 </x-bs.card>
