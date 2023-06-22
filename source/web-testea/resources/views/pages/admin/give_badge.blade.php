@@ -37,7 +37,7 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">付与日</th>
+            <th width="15%">認定日</th>
             <th width="10%">バッジ種別</th>
             <th width="10%">校舎</th>
             <th width="15%">生徒名</th>
