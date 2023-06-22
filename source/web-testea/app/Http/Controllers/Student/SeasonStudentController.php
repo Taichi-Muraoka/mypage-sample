@@ -197,11 +197,12 @@ class SeasonStudentController extends Controller
     //==========================
 
     /**
-     * 登録画面
+     * 編集画面
      *
-     * @return view
+     * @param int $seasonStudenId
+     * @return void
      */
-    public function new()
+    public function edit($seasonStudenId)
     {
         //==========================
         // 既存処理
@@ -300,7 +301,7 @@ class SeasonStudentController extends Controller
      * @param request
      * @return void
      */
-    public function create(Request $request)
+    public function update(Request $request)
     {
         //==========================
         // 既存処理

@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '特別期間講習　日程連絡')
+@section('title', '特別期間講習 日程連絡')
 
 @section('content')
 
@@ -10,19 +10,15 @@
 {{-- フォーム --}}
 <x-bs.card :form=true >
 
-  <p>下記の特別期間について、<b>授業に入れない日程・時間</b>を選択・登録してください。</p>
+  <p>下記の特別期間について、<b>授業に入れない日程・時限</b>を選択・登録してください。</p>
 
     {{-- 詳細を表示 --}}
     <x-bs.table :hover=false :vHeader=true class="mb-4">
       <tr>
-          <th class="t-minimum" width="25%">特別期間</th>
+          <th width="25%">特別期間</th>
           <td>2023年春期</td>
       </tr>
-      <tr>
-        <th>提出締め切り</th>
-        <td>3/10</td>
-    </tr>
-</x-bs.table>
+    </x-bs.table>
 
   {{-- チェックボックスのエラー時のメッセージ --}}
   <x-bs.form-group name="chkWs" />

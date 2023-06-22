@@ -363,10 +363,10 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     Route::get('/season_student/detail/{sid}', [SeasonStudentController::class, 'detail'])->name('season_student-detail');
 
     // 日程登録画面
-    Route::get('/season_student/new', [SeasonStudentController::class, 'new'])->name('season_student-new');
+    Route::get('/season_student/edit/{seasonStudentId}', [SeasonStudentController::class, 'edit'])->name('season_student-edit');
 
     // 新規登録処理
-    Route::post('/season_student/create', [SeasonStudentController::class, 'create'])->name('season_student-create');
+    Route::post('/season_student/update', [SeasonStudentController::class, 'update'])->name('season_student-update');
 
     // バリデーション(登録用)
     Route::post('/season_student/vd_input', [SeasonStudentController::class, 'validationForInput'])->name('season_student-vd_input');

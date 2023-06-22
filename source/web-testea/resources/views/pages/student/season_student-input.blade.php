@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '特別期間講習　日程連絡')
+@section('title', '特別期間講習 日程連絡')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -10,29 +10,23 @@
 {{-- フォーム --}}
 <x-bs.card :form=true >
 
-  <p>下記の特別期間について、<b>ご都合の悪い日程・時間</b>を選択し、受講希望科目・回数を入力してください。</p>
+  <p>下記の特別期間について、<b>ご都合の悪い日程・時限</b>を選択し、受講希望科目・回数を入力してください。</p>
 
     {{-- 詳細を表示 --}}
     <x-bs.table :hover=false :vHeader=true class="mb-4">
       <tr>
-          <th class="t-minimum" width="25%">特別期間</th>
+          <th width="25%">特別期間</th>
           <td>2023年春期</td>
+      </tr>
+      <tr>
+        <th>受講校舎</th>
+        <td>久我山</td>
       </tr>
       <tr>
           <th>受講回数（目安）</th>
           <td>4回</td>
       </tr>
-      <tr>
-        <th>受付終了日</th>
-        <td>2023/03/10</td>
-    </tr>
-</x-bs.table>
-
-            <x-input.select id="roomcd" caption="受講校舎" :select2=true :select2Search=false :blank=false >
-                <option value="1">久我山</option>
-                <option value="2">西永福</option>
-                <option value="3">下高井戸</option>
-            </x-input.select>
+    </x-bs.table>
 
   {{-- チェックボックスのエラー時のメッセージ --}}
   <x-bs.form-group name="chkWs" />
@@ -134,8 +128,9 @@
     <x-input.textarea caption="備考欄" id="memo" />
 
     <x-bs.callout type="warning">
-      ※ご希望の日時ではなく、ご都合の悪い日程・時間を入力してください。<br>
-      　ピンポイントでの日時のご指定をいただくと、授業の設定ができない場合がございます。
+      ※ご希望の日時ではなく、ご都合の悪い日程・時限を入力してください。<br>
+      　ピンポイントでの日時のご指定をいただくと、授業の設定ができない場合がございます。<br>
+      ※早めのご登録をお願いいたします。登録いただいた方から順次スケジュールを作成いたします。
     </x-bs.callout>
 
   {{-- フッター --}}

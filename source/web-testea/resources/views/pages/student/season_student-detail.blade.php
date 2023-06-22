@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '特別期間講習　連絡内容詳細')
+@section('title', '特別期間講習 連絡内容詳細')
 
 @section('content')
 
