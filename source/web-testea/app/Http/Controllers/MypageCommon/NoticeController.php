@@ -153,8 +153,6 @@ class NoticeController extends Controller
                         $item['flg'] = 'event';
                     } else if ($item->notice_type == AppConst::CODE_MASTER_14_3) {
                         $item['flg'] = 'course';
-                    } else if ($item->notice_type == AppConst::CODE_MASTER_14_5) {
-                        $item['flg'] = 'conference';
                     } else {
                         $item['flg'] = 'absent';
                     }
@@ -318,9 +316,9 @@ class NoticeController extends Controller
 
                 return $notice;
 
-            case "#modal-dtl-conference":
+            case "#modal-dtl":
                 //---------------
-                // 面談
+                // 共通（テスティ―ではこのルートのみ使用する）
                 //---------------
 
                 // お知らせIDからお知らせを取得する。
@@ -330,6 +328,7 @@ class NoticeController extends Controller
                         'regist_time AS date',
                         'title',
                         'text AS body',
+                        'notice_type AS type',
                         'office.name AS sender',
                         'room_name'
                     )
@@ -342,8 +341,8 @@ class NoticeController extends Controller
                     ->where('notice.notice_id', '=', $notice_id)
                     ->firstOrFail();
 
-                return $notice;
-
+                    return $notice;
+        
             default:
                 //---------------
                 // 該当しない場合

@@ -25,7 +25,7 @@
             <x-bs.td-sp caption="送信元教室">@{{item.room_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="送信者">@{{item.sender}}</x-bs.td-sp>
             <td>
-                <x-button.list-dtl :vueDataAttr="['target' => '\'#modal-dtl-\' + item.flg', 'id' => 'item.id']" />
+                <x-button.list-dtl :vueDataAttr="['target' => '\'#modal-dtl\'', 'id' => 'item.id']" />
             </td>
         </tr>
 
@@ -35,12 +35,12 @@
 
 {{-- モーダル --}}
 {{-- 模試・イベント申込 --}}
-@include('pages.mypage-common.modal.notice_event-modal', ['modal_id' => 'modal-dtl-event'])
+{{-- @include('pages.mypage-common.modal.notice_event-modal', ['modal_id' => 'modal-dtl-event']) --}}
 {{-- 短期個別講習案内 --}}
-@include('pages.mypage-common.modal.notice_course-modal', ['modal_id' => 'modal-dtl-course'])
-{{-- 面談案内 --}}
-@include('pages.mypage-common.modal.notice_conference-modal', ['modal_id' => 'modal-dtl-conference'])
+{{-- @include('pages.mypage-common.modal.notice_course-modal', ['modal_id' => 'modal-dtl-course']) --}}
 {{-- それ以外 --}}
-@include('pages.mypage-common.modal.notice_absent-modal', ['modal_id' => 'modal-dtl-absent'])
+{{-- @include('pages.mypage-common.modal.notice_absent-modal', ['modal_id' => 'modal-dtl-absent']) --}}
+{{-- 共通のモーダルとした --}}
+@include('pages.mypage-common.modal.notice-modal')
 
 @stop

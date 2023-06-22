@@ -440,6 +440,15 @@ class AppConst
      */
     const CODE_MASTER_14_5 = 5;
 
+    /**
+     * お知らせ種別 特別期間講習
+     */
+    const CODE_MASTER_14_6 = 6;
+
+    /**
+     * お知らせ種別 成績登録
+     */
+    const CODE_MASTER_14_7 = 7;
 
     //-----------
     // 宛先種別
