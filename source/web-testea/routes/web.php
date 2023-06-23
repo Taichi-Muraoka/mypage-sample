@@ -734,6 +734,12 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // PDF出力
     Route::get('/member_mng/invoice/{sid}/pdf/{date}', [MemberMngController::class, 'pdf'])->name('member_mng-pdf_invoice');
 
+    // バリデーション(学校-検索用)
+    Route::post('/member_mng/vd_search_school', [MemberMngController::class, 'validationForSearchSchool'])->name('member_mng-vd_search_school');
+
+    // 学校-検索結果取得
+    Route::post('/member_mng/search_school', [MemberMngController::class, 'searchSchool'])->name('member_mng-search_school');
+        
     //---------------------
     // 受験校管理 モック
     //---------------------

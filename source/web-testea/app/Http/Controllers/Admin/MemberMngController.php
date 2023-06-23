@@ -588,6 +588,11 @@ class MemberMngController extends Controller
             'name' => $student['name'],
             'cls_cd' => $student['cls_cd'],
             'email_student' => $student['mailaddress1'],
+
+            // TODO: サンプル。表示用(学校名)と、ID(学校ID)を指定する
+            // 学校名はtext_xxxのように指定する
+            'text_school_cd_e' => '東京都立青山高等学校',
+            'school_cd_e' => 99
         ];
 
         return view('pages.admin.member_mng-input', [
@@ -683,6 +688,57 @@ class MemberMngController extends Controller
         return $rules;
     }
 
+    //==========================
+    // 学校検索
+    //==========================
+
+    /**
+     * 検索結果取得(学校検索)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 検索結果
+     */
+    public function searchSchool(Request $request)
+    {
+        // TODO: 実装 適当ですので修正してください
+        $query = Account::query();
+        $students = $query
+            ->select(
+                \DB::raw("'100' as 'school_id'"),
+                \DB::raw("'D113299902058' as 'school_code'"),
+                \DB::raw("'高校' as 'school_type'"),
+                \DB::raw("'東京' as 'school_pref'"),
+                \DB::raw("'公立' as 'school_div'"),
+                \DB::raw("'東京都立青山高等学校' as 'school_name'"),
+            );
+
+        // ページネータで返却
+        return $this->getListAndPaginator($request, $students);
+    }
+
+    /**
+     * バリデーション(学校検索用)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed バリデーション結果
+     */
+    public function validationForSearchSchool(Request $request)
+    {
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForSearchSchool());
+        return $validator->errors();
+    }
+
+    /**
+     * バリデーションルールを取得(学校検索用)
+     *
+     * @return array ルール
+     */
+    private function rulesForSearchSchool()
+    {
+        // TODO: 実装してください
+        return array();
+    }
 
     //==========================
     // クラス内共通処理

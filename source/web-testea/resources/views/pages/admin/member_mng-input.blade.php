@@ -68,9 +68,9 @@
         <option value="1">非受験生</option>
         <option value="2">受験生</option>
     </x-input.select>
-    <x-input.modal-select caption="所属学校（小）" id="school_cd_e" btnCaption="学校検索" />
-    <x-input.modal-select caption="所属学校（中）" id="school_cd_j" btnCaption="学校検索" />
-    <x-input.modal-select caption="所属学校（高）" id="school_cd_h" btnCaption="学校検索" />
+    <x-input.modal-select caption="所属学校（小）" id="school_cd_e" btnCaption="学校検索" :editData=$editData />
+    <x-input.modal-select caption="所属学校（中）" id="school_cd_j" btnCaption="学校検索" :editData=$editData />
+    <x-input.modal-select caption="所属学校（高）" id="school_cd_h" btnCaption="学校検索" :editData=$editData />
     <x-input.text caption="生徒電話番号" id="tel_stu" :rules=$rules :editData=$editData/>
     <x-input.text caption="保護者電話番号" id="tel_par" :rules=$rules :editData=$editData/>
     <x-input.text caption="生徒メールアドレス" id="email_stu" :rules=$rules :editData=$editData/>

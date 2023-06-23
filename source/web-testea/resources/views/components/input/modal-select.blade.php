@@ -27,7 +27,7 @@
       {{-- placeholderはデフォルトでcaptionにした --}}
       placeholder="@if (empty($placeholder)){{ $caption }}@else{{ $placeholder }}@endif"
       {{-- vue --}}
-      v-model="form.{{ $id }}"
+      v-model="form.text_{{ $id }}"
         {{-- エラー時の表示 --}}
         v-bind:class="{ 'is-invalid': form_err.class.{{ $id }} }"
       {{-- 編集時にデータをセット --}}
@@ -44,6 +44,9 @@
       v-bind:class="{ 'error-btn': form_err.class.{{ $id }} || form_err.class.file_{{ $id }} }" 
       data-toggle="modal"
 
+      {{-- 選択モーダルのid --}}
+      data-modalSelectId="{{ $id }}"
+
       {{-- 開くモーダルを指定。動的に指定する場合は、vueDataAttr=['target' => 'xxx'] のように指定するのでそれ以外の場合 --}} 
       @if (!isset($vueDataAttr['target']))
       data-target="@if (empty($dataTarget)){{ '#modal-dtl' }}@else{{ $dataTarget }}@endif" 
@@ -56,21 +59,26 @@
       >
       @if (empty($btnCaption)){{ '選択' }}@else{{ $btnCaption }}@endif
         </button>
-      {{-- 取り消しボタンはclassで引っ掛けてクリックイベントを発動させる --}}
-      {{-- 未対応 --}}
+
+      {{-- 取り消しボタン --}}
       <button type="button" class="btn input-group-text"
+      {{-- 選択モーダルのid --}}
+      data-modalSelectId="{{ $id }}"
+      v-on:click="modalSelectClear"
       v-bind:class="{ 'error-btn': form_err.class.{{ $id }} || form_err.class.file_{{ $id }} }" 
       >取消</button>
     </div>
 
   </div>
 
-  @isset($editData[$id])
   <div class="mt-1">
     {{-- 編集時にデータをセット --}} 
-    <input type="hidden" id="{{ $id }}" v-model="form.{{ $id }}" value="{{$editData[$id]}}">
+    <input type="hidden" id="{{ $id }}" v-model="form.{{ $id }}" 
+    @isset($editData[$id])
+    value="{{$editData[$id]}}"
+    @endisset
+    >
   </div>
-  @endisset
 
   {{-- バリデート結果のエラー --}}
   <ul class="err-list" v-cloak>

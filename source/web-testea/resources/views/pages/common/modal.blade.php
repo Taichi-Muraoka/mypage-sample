@@ -62,4 +62,6 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
+{{-- 選択モーダルの場合のVueのインスタンス --}}
+<div id="selected-modal"></div>
 <!-- /.modal -->
