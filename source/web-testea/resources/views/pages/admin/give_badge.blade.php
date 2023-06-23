@@ -43,6 +43,11 @@
 {{-- 結果リスト --}}
 <x-bs.card-list>
 
+    {{-- カードヘッダ右 --}}
+    <x-slot name="tools">
+        <x-button.submit-exec caption="CSVダウンロード" icon="fas fa-download" />
+    </x-slot>
+
     {{-- テーブル --}}
     <x-bs.table :button=true :smartPhone=true>
 
@@ -91,14 +96,6 @@
         </tr>
 
     </x-bs.table>
-
-    {{-- 余白 --}}
-    <div class="mb-3"></div>
-
-    {{-- フッター --}}
-    <div class="d-flex justify-content-end">
-        <x-button.submit-exec caption="CSVダウンロード" icon="fas fa-download" />
-    </div>
 
 </x-bs.card-list>
 
