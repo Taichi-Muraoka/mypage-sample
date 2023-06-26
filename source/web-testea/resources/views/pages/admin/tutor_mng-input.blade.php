@@ -87,17 +87,15 @@
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
-            <x-button.back />
-
             @if (request()->routeIs('tutor_mng-edit'))
             {{-- 編集時 --}}
+            <x-button.back url="{{route('tutor_mng-detail', 1)}}"/>
             <div class="d-flex justify-content-end">
-                {{-- 削除機能なし --}}
-                {{-- <x-button.submit-delete /> --}}
                 <x-button.submit-edit />
             </div>
             @else
             {{-- 登録時 --}}
+            <x-button.back />
             <x-button.submit-new />
             @endif
 
