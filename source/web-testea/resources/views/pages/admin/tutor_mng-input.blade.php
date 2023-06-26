@@ -15,7 +15,7 @@
     <p>以下の講師について、編集を行います。</p>
     <x-bs.table :hover=false :vHeader=true>
         <tr>
-            <th width="15%">講師No</th>
+            <th width="15%">講師ID</th>
             <td>101</td>
         </tr>
     </x-bs.table>
