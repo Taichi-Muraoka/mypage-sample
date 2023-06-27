@@ -64,6 +64,7 @@
         <option value="5">中2</option>
         <option value="6">中1</option>
     </x-input.select>
+    <x-input.text caption="学年設定年度" id="grade_year" :rules=$rules :editData=$editData/>
     <x-input.select caption="受験生フラグ" id="is_jukensei" :select2=true :blank=false :editData=$editData>
         <option value="1">非受験生</option>
         <option value="2">受験生</option>
