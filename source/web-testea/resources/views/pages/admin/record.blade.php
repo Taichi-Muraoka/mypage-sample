@@ -27,7 +27,7 @@
         <x-slot name="thead">
             <th width="20%">対応日時</th>
             <th>記録種別</th>
-            <th>校舎</th>
+            <th>対応校舎</th>
             <th>担当者名</th>
             <th></th>
         </x-slot>

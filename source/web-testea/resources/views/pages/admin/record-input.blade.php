@@ -35,7 +35,7 @@
         <option value="3">その他</option>
     </x-input.select>
 
-    <x-input.select caption="校舎" id="roomcd" :select2=true :editData="$editData">
+    <x-input.select caption="対応校舎" id="roomcd" :select2=true :editData="$editData">
         <option value="1">久我山</option>
         <option value="2">西永福</option>
         <option value="3">本郷</option>
@@ -46,11 +46,6 @@
     <x-input.date-picker caption="対応日" id="received_date" :editData=$editData />
 
     <x-input.time-picker caption="対応時刻" id="received_time" :editData=$editData />
-
-    <x-input.select caption="担当者" id="adm_user" :select2=true :editData="$editData">
-        <option value="1">鈴木　花子</option>
-        <option value="2">山田　太郎</option>
-    </x-input.select>
 
     {{-- hidden --}}
     <x-input.hidden id="karte_id" :editData=$editData />
