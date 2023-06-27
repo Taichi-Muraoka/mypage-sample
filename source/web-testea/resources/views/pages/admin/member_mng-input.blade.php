@@ -86,7 +86,11 @@
         <option value="3">退会</option>
     </x-input.select>
     <x-input.date-picker caption="入会日" id="enter_date" />
+
+    @if (request()->routeIs('member_mng-edit'))
     <x-input.date-picker caption="退会日" id="leave_date" />
+    @endif
+
     <x-input.text caption="ストレージURL" id="storage_url" :rules=$rules :editData=$editData/>
 
     {{-- hidden --}}
