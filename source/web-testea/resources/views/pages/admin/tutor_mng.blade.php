@@ -6,19 +6,20 @@
 
 {{-- 検索フォーム --}}
 <x-bs.card :search=true>
-
     <x-bs.row>
         <x-bs.col2>
-            <x-input.text id="tid" caption="講師No" :rules=$rules />
+            <x-input.select id="roomcd" caption="校舎" :select2=true >
+                <option value="1">久我山</option>
+                <option value="2">西永福</option>
+                <option value="3">下高井戸</option>
+                <option value="4">駒込</option>
+                <option value="5">日吉</option>
+                <option value="6">自由が丘</option>
+            </x-input.select>
         </x-bs.col2>
-        <x-bs.col2>
-            <x-input.text id="name" caption="講師名" :rules=$rules />
-        </x-bs.col2>
-    </x-bs.row>
-    <x-bs.row>
         <x-bs.col2>
             <x-bs.form-group name="status_groups">
-                <x-bs.form-title>対象講師</x-bs.form-title>
+                <x-bs.form-title>講師ステータス</x-bs.form-title>
                 {{-- ステータスチェックボックス --}}
                 @for ($i = 0; $i < count($statusGroup); $i++)
                 <x-input.checkbox :caption="$statusGroup[$i]"
@@ -28,7 +29,14 @@
             </x-bs.form-group>
         </x-bs.col2>
     </x-bs.row>
-
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.text id="tid" caption="講師ID" :rules=$rules />
+        </x-bs.col2>
+        <x-bs.col2>
+            <x-input.text id="name" caption="講師名" :rules=$rules />
+        </x-bs.col2>
+    </x-bs.row>
 </x-bs.card>
 
 {{-- 結果リスト --}}
@@ -44,7 +52,7 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="12%">講師No</th>
+            <th width="12%">講師ID</th>
             <th width="18%">講師名</th>
             <th>メールアドレス</th>
             <th>講師ステータス</th>

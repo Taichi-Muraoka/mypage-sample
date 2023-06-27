@@ -19,7 +19,7 @@
     @if (request()->routeIs('member_mng-edit'))
     {{-- 編集時 --}}
     <p>以下の会員について、編集を行います。</p>
-    <x-bs.form-title>生徒No</x-bs.form-title>
+    <x-bs.form-title>生徒ID</x-bs.form-title>
     <p class="edit-disp-indent">1</p>
 
     @else
@@ -86,7 +86,11 @@
         <option value="3">退会</option>
     </x-input.select>
     <x-input.date-picker caption="入会日" id="enter_date" />
+
+    @if (request()->routeIs('member_mng-edit'))
     <x-input.date-picker caption="退会日" id="leave_date" />
+    @endif
+
     <x-input.text caption="ストレージURL" id="storage_url" :rules=$rules :editData=$editData/>
 
     {{-- hidden --}}

@@ -39,7 +39,7 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.text id="sid" caption="生徒No" :rules=$rules />
+            <x-input.text id="sid" caption="生徒ID" :rules=$rules />
         </x-bs.col2>
         <x-bs.col2>
             <x-input.text id="name" caption="生徒名" :rules=$rules />
@@ -83,7 +83,7 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th>生徒No</th>
+            <th>生徒ID</th>
             <th>生徒名</th>
             <th>学年</th>
             <th>入会日</th>

@@ -15,7 +15,7 @@
     <p>以下の講師について、編集を行います。</p>
     <x-bs.table :hover=false :vHeader=true>
         <tr>
-            <th width="15%">講師No</th>
+            <th width="15%">講師ID</th>
             <td>101</td>
         </tr>
     </x-bs.table>
@@ -87,17 +87,15 @@
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
-            <x-button.back />
-
             @if (request()->routeIs('tutor_mng-edit'))
             {{-- 編集時 --}}
+            <x-button.back url="{{route('tutor_mng-detail', 1)}}"/>
             <div class="d-flex justify-content-end">
-                {{-- 削除機能なし --}}
-                {{-- <x-button.submit-delete /> --}}
                 <x-button.submit-edit />
             </div>
             @else
             {{-- 登録時 --}}
+            <x-button.back />
             <x-button.submit-new />
             @endif
 

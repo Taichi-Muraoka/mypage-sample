@@ -31,7 +31,8 @@
             <x-input.select id="destination_type" caption="学年" :select2=true>
                 <option value="1">小学校</option>
                 <option value='2'>中学校</option>
-                <option value='3'>高校</option>
+                <option value='3'>高等学校</option>
+                <option value='4'>その他</option>
             </x-input.select>
 
             <x-bs.card  v-show="form.destination_type == 1">

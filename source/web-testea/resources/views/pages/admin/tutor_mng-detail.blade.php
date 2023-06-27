@@ -25,7 +25,7 @@
 
     <x-bs.table :hover=false :vHeader=true>
         <tr>
-            <th width="35%">講師No</th>
+            <th width="35%">講師ID</th>
             <td>101</td>
         </tr>
         <tr>
