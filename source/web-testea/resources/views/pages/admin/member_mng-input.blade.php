@@ -19,7 +19,7 @@
     @if (request()->routeIs('member_mng-edit'))
     {{-- 編集時 --}}
     <p>以下の会員について、編集を行います。</p>
-    <x-bs.form-title>生徒No</x-bs.form-title>
+    <x-bs.form-title>生徒ID</x-bs.form-title>
     <p class="edit-disp-indent">1</p>
 
     @else

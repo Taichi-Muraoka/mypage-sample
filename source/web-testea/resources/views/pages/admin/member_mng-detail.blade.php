@@ -20,7 +20,7 @@
 
     <x-bs.table :hover=false :vHeader=true class="mb-4 fix">
         <tr>
-            <th width="35%">生徒No</th>
+            <th width="35%">生徒ID</th>
             <td>{{$student->sid}}</td>
         </tr>
         <tr>
