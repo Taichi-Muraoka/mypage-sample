@@ -70,8 +70,7 @@
             <td>@{{item.school_div}}</td>
             <td>@{{item.school_name}}</td>
             <td>
-                {{-- TODO: list-select にして、以下をラップする。vueClickは指定しない。captionも不要 --}}
-                <x-button.list-dtl caption="選択" vueClick="selectedData"
+                <x-button.list-select
                     :vueDataAttr="['school_id' => 'item.school_id', 'school_name' => 'item.school_name']" />
             </td>
         </tr>

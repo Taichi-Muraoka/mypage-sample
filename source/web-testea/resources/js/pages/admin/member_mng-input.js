@@ -35,14 +35,18 @@ export default class AppClass extends PageBase {
 
         // 選択後イベント
         var afterSelected = (modalButtonData, selectedDatas) => {
-            // selectedDatasは「選択」ボタンのdata-xxにセットされている値
+            // selectedDatasは「選択」ボタンのvueDataAttrにセットされている値
 
             // モーダルを起動したボタンのID取得
             const modalSelectId = modalButtonData.modalselectid;
 
             // 学校名とIDを更新
             // 名称
-            Vue.set(vueForm.form, "text_" + modalSelectId, selectedDatas["school_name"]);
+            Vue.set(
+                vueForm.form,
+                "text_" + modalSelectId,
+                selectedDatas["school_name"]
+            );
             // ID
             Vue.set(vueForm.form, modalSelectId, selectedDatas["school_id"]);
         };
