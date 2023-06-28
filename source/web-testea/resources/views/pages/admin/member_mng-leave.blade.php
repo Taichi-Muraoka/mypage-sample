@@ -26,7 +26,7 @@
         </tr>
         <tr>
             <th width="15%">会員ステータス</th>
-            <td>入会</td>
+            <td>在籍</td>
         </tr>
     </x-bs.table>
 
