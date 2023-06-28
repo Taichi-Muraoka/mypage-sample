@@ -17,7 +17,7 @@
     <p>以下の会員について、退会登録を行います。</p>
     <x-bs.table :hover=false :vHeader=true>
         <tr>
-            <th width="15%">会員ID</th>
+            <th width="15%">生徒ID</th>
             <td>1</td>
         </tr>
         <tr>
