@@ -1018,11 +1018,6 @@ export default class PageBase {
             option["id"] = "#modal-dtl";
         }
 
-        // Vueにdataを追加
-        if (option["vueData"] == undefined) {
-            option["vueData"] = {};
-        }
-
         // URLの接尾語(画面ごとにURLを変えたい場合)
         if (self._isEmpty(option["urlSuffix"])) {
             option["urlSuffix"] = "";
@@ -1041,21 +1036,18 @@ export default class PageBase {
 
         // Vue: モーダル
         const $modal = new Vue({
-            // 選択用モーダルインスタンス(ダミー)
+            // モーダルボタン インスタンス(modal-bodyは対象外)
             // TODO: 同一画面で複数の選択画面が必要であれば検討
-            el: "#selected-modal",
+            el: "#modal-buttons",
 
-            data: Object.assign(
-                {
-                    modal: null,
-                    id: option["id"].replace("#", ""),
-                    // モーダルを開いたときのボタンのdata属性を保持しておく
-                    modalButtonData: null,
-                    // Vue検索インスタンス
-                    vueSearchForm: null
-                },
-                option["vueData"]
-            ),
+            data: {
+                modal: null,
+                id: option["id"].replace("#", ""),
+                // モーダルを開いたときのボタンのdata属性を保持しておく
+                modalButtonData: null,
+                // Vue検索インスタンス
+                vueSearchForm: null
+            },
             mounted() {
                 // モーダルを保持
                 this.modal = $(document.getElementById(this.id));
@@ -1076,9 +1068,8 @@ export default class PageBase {
                             // クリックされたボタンを取得(各リストのdata属性)
                             var button = $(event.target);
                             const selectedDatas = self.getDatasFromButton(button);
-
-                            // 選択イベント
                             option["afterSelected"](vueModal.modalButtonData, selectedDatas);
+
                         },
                     },
                 });
@@ -1087,12 +1078,6 @@ export default class PageBase {
             // フィルターをセット
             filters: filters,
             methods: {
-                //---------------------------
-                // モーダルを表示する
-                //---------------------------
-                show() {
-                    this.modal.modal();
-                },
                 //---------------------------
                 // モーダル閉じる
                 //---------------------------
@@ -1117,6 +1102,105 @@ export default class PageBase {
                     this.vueSearchForm.execSearch();
 
                 },
+            },
+        });
+
+        return $modal;
+    }
+
+    /*
+     * モーダル(フォーム)のVue
+     */
+    getVueModalForm(option = {}) {
+        // 共通フィルター取得
+        var filters = this.getFiltersCom();
+
+        //--------------------
+        // オプションの定義
+        //--------------------
+
+        // モーダルのID
+        if (option["id"] == undefined) {
+            option["id"] = "#modal-dtl";
+        }
+
+        // 確定後
+        if (option["afterOk"] == undefined) {
+            option["afterOk"] = () => {};
+        }
+
+        // モーダル表示時
+        if (option["onShowModal"] == undefined) {
+            option["onShowModal"] = ($vue) => {};
+        }
+
+        // Vueにmethodsを追加
+        if (option["vueInputFormMethods"] == undefined) {
+            option["vueInputFormMethods"] = {};
+        }
+                
+        //--------------------
+        // Vueの定義
+        //--------------------
+
+        // Vue: モーダル
+        const $modal = new Vue({
+            // モーダルボタン インスタンス(modal-bodyは対象外)
+            // TODO: 同一画面で複数の選択画面が必要であれば検討
+            el: "#modal-buttons",
+
+            data: {
+                modal: null,
+                id: option["id"].replace("#", ""),
+                // モーダルを開いたときのボタンのdata属性を保持しておく
+                modalButtonData: null,
+                // Vueフォームインスタンス
+                vueInputForm: null
+            },
+            mounted() {
+                // モーダルを保持
+                this.modal = $(document.getElementById(this.id));
+
+                // モーダル表示イベント
+                this.modal.on("show.bs.modal", this.onShowModal);
+
+                // Vue: フォーム
+                this.vueInputForm = self.getVueInputForm({
+                    id: "#app-form-modal",
+                    vueMethods: option["vueInputFormMethods"]
+                });
+            },
+            // フィルターをセット
+            filters: filters,
+            methods: {
+                //---------------------------
+                // モーダル閉じる
+                //---------------------------
+                hide() {
+                    this.modal.modal("hide");
+                },
+                //---------------------------
+                // モーダルが表示されるイベント
+                //---------------------------
+                onShowModal(event) {
+
+                    // クリックされたボタンを取得
+                    var button = $(event.relatedTarget);
+                    const sendData = self.getDatasFromButton(button);
+                    this.modalButtonData = sendData;
+
+                    option["onShowModal"](this, this.modalButtonData);
+
+                },
+                //---------------------------
+                // モーダルの確定ボタン押下時イベント
+                //---------------------------
+                modalOk() {
+
+                    option["afterOk"](this.modalButtonData, this.vueInputForm.form);
+                    this.hide();
+
+                }
             },
         });
 
@@ -1658,12 +1742,17 @@ export default class PageBase {
             option["useModalSelect"] = false;
         }
 
+        // ターゲットのID
+        if (option["id"] == undefined) {
+            option["id"] = "#app-form";
+        }
+
         //--------------------
         // Vueの定義
         //--------------------
 
         // フォームのID
-        var formId = "#app-form";
+        var formId = option["id"];
 
         // 編集時にformのvalueから値を取得するためformの定義を作成する。
         var formData = this._getVueFormData(formId);
