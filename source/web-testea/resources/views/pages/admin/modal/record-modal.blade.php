@@ -6,6 +6,10 @@
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true>
     <tr>
+        <th width="35%">対応日時</th>
+        <td>2023/01/10 17:00</td>
+    </tr>
+    <tr>
         <th width="35%">登録日時</th>
         <td>2023/01/10 17:00</td>
     </tr>
