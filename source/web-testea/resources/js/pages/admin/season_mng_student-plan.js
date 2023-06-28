@@ -49,6 +49,7 @@ export default class AppClass extends PageBase {
             onShowModal: function ($vue, modalButtonData) {
                 // クリア
                 $vue.vueInputForm.form.tid = "";
+                $vue.vueInputForm.form.tname = "";
 
                 // Hidden名
                 const chkPlanId = modalButtonData.chk_plan_id;
@@ -71,20 +72,15 @@ export default class AppClass extends PageBase {
                     (data) => {
                         Vue.set($vue.vueInputForm, "selectGetItem", data);
 
-                        // プルダウンに存在するかどうか
-                        var isExist = false;
                         for (const [key, value] of Object.entries(
                             $vue.vueInputForm.selectGetItem
                         )) {
                             if (selectedValue == value.id) {
-                                var isExist = true;
+                                // プルダウンに存在。IDと講師名を初期化
+                                $vue.vueInputForm.form.tid = value.id;
+                                $vue.vueInputForm.form.tname = value.value;
                                 break;
                             }
-                        }
-
-                        if (isExist) {
-                            // プルダウンを選択状態にする
-                            $vue.vueInputForm.form.tid = selectedValue;
                         }
                     }
                 );
@@ -94,7 +90,6 @@ export default class AppClass extends PageBase {
                 selectChange: function (event) {
                     // 講師名を取得しHiddenに退避する
                     const idx = event.target.selectedIndex;
-
                     if (self._isEmpty(event.target.options[idx].value)) {
                         // 未選択
                         this.form.tname = "";
