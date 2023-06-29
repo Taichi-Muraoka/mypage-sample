@@ -17,7 +17,7 @@
     <p>講師退職処理を実行します。</p>
     <x-bs.table :hover=false :vHeader=true>
         <tr>
-            <th width="15%">講師No</th>
+            <th width="15%">講師ID</th>
             <td>101</td>
         </tr>
         <tr>
