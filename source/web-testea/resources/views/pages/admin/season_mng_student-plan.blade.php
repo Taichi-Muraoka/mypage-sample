@@ -77,10 +77,15 @@
               </div>
               @else
               <div class="sel-button">
-                <x-button.list-dtl caption="講師"/>
-                @if ($i == 1 && $j== 0 )
-                <span>CW講師１０２</span>
-                @endif
+
+                {{-- TODO: dataAttrは日付・時限を特定する値をセットする。以下はサンプル --}}
+                <x-button.list-dtl caption="講師" :dataAttr="['chk_plan_id' => $j . '_' . $periodIdList[$i]]"/>
+
+                {{-- 講師名表示用 波括弧の入れ子ができず暫定対応 --}}
+                <span v-cloak>&#123;&#123; form.hd_text_{{$j}}_{{$periodIdList[$i]}} &#125;&#125;</span>
+                <x-input.hidden :id="'hd_text_' . $j . '_' . $periodIdList[$i]" :editData=$editData />
+                <x-input.hidden :id="'hd_' . $j . '_' . $periodIdList[$i]" :editData=$editData />
+
               </div>
               @endif
             @endif
@@ -111,7 +116,8 @@
     </x-slot>
 
 </x-bs.card>
-{{-- モーダル --}}
-@include('pages.admin.modal.season_mng_student-modal')
+
+{{-- フォームモーダル --}}
+@include('pages.admin.modal.season_mng_student-modal', ['modal_form' => true])
 
 @stop

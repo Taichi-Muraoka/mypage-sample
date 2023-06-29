@@ -6,6 +6,7 @@
     modal_id: モーダルのID
     modal_send_confirm: 送信確認用のダイアログ。fadeは無効にし、タイトル行は非表示にする
     modal-size: モーダルのサイズ
+    modal_form: モーダルでフォームを表示
 --}}
 
 {{-- モーダルを複数使用する場合はmodalIdを指定する --}}
@@ -40,12 +41,27 @@
 
             {{-- 本文 --}}
             <div class="modal-body">
+                {{-- モーダルでフォームを表示 --}}
+                @if (isset($modal_form) && ($modal_form)) 
+                <div id="app-form-modal">
+                @endif
+
                 @yield('modal-body')
+
+                @if (isset($modal_form) && ($modal_form)) 
+                </div>
+                @endif
             </div>
 
-            <div class="modal-footer flex-end">
+            {{-- modal-buttons: 選択モーダル・フォームモーダルの場合のVueのインスタンス --}}
+            <div id="modal-buttons" class="modal-footer flex-end">
                 {{-- 追加のボタンを配置 --}}
                 @yield('modal-button')
+
+                {{-- モーダルでフォームを表示 --}}
+                @if (isset($modal_form) && ($modal_form)) 
+                <button type="button" class="btn btn-primary" v-on:click="modalOk">確定</button>
+                @endif
 
                 @if (!isset($modal_send_confirm) || (!$modal_send_confirm)) 
                 <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>

@@ -42,7 +42,7 @@
         <option value="3">3</option>
     </x-input.select>
 
-    <x-input.modal-select caption="受験校" id="school_cd" btnCaption="学校検索" />
+    <x-input.modal-select caption="受験校" id="school_cd" btnCaption="学校検索" :editData=$editData />
 
     <x-input.text caption="学部・学科名" id="faculty_department" :rules=$rules :editData=$editData/>
     <x-input.select caption="受験年度" id="cls_year" :select2=true :editData="$editData">

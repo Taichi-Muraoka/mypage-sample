@@ -374,6 +374,26 @@ export default class PageBase {
         location.href = appInfo.parent2;
     }
 
+    /**
+     * ボタンのData属性を配列で取得
+     */
+    getDatasFromButton(button) {
+
+        // data属性をすべて取得し送信する
+        // $.dataはキャッシュするみたい。Vueで動的に変えたIdが取れなくなってしまう。
+        // 以下のattrで必ず取得するが、一気に取れないのでdataのキーでループ
+        const datas = $(button).data();
+        const dataKeys = Object.keys(datas);
+        var arrayData = {};
+        for (var i = 0; i < dataKeys.length; i++) {
+            const key = dataKeys[i];
+            // 配列で保持 attrで取得
+            arrayData[key] = $(button).attr("data-" + key);
+        }
+
+        return arrayData;
+    }
+
     //--------------------------------------------
     // カレンダー処理
     //--------------------------------------------
@@ -779,18 +799,8 @@ export default class PageBase {
 
                     // クリックされたボタンを取得
                     var button = $(event.relatedTarget);
-
                     // data属性をすべて取得し送信する
-                    // $.dataはキャッシュするみたい。Vueで動的に変えたIdが取れなくなってしまう。
-                    // 以下のattrで必ず取得するが、一気に取れないのでdataのキーでループ
-                    var datas = $(button).data();
-                    const dataKeys = Object.keys(datas);
-                    var sendData = {};
-                    for (var i = 0; i < dataKeys.length; i++) {
-                        var key = dataKeys[i];
-                        // 配列で保持 attrで取得
-                        sendData[key] = $(button).attr("data-" + key);
-                    }
+                    const sendData = self.getDatasFromButton(button);
 
                     // また、確認モーダルの場合、OKボタン押下時にもこのIDは使用するためthisに保持しておく
                     this.sendData = Object.assign(
@@ -992,6 +1002,211 @@ export default class PageBase {
         });
     }
 
+    /*
+     * 選択モーダル(検索リスト)のVue
+     */
+    getVueModalSelectList(option = {}) {
+        // 共通フィルター取得
+        var filters = this.getFiltersCom();
+
+        //--------------------
+        // オプションの定義
+        //--------------------
+
+        // モーダルのID
+        if (option["id"] == undefined) {
+            option["id"] = "#modal-dtl";
+        }
+
+        // URLの接尾語(画面ごとにURLを変えたい場合)
+        if (self._isEmpty(option["urlSuffix"])) {
+            option["urlSuffix"] = "";
+        } else {
+            option["urlSuffix"] = option["urlSuffix"];
+        }
+
+        // 選択後
+        if (option["afterSelected"] == undefined) {
+            option["afterSelected"] = () => {};
+        }
+
+        //--------------------
+        // Vueの定義
+        //--------------------
+
+        // Vue: モーダル
+        const $modal = new Vue({
+            // モーダルボタン インスタンス(modal-bodyは対象外)
+            // TODO: 同一画面で複数の選択画面が必要であれば検討
+            el: "#modal-buttons",
+
+            data: {
+                modal: null,
+                id: option["id"].replace("#", ""),
+                // モーダルを開いたときのボタンのdata属性を保持しておく
+                modalButtonData: null,
+                // Vue検索インスタンス
+                vueSearchForm: null
+            },
+            mounted() {
+                // モーダルを保持
+                this.modal = $(document.getElementById(this.id));
+
+                // モーダル表示イベント
+                this.modal.on("show.bs.modal", this.onShowModal);
+
+                // モーダルボタンのdata属性
+                const vueModal = this;
+
+                // Vue: 検索フォーム
+                this.vueSearchForm = self.getVueSearchForm({
+                    urlSuffix: option["urlSuffix"],
+                    initSearch: false,  // 初期化時に検索しない
+                    vueSearchListMethods: {
+                        selectedData: function (event) {
+
+                            // クリックされたボタンを取得(各リストのdata属性)
+                            var button = $(event.target);
+                            const selectedDatas = self.getDatasFromButton(button);
+                            option["afterSelected"](vueModal.modalButtonData, selectedDatas);
+
+                        },
+                    },
+                });
+
+            },
+            // フィルターをセット
+            filters: filters,
+            methods: {
+                //---------------------------
+                // モーダル閉じる
+                //---------------------------
+                hide() {
+                    this.modal.modal("hide");
+                },
+                //---------------------------
+                // モーダルが表示されるイベント
+                //---------------------------
+                onShowModal(event) {
+                    
+                    // クリックされたボタンを取得
+                    var button = $(event.relatedTarget);
+                    const sendData = self.getDatasFromButton(button);
+                    this.modalButtonData = sendData;
+                    
+                    // 検索条件・一覧をクリアする
+                    this.vueSearchForm.initSearchCond();
+                    this.vueSearchForm.searchListClear();
+
+                    // 検索する
+                    this.vueSearchForm.execSearch();
+
+                },
+            },
+        });
+
+        return $modal;
+    }
+
+    /*
+     * モーダル(フォーム)のVue
+     */
+    getVueModalForm(option = {}) {
+        // 共通フィルター取得
+        var filters = this.getFiltersCom();
+
+        //--------------------
+        // オプションの定義
+        //--------------------
+
+        // モーダルのID
+        if (option["id"] == undefined) {
+            option["id"] = "#modal-dtl";
+        }
+
+        // 確定後
+        if (option["afterOk"] == undefined) {
+            option["afterOk"] = () => {};
+        }
+
+        // モーダル表示時
+        if (option["onShowModal"] == undefined) {
+            option["onShowModal"] = ($vue) => {};
+        }
+
+        // Vueにmethodsを追加
+        if (option["vueInputFormMethods"] == undefined) {
+            option["vueInputFormMethods"] = {};
+        }
+                
+        //--------------------
+        // Vueの定義
+        //--------------------
+
+        // Vue: モーダル
+        const $modal = new Vue({
+            // モーダルボタン インスタンス(modal-bodyは対象外)
+            // TODO: 同一画面で複数の選択画面が必要であれば検討
+            el: "#modal-buttons",
+
+            data: {
+                modal: null,
+                id: option["id"].replace("#", ""),
+                // モーダルを開いたときのボタンのdata属性を保持しておく
+                modalButtonData: null,
+                // Vueフォームインスタンス
+                vueInputForm: null
+            },
+            mounted() {
+                // モーダルを保持
+                this.modal = $(document.getElementById(this.id));
+
+                // モーダル表示イベント
+                this.modal.on("show.bs.modal", this.onShowModal);
+
+                // Vue: フォーム
+                this.vueInputForm = self.getVueInputForm({
+                    id: "#app-form-modal",
+                    vueMethods: option["vueInputFormMethods"]
+                });
+            },
+            // フィルターをセット
+            filters: filters,
+            methods: {
+                //---------------------------
+                // モーダル閉じる
+                //---------------------------
+                hide() {
+                    this.modal.modal("hide");
+                },
+                //---------------------------
+                // モーダルが表示されるイベント
+                //---------------------------
+                onShowModal(event) {
+
+                    // クリックされたボタンを取得
+                    var button = $(event.relatedTarget);
+                    const sendData = self.getDatasFromButton(button);
+                    this.modalButtonData = sendData;
+
+                    option["onShowModal"](this, this.modalButtonData);
+
+                },
+                //---------------------------
+                // モーダルの確定ボタン押下時イベント
+                //---------------------------
+                modalOk() {
+
+                    option["afterOk"](this.modalButtonData, this.vueInputForm.form);
+                    this.hide();
+
+                }
+            },
+        });
+
+        return $modal;
+    }
+
     //--------------------------------------------
     // 一覧処理
     //--------------------------------------------
@@ -1008,6 +1223,10 @@ export default class PageBase {
 
         // hidden値を取得するためにFormの値を取得
         var formData = this._getVueFormData(id);
+
+        // 検索フォームをクリアする際の初期値
+        // 一律空白でもよかったが、念のため初期値がある場合を考慮
+        var formDataInit = this._getVueFormData(id);
 
         //--------------------
         // オプションの定義
@@ -1036,6 +1255,16 @@ export default class PageBase {
             option["vueMethods"] = {};
         }
 
+        // Vue(List)にmethodsを追加
+        if (option["vueSearchListMethods"] == undefined) {
+            option["vueSearchListMethods"] = {};
+        }
+                       
+        // 初期時に検索を行うかどうか
+        if (option["initSearch"] == undefined) {
+            option["initSearch"] = true;
+        }
+        
         //--------------------
         // Vueの定義
         //--------------------
@@ -1081,7 +1310,8 @@ export default class PageBase {
                         afterSearch: function() {
                             // 検索完了後は検索ボタンを活性化する
                             _self.disabledBtnSearch = false;
-                        }
+                        },
+                        vueMethods: option["vueSearchListMethods"],
                     })
                 );
 
@@ -1089,7 +1319,9 @@ export default class PageBase {
                 option["vueMounted"](this, option);
 
                 // 画面読み込み時に一覧を表示
-                this.execSearch();
+                if (option["initSearch"]) {
+                    this.execSearch();
+                }
             },
             updated() {
                 // Vue更新後、ライブラリの初期化
@@ -1100,6 +1332,27 @@ export default class PageBase {
             // オプションでメソッドを追加する
             methods: Object.assign(
                 {
+                    //-----------------------
+                    // 検索条件クリア
+                    //-----------------------
+                    initSearchCond: function(event) {
+
+                        for (const [key, value] of Object.entries(
+                            this.form
+                        )) {
+                            // 検索フォームを初期化する
+                            if (key in formDataInit) {
+                                Vue.set(this.form, key, formDataInit[key]);
+                            }
+                        }
+
+                    },
+                    //-----------------------
+                    // 検索結果クリア
+                    //-----------------------
+                    searchListClear: function() {
+                        this.vueSearchList.clear();
+                    },
                     //-----------------------
                     // 検索済み検索結果を取得
                     //-----------------------
@@ -1200,6 +1453,11 @@ export default class PageBase {
             option["afterSearch"] = () => {};
         }
 
+        // Vueにmethodsを追加
+        if (option["vueMethods"] == undefined) {
+            option["vueMethods"] = {};
+        }
+        
         //--------------------
         // Vueの定義
         //--------------------
@@ -1227,20 +1485,44 @@ export default class PageBase {
             },
             // フィルターをセット
             filters: filters,
-            methods: {
+            methods: Object.assign({
+                //--------------------------
+                // 検索一覧クリア
+                //--------------------------
+                clear: function() {
+                    // クリア
+                    Vue.set(this, "paginator", {});
+                    Vue.set(this, "elements", []);
+                },
                 //--------------------------
                 // 検索
                 //--------------------------
                 search: function($searchForm = {}, page = 1, scroll = false) {
+
                     if (scroll) {
+                        // モーダルかどうか判断
+                        const parent = $("#search-top").parent(".modal-body");
+                        const speed = 300;
+
                         // 一覧のトップへ移動する
-                        var position = $("#search-top").offset().top;
-                        var speed = 300;
-                        $("html, body").animate(
-                            { scrollTop: position },
-                            speed,
-                            "swing"
-                        );
+                        if (parent.length == 0) {
+                            // モーダル以外
+                            const position = $("#search-top").offset().top;
+                            $("html, body").animate(
+                                { scrollTop: position },
+                                speed,
+                                "swing"
+                            );
+                        } else {
+                            // モーダル内の相対位置を取得
+                            const pos = document.getElementById("search-top").offsetTop;
+                            $('.modal-dialog-scrollable .modal-body').animate(
+                                { scrollTop: pos }, 
+                                speed,
+                                "swing"
+                            );
+                        }
+
                     }
 
                     // ページ数を保持する
@@ -1336,7 +1618,9 @@ export default class PageBase {
                     // 検索
                     this.search(this.searchForm, this.page, false);
                 }
-            }
+            },
+            option["vueMethods"]
+            ),
         });
     }
 
@@ -1450,12 +1734,25 @@ export default class PageBase {
             option["progressShow"] = false;
         }
 
+        // ライブラリを初期化するかどうか
+        // 選択モーダル対応時に、フォームとモーダルの両方を呼ぶため
+        // 制御できるようにした。(select2対応)
+        // →最後に一回だけ呼べるようにしたいが、とりあえずフラグで制御
+        if (option["useModalSelect"] == undefined) {
+            option["useModalSelect"] = false;
+        }
+
+        // ターゲットのID
+        if (option["id"] == undefined) {
+            option["id"] = "#app-form";
+        }
+
         //--------------------
         // Vueの定義
         //--------------------
 
         // フォームのID
-        var formId = "#app-form";
+        var formId = option["id"];
 
         // 編集時にformのvalueから値を取得するためformの定義を作成する。
         var formData = this._getVueFormData(formId);
@@ -1498,7 +1795,9 @@ export default class PageBase {
                 this.option = option;
 
                 // ライブラリの初期化
-                self._initLibs(this, option);
+                if (!option["useModalSelect"]) {
+                    self._initLibs(this, option);
+                }
 
                 // 確認モーダルの表示用
                 if (!self._isEmpty(option["confirmModal"])) {
@@ -1544,7 +1843,9 @@ export default class PageBase {
                 }
 
                 // Vue更新後、ライブラリの初期化
-                self._updatedLibs();
+                if (!option["useModalSelect"]) {
+                    self._updatedLibs();
+                }
             },
             // フィルターをセット
             filters: filters,
@@ -1589,6 +1890,20 @@ export default class PageBase {
                         this.form[updHidden.id] = "";
                         // divごと非表示にする
                         uploaded.remove();
+                    },
+                    // 選択モーダル入力の取り消しボタン処理
+                    modalSelectClear: function(event) {
+
+                        // クリックされたボタンを取得
+                        var button = $(event.target);
+                        // data属性を取得
+                        const modalButtonData = self.getDatasFromButton(button);
+                        const modalSelectId = modalButtonData.modalselectid;
+
+                        // クリア
+                        Vue.set(this.form, "text_" + modalSelectId, '');
+                        Vue.set(this.form, modalSelectId, '');
+                        
                     }
                 },
                 option["vueMethods"]

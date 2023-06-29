@@ -12,9 +12,10 @@
   disabled: 使用不可 Def: false
   vueDisabled: Vueの使用不可条件
   vueHref: vue用のhrefのbind
+  vueClick: Clickイベントを定義
 --}}
 @props(['dataTarget' => '', 'href' => '', 'vueDataAttr' => [], 'dataAttr' => [], 
-  'caption' => '', 'btn' => '', 'disabled' => false, 'class' => '', 'vueDisabled' => '', 'vueHref' => ''])
+  'caption' => '', 'btn' => '', 'disabled' => false, 'class' => '', 'vueDisabled' => '', 'vueHref' => '', 'vueClick' => ''])
 
 @if (empty($href) && empty($vueHref))
 
@@ -42,6 +43,7 @@
   {{-- Bladeの場合 --}}
   @if ($disabled) {{ 'disabled' }} @endif
 
+  @if (!empty($vueClick)) v-on:click="{{ $vueClick }}" @endif
 >
   @if (empty($caption)){{ '詳細' }}@else{{ $caption }}@endif
 </button>

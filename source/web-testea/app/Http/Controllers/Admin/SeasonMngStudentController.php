@@ -122,7 +122,7 @@ class SeasonMngStudentController extends Controller
 
         // 時間帯
         $timeList = array(
-            '1時限目','2時限目','3時限目','4時限目','5時限目','6時限目','7時限目',
+            '1時限目', '2時限目', '3時限目', '4時限目', '5時限目', '6時限目', '7時限目',
         );
 
         // コロンを除いた値をIDとして扱う
@@ -180,13 +180,13 @@ class SeasonMngStudentController extends Controller
 
         // 時限リスト
         $timeList = array(
-            '1時限目','2時限目','3時限目','4時限目','5時限目','6時限目','7時限目',
+            '1時限目', '2時限目', '3時限目', '4時限目', '5時限目', '6時限目', '7時限目',
         );
 
         // 期間リスト（日付・曜日）
         $dayList = array(
-            '03/27(月)','03/28(火)','03/29(水)','03/30(木)','03/31(金)','04/01(土)',
-            '04/03(月)','04/04(火)','04/05(水)','04/06(木)','04/07(金)','04/08(土)'
+            '03/27(月)', '03/28(火)', '03/29(水)', '03/30(木)', '03/31(金)', '04/01(土)',
+            '04/03(月)', '04/04(火)', '04/05(水)', '04/06(木)', '04/07(金)', '04/08(土)'
         );
 
         // コロンを除いた値をIDとして扱う
@@ -235,7 +235,11 @@ class SeasonMngStudentController extends Controller
             'periodIdList' => $timeIdList,
             'dayList' => $dayList,
             'editData' => [
-                'chkWs' => $editData
+                'chkWs' => $editData,
+
+                // TODO: サンプル(日付・時限単位で設定)。どういう持ち方にするかは要検討
+                "hd_text_0_2" => "CW講師１０１",
+                "hd_0_2" => 1,
             ],
             //'extRirekisho' => $teacher,
         ]);
@@ -288,7 +292,7 @@ class SeasonMngStudentController extends Controller
 
         $editData = [
             "sid" => 1,
-            "record_kind" => 1
+            "record_kind" => 1,
         ];
 
         return view('pages.admin.season_mng_student-plan', [
@@ -372,4 +376,37 @@ class SeasonMngStudentController extends Controller
         return $rules;
     }
 
+    //==========================
+    // モーダル
+    //==========================
+
+    /**
+     * 担当講師一覧取得
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 担当講師一覧
+     */
+    public function getDataSelectTutor(Request $request)
+    {
+
+        // TODO: 日付と時限を特定できる情報を受け取る。以下はサンプル
+        // TODO: 要バリデーション
+        $chkPlanId = $request->input('chk_plan_id');
+
+        // TODO: サンプル。実装してください。上記の情報をもとに講師一覧を取得する
+        return [
+            [
+                'id' => 1,
+                'value' => 'CW講師１０１'
+            ],
+            [
+                'id' => 2,
+                'value' => 'CW講師１０２'
+            ],
+            [
+                'id' => 3,
+                'value' => 'CW講師１０３'
+            ]
+        ];
+    }
 }

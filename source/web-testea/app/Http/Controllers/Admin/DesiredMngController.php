@@ -160,7 +160,12 @@ class DesiredMngController extends Controller
 
         $editData = [
             "sid" => 1,
-            "record_kind" => 1
+            "record_kind" => 1,
+
+            // TODO: サンプル。表示用(学校名)と、ID(学校ID)を指定する
+            // 学校名はtext_xxxのように指定する
+            'text_school_cd' => '東京都立青山高等学校',
+            'school_cd' => 99
         ];
 
         return view('pages.admin.desired_mng-input', [

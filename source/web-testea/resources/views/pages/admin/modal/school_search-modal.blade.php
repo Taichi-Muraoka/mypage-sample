@@ -63,16 +63,15 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>D113299902058</td>
-            <td>高校</td>
-            <td>東京</td>
-            <td>公立</td>
-            <td>東京都立青山高等学校</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{item.school_code}}</td>
+            <td>@{{item.school_type}}</td>
+            <td>@{{item.school_pref}}</td>
+            <td>@{{item.school_div}}</td>
+            <td>@{{item.school_name}}</td>
             <td>
-                <x-button.list-dtl vueHref="{{ route('desired_mng-edit',1) }}" caption="選択" />
-                {{-- <x-button.list-edit href="{{ route('member_mng-edit', 1) }}" /> --}}
-                {{-- <x-button.list-edit vueHref="'{{ route('member_mng-calendar', '') }}/' + item.sid" caption="カレンダー" /> --}}
+                <x-button.list-select
+                    :vueDataAttr="['school_id' => 'item.school_id', 'school_name' => 'item.school_name']" />
             </td>
         </tr>
 

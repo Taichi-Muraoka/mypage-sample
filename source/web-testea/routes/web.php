@@ -734,6 +734,12 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // PDF出力
     Route::get('/member_mng/invoice/{sid}/pdf/{date}', [MemberMngController::class, 'pdf'])->name('member_mng-pdf_invoice');
 
+    // バリデーション(学校-検索用)
+    Route::post('/member_mng/vd_search_school', [MemberMngController::class, 'validationForSearchSchool'])->name('member_mng-vd_search_school');
+
+    // 学校-検索結果取得
+    Route::post('/member_mng/search_school', [MemberMngController::class, 'searchSchool'])->name('member_mng-search_school');
+        
     //---------------------
     // 受験校管理 モック
     //---------------------
@@ -2408,6 +2414,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 生徒科目別コマ組み編集 - バリデーション(登録用)
     Route::post('/season_mng_student/vd_input_plan', [SeasonMngStudentController::class, 'validationForInputPlan'])->name('season_mng_student-vd_input_plan');
+
+    // 生徒科目別コマ組み - 講師一覧
+    Route::post('/season_mng_student/get_data_select_tutor', [SeasonMngStudentController::class, 'getDataSelectTutor'])->name('season_mng_student-get_data_select_tutor');
 
     // 講師日程一覧
     Route::get('/season_mng_tutor', [SeasonMngTutorController::class, 'index'])->name('season_mng_tutor');
