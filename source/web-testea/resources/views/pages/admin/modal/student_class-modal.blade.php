@@ -17,12 +17,16 @@
         <td>個別指導コース</td>
     </tr>
     <tr>
-        <th>授業日</th>
+        <th>授業区分</th>
+        <td>追加</td>
+    </tr>
+    <tr>
+        <th>日付</th>
         <td>2023/02/28</td>
     </tr>
     <tr>
         <th>時限</th>
-        <td>5</td>
+        <td>5時限</td>
     </tr>
     <tr>
         <th>開始時刻</th>
@@ -33,24 +37,28 @@
         <td>17:30</td>
     </tr>
     <tr>
-        <th>生徒名</th>
-        <td>CWテスト生徒５</td>
-    </tr>
-    <tr>
         <th>講師名</th>
         <td>CWテスト教師１０１</td>
+    </tr>
+    <tr>
+        <th>生徒名</th>
+        <td>CWテスト生徒５</td>
     </tr>
     <tr>
         <th>教科</th>
         <td>英語</td>
     </tr>
     <tr>
-        <th>授業種別</th>
-        <td>追加</td>
+        <th>通塾</th>
+        <td>生徒通塾 - 教師通塾</td>
     </tr>
     <tr>
-        <th>出欠状態</th>
-        <td>実施前</td>
+        <th>授業代講</th>
+        <td>なし</td>
+    </tr>
+    <tr>
+        <th>出欠ステータス</th>
+        <td>未実施・出席</td>
     </tr>
     <tr>
         <th>授業報告書</th>

@@ -36,7 +36,7 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="lesson_kind" caption="授業種別" :select2=true>
+            <x-input.select id="lesson_kind" caption="授業区分" :select2=true>
                 <option value="1">通常</option>
                 <option value="2">特別</option>
                 <option value="3">追加</option>
@@ -100,7 +100,7 @@
             <th>講師名</th>
             <th>コース名</th>
             <th>教科</th>
-            <th>授業種別</th>
+            <th>授業区分</th>
             <th>出欠ステータス</th>
             <th>授業報告書</th>
             <th></th>
