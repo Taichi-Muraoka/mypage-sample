@@ -39,8 +39,6 @@
 
     <x-input.date-picker caption="対応日" id="received_date" :editData=$editData />
 
-    <x-input.time-picker caption="対応時刻" id="received_time" :rules=$rules :editData=$editData />
-
     <x-bs.callout title="退会登録時の注意事項" type="danger">
         登録された退会日以降の生徒スケジュールが削除されます。<br>
         画面からの復元はできませんのでご注意ください。<br>
