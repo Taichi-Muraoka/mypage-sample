@@ -16,7 +16,11 @@
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="name" caption="生徒名" :rules=$rules />
+            <x-input.select caption="生徒名" id="student" :select2=true :editData="$editData">
+                <option value="1">CWテスト生徒１</option>
+                <option value="2">CWテスト生徒２</option>
+                <option value="3">CWテスト生徒３</option>
+            </x-input.select>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
