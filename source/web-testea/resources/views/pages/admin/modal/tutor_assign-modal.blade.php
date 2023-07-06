@@ -5,6 +5,10 @@
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true>
     <tr>
+        <th width="35%">校舎</th>
+        <td>久我山</td>
+    </tr>
+    <tr>
         <th width="35%">講師名</th>
         <td>CWテスト教師１０１</td>
     </tr>
@@ -18,7 +22,7 @@
     </tr>
     <tr>
         <th>担当科目</th>
-        <td>国語 数学 英語</td>
+        <td>国語,数学,英語</td>
     </tr>
 </x-bs.table>
 
