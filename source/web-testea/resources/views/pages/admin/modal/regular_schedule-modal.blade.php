@@ -42,7 +42,7 @@
         <td>CWテスト生徒１</td>
     </tr>
     <tr v-Show="item.lesson_type == 1">
-        <th>参加生徒名</th>
+        <th>受講生徒名</th>
         <td>CWテスト生徒１<br>CWテスト生徒２<br>CWテスト生徒３</td>
     </tr>
     <tr v-show="item.mdSubject">

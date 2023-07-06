@@ -79,7 +79,7 @@
             <option value="3">CWテスト生徒３</option>
         </x-input.select>
 
-        <x-input.select vShow="form.course_cd == 4" caption="参加生徒選択" id="sid2" :select2=true :editData="$editData" multiple>
+        <x-input.select vShow="form.course_cd == 4" caption="受講生徒選択" id="sid2" :select2=true :editData="$editData" multiple>
             <option value="1">CWテスト生徒１</option>
             <option value="2">CWテスト生徒２</option>
             <option value="3">CWテスト生徒３</option>

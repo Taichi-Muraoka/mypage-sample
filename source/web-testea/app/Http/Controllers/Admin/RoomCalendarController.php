@@ -336,6 +336,7 @@ class RoomCalendarController extends Controller
             'start_time' => $extSchedule['start_time'],
             'end_time' => $extSchedule['end_time'],
             'kind' => $kind,
+            'course_cd' => "4",
         ];
 
         return view('pages.admin.room_calendar-input', [
@@ -378,6 +379,7 @@ class RoomCalendarController extends Controller
             'start_time' => $extSchedule['start_time'],
             'end_time' => $extSchedule['end_time'],
             'kind' => $kind,
+            'course_cd' => "4",
         ];
 
         return view('pages.admin.room_calendar-input', [

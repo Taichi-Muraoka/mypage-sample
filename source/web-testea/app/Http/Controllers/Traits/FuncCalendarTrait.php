@@ -119,7 +119,7 @@ trait FuncCalendarTrait
         foreach ($regular_schedules as $schedule) {
 
             $schedule_type = $this->getScheduleType($schedule);
-            $schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdSubject'];
+            $schedule['title'] = $schedule['mdSubject'] . ' ' . $schedule['mdTitleVal'];
             if ($schedule_type['mdFurikae'] != '') {
                 $schedule['title'] = $schedule['title'] . ' ' . $schedule_type['mdFurikae'];
             }
@@ -194,8 +194,8 @@ trait FuncCalendarTrait
         foreach ($tanki_schedules as $schedule) {
 
             $schedule_type = $this->getScheduleType($schedule);
-            //$schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdTitleVal'];
             $schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdSubject'];
+            $schedule['title'] = $schedule['mdSubject'] . ' ' . $schedule['mdTitleVal'];
             if ($schedule_type['mdFurikae'] != '') {
                 $schedule['title'] = $schedule['title'] . ' ' . $schedule_type['mdFurikae'];
             }

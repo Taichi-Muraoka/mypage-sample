@@ -71,7 +71,7 @@
     </tr>
     {{-- 集団授業の場合 --}}
     <tr v-show="item.mdType == {{ App\Consts\AppConst::CODE_MASTER_21_2 }}">
-        <th>参加生徒名</th>
+        <th>受講生徒名</th>
         <td>CWテスト生徒１<br>CWテスト生徒２<br>CWテスト生徒３</td>
     </tr>
     @endcan
