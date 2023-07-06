@@ -21,23 +21,11 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="pref" caption="都道府県" :select2=true>
-                <option value="1">千葉</option>
-                <option value="2">東京</option>
-                <option value="3">神奈川</option>
-            </x-input.select>
-        </x-bs.col2>
-        <x-bs.col2>
             <x-input.select id="division" caption="設置区分" :select2=true>
                 <option value="1">国立</option>
                 <option value="2">公立</option>
                 <option value="3">私立</option>
             </x-input.select>
-        </x-bs.col2>
-    </x-bs.row>
-    <x-bs.row>
-        <x-bs.col2>
-            <x-input.text id="address" caption="住所" :rules=$rules />
         </x-bs.col2>
         <x-bs.col2>
             <x-input.text id="school_name" caption="学校名" :rules=$rules />
@@ -56,7 +44,6 @@
         <x-slot name="thead">
             <th>学校コード</th>
             <th>学校種</th>
-            <th>都道府県</th>
             <th>設置区分</th>
             <th>学校名</th>
             <th></th>
@@ -66,7 +53,6 @@
         <tr v-for="item in paginator.data" v-cloak>
             <td>@{{item.school_code}}</td>
             <td>@{{item.school_type}}</td>
-            <td>@{{item.school_pref}}</td>
             <td>@{{item.school_div}}</td>
             <td>@{{item.school_name}}</td>
             <td>
