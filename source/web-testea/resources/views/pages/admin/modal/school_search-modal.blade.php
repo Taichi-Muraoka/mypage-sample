@@ -9,23 +9,23 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.text id="school_id" caption="学校コード" :rules=$rules />
-        </x-bs.col2>
-        <x-bs.col2>
             <x-input.select id="kinds" caption="学校種" :select2=true>
                 <option value="1">小学校</option>
                 <option value="2">中学校</option>
                 <option value="3">高校</option>
             </x-input.select>
         </x-bs.col2>
-    </x-bs.row>
-    <x-bs.row>
         <x-bs.col2>
             <x-input.select id="division" caption="設置区分" :select2=true>
                 <option value="1">国立</option>
                 <option value="2">公立</option>
                 <option value="3">私立</option>
             </x-input.select>
+        </x-bs.col2>
+    </x-bs.row>
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.text id="school_id" caption="学校コード" :rules=$rules />
         </x-bs.col2>
         <x-bs.col2>
             <x-input.text id="school_name" caption="学校名" :rules=$rules />
