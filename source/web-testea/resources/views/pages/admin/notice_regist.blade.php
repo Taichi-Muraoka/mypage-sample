@@ -11,14 +11,20 @@
         <x-bs.col2>
             @can('roomAdmin')
             {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-            <x-input.select id="roomcd" caption="教室（送信元）" :select2=true :mastrData=$rooms :editData=$editData
+            <x-input.select id="roomcd" caption="校舎（送信元）" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false :blank=false />
             @else
-            <x-input.select id="roomcd" caption="教室（送信元）" :select2=true :mastrData=$rooms :editData=$editData />
+            <x-input.select id="roomcd" caption="校舎（送信元）" :select2=true :mastrData=$rooms :editData=$editData />
             @endcan
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="destination_type" caption="宛先種別" :select2=true :mastrData=$destination_types :editData=$editData />
+            {{-- 本番用 --}}
+            {{-- <x-input.select id="destination_type" caption="宛先種別" :select2=true :mastrData=$destination_types :editData=$editData /> --}}
+
+            {{-- モック用 --}}
+            <x-input.select id="destination_type" caption="宛先種別" :select2=true :mastrData=$destination_types :editData=$editData >
+                <option value="4">個別（保護者メール）</option>
+            </x-input.select>
         </x-bs.col2>
     </x-bs.row>
 
@@ -50,7 +56,19 @@
             <th></th>
         </x-slot>
 
-        <tr v-for="item in paginator.data" v-cloak>
+        {{-- モック用 --}}
+        <tr>
+            <td>2023/06/16</td>
+            <td>面談のご案内</td>
+            <td>グルーブ一斉</td>
+            <td>本部</td>
+            <td>
+                <x-button.list-dtl href="{{ route('notice_regist-detail', 1) }}" caption="お知らせ情報"/>
+            </td>
+        </tr>
+
+        {{-- 本番用 --}}
+        {{-- <tr v-for="item in paginator.data" v-cloak>
             <td>@{{item.date|formatYmd}}</td>
             <td>@{{item.title}}</td>
             <td>@{{item.type_name}}</td>
@@ -58,7 +76,7 @@
             <td>
                 <x-button.list-dtl vueHref="'{{ route('notice_regist-detail', '') }}/' + item.id" caption="お知らせ情報" />
             </td>
-        </tr>
+        </tr> --}}
 
     </x-bs.table>
 

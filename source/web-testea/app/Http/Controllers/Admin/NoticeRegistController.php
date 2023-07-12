@@ -155,120 +155,129 @@ class NoticeRegistController extends Controller
      */
     public function detail($noticeId)
     {
-        // IDのバリデーション
-        $this->validateIds($noticeId);
-
-        // 教室管理者の場合、見れていいidかチェックする
-        if (AuthEx::isRoomAdmin()) {
-            $notice = Notice::where('notice_id', $noticeId)
-                // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-                ->where($this->guardRoomAdminTableWithRoomCd())
-                ->firstOrFail();
-        }
-
-        // 教室名取得のサブクエリ
-        $room_names = $this->mdlGetRoomQuery();
-
-        // クエリを作成
-        $query = Notice::query();
-        $notice = $query
-            ->select(
-                'notice.notice_id AS id',
-                'notice.regist_time',
-                'notice.title',
-                'notice.text',
-                'notice.notice_type',
-                'code_master.name AS type_name',
-                'room_name',
-                'office.name AS sender',
-                'ext_trial_master.name AS trial_name',
-                'ext_trial_master.trial_date',
-                'event.name AS event_name',
-                'event.event_date'
-            )
-            // お知らせ宛先
-            ->sdLeftJoin(NoticeDestination::class, function ($join) {
-                // 1件取得
-                $join->on('notice_destination.notice_id', '=', 'notice.notice_id')
-                    ->limit(1);
-            })
-            // 宛先種別
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('code_master.code', '=', 'notice_destination.destination_type')
-                    ->where('code_master.data_type', '=', AppConst::CODE_MASTER_15);
-            })
-            // 事務局マスタ(送信者名)
-            ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
-            // 教室名
-            ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('notice.roomcd', '=', 'room_names.code');
-            })
-            // 模試名の取得
-            ->sdLeftJoin(ExtTrialMaster::class, 'ext_trial_master.tmid', '=', 'notice.tmid_event_id')
-            // イベント名の取得
-            ->sdLeftJoin(Event::class, 'event.event_id', '=', 'notice.tmid_event_id')
-            // IDで絞り込み
-            ->where('notice.notice_id', '=', $noticeId)
-            ->firstOrFail();
-
-        // 該当データである場合は、模試・イベントいずれかのみ残す
-        if ($notice['notice_type'] == AppConst::CODE_MASTER_14_1) {
-            //---------
-            // 模試
-            //---------
-            $notice['tm_event_name'] = $notice['trial_name'];
-            // 日時の取得(JOIN先の方はCarbonで取れないので以下初期化)
-            $tmpDate = new Carbon($notice['trial_date']);
-            $notice['tm_event_date'] = $tmpDate->format('Y/m/d');
-        } elseif ($notice['notice_type'] == AppConst::CODE_MASTER_14_2) {
-            //---------
-            // イベント
-            //---------
-            $notice['tm_event_name'] = $notice['event_name'];
-            // 日時の取得(JOIN先の方はCarbonで取れないので以下初期化)
-            $tmpDate = new Carbon($notice['event_date']);
-            $notice['tm_event_date'] = $tmpDate->format('Y/m/d');
-        } else {
-            $notice['tm_event_name'] = '';
-        }
-        unset($notice['trial_name']);
-        unset($notice['trial_date']);
-        unset($notice['event_name']);
-        unset($notice['event_date']);
-
-        // 宛先名の取得
-        $query = NoticeDestination::query();
-        $destination_names = $query
-            ->distinct()
-            ->select(
-                'ext_student_kihon.name AS student_name',
-                'ext_rirekisho.name AS teacher_name',
-                'notice_destination.notice_group_id',
-                'group_name'
-            )
-            // 生徒名の取得
-            ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
-                $join->on('ext_student_kihon.sid', '=', 'notice_destination.sid');
-            })
-            // 教師名の取得
-            ->sdLeftJoin(ExtRirekisho::class, function ($join) {
-                $join->on('ext_rirekisho.tid', '=', 'notice_destination.tid');
-            })
-            // お知らせグループ
-            ->sdLeftJoin(NoticeGroup::class, function ($join) {
-                $join->on('notice_group.notice_group_id', '=', 'notice_destination.notice_group_id');
-            })
-            ->where('notice_destination.notice_id', '=', $noticeId)
-            ->orderBy('notice_destination.notice_group_id', 'asc')
-            ->get();
-
         return view('pages.admin.notice_regist-detail', [
-            'notice' => $notice,
-            'destination_names' => $destination_names,
             'editData' => [
-                'noticeId' => $notice->id
+                'noticeId' => null
             ]
         ]);
+
+    //==========================
+    // 本番用
+    //==========================
+        // // IDのバリデーション
+        // $this->validateIds($noticeId);
+
+        // // 教室管理者の場合、見れていいidかチェックする
+        // if (AuthEx::isRoomAdmin()) {
+        //     $notice = Notice::where('notice_id', $noticeId)
+        //         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        //         ->where($this->guardRoomAdminTableWithRoomCd())
+        //         ->firstOrFail();
+        // }
+
+        // // 教室名取得のサブクエリ
+        // $room_names = $this->mdlGetRoomQuery();
+
+        // // クエリを作成
+        // $query = Notice::query();
+        // $notice = $query
+        //     ->select(
+        //         'notice.notice_id AS id',
+        //         'notice.regist_time',
+        //         'notice.title',
+        //         'notice.text',
+        //         'notice.notice_type',
+        //         'code_master.name AS type_name',
+        //         'room_name',
+        //         'office.name AS sender',
+        //         'ext_trial_master.name AS trial_name',
+        //         'ext_trial_master.trial_date',
+        //         'event.name AS event_name',
+        //         'event.event_date'
+        //     )
+        //     // お知らせ宛先
+        //     ->sdLeftJoin(NoticeDestination::class, function ($join) {
+        //         // 1件取得
+        //         $join->on('notice_destination.notice_id', '=', 'notice.notice_id')
+        //             ->limit(1);
+        //     })
+        //     // 宛先種別
+        //     ->sdLeftJoin(CodeMaster::class, function ($join) {
+        //         $join->on('code_master.code', '=', 'notice_destination.destination_type')
+        //             ->where('code_master.data_type', '=', AppConst::CODE_MASTER_15);
+        //     })
+        //     // 事務局マスタ(送信者名)
+        //     ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+        //     // 教室名
+        //     ->leftJoinSub($room_names, 'room_names', function ($join) {
+        //         $join->on('notice.roomcd', '=', 'room_names.code');
+        //     })
+        //     // 模試名の取得
+        //     ->sdLeftJoin(ExtTrialMaster::class, 'ext_trial_master.tmid', '=', 'notice.tmid_event_id')
+        //     // イベント名の取得
+        //     ->sdLeftJoin(Event::class, 'event.event_id', '=', 'notice.tmid_event_id')
+        //     // IDで絞り込み
+        //     ->where('notice.notice_id', '=', $noticeId)
+        //     ->firstOrFail();
+
+        // // 該当データである場合は、模試・イベントいずれかのみ残す
+        // if ($notice['notice_type'] == AppConst::CODE_MASTER_14_1) {
+        //     //---------
+        //     // 模試
+        //     //---------
+        //     $notice['tm_event_name'] = $notice['trial_name'];
+        //     // 日時の取得(JOIN先の方はCarbonで取れないので以下初期化)
+        //     $tmpDate = new Carbon($notice['trial_date']);
+        //     $notice['tm_event_date'] = $tmpDate->format('Y/m/d');
+        // } elseif ($notice['notice_type'] == AppConst::CODE_MASTER_14_2) {
+        //     //---------
+        //     // イベント
+        //     //---------
+        //     $notice['tm_event_name'] = $notice['event_name'];
+        //     // 日時の取得(JOIN先の方はCarbonで取れないので以下初期化)
+        //     $tmpDate = new Carbon($notice['event_date']);
+        //     $notice['tm_event_date'] = $tmpDate->format('Y/m/d');
+        // } else {
+        //     $notice['tm_event_name'] = '';
+        // }
+        // unset($notice['trial_name']);
+        // unset($notice['trial_date']);
+        // unset($notice['event_name']);
+        // unset($notice['event_date']);
+
+        // // 宛先名の取得
+        // $query = NoticeDestination::query();
+        // $destination_names = $query
+        //     ->distinct()
+        //     ->select(
+        //         'ext_student_kihon.name AS student_name',
+        //         'ext_rirekisho.name AS teacher_name',
+        //         'notice_destination.notice_group_id',
+        //         'group_name'
+        //     )
+        //     // 生徒名の取得
+        //     ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
+        //         $join->on('ext_student_kihon.sid', '=', 'notice_destination.sid');
+        //     })
+        //     // 教師名の取得
+        //     ->sdLeftJoin(ExtRirekisho::class, function ($join) {
+        //         $join->on('ext_rirekisho.tid', '=', 'notice_destination.tid');
+        //     })
+        //     // お知らせグループ
+        //     ->sdLeftJoin(NoticeGroup::class, function ($join) {
+        //         $join->on('notice_group.notice_group_id', '=', 'notice_destination.notice_group_id');
+        //     })
+        //     ->where('notice_destination.notice_id', '=', $noticeId)
+        //     ->orderBy('notice_destination.notice_group_id', 'asc')
+        //     ->get();
+
+        // return view('pages.admin.notice_regist-detail', [
+        //     'notice' => $notice,
+        //     'destination_names' => $destination_names,
+        //     'editData' => [
+        //         'noticeId' => $notice->id
+        //     ]
+        // ]);
     }
 
     /**
