@@ -77,7 +77,9 @@
         </tr>
         <tr>
             <th>ストレージURL</th>
-            <td></td>
+            <td>
+                <a href="https://drive.google.com/drive/folders/1GiSWPRMHYohxQ04OujILYQvjBtciXLiC?usp=drive_link">https://drive.google.com/drive/folders/1GiSWPRMHYohxQ04OujILYQvjBtciXLiC?usp=drive_link</a>
+            </td>
         </tr>
     </x-bs.table>
 </x-bs.card>
