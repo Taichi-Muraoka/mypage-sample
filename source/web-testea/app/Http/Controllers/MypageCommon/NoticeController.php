@@ -175,180 +175,184 @@ class NoticeController extends Controller
      */
     public function getData(Request $request)
     {
+        return ['id' => $request->id];
 
-        // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'id');
+    //---------------
+    // 本番用
+    //---------------
+        // // IDのバリデーション
+        // $this->validateIdsFromRequest($request, 'id');
 
-        // モーダルによって処理を行う
-        $modal = $request->input('target');
-        $notice_id = $request->input('id');
+        // // モーダルによって処理を行う
+        // $modal = $request->input('target');
+        // $notice_id = $request->input('id');
 
-        // [ガード] お知らせIDが自分が見れるIDかチェックする
-        $this->guardNoticeId($notice_id);
+        // // [ガード] お知らせIDが自分が見れるIDかチェックする
+        // $this->guardNoticeId($notice_id);
 
-        // 教室名取得のサブクエリ
-        $room_names = $this->mdlGetRoomQuery();
+        // // 教室名取得のサブクエリ
+        // $room_names = $this->mdlGetRoomQuery();
 
-        switch ($modal) {
-            case "#modal-dtl-event":
-                //---------------
-                // イベント・模試
-                //---------------
+        // switch ($modal) {
+        //     case "#modal-dtl-event":
+        //         //---------------
+        //         // イベント・模試
+        //         //---------------
 
-                // お知らせIDからお知らせを取得する。
-                $query = Notice::query();
-                $notice = $query
-                    ->select(
-                        'regist_time AS date',
-                        'title',
-                        'text AS body',
-                        'notice_type AS type',
-                        'tmid_event_id AS id',
-                        'office.name AS sender',
-                        'room_name'
-                    )
-                    // 送信者名の取得
-                    ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
-                    // 教室名の取得
-                    ->leftJoinSub($room_names, 'room_names', function ($join) {
-                        $join->on('notice.roomcd', '=', 'room_names.code');
-                    })
-                    ->where('notice.notice_id', '=', $notice_id)
-                    ->firstOrFail();
+        //         // お知らせIDからお知らせを取得する。
+        //         $query = Notice::query();
+        //         $notice = $query
+        //             ->select(
+        //                 'regist_time AS date',
+        //                 'title',
+        //                 'text AS body',
+        //                 'notice_type AS type',
+        //                 'tmid_event_id AS id',
+        //                 'office.name AS sender',
+        //                 'room_name'
+        //             )
+        //             // 送信者名の取得
+        //             ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+        //             // 教室名の取得
+        //             ->leftJoinSub($room_names, 'room_names', function ($join) {
+        //                 $join->on('notice.roomcd', '=', 'room_names.code');
+        //             })
+        //             ->where('notice.notice_id', '=', $notice_id)
+        //             ->firstOrFail();
 
-                $notice['tmid_event_name'] = '';
-                $notice['tmid_event_date'] = '';
+        //         $notice['tmid_event_name'] = '';
+        //         $notice['tmid_event_date'] = '';
 
-                if ($notice->type === AppConst::CODE_MASTER_14_1) {
-                    //---------------
-                    // 模試
-                    //---------------
+        //         if ($notice->type === AppConst::CODE_MASTER_14_1) {
+        //             //---------------
+        //             // 模試
+        //             //---------------
 
-                    // 模試詳細の取得
-                    $query = ExtTrialMaster::query();
-                    $trial = $query
-                        ->select(
-                            'name',
-                            'trial_date'
-                        )
-                        ->where('ext_trial_master.tmid', '=', $notice->id)
-                        ->firstOrFail();
+        //             // 模試詳細の取得
+        //             $query = ExtTrialMaster::query();
+        //             $trial = $query
+        //                 ->select(
+        //                     'name',
+        //                     'trial_date'
+        //                 )
+        //                 ->where('ext_trial_master.tmid', '=', $notice->id)
+        //                 ->firstOrFail();
 
-                    if (isset($trial['name']) && isset($trial['trial_date'])) {
-                        $notice['tmid_event_name'] = $trial->name;
-                        $notice['tmid_event_date'] = $trial->trial_date;
-                    }
-                } elseif ($notice->type === AppConst::CODE_MASTER_14_2) {
-                    //---------------
-                    // イベント
-                    //---------------
+        //             if (isset($trial['name']) && isset($trial['trial_date'])) {
+        //                 $notice['tmid_event_name'] = $trial->name;
+        //                 $notice['tmid_event_date'] = $trial->trial_date;
+        //             }
+        //         } elseif ($notice->type === AppConst::CODE_MASTER_14_2) {
+        //             //---------------
+        //             // イベント
+        //             //---------------
 
-                    // イベント詳細の取得
-                    $query = Event::query();
-                    $event = $query
-                        ->select(
-                            'name',
-                            'event_date'
-                        )
-                        ->where('event.event_id', '=', $notice->id)
-                        ->firstOrFail();
+        //             // イベント詳細の取得
+        //             $query = Event::query();
+        //             $event = $query
+        //                 ->select(
+        //                     'name',
+        //                     'event_date'
+        //                 )
+        //                 ->where('event.event_id', '=', $notice->id)
+        //                 ->firstOrFail();
 
-                    if (isset($event['name']) && isset($event['event_date'])) {
-                        $notice['tmid_event_name'] = $event->name;
-                        $notice['tmid_event_date'] = $event->event_date;
-                    }
-                } else {
-                    // エラー
-                    $this->illegalResponseErr();
-                }
+        //             if (isset($event['name']) && isset($event['event_date'])) {
+        //                 $notice['tmid_event_name'] = $event->name;
+        //                 $notice['tmid_event_date'] = $event->event_date;
+        //             }
+        //         } else {
+        //             // エラー
+        //             $this->illegalResponseErr();
+        //         }
 
-                return $notice;
+        //         return $notice;
 
-            case "#modal-dtl-absent":
-                //---------------
-                // 欠席申請
-                //---------------
+        //     case "#modal-dtl-absent":
+        //         //---------------
+        //         // 欠席申請
+        //         //---------------
 
-                // お知らせIDからお知らせを取得する。
-                $query = Notice::query();
-                $notice = $query
-                    ->select(
-                        'regist_time AS date',
-                        'title',
-                        'text AS body',
-                        'office.name AS sender',
-                        'room_name'
-                    )
-                    // 送信者名の取得
-                    ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
-                    // 教室名の取得
-                    ->leftJoinSub($room_names, 'room_names', function ($join) {
-                        $join->on('notice.roomcd', '=', 'room_names.code');
-                    })
-                    ->where('notice.notice_id', '=', $notice_id)
-                    ->firstOrFail();
+        //         // お知らせIDからお知らせを取得する。
+        //         $query = Notice::query();
+        //         $notice = $query
+        //             ->select(
+        //                 'regist_time AS date',
+        //                 'title',
+        //                 'text AS body',
+        //                 'office.name AS sender',
+        //                 'room_name'
+        //             )
+        //             // 送信者名の取得
+        //             ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+        //             // 教室名の取得
+        //             ->leftJoinSub($room_names, 'room_names', function ($join) {
+        //                 $join->on('notice.roomcd', '=', 'room_names.code');
+        //             })
+        //             ->where('notice.notice_id', '=', $notice_id)
+        //             ->firstOrFail();
 
-                return $notice;
+        //         return $notice;
 
-            case "#modal-dtl-course":
-                //---------------
-                // 個別講習
-                //---------------
+        //     case "#modal-dtl-course":
+        //         //---------------
+        //         // 個別講習
+        //         //---------------
 
-                // お知らせIDからお知らせを取得する。
-                $query = Notice::query();
-                $notice = $query
-                    ->select(
-                        'regist_time AS date',
-                        'title',
-                        'text AS body',
-                        'office.name AS sender',
-                        'room_name'
-                    )
-                    // 送信者名の取得
-                    ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
-                    // 教室名の取得
-                    ->leftJoinSub($room_names, 'room_names', function ($join) {
-                        $join->on('notice.roomcd', '=', 'room_names.code');
-                    })
-                    ->where('notice.notice_id', '=', $notice_id)
-                    ->firstOrFail();
+        //         // お知らせIDからお知らせを取得する。
+        //         $query = Notice::query();
+        //         $notice = $query
+        //             ->select(
+        //                 'regist_time AS date',
+        //                 'title',
+        //                 'text AS body',
+        //                 'office.name AS sender',
+        //                 'room_name'
+        //             )
+        //             // 送信者名の取得
+        //             ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+        //             // 教室名の取得
+        //             ->leftJoinSub($room_names, 'room_names', function ($join) {
+        //                 $join->on('notice.roomcd', '=', 'room_names.code');
+        //             })
+        //             ->where('notice.notice_id', '=', $notice_id)
+        //             ->firstOrFail();
 
-                return $notice;
+        //         return $notice;
 
-            case "#modal-dtl":
-                //---------------
-                // 共通（テスティ―ではこのルートのみ使用する）
-                //---------------
+        //     case "#modal-dtl":
+        //         //---------------
+        //         // 共通（テスティ―ではこのルートのみ使用する）
+        //         //---------------
 
-                // お知らせIDからお知らせを取得する。
-                $query = Notice::query();
-                $notice = $query
-                    ->select(
-                        'regist_time AS date',
-                        'title',
-                        'text AS body',
-                        'notice_type AS type',
-                        'office.name AS sender',
-                        'room_name'
-                    )
-                    // 送信者名の取得
-                    ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
-                    // 教室名の取得
-                    ->leftJoinSub($room_names, 'room_names', function ($join) {
-                        $join->on('notice.roomcd', '=', 'room_names.code');
-                    })
-                    ->where('notice.notice_id', '=', $notice_id)
-                    ->firstOrFail();
+        //         // お知らせIDからお知らせを取得する。
+        //         $query = Notice::query();
+        //         $notice = $query
+        //             ->select(
+        //                 'regist_time AS date',
+        //                 'title',
+        //                 'text AS body',
+        //                 'notice_type AS type',
+        //                 'office.name AS sender',
+        //                 'room_name'
+        //             )
+        //             // 送信者名の取得
+        //             ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+        //             // 教室名の取得
+        //             ->leftJoinSub($room_names, 'room_names', function ($join) {
+        //                 $join->on('notice.roomcd', '=', 'room_names.code');
+        //             })
+        //             ->where('notice.notice_id', '=', $notice_id)
+        //             ->firstOrFail();
 
-                    return $notice;
+        //             return $notice;
         
-            default:
-                //---------------
-                // 該当しない場合
-                //---------------
-                $this->illegalResponseErr();
-        }
+        //     default:
+        //         //---------------
+        //         // 該当しない場合
+        //         //---------------
+        //         $this->illegalResponseErr();
+        // }
     }
 
     /**
