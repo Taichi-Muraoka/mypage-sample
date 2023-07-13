@@ -36,6 +36,13 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
+    <x-input.select caption="受験年度" id="cls_year" :select2=true :editData="$editData">
+        <option value="1">2022</option>
+        <option value="2">2023</option>
+        <option value="3">2024</option>
+        <option value="4">2025</option>
+    </x-input.select>
+
     <x-input.select caption="志望順" id="order" :select2=true :editData="$editData">
         <option value="1">1</option>
         <option value="2">2</option>
@@ -45,12 +52,7 @@
     <x-input.modal-select caption="受験校" id="school_cd" btnCaption="学校検索" :editData=$editData />
 
     <x-input.text caption="学部・学科名" id="faculty_department" :rules=$rules :editData=$editData/>
-    <x-input.select caption="受験年度" id="cls_year" :select2=true :editData="$editData">
-        <option value="1">2022</option>
-        <option value="2">2023</option>
-        <option value="3">2024</option>
-        <option value="4">2025</option>
-    </x-input.select>
+    <x-input.text caption="受験日程名" id="exam_name" :rules=$rules :editData=$editData/>
     <x-input.date-picker caption="受験日" id="exam_date" :editData=$editData />
     <x-input.select caption="合否" id="pass_fail" :select2=true :editData="$editData">
         <option value="1">未</option>

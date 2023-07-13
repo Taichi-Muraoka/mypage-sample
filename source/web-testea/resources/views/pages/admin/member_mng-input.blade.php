@@ -83,6 +83,8 @@
     <x-input.select caption="会員ステータス" id="stu_status" :select2=true :blank=false :editData=$editData>
         <option value="0">見込客</option>
         <option value="1">在籍</option>
+        <option value="2">休塾処理中</option>
+        <option value="3">休塾</option>
         <option value="2">退会処理中</option>
         <option value="3">退会</option>
     </x-input.select>
