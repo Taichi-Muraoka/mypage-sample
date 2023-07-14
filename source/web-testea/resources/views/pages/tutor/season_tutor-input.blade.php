@@ -55,6 +55,10 @@
     @endfor
 
   </x-bs.table>
+  
+  {{-- 余白 --}}
+  <div class="mb-3"></div>
+  <x-input.textarea caption="備考欄" id="memo" />
 
   {{-- フッター --}}
   <x-slot name="footer">

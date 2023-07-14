@@ -9,7 +9,7 @@
 
     {{-- カードヘッダ右 --}}
     <x-slot name="tools">
-        <x-button.new href="{{ route('season_tutor-new') }}" :small=true />
+        <x-button.new href="{{ route('season_tutor-new') }}" :small=true caption="日程登録" />
     </x-slot>
 
     {{-- テーブル --}}

@@ -15,7 +15,6 @@
             <th width="15%">特別期間名</th>
             <th>校舎</th>
             <th width="15%">受付開始日</th>
-            <th width="15%">受付終了日</th>
             <th width="15%">ステータス</th>
             <th width="15%">連絡日</th>
             <th></th>
@@ -26,7 +25,6 @@
             <x-bs.td-sp caption="特別期間名">2023年夏期</x-bs.td-sp>
             <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
             <x-bs.td-sp caption="受付開始日">2023/06/20</x-bs.td-sp>
-            <x-bs.td-sp caption="受付終了日">2023/07/10</x-bs.td-sp>
             <x-bs.td-sp caption="ステータス">未登録</x-bs.td-sp>
             <x-bs.td-sp caption="連絡日"></x-bs.td-sp>
             <td>
@@ -40,7 +38,6 @@
             <x-bs.td-sp caption="特別期間名">2023年夏期</x-bs.td-sp>
             <x-bs.td-sp caption="校舎">西永福</x-bs.td-sp>
             <x-bs.td-sp caption="受付開始日">2023/07/01</x-bs.td-sp>
-            <x-bs.td-sp caption="受付終了日">2023/07/10</x-bs.td-sp>
             <x-bs.td-sp caption="ステータス">未登録</x-bs.td-sp>
             <x-bs.td-sp caption="連絡日"></x-bs.td-sp>
             <td>
@@ -54,7 +51,6 @@
             <x-bs.td-sp caption="特別期間名">2023年春期</x-bs.td-sp>
             <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
             <x-bs.td-sp caption="受付開始日">2023/03/01</x-bs.td-sp>
-            <x-bs.td-sp caption="受付終了日">2023/03/10</x-bs.td-sp>
             <x-bs.td-sp caption="ステータス">登録済</x-bs.td-sp>
             <x-bs.td-sp caption="連絡日">2023/03/05</x-bs.td-sp>
             <td>
@@ -68,7 +64,6 @@
             <x-bs.td-sp caption="特別期間名">2022年冬期</x-bs.td-sp>
             <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
             <x-bs.td-sp caption="受付開始日">2022/12/01</x-bs.td-sp>
-            <x-bs.td-sp caption="受付終了日">2022/12/10</x-bs.td-sp>
             <x-bs.td-sp caption="ステータス">登録済</x-bs.td-sp>
             <x-bs.td-sp caption="連絡日">2022/12/05</x-bs.td-sp>
             <td>

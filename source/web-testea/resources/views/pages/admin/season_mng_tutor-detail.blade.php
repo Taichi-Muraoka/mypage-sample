@@ -12,6 +12,22 @@
     <x-slot name="card_title">
         CWテスト教師１０１
     </x-slot>
+
+    {{-- テーブル --}}
+    <x-bs.table :hover=false :vHeader=true>
+      <tr>
+          <th width="35%">特別期間名</th>
+          <td>2023年春期</td>
+      </tr>
+      <tr>
+          <th>講師コメント</th>
+          <td>コメントコメントコメント</td>
+      </tr>
+  </x-bs.table>
+
+    {{-- 余白 --}}
+    <div class="mb-3"></div>
+
     <x-bs.table :hover=false class="table-checked">
 
     {{-- テーブルタイトル行 --}}

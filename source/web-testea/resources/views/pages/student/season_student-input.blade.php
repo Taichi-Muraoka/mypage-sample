@@ -77,9 +77,10 @@
         <td>教科</td>
         <td>受講回数</td>
       </x-slot>
+      @for ($i = 1; $i <= 5; $i++)
       <tr v-cloak>
         <x-bs.td-sp caption="教科">
-          <x-input.select id="curriculumcd_1" :select2=true >
+          <x-input.select id="curriculumcd_{{ $i }}" :select2=true >
             <option value="1">国語</option>
             <option value="2">数学</option>
             <option value="3">理科</option>
@@ -89,40 +90,11 @@
         </x-bs.td-sp>
 
         <x-bs.td-sp caption="回数">
-          <x-input.text id="kaisu_1" />
+          <x-input.text id="kaisu_{{ $i }}" />
         </x-bs.td-sp>
       </tr>
+      @endfor
 
-      <tr v-cloak>
-        <x-bs.td-sp caption="教科">
-          <x-input.select id="curriculumcd_2" :select2=true >
-            <option value="1">国語</option>
-            <option value="2">数学</option>
-            <option value="3">理科</option>
-            <option value="4">社会</option>
-            <option value="5">英語</option>
-          </x-input.select>
-        </x-bs.td-sp>
-
-        <x-bs.td-sp caption="受講回数">
-          <x-input.text id="kaisu_2" />
-        </x-bs.td-sp>
-      </tr>
-      <tr v-cloak>
-        <x-bs.td-sp caption="教科">
-          <x-input.select id="curriculumcd_3" :select2=true >
-            <option value="1">国語</option>
-            <option value="2">数学</option>
-            <option value="3">理科</option>
-            <option value="4">社会</option>
-            <option value="5">英語</option>
-          </x-input.select>
-        </x-bs.td-sp>
-
-        <x-bs.td-sp caption="受講回数">
-          <x-input.text id="kaisu_3" />
-        </x-bs.td-sp>
-      </tr>
     </x-bs.table>
 
     <x-input.textarea caption="備考欄" id="memo" />
