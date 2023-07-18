@@ -76,7 +76,7 @@
     </tr>
 </x-bs.table>
 
-{{-- その他 --}}
+{{-- その他　生徒用 --}}
 <x-bs.table :hover=false :vHeader=true :smartPhoneModal=true vShow="item.id == 4">
     <tr>
         <th width="35%">通知日</th>
@@ -97,6 +97,30 @@
     <tr>
         <th>内容</th>
         <td class="nl2br">以下の欠席申請を受け付けました。<br>授業日時：2023/01/23 16:00<br>校舎：久我山</td>
+    </tr>
+</x-bs.table>
+
+{{-- その他　講師用 --}}
+<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true vShow="item.id == 5">
+    <tr>
+        <th width="35%">通知日</th>
+        <td>2023/01/16</td>
+    </tr>
+    <tr>
+        <th>タイトル</th>
+        <td>生徒欠席連絡</td>
+    </tr>
+    <tr>
+        <th>送信元校舎</th>
+        <td>本部</td>
+    </tr>
+    <tr>
+        <th>送信者名</th>
+        <td>本部管理者</td>
+    </tr>
+    <tr>
+        <th>内容</th>
+        <td class="nl2br">CWテスト生徒１さんより、授業欠席の連絡がありました。<br>授業日時：2023/01/23 16:00<br>校舎：久我山</td>
     </tr>
 </x-bs.table>
 

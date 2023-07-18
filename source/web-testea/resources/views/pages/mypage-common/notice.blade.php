@@ -19,6 +19,7 @@
             <th></th>
         </x-slot>
 
+    @can('student')
         <tr>
             <td>2023/06/16</td>
             <td>面談のご案内</td>
@@ -55,7 +56,28 @@
                 <x-button.list-dtl :vueDataAttr="['target' => '\'#modal-dtl\'', 'id' => '4']"/>
             </td>
         </tr>
+    @endcan
 
+    @can('tutor')
+        <tr>
+            <td>2023/05/16</td>
+            <td>特別期間講習日程連絡のお願い</td>
+            <td>本部</td>
+            <td>本部管理者</td>
+            <td>
+                <x-button.list-dtl :vueDataAttr="['target' => '\'#modal-dtl\'', 'id' => '2']"/>
+            </td>
+        </tr>
+        <tr>
+            <td>2023/01/16</td>
+            <td>生徒欠席連絡</td>
+            <td>本部</td>
+            <td>本部管理者</td>
+            <td>
+                <x-button.list-dtl :vueDataAttr="['target' => '\'#modal-dtl\'', 'id' => '5']"/>
+            </td>
+        </tr>
+    @endcan
         {{-- 本番用 --}}
         {{-- <tr v-for="item in paginator.data" v-cloak>
             <x-bs.td-sp caption="通知日" class="t-minimum">@{{item.date|formatYmd}}</x-bs.td-sp>
