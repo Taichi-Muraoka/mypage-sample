@@ -74,6 +74,6 @@
 @section('modal-button')
 
 {{-- 更新ボタンを表示 --}}
-<x-button.edit vueHref="'{{ route('room_calendar-edit', '') }}/' + item.id" icon="" caption="スケジュール編集" />
+<x-button.edit vueHref="'{{ route('room_calendar-edit', ['','']) }}/' + item.lesson_type + '/' + item.id" icon="" caption="スケジュール編集" />
 
 @overwrite

@@ -145,51 +145,106 @@
 
 <x-bs.card>
     <x-slot name="tools">
+        <x-button.new href="{{ route('transfer_check-new') }}" :small=true caption="振替授業登録" />
         <x-button.edit href="{{ route('member_mng-calendar', $student->sid) }}" caption="カレンダー" icon="" :small=true />
+        <x-button.edit href="{{ route('member_mng-invoice', $student->sid) }}" caption="請求管理" icon="" :small=true />
     </x-slot>
 
     <x-slot name="card_title">
-        受講情報
+        授業情報
     </x-slot>
+
+    <x-bs.form-title>レギュラー授業情報</x-bs.form-title>
 
     {{-- テーブル --}}
     <x-bs.table :button=true class="inner-card">
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">授業日</th>
+            <th width="10%">曜日</th>
+            <th width="10%">時限</th>
+            <th width="10%">校舎</th>
+            <th width="20%">コース名</th>
+            <th width="20%">講師名</th>
+            <th width="20%">科目</th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
+        <tr>
+            <td>火</td>
+            <td>6</td>
+            <td>久我山</td>
+            <td>個別指導コース</td>
+            <td>CWテスト講師１０１</td>
+            <td>英語</td>
+        </tr>
+    </x-bs.table>
+
+    {{-- 余白 --}}
+    <div class="mb-3"></div>
+    <x-bs.form-title>未振替授業情報</x-bs.form-title>
+
+    {{-- テーブル --}}
+    <x-bs.table :button=true class="inner-card">
+
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th>授業日</th>
             <th>時限</th>
             <th>校舎</th>
-            <th>講師名</th>
             <th>コース名</th>
-            <th>教科</th>
-            <th>授業種別</th>
+            <th>講師名</th>
+            <th>科目</th>
+            <th>授業区分</th>
             <th>出欠ステータス</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <td>2023/03/03</td>
+            <td>2023/01/30</td>
             <td>6</td>
             <td>久我山</td>
-            <td>CWテスト教師１０１</td>
             <td>個別指導コース</td>
-            <td>数学</td>
-            <td>初回授業（入会金無料）</td>
-            <td>実施前・出席</td>
+            <td>CWテスト講師１０１</td>
+            <td>英語</td>
+            <td>通常</td>
+            <td>振替中（未振替）</td>
             <td>
-                <x-button.list-dtl  dataTarget="#modal-dtl-student_class" />
+                <x-button.list-dtl dataTarget="#modal-dtl-student_class" />
             </td>
         </tr>
+    </x-bs.table>
+
+    {{-- 余白 --}}
+    <div class="mb-3"></div>
+    <x-bs.form-title>イレギュラー授業情報</x-bs.form-title>
+
+    {{-- テーブル --}}
+    <x-bs.table :button=true class="inner-card">
+
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th>授業日</th>
+            <th>時限</th>
+            <th>校舎</th>
+            <th>コース名</th>
+            <th>講師名</th>
+            <th>科目</th>
+            <th>授業区分</th>
+            <th>出欠ステータス</th>
+            <th></th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
         <tr>
             <td>2023/03/10</td>
             <td>6</td>
             <td>久我山</td>
-            <td>CWテスト教師１０１</td>
             <td>個別指導コース</td>
+            <td>CWテスト教師１０１</td>
             <td>英語</td>
-            <td>通常</td>
+            <td>追加</td>
             <td>実施前・出席</td>
             <td>
                 <x-button.list-dtl dataTarget="#modal-dtl-student_class" />
@@ -199,23 +254,10 @@
             <td>2023/03/17</td>
             <td>6</td>
             <td>久我山</td>
+            <td>個別指導コース</td>
             <td>CWテスト教師１０１</td>
-            <td>個別指導コース</td>
             <td>英語</td>
-            <td>通常</td>
-            <td>振替中（未振替）</td>
-            <td>
-                <x-button.list-dtl  dataTarget="#modal-dtl-student_class" />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/03/24</td>
-            <td>5</td>
-            <td>久我山</td>
-            <td>CWテスト教師１０２</td>
-            <td>個別指導コース</td>
-            <td>数学</td>
-            <td>通常</td>
+            <td>振替</td>
             <td>実施前・出席</td>
             <td>
                 <x-button.list-dtl  dataTarget="#modal-dtl-student_class" />
@@ -263,82 +305,6 @@
             <td>
                 <x-button.list-dtl  dataTarget="#modal-dtl-record" />
             </td>
-        </tr>
-    </x-bs.table>
-
-</x-bs.card>
-
-<x-bs.card>
-    <x-slot name="tools">
-        <x-button.new href="{{ route('agreement_mng-new', $student->sid) }}" caption="契約登録" :small=true />
-        <x-button.edit href="{{ route('agreement_mng', $student->sid) }}" caption="契約管理" icon="" :small=true />
-        <x-button.edit href="{{ route('member_mng-invoice', $student->sid) }}" caption="請求管理" icon="" :small=true />
-    </x-slot>
-
-    <x-slot name="card_title">
-        契約情報
-    </x-slot>
-
-    {{-- テーブル --}}
-    <x-bs.table :button=true class="inner-card">
-
-        {{-- テーブルタイトル行 --}}
-        <x-slot name="thead">
-            <th width="10%">授業種別</th>
-            <th>契約コース名</th>
-            <th width="10%">開始日</th>
-            <th width="10%">終了日</th>
-            <th width="10%">金額</th>
-            <th width="10%">単価</th>
-            <th width="10%">回数</th>
-        </x-slot>
-
-        {{-- テーブル行 --}}
-        <tr>
-            <x-bs.td-sp caption="授業種別">個別</x-bs.td-sp>
-            <x-bs.td-sp caption="契約コース名">個別指導 中学生コース（受験準備学年） 月4回 90分</x-bs.td-sp>
-            <x-bs.td-sp caption="開始日">2023/03/01</x-bs.td-sp>
-            <x-bs.td-sp caption="終了日">2024/02/29</x-bs.td-sp>
-            <x-bs.td-sp caption="金額" class="t-price">33,880</x-bs.td-sp>
-            <x-bs.td-sp caption="単価" class="t-price">8,470</x-bs.td-sp>
-            <x-bs.td-sp caption="回数" class="t-price">4</x-bs.td-sp>
-        </tr>
-        <tr>
-            <x-bs.td-sp caption="授業種別">集団</x-bs.td-sp>
-            <x-bs.td-sp caption="契約コース名">集団授業 中学生 英語・数学総復習パック</x-bs.td-sp>
-            <x-bs.td-sp caption="開始日">2022/07/01</x-bs.td-sp>
-            <x-bs.td-sp caption="終了日">2022/08/31</x-bs.td-sp>
-            <x-bs.td-sp caption="金額" class="t-price">50,000</x-bs.td-sp>
-            <x-bs.td-sp caption="単価" class="t-price">5,000</x-bs.td-sp>
-            <x-bs.td-sp caption="回数" class="t-price">10</x-bs.td-sp>
-        </tr>
-    </x-bs.table>
-
-    {{-- 余白 --}}
-    <div class="mb-3"></div>
-    <x-bs.form-title>レギュラー授業情報</x-bs.form-title>
-
-    {{-- テーブル --}}
-    <x-bs.table :button=true class="inner-card">
-
-        {{-- テーブルタイトル行 --}}
-        <x-slot name="thead">
-            <th width="10%">校舎</th>
-            <th width="10%">曜日</th>
-            <th width="10%">時限</th>
-            <th width="10%">授業種別</th>
-            <th width="20%">講師</th>
-            <th width="20%">科目</th>
-        </x-slot>
-
-        {{-- テーブル行 --}}
-        <tr>
-            <td>久我山</td>
-            <td>火</td>
-            <td>6</td>
-            <td>個別</td>
-            <td>CWテスト講師１０１</td>
-            <td>中学英語</td>
         </tr>
     </x-bs.table>
 
