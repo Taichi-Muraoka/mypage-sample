@@ -55,6 +55,8 @@
                 name="campas_groups" :value="6" />
     </x-bs.form-group>
 
+    <x-input.date-picker caption="生年月日" id="birth_date" />
+
     {{-- <x-input.select caption="学年" id="grade_cd" :select2=true :blank=false :editData=$editData :mastrData=$classes/> --}}
     <x-input.select id="grade_cd" caption="学年" :select2=true >
         <option value="1">高3</option>
@@ -80,21 +82,30 @@
         <option value="1">生徒</option>
         <option value="2">保護者</option>
     </x-input.select>
+
     <x-input.select caption="会員ステータス" id="stu_status" :select2=true :blank=false :editData=$editData>
         <option value="0">見込客</option>
         <option value="1">在籍</option>
-        <option value="2">休塾処理中</option>
+        <option value="2">休塾予定</option>
         <option value="3">休塾</option>
-        <option value="2">退会処理中</option>
-        <option value="3">退会</option>
+        <option value="4">退会処理中</option>
+        <option value="5">退会</option>
     </x-input.select>
+
     <x-input.date-picker caption="入会日" id="enter_date" />
 
     @if (request()->routeIs('member_mng-edit'))
-    <x-input.date-picker caption="退会日" id="leave_date" />
+    <x-input.date-picker caption="退会日" id="leave_date" vShow="form.stu_status == 4 || form.stu_status == 5" />
     @endif
 
+    <div v-cloak>
+        <x-input.date-picker caption="休塾開始日" id="recess_start_date" vShow="form.stu_status == 2 || form.stu_status == 3"/>
+        <x-input.date-picker caption="休塾終了日" id="recess_end_date" vShow="form.stu_status == 2 || form.stu_status == 3"/>
+    </div>
+
     <x-input.text caption="ストレージURL" id="storage_url" :rules=$rules :editData=$editData/>
+
+    <x-input.textarea id="memo" caption="メモ" :rules=$rules :editData=$editData />
 
     {{-- hidden --}}
     <x-input.hidden id="sid" :editData=$editData />
