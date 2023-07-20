@@ -870,7 +870,30 @@ class TutorMngController extends Controller
     public function new()
     {
         // 教科グループチェックボックス
-        $subjectGroup = array("国語","数学","理科","社会","英語");
+        $subjectGroup = array(
+            "英語",
+            "数学",
+            "算数",
+            "国語",
+            "古文・漢文",
+            "理科",
+            "化学",
+            "物理",
+            "生物",
+            "地学",
+            "社会",
+            "世界史",
+            "日本史",
+            "地理",
+            "政治経済",
+            "算数・国語",
+            "数学・理科",
+            "英語・数学",
+            "理科・社会",
+            "英語・国語",
+            "国語・社会",
+            "算数・理科"
+        );
 
         // テンプレートは編集と同じ
         return view('pages.admin.tutor_mng-input', [
@@ -900,7 +923,30 @@ class TutorMngController extends Controller
     public function edit($tid)
     {
         // 教科グループチェックボックス
-        $subjectGroup = array("国語","数学","理科","社会","英語");
+        $subjectGroup = array(
+            "英語",
+            "数学",
+            "算数",
+            "国語",
+            "古文・漢文",
+            "理科",
+            "化学",
+            "物理",
+            "生物",
+            "地学",
+            "社会",
+            "世界史",
+            "日本史",
+            "地理",
+            "政治経済",
+            "算数・国語",
+            "数学・理科",
+            "英語・数学",
+            "理科・社会",
+            "英語・国語",
+            "国語・社会",
+            "算数・理科"
+        );
 
         return view('pages.admin.tutor_mng-input', [
             'editData' => [

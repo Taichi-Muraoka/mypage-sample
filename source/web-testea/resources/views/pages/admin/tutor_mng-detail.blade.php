@@ -41,12 +41,15 @@
             <td>teacher0101@mp-sample.rulez.jp</td>
         </tr>
         <tr>
-            <th>授業時給（個別）</th>
-            <td>1300</td>
+            <th>生年月日</th>
+            <td>2003/04/10</td>
         </tr>
         <tr>
-            <th>授業時給（集団）</th>
-            <td>1400</td>
+            <th>学年</th>
+            <td>大学１年</td>
+        </tr>        <tr>
+            <th>授業時給（ベース給）</th>
+            <td>1300</td>
         </tr>
         <tr>
             <th>講師ステータス</th>
@@ -61,8 +64,16 @@
             <td></td>
         </tr>
         <tr>
+            <th>勤務年数</th>
+            <td>1年3ヶ月</td>
+        </tr>
+        <tr>
             <th>担当科目</th>
             <td>数学</td>
+        </tr>
+        <tr>
+            <th>メモ</th>
+            <td></td>
         </tr>
     </x-bs.table>
 </x-bs.card>

@@ -14,7 +14,7 @@
 {{-- formを指定 --}}
 <x-bs.card :form=true>
 
-    <p>講師退職処理を実行します。</p>
+    <p>以下の講師について、退職処理を行います。</p>
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="15%">講師ID</th>
@@ -29,10 +29,10 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.text caption="退職日" id="leave_date" :editData=$editData />
+    <x-input.date-picker caption="退職日" id="leave_date" />
 
     <x-bs.callout title="講師退職処理の注意事項" type="danger">
-        退職処理を行うと、講師は退職日以降、システムにログインできなくなります。
+        退職処理を行うと、対象講師のアカウントは退職日以降、ログイン不可となります。
     </x-bs.callout>
 
     {{-- hidden --}}
