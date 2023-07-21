@@ -26,6 +26,15 @@
         <option value="3">2023/01/31 2限</option>
     </x-input.select>
 
+    <div v-cloak>
+        <x-bs.table vShow="form.id" :hover=false :vHeader=true>
+            <tr>
+                <th>教室</th>
+                <td>久我山</td>
+            </tr>
+        </x-bs.table>
+    </div>
+
     <x-bs.form-title>振替希望日</x-bs.form-title>
     {{-- 第１希望日 --}}
     {{-- id="preferred_date3" --}}
@@ -43,7 +52,6 @@
             <option value="8">8限</option>
         </x-input.select>
 
-        <x-input.time-picker caption="開始時刻" id="start_time1" :rules=$rules />
     </x-bs.card>
 
     {{-- 第２希望日 --}}
@@ -62,7 +70,6 @@
             <option value="8">8限</option>
         </x-input.select>
 
-        <x-input.time-picker caption="開始時刻" id="start_time2" :rules=$rules />
     </x-bs.card>
 
     {{-- 第３希望日 --}}
@@ -81,10 +88,9 @@
             <option value="8">8限</option>
         </x-input.select>
 
-        <x-input.time-picker caption="開始時刻" id="start_time3" :rules=$rules />
     </x-bs.card>
 
-    <x-input.textarea caption="振替理由" id="transfer_reason" :rules=$rules />
+    <x-input.textarea caption="振替理由／連絡事項など" id="transfer_reason" :rules=$rules />
 
     {{-- hidden --}}
     <x-input.hidden id="transfer_tutor_id" :editData=$editData />

@@ -5,8 +5,8 @@
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true :smartPhoneModal=true>
     <tr>
-        <th>申請日時</th>
-        <td>2023/01/10 17:00</td>
+        <th>申請日</th>
+        <td>2023/01/10</td>
     </tr>
     <tr>
         <th>申請者種別</th>

@@ -21,7 +21,11 @@
             <td>2023/01/30 4限 15:00</td>
         </tr>
         <tr>
-            <th>振替理由</th>
+            <th>教室</th>
+            <td>久我山</td>
+        </tr>
+        <tr>
+            <th>振替理由／要望など</th>
             <td>学校行事のため</td>
         </tr>
     </x-bs.table>
@@ -35,7 +39,7 @@
             <th width="5%"></th>
             <th width="20%">振替希望日</th>
             <th width="15%">時限</th>
-            <th>開始時間</th>
+            <th> </th>
         </x-slot>
 
         {{-- テーブル行 --}}
@@ -43,19 +47,19 @@
             <td><x-input.radio id="20221226_1" name="shift" icheck=true value="20221226_1" :icheck=false /></td>
             <td>2023/02/03</td>
             <td>5</td>
-            <td>16:00</td>
+            <td></td>
         </tr>
-        <tr>
-            <td><x-input.radio id="20221227_2" name="shift" icheck=true value="20221226_2" :icheck=false /></td>
+        <tr style="background-color: #C0C0C0">
+            <td><x-input.radio id="20221227_2" name="shift" icheck=true value="20221226_2" :icheck=false disabled==true /></td>
             <td>2023/02/04</td>
             <td>6</td>
-            <td>17:30</td>
+            <td>空きブースなし</td>
         </tr>
         <tr>
             <td><x-input.radio id="20221228_3" name="shift" icheck=true value="20221228_3" :icheck=false /></td>
             <td>2023/02/06</td>
             <td>5</td>
-            <td>16:00</td>
+            <td></td>
         </tr>
     </x-bs.table>
 
