@@ -13,16 +13,20 @@
     <p>以下の授業振替依頼について、振替希望日一覧から１つ選択し、承認を行います。</p>
     <x-bs.table :hover=false :vHeader=true>
         <tr>
-            <th width="35%">講師名</th>
-            <td>CWテスト教師１０１</td>
-        </tr>
-        <tr>
-            <th>授業日時</th>
+            <th width="35%">授業日・時限</th>
             <td>2023/01/30 4限 15:00</td>
         </tr>
         <tr>
-            <th>教室</th>
+            <th>校舎</th>
             <td>久我山</td>
+        </tr>
+        <tr>
+            <th>コース</th>
+            <td>個別指導コース</td>
+        </tr>
+        <tr>
+            <th>講師名</th>
+            <td>CWテスト教師１０１</td>
         </tr>
         <tr>
             <th>振替理由／連絡事項など</th>

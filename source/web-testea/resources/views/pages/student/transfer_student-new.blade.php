@@ -21,8 +21,12 @@
     <div v-cloak>
         <x-bs.table vShow="form.id" :hover=false :vHeader=true>
             <tr>
-                <th>教室</th>
+                <th>校舎</th>
                 <td>久我山</td>
+            </tr>
+            <tr>
+                <th>コース</th>
+                <td>個別指導コース</td>
             </tr>
             <tr>
                 <th>講師名</th>

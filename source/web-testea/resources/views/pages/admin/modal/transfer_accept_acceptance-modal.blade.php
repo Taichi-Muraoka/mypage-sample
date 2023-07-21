@@ -11,12 +11,16 @@
 
 <x-bs.table :hover=false :vHeader=true>
     <tr>
-        <th width="35%">授業日時</th>
+        <th width="35%">授業日・時限</th>
         <td>@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</td>
     </tr>
     <tr>
-        <th>教室</th>
+        <th>校舎</th>
         <td>@{{item.room_name}}</td>
+    </tr>
+    <tr>
+        <th>コース</th>
+        <td>個別指導コース</td>
     </tr>
     <tr>
         <th>生徒名</th>
