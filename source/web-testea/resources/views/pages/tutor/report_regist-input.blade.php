@@ -56,19 +56,19 @@
         {{-- 詳細を表示 --}}
         <x-bs.table vShow="form.id > 0" :hover=false :vHeader=true class="mb-4">
             <tr>
-                <th class="t-minimum">校舎</th>
+                <th>校舎</th>
                 <td><span v-cloak>久我山</span></td>
             </tr>
             <tr>
-                <th class="t-minimum">コース</th>
+                <th>コース</th>
                 <td><span v-cloak>個別指導コース</span></td>
             </tr>
             <tr>
-                <th class="t-minimum">生徒</th>
+                <th>生徒</th>
                 <td><span v-cloak>CWテスト生徒１</span></td>
             </tr>
             <tr>
-                <th class="t-minimum">科目</th>
+                <th>科目</th>
                 <td><span v-cloak>数学</span></td>
             </tr>
         </x-bs.table>
@@ -83,16 +83,16 @@
         <x-bs.row>
             <x-bs.col2>
                 <x-input.select caption="教材" id="lesson_text1" :select2=true>
-                    <option value="701">中１数学ドリル基本</option>
-                    <option value="702">中１数学ドリル演習</option>
-                    <option value="709">中１数学その他</option>
-                    <option value="801">中２数学ドリル基本</option>
-                    <option value="802">中２数学ドリル演習</option>
-                    <option value="809">中２数学その他</option>
-                    <option value="901">中３数学ドリル基本</option>
-                    <option value="902">中３数学ドリル演習</option>
-                    <option value="903">中３数学受験対策</option>
-                    <option value="909">中３数学その他</option>
+                    <option value="07102001">中１数学ドリル基本</option>
+                    <option value="07102002">中１数学ドリル演習</option>
+                    <option value="07102099">中１数学その他</option>
+                    <option value="08102001">中２数学ドリル基本</option>
+                    <option value="08102002">中２数学ドリル演習</option>
+                    <option value="08102099">中２数学その他</option>
+                    <option value="09102001">中３数学ドリル基本</option>
+                    <option value="09102002">中３数学ドリル演習</option>
+                    <option value="09102003">中３数学受験対策</option>
+                    <option value="09102099">中３数学その他</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
@@ -102,20 +102,20 @@
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他教材名（フリー入力）" id="lesson_text_name1"
-                    v-Show="form.lesson_text1.endsWith('9')" />
+                    v-Show="form.lesson_text1.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.select caption="単元分類１" id="lesson_category1_1" :select2=true>
-                    <option value="01">正負の数</option>
-                    <option value="02">文字と式</option>
-                    <option value="03">方程式</option>
-                    <option value="04">比例と反比例</option>
-                    <option value="05">平面図形</option>
-                    <option value="06">空間図形</option>
-                    <option value="07">データの分析と活用</option>
-                    <option value="99">その他</option>
+                    <option value="0710201">正負の数</option>
+                    <option value="0710202">文字と式</option>
+                    <option value="0710203">方程式</option>
+                    <option value="0710204">比例と反比例</option>
+                    <option value="0710205">平面図形</option>
+                    <option value="0710206">空間図形</option>
+                    <option value="0710207">データの分析と活用</option>
+                    <option value="0710299">その他</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
@@ -125,31 +125,31 @@
                     <option value="03">加法と減法</option>
                     <option value="03">乗法と除法</option>
                     <option value="04">四則の混じった計算</option>
-                    <option value="09">その他</option>
+                    <option value="99">その他</option>
                 </x-input.select>
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他単元分類名１（フリー入力）" id="lesson_category_name1_1"
-                    v-Show="form.lesson_category1_1.endsWith('9')" />
+                    v-Show="form.lesson_category1_1.endsWith('99')" />
         </x-bs.col2>
         <x-bs.col2>
                     <x-input.text caption="その他単元名１（フリー入力）" id="lesson_unit_name1_1"
-                        v-Show="form.lesson_unit1_1.endsWith('9')" />
+                        v-Show="form.lesson_unit1_1.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.select caption="単元分類２" id="lesson_category1_2" :select2=true>
-                    <option value="01">正負の数</option>
-                    <option value="02">文字と式</option>
-                    <option value="03">方程式</option>
-                    <option value="04">比例と反比例</option>
-                    <option value="05">平面図形</option>
-                    <option value="06">空間図形</option>
-                    <option value="07">データの分析と活用</option>
-                    <option value="99">その他</option>
+                    <option value="0710201">正負の数</option>
+                    <option value="0710202">文字と式</option>
+                    <option value="0710203">方程式</option>
+                    <option value="0710204">比例と反比例</option>
+                    <option value="0710205">平面図形</option>
+                    <option value="0710206">空間図形</option>
+                    <option value="0710207">データの分析と活用</option>
+                    <option value="0710299">その他</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
@@ -158,47 +158,47 @@
                     <option value="02">文字を使った式の表し方</option>
                     <option value="03">代入と式の値</option>
                     <option value="04">１次式の計算</option>
-                    <option value="09">その他</option>
+                    <option value="99">その他</option>
                 </x-input.select>
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他単元分類名２（フリー入力）" id="lesson_category_name1_2"
-                    v-Show="form.lesson_category1_2.endsWith('9')" />
+                    v-Show="form.lesson_category1_2.endsWith('99')" />
         </x-bs.col2>
         <x-bs.col2>
                     <x-input.text caption="その他単元名２（フリー入力）" id="lesson_unit_name1_2"
-                        v-Show="form.lesson_unit1_2.endsWith('9')" />
+                        v-Show="form.lesson_unit1_2.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.select caption="単元分類３" id="lesson_category1_3" :select2=true>
-                    <option value="01">正負の数</option>
-                    <option value="02">文字と式</option>
-                    <option value="03">方程式</option>
-                    <option value="04">比例と反比例</option>
-                    <option value="05">平面図形</option>
-                    <option value="06">空間図形</option>
-                    <option value="07">データの分析と活用</option>
-                    <option value="99">その他</option>
+                    <option value="0710201">正負の数</option>
+                    <option value="0710202">文字と式</option>
+                    <option value="0710203">方程式</option>
+                    <option value="0710204">比例と反比例</option>
+                    <option value="0710205">平面図形</option>
+                    <option value="0710206">空間図形</option>
+                    <option value="0710207">データの分析と活用</option>
+                    <option value="0710299">その他</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
                 <x-input.select caption="単元３" id="lesson_unit1_3" :select2=true>
-                    <option value="09">その他</option>
+                    <option value="99">その他</option>
                 </x-input.select>
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他単元分類名３（フリー入力）" id="lesson_category_name1_3"
-                    v-Show="form.lesson_category1_3.endsWith('9')" />
+                    v-Show="form.lesson_category1_3.endsWith('99')" />
         </x-bs.col2>
         <x-bs.col2>
                     <x-input.text caption="その他単元名３（フリー入力）" id="lesson_unit_name1_3"
-                        v-Show="form.lesson_unit1_3.endsWith('9')" />
+                        v-Show="form.lesson_unit1_3.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
     </x-bs.card>
@@ -208,16 +208,16 @@
         <x-bs.row>
             <x-bs.col2>
                 <x-input.select caption="教材" id="lesson_text2" :select2=true>
-                    <option value="701">中１数学ドリル基本</option>
-                    <option value="702">中１数学ドリル演習</option>
-                    <option value="709">中１数学その他</option>
-                    <option value="801">中２数学ドリル基本</option>
-                    <option value="802">中２数学ドリル演習</option>
-                    <option value="809">中２数学その他</option>
-                    <option value="901">中３数学ドリル基本</option>
-                    <option value="902">中３数学ドリル演習</option>
-                    <option value="903">中３数学受験対策</option>
-                    <option value="909">中３数学その他</option>
+                    <option value="07102001">中１数学ドリル基本</option>
+                    <option value="07102002">中１数学ドリル演習</option>
+                    <option value="07102099">中１数学その他</option>
+                    <option value="08102001">中２数学ドリル基本</option>
+                    <option value="08102002">中２数学ドリル演習</option>
+                    <option value="08102099">中２数学その他</option>
+                    <option value="09102001">中３数学ドリル基本</option>
+                    <option value="09102002">中３数学ドリル演習</option>
+                    <option value="09102003">中３数学受験対策</option>
+                    <option value="09102099">中３数学その他</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
@@ -227,20 +227,20 @@
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他教材名（フリー入力）" id="lesson_text_name2"
-                    v-Show="form.lesson_text1.endsWith('9')" />
+                    v-Show="form.lesson_text1.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.select caption="単元分類１" id="lesson_category2_1" :select2=true>
-                    <option value="01">正負の数</option>
-                    <option value="02">文字と式</option>
-                    <option value="03">方程式</option>
-                    <option value="04">比例と反比例</option>
-                    <option value="05">平面図形</option>
-                    <option value="06">空間図形</option>
-                    <option value="07">データの分析と活用</option>
-                    <option value="99">その他</option>
+                    <option value="0710201">正負の数</option>
+                    <option value="0710202">文字と式</option>
+                    <option value="0710203">方程式</option>
+                    <option value="0710204">比例と反比例</option>
+                    <option value="0710205">平面図形</option>
+                    <option value="0710206">空間図形</option>
+                    <option value="0710207">データの分析と活用</option>
+                    <option value="0710299">その他</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
@@ -250,31 +250,31 @@
                     <option value="03">加法と減法</option>
                     <option value="03">乗法と除法</option>
                     <option value="04">四則の混じった計算</option>
-                    <option value="09">その他</option>
+                    <option value="99">その他</option>
                 </x-input.select>
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他単元分類名１（フリー入力）" id="lesson_category_name2_1"
-                    v-Show="form.lesson_category2_1.endsWith('9')" />
+                    v-Show="form.lesson_category2_1.endsWith('99')" />
         </x-bs.col2>
         <x-bs.col2>
                     <x-input.text caption="その他単元名１（フリー入力）" id="lesson_unit_name2_1"
-                        v-Show="form.lesson_unit2_1.endsWith('9')" />
+                        v-Show="form.lesson_unit2_1.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.select caption="単元分類２" id="lesson_category2_2" :select2=true>
-                    <option value="01">正負の数</option>
-                    <option value="02">文字と式</option>
-                    <option value="03">方程式</option>
-                    <option value="04">比例と反比例</option>
-                    <option value="05">平面図形</option>
-                    <option value="06">空間図形</option>
-                    <option value="07">データの分析と活用</option>
-                    <option value="99">その他</option>
+                    <option value="0710201">正負の数</option>
+                    <option value="0710202">文字と式</option>
+                    <option value="0710203">方程式</option>
+                    <option value="0710204">比例と反比例</option>
+                    <option value="0710205">平面図形</option>
+                    <option value="0710206">空間図形</option>
+                    <option value="0710207">データの分析と活用</option>
+                    <option value="0710299">その他</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
@@ -283,47 +283,47 @@
                     <option value="02">文字を使った式の表し方</option>
                     <option value="03">代入と式の値</option>
                     <option value="04">１次式の計算</option>
-                    <option value="09">その他</option>
+                    <option value="99">その他</option>
                 </x-input.select>
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他単元分類名２（フリー入力）" id="lesson_category_name2_2"
-                    v-Show="form.lesson_category2_2.endsWith('9')" />
+                    v-Show="form.lesson_category2_2.endsWith('99')" />
         </x-bs.col2>
         <x-bs.col2>
                     <x-input.text caption="その他単元名２（フリー入力）" id="lesson_unit_name2_2"
-                        v-Show="form.lesson_unit2_2.endsWith('9')" />
+                        v-Show="form.lesson_unit2_2.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.select caption="単元分類３" id="lesson_category2_3" :select2=true>
-                    <option value="01">正負の数</option>
-                    <option value="02">文字と式</option>
-                    <option value="03">方程式</option>
-                    <option value="04">比例と反比例</option>
-                    <option value="05">平面図形</option>
-                    <option value="06">空間図形</option>
-                    <option value="07">データの分析と活用</option>
-                    <option value="99">その他</option>
+                    <option value="0710201">正負の数</option>
+                    <option value="0710202">文字と式</option>
+                    <option value="0710203">方程式</option>
+                    <option value="0710204">比例と反比例</option>
+                    <option value="0710205">平面図形</option>
+                    <option value="0710206">空間図形</option>
+                    <option value="0710207">データの分析と活用</option>
+                    <option value="0710299">その他</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
                 <x-input.select caption="単元３" id="lesson_unit2_3" :select2=true>
-                    <option value="09">その他</option>
+                    <option value="99">その他</option>
                 </x-input.select>
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他単元分類名３（フリー入力）" id="lesson_category_name2_3"
-                    v-Show="form.lesson_category2_3.endsWith('9')" />
+                    v-Show="form.lesson_category2_3.endsWith('99')" />
         </x-bs.col2>
         <x-bs.col2>
                     <x-input.text caption="その他単元名３（フリー入力）" id="lesson_unit_name2_3"
-                        v-Show="form.lesson_unit2_3.endsWith('9')" />
+                        v-Show="form.lesson_unit2_3.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
     </x-bs.card>
@@ -356,123 +356,123 @@
         <x-bs.form-title>教材１</x-bs.form-title>
         <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="教材" id="lesson_text1" :select2=true>
-                    <option value="701">中１数学ドリル基本</option>
-                    <option value="702">中１数学ドリル演習</option>
-                    <option value="709">中１数学その他</option>
-                    <option value="801">中２数学ドリル基本</option>
-                    <option value="802">中２数学ドリル演習</option>
-                    <option value="809">中２数学その他</option>
-                    <option value="901">中３数学ドリル基本</option>
-                    <option value="902">中３数学ドリル演習</option>
-                    <option value="903">中３数学受験対策</option>
-                    <option value="909">中３数学その他</option>
+                <x-input.select caption="教材" id="homework_text1" :select2=true>
+                    <option value="07102001">中１数学ドリル基本</option>
+                    <option value="07102002">中１数学ドリル演習</option>
+                    <option value="07102099">中１数学その他</option>
+                    <option value="08102001">中２数学ドリル基本</option>
+                    <option value="08102002">中２数学ドリル演習</option>
+                    <option value="08102099">中２数学その他</option>
+                    <option value="09102001">中３数学ドリル基本</option>
+                    <option value="09102002">中３数学ドリル演習</option>
+                    <option value="09102003">中３数学受験対策</option>
+                    <option value="09102099">中３数学その他</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
-                <x-input.text caption="ページ" id="lesson_page1"/>
+                <x-input.text caption="ページ" id="homework_page1"/>
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
-                <x-input.text caption="その他教材名（フリー入力）" id="lesson_text_name1"
-                    v-Show="form.lesson_text1.endsWith('9')" />
+                <x-input.text caption="その他教材名（フリー入力）" id="homework_text_name1"
+                    v-Show="form.homework_text1.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="単元分類１" id="lesson_category1_1" :select2=true>
-                    <option value="01">正負の数</option>
-                    <option value="02">文字と式</option>
-                    <option value="03">方程式</option>
-                    <option value="04">比例と反比例</option>
-                    <option value="05">平面図形</option>
-                    <option value="06">空間図形</option>
-                    <option value="07">データの分析と活用</option>
-                    <option value="99">その他</option>
+                <x-input.select caption="単元分類１" id="homework_category1_1" :select2=true>
+                    <option value="0710201">正負の数</option>
+                    <option value="0710202">文字と式</option>
+                    <option value="0710203">方程式</option>
+                    <option value="0710204">比例と反比例</option>
+                    <option value="0710205">平面図形</option>
+                    <option value="0710206">空間図形</option>
+                    <option value="0710207">データの分析と活用</option>
+                    <option value="0710299">その他</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
-                <x-input.select caption="単元１" id="lesson_unit1_1" :select2=true>
+                <x-input.select caption="単元１" id="homework_unit1_1" :select2=true>
                     <option value="01">符号のついた数</option>
                     <option value="02">数の大小</option>
                     <option value="03">加法と減法</option>
                     <option value="03">乗法と除法</option>
                     <option value="04">四則の混じった計算</option>
-                    <option value="09">その他</option>
-                </x-input.select>
-            </x-bs.col2>
-        </x-bs.row>
-        <x-bs.row>
-            <x-bs.col2>
-                <x-input.text caption="その他単元分類名１（フリー入力）" id="lesson_category_name1_1"
-                    v-Show="form.lesson_category1_1.endsWith('9')" />
-        </x-bs.col2>
-        <x-bs.col2>
-                    <x-input.text caption="その他単元名１（フリー入力）" id="lesson_unit_name1_1"
-                        v-Show="form.lesson_unit1_1.endsWith('9')" />
-            </x-bs.col2>
-        </x-bs.row>
-        <x-bs.row>
-            <x-bs.col2>
-                <x-input.select caption="単元分類２" id="lesson_category1_2" :select2=true>
-                    <option value="01">正負の数</option>
-                    <option value="02">文字と式</option>
-                    <option value="03">方程式</option>
-                    <option value="04">比例と反比例</option>
-                    <option value="05">平面図形</option>
-                    <option value="06">空間図形</option>
-                    <option value="07">データの分析と活用</option>
                     <option value="99">その他</option>
                 </x-input.select>
             </x-bs.col2>
+        </x-bs.row>
+        <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="単元２" id="lesson_unit1_2" :select2=true>
+                <x-input.text caption="その他単元分類名１（フリー入力）" id="homework_category_name1_1"
+                    v-Show="form.homework_category1_1.endsWith('99')" />
+        </x-bs.col2>
+        <x-bs.col2>
+                    <x-input.text caption="その他単元名１（フリー入力）" id="homework_unit_name1_1"
+                        v-Show="form.homework_unit1_1.endsWith('99')" />
+            </x-bs.col2>
+        </x-bs.row>
+        <x-bs.row>
+            <x-bs.col2>
+                <x-input.select caption="単元分類２" id="homework_category1_2" :select2=true>
+                    <option value="0710201">正負の数</option>
+                    <option value="0710202">文字と式</option>
+                    <option value="0710203">方程式</option>
+                    <option value="0710204">比例と反比例</option>
+                    <option value="0710205">平面図形</option>
+                    <option value="0710206">空間図形</option>
+                    <option value="0710207">データの分析と活用</option>
+                    <option value="0710299">その他</option>
+                </x-input.select>
+            </x-bs.col2>
+            <x-bs.col2>
+                <x-input.select caption="単元２" id="homework_unit1_2" :select2=true>
                     <option value="01">文字の使用</option>
                     <option value="02">文字を使った式の表し方</option>
                     <option value="03">代入と式の値</option>
                     <option value="04">１次式の計算</option>
-                    <option value="09">その他</option>
-                </x-input.select>
-            </x-bs.col2>
-        </x-bs.row>
-        <x-bs.row>
-            <x-bs.col2>
-                <x-input.text caption="その他単元分類名２（フリー入力）" id="lesson_category_name1_2"
-                    v-Show="form.lesson_category1_2.endsWith('9')" />
-        </x-bs.col2>
-        <x-bs.col2>
-                    <x-input.text caption="その他単元名２（フリー入力）" id="lesson_unit_name1_2"
-                        v-Show="form.lesson_unit1_2.endsWith('9')" />
-            </x-bs.col2>
-        </x-bs.row>
-        <x-bs.row>
-            <x-bs.col2>
-                <x-input.select caption="単元分類３" id="lesson_category1_3" :select2=true>
-                    <option value="01">正負の数</option>
-                    <option value="02">文字と式</option>
-                    <option value="03">方程式</option>
-                    <option value="04">比例と反比例</option>
-                    <option value="05">平面図形</option>
-                    <option value="06">空間図形</option>
-                    <option value="07">データの分析と活用</option>
                     <option value="99">その他</option>
                 </x-input.select>
             </x-bs.col2>
+        </x-bs.row>
+        <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="単元３" id="lesson_unit1_3" :select2=true>
-                    <option value="09">その他</option>
+                <x-input.text caption="その他単元分類名２（フリー入力）" id="homework_category_name1_2"
+                    v-Show="form.homework_category1_2.endsWith('99')" />
+        </x-bs.col2>
+        <x-bs.col2>
+                    <x-input.text caption="その他単元名２（フリー入力）" id="homework_unit_name1_2"
+                        v-Show="form.homework_unit1_2.endsWith('99')" />
+            </x-bs.col2>
+        </x-bs.row>
+        <x-bs.row>
+            <x-bs.col2>
+                <x-input.select caption="単元分類３" id="homework_category1_3" :select2=true>
+                    <option value="0710201">正負の数</option>
+                    <option value="0710202">文字と式</option>
+                    <option value="0710203">方程式</option>
+                    <option value="0710204">比例と反比例</option>
+                    <option value="0710205">平面図形</option>
+                    <option value="0710206">空間図形</option>
+                    <option value="0710207">データの分析と活用</option>
+                    <option value="0710299">その他</option>
+                </x-input.select>
+            </x-bs.col2>
+            <x-bs.col2>
+                <x-input.select caption="単元３" id="homework_unit1_3" :select2=true>
+                    <option value="99">その他</option>
                 </x-input.select>
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
-                <x-input.text caption="その他単元分類名３（フリー入力）" id="lesson_category_name1_3"
-                    v-Show="form.lesson_category1_3.endsWith('9')" />
+                <x-input.text caption="その他単元分類名３（フリー入力）" id="homework_category_name1_3"
+                    v-Show="form.homework_category1_3.endsWith('99')" />
         </x-bs.col2>
         <x-bs.col2>
-                    <x-input.text caption="その他単元名３（フリー入力）" id="lesson_unit_name1_3"
-                        v-Show="form.lesson_unit1_3.endsWith('9')" />
+                    <x-input.text caption="その他単元名３（フリー入力）" id="homework_unit_name1_3"
+                        v-Show="form.homework_unit1_3.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
     </x-bs.card>
@@ -481,123 +481,123 @@
         <x-bs.form-title>教材２</x-bs.form-title>
         <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="教材" id="lesson_text2" :select2=true>
-                    <option value="701">中１数学ドリル基本</option>
-                    <option value="702">中１数学ドリル演習</option>
-                    <option value="709">中１数学その他</option>
-                    <option value="801">中２数学ドリル基本</option>
-                    <option value="802">中２数学ドリル演習</option>
-                    <option value="809">中２数学その他</option>
-                    <option value="901">中３数学ドリル基本</option>
-                    <option value="902">中３数学ドリル演習</option>
-                    <option value="903">中３数学受験対策</option>
-                    <option value="909">中３数学その他</option>
+                <x-input.select caption="教材" id="homework_text2" :select2=true>
+                    <option value="07102001">中１数学ドリル基本</option>
+                    <option value="07102002">中１数学ドリル演習</option>
+                    <option value="07102099">中１数学その他</option>
+                    <option value="08102001">中２数学ドリル基本</option>
+                    <option value="08102002">中２数学ドリル演習</option>
+                    <option value="08102099">中２数学その他</option>
+                    <option value="09102001">中３数学ドリル基本</option>
+                    <option value="09102002">中３数学ドリル演習</option>
+                    <option value="09102003">中３数学受験対策</option>
+                    <option value="09102099">中３数学その他</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
-                <x-input.text caption="ページ" id="lesson_page2"/>
+                <x-input.text caption="ページ" id="homework_page2"/>
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
-                <x-input.text caption="その他教材名（フリー入力）" id="lesson_text_name2"
-                    v-Show="form.lesson_text1.endsWith('9')" />
+                <x-input.text caption="その他教材名（フリー入力）" id="homework_text_name2"
+                    v-Show="form.homework_text1.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="単元分類１" id="lesson_category2_1" :select2=true>
-                    <option value="01">正負の数</option>
-                    <option value="02">文字と式</option>
-                    <option value="03">方程式</option>
-                    <option value="04">比例と反比例</option>
-                    <option value="05">平面図形</option>
-                    <option value="06">空間図形</option>
-                    <option value="07">データの分析と活用</option>
-                    <option value="99">その他</option>
+                <x-input.select caption="単元分類１" id="homework_category2_1" :select2=true>
+                    <option value="0710201">正負の数</option>
+                    <option value="0710202">文字と式</option>
+                    <option value="0710203">方程式</option>
+                    <option value="0710204">比例と反比例</option>
+                    <option value="0710205">平面図形</option>
+                    <option value="0710206">空間図形</option>
+                    <option value="0710207">データの分析と活用</option>
+                    <option value="0710299">その他</option>
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
-                <x-input.select caption="単元１" id="lesson_unit2_1" :select2=true>
+                <x-input.select caption="単元１" id="homework_unit2_1" :select2=true>
                     <option value="01">符号のついた数</option>
                     <option value="02">数の大小</option>
                     <option value="03">加法と減法</option>
                     <option value="03">乗法と除法</option>
                     <option value="04">四則の混じった計算</option>
-                    <option value="09">その他</option>
-                </x-input.select>
-            </x-bs.col2>
-        </x-bs.row>
-        <x-bs.row>
-            <x-bs.col2>
-                <x-input.text caption="その他単元分類名１（フリー入力）" id="lesson_category_name2_1"
-                    v-Show="form.lesson_category2_1.endsWith('9')" />
-        </x-bs.col2>
-        <x-bs.col2>
-                    <x-input.text caption="その他単元名１（フリー入力）" id="lesson_unit_name2_1"
-                        v-Show="form.lesson_unit2_1.endsWith('9')" />
-            </x-bs.col2>
-        </x-bs.row>
-        <x-bs.row>
-            <x-bs.col2>
-                <x-input.select caption="単元分類２" id="lesson_category2_2" :select2=true>
-                    <option value="01">正負の数</option>
-                    <option value="02">文字と式</option>
-                    <option value="03">方程式</option>
-                    <option value="04">比例と反比例</option>
-                    <option value="05">平面図形</option>
-                    <option value="06">空間図形</option>
-                    <option value="07">データの分析と活用</option>
                     <option value="99">その他</option>
                 </x-input.select>
             </x-bs.col2>
+        </x-bs.row>
+        <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="単元２" id="lesson_unit2_2" :select2=true>
+                <x-input.text caption="その他単元分類名１（フリー入力）" id="homework_category_name2_1"
+                    v-Show="form.homework_category2_1.endsWith('99')" />
+        </x-bs.col2>
+        <x-bs.col2>
+                    <x-input.text caption="その他単元名１（フリー入力）" id="homework_unit_name2_1"
+                        v-Show="form.homework_unit2_1.endsWith('99')" />
+            </x-bs.col2>
+        </x-bs.row>
+        <x-bs.row>
+            <x-bs.col2>
+                <x-input.select caption="単元分類２" id="homework_category2_2" :select2=true>
+                    <option value="0710201">正負の数</option>
+                    <option value="0710202">文字と式</option>
+                    <option value="0710203">方程式</option>
+                    <option value="0710204">比例と反比例</option>
+                    <option value="0710205">平面図形</option>
+                    <option value="0710206">空間図形</option>
+                    <option value="0710207">データの分析と活用</option>
+                    <option value="0710299">その他</option>
+                </x-input.select>
+            </x-bs.col2>
+            <x-bs.col2>
+                <x-input.select caption="単元２" id="homework_unit2_2" :select2=true>
                     <option value="01">文字の使用</option>
                     <option value="02">文字を使った式の表し方</option>
                     <option value="03">代入と式の値</option>
                     <option value="04">１次式の計算</option>
-                    <option value="09">その他</option>
-                </x-input.select>
-            </x-bs.col2>
-        </x-bs.row>
-        <x-bs.row>
-            <x-bs.col2>
-                <x-input.text caption="その他単元分類名２（フリー入力）" id="lesson_category_name2_2"
-                    v-Show="form.lesson_category2_2.endsWith('9')" />
-        </x-bs.col2>
-        <x-bs.col2>
-                    <x-input.text caption="その他単元名２（フリー入力）" id="lesson_unit_name2_2"
-                        v-Show="form.lesson_unit2_2.endsWith('9')" />
-            </x-bs.col2>
-        </x-bs.row>
-        <x-bs.row>
-            <x-bs.col2>
-                <x-input.select caption="単元分類３" id="lesson_category2_3" :select2=true>
-                    <option value="01">正負の数</option>
-                    <option value="02">文字と式</option>
-                    <option value="03">方程式</option>
-                    <option value="04">比例と反比例</option>
-                    <option value="05">平面図形</option>
-                    <option value="06">空間図形</option>
-                    <option value="07">データの分析と活用</option>
                     <option value="99">その他</option>
                 </x-input.select>
             </x-bs.col2>
+        </x-bs.row>
+        <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="単元３" id="lesson_unit2_3" :select2=true>
-                    <option value="09">その他</option>
+                <x-input.text caption="その他単元分類名２（フリー入力）" id="homework_category_name2_2"
+                    v-Show="form.homework_category2_2.endsWith('99')" />
+        </x-bs.col2>
+        <x-bs.col2>
+                    <x-input.text caption="その他単元名２（フリー入力）" id="homework_unit_name2_2"
+                        v-Show="form.homework_unit2_2.endsWith('99')" />
+            </x-bs.col2>
+        </x-bs.row>
+        <x-bs.row>
+            <x-bs.col2>
+                <x-input.select caption="単元分類３" id="homework_category2_3" :select2=true>
+                    <option value="0710201">正負の数</option>
+                    <option value="0710202">文字と式</option>
+                    <option value="0710203">方程式</option>
+                    <option value="0710204">比例と反比例</option>
+                    <option value="0710205">平面図形</option>
+                    <option value="0710206">空間図形</option>
+                    <option value="0710207">データの分析と活用</option>
+                    <option value="0710299">その他</option>
+                </x-input.select>
+            </x-bs.col2>
+            <x-bs.col2>
+                <x-input.select caption="単元３" id="homework_unit2_3" :select2=true>
+                    <option value="99">その他</option>
                 </x-input.select>
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
-                <x-input.text caption="その他単元分類名３（フリー入力）" id="lesson_category_name2_3"
-                    v-Show="form.lesson_category2_3.endsWith('9')" />
+                <x-input.text caption="その他単元分類名３（フリー入力）" id="homework_category_name2_3"
+                    v-Show="form.homework_category2_3.endsWith('99')" />
         </x-bs.col2>
         <x-bs.col2>
-                    <x-input.text caption="その他単元名３（フリー入力）" id="lesson_unit_name2_3"
-                        v-Show="form.lesson_unit2_3.endsWith('9')" />
+                    <x-input.text caption="その他単元名３（フリー入力）" id="homework_unit_name2_3"
+                        v-Show="form.homework_unit2_3.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
     </x-bs.card>
