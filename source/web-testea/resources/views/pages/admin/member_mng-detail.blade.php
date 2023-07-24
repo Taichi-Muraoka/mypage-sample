@@ -425,8 +425,6 @@
 </x-bs.card>
 
 {{-- モーダル --}}
-{{-- 規定情報 --}}
-@include('pages.admin.modal.member_mng_regulation-modal', ['modal_id' => 'modal-dtl-regulation'])
 {{-- 受講情報 --}}
 @include('pages.admin.modal.student_class-modal', ['modal_id' => 'modal-dtl-student_class'])
 {{-- 生徒成績 --}}

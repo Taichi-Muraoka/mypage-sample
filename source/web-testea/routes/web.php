@@ -233,7 +233,7 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     Route::post('/card/vd_input', [CardController::class, 'validationForInput'])->name('card-vd_input');
 
     //---------------------
-    // 契約内容
+    // 契約内容（生徒情報へメニュー名変更）
     //---------------------
 
     // 一覧
@@ -775,38 +775,38 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/member_mng/delete_desired_mng', [DesiredMngController::class, 'delete'])->name('desired_mng-delete');
 
     //---------------------
-    // 契約管理 モック
+    // 【機能削除】契約管理 モック
     //---------------------
 
-    // 契約管理一覧
-    Route::get('/member_mng/agreement_mng/{sid}', [AgreementMngController::class, 'index'])->name('agreement_mng');
+    // // 契約管理一覧
+    // Route::get('/member_mng/agreement_mng/{sid}', [AgreementMngController::class, 'index'])->name('agreement_mng');
 
-    // 詳細取得用
-    Route::post('/member_mng/get_data_agreement_mng', [AgreementMngController::class, 'getData'])->name('agreement_mng-get_data');
+    // // 詳細取得用
+    // Route::post('/member_mng/get_data_agreement_mng', [AgreementMngController::class, 'getData'])->name('agreement_mng-get_data');
 
-    // 検索結果取得
-    Route::post('/member_mng/search_agreement_mng', [AgreementMngController::class, 'search'])->name('agreement_mng-search');
+    // // 検索結果取得
+    // Route::post('/member_mng/search_agreement_mng', [AgreementMngController::class, 'search'])->name('agreement_mng-search');
 
-    // バリデーション(検索用)
-    Route::post('/member_mng/vd_search_agreement_mng', [AgreementMngController::class, 'validationForSearch'])->name('agreement_mng-vd_search');
+    // // バリデーション(検索用)
+    // Route::post('/member_mng/vd_search_agreement_mng', [AgreementMngController::class, 'validationForSearch'])->name('agreement_mng-vd_search');
 
-    // 契約登録画面
-    Route::get('/member_mng/agreement_mng/{sid}/new', [AgreementMngController::class, 'new'])->name('agreement_mng-new');
+    // // 契約登録画面
+    // Route::get('/member_mng/agreement_mng/{sid}/new', [AgreementMngController::class, 'new'])->name('agreement_mng-new');
 
-    // 新規登録処理
-    Route::post('/member_mng/create_agreement_mng', [AgreementMngController::class, 'create'])->name('agreement_mng-create');
+    // // 新規登録処理
+    // Route::post('/member_mng/create_agreement_mng', [AgreementMngController::class, 'create'])->name('agreement_mng-create');
 
-    // 契約編集画面
-    Route::get('/member_mng/agreement_mng/edit/{agreementId}', [AgreementMngController::class, 'edit'])->name('agreement_mng-edit');
+    // // 契約編集画面
+    // Route::get('/member_mng/agreement_mng/edit/{agreementId}', [AgreementMngController::class, 'edit'])->name('agreement_mng-edit');
 
-    // 編集処理
-    Route::post('/member_mng/update_agreement_mng', [AgreementMngController::class, 'update'])->name('agreement_mng-update');
+    // // 編集処理
+    // Route::post('/member_mng/update_agreement_mng', [AgreementMngController::class, 'update'])->name('agreement_mng-update');
 
-    // バリデーション(登録用)
-    Route::post('/member_mng/vd_input_agreement_mng', [AgreementMngController::class, 'validationForInput'])->name('agreement_mng-vd_input');
+    // // バリデーション(登録用)
+    // Route::post('/member_mng/vd_input_agreement_mng', [AgreementMngController::class, 'validationForInput'])->name('agreement_mng-vd_input');
 
-    // 削除処理
-    Route::post('/member_mng/delete_agreement_mng', [AgreementMngController::class, 'delete'])->name('agreement_mng-delete');
+    // // 削除処理
+    // Route::post('/member_mng/delete_agreement_mng', [AgreementMngController::class, 'delete'])->name('agreement_mng-delete');
 
     //---------------------
     // 連絡記録
@@ -1932,31 +1932,31 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/master_mng_course/delete', [MasterMngCourseController::class, 'delete'])->name('master_mng_course-delete');
 
     //---------------------
-    // 契約コースマスタ モック
+    // 【機能削除】契約コースマスタ モック
     //---------------------
-    // 一覧
-    Route::get('/master_mng_agreement', [MasterMngAgreementController::class, 'index'])->name('master_mng_agreement');
+    // // 一覧
+    // Route::get('/master_mng_agreement', [MasterMngAgreementController::class, 'index'])->name('master_mng_agreement');
 
-    // 詳細取得用
-    Route::post('/master_mng_agreement/get_data', [MasterMngAgreementController::class, 'getData'])->name('master_mng_agreement-get_data');
+    // // 詳細取得用
+    // Route::post('/master_mng_agreement/get_data', [MasterMngAgreementController::class, 'getData'])->name('master_mng_agreement-get_data');
 
-    // 登録
-    Route::get('/master_mng_agreement/new', [MasterMngAgreementController::class, 'new'])->name('master_mng_agreement-new');
+    // // 登録
+    // Route::get('/master_mng_agreement/new', [MasterMngAgreementController::class, 'new'])->name('master_mng_agreement-new');
 
-    // 登録処理
-    Route::post('/master_mng_agreement/create', [MasterMngAgreementController::class, 'create'])->name('master_mng_agreement-create');
+    // // 登録処理
+    // Route::post('/master_mng_agreement/create', [MasterMngAgreementController::class, 'create'])->name('master_mng_agreement-create');
 
-    // 編集
-    Route::get('/master_mng_agreement/edit/{agreementId}', [MasterMngAgreementController::class, 'edit'])->name('master_mng_agreement-edit');
+    // // 編集
+    // Route::get('/master_mng_agreement/edit/{agreementId}', [MasterMngAgreementController::class, 'edit'])->name('master_mng_agreement-edit');
 
-    // 編集処理
-    Route::post('/master_mng_agreement/update', [MasterMngAgreementController::class, 'update'])->name('master_mng_agreement-update');
+    // // 編集処理
+    // Route::post('/master_mng_agreement/update', [MasterMngAgreementController::class, 'update'])->name('master_mng_agreement-update');
 
-    // バリデーション(登録用)
-    Route::post('/master_mng_agreement/vd_input', [MasterMngAgreementController::class, 'validationForInput'])->name('master_mng_agreement-vd_input');
+    // // バリデーション(登録用)
+    // Route::post('/master_mng_agreement/vd_input', [MasterMngAgreementController::class, 'validationForInput'])->name('master_mng_agreement-vd_input');
 
-    // 削除処理
-    Route::post('/master_mng_agreement/delete', [MasterMngAgreementController::class, 'delete'])->name('master_mng_agreement-delete');
+    // // 削除処理
+    // Route::post('/master_mng_agreement/delete', [MasterMngAgreementController::class, 'delete'])->name('master_mng_agreement-delete');
 
     //---------------------
     // 時間割マスタ モック

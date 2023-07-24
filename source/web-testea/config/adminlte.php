@@ -386,7 +386,7 @@ return [
             'can'  => 'student',
         ],
         [
-            'text' => '契約内容',
+            'text' => '生徒情報',
             'route'  => 'agreement',
             'icon' => 'fas fa-file-contract',
             'can'  => 'student',
@@ -933,11 +933,11 @@ return [
                     'route' => 'master_mng_course',
                     'active' => ['master_mng_course*']
                 ],
-                [
-                    'text' => '契約コースマスタ管理',
-                    'route' => 'master_mng_agreement',
-                    'active' => ['master_mng_agreement*']
-                ],
+                // [
+                //     'text' => '契約コースマスタ管理',
+                //     'route' => 'master_mng_agreement',
+                //     'active' => ['master_mng_agreement*']
+                // ],
                 [
                     'text' => '時間割マスタ管理',
                     'route' => 'master_mng_timetable',
