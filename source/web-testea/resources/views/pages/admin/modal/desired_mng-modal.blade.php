@@ -18,7 +18,7 @@
         <td>1</td>
     </tr>
     <tr>
-        <th>学校名</th>
+        <th>受験校</th>
         <td>青山高等学校</td>
     </tr>
     <tr>
@@ -43,7 +43,7 @@
     </tr>
     <tr>
         <th>備考</th>
-        <td class="nl2br">補欠合格</td>
+        <td class="nl2br"></td>
     </tr>
 
 </x-bs.table>
