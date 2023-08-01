@@ -22,17 +22,14 @@
     @endif
 
     {{-- 共通フォーム --}}
-    <x-input.text caption="教材ID" id="text_id" :rules=$rules :editData=$editData/>
+    <x-input.text caption="教材コード" id="text_cd" :rules=$rules :editData=$editData/>
     <x-input.select caption="学年" id="grade_cd" :select2=true :editData=$editData>
-        <option value="1">小1</option>
-        <option value="2">小2</option>
-        <option value="3">小3</option>
+        <option value="1">中1</option>
+        <option value="2">中2</option>
+        <option value="3">中3</option>
     </x-input.select>
-    <x-input.select caption="科目" id="subject_cd" :select2=true :editData=$editData>
-        <option value="1">国語</option>
-        <option value="2">数学</option>
-        <option value="3">英語</option>
-    </x-input.select>
+    <x-input.text caption="授業科目コード" id="l_subject_cd" :rules=$rules :editData=$editData/>
+    <x-input.text caption="教材科目コード" id="t_subject_cd" :rules=$rules :editData=$editData/>
     <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData/>
 
     {{-- フッター --}}

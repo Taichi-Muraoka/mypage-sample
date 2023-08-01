@@ -99,7 +99,9 @@ class MasterMngGradeSubjectController extends Controller
     public function edit($gradeSubjectId)
     {
         return view('pages.admin.master_mng_grade_subject-input', [
-            'editData' => null,
+            'editData' => ['g_subject_cd'=>'001',
+                           'school_kind'=>'1',
+                           'name'=>'国語'],
             'rules' => $this->rulesForInput(null),
         ]);
     }

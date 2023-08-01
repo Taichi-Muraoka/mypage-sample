@@ -909,6 +909,16 @@ return [
                     'active' => ['master_mng_booth*']
                 ],
                 [
+                    'text' => '時間割マスタ管理',
+                    'route' => 'master_mng_timetable',
+                    'active' => ['master_mng_timetable*']
+                ],
+                [
+                    'text' => 'コースマスタ管理',
+                    'route' => 'master_mng_course',
+                    'active' => ['master_mng_course*']
+                ],
+                [
                     'text' => '授業科目マスタ管理',
                     'route' => 'master_mng_subject',
                     'active' => ['master_mng_subject*']
@@ -924,25 +934,20 @@ return [
                     'active' => ['master_mng_text*']
                 ],
                 [
+                    'text' => '授業単元分類マスタ管理',
+                    'route' => 'master_mng_category',
+                    'active' => ['master_mng_category*']
+                ],
+                [
                     'text' => '授業単元マスタ管理',
                     'route' => 'master_mng_unit',
                     'active' => ['master_mng_unit*']
-                ],
-                [
-                    'text' => 'コースマスタ管理',
-                    'route' => 'master_mng_course',
-                    'active' => ['master_mng_course*']
                 ],
                 // [
                 //     'text' => '契約コースマスタ管理',
                 //     'route' => 'master_mng_agreement',
                 //     'active' => ['master_mng_agreement*']
                 // ],
-                [
-                    'text' => '時間割マスタ管理',
-                    'route' => 'master_mng_timetable',
-                    'active' => ['master_mng_timetable*']
-                ],
                 [
                     'text' => 'システムマスタ管理',
                     'route' => 'master_mng_system',

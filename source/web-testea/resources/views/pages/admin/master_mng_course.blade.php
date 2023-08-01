@@ -17,32 +17,38 @@
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
 			<th width="20%">コースコード</th>
-			<th width="60%">名称</th>
-			<th width="10%"></th>
+			<th width="30%">名称</th>
+			<th width="30%">コース種別</th>
+			<th width="7%"></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}
 		<tr>
-			<td>101</td>
-			<td>個別指導</td>
+			<td>10100</td>
+			<td>個別指導コース</td>
+			<td>授業単</td>
 			<td>
-				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_course-edit',1) }}" />
 			</td>
 		</tr>
 		<tr>
-			<td>201</td>
-			<td>集団授業</td>
+			<td>20100</td>
+			<td>集団指導</td>
+			<td>授業複</td>
 			<td>
-				{{-- <x-button.list-dtl /> --}}
+                <x-button.list-edit href="{{ route('master_mng_course-edit',1) }}" />
+			</td>
+		</tr>
+		<tr>
+			<td>90100</td>
+			<td>自習</td>
+			<td>その他</td>
+			<td>
                 <x-button.list-edit href="{{ route('master_mng_course-edit',1) }}" />
 			</td>
 		</tr>
 
 	</x-bs.table>
 </x-bs.card-list>
-
-{{-- 詳細 --}}
-@include('pages.admin.modal.master_mng_course-modal')
 
 @stop

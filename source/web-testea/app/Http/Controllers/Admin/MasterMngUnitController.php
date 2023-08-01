@@ -99,7 +99,9 @@ class MasterMngUnitController extends Controller
     public function edit($unitId)
     {
         return view('pages.admin.master_mng_unit-input', [
-            'editData' => null,
+            'editData' => ['unit_category_cd'=>'0710201',
+                           'unit_cd'=>'01',
+                           'name'=>'負の数とは'],
             'rules' => $this->rulesForInput(null),
         ]);
     }

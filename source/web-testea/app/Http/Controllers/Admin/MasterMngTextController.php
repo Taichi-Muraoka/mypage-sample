@@ -99,7 +99,11 @@ class MasterMngTextController extends Controller
     public function edit($textId)
     {
         return view('pages.admin.master_mng_text-input', [
-            'editData' => null,
+            'editData' => ['text_cd'=>'07101001',
+                           'grade_cd'=>'1',
+                           'l_subject_cd'=>'101',
+                           't_subject_cd'=>'101',
+                           'name'=>'中1英語基礎テキスト'],
             'rules' => $this->rulesForInput(null),
         ]);
     }

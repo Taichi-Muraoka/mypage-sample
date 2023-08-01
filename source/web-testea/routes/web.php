@@ -689,6 +689,7 @@ use App\Http\Controllers\Admin\MasterMngBoothController;
 use App\Http\Controllers\Admin\MasterMngSubjectController;
 use App\Http\Controllers\Admin\MasterMngGradeSubjectController;
 use App\Http\Controllers\Admin\MasterMngTextController;
+use App\Http\Controllers\Admin\MasterMngCategoryController;
 use App\Http\Controllers\Admin\MasterMngUnitController;
 use App\Http\Controllers\Admin\MasterMngCourseController;
 use App\Http\Controllers\Admin\MasterMngAgreementController;
@@ -1878,6 +1879,33 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/master_mng_text/delete', [MasterMngTextController::class, 'delete'])->name('master_mng_text-delete');
 
     //---------------------
+    // 授業単元分類マスタ モック
+    //---------------------
+    // 一覧
+    Route::get('/master_mng_category', [MasterMngCategoryController::class, 'index'])->name('master_mng_category');
+
+    // 詳細取得用
+    Route::post('/master_mng_category/get_data', [MasterMngCategoryController::class, 'getData'])->name('master_mng_category-get_data');
+
+    // 登録
+    Route::get('/master_mng_category/new', [MasterMngCategoryController::class, 'new'])->name('master_mng_category-new');
+
+    // 登録処理
+    Route::post('/master_mng_category/create', [MasterMngCategoryController::class, 'create'])->name('master_mng_category-create');
+
+    // 編集
+    Route::get('/master_mng_category/edit/{unitId}', [MasterMngCategoryController::class, 'edit'])->name('master_mng_category-edit');
+
+    // 編集処理
+    Route::post('/master_mng_category/update', [MasterMngCategoryController::class, 'update'])->name('master_mng_category-update');
+
+    // バリデーション(登録用)
+    Route::post('/master_mng_category/vd_input', [MasterMngCategoryController::class, 'validationForInput'])->name('master_mng_category-vd_input');
+
+    // 削除処理
+    Route::post('/master_mng_category/delete', [MasterMngCategoryController::class, 'delete'])->name('master_mng_category-delete');
+
+    //---------------------
     // 授業単元マスタ モック
     //---------------------
     // 一覧
@@ -1993,6 +2021,12 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 詳細取得用
     Route::post('/master_mng_system/get_data', [MasterMngSystemController::class, 'getData'])->name('master_mng_system-get_data');
+
+    // 登録
+    Route::get('/master_mng_system/new', [MasterMngSystemController::class, 'new'])->name('master_mng_system-new');
+
+    // 登録処理
+    Route::post('/master_mng_system/create', [MasterMngSystemController::class, 'create'])->name('master_mng_system-create');
 
     // 編集
     Route::get('/master_mng_system/edit/{systemId}', [MasterMngSystemController::class, 'edit'])->name('master_mng_system-edit');
