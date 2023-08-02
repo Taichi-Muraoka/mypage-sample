@@ -71,7 +71,6 @@
             <td>{{$invoice->note}}</td>
         </tr>
         @endif
-
     </x-bs.table>
 
     {{-- フッター --}}

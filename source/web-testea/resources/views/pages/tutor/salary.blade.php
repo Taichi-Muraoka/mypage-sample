@@ -18,7 +18,7 @@
 
         {{-- テーブル行 --}}
         <tr v-for="item in paginator.data" v-cloak>
-            <td>@{{item.salary_date|formatYmString}}支払い分給与</td>
+            <td>@{{item.salary_date|formatYmString}}分給与</td>
             <td>
                 <x-button.list-dtl vueHref="'{{ route('salary-detail', '') }}/' + item.id" caption="給与情報" />
             </td>
