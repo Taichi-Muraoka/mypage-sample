@@ -11,7 +11,8 @@
 <x-bs.card :form=true>
 
     <p>請求情報ファイルの取込みを行います。<br>
-    個別教室用・家庭教師用それぞれの請求情報ファイルを指定してください。</p>
+    請求情報ファイル（csv）を1つにまとめたZipファイルを指定してください。</p>
+    </p>
 
     {{-- 余白 --}}
     <div class="mb-3"></div>
@@ -26,9 +27,12 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.file caption="請求情報ファイル（個別教室）" id="upload_file_kobetsu" :rules=$rules />
+    <x-input.file caption="請求情報ファイル" id="upload_file_kobetsu" :rules=$rules />
 
-    <x-input.file caption="請求情報ファイル（家庭教師）" id="upload_file_katei" :rules=$rules />
+    <x-bs.callout>
+        ファイル形式: Zip形式<br>
+        各校舎の請求情報ファイル（csv）をまとめて圧縮し、1つのZipファイルを作成してください。
+    </x-bs.callout>
 
     {{-- hidden --}}
     <x-input.hidden id="invoiceDate" :editData=$editData />
@@ -41,12 +45,6 @@
         </div>
     </x-slot>
 
-    <x-bs.callout>
-        ファイル形式：CSV形式
-    </x-bs.callout>
-
 </x-bs.card>
-
-
 
 @stop

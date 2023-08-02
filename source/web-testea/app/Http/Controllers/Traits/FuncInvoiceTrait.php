@@ -84,6 +84,15 @@ trait FuncInvoiceTrait
             ->orderBy('invoice.lesson_type', 'desc')
             ->first();
 
+
+        $invoice['invoice_date'] = strtotime('2023-07-01');
+        $invoice['pay_name'] = "口座引落";
+        $invoice['issue_date'] = strtotime('2023-06-19');
+        $invoice['bill_date'] = strtotime('2023-07-04');
+        $invoice['agreement1'] = "7月分お月謝期間：7月10日（月）～8月5日（土）実施分となります。";
+        $invoice['agreement2'] = "※7月21日（金）より夏期特別期間となります。";
+        $invoice['note'] = "ご登録いただきました口座から引落をさせていただきます。";
+
         // クエリを作成（請求情報詳細）
         $query = InvoiceDetail::query();
 
@@ -96,10 +105,12 @@ trait FuncInvoiceTrait
             // データを取得
             ->select(
                 'invoice_detail.cost_name',
+                'invoice_detail.invoice_seq',
                 'invoice_detail.cost'
             )
             // 金額0のデータは除外
             ->where('invoice_detail.cost', '!=', 0)
+            //->where('invoice_detail.invoice_seq', 1)
             ->orderBy('lesson_type')
             ->orderBy('order_code')
             ->get();
@@ -117,8 +128,21 @@ trait FuncInvoiceTrait
             $invoice['billflg'] = 0;
         }
 
+        $invoiceDatails[0]['cost_name'] = "7月分授業料";
+        $invoiceDatails[0]['unit_cost'] = 8690;
+        $invoiceDatails[0]['times'] = 8;
+        $invoiceDatails[0]['cost'] = 69520;
+        $invoiceDatails[1]['cost_name'] = "7月分授業料2";
+        $invoiceDatails[1]['unit_cost'] = 6083;
+        $invoiceDatails[1]['times'] = 8;
+        $invoiceDatails[1]['cost'] = 48664;
+        //$invoiceDatails[2]['cost_name'] = "入会金";
+        //$invoiceDatails[2]['unit_cost'] = 0;
+        //$invoiceDatails[2]['times'] = 0;
+        //$invoiceDatails[2]['cost'] = 11000;
+
         // 金額合計の算出
-        $invoice['costsum'] = 0;
+        $invoice['cost_sum'] = 0;
         foreach ($invoiceDatails as $invoiceDatail) {
             $invoice['cost_sum'] = $invoice['cost_sum'] + $invoiceDatail->cost;
         }
@@ -157,30 +181,30 @@ trait FuncInvoiceTrait
 
         // 右上のロゴの表示(HTMLでは難しいのでここで指定)
         // writeHTMLの内容が長すぎる場合、2ページ目にも表示されるので、2ページ目が想定される場合は対応が必要
-        $pdf->Image(resource_path('pdf/invoice.png'), 121, 10, 25.0);
-        $pdf->Image(resource_path('pdf/free-dial.png'), 149, 30.5, 5.0);
+        $pdf->Image(resource_path('pdf/testea_logo1.png'), 140, 10, 45.0);
+        //$pdf->Image(resource_path('pdf/free-dial.png'), 149, 30.5, 5.0);
 
-        $pdf->SetFont('ipaexg', '', 10);
-        $pdf->SetXY(148, 10);
-        $pdf->Write(1, 'コー・ワークス塾');
+        //$pdf->SetFont('ipaexg', '', 12);
+        //$pdf->SetXY(148, 15);
+        //$pdf->Write(1, '個別指導塾TESTEA（久我山校）');
 
-        $pdf->SetFont('ipaexg', '', 12);
-        $pdf->SetXY(148, 15);
-        $pdf->Write(1, '株式会社コー・ワークス');
+        $pdf->SetFont('ipaexg', '', 11);
+        $pdf->SetXY(138, 25);
+        $pdf->Write(1, '個別指導塾TESTEA（久我山校）');
 
         $pdf->SetFont('ipaexg', '', 8);
-        $pdf->SetXY(148, 21);
-        $pdf->Write(1, '980-0811');
+        $pdf->SetXY(138, 30);
+        $pdf->Write(1, '〒168-0082');
 
-        $pdf->SetFont('ipaexg', '', 6);
-        $pdf->SetXY(148, 25);
-        $pdf->Write(1, '宮城県仙台市青葉区一番町1-8-10');
-        $pdf->SetXY(148, 28);
-        $pdf->Write(1, '京成壱番町ビル203');
+        $pdf->SetFont('ipaexg', '', 9);
+        $pdf->SetXY(138, 34);
+        $pdf->Write(1, '東京都杉並区久我山2-16-27');
+        $pdf->SetXY(138, 38);
+        $pdf->Write(1, '関口花園ビル2F');
 
-        $pdf->SetFont('ipaexg', '', 7);
-        $pdf->SetXY(154, 31.5);
-        $pdf->Write(1, '0120-XX-XXXX FAX 022-XXX-XXXX');
+        $pdf->SetFont('ipaexg', '', 8);
+        $pdf->SetXY(138, 42);
+        $pdf->Write(1, 'TEL 03-3335-2774 FAX 03-6324-9054');
 
         $date_str = $data['invoice']->invoice_date->format('Y年m月');
         $student_name = $data['invoice']->sname;
