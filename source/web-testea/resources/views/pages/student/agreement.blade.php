@@ -63,41 +63,22 @@
     <x-bs.table :button=true :smartPhone=true class="inner-card">
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">バッジ種別</th>
             <th>バッジ</th>
+            <th width="15%">合計</th>
             <th width="10%"></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <x-bs.td-sp>通塾</x-bs.td-sp>
             <x-bs.td-sp>
                 @for ($i = 1; $i <= 1; $i++) 
-                <img src="/img/gold.png" class="user-image"  width="50" height="50" alt="badge">
+                <img src="/img/gold.png" class="user-image"  width="60" height="60" alt="badge">
                 @endfor
-            </x-bs.td-sp>
-            <td>
-                <x-button.list-dtl dataTarget="#" />
-            </td>
-        </tr>
-        <tr>
-            <x-bs.td-sp>成績</x-bs.td-sp>
-            <x-bs.td-sp>
-                @for ($i = 1; $i <= 1; $i++) 
+                @for ($i = 1; $i <= 9; $i++) 
                 <img src="/img/silver.png" class="user-image"  width="50" height="50" alt="badge">
                 @endfor
             </x-bs.td-sp>
-            <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-badge" />
-            </td>
-        </tr>
-        <tr>
-            <x-bs.td-sp>紹介</x-bs.td-sp>
-            <x-bs.td-sp>
-                @for ($i = 1; $i <= 2; $i++) 
-                <img src="/img/bronze.png" class="user-image"  width="50" height="50" alt="badge">
-                @endfor
-            </x-bs.td-sp>
+            <x-bs.td-sp>19</x-bs.td-sp>
             <td>
                 <x-button.list-dtl dataTarget="#modal-dtl-badge" />
             </td>
