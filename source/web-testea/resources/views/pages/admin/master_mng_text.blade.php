@@ -4,6 +4,41 @@
 
 @section('content')
 
+{{-- 検索フォーム --}}
+<x-bs.card :search=true>
+
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.select id="cls_cd" caption="学年" :select2=true >
+                <option value="1">中1</option>
+                <option value="2">中2</option>
+                <option value="3">中3</option>
+                <option value="4">高1</option>
+                <option value="5">高2</option>
+                <option value="6">高3</option>
+            </x-input.select>
+        </x-bs.col2>
+		<x-bs.col2>
+            <x-input.select id="l_subject_cd" caption="授業科目" :select2=true >
+                <option value="1">英語</option>
+                <option value="2">数学</option>
+                <option value="3">国語</option>
+            </x-input.select>
+        </x-bs.col2>
+    </x-bs.row>
+	<x-bs.row>
+		<x-bs.col2>
+            <x-input.select id="t_subject_cd" caption="教材科目" :select2=true >
+                <option value="1">英語</option>
+                <option value="2">数学</option>
+                <option value="3">国語</option>
+            </x-input.select>
+        </x-bs.col2>
+    </x-bs.row>
+
+</x-bs.card>
+
+{{-- 結果リスト --}}
 <x-bs.card-list>
 
 	{{-- カードヘッダ右 --}}
@@ -12,7 +47,7 @@
     </x-slot>
 
 	{{-- テーブル --}}
-	<x-bs.table>
+	<x-bs.table :button=true>
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">

@@ -28,8 +28,16 @@
         <option value="2">中2</option>
         <option value="3">中3</option>
     </x-input.select>
-    <x-input.text caption="授業科目コード" id="l_subject_cd" :rules=$rules :editData=$editData/>
-    <x-input.text caption="教材科目コード" id="t_subject_cd" :rules=$rules :editData=$editData/>
+    <x-input.select caption="授業科目コード" id="l_subject_cd" :select2=true :editData=$editData>
+        <option value="1">101（英語）</option>
+        <option value="2">102（数学）</option>
+        <option value="3">103（国語）</option>
+    </x-input.select>
+    <x-input.select caption="教材科目コード" id="t_subject_cd" :select2=true :editData=$editData>
+        <option value="1">101（英語）</option>
+        <option value="2">102（数学）</option>
+        <option value="3">103（国語）</option>
+    </x-input.select>
     <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData/>
 
     {{-- フッター --}}
