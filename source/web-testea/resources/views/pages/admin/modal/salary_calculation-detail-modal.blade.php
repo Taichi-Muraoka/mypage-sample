@@ -13,6 +13,14 @@
         <th>講師名</th>
         <td>CWテスト講師１０１</td>
     </tr>
+    <tr>
+        <th>出社回数</th>
+        <td>10</td>
+    </tr>
+    <tr>
+        <th>授業時給(ベース給)</th>
+        <td>1300</td>
+    </tr>
 
 </x-bs.table>
 
@@ -53,6 +61,18 @@
     <tr>
         <td>家庭教師</td>
         <td>6</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>演習</td>
+        <td>2</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>ハイプラン</td>
+        <td>10</td>
         <td></td>
         <td></td>
     </tr>
