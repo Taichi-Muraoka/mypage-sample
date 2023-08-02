@@ -1677,8 +1677,11 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 年度スケジュール取込
     //----------------------
 
-    // 取込
+    // 取込一覧
     Route::get('/year_schedule_import', [YearScheduleImportController::class, 'index'])->name('year_schedule_import');
+
+    // 取り込み
+    Route::get('/year_schedule_import/import/{YearScheduleDate}', [YearScheduleImportController::class, 'import'])->name('year_schedule_import-import');
 
     // 取込処理
     Route::post('/year_schedule_import/create', [YearScheduleImportController::class, 'create'])->name('year_schedule_import-create');

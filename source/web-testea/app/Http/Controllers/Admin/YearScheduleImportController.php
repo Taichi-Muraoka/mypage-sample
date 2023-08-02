@@ -76,7 +76,7 @@ class YearScheduleImportController extends Controller
     //==========================
 
     /**
-     * 初期画面
+     * 初期画面(一覧)
      *
      * @return view
      */
@@ -85,6 +85,16 @@ class YearScheduleImportController extends Controller
 
         return view('pages.admin.year_schedule_import', [
             'rules' => $this->rulesForInput()
+        ]);
+    }
+
+    // 取り込み画面
+    public function import($school)
+    {
+
+        return view('pages.admin.year_schedule_import-import', [
+            'rules' => $this->rulesForInput(),
+            'school' => $school
         ]);
     }
 
