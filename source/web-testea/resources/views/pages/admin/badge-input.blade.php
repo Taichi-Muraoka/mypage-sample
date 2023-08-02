@@ -29,12 +29,6 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.select caption="バッジ種別" id="badge_kind" :select2=true :select2Search=false :editData="$editData">
-        <option value="1" selected>通塾</option>
-        <option value="2">成績</option>
-        <option value="3">紹介</option>
-    </x-input.select>
-
     <x-input.select caption="校舎" id="roomcd" :select2=true :editData="$editData">
         <option value="1">久我山</option>
         <option value="2">西永福</option>
