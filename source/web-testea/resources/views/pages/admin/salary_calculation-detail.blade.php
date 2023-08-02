@@ -20,10 +20,6 @@
             <td>2023/03/31</td>
         </tr>
         <tr>
-            <th>合計金額</th>
-            <td>1,000,000</td>
-        </tr>
-        <tr>
             <th>状態</th>
             <td>集計済</td>
         </tr>
@@ -53,17 +49,39 @@
 
             {{-- テーブルタイトル行 --}}
             <x-slot name="thead">
-                <th width="15%">講師ID</th>
-                <th>講師名</th>
-                <th>金額</th>
-                <th></th>
+                <th width="10%">講師ID</th>
+                <th width="10%">講師名</th>
+                <th width="10%">出社回数</th>
+                <th width="10%">授業時給(ベース給)</th>
+                <th width="5%">個別</th>
+                <th width="5%">１対２</th>
+                <th width="5%">１対３</th>
+                <th width="5%">集団</th>
+                <th width="5%">家庭教師</th>
+                <th width="5%">演習</th>
+                <th width="5%">ハイプラン</th>
+                <th width="5%">事務作業</th>
+                <th width="5%">その他経費</th>
+                <th width="5%">交通費</th>
+                <th width="5%"></th>
             </x-slot>
 
             {{-- テーブル行 --}}
             <tr>
                 <td>101</td>
                 <td>CWテスト講師１０１</td>
-                <td>77,000</td>
+                <td>10</td>
+                <td>1300</td>
+                <td>18</td>
+                <td>3</td>
+                <td>4.5</td>
+                <td>3</td>
+                <td>6</td>
+                <td>2</td>
+                <td>10</td>
+                <td>2</td>
+                <td>1200</td>
+                <td>3200</td>
                 <td>
                     {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                     <x-button.list-dtl/>

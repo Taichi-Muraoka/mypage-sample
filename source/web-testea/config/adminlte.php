@@ -984,15 +984,15 @@ return [
                     'route' => 'import_school_code',
                     'active' => ['import_school_code*']
                 ],
+                [
+                    'text' => '年間授業カレンダー情報取込',
+                    'route' => 'year_schedule_import',
+                    'active' => ['year_schedule_import*']
+                ],
                 //[
                 //    'text' => '振替残数クリア',
                 //    'route' => 'under_construction',
                 //],
-                // [
-                //     'text' => '年度スケジュール取込',
-                //     'route' => 'year_schedule_import',
-                //     'active' => ['year_schedule_import*']
-                // ],
             ]
         ],
         [

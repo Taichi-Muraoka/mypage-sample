@@ -21,15 +21,7 @@
             <x-input.text id="name" caption="生徒名" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
-    <x-bs.row>
-        <x-bs.col2>
-            <x-input.select id="badge_type" caption="バッジ種別" :select2=true >
-                <option value="1">紹介</option>
-                <option value="2">通塾</option>
-                <option value="3">成績</option>
-            </x-input.select>
-        </x-bs.col2>
-    </x-bs.row>
+
     <x-bs.row>
         <x-bs.col2>
             <x-input.date-picker caption="認定日 From" id="date_from" />
@@ -54,7 +46,6 @@
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
             <th width="15%">認定日</th>
-            <th width="10%">バッジ種別</th>
             <th width="10%">校舎</th>
             <th width="15%">生徒名</th>
             <th width="15%">担当者名</th>
@@ -64,7 +55,6 @@
         {{-- テーブル行 --}}
         <tr>
             <td>2023/05/10</td>
-            <td>紹介</td>
             <td>久我山</td>
             <td>CWテスト生徒１</td>
             <td>鈴木　花子</td>
@@ -72,7 +62,6 @@
         </tr>
         <tr>
             <td>2023/04/01</td>
-            <td>通塾</td>
             <td>久我山</td>
             <td>CWテスト生徒１</td>
             <td>鈴木　花子</td>
@@ -80,7 +69,6 @@
         </tr>
         <tr>
             <td>2022/03/20</td>
-            <td>紹介</td>
             <td>久我山</td>
             <td>CWテスト生徒２</td>
             <td>鈴木　花子</td>
@@ -88,7 +76,6 @@
         </tr>
         <tr>
             <td>2022/02/20</td>
-            <td>成績</td>
             <td>久我山</td>
             <td>CWテスト生徒２</td>
             <td>鈴木　花子</td>
