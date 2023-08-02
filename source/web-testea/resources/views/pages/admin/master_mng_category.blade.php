@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '授業教材マスタ管理')
+@section('title', '授業単元分類マスタ管理')
 
 @section('content')
 
@@ -19,15 +19,6 @@
             </x-input.select>
         </x-bs.col2>
 		<x-bs.col2>
-            <x-input.select id="l_subject_cd" caption="授業科目" :select2=true >
-                <option value="1">英語</option>
-                <option value="2">数学</option>
-                <option value="3">国語</option>
-            </x-input.select>
-        </x-bs.col2>
-    </x-bs.row>
-	<x-bs.row>
-		<x-bs.col2>
             <x-input.select id="t_subject_cd" caption="教材科目" :select2=true >
                 <option value="1">英語</option>
                 <option value="2">数学</option>
@@ -43,7 +34,7 @@
 
 	{{-- カードヘッダ右 --}}
     <x-slot name="tools">
-        <x-button.new href="{{ route('master_mng_text-new') }}" :small=true />
+        <x-button.new href="{{ route('master_mng_category-new') }}" :small=true />
     </x-slot>
 
 	{{-- テーブル --}}
@@ -51,9 +42,8 @@
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
-			<th>教材コード</th>
+			<th>単元分類コード</th>
 			<th>学年</th>
-			<th>授業科目コード</th>
 			<th>教材科目コード</th>
 			<th>名称</th>
 			<th width="7%"></th>
@@ -61,33 +51,30 @@
 
 		{{-- テーブル行 --}}
 		<tr>
-			<td>07101001</td>
+			<td>0710201</td>
 			<td>中1</td>
-			<td>101（英語）</td>
-			<td>101（英語）</td>
-			<td>中1英語基礎テキスト</td>
+			<td>102（数学）</td>
+			<td>正負の数</td>
 			<td>
-                <x-button.list-edit href="{{ route('master_mng_text-edit',1) }}" />
+                <x-button.list-edit href="{{ route('master_mng_category-edit',1) }}" />
 			</td>
 		</tr>
 		<tr>
-			<td>07501201</td>
+			<td>0710202</td>
 			<td>中1</td>
-			<td>501（数学・英語）</td>
 			<td>102（数学）</td>
-			<td>中1数学ドリル</td>
+			<td>方程式</td>
 			<td>
-                <x-button.list-edit href="{{ route('master_mng_text-edit',1) }}" />
+                <x-button.list-edit href="{{ route('master_mng_category-edit',1) }}" />
 			</td>
 		</tr>
 		<tr>
-			<td>07102099</td>
+			<td>0710299</td>
 			<td>中1</td>
 			<td>102（数学）</td>
-			<td>102（数学）</td>
-			<td>中1その他</td>
+			<td>その他</td>
 			<td>
-                <x-button.list-edit href="{{ route('master_mng_text-edit',1) }}" />
+                <x-button.list-edit href="{{ route('master_mng_category-edit',1) }}" />
 			</td>
 		</tr>
 

@@ -75,7 +75,8 @@ class MasterMngSystemController extends Controller
     public function edit($systemId)
     {
         return view('pages.admin.master_mng_system-input', [
-            'editData' => null,
+            'editData' => ['name'=>'現年度',
+                           'value_num'=>'2023'],
             'rules' => $this->rulesForInput(null),
         ]);
     }

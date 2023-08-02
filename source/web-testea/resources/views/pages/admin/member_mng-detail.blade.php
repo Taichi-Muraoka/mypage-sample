@@ -101,7 +101,7 @@
         <x-slot name="thead">
             <th width="10%">受験年度</th>
             <th width="10%">志望順</th>
-            <th>学校名</th>
+            <th>受験校</th>
             <th>学部・学科名</th>
             <th>受験日程名</th>
             <th>受験日</th>
@@ -364,12 +364,8 @@
     {{-- 詳細を表示 --}}
     <x-bs.table :hover=false :vHeader=true class="mb-4">
         <tr>
-            <th width="15%">通塾バッジ数</th>
-            <td width="18%" class="t-price">1</td>
-            <th width="15%">成績バッジ数</th>
-            <td width="18%" class="t-price">1</td>
-            <th width="15%">紹介バッジ数</th>
-            <td width="18%" class="t-price">2</td>
+            <th>バッジ数合計</th>
+            <td>19</td>
         </tr>
     </x-bs.table>
 
@@ -379,8 +375,7 @@
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
             <th width="15%">認定日</th>
-            <th width="10%">バッジ種別</th>
-            <th width="10%">校舎</th>
+            <th width="15%">校舎</th>
             <th width="15%">担当者名</th>
             <th>認定理由</th>
         </x-slot>
@@ -388,28 +383,24 @@
         {{-- テーブル行 --}}
         <tr>
             <td>2023/05/10</td>
-            <td>紹介</td>
             <td>久我山</td>
             <td>鈴木　花子</td>
             <td>生徒紹介（佐藤次郎さん）</td>
         </tr>
         <tr>
             <td>2023/04/01</td>
-            <td>通塾</td>
             <td>久我山</td>
             <td>鈴木　花子</td>
             <td>契約期間が３年を超えた</td>
         </tr>
         <tr>
             <td>2022/03/20</td>
-            <td>紹介</td>
             <td>久我山</td>
             <td>鈴木　花子</td>
             <td>生徒紹介（仙台太郎さん）</td>
         </tr>
         <tr>
             <td>2022/02/20</td>
-            <td>成績</td>
             <td>久我山</td>
             <td>鈴木　花子</td>
             <td>成績UP</td>
@@ -425,8 +416,6 @@
 </x-bs.card>
 
 {{-- モーダル --}}
-{{-- 規定情報 --}}
-@include('pages.admin.modal.member_mng_regulation-modal', ['modal_id' => 'modal-dtl-regulation'])
 {{-- 受講情報 --}}
 @include('pages.admin.modal.student_class-modal', ['modal_id' => 'modal-dtl-student_class'])
 {{-- 生徒成績 --}}

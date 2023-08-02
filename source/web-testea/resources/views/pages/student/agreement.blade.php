@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '契約内容')
+@section('title', '生徒情報')
 
 @section('content')
 
@@ -63,41 +63,22 @@
     <x-bs.table :button=true :smartPhone=true class="inner-card">
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">バッジ種別</th>
             <th>バッジ</th>
+            <th width="15%">合計</th>
             <th width="10%"></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <x-bs.td-sp>通塾</x-bs.td-sp>
             <x-bs.td-sp>
                 @for ($i = 1; $i <= 1; $i++) 
-                <img src="/img/gold.png" class="user-image"  width="50" height="50" alt="badge">
+                <img src="/img/gold.png" class="user-image"  width="60" height="60" alt="badge">
                 @endfor
-            </x-bs.td-sp>
-            <td>
-                <x-button.list-dtl dataTarget="#" />
-            </td>
-        </tr>
-        <tr>
-            <x-bs.td-sp>成績</x-bs.td-sp>
-            <x-bs.td-sp>
-                @for ($i = 1; $i <= 1; $i++) 
+                @for ($i = 1; $i <= 9; $i++) 
                 <img src="/img/silver.png" class="user-image"  width="50" height="50" alt="badge">
                 @endfor
             </x-bs.td-sp>
-            <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-badge" />
-            </td>
-        </tr>
-        <tr>
-            <x-bs.td-sp>紹介</x-bs.td-sp>
-            <x-bs.td-sp>
-                @for ($i = 1; $i <= 2; $i++) 
-                <img src="/img/bronze.png" class="user-image"  width="50" height="50" alt="badge">
-                @endfor
-            </x-bs.td-sp>
+            <x-bs.td-sp>19</x-bs.td-sp>
             <td>
                 <x-button.list-dtl dataTarget="#modal-dtl-badge" />
             </td>
@@ -107,30 +88,28 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-bs.form-title>契約情報</x-bs.form-title>
+    <x-bs.form-title>レギュラー授業情報</x-bs.form-title>
 
     {{-- テーブル --}}
     <x-bs.table :button=true :smartPhone=true class="inner-card">
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="10%">授業種別</th>
-            <th>契約コース名</th>
-            <th width="10%">開始日</th>
-            <th width="10%">終了日</th>
+            <th width="10%">曜日</th>
+            <th width="10%">時限</th>
+            <th width="10%">校舎</th>
+            <th width="20%">コース名</th>
+            <th width="20%">講師名</th>
+            <th width="20%">科目</th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <x-bs.td-sp caption="授業種別">個別</x-bs.td-sp>
-            <x-bs.td-sp caption="契約コース名">個別指導 中学生コース（受験準備学年） 月4回 90分</x-bs.td-sp>
-            <x-bs.td-sp caption="開始日">2023/03/01</x-bs.td-sp>
-            <x-bs.td-sp caption="終了日">2024/02/29</x-bs.td-sp>
-        </tr>
-        <tr>
-            <x-bs.td-sp caption="授業種別">集団</x-bs.td-sp>
-            <x-bs.td-sp caption="契約コース名">集団授業 中学生 英語・数学総復習パック</x-bs.td-sp>
-            <x-bs.td-sp caption="開始日">2022/07/01</x-bs.td-sp>
-            <x-bs.td-sp caption="終了日">2022/08/31</x-bs.td-sp>
+            <td>火</td>
+            <td>6</td>
+            <td>久我山</td>
+            <td>個別指導コース</td>
+            <td>CWテスト講師１０１</td>
+            <td>英語</td>
         </tr>
     </x-bs.table>
 

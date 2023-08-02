@@ -99,7 +99,11 @@ class MasterMngTimetableController extends Controller
     public function edit($timetableId)
     {
         return view('pages.admin.master_mng_timetable-input', [
-            'editData' => null,
+            'editData' => ['campus_cd'=>'1',
+                           'period_no'=>'1',
+                           'start_time'=>'15:00',
+                           'end_time'=>'16:30',
+                           'kind_cd'=>'1'],
             'rules' => $this->rulesForInput(null),
         ]);
     }

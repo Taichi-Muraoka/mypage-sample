@@ -22,15 +22,21 @@
     @endif
 
     {{-- 共通フォーム --}}
-    <x-input.select caption="校舎" id="school_kind" :select2=true :editData=$editData>
+    <x-input.select caption="校舎" id="campus_cd" :select2=true :editData=$editData>
         <option value="1">久我山</option>
         <option value="2">西永福</option>
         <option value="3">下高井戸</option>
     </x-input.select>
-    <x-input.text caption="指導ブースコード" id="booth_cd" :rules=$rules :editData=$editData/>
+    <x-input.text caption="ブースコード" id="booth_cd" :rules=$rules :editData=$editData/>
+    <x-input.select caption="用途種別" id="usage_kind" :select2=true :select2Search=false :editData=$editData >
+        <option value="1">授業用</option>
+        <option value="2">オンライン用</option>
+        <option value="3">面談用</option>
+        <option value="4">両者オンライン</option>
+        <option value="5">家庭教師</option>
+    </x-input.select>
     <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData/>
     <x-input.text caption="表示順" id="disp_order" :rules=$rules :editData=$editData/>
-    <x-input.text caption="cat" id="cat" :rules=$rules :editData=$editData/>
 
     {{-- フッター --}}
     <x-slot name="footer">

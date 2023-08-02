@@ -99,7 +99,9 @@ class MasterMngCourseController extends Controller
     public function edit($courseId)
     {
         return view('pages.admin.master_mng_course-input', [
-            'editData' => null,
+            'editData' => ['course_cd'=>'10100',
+                           'name'=>'個別指導コース',
+                           'course_kind'=>'1',],
             'rules' => $this->rulesForInput(null),
         ]);
     }

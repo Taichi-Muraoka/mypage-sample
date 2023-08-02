@@ -99,7 +99,8 @@ class MasterMngSubjectController extends Controller
     public function edit($subjectId)
     {
         return view('pages.admin.master_mng_subject-input', [
-            'editData' => null,
+            'editData' => ['subject_cd'=>'101',
+                           'name'=>'英語'],
             'rules' => $this->rulesForInput(null),
         ]);
     }

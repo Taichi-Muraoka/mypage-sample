@@ -27,7 +27,7 @@
         <x-slot name="thead">
             <th>受験年度</th>
             <th>志望順</th>
-            <th>学校名</th>
+            <th>受験校</th>
             <th>学部・学科名</th>
             <th>受験日程名</th>
             <th>受験日</th>

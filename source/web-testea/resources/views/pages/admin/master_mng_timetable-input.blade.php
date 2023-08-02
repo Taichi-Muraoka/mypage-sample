@@ -22,7 +22,7 @@
     @endif
 
     {{-- 共通フォーム --}}
-    <x-input.select caption="校舎" id="school_kind" :select2=true :editData=$editData>
+    <x-input.select caption="校舎" id="campus_cd" :select2=true :editData=$editData>
         <option value="1">久我山</option>
         <option value="2">西永福</option>
         <option value="3">下高井戸</option>

@@ -21,9 +21,9 @@ use App\Libs\AuthEx;
 use App\Http\Controllers\Traits\FuncTransferTrait;
 
 /**
- * 校舎マスタ管理 - コントローラ
+ * 授業単元分類マスタ管理 - コントローラ
  */
-class MasterMngCampusController extends Controller
+class MasterMngCategoryController extends Controller
 {
     /**
      * コンストラクタ
@@ -45,7 +45,7 @@ class MasterMngCampusController extends Controller
      */
     public function index()
     {
-        return view('pages.admin.master_mng_campus', [
+        return view('pages.admin.master_mng_category', [
             'editData' => null
         ]);
     }
@@ -73,7 +73,7 @@ class MasterMngCampusController extends Controller
      */
     public function new()
     {
-        return view('pages.admin.master_mng_campus-input', [
+        return view('pages.admin.master_mng_category-input', [
             'rules' => null,
             'editData' => null,
         ]);
@@ -96,16 +96,13 @@ class MasterMngCampusController extends Controller
      * @param int
      * @return view
      */
-    public function edit($campusId)
+    public function edit($categoryId)
     {
-        return view('pages.admin.master_mng_campus-input', [
-            'editData' => ['campus_cd'=>'110',
-                           'name'=>'久我山',
-                           'short_name'=>'久',
-                           'email_campus'=>'kugayama@testea.test.com',
-                           'tel_campus'=>'0311112222',
-                           'disp_order'=>'1',
-                           'is_hidden'=>'0'],
+        return view('pages.admin.master_mng_category-input', [
+            'editData' => ['unit_category_cd'=>'0710201',
+                           'grade_cd'=>'1',
+                           't_subject_cd'=>'102',
+                           'name'=>'正負の数'],
             'rules' => $this->rulesForInput(null),
         ]);
     }

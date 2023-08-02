@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', (request()->routeIs('master_mng_text-edit')) ? '授業教材マスタデータ編集' : '授業教材マスタデータ登録')
+@section('title', (request()->routeIs('master_mng_category-edit')) ? '授業単元分類マスタデータ編集' : '授業単元分類マスタデータ登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -10,28 +10,23 @@
 {{-- formを指定 --}}
 <x-bs.card :form=true>
 
-    @if (request()->routeIs('master_mng_text-edit'))
+    @if (request()->routeIs('master_mng_category-edit'))
     {{-- 編集時 --}}
-    <p>以下の授業教材情報について編集を行います。</p>
+    <p>以下の授業単元分類情報について編集を行います。</p>
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
     @else
     {{-- 登録時 --}}
-    <p>授業教材の登録を行います。</p>
+    <p>授業単元分類の登録を行います。</p>
     @endif
 
     {{-- 共通フォーム --}}
-    <x-input.text caption="教材コード" id="text_cd" :rules=$rules :editData=$editData/>
+    <x-input.text caption="単元分類コード" id="unit_category_cd" :rules=$rules :editData=$editData/>
     <x-input.select caption="学年" id="grade_cd" :select2=true :editData=$editData>
         <option value="1">中1</option>
         <option value="2">中2</option>
         <option value="3">中3</option>
-    </x-input.select>
-    <x-input.select caption="授業科目コード" id="l_subject_cd" :select2=true :editData=$editData>
-        <option value="1">101（英語）</option>
-        <option value="2">102（数学）</option>
-        <option value="3">103（国語）</option>
     </x-input.select>
     <x-input.select caption="教材科目コード" id="t_subject_cd" :select2=true :editData=$editData>
         <option value="1">101（英語）</option>
@@ -45,7 +40,7 @@
         <div class="d-flex justify-content-between">
             <x-button.back />
 
-            @if (request()->routeIs('master_mng_text-edit'))
+            @if (request()->routeIs('master_mng_category-edit'))
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
                 <x-button.submit-delete />

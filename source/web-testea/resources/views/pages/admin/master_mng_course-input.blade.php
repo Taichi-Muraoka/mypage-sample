@@ -24,6 +24,11 @@
     {{-- 共通フォーム --}}
     <x-input.text caption="コースコード" id="course_cd" :rules=$rules :editData=$editData/>
     <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData/>
+    <x-input.select caption="コース種別" id="course_kind" :select2=true :select2Search=false>
+        <option value="1">授業単</option>
+        <option value="2">授業複</option>
+        <option value="3">その他</option>
+    </x-input.select>
 
     {{-- フッター --}}
     <x-slot name="footer">

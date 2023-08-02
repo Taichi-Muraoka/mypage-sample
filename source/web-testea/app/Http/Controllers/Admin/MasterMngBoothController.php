@@ -99,7 +99,11 @@ class MasterMngBoothController extends Controller
     public function edit($boothId)
     {
         return view('pages.admin.master_mng_booth-input', [
-            'editData' => null,
+            'editData' => ['campus_cd'=>'1',
+                           'booth_cd'=>'110',
+                           'usage_kind'=>'1',
+                           'name'=>'Aテーブル',
+                           'disp_order'=>'1'],
             'rules' => $this->rulesForInput(null),
         ]);
     }

@@ -16,10 +16,10 @@
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
-			<th>成績科目コード</th>
-			<th>学校区分</th>
-			<th>名称</th>
-			<th width="10%"></th>
+			<th width="30%">成績科目コード</th>
+			<th width="30%">学校区分</th>
+			<th width="30%">名称</th>
+			<th width="7%"></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}
@@ -28,7 +28,6 @@
 			<td>小</td>
 			<td>国語</td>
 			<td>
-				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
 			</td>
 		</tr>
@@ -37,7 +36,6 @@
 			<td>中</td>
 			<td>国語</td>
 			<td>
-				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
 			</td>
 		</tr>
@@ -46,15 +44,11 @@
 			<td>高</td>
 			<td>英語</td>
 			<td>
-				{{-- <x-button.list-dtl /> --}}
                 <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
 			</td>
 		</tr>
 
 	</x-bs.table>
 </x-bs.card-list>
-
-{{-- 詳細 --}}
-@include('pages.admin.modal.master_mng_grade_subject-modal')
 
 @stop
