@@ -13,10 +13,6 @@
         <th>講師名</th>
         <td>CWテスト講師１０１</td>
     </tr>
-    <tr>
-        <th>合計金額</th>
-        <td>77,000</td>
-    </tr>
 
 </x-bs.table>
 
@@ -31,20 +27,38 @@
     </x-slot>
 
     <tr>
-        <td>授業給</td>
-        <td>50.5</td>
-        <td>75,750</td>
+        <td>個別</td>
+        <td>18</td>
+        <td></td>
         <td></td>
     </tr>
     <tr>
-        <td>授業給（超過）</td>
-        <td>5</td>
-        <td>10,000</td>
+        <td>１対２</td>
+        <td>3</td>
+        <td></td>
         <td></td>
     </tr>
     <tr>
-        <td>事務給</td>
-        <td>10</td>
+        <td>１対３</td>
+        <td>4.5</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>集団</td>
+        <td>3</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>家庭教師</td>
+        <td>6</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>事務作業</td>
+        <td>2</td>
         <td>6,000</td>
         <td></td>
     </tr>
@@ -56,14 +70,14 @@
     </tr>
     <tr>
         <td>交通費1</td>
-        <td>8</td>
-        <td>4,000</td>
+        <td>2</td>
+        <td>1,000</td>
         <td>久我山</td>
     </tr>
     <tr>
         <td>交通費２</td>
-        <td>5</td>
-        <td>3,200</td>
+        <td>8</td>
+        <td>2,200</td>
         <td>渋谷</td>
     </tr>
 </x-bs.table>
