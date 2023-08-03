@@ -122,7 +122,7 @@
     <x-bs.table :hover=false :vHeader=true class="mb-4">
         <tr>
             <th width="35%">備考</th>
-            <td>特別報酬：1200円×1.5時間 / 遅刻：07/13 15分</td>
+            <td>特別報酬：1200円×1.5時間  遅刻：07/13 15分</td>
         </tr>
     </x-bs.table>
 

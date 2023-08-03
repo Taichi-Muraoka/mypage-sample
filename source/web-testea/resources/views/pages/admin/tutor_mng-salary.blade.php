@@ -28,7 +28,8 @@
 
             {{-- テーブル行 --}}
             <tr v-for="item in paginator.data" v-cloak>
-                <td>@{{item.salary_date|formatYmString}}分給与</td>
+                {{-- <td>@{{item.salary_date|formatYmString}}分給与</td> --}}
+                <td>2023年7月分給与</td>
                 <td>
                     <x-button.list-dtl vueHref="'{{ route('tutor_mng-detail_salary', ['tid' => $editData['tid'], '']) }}/' + item.tid" caption="給与情報" />
                 </td>

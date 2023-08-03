@@ -89,7 +89,7 @@ trait FuncInvoiceTrait
         $invoice['pay_name'] = "口座引落";
         $invoice['issue_date'] = strtotime('2023-06-19');
         $invoice['bill_date'] = strtotime('2023-07-04');
-        $invoice['agreement1'] = "7月分お月謝期間：7月10日（月）～8月5日（土）実施分となります。";
+        $invoice['agreement1'] = "7月10日（月）～8月5日（土）実施分となります。";
         $invoice['agreement2'] = "※7月21日（金）より夏期特別期間となります。";
         $invoice['note'] = "ご登録いただきました口座から引落をさせていただきます。";
 
@@ -113,6 +113,8 @@ trait FuncInvoiceTrait
             //->where('invoice_detail.invoice_seq', 1)
             ->orderBy('lesson_type')
             ->orderBy('order_code')
+            // 件数指定はモック用
+            ->take(2)
             ->get();
 
         // 引落日表示有無

@@ -27,12 +27,21 @@
 
             {{-- テーブル行 --}}
             <tr v-for="item in paginator.data" v-cloak>
-                <x-bs.td-sp caption="請求年月">@{{item.invoice_date|formatYmString}}請求書</x-bs.td-sp>
+                {{-- <x-bs.td-sp caption="請求年月">@{{item.invoice_date|formatYmString}}請求書</x-bs.td-sp> --}}
+                <x-bs.td-sp caption="請求年月">2023年7月分請求書</x-bs.td-sp>
                 <td>
                     {{-- 請求明細 URLとIDを指定。IDはVueで指定される。 --}}
                     <x-button.list-dtl vueHref="'{{ route('member_mng-invoice', ['', '']) }}/' + item.id + '/detail/' + item.date" caption="請求情報" />
                 </td>
-        </x-bs.table>
+                {{-- モックのサンプル表示のためもう一行追加（実装の際は不要） --}}
+                <tr v-for="item in paginator.data" v-cloak>
+                    {{-- <x-bs.td-sp caption="請求年月">@{{item.invoice_date|formatYmString}}請求書</x-bs.td-sp> --}}
+                    <x-bs.td-sp caption="請求年月">2023年6月分請求書</x-bs.td-sp>
+                    <td>
+                        {{-- 請求明細 URLとIDを指定。IDはVueで指定される。 --}}
+                        <x-button.list-dtl vueHref="'{{ route('member_mng-invoice', ['', '']) }}/' + item.id + '/detail/' + item.date" caption="請求情報" />
+                    </td>
+            </x-bs.table>
 
     </x-bs.card-list>
 
