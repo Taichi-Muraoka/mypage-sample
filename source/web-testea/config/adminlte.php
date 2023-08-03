@@ -326,13 +326,6 @@ return [
             'can'  => 'student',
         ],
         [
-            'text' => '集団授業欠席申請',
-            'route'  => 'absent',
-            'icon' => 'far fa-times-circle',
-            'can'  => 'student',
-            'active' => ['absent/*']
-        ],
-        [
             'text' => '振替授業調整',
             'route'  => 'transfer_student',
             'icon' => 'fas fa-exchange-alt',
@@ -381,9 +374,16 @@ return [
             'icon' => 'fas fa-chalkboard',
             'can'  => 'student',
         ],
+        [
+            'text' => '欠席申請（１対多）',
+            'route'  => 'absent',
+            'icon' => 'far fa-times-circle',
+            'can'  => 'student',
+            'active' => ['absent/*']
+        ],
 
         [
-            'header' => '契約',
+            'header' => '情報',
             'can'  => 'student',
         ],
         [
@@ -468,14 +468,6 @@ return [
         //     'active' => ['attendance/*']
         // ],
         [
-            'text' => '振替授業調整',
-            'route'  => 'transfer_tutor',
-            'icon' => 'fas fa-exchange-alt',
-            'can'  => 'tutor',
-            'active' => ['transfer_tutor/*'],
-            'menuid' => 'id_transfer_check',
-        ],
-        [
             'text' => '授業報告書',
             'route'  => 'report_regist',
             'icon' => 'fas fa-chalkboard-teacher',
@@ -489,6 +481,14 @@ return [
             'icon' => 'fas fa-clock',
             'can'  => 'tutor',
             'active' => ['weekly_shift/*']
+        ],
+        [
+            'text' => '振替授業調整',
+            'route'  => 'transfer_tutor',
+            'icon' => 'fas fa-exchange-alt',
+            'can'  => 'tutor',
+            'active' => ['transfer_tutor/*'],
+            'menuid' => 'id_transfer_check',
         ],
         // [
         //     'text' => '回数報告',
@@ -627,10 +627,15 @@ return [
             'menuid' => 'id_lesson',
             'submenu' => [
                 [
-                    'text' => '欠席申請受付',
-                    'route' => 'absent_accept',
-                    'active' => ['absent_accept*'],
-                    'menuid' => 'id_absent_accept',
+                    'text' => '授業報告書',
+                    'route' => 'report_check',
+                    'active' => ['report_check*'],
+                    'menuid' => 'id_report_check',
+                ],
+                [
+                    'text' => '授業情報検索',
+                    'route' => 'student_class',
+                    'active' => ['student_class*']
                 ],
                 // [
                 //     'text' => '振替連絡受付',
@@ -651,21 +656,16 @@ return [
                     'menuid' => 'id_transfer_required',
                 ],
                 [
+                    'text' => '欠席申請受付',
+                    'route' => 'absent_accept',
+                    'active' => ['absent_accept*'],
+                    'menuid' => 'id_absent_accept',
+                ],
+                [
                     'text' => '追加授業依頼受付',
                     'route' => 'extra_lesson_mng',
                     'active' => ['extra_lesson_mng*'],
                     'menuid' => 'id_extra_lesson_mng',
-                ],
-                [
-                    'text' => '授業報告書',
-                    'route' => 'report_check',
-                    'active' => ['report_check*'],
-                    'menuid' => 'id_report_check',
-                ],
-                [
-                    'text' => '授業情報検索',
-                    'route' => 'student_class',
-                    'active' => ['student_class*']
                 ],
                 // [
                 //     'text' => 'スケジュール取込',
@@ -1004,28 +1004,28 @@ return [
                 //],
             ]
         ],
-        [
-            'text' => '移行管理',
-            'icon' => 'fas fa-file-import',
-            'can'  => 'admin',
-            'submenu' => [
-                [
-                    'text' => '生徒一括取込',
-                    'route' => 'import_student',
-                    'active' => ['import_student_information*']
-                ],
-                [
-                    'text' => '生徒スケジュール取込',
-                    'route' => 'import_student_schedule',
-                    'active' => ['import_student_schedule*']
-                ],
-                [
-                    'text' => '講師一括取込',
-                    'route' => 'import_tutor',
-                    'active' => ['import_tutor*']
-                ],
-            ]
-        ],
+        // [
+        //     'text' => '移行管理',
+        //     'icon' => 'fas fa-file-import',
+        //     'can'  => 'admin',
+        //     'submenu' => [
+        //         [
+        //             'text' => '生徒一括取込',
+        //             'route' => 'import_student',
+        //             'active' => ['import_student_information*']
+        //         ],
+        //         [
+        //             'text' => '生徒スケジュール取込',
+        //             'route' => 'import_student_schedule',
+        //             'active' => ['import_student_schedule*']
+        //         ],
+        //         [
+        //             'text' => '講師一括取込',
+        //             'route' => 'import_tutor',
+        //             'active' => ['import_tutor*']
+        //         ],
+        //     ]
+        // ],
         // [
         //     'text' => '休業日管理',
         //     'icon' => 'fa fa-calendar-alt',
