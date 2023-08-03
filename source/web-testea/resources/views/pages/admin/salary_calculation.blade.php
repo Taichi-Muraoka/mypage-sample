@@ -20,9 +20,33 @@
 
         {{-- テーブル行 --}}
         <tr>
+            <td>2023年04月</td>
+            <td> </td>
+            <td>未処理</td>
+            <td>
+                <x-button.list-dtl href="{{ route('salary_calculation-detail', 1) }}"/>
+            </td>
+        </tr>
+        <tr>
             <td>2023年03月</td>
-            <td>2023/03/31</td>
+            <td> </td>
             <td>集計済</td>
+            <td>
+                <x-button.list-dtl href="{{ route('salary_calculation-detail', 1) }}"/>
+            </td>
+        </tr>
+        <tr>
+            <td>2023年02月</td>
+            <td>2023/03/05</td>
+            <td>確定済</td>
+            <td>
+                <x-button.list-dtl href="{{ route('salary_calculation-detail', 1) }}"/>
+            </td>
+        </tr>
+        <tr>
+            <td>2023年01月</td>
+            <td>2023/02/07</td>
+            <td>確定済</td>
             <td>
                 <x-button.list-dtl href="{{ route('salary_calculation-detail', 1) }}"/>
             </td>
