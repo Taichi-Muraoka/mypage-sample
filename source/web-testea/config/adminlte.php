@@ -337,7 +337,8 @@ return [
             'route'  => 'transfer_student',
             'icon' => 'fas fa-exchange-alt',
             'can'  => 'student',
-            'active' => ['transfer_student/*']
+            'active' => ['transfer_student/*'],
+            'menuid' => 'id_transfer_check',
         ],
         [
             'text' => '追加授業依頼',
@@ -346,13 +347,13 @@ return [
             'can'  => 'student',
             'active' => ['extra_lesson/*']
         ],
-        [
-            'text' => '授業報告書',
-            'route'  => 'report',
-            'icon' => 'fas fa-chalkboard-teacher',
-            'can'  => 'student',
-            'active' => ['report/*']
-        ],
+        // [
+        //     'text' => '授業報告書',
+        //     'route'  => 'report',
+        //     'icon' => 'fas fa-chalkboard-teacher',
+        //     'can'  => 'student',
+        //     'active' => ['report/*']
+        // ],
         [
             'text' => '生徒成績',
             'route'  => 'grades',
@@ -471,14 +472,16 @@ return [
             'route'  => 'transfer_tutor',
             'icon' => 'fas fa-exchange-alt',
             'can'  => 'tutor',
-            'active' => ['transfer_tutor/*']
+            'active' => ['transfer_tutor/*'],
+            'menuid' => 'id_transfer_check',
         ],
         [
             'text' => '授業報告書',
             'route'  => 'report_regist',
             'icon' => 'fas fa-chalkboard-teacher',
             'can'  => 'tutor',
-            'active' => ['report_regist/*']
+            'active' => ['report_regist/*'],
+            'menuid' => 'id_report_regist',
         ],
         [
             'text' => '空き時間登録',
@@ -512,7 +515,8 @@ return [
             'route'  => 'surcharge',
             'icon' => 'fas fa-file-invoice-dollar',
             'can'  => 'tutor',
-            'active' => ['surcharge/*']
+            'active' => ['surcharge/*'],
+            'menuid' => 'id_surcharge',
         ],
         [
             'text' => '給与明細',
@@ -600,7 +604,8 @@ return [
                 [
                     'text' => '面談日程受付',
                     'route' => 'conference_accept',
-                    'active' => ['conference_accept*']
+                    'active' => ['conference_accept*'],
+                    'menuid' => 'id_conference_accept',
                 ],
                 //[
                 //    'text' => 'コース変更受付',
@@ -654,7 +659,8 @@ return [
                 [
                     'text' => '授業報告書',
                     'route' => 'report_check',
-                    'active' => ['report_check*']
+                    'active' => ['report_check*'],
+                    'menuid' => 'id_report_check',
                 ],
                 [
                     'text' => '授業情報検索',
@@ -672,7 +678,7 @@ return [
             'text' => '特別期間講習管理',
             'icon' => 'fas fa-chalkboard',
             'can'  => 'admin',
-            'menuid' => '',
+            'menuid' => 'id_season_lesson',
             'submenu' => [
                 [
                     'text' => '講習情報管理',
@@ -682,7 +688,8 @@ return [
                 [
                     'text' => '生徒日程・コマ組み',
                     'route' => 'season_mng_student',
-                    'active' => ['season_mng_student*']
+                    'active' => ['season_mng_student*'],
+                    'menuid' => 'id_season_mng_student',
                 ],
                 [
                     'text' => '講師日程',
@@ -846,11 +853,13 @@ return [
             'text' => '給与情報管理',
             'icon' => 'fa fa-wallet',
             'can'  => 'admin',
+            'menuid' => 'id_mng_salary',
             'submenu' => [
                 [
                     'text' => '追加請求受付',
                     'route' => 'surcharge_accept',
-                    'active' => ['surcharge_accept*']
+                    'active' => ['surcharge_accept*'],
+                    'menuid' => 'id_surcharge_accept',
                 ],
                 [
                     'text' => '超過勤務者一覧',

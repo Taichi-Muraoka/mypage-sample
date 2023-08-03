@@ -79,6 +79,12 @@ class AppMenuFilter implements FilterInterface
                         $submenu["label"] = $countLeave->count;
                         $submenu["label_color"] = "info";
                     }
+
+                    if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_conference_accept")) {
+                        // 面談日程受付
+                        $submenu["label"] = $countLeave->count;
+                        $submenu["label_color"] = "info";
+                    }
                 }
             }
 
@@ -128,96 +134,142 @@ class AppMenuFilter implements FilterInterface
                         $submenu["label_color"] = "info";
                     }
 
-                    if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_transfer_accept")) {
-                        // 振替連絡
+                    if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_transfer_check")) {
+                        // 振替授業調整
+                        $submenu["label"] = $countTransfer->count;
+                        $submenu["label_color"] = "info";
+                    }
+
+                    if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_extra_lesson_mng")) {
+                        // 追加授業依頼受付
+                        $submenu["label"] = $countTransfer->count;
+                        $submenu["label_color"] = "info";
+                    }
+
+                    if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_report_check")) {
+                        // 授業報告書
                         $submenu["label"] = $countTransfer->count;
                         $submenu["label_color"] = "info";
                     }
                 }
             }
 
-            // 模試・イベント管理メニュー
-            if ((isset($item["menuid"])) && ($item["menuid"] === "id_trial_event")) {
+            // 特別期間講習管理メニュー
+            if ((isset($item["menuid"])) && ($item["menuid"] === "id_season_lesson")) {
 
-                // 模試
-                $query = TrialApply::where('apply_state', AppConst::CODE_MASTER_3_0);
+                // // ギフトカード
+                // $query = Card::where('card_state', AppConst::CODE_MASTER_4_1);
 
-                // アカウント情報取得
-                $account = Auth::user();
+                // // アカウント情報取得
+                // $account = Auth::user();
 
-                // 教室の絞り込み(生徒基本情報参照)
-                if (AuthEx::isRoomAdmin()) {
-                    // 教室管理者の場合、強制的に教室コードで検索する
-                    $this->mdlWhereSidByRoomQuery($query, TrialApply::class, $account->roomcd);
-                }
-                $countTrial = $query->select(DB::raw('count(1) as count'))
-                    ->first();
+                // // 教室の絞り込み(生徒基本情報参照)
+                // if (AuthEx::isRoomAdmin()) {
+                //     // 教室管理者の場合、強制的に教室コードで検索する
+                //     $this->mdlWhereSidByRoomQuery($query, Card::class, $account->roomcd);
+                // }
+                // $countCard = $query->select(DB::raw('count(1) as count'))
+                //     ->first();
 
-                // イベント
-                $query = EventApply::where('changes_state', AppConst::CODE_MASTER_2_0);
-
-                // 教室の絞り込み(生徒基本情報参照)
-                if (AuthEx::isRoomAdmin()) {
-                    // 教室管理者の場合、強制的に教室コードで検索する
-                    $this->mdlWhereSidByRoomQuery($query, EventApply::class, $account->roomcd);
-                }
-                $countEvent = $query->select(DB::raw('count(1) as count'))
-                    ->first();
-
-                // !の表示
-                if ($countTrial->count || $countEvent->count) {
-                    $item["label"] = '!';
-                    $item["label_color"] = "info";
-
-                    // サブメニューの件数表示
-                    foreach ($item["submenu"] as &$submenu) {
-
-                        if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_trial_mng") && ($countTrial->count)) {
-                            // 模試管理
-                            $submenu["label"] = '!';
-                            $submenu["label_color"] = "info";
-                        }
-
-                        if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_event_mng") && ($countEvent->count)) {
-                            // イベント
-                            $submenu["label"] = '!';
-                            $submenu["label_color"] = "info";
-                        }
-                    }
-                }
-            }
-
-            // カードメニュー
-            if ((isset($item["menuid"])) && ($item["menuid"] === "id_card")) {
-
-                // ギフトカード
-                $query = Card::where('card_state', AppConst::CODE_MASTER_4_1);
-
-                // アカウント情報取得
-                $account = Auth::user();
-
-                // 教室の絞り込み(生徒基本情報参照)
-                if (AuthEx::isRoomAdmin()) {
-                    // 教室管理者の場合、強制的に教室コードで検索する
-                    $this->mdlWhereSidByRoomQuery($query, Card::class, $account->roomcd);
-                }
-                $countCard = $query->select(DB::raw('count(1) as count'))
-                    ->first();
-
+                $countSeasonStutent = 0;
                 // 合計件数
-                $item["label"] = $countCard->count;
+                // $item["label"] = $countCard->count;
+                $item["label"] = $countSeasonStutent;
                 $item["label_color"] = "info";
 
                 // サブメニューの件数表示
                 foreach ($item["submenu"] as &$submenu) {
 
-                    if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_card_mng")) {
-                        // ギフトカード管理
-                        $submenu["label"] = $countCard->count;
+                    if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_season_mng_student")) {
+                        // 生徒日程・コマ組み
+                        $submenu["label"] = $countSeasonStutent;
                         $submenu["label_color"] = "info";
                     }
                 }
             }
+
+            // // 模試・イベント管理メニュー
+            // if ((isset($item["menuid"])) && ($item["menuid"] === "id_trial_event")) {
+
+            //     // 模試
+            //     $query = TrialApply::where('apply_state', AppConst::CODE_MASTER_3_0);
+
+            //     // アカウント情報取得
+            //     $account = Auth::user();
+
+            //     // 教室の絞り込み(生徒基本情報参照)
+            //     if (AuthEx::isRoomAdmin()) {
+            //         // 教室管理者の場合、強制的に教室コードで検索する
+            //         $this->mdlWhereSidByRoomQuery($query, TrialApply::class, $account->roomcd);
+            //     }
+            //     $countTrial = $query->select(DB::raw('count(1) as count'))
+            //         ->first();
+
+            //     // イベント
+            //     $query = EventApply::where('changes_state', AppConst::CODE_MASTER_2_0);
+
+            //     // 教室の絞り込み(生徒基本情報参照)
+            //     if (AuthEx::isRoomAdmin()) {
+            //         // 教室管理者の場合、強制的に教室コードで検索する
+            //         $this->mdlWhereSidByRoomQuery($query, EventApply::class, $account->roomcd);
+            //     }
+            //     $countEvent = $query->select(DB::raw('count(1) as count'))
+            //         ->first();
+
+            //     // !の表示
+            //     if ($countTrial->count || $countEvent->count) {
+            //         $item["label"] = '!';
+            //         $item["label_color"] = "info";
+
+            //         // サブメニューの件数表示
+            //         foreach ($item["submenu"] as &$submenu) {
+
+            //             if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_trial_mng") && ($countTrial->count)) {
+            //                 // 模試管理
+            //                 $submenu["label"] = '!';
+            //                 $submenu["label_color"] = "info";
+            //             }
+
+            //             if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_event_mng") && ($countEvent->count)) {
+            //                 // イベント
+            //                 $submenu["label"] = '!';
+            //                 $submenu["label_color"] = "info";
+            //             }
+            //         }
+            //     }
+            // }
+
+            // // カードメニュー
+            // if ((isset($item["menuid"])) && ($item["menuid"] === "id_card")) {
+
+            //     // ギフトカード
+            //     $query = Card::where('card_state', AppConst::CODE_MASTER_4_1);
+
+            //     // アカウント情報取得
+            //     $account = Auth::user();
+
+            //     // 教室の絞り込み(生徒基本情報参照)
+            //     if (AuthEx::isRoomAdmin()) {
+            //         // 教室管理者の場合、強制的に教室コードで検索する
+            //         $this->mdlWhereSidByRoomQuery($query, Card::class, $account->roomcd);
+            //     }
+            //     $countCard = $query->select(DB::raw('count(1) as count'))
+            //         ->first();
+
+            //     // 合計件数
+            //     $item["label"] = $countCard->count;
+            //     $item["label_color"] = "info";
+
+            //     // サブメニューの件数表示
+            //     foreach ($item["submenu"] as &$submenu) {
+
+            //         if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_card_mng")) {
+            //             // ギフトカード管理
+            //             $submenu["label"] = $countCard->count;
+            //             $submenu["label_color"] = "info";
+            //         }
+            //     }
+            // }
 
             // 問い合わせメニュー
             if ((isset($item["menuid"])) && ($item["menuid"] === "id_contact")) {
@@ -250,8 +302,113 @@ class AppMenuFilter implements FilterInterface
                     }
                 }
             }
+            
+            // 給与情報管理メニュー
+            if ((isset($item["menuid"])) && ($item["menuid"] === "id_mng_salary")) {
+
+                // // ギフトカード
+                // $query = Card::where('card_state', AppConst::CODE_MASTER_4_1);
+
+                // // アカウント情報取得
+                // $account = Auth::user();
+
+                // // 教室の絞り込み(生徒基本情報参照)
+                // if (AuthEx::isRoomAdmin()) {
+                //     // 教室管理者の場合、強制的に教室コードで検索する
+                //     $this->mdlWhereSidByRoomQuery($query, Card::class, $account->roomcd);
+                // }
+                // $countCard = $query->select(DB::raw('count(1) as count'))
+                //     ->first();
+
+                $countSurcharge = 0;
+                // 合計件数
+                // $item["label"] = $countCard->count;
+                $item["label"] = $countSurcharge;
+                $item["label_color"] = "info";
+
+                // サブメニューの件数表示
+                foreach ($item["submenu"] as &$submenu) {
+
+                    if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_surcharge_accept")) {
+                        // 追加請求受付
+                        $submenu["label"] = $countSurcharge;
+                        $submenu["label_color"] = "info";
+                    }
+                }
+            }
         }
 
+        if (AuthEx::isStudent()) {
+            //-------------
+            // 生徒の場合
+            //-------------
+
+            // 振替授業調整
+            if ((isset($item["menuid"])) && ($item["menuid"] === "id_transfer_check")) {
+
+                // // 振替連絡
+                // $query = TransferApply::where('state', AppConst::CODE_MASTER_1_0)
+                //     ->sdLeftJoin(ExtSchedule::class, function ($join) {
+                //         $join->on('transfer_apply.id', '=', 'ext_schedule.id');
+                //     });
+
+                // $countTransfer = $query->select(
+                //     DB::raw('count(1) as count')
+                // )->first();
+                $countTransferStudent = 0;
+
+                // 合計件数
+                $item["label"] = $countTransferStudent;
+                $item["label_color"] = "info";
+
+            }
+
+            
+        } else if (AuthEx::isTutor()) {
+            //-------------
+            // 教師の場合
+            //-------------
+
+            // 振替授業調整
+            if ((isset($item["menuid"])) && ($item["menuid"] === "id_transfer_check")) {
+
+                // // 振替連絡
+                // $query = TransferApply::where('state', AppConst::CODE_MASTER_1_0)
+                //     ->sdLeftJoin(ExtSchedule::class, function ($join) {
+                //         $join->on('transfer_apply.id', '=', 'ext_schedule.id');
+                //     });
+
+                // $countTransfer = $query->select(
+                //     DB::raw('count(1) as count')
+                // )->first();
+                $countTransferTutor = 0;
+
+                // 合計件数
+                $item["label"] = $countTransferTutor;
+                $item["label_color"] = "info";
+
+            }
+            // 授業報告書
+            if ((isset($item["menuid"])) && ($item["menuid"] === "id_report_regist")) {
+
+                $countReportTutor = 0;
+
+                // 合計件数
+                $item["label"] = $countReportTutor;
+                $item["label_color"] = "info";
+
+            }
+            // 追加請求申請
+            if ((isset($item["menuid"])) && ($item["menuid"] === "id_surcharge")) {
+
+                $countSurchargeTutor = 0;
+
+                // 合計件数
+                $item["label"] = $countSurchargeTutor;
+                $item["label_color"] = "info";
+
+            }
+        }
         return $item;
     }
 }
