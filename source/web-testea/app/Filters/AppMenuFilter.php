@@ -140,6 +140,12 @@ class AppMenuFilter implements FilterInterface
                         $submenu["label_color"] = "info";
                     }
 
+                    if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_transfer_required")) {
+                        // 要振替授業管理
+                        $submenu["label"] = $countTransfer->count;
+                        $submenu["label_color"] = "info";
+                    }
+
                     if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_extra_lesson_mng")) {
                         // 追加授業依頼受付
                         $submenu["label"] = $countTransfer->count;
@@ -405,6 +411,16 @@ class AppMenuFilter implements FilterInterface
 
                 // 合計件数
                 $item["label"] = $countSurchargeTutor;
+                $item["label_color"] = "info";
+
+            }
+            // 研修受講
+            if ((isset($item["menuid"])) && ($item["menuid"] === "id_training")) {
+
+                $countReportTutor = 0;
+
+                // 合計件数
+                $item["label"] = $countReportTutor;
                 $item["label_color"] = "info";
 
             }

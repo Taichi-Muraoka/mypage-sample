@@ -530,7 +530,8 @@ return [
             'route'  => 'training',
             'icon' => 'fas fa-book-open',
             'can'  => 'tutor',
-            'active' => ['training/*']
+            'active' => ['training/*'],
+            'menuid' => 'id_training',
         ],
         // [
         //     // 個別指導向け
