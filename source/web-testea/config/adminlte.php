@@ -603,7 +603,7 @@ return [
                     'active' => ['give_badge*']
                 ],
                 [
-                    'text' => '面談日程受付',
+                    'text' => '面談日程管理',
                     'route' => 'conference_accept',
                     'active' => ['conference_accept*'],
                     'menuid' => 'id_conference_accept',

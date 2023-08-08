@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '新規面談日程登録')
+@section('title', '面談追加登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -37,6 +37,8 @@
         <option value="2">CWテスト生徒２</option>
         <option value="3">CWテスト生徒３</option>
     </x-input.select>
+
+    <x-input.textarea caption="特記事項" id="conference_comment" :rules=$rules :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">

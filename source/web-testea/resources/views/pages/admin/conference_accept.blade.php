@@ -31,11 +31,23 @@
                 <option value="2">登録済</option>
             </x-input.select>
         </x-bs.col2>
-</x-bs.row>
+    </x-bs.row>
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.text caption="生徒名" id="student_name" :rules=$rules />
+            <x-input.select caption="生徒名" id="student_name" :select2=true :editData=$editData>
+                <option value="1">CWテスト生徒１</option>
+                <option value="2">CWテスト生徒２</option>
+            </x-input.select>
+        </x-bs.col2>
+    </x-bs.row>
+
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.date-picker caption="連絡日 From" id="conference_date_from" />
+        </x-bs.col2>
+        <x-bs.col2>
+            <x-input.date-picker caption="連絡日 To" id="conference_date_to" />
         </x-bs.col2>
     </x-bs.row>
 
@@ -46,7 +58,7 @@
 
     {{-- カードヘッダ右 --}}
     <x-slot name="tools">
-        <x-button.new href="{{ route('conference_accept-new') }}" :small=true caption="新規面談日程登録" />
+        <x-button.new href="{{ route('conference_accept-new') }}" :small=true caption="面談追加登録" />
     </x-slot>
 
     {{-- テーブル --}}
@@ -58,6 +70,7 @@
             <th>生徒名</th>
             <th>校舎</th>
             <th>面談日</th>
+            <th>面談担当者</th>
             <th>開始時刻</th>
             <th>ステータス</th>
             <th></th>
@@ -69,6 +82,7 @@
             <td>CWテスト生徒１</td>
             <td>久我山</td>
             <td>2023/01/30</td>
+            <td>久我山教室長</td>
             <td>16:00</td>
             <td>登録済</td>
             <td>
@@ -80,6 +94,7 @@
             <td>2023/01/17</td>
             <td>CWテスト生徒２</td>
             <td>久我山</td>
+            <td></td>
             <td></td>
             <td></td>
             <td>未登録</td>
