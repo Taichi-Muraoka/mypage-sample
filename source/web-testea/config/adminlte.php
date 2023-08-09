@@ -975,7 +975,7 @@ return [
                 //    'route' => 'under_construction',
                 //],
                 [
-                    'text' => '学年情報更新',
+                    'text' => '生徒学年情報更新',
                     'route' => 'all_member_import',
                     'active' => ['all_member_import*']
                 ],

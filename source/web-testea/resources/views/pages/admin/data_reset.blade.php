@@ -7,7 +7,8 @@
 {{-- カード --}}
 <x-bs.card :form=true>
 
-    <p>保持期限超過データ削除処理のログ情報を確認できます。</p>
+    <p>保持期限超過データ削除処理の実行ログを確認します。<br>
+        バックアップ出力ボタン押下で、削除されたデータをCSV形式でダウンロードできます。</p>
 
 </x-bs.card>
 
@@ -24,16 +25,26 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th>処理日時</th>
+            <th width="20%">処理開始日時</th>
+            <th width="20%">処理終了日時</th>
             <th>終了ステータス</th>
-            <th></th>
+            <th width="15%"></th>
         </x-slot>
         {{-- テーブル行 --}}
         <tr>
-            <td>2023/02/28 16:00</td>
+            <td>2023/03/01 00:00</td>
+            <td>2023/03/01 00:05</td>
             <td>正常終了</td>
             <td>
-                <x-button.submit-exec caption="バックアップデータ出力" icon="fas fa-download" />
+                <x-button.submit-exec caption="バックアップ出力" icon="fas fa-download" />
+            </td>
+        </tr>
+        <tr>
+            <td>2022/03/01 00:00</td>
+            <td>2022/03/01 00:04</td>
+            <td>正常終了</td>
+            <td>
+                <x-button.submit-exec caption="バックアップ出力" icon="fas fa-download" />
             </td>
         </tr>
 

@@ -1,13 +1,13 @@
 @extends('adminlte::page')
 
-@section('title', '学年情報更新')
+@section('title', '生徒学年情報更新')
 
 @section('content')
 
 {{-- カード --}}
 <x-bs.card :form=true>
 
-    <p>新年度の学年更新処理を実行します。</p>
+    <p>システム内の年度切り替え および 生徒学年情報の更新処理を実行します。</p>
 
     <x-bs.table :hover=false :vHeader=true>
         <tr>
@@ -20,16 +20,16 @@
         </tr>
     </x-bs.table>
 
-    <x-bs.callout type="warning">
-        送信ボタン押下後、バッググラウンドで処理されます。<br>
-        (他の処理が実行中の場合は送信できません)<br>
-        処理が正常に完了したかどうかは、下記の実行履歴よりご確認ください。
-    </x-bs.callout>
+    {{-- <x-bs.callout type="warning"> --}}
+    {{--     送信ボタン押下後、バッググラウンドで処理されます。<br> --}}
+    {{--     (他の処理が実行中の場合は送信できません)<br> --}}
+    {{--     処理が正常に完了したかどうかは、下記の実行履歴よりご確認ください。 --}}
+    {{-- </x-bs.callout> --}}
 
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-end">
-            <x-button.submit-new caption='学年更新実行'/>
+            <x-button.submit-new caption='処理実行'/>
         </div>
     </x-slot>
 
@@ -48,20 +48,21 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="25%">処理開始日時</th>
-            <th width="25%">処理終了日時</th>
+            <th width="20%">処理実行日時</th>
             <th width="20%">終了ステータス</th>
-            <th width="15%">処理件数</th>
-            <th width="15%">実行者</th>
+            <th>実行者</th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <td>2023/03/10 16:00</td>
-            <td>2023/03/10 16:05</td>
+            <td>2023/03/01 16:00</td>
             <td>正常終了</td>
-            <td>100</td>
-            <td>久我山　教室長</td>
+            <td>本部管理者１</td>
+        </tr>
+        <tr>
+            <td>2022/03/01 10:00</td>
+            <td>正常終了</td>
+            <td>本部管理者２</td>
         </tr>
 
     </x-bs.table>
