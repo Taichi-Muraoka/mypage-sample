@@ -24,10 +24,10 @@
     {{-- 定期考査 --}}
     <x-input.select caption="試験名" id="teiki_id" :select2=true :rules=$rules :editData=$editData
         vShow="form.exam_type == 2">
-        <option value="1">1学期中間考査</option>
-        <option value="2">1学期末考査</option>
-        <option value="3">2学期中間考査</option>
-        <option value="4">2学期末考査</option>
+        <option value="1">1学期(前期)中間考査</option>
+        <option value="2">1学期(前期)末考査</option>
+        <option value="3">2学期(後期)中間考査</option>
+        <option value="4">2学期(後期)末考査</option>
         <option value="5">3学期末考査</option>
     </x-input.select>
 
@@ -37,8 +37,8 @@
     {{-- 通信票評定 --}}
     <x-input.select caption="学期" id="term_id" :select2=true :rules=$rules
         vShow="form.exam_type == 3">
-        <option value="1">1学期</option>
-        <option value="2">2学期</option>
+        <option value="1">1学期（前期）</option>
+        <option value="2">2学期（後期）</option>
         <option value="3">3学期</option>
         <option value="4">学年</option>
     </x-input.select>
@@ -56,43 +56,34 @@
         <x-slot name="thead">
             <td>教科</td>
             <td>得点</td>
-            <td>学年平均</td>
+            <td>満点</td>
+            <td>平均点</td>
             <td>偏差値</td>
         </x-slot>
 
-        <tr v-cloak>
-            <x-bs.td-sp caption="教科">
-                全教科合計
-            </x-bs.td-sp>
-
-            <x-bs.td-sp caption="得点">
-                <x-input.text id="total_score"  :rules=$rules />
-            </x-bs.td-sp>
-
-            <x-bs.td-sp caption="学年平均" class="not-center">
-                <x-input.text id="total_average"  :rules=$rules />
-            </x-bs.td-sp>
-
-            <x-bs.td-sp caption="偏差値" vShow="form.exam_type == 1">
-                <x-input.text id="total_deviation"  :rules=$rules />
-            </x-bs.td-sp>
-        </tr>
-
-        @for ($i = 0; $i < 10; $i++) <tr v-cloak>
+        {{-- 小6、中7、高10項目用意する --}}
+        @for ($i = 0; $i < 7; $i++) <tr v-cloak>
             {{-- hidden --}}
             <x-input.hidden id="grades_seq_{{$i}}" :editData=$editDataDtls[$i] />
 
             <x-bs.td-sp caption="教科">
                 {{-- プルダウンselect2 --}}
                 <x-input.select id="curriculumcd_{{$i}}" :select2=true
-                    :mastrData=$curriculums :rules=$rules :editData=$editDataDtls[$i] />
+                    :mastrData=$curriculums :rules=$rules :editData=$editDataDtls[$i] >
+                    <option>3教科合計</option>
+                    <option>5教科合計</option>
+                </x-input.select>
             </x-bs.td-sp>
 
             <x-bs.td-sp caption="得点">
                 <x-input.text id="score_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
             </x-bs.td-sp>
 
-            <x-bs.td-sp caption="学年平均" class="not-center">
+            <x-bs.td-sp caption="満点">
+                <x-input.text id="full_score_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
+            </x-bs.td-sp>
+
+            <x-bs.td-sp caption="平均点" class="not-center">
                 <x-input.text id="average_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
             </x-bs.td-sp>
 
@@ -108,24 +99,11 @@
         <x-slot name="thead">
             <td>教科</td>
             <td>得点</td>
-            <td>学年平均</td>
+            <td>平均点</td>
         </x-slot>
 
-        <tr v-cloak>
-            <x-bs.td-sp caption="教科">
-                全教科合計
-            </x-bs.td-sp>
-
-            <x-bs.td-sp caption="得点">
-                <x-input.text id="total_score"  :rules=$rules />
-            </x-bs.td-sp>
-
-            <x-bs.td-sp caption="学年平均" class="not-center">
-                <x-input.text id="total_average"  :rules=$rules />
-            </x-bs.td-sp>
-        </tr>
-
-        @for ($i = 0; $i < 10; $i++) <tr v-cloak>
+        {{-- 中高15項目用意する --}}
+        @for ($i = 0; $i < 15; $i++) <tr v-cloak>
             {{-- hidden --}}
             <x-input.hidden id="grades_seq_{{$i}}" :editData=$editDataDtls[$i] />
 
@@ -139,7 +117,7 @@
                 <x-input.text id="score_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
             </x-bs.td-sp>
 
-            <x-bs.td-sp caption="学年平均" class="not-center">
+            <x-bs.td-sp caption="平均点" class="not-center">
                 <x-input.text id="average_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
             </x-bs.td-sp>
             </tr>
@@ -153,7 +131,8 @@
             <td>評定値</td>
         </x-slot>
 
-        @for ($i = 0; $i < 10; $i++) <tr v-cloak>
+        {{-- 中9、高15項目用意する --}}
+        @for ($i = 0; $i < 9; $i++) <tr v-cloak>
             {{-- hidden --}}
             <x-input.hidden id="grades_seq_{{$i}}" />
 
