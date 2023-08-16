@@ -1,13 +1,13 @@
 @extends('adminlte::page')
 
-@section('title', '集団授業欠席申請')
+@section('title', '欠席連絡（1対多）')
 
 @section('content')
 
 {{-- 検索フォーム --}}
 <x-bs.card :form=true>
 
-    <p>集団授業の欠席申請を行います。</p>
+    <p>1対多授業の欠席連絡を行います。</p>
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
@@ -29,6 +29,10 @@
             <th>講師</th>
             <td><span v-cloak v-show="form.id != 0">CWテスト講師１０１<span v-show="form.id != 0">先生</span></span></td>
         </tr>
+        <tr>
+            <th class="t-minimum" width="25%">電話番号</th>
+            <td><span v-cloak v-show="form.id != 0"><a href="tel:000-1234-5678">000-1234-5678</a></span></td>
+        </tr>
 
         {{-- 本番用処理 --}}
         {{-- <tr>
@@ -44,8 +48,8 @@
     <x-input.textarea caption="欠席理由" id="absent_reason" :rules=$rules />
 
     <x-bs.callout title="欠席の際の注意事項" type="warning">
-        授業日の前日までに申請を行ってください。<br>
-        授業日当日の欠席連絡につきましては、0120-XX-XXXX までお電話いただきますようお願いします。
+        授業日の前日までに連絡を行ってください。<br>
+        授業日当日の欠席連絡につきましては、各校舎までお電話いただきますようお願いします。
     </x-bs.callout>
 
     {{-- フッター --}}

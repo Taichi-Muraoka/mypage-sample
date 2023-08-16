@@ -375,7 +375,7 @@ return [
             'can'  => 'student',
         ],
         [
-            'text' => '欠席申請（１対多）',
+            'text' => '欠席連絡（1対多）',
             'route'  => 'absent',
             'icon' => 'far fa-times-circle',
             'can'  => 'student',
