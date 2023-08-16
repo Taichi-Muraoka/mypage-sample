@@ -36,10 +36,18 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.text caption="生徒名" id="name" :rules=$rules />
+            <x-input.select caption="生徒名" id="student" :select2=true :editData="$editData">
+                <option value="1">CWテスト生徒１</option>
+                <option value="2">CWテスト生徒２</option>
+                <option value="3">CWテスト生徒３</option>
+            </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text caption="講師名" id="tname" :rules=$rules />
+            <x-input.select caption="講師名" id="tutor" :select2=true :editData="$editData">
+                <option value="1">CWテスト講師１０１</option>
+                <option value="2">CWテスト講師１０２</option>
+                <option value="3">CWテスト講師１０３</option>
+            </x-input.select>
         </x-bs.col2>
     </x-bs.row>
 
@@ -53,12 +61,12 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th class="t-minimum">申請日</th>
-            <th>生徒名</th>
-            <th width="20%">授業日・時限</th>
+            <th width="15%">申請日</th>
+            <th width="15%">生徒名</th>
+            <th width="15%">授業日・時限</th>
             <th width="15%">校舎</th>
-            <th>講師名</th>
-            <th width="t-minimum">ステータス</th>
+            <th width="15%">講師名</th>
+            <th width="15%">ステータス</th>
             <th></th>
         </x-slot>
 
@@ -69,7 +77,7 @@
             <td>CWテスト生徒１</td>
             <td>2023/05/22 4限</td>
             <td>久我山</td>
-            <td>CWテスト教師１０１</td>
+            <td>CWテスト講師１０１</td>
             <td>未対応</td>
             <td>
                 <x-button.list-dtl />
