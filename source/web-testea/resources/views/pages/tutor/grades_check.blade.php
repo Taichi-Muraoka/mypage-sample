@@ -53,30 +53,30 @@
         {{-- モック用処理 --}}
         {{-- テーブル行 --}}
         <tr>
-            <x-bs.td-sp caption="登録日">2023/03/18</x-bs.td-sp>
+            <x-bs.td-sp caption="登録日">2023/07/21</x-bs.td-sp>
             <x-bs.td-sp caption="生徒名">CWテスト生徒１</x-bs.td-sp>
-            <x-bs.td-sp caption="種別">模試</x-bs.td-sp>
-            <x-bs.td-sp caption="学期・試験名">全国統一模試</x-bs.td-sp>
+            <x-bs.td-sp caption="種別">通信票評定</x-bs.td-sp>
+            <x-bs.td-sp caption="学期・試験名">１学期（前期）</x-bs.td-sp>
             <td>
-                <x-button.list-dtl :vueDataAttr="['id' => '1']" />
+                <x-button.list-dtl :vueDataAttr="['id' => '3']" />
             </td>
         </tr>
         <tr>
             <x-bs.td-sp caption="登録日">2023/04/10</x-bs.td-sp>
             <x-bs.td-sp caption="生徒名">CWテスト生徒１</x-bs.td-sp>
             <x-bs.td-sp caption="種別">定期考査</x-bs.td-sp>
-            <x-bs.td-sp caption="学期・試験名">１学期中間考査</x-bs.td-sp>
+            <x-bs.td-sp caption="学期・試験名">１学期（前期）中間考査</x-bs.td-sp>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => '2']" />
             </td>
         </tr>
         <tr>
-            <x-bs.td-sp caption="登録日">2023/07/21</x-bs.td-sp>
+            <x-bs.td-sp caption="登録日">2023/03/18</x-bs.td-sp>
             <x-bs.td-sp caption="生徒名">CWテスト生徒１</x-bs.td-sp>
-            <x-bs.td-sp caption="種別">通信票評定</x-bs.td-sp>
-            <x-bs.td-sp caption="学期・試験名">１学期</x-bs.td-sp>
+            <x-bs.td-sp caption="種別">模試</x-bs.td-sp>
+            <x-bs.td-sp caption="学期・試験名">全国統一模試</x-bs.td-sp>
             <td>
-                <x-button.list-dtl :vueDataAttr="['id' => '3']" />
+                <x-button.list-dtl :vueDataAttr="['id' => '1']" />
             </td>
         </tr>
 
