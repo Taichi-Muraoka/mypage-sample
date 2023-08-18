@@ -19,31 +19,33 @@
     </x-input.select>
 
     {{-- 詳細を表示 --}}
-    <x-bs.table :hover=false :vHeader=true class="mb-4">
-        {{-- モック用処理 --}}
-        <tr>
-            <th class="t-minimum" width="25%">校舎</th>
-            <td><span v-cloak v-show="form.id != 0">久我山</span></td>
-        </tr>
-        <tr>
-            <th>講師</th>
-            <td><span v-cloak v-show="form.id != 0">CWテスト講師１０１<span v-show="form.id != 0">先生</span></span></td>
-        </tr>
-        <tr>
-            <th class="t-minimum" width="25%">電話番号</th>
-            <td><span v-cloak v-show="form.id != 0"><a href="tel:000-1234-5678">000-1234-5678</a></span></td>
-        </tr>
+    <div v-cloak>
+        <x-bs.table :hover=false :vHeader=true class="mb-4" vShow="form.id != 0">
+            {{-- モック用処理 --}}
+            <tr>
+                <th class="t-minimum" width="25%">校舎</th>
+                <td><span v-cloak v-show="form.id != 0">久我山</span></td>
+            </tr>
+            <tr>
+                <th>講師</th>
+                <td><span v-cloak v-show="form.id != 0">CWテスト講師１０１<span v-show="form.id != 0">先生</span></span></td>
+            </tr>
+            <tr>
+                <th class="t-minimum" width="25%">校舎連絡先</th>
+                <td><span v-cloak v-show="form.id != 0"><a href="tel:000-1234-5678">000-1234-5678</a></span></td>
+            </tr>
 
-        {{-- 本番用処理 --}}
-        {{-- <tr>
-            <th class="t-minimum" width="25%">校舎</th>
-            <td><span v-cloak>@{{selectGetItem.class_name}}</span></td>
-        </tr>
-        <tr>
-            <th>講師</th>
-            <td><span v-cloak>@{{selectGetItem.teacher_name}}<span v-if="selectGetItem.teacher_name">先生</span></span></td>
-        </tr> --}}
-    </x-bs.table>
+            {{-- 本番用処理 --}}
+            {{-- <tr>
+                <th class="t-minimum" width="25%">校舎</th>
+                <td><span v-cloak>@{{selectGetItem.class_name}}</span></td>
+            </tr>
+            <tr>
+                <th>講師</th>
+                <td><span v-cloak>@{{selectGetItem.teacher_name}}<span v-if="selectGetItem.teacher_name">先生</span></span></td>
+            </tr> --}}
+        </x-bs.table>
+    </div>
 
     <x-input.textarea caption="欠席理由" id="absent_reason" :rules=$rules />
 
