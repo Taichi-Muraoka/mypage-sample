@@ -312,6 +312,7 @@
 
 <x-bs.card>
     <x-slot name="tools">
+        <x-button.new href="{{ route('grades_mng-new', $student->sid) }}" caption="成績登録" :small=true />
         <x-button.edit href="{{ route('grades_mng', $student->sid) }}" caption="成績管理" icon="" :small=true />
     </x-slot>
 

@@ -890,6 +890,12 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 詳細取得用
     Route::post('/member_mng/get_data_grades_mng', [GradesMngController::class, 'getData'])->name('grades_mng-get_data');
 
+    // 登録画面
+    Route::get('/member_mng/grades_mng/{sid}/new', [GradesMngController::class, 'new'])->name('grades_mng-new');
+
+    // 新規登録処理
+    Route::post('/member_mng/create_grades_mng', [GradesMngController::class, 'create'])->name('grades_mng-create');
+
     // 生徒成績編集
     Route::get('/member_mng/grades_mng/edit/{gradesId}', [GradesMngController::class, 'edit'])->name('grades_mng-edit');
 
