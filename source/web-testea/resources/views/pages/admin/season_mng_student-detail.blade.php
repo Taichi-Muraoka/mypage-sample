@@ -14,7 +14,7 @@
     </x-slot>
 
     <p>生徒の連絡内容を確認し、科目毎にコマ組みを行います。<br>
-    登録した講習スケジュールを確認し、コマ組みステータスを登録してください。</p>
+    登録した講習スケジュールを確認し、コマ組み状態を登録してください。</p>
 
     {{-- テーブル --}}
     <x-bs.table :hover=false :vHeader=true>
@@ -35,7 +35,7 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-  <x-bs.form-title>受講希望科目・授業数</x-bs.form-title>
+  <x-bs.form-title>受講希望科目・受講回数</x-bs.form-title>
 
   {{-- テーブル --}}
     <x-bs.table class="mb-3">
@@ -103,7 +103,7 @@
     </tr>
   </x-bs.table>
 
-      <x-input.select id="status" caption="コマ組みステータス" :select2=true :select2Search=false>
+      <x-input.select id="status" caption="コマ組み状態" :select2=true :select2Search=false>
         <option value="1" selected>未対応</option>
         <option value="2">対応中</option>
         <option value="3">対応済</option>
@@ -113,9 +113,9 @@
     <div class="mb-3"></div>
 
     <x-bs.callout type="warning">
-        全ての受講科目についてコマ組みを行った後、コマ組みステータスを「対応済」としてください。<br>
+        全ての受講希望科目についてコマ組みを行った後、コマ組み状態を「対応済」としてください。<br>
         当機能でコマ組みされた講習スケジュールは仮確定の状態であり、生徒・講師への公開はされません。<br>
-        教室カレンダーから確認・編集を行うことができます。<br>
+        管理者からは教室カレンダーより確認・編集を行うことができます。<br>
         スケジュールを確定し、生徒・講師へ公開するには、対象生徒全員のスケジュールを登録後にコマ組み確定処理を行ってください。
     </x-bs.callout>
 

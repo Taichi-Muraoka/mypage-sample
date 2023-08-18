@@ -65,8 +65,8 @@
 
         {{-- テーブル行 --}}
         <tr>
-            <td>2023/03/05</td>
-            <td>2023年春期</td>
+            <td>2023/07/05</td>
+            <td>2023年夏期</td>
             <td>久我山</td>
             <td>CWテスト生徒１</td>
             <td>登録済</td>
@@ -76,8 +76,8 @@
             </td>
         </tr>
         <tr>
-            <td>2023/03/04</td>
-            <td>2023年春期</td>
+            <td>2023/07/04</td>
+            <td>2023年夏期</td>
             <td>久我山</td>
             <td>CWテスト生徒２</td>
             <td>登録済</td>
@@ -87,8 +87,8 @@
             </td>
         </tr>
         <tr>
-            <td>2023/03/04</td>
-            <td>2023年春期</td>
+            <td>2023/07/04</td>
+            <td>2023年夏期</td>
             <td>久我山</td>
             <td>CWテスト生徒３</td>
             <td>登録済</td>
@@ -99,13 +99,24 @@
         </tr>
         <tr>
             <td></td>
-            <td>2023年春期</td>
+            <td>2023年夏期</td>
             <td>久我山</td>
             <td>CWテスト生徒４</td>
             <td>未登録</td>
             <td>未対応</td>
             <td>
-                <x-button.list-edit vueHref="'{{ route('season_mng_student-detail', '') }}/' + 1" caption="詳細・コマ組み" />
+                <x-button.list-edit vueHref="'{{ route('season_mng_student-detail', '') }}/' + 1" caption="詳細・コマ組み" disabled=true/>
+            </td>
+        </tr>
+        <tr>
+            <td>2023/03/04</td>
+            <td>2023年春期</td>
+            <td>久我山</td>
+            <td>CWテスト生徒３</td>
+            <td>登録済</td>
+            <td>対応済</td>
+            <td>
+                <x-button.list-edit vueHref="'{{ route('season_mng_student-detail', '') }}/' + 1" caption="詳細・コマ組み" disabled=true />
             </td>
         </tr>
 

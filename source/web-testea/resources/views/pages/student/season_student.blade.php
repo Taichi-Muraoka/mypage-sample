@@ -42,7 +42,7 @@
             <x-bs.td-sp caption="連絡日"></x-bs.td-sp>
             <td>
                 {{-- 未登録の場合 --}}
-                <div v-show="1==1"><x-button.list-edit vueHref="'{{ route('season_student-edit', '') }}/' + 1" caption="登録" disabled=true/></div>
+                <div v-show="1==1"><x-button.list-edit vueHref="'{{ route('season_student-edit', '') }}/' + 1" caption="登録"/></div>
                 {{-- 登録済の場合 --}}
                 <div v-show="1==0"><x-button.list-dtl vueHref="'{{ route('season_student-detail', '') }}/' + 1" caption="詳細"/></div>
             </td>

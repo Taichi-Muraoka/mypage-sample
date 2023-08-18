@@ -13,7 +13,7 @@
     {{-- 詳細を表示 --}}
     <x-bs.table :hover=false :vHeader=true class="mb-4">
       <tr>
-          <th class="t-minimum" width="25%">特別期間</th>
+          <th class="t-minimum" width="25%">特別期間名</th>
           <td>2023年春期</td>
       </tr>
         <tr>
@@ -29,7 +29,7 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-  <x-bs.form-title>受講希望科目・授業数</x-bs.form-title>
+  <x-bs.form-title>受講希望科目・受講回数</x-bs.form-title>
 
   {{-- テーブル --}}
     <x-bs.table class="mb-3">

@@ -69,17 +69,17 @@
 
     <x-bs.form-group name="kaisuArea" />
 
-    <x-bs.form-title>受講希望科目・回数</x-bs.form-title>
+    <x-bs.form-title>受講希望科目・受講回数</x-bs.form-title>
 
     {{-- テーブル --}}
     <x-bs.table :bordered=false :hover=false :smartPhone=true class="mb-small">
       <x-slot name="thead">
-        <td>教科</td>
+        <td>科目</td>
         <td>受講回数</td>
       </x-slot>
       @for ($i = 1; $i <= 5; $i++)
       <tr v-cloak>
-        <x-bs.td-sp caption="教科">
+        <x-bs.td-sp caption="科目">
           <x-input.select id="curriculumcd_{{ $i }}" :select2=true >
             <option value="1">国語</option>
             <option value="2">数学</option>
