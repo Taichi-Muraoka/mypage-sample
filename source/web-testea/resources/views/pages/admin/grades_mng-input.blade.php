@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title','生徒成績編集')
+@section('title', (request()->routeIs('grades_mng-edit')) ? '生徒成績編集' : '生徒成績登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -10,22 +10,26 @@
 
 @section('parent_page_title', '生徒カルテ')
 
+{{-- 編集画面の場合のみ、一覧を経由し四階層とする --}}
+@if (request()->routeIs('grades_mng-edit'))
 @section('parent_page2', route('grades_mng', $editData['sid']))
-
 @section('parent_page_title2', '生徒成績一覧')
-
+@endif
 
 @section('content')
 
 {{-- formを指定 --}}
 <x-bs.card :form=true>
 
-    <p>以下の試験成績の変更を行います。</p>
+    <p>以下の成績の{{(request()->routeIs('grades_mng-edit')) ? '変更' : '登録'}}を行います。</p>
 
+    @if (request()->routeIs('grades_mng-edit'))
     <x-input.date-picker caption="登録日" id="regist_time" :editData=$editData />
+    @endif
 
     <x-bs.form-title>生徒名</x-bs.form-title>
-    <p class="edit-disp-indent">{{$editData->sname}}</p>
+    {{-- <p class="edit-disp-indent">{{$editData->sname}}</p> --}}
+    <p class="edit-disp-indent">CWテスト生徒１</p>
 
     {{-- <x-input.select caption="試験種別" id="exam_type" :blank=false :select2=true :select2Search=false :mastrData=$examTypes :rules=$rules :editData=$editData /> --}}
     <x-input.select caption="種別" id="exam_type" :blank=false :select2=true :select2Search=false :rules=$rules :editData=$editData >
@@ -42,10 +46,11 @@
     {{-- <x-input.select caption="試験名" id="teiki_id" :select2=true :mastrData=$teikiNames :rules=$rules :editData=$editData  vShow="form.exam_type == {{ App\Consts\AppConst::CODE_MASTER_9_2 }}"/> --}}
     <x-input.select caption="試験名" id="teiki_id" :select2=true :rules=$rules :editData=$editData
         vShow="form.exam_type == 2">
-        <option value="1">1学期中間考査</option>
-        <option value="2">1学期末考査</option>
-        <option value="3">2学期中間考査</option>
-        <option value="4">2学期末考査</option>
+        <option value="1">1学期(前期)中間考査</option>
+        <option value="2">1学期(前期)末考査</option>
+        <option value="3">2学期(後期)中間考査</option>
+        <option value="4">2学期(後期)末考査</option>
+        <option value="5">3学期末考査</option>
     </x-input.select>
 
     {{-- 模試 --}}{{-- 定期考査 --}}
@@ -54,8 +59,8 @@
     {{-- 通信票評定 --}}
     <x-input.select caption="学期" id="term_id" :select2=true :rules=$rules
         vShow="form.exam_type == 3">
-        <option value="1">1学期</option>
-        <option value="2">2学期</option>
+        <option value="1">1学期（前期）</option>
+        <option value="2">2学期（後期）</option>
         <option value="3">3学期</option>
         <option value="4">学年</option>
     </x-input.select>
@@ -73,43 +78,34 @@
         <x-slot name="thead">
             <td>教科</td>
             <td>得点</td>
-            <td>学年平均</td>
+            <td>満点</td>
+            <td>平均点</td>
             <td>偏差値</td>
         </x-slot>
 
-        <tr v-cloak>
-            <x-bs.td-sp caption="教科">
-                全教科合計
-            </x-bs.td-sp>
-
-            <x-bs.td-sp caption="得点">
-                <x-input.text id="total_score"  :rules=$rules />
-            </x-bs.td-sp>
-
-            <x-bs.td-sp caption="学年平均" class="not-center">
-                <x-input.text id="total_average"  :rules=$rules />
-            </x-bs.td-sp>
-
-            <x-bs.td-sp caption="偏差値" vShow="form.exam_type == 1">
-                <x-input.text id="total_deviation"  :rules=$rules />
-            </x-bs.td-sp>
-        </tr>
-
-        @for ($i = 0; $i < 10; $i++) <tr v-cloak>
+        {{-- 小6、中7、高10項目用意する --}}
+        @for ($i = 0; $i < 7; $i++) <tr v-cloak>
             {{-- hidden --}}
             <x-input.hidden id="grades_seq_{{$i}}" :editData=$editDataDtls[$i] />
 
             <x-bs.td-sp caption="教科">
                 {{-- プルダウンselect2 --}}
                 <x-input.select id="curriculumcd_{{$i}}" :select2=true
-                    :mastrData=$curriculums :rules=$rules :editData=$editDataDtls[$i] />
+                    :mastrData=$curriculums :rules=$rules :editData=$editDataDtls[$i] >
+                    <option>3教科合計</option>
+                    <option>5教科合計</option>
+                </x-input.select>
             </x-bs.td-sp>
 
             <x-bs.td-sp caption="得点">
                 <x-input.text id="score_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
             </x-bs.td-sp>
 
-            <x-bs.td-sp caption="学年平均" class="not-center">
+            <x-bs.td-sp caption="満点">
+                <x-input.text id="full_score_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
+            </x-bs.td-sp>
+
+            <x-bs.td-sp caption="平均点" class="not-center">
                 <x-input.text id="average_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
             </x-bs.td-sp>
 
@@ -125,24 +121,11 @@
         <x-slot name="thead">
             <td>教科</td>
             <td>得点</td>
-            <td>学年平均</td>
+            <td>平均点</td>
         </x-slot>
 
-        <tr v-cloak>
-            <x-bs.td-sp caption="教科">
-                全教科合計
-            </x-bs.td-sp>
-
-            <x-bs.td-sp caption="得点">
-                <x-input.text id="total_score"  :rules=$rules />
-            </x-bs.td-sp>
-
-            <x-bs.td-sp caption="学年平均" class="not-center">
-                <x-input.text id="total_average"  :rules=$rules />
-            </x-bs.td-sp>
-        </tr>
-
-        @for ($i = 0; $i < 10; $i++) <tr v-cloak>
+        {{-- 中高15項目用意する --}}
+        @for ($i = 0; $i < 15; $i++) <tr v-cloak>
             {{-- hidden --}}
             <x-input.hidden id="grades_seq_{{$i}}" :editData=$editDataDtls[$i] />
 
@@ -156,7 +139,7 @@
                 <x-input.text id="score_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
             </x-bs.td-sp>
 
-            <x-bs.td-sp caption="学年平均" class="not-center">
+            <x-bs.td-sp caption="平均点" class="not-center">
                 <x-input.text id="average_{{$i}}" :editData=$editDataDtls[$i] :rules=$rules />
             </x-bs.td-sp>
             </tr>
@@ -170,7 +153,8 @@
             <td>評定値</td>
         </x-slot>
 
-        @for ($i = 0; $i < 10; $i++) <tr v-cloak>
+        {{-- 中9、高15項目用意する --}}
+        @for ($i = 0; $i < 9; $i++) <tr v-cloak>
             {{-- hidden --}}
             <x-input.hidden id="grades_seq_{{$i}}" />
 
@@ -193,13 +177,26 @@
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
+            @if (request()->routeIs('grades_mng-edit'))
+            {{-- 編集時 --}}
             {{-- 前の階層に戻る --}}
             <x-button.back url="{{route('grades_mng', $editData['sid'])}}" />
+            @else
+            {{-- 登録時 --}}
+            {{-- 生徒カルテに戻る --}}
+            <x-button.back url="{{route('member_mng-detail', $editData['sid'])}}" />
+            @endif
 
+            @if (request()->routeIs('grades_mng-edit'))
+            {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
                 <x-button.submit-delete />
                 <x-button.submit-edit />
             </div>
+            @else
+            {{-- 登録時 --}}
+            <x-button.submit-new />
+            @endif
         </div>
     </x-slot>
 

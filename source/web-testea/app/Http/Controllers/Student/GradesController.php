@@ -189,7 +189,7 @@ class GradesController extends Controller
 
         return view('pages.student.grades-input', [
             'editData' => null,
-            'editDataDtls' => [null, null, null, null, null, null, null, null, null, null],
+            'editDataDtls' => [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
             'rules' => $this->rulesForInput(null),
             'examTypes' => $examTypes,
             'teikiNames' => $teikiNames,
@@ -249,7 +249,7 @@ class GradesController extends Controller
     public function edit($gradesId)
     {
         // IDのバリデーション
-        $this->validateIds($gradesId);
+        // $this->validateIds($gradesId);
 
         // ログイン者の情報を取得する
         $account = Auth::user();
@@ -269,32 +269,32 @@ class GradesController extends Controller
         // 前回比リストを取得
         $updownList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_11);
 
-        // クエリを作成
-        $query = Grades::query();
+        // // クエリを作成
+        // $query = Grades::query();
 
-        // データを取得（生徒成績）
-        $grades = $query
-            // データを取得
-            ->select(
-                'grades_id',
-                'exam_type',
-                'exam_id as teiki_id',
-                'exam_id as moshi_id',
-                'student_comment'
-            )
-            // IDを指定
-            ->where('grades.grades_id', $gradesId)
-            // 自分の生徒IDのみにガードを掛ける
-            ->where($this->guardStudentTableWithSid())
-            // MEMO: 取得できない場合はエラーとする
-            ->firstOrFail();
+        // // データを取得（生徒成績）
+        // $grades = $query
+        //     // データを取得
+        //     ->select(
+        //         'grades_id',
+        //         'exam_type',
+        //         'exam_id as teiki_id',
+        //         'exam_id as moshi_id',
+        //         'student_comment'
+        //     )
+        //     // IDを指定
+        //     ->where('grades.grades_id', $gradesId)
+        //     // 自分の生徒IDのみにガードを掛ける
+        //     ->where($this->guardStudentTableWithSid())
+        //     // MEMO: 取得できない場合はエラーとする
+        //     ->firstOrFail();
 
-        // データを取得（生徒成績詳細）
-        $gradesDetails = $this->getGradesDetailEdit($gradesId);
+        // // データを取得（生徒成績詳細）
+        // $gradesDetails = $this->getGradesDetailEdit($gradesId);
 
         return view('pages.student.grades-input', [
-            'editData' => $grades,
-            'editDataDtls' => $gradesDetails,
+            'editData' => null,
+            'editDataDtls' => [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
             'rules' => $this->rulesForInput(null),
             'examTypes' => $examTypes,
             'teikiNames' => $teikiNames,

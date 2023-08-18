@@ -28,7 +28,7 @@
         <tr>
             <x-bs.td-sp caption="登録日">2023/05/15</x-bs.td-sp>
             <x-bs.td-sp caption="種別">定期考査</x-bs.td-sp>
-            <x-bs.td-sp caption="学期・試験名">１学期中間考査</x-bs.td-sp>
+            <x-bs.td-sp caption="学期・試験名">１学期（前期）中間考査</x-bs.td-sp>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => '1']" />
                 <x-button.list-edit href="{{ route('grades-edit', 1) }}" />
@@ -46,7 +46,7 @@
         <tr>
             <x-bs.td-sp caption="登録日">2023/03/20</x-bs.td-sp>
             <x-bs.td-sp caption="種別">通信票評定</x-bs.td-sp>
-            <x-bs.td-sp caption="学期・試験名">２学期</x-bs.td-sp>
+            <x-bs.td-sp caption="学期・試験名">２学期（後期）</x-bs.td-sp>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => '3']" />
                 <x-button.list-edit href="{{ route('grades-edit', 1) }}" />

@@ -33,46 +33,60 @@
             {{-- tableの中にtableを書くと線が出てしまう noborder-only-topを指定した --}}
             <x-bs.table :bordered=false :hover=false class="noborder-only-top">
                 <x-slot name="thead">
-                    <th width="25%">教科</th>
-                    <th width="25%">得点</th>
-                    <th width="25%">学年平均</th>
-                    <th width="25%">偏差値</th>
+                    <th width="20%">教科</th>
+                    <th width="20%">得点</th>
+                    <th width="20%">満点</th>
+                    <th width="20%">平均点</th>
+                    <th width="20%">偏差値</th>
                 </x-slot>
 
                 <tr>
-                    <x-bs.td-sp>全教科合計</x-bs.td-sp>
-                    <x-bs.td-sp>380点</x-bs.td-sp>
-                    <x-bs.td-sp>50点</x-bs.td-sp>
-                    <x-bs.td-sp>62</x-bs.td-sp>
-                </tr>
-                <tr>
                     <x-bs.td-sp>国語</x-bs.td-sp>
                     <x-bs.td-sp>80点</x-bs.td-sp>
+                    <x-bs.td-sp>100点</x-bs.td-sp>
                     <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>数学</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
+                    <x-bs.td-sp>100点</x-bs.td-sp>
                     <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>理科</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
+                    <x-bs.td-sp>100点</x-bs.td-sp>
                     <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>社会</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
+                    <x-bs.td-sp>100点</x-bs.td-sp>
                     <x-bs.td-sp>50点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
                 <tr>
                     <x-bs.td-sp>英語</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
+                    <x-bs.td-sp>100点</x-bs.td-sp>
                     <x-bs.td-sp>50点</x-bs.td-sp>
+                    <x-bs.td-sp>62</x-bs.td-sp>
+                </tr>
+                <tr>
+                    <x-bs.td-sp>3教科合計</x-bs.td-sp>
+                    <x-bs.td-sp>250点</x-bs.td-sp>
+                    <x-bs.td-sp>300点</x-bs.td-sp>
+                    <x-bs.td-sp>150点</x-bs.td-sp>
+                    <x-bs.td-sp>62</x-bs.td-sp>
+                </tr>
+                <tr>
+                    <x-bs.td-sp>5教科合計</x-bs.td-sp>
+                    <x-bs.td-sp>380点</x-bs.td-sp>
+                    <x-bs.td-sp>500点</x-bs.td-sp>
+                    <x-bs.td-sp>250点</x-bs.td-sp>
                     <x-bs.td-sp>62</x-bs.td-sp>
                 </tr>
             </x-bs.table>
@@ -103,7 +117,7 @@
     </tr>
     <tr>
         <th>試験名</th>
-        <td>１学期中間考査</td>
+        <td>１学期（前期）中間考査</td>
     </tr>
     <tr>
         <th>試験日（開始日）</th>
@@ -120,14 +134,9 @@
                 <x-slot name="thead">
                     <th width="30%">教科</th>
                     <th width="30%">得点</th>
-                    <th width="30%">学年平均</th>
+                    <th width="30%">平均点</th>
                 </x-slot>
 
-                <tr>
-                    <x-bs.td-sp>全教科合計</x-bs.td-sp>
-                    <x-bs.td-sp>380点</x-bs.td-sp>
-                    <x-bs.td-sp>250点</x-bs.td-sp>
-                </tr>
                 <tr>
                     <x-bs.td-sp>国語</x-bs.td-sp>
                     <x-bs.td-sp>80点</x-bs.td-sp>
@@ -152,6 +161,11 @@
                     <x-bs.td-sp>英語</x-bs.td-sp>
                     <x-bs.td-sp>75点</x-bs.td-sp>
                     <x-bs.td-sp>50点</x-bs.td-sp>
+                </tr>
+                <tr>
+                    <x-bs.td-sp>全教科合計</x-bs.td-sp>
+                    <x-bs.td-sp>380点</x-bs.td-sp>
+                    <x-bs.td-sp>250点</x-bs.td-sp>
                 </tr>
             </x-bs.table>
         </td>
@@ -181,7 +195,7 @@
     </tr>
     <tr>
         <th>学期</th>
-        <td>１学期</td>
+        <td>１学期（前期）</td>
     </tr>
 
     <tr>

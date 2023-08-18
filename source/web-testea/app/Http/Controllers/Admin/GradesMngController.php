@@ -263,8 +263,76 @@ class GradesMngController extends Controller
     }
 
     //==========================
-    // 編集
+    // 登録・編集・削除
     //==========================
+
+    /**
+     * 登録画面
+     *
+     * @return view
+     */
+    public function new()
+    {
+        // 試験種別リストを取得
+        $examTypes = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_9);
+
+        // 定期考査名リストを取得
+        $teikiNames = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_10);
+
+        $editData = [
+            "sid" => 1,
+        ];
+
+        return view('pages.admin.grades_mng-input', [
+            'editData' => $editData,
+            'editDataDtls' => [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+            'rules' => $this->rulesForInput(null),
+            'examTypes' => $examTypes,
+            'teikiNames' => $teikiNames,
+            'curriculums' => null,
+        ]);
+    }
+
+    /**
+     * 登録処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function create(Request $request)
+    {
+
+        // 登録前バリデーション。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForInput($request))->validate();
+
+        // ログイン者の情報を取得する
+        $account = Auth::user();
+
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($request, $account) {
+
+            // 現在日時を取得
+            $now = Carbon::now();
+            // Gradesテーブルへのinsert
+            $grades = new Grades;
+            // 登録
+            $grades->sid = $account->account_id;
+            $grades->exam_type =  $request['exam_type'];
+            if ($request['exam_type'] == AppConst::CODE_MASTER_9_1) {
+                $grades->exam_id = $request['moshi_id'];
+            } else {
+                $grades->exam_id = $request['teiki_id'];
+            }
+            $grades->student_comment = $request['student_comment'];
+            $grades->regist_time = $now;
+            $grades->save();
+
+            // GradesDetailテーブルへのinsert
+            $this->saveToGradesDetail($request, $grades->grades_id);
+        });
+
+        return;
+    }
 
     /**
      * 編集画面
@@ -274,8 +342,8 @@ class GradesMngController extends Controller
      */
     public function edit($gradesId)
     {
-        // IDのバリデーション
-        $this->validateIds($gradesId);
+        // // IDのバリデーション
+        // $this->validateIds($gradesId);
 
         // 試験種別リストを取得
         $examTypes = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_9);
@@ -283,53 +351,52 @@ class GradesMngController extends Controller
         // 定期考査名リストを取得
         $teikiNames = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_10);
 
-        // 前回比リストを取得
-        $updownList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_11);
+        // // クエリを作成
+        // $query = Grades::query();
 
-        // クエリを作成
-        $query = Grades::query();
+        // // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
+        // $query->where($this->guardRoomAdminTableWithSid());
 
-        // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
-        $query->where($this->guardRoomAdminTableWithSid());
+        // // データを取得（生徒成績）
+        // $grades = $query
+        //     // データを取得
+        //     ->select(
+        //         'regist_time',
+        //         'ext_student_kihon.name as sname',
+        //         'grades_id',
+        //         'grades.sid',
+        //         'exam_type',
+        //         'exam_id as teiki_id',
+        //         'exam_id as moshi_id',
+        //         'student_comment'
+        //     )
+        //     // 生徒名の取得
+        //     ->sdLeftJoin(ExtStudentKihon::class, 'grades.sid', '=', 'ext_student_kihon.sid')
+        //     // IDを指定
+        //     ->where('grades.grades_id', $gradesId)
+        //     // MEMO: 取得できない場合はエラーとする
+        //     ->firstOrFail();
 
-        // データを取得（生徒成績）
-        $grades = $query
-            // データを取得
-            ->select(
-                'regist_time',
-                'ext_student_kihon.name as sname',
-                'grades_id',
-                'grades.sid',
-                'exam_type',
-                'exam_id as teiki_id',
-                'exam_id as moshi_id',
-                'student_comment'
-            )
-            // 生徒名の取得
-            ->sdLeftJoin(ExtStudentKihon::class, 'grades.sid', '=', 'ext_student_kihon.sid')
-            // IDを指定
-            ->where('grades.grades_id', $gradesId)
-            // MEMO: 取得できない場合はエラーとする
-            ->firstOrFail();
+        // // データを取得（生徒成績詳細）
+        // $gradesDetails = $this->getGradesDetailEdit($gradesId);
 
-        // データを取得（生徒成績詳細）
-        $gradesDetails = $this->getGradesDetailEdit($gradesId);
+        // // 教科リストを取得（対象生徒のもの）
+        // $curriculums = $this->getCurriculumList($grades->sid);
 
-        // 教科リストを取得（対象生徒のもの）
-        $curriculums = $this->getCurriculumList($grades->sid);
+        // // 模試名リストを取得（対象生徒のもの）
+        // $moshiNames = $this->getTrialList($grades->sid);
 
-        // 模試名リストを取得（対象生徒のもの）
-        $moshiNames = $this->getTrialList($grades->sid);
+        $editData = [
+            "sid" => 1,
+        ];
 
-        return view('pages.admin.grades_mng-edit', [
-            'editData' => $grades,
-            'editDataDtls' => $gradesDetails,
+        return view('pages.admin.grades_mng-input', [
+            'editData' => $editData,
+            'editDataDtls' => [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
             'rules' => $this->rulesForInput(null),
             'examTypes' => $examTypes,
             'teikiNames' => $teikiNames,
-            'moshiNames' => $moshiNames,
-            'curriculums' => $curriculums,
-            'updownList' => $updownList
+            'curriculums' => null,
         ]);
     }
 
