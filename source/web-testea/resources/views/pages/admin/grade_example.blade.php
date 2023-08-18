@@ -17,13 +17,6 @@
                 <option value="6">自由が丘</option>
             </x-input.select>
         </x-bs.col2>
-        <x-bs.col2>
-            <x-input.select id="exam_kinds" caption="種別" :select2=true>
-                <option value="1">模試</option>
-                <option value="2">定期考査</option>
-                <option value="3">通信票評定</option>
-            </x-input.select>
-        </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>
@@ -68,6 +61,35 @@
                 </x-bs.form-group>
             </x-bs.card>
         </x-bs.col2>
+        <x-bs.col2>
+            <x-input.select id="exam_kinds" caption="種別" :select2=true>
+                <option value="1">模試</option>
+                <option value="2">定期考査</option>
+                <option value="3">通信票評定</option>
+            </x-input.select>
+
+            <x-bs.card  v-show="form.exam_kinds == 2">
+                <x-bs.form-group name="regular_exam">
+                    {{-- 定期考査コードチェックボックス --}}
+                    @for ($i = 0; $i < count($regular_exam); $i++)
+                    <x-input.checkbox :caption="$regular_exam[$i]"
+                            :id="'regular_exam_' . $regular_exam[$i]"
+                            name="regular_exam" :value="$regular_exam[$i]" />
+                    @endfor
+                </x-bs.form-group>
+            </x-bs.card>
+
+            <x-bs.card  v-show="form.exam_kinds == 3">
+                <x-bs.form-group name="term">
+                    {{-- 学期コードチェックボックス --}}
+                    @for ($i = 0; $i < count($term); $i++)
+                    <x-input.checkbox :caption="$term[$i]"
+                            :id="'term_' . $term[$i]"
+                            name="term" :value="$term[$i]" />
+                    @endfor
+                </x-bs.form-group>
+            </x-bs.card>
+        </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>
@@ -94,12 +116,12 @@
 
             {{-- テーブルタイトル行 --}}
             <x-slot name="thead">
-                <th>登録日</th>
-                <th>校舎</th>
-                <th>学年</th>
-                <th>生徒名</th>
-                <th>種別</th>
-                <th>学期・試験名</th>
+                <th width="15%">登録日</th>
+                <th width="15%">校舎</th>
+                <th width="15%">学年</th>
+                <th width="20%">生徒名</th>
+                <th width="15%">種別</th>
+                <th width="20%">学期・試験名</th>
             </x-slot>
 
             {{-- テーブル行 --}}
@@ -109,7 +131,7 @@
                 <td>中学2年</td>
                 <td>CWテスト生徒１</td>
                 <td>通信票評定</td>
-                <td>1学期</td>
+                <td>1学期（前期）</td>
             </tr>
             <tr>
                 <td>2023/04/10</td>
@@ -117,7 +139,7 @@
                 <td>中学2年</td>
                 <td>CWテスト生徒１</td>
                 <td>定期考査</td>
-                <td>1学期中間考査</td>
+                <td>1学期（前期）中間考査</td>
             </tr>
             <tr>
                 <td>2023/03/18</td>
