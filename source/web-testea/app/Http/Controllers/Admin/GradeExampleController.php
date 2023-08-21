@@ -42,6 +42,10 @@ class GradeExampleController extends Controller
      */
     public function index()
     {
+        // 定期考査コードチェックボックス
+        $regular_exam = array("1学期（前期）中間考査","1学期（前期）末考査","2学期（後期）中間考査","2学期（後期）末考査","3学期中間考査","3学期末考査","学年末考査");
+        // 学期コードチェックボックス
+        $term = array("1学期（前期）","2学期（後期）","3学期","学年");
         // 小学校グループチェックボックス
         $noticeGroup_p = array("小1","小2","小3","小4","小5","小6");
         // 中学校グループチェックボックス
@@ -55,6 +59,8 @@ class GradeExampleController extends Controller
         return view('pages.admin.grade_example', [
             'rules' => $this->rulesForSearch(),
             'editData' => null,
+            'regular_exam' => $regular_exam,
+            'term' => $term,
             'noticeGroup_p' => $noticeGroup_p,
             'noticeGroup_j' => $noticeGroup_j,
             'noticeGroup_h' => $noticeGroup_h,

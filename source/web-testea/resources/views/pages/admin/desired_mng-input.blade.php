@@ -23,18 +23,9 @@
 
     <p>以下の生徒の受験校の{{(request()->routeIs('desired_mng-edit')) ? '変更' : '登録'}}を行います。</p>
 
-    <x-bs.table :hover=false :vHeader=true>
-        <tr>
-            <th width="35%">校舎</th>
-            <td>久我山</td>
-        </tr>
-        <tr>
-            <th>生徒名</th>
-            <td>CWテスト生徒１</td>
-        </tr>
-    </x-bs.table>
-    {{-- 余白 --}}
-    <div class="mb-3"></div>
+    <x-bs.form-title>生徒名</x-bs.form-title>
+    {{-- <p class="edit-disp-indent">{{$editData->sname}}</p> --}}
+    <p class="edit-disp-indent">CWテスト生徒１</p>
 
     <x-input.select caption="受験年度" id="cls_year" :select2=true :editData="$editData">
         <option value="2">2023</option>

@@ -5,12 +5,16 @@
 {{-- バリデートルールを解析する処理 --}}
 @inject('bladeInputRule', 'App\Libs\BladeInputRule')
 
-@props(['caption' => '', 'id' => '', 'placeholder' => '', 'rows' => 3, 'editData' => [], 'rules' => []])
+@props(['caption' => '', 'id' => '', 'placeholder' => '', 'rows' => 3, 'editData' => [], 'rules' => [],'vShow' => ''])
 
 {{-- バリデーションエラー時のスクロール先 --}}
 <span class="form-validation" data-id="{{ $id }}"></span>
 
-<div class="form-group">
+<div class="form-group"
+  {{-- v-show --}}
+  @if ($vShow)
+  v-show="{{ $vShow }}"
+  @endif >
 
   {{-- ラベル --}}
   @if (!empty($caption))
