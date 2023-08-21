@@ -43,56 +43,56 @@
             {{-- Content Header --}}
             <div class="content-header">
                 <div class="{{ config('adminlte.classes_content_header') ?: $def_container_class }}">
-                {{-- タイトルの表示。子ページであれば表示 --}}
-                @hasSection('child_page')
-                <div class="row">
-                    <div class="col-sm-6">
-                        @hasSection('page_title')
-                        <h1>@yield('page_title')</h1><br>
-                        @else
-                        <h1>@yield('title')</h1><br>
-                        @endif
-                    </div>
+                    {{-- タイトルの表示。子ページであれば表示 --}}
+                    @hasSection('child_page')
+                    <div class="row">
+                        <div class="col-sm-6">
+                            @hasSection('page_title')
+                            <h1>@yield('page_title')</h1><br>
+                            @else
+                            <h1>@yield('title')</h1><br>
+                            @endif
+                        </div>
 
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            {{-- 一覧は固定 --}}
-                            <li class="breadcrumb-item">
-                                <a href="{{ Request::root()}}/{{ Request::segment(1) }}">
-                                    @hasSection('base_page_title')
-                                    @yield('base_page_title')
-                                    @else
-                                    一覧
-                                    @endif
-                                </a>
-                            </li>
-                            {{-- 三階層目のページの場合 --}}
-                            @hasSection('parent_page')
-                            <li class="breadcrumb-item">
-                                <a href="@yield('parent_page')">@yield('parent_page_title')</a>
-                            </li>
-                            @endif
-                            {{-- 四階層目のページの場合 --}}
-                            @hasSection('parent_page2')
-                            <li class="breadcrumb-item">
-                                <a href="@yield('parent_page2')">@yield('parent_page_title2')</a>
-                            </li>
-                            @endif
-                            {{-- タイトル --}}
-                            <li class="breadcrumb-item active">@yield('title')</li>
-                        </ol>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                {{-- 一覧は固定 --}}
+                                <li class="breadcrumb-item">
+                                    <a href="{{ Request::root()}}/{{ Request::segment(1) }}">
+                                        @hasSection('base_page_title')
+                                        @yield('base_page_title')
+                                        @else
+                                        一覧
+                                        @endif
+                                    </a>
+                                </li>
+                                {{-- 三階層目のページの場合 --}}
+                                @hasSection('parent_page')
+                                <li class="breadcrumb-item">
+                                    <a href="@yield('parent_page')">@yield('parent_page_title')</a>
+                                </li>
+                                @endif
+                                {{-- 四階層目のページの場合 --}}
+                                @hasSection('parent_page2')
+                                <li class="breadcrumb-item">
+                                    <a href="@yield('parent_page2')">@yield('parent_page_title2')</a>
+                                </li>
+                                @endif
+                                {{-- タイトル --}}
+                                <li class="breadcrumb-item active">@yield('title')</li>
+                            </ol>
+                        </div>
                     </div>
-                </div>
-                @else
-                    @hasSection('page_title')
-                        <h1>@yield('page_title')</h1><br>
                     @else
-                        <h1>@yield('title')</h1><br>
+                        @hasSection('page_title')
+                            <h1>@yield('page_title')</h1><br>
+                        @else
+                            <h1>@yield('title')</h1><br>
+                        @endif
                     @endif
-                @endif
 
+                </div>
             </div>
-
 
             {{-- Main Content --}}
             <div class="content">
