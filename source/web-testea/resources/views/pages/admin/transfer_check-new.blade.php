@@ -38,7 +38,7 @@
                 <td>個別指導コース</td>
             </tr>
             <tr>
-                <th>教師名</th>
+                <th>講師名</th>
                 <td>CWテスト教師１０１</td>
             </tr>
         </x-bs.table>
