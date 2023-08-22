@@ -56,6 +56,15 @@
                 <x-button.list-dtl :vueDataAttr="['target' => '\'#modal-dtl\'', 'id' => '4']"/>
             </td>
         </tr>
+        <tr>
+            <td>2023/1/16</td>
+            <td>月謝のお知らせ</td>
+            <td>本部</td>
+            <td>本部管理者</td>
+            <td>
+                <x-button.list-dtl :vueDataAttr="['target' => '\'#modal-dtl\'', 'id' => '5']"/>
+            </td>
+        </tr>
     @endcan
 
     @can('tutor')
@@ -74,7 +83,25 @@
             <td>本部</td>
             <td>本部管理者</td>
             <td>
-                <x-button.list-dtl :vueDataAttr="['target' => '\'#modal-dtl\'', 'id' => '5']"/>
+                <x-button.list-dtl :vueDataAttr="['target' => '\'#modal-dtl\'', 'id' => '6']"/>
+            </td>
+        </tr>
+        <tr>
+            <td>2023/01/16</td>
+            <td>給与のお知らせ</td>
+            <td>本部</td>
+            <td>本部管理者</td>
+            <td>
+                <x-button.list-dtl :vueDataAttr="['target' => '\'#modal-dtl\'', 'id' => '7']"/>
+            </td>
+        </tr>
+        <tr>
+            <td>2023/01/16</td>
+            <td>追加請求申請に関するお知らせ</td>
+            <td>本部</td>
+            <td>本部管理者</td>
+            <td>
+                <x-button.list-dtl :vueDataAttr="['target' => '\'#modal-dtl\'', 'id' => '8']"/>
             </td>
         </tr>
     @endcan
