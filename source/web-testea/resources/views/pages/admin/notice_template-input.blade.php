@@ -27,6 +27,9 @@
         <option value="5">面談</option>
         <option value="6">特別期間講習</option>
         <option value="7">成績登録</option>
+        <option value="8">請求</option>
+        <option value="9">給与</option>
+        <option value="10">追加請求</option>
     </x-input.select>
 
     {{-- 現在の表示順の最大値＋1をデフォルト値として設定 --}}
