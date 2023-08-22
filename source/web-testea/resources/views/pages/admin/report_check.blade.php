@@ -40,10 +40,16 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.text id="sname" caption="生徒名" :rules=$rules />
+            <x-input.select caption="生徒名" id="sname" :select2=true :editData=$editData>
+                <option value="1">CWテスト生徒１</option>
+                <option value="2">CWテスト生徒２</option>
+            </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="tname" caption="講師名" :rules=$rules />
+            <x-input.select caption="講師名" id="tname" :select2=true :editData=$editData>
+                <option value="1">CWテスト教師１０１</option>
+                <option value="2">CWテスト教師１０２</option>
+            </x-input.select>
         </x-bs.col2>
     </x-bs.row>
 
@@ -60,6 +66,15 @@
                 <option value="2">承認</option>
                 <option value="3">差戻し</option>
             </x-input.select>
+        </x-bs.col2>
+    </x-bs.row>
+
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.date-picker caption="授業実施日 From" id="report_date_from" />
+        </x-bs.col2>
+        <x-bs.col2>
+            <x-input.date-picker caption="授業実施日 To" id="report_date_to" />
         </x-bs.col2>
     </x-bs.row>
 
@@ -95,6 +110,7 @@
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl />
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval" />
                 <x-button.list-edit href="{{ route('report_check-edit', '1') }}" />
             </td>
         </tr>
