@@ -37,6 +37,28 @@
             <x-input.text id="name" caption="講師名" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.select id="grade_cd" caption="学年" :select2=true >
+                <option value="1">大学1年</option>
+                <option value="2">大学2年</option>
+                <option value="3">大学3年</option>
+                <option value="4">大学4年</option>
+                <option value="5">大学卒</option>
+                <option value="6">M1</option>
+                <option value="7">M2</option>
+                <option value="8">修士修了</option>
+                <option value="9">D1</option>
+                <option value="10">D2</option>
+                <option value="11">D3</option>
+                <option value="12">博士修了</option>
+                <option value="13">その他</option>
+            </x-input.select>
+        </x-bs.col2>
+        <x-bs.col2>
+            <x-input.text id="hourly_base_wage" caption="ベース給" :rules=$rules />
+        </x-bs.col2>
+    </x-bs.row>
 </x-bs.card>
 
 {{-- 結果リスト --}}
@@ -56,6 +78,7 @@
             <th width="18%">講師名</th>
             <th>メールアドレス</th>
             <th>講師ステータス</th>
+            <th>勤続年数</th>
             <th></th>
         </x-slot>
 
@@ -64,6 +87,7 @@
             <td>@{{item.name}}</td>
             <td>@{{item.email}}</td>
             <td>在籍</td>
+            <td>1年3ヶ月</td>
             <td>
                 <x-button.list-edit href="{{ route('tutor_mng-detail', 101) }}" caption="講師情報" />
                 <x-button.list-edit vueHref="'{{ route('tutor_mng-calendar', '') }}/' + item.tid" caption="カレンダー" />
