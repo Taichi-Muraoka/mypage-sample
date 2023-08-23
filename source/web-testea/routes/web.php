@@ -1135,6 +1135,12 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // バリデーション(登録用)（教師登録）
     Route::post('/tutor_mng/vd_input', [TutorMngController::class, 'validationForInput'])->name('tutor_mng-vd_input');
 
+    // バリデーション(学校-検索用)
+    Route::post('/tutor_mng/vd_search_school', [TutorMngController::class, 'validationForSearchSchool'])->name('tutor_mng-vd_search_school');
+
+    // 学校-検索結果取得
+    Route::post('/tutor_mng/search_school', [TutorMngController::class, 'searchSchool'])->name('tutor_mng-search_school');
+
     // 退職登録画面
     Route::get('/tutor_mng/leave/edit/{tid}', [TutorMngController::class, 'leaveEdit'])->name('tutor_mng-leave-edit');
 
