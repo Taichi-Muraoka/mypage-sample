@@ -28,6 +28,7 @@
                 <option value="1">個別指導コース</option>
                 <option value="4">集団指導</option>
                 <option value="5">その他・自習</option>
+                <option value="6">面談</option>
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
@@ -53,7 +54,6 @@
                 <option value="2">当日欠席（講師出勤あり）</option>
                 <option value="3">当日欠席（講師出勤なし）</option>
                 <option value="4">振替中（未振替）</option>
-                <option value="5">振替済</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
@@ -68,18 +68,20 @@
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="報告書有無" id="report" :select2=true :select2Search=false>
-                <option value="1">有</option>
-                <option value="2">無</option>
+            <x-input.select caption="授業報告書ステータス" id="report" :select2=true :select2Search=false>
+                <option value="1">―（登録不要）</option>
+                <option value="2">✕（要登録・差戻し）</option>
+                <option value="3">△（承認待ち）</option>
+                <option value="4">〇（登録済み）</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="授業日 From" id="holiday_date_from" />
+            <x-input.date-picker caption="日付 From" id="holiday_date_from" />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="授業日 To" id="holiday_date_to" />
+            <x-input.date-picker caption="日付 To" id="holiday_date_to" />
         </x-bs.col2>
     </x-bs.row>
 
@@ -93,12 +95,13 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="10%">授業日</th>
+            <th width="10%">日付</th>
+            <th>コース名</th>
             <th>時限</th>
+            <th>開始時刻</th>
             <th>校舎</th>
             <th>生徒名</th>
-            <th>講師名</th>
-            <th>コース名</th>
+            <th>講師名/担当者名</th>
             <th>教科</th>
             <th>授業区分</th>
             <th>出欠ステータス</th>
@@ -109,11 +112,12 @@
         {{-- テーブル行 --}}
         <tr>
             <td>2023/02/28</td>
+            <td>個別指導コース</td>
             <td>6</td>
+            <td>16:00</td>
             <td>久我山</td>
             <td>CWテスト生徒５</td>
             <td>CWテスト教師１０１</td>
-            <td>個別指導コース</td>
             <td>英語</td>
             <td>追加</td>
             <td>実施前・出席</td>
@@ -124,11 +128,12 @@
         </tr>
         <tr>
             <td>2023/02/28</td>
+            <td>個別指導コース</td>
             <td>5</td>
+            <td>16:00</td>
             <td>久我山</td>
             <td>CWテスト生徒１</td>
             <td>CWテスト教師１０２</td>
-            <td>個別指導コース</td>
             <td>数学</td>
             <td>通常</td>
             <td>実施前・出席</td>
@@ -139,11 +144,12 @@
         </tr>
         <tr>
             <td>2023/02/24</td>
+            <td>個別指導コース</td>
             <td>6</td>
+            <td>16:00</td>
             <td>久我山</td>
             <td>CWテスト生徒１</td>
             <td>CWテスト教師１０１</td>
-            <td>個別指導コース</td>
             <td>理科</td>
             <td>体験授業１回目</td>
             <td>当日欠席（講師出勤あり）</td>
@@ -154,11 +160,12 @@
         </tr>
         <tr>
             <td>2023/02/24</td>
+            <td>個別指導コース</td>
             <td>5</td>
+            <td>16:00</td>
             <td>久我山</td>
             <td>CWテスト生徒３</td>
             <td>CWテスト教師１０１</td>
-            <td>個別指導コース</td>
             <td>社会</td>
             <td>通常</td>
             <td>振替中（未振替）</td>
@@ -169,15 +176,32 @@
         </tr>
         <tr>
             <td>2023/02/24</td>
+            <td>個別指導コース</td>
             <td>4</td>
+            <td>16:00</td>
             <td>久我山</td>
             <td>CWテスト生徒４</td>
             <td>CWテスト教師１０２</td>
-            <td>個別指導コース</td>
             <td>英語</td>
             <td>追加</td>
             <td>実施前・出席</td>
             <td>〇</td>
+            <td>
+                <x-button.list-dtl />
+            </td>
+        </tr>
+        <tr>
+            <td>2023/02/24</td>
+            <td>面談</td>
+            <td>3</td>
+            <td>15:00</td>
+            <td>久我山</td>
+            <td>CWテスト生徒2</td>
+            <td>CWテスト教師１０２</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
             <td>
                 <x-button.list-dtl />
             </td>
