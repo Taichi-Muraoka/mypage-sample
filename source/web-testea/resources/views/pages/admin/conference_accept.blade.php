@@ -70,8 +70,8 @@
             <th>生徒名</th>
             <th>校舎</th>
             <th>面談日</th>
-            <th>面談担当者</th>
             <th>開始時刻</th>
+            <th>面談担当者</th>
             <th>ステータス</th>
             <th></th>
         </x-slot>
@@ -82,8 +82,8 @@
             <td>CWテスト生徒１</td>
             <td>久我山</td>
             <td>2023/01/30</td>
-            <td>久我山教室長</td>
             <td>16:00</td>
+            <td>久我山教室長</td>
             <td>登録済</td>
             <td>
                 <x-button.list-dtl />
