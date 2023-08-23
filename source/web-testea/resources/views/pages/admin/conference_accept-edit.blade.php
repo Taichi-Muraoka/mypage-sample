@@ -48,7 +48,7 @@
 
     <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules :editData=$editData/>
 
-    <x-input.select caption="指導スペース" id="booth_cd" :select2=true :editData="$editData">
+    <x-input.select caption="ブース" id="booth_cd" :select2=true :editData="$editData">
         <option value="1">Aテーブル</option>
         <option value="2">Bテーブル</option>
         <option value="3">Cテーブル</option>
