@@ -21,7 +21,24 @@
     <x-bs.form-title>校舎</x-bs.form-title>
     <p class="edit-disp-indent">久我山</p>
 
-    <x-input.select caption="指導スペース" id="classroomcd" :select2=true :editData="$editData">
+    @if (!isset( $editData['kind']))
+    <x-input.select caption="コース名" id="course_cd" :select2=true :select2Search=false :editData="$editData">
+        <option value="0" selected>個別指導コース</option>
+        <option value="1">集団指導</option>
+        <option value="5">その他・自習</option>
+    </x-input.select>
+
+    @else
+    <x-bs.form-title>コース名</x-bs.form-title>
+        @if(!isset( $editData['kind']) == 0)
+        <p class="edit-disp-indent">個別指導コース</p>
+        @else
+        <p class="edit-disp-indent">集団指導</p>
+        @endif
+    <x-input.hidden id="course_cd" :editData=$editData/>
+    @endif
+
+    <x-input.select caption="ブース" id="classroomcd" :select2=true :editData="$editData">
         <option value="1" selected>Aテーブル</option>
         <option value="2">Bテーブル</option>
         <option value="3">Cテーブル</option>
@@ -50,23 +67,6 @@
 
     <x-input.time-picker caption="終了時刻" id="end_time" :rules=$rules :editData=$editData />
 
-    @if (!isset( $editData['kind']))
-    <x-input.select caption="コース名" id="course_cd" :select2=true :select2Search=false :editData="$editData">
-        <option value="0" selected>個別指導コース</option>
-        <option value="1">集団指導</option>
-        <option value="5">その他・自習</option>
-    </x-input.select>
-
-    @else
-    <x-bs.form-title>コース名</x-bs.form-title>
-        @if(!isset( $editData['kind']) == 0)
-        <p class="edit-disp-indent">個別指導コース</p>
-        @else
-        <p class="edit-disp-indent">集団指導</p>
-        @endif
-    <x-input.hidden id="course_cd" :editData=$editData/>
-    @endif
-
     <x-input.select caption="講師" id="tid" :select2=true :editData="$editData">
         <option value="1">CWテスト教師１</option>
         <option value="2">CWテスト教師２</option>
@@ -86,7 +86,7 @@
         </x-input.select>
     </div>
 
-    <x-input.select caption="教科" id="subject_cd" :select2=true :select2Search=false :editData="$editData">
+    <x-input.select caption="科目" id="subject_cd" :select2=true :select2Search=false :editData="$editData">
         <option value="1" selected>国語</option>
         <option value="2">数学</option>
         <option value="3">理科</option>

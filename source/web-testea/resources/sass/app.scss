@@ -368,8 +368,10 @@ label:not(.form-check-label):not(.custom-file-label) {
 
 /* 時間割の背景色 */
 [id^="calendar"] .cal_period {
-    background: #0073b7;
-    border-color: #0073b7;
+//    background: #0073b7;
+//    border-color: #0073b7;
+    background: #00205b;
+    border-color: #00205b;
     font-size: 1em !important;
 }
 
@@ -377,8 +379,6 @@ label:not(.form-check-label):not(.custom-file-label) {
 [id^="calendar"] .cal_class {
     background: #f39c12;
     border-color: #f39c12;
-//    background: #aabbee;
-//    border-color: #aabbee;
 }
 
 /* 個別授業 振替日の予定の背景色 */
@@ -395,12 +395,14 @@ label:not(.form-check-label):not(.custom-file-label) {
     border-color: #6c757d;
 }
 
-/* 短期講習の予定の背景色 */
+/* 集団授業の予定の背景色 */
 [id^="calendar"] .cal_tanki_koshu {
     //background: #7507b4;
     //border-color: #7507b4;
-    background: #af0058;
-    border-color: #af0058;
+//    background: #af0058;
+//    border-color: #af0058;
+    background: #7507b4;
+    border-color: #7507b4;
 }
 
 /* 短期講習 振替日の予定の背景色 */
@@ -411,12 +413,42 @@ label:not(.form-check-label):not(.custom-file-label) {
     border-color: #af0058;
 }
 
-/* 模試の予定の背景色 */
+/* 演習の予定の背景色 */
+[id^="calendar"] .cal_ensyu {
+//    background: yellowgreen;
+//    border-color: yellowgreen;
+    background: #7ac143;
+    border-color: #7ac143;
+}
+
+/* １対２の予定の背景色 */
+[id^="calendar"] .cal_two {
+    background: #009f4d;
+    border-color: #009f4d;
+//    background: #11862f;
+//    border-color: #11862f;
+}
+
+/* １対３の予定の背景色 */
+[id^="calendar"] .cal_three {
+    background: #00a78e;
+    border-color: #00a78e;
+//    background: yellow;
+//    border-color: yellow;
+}
+
+/* ハイプランの予定の背景色 */
+[id^="calendar"] .cal_highplan {
+    background: salmon;
+    border-color: salmon;
+}
+
+/* 自習の予定の背景色 */
 [id^="calendar"] .cal_tanki_moshi {
     //background: #af0058;
     //border-color: #af0058;
-    background: green;
-    border-color: green;
+    background: #0073b7;
+    border-color: #0073b7;
 }
 
 /* イベントの予定の背景色 */
@@ -425,10 +457,12 @@ label:not(.form-check-label):not(.custom-file-label) {
     border-color: orangered;
 }
 
-/* 打ち合わせの予定の背景色 */
+/* 面談の背景色 */
 [id^="calendar"] .cal_meeting {
-    background: #7507b4;
-    border-color: #7507b4;
+//    background: #7507b4;
+//    border-color: #7507b4;
+    background: #af0058;
+    border-color: #af0058;
 }
 
 /* 休業日の予定の背景色 */
@@ -763,5 +797,10 @@ label:not(.form-check-label):not(.custom-file-label) {
     }
     .table-bordered tbody td.fc-day-top > .fc-day-number {
         font-size: 0.875rem;
+    }
+}
+@media print {
+    @page {
+        size: auto!important;
     }
 }

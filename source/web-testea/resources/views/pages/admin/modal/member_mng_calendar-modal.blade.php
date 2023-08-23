@@ -9,7 +9,7 @@
         <td>@{{item.mdClassName}}</td>
     </tr>
     <tr>
-        <th width="35%">指導スペース</th>
+        <th width="35%">ブース</th>
         <td>Aテーブル</td>
     </tr>
     <tr>
@@ -44,7 +44,7 @@
         <td>CWテスト生徒１<br>CWテスト生徒２<br>CWテスト生徒３</td>
     </tr>
     <tr v-show="item.mdSubject">
-        <th>教科</th>
+        <th>科目</th>
         <td>@{{item.mdSubject}}</td>
     </tr>
     <tr v-Show="item.lesson_type != 3">

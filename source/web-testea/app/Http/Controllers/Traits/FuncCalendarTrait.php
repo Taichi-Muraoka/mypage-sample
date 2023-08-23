@@ -856,24 +856,43 @@ trait FuncCalendarTrait
             $schedule_type = $this->getScheduleType($schedule);
             $schedule['title'] = $schedule['start_time']->format('H:i') . '-' . $schedule['end_time']->format('H:i');
             //$schedule['title'] = $schedule['title'] . '<br>通常 ';
+            // 体験授業
             if ($schedule['diff_time'] == 1) {
-                $schedule['title'] = $schedule['title'] . '<br>体験授業';
+                $schedule['title'] = $schedule['title'] . '<br><span style="font-size:125%; font-weight: bold; background: red; padding: 5px 3px;">' .'体験授業１回目' . '</span>';
             }
+            // 体験授業
+            if ($schedule['diff_time'] == 6) {
+                $schedule['title'] = $schedule['title'] . '<br><span style="font-size:125%; font-weight: bold; background: red; padding: 5px 3px;">' .'追加' . '</span>';
+            }
+            // 振替
             if ($schedule['create_kind_cd'] == AppConst::CREATE_KIND_CD_2) {
-                $schedule['title'] = $schedule['title'] . '<br>振替';
+                //$schedule['title'] = $schedule['title'] . '<br>振替';
+                $schedule['title'] = $schedule['title'] . '<br><span style="font-size:125%; font-weight: bold; background: red; padding: 5px 3px;">' .'振替' . '</span>';
             }
-            $schedule['title'] = $schedule['title'] . '<br>個別指導コース<br>' . $schedule['mdSubject'];
+            //$schedule['title'] = $schedule['title'] . '<br>個別指導コース<br>' . $schedule['mdSubject'];
+            if ($schedule['diff_time'] == 3) {
+                $schedule['title'] = $schedule['title'] . '<br>１対２コース<br>' . $schedule['mdSubject'];
+            } else if ($schedule['diff_time'] == 4) {
+                $schedule['title'] = $schedule['title'] . '<br>１対３コース<br>' . $schedule['mdSubject'];
+            } else if ($schedule['diff_time'] == 5) {
+                $schedule['title'] = $schedule['title'] . '<br>演習<br>' . $schedule['mdSubject'];
+            } else if ($schedule['diff_time'] == 6) {
+                $schedule['title'] = $schedule['title'] . '<br>ハイプラン<br>' . $schedule['mdSubject'];
+            } else {
+                $schedule['title'] = $schedule['title'] . '<br>個別指導コース<br>' . $schedule['mdSubject'];
+            }
+            $schedule['title'] = $schedule['title'] . '<br>tea：' . $schedule['mdTitleVal'];
             $schedule['title'] = $schedule['title'] . '<br>stu：';
-            if ($schedule['diff_time'] == 2) {
-                $schedule['title'] = $schedule['title'] . '<span style="border: solid 2px;">' . $schedule['name'] . '</span>';
+            //if ($schedule['diff_time'] == 2) {
+            if ($schedule['atd_status_cd'] != AppConst::ATD_STATUS_CD_2) {
+                $schedule['title'] = $schedule['title'] . '<span style="font-weight: bold; background:linear-gradient(transparent 50%, red 65%);">' . $schedule['name'] . '</span>';
             } else {
                 $schedule['title'] = $schedule['title'] . $schedule['name'];
             }
-            $schedule['title'] = $schedule['title'] . '<br>tea：' . $schedule['mdTitleVal'];;
             $schedule['start'] = $schedule['lesson_date']->format('Y-m-d') . ' ' . $schedule['start_time']->format('H:i');
             $schedule['end'] = $schedule['lesson_date']->format('Y-m-d') . ' ' . $schedule['end_time']->format('H:i');
             $schedule['classNames'] = $schedule_type['className'];
-            if ($schedule_type['mdFurikae'] === '後日振替・未') {
+            if ($schedule_type['mdFurikae'] === '未振替') {
                 $schedule['resourceId'] = "999";
             } else if ($schedule['status_info']){
                 $schedule['resourceId'] = $schedule['status_info'];
@@ -928,6 +947,7 @@ trait FuncCalendarTrait
                 'create_kind_cd',
                 'transefer_kind_cd',
                 'status_info',
+                'diff_time',
                 'room_name AS mdClassName',
                 'room_name_symbol AS symbol',
                 'ext_rirekisho.name AS mdTitleVal',
@@ -962,15 +982,31 @@ trait FuncCalendarTrait
 
             $schedule_type = $this->getScheduleType($schedule);
             $schedule['title'] = $schedule['start_time']->format('H:i') . '-'
-             . $schedule['end_time']->format('H:i') . '<br>集団授業<br>' . $schedule['mdSubject']
-             . '<br>tea：' . $schedule['mdTitleVal'];
+             . $schedule['end_time']->format('H:i');
+            if ($schedule['diff_time'] >= 3) {
+                $schedule['title'] = $schedule['title'] . '<br><span style="font-size:125%; font-weight: bold; background: red; padding: 5px 3px;">' .'初回授業' . '</span>';
+            }
+            if ($schedule['diff_time'] == 3) {
+                $schedule['title'] = $schedule['title'] . '<br>１対２コース<br>' . $schedule['mdSubject'];
+            } else if ($schedule['diff_time'] == 4) {
+                $schedule['title'] = $schedule['title'] . '<br>１対３コース<br>' . $schedule['mdSubject'];
+            } else {
+                $schedule['title'] = $schedule['title'] . '<br>集団授業<br>' . $schedule['mdSubject'];
+            }
+            //$schedule['title'] = $schedule['title'] . '<br>tea：' . $schedule['mdTitleVal'];
+            $schedule['title'] = $schedule['title'] . '<br>tea：';
+            //if ($schedule['diff_time'] == 2) {
+                $schedule['title'] = $schedule['title'] . '<span style="font-weight: bold; background:linear-gradient(transparent 50%, red 65%);">' . $schedule['mdTitleVal'] . '</span>';
+            //} else {
+            //    $schedule['title'] = $schedule['title'] . $schedule['name'];
+            //}
              if ($schedule_type['mdFurikae'] != '') {
                 $schedule['title'] = $schedule['title'] . '<br>' . $schedule_type['mdFurikae'];
             }
             $schedule['start'] = $schedule['lesson_date']->format('Y-m-d') . ' ' . $schedule['start_time']->format('H:i');
             $schedule['end'] = $schedule['lesson_date']->format('Y-m-d') . ' ' . $schedule['end_time']->format('H:i');
             $schedule['classNames'] = $schedule_type['className'];
-            if ($schedule_type['mdFurikae'] === '後日振替・未' || $schedule_type['mdFurikae'] === '後日振替・済') {
+            if ($schedule_type['mdFurikae'] === '未振替' || $schedule_type['mdFurikae'] === '後日振替・済') {
                 $schedule['resourceId'] = "999";
             } else if ($schedule_type['mdFurikae'] === '後日振替・済'){
                 $schedule['resourceId'] = "998";
@@ -1034,8 +1070,9 @@ trait FuncCalendarTrait
 
             $schedule_type = $this->getScheduleType($schedule);
             $schedule['title'] = $schedule['start_time']->format('H:i') . '-'
-             . $schedule['end_time']->format('H:i') . '<br>その他・自習<br>'
-             . '<br>stu：' . $schedule['name'];
+             . $schedule['end_time']->format('H:i');
+            $schedule['title'] = $schedule['title'] . '<br>' .'その他・自習';
+            $schedule['title'] = $schedule['title'] . '<br>stu：' . $schedule['name'];
             $schedule_type = ['type' => AppConst::CODE_MASTER_21_3, 'className' => 'cal_tanki_moshi', 'mdFurikae' => ''];
             $schedule['start'] = $schedule['lesson_date']->format('Y-m-d') . ' ' . $schedule['start_time']->format('H:i');
             $schedule['end'] = $schedule['lesson_date']->format('Y-m-d') . ' ' . $schedule['end_time']->format('H:i');
@@ -1145,7 +1182,7 @@ trait FuncCalendarTrait
 
             $schedule_type = ['type' => AppConst::CODE_MASTER_21_6, 'className' => 'cal_meeting', 'mdFurikae' => ''];
             $schedule['title'] = $schedule['start_time']->format('H:i') . '-'
-             . $schedule['end_time']->format('H:i') . '<br>' . '面談<br>'
+             . $schedule['end_time']->format('H:i') . '<br>' . '面談'
              . '<br>stu：' . 'CWテスト生徒6';
              $schedule['start'] = $schedule['start_date']->format('Y-m-d') . ' ' . $schedule['start_time']->format('H:i');
              $schedule['end'] = $schedule['start_date']->format('Y-m-d') . ' ' . $schedule['end_time']->format('H:i');
@@ -1382,9 +1419,16 @@ trait FuncCalendarTrait
             // レギュラー
             if ($schedule['create_kind_cd'] == AppConst::CREATE_KIND_CD_1 && $schedule['atd_status_cd'] != AppConst::ATD_STATUS_CD_2) {
                 // 個別授業
+                if ($schedule['diff_time'] == 5) {
+                    $class = 'cal_ensyu';
+                } else if ($schedule['diff_time'] == 6) {
+                    $class = 'cal_highplan';
+                } else {
+                    $class = 'cal_class';
+                }
                 return [
                     'type' => AppConst::CODE_MASTER_21_1,
-                    'className' => 'cal_class',
+                    'className' => $class,
                     'mdFurikae' => ''
                 ];
             } elseif ($schedule['create_kind_cd'] == AppConst::CREATE_KIND_CD_2 && $schedule['atd_status_cd'] != AppConst::ATD_STATUS_CD_2) {
@@ -1415,7 +1459,7 @@ trait FuncCalendarTrait
                     return [
                         'type' => AppConst::CODE_MASTER_21_1,
                         'className' => 'cal_class_gojitsu_furikae',
-                        'mdFurikae' => '後日振替・未'
+                        'mdFurikae' => '未振替'
                     ];
                 }
             } else {
@@ -1430,9 +1474,16 @@ trait FuncCalendarTrait
             // 個別講習
             if ($schedule['create_kind_cd'] == AppConst::CREATE_KIND_CD_1 && $schedule['atd_status_cd'] != AppConst::ATD_STATUS_CD_2) {
                 // 短期講習
+                if ($schedule['diff_time'] == 3) {
+                    $class = 'cal_two';
+                } else if ($schedule['diff_time'] == 4) {
+                    $class = 'cal_three';
+                } else {
+                    $class = 'cal_tanki_koshu';
+                }
                 return [
                     'type' => AppConst::CODE_MASTER_21_2,
-                    'className' => 'cal_tanki_koshu',
+                    'className' => $class,
                     'mdFurikae' => ''
                 ];
             } elseif ($schedule['create_kind_cd'] == AppConst::CREATE_KIND_CD_2 && $schedule['atd_status_cd'] != AppConst::ATD_STATUS_CD_2) {
@@ -1464,7 +1515,7 @@ trait FuncCalendarTrait
                     return [
                         'type' => AppConst::CODE_MASTER_21_2,
                         'className' => 'cal_class_gojitsu_furikae',
-                        'mdFurikae' => '後日振替・未'
+                        'mdFurikae' => '未振替'
                     ];
                 }
             } else {

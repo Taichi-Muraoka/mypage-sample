@@ -17,7 +17,7 @@
         <td>@{{item.mdClassName}}</td>
     </tr>
     <tr>
-        <th width="35%">指導スペース</th>
+        <th width="35%">ブース</th>
         <td>Aテーブル</td>
     </tr>
     <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type == 0">
@@ -77,7 +77,7 @@
     @endcan
 
     <tr v-show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.mdSubject">
-        <th>教科</th>
+        <th>科目</th>
         <td>@{{item.mdSubject}}</td>
     </tr>
 

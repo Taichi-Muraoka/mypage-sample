@@ -1,10 +1,6 @@
 @extends('adminlte::page')
 
-@if (isset( $editData['kind']) && $editData['kind'] == 9)
-@section('title', '面談スケジュール編集')
-@else
-@section('title', (request()->routeIs('room_calendar-edit')) ? '授業スケジュール編集' : ((request()->routeIs('room_calendar-new')) ? '授業スケジュール登録' : '授業スケジュールコピー登録'))
-@endif
+@section('title', (request()->routeIs('room_calendar-edit')) ? 'スケジュール編集' : ((request()->routeIs('room_calendar-new')) ? 'スケジュール登録' : 'スケジュールコピー登録'))
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -20,16 +16,30 @@
     <x-input.hidden id="kind" :editData=$editData />
     <x-input.hidden id="schedule_id" :editData=$editData />
 
-    @if (isset( $editData['kind']) && $editData['kind'] == 9)
-    <p>面談スケジュールの変更を行います。</p>
-    @else
-    <p>授業スケジュールの{{(request()->routeIs('room_calendar-edit')) ? '変更' : ((request()->routeIs('room_calendar-new')) ? '登録' : 'コピー登録')}}を行います。</p>
-    @endif
+    <p>スケジュールの{{(request()->routeIs('room_calendar-edit')) ? '変更' : ((request()->routeIs('room_calendar-new')) ? '登録' : 'コピー登録')}}を行います。</p>
 
     <x-bs.form-title>校舎</x-bs.form-title>
     <p class="edit-disp-indent">久我山</p>
 
-    <x-input.select caption="指導スペース" id="classroomcd" :select2=true :editData="$editData">
+    @if (!isset( $editData['kind']))
+    <x-input.select caption="コース名" id="course_cd" :select2=true :select2Search=false :editData="$editData">
+        <option value="1" selected>個別指導コース</option>
+        <option value="2">１対２コース</option>
+        <option value="3">１対３コース</option>
+        <option value="4">集団指導</option>
+        <option value="6">演習</option>
+        <option value="7">ハイプラン</option>
+        <option value="5">その他・自習</option>
+        <option value="9">面談</option>
+    </x-input.select>
+
+    @elseif(isset( $editData['kind']))
+    <x-bs.form-title>コース名</x-bs.form-title>
+    <p class="edit-disp-indent">個別指導コース</p>
+    <x-input.hidden id="course_cd" :editData=$editData value="1"/>
+    @endif
+
+    <x-input.select caption="ブース" id="classroomcd" :select2=true :editData="$editData">
         <option value="1" selected>Aテーブル</option>
         <option value="2">Bテーブル</option>
         <option value="3">Cテーブル</option>
@@ -53,19 +63,6 @@
 
     <x-input.time-picker caption="終了時刻" id="end_time" :rules=$rules :editData=$editData />
 
-    @if (!isset( $editData['kind']))
-    <x-input.select caption="コース名" id="course_cd" :select2=true :select2Search=false :editData="$editData">
-        <option value="1" selected>個別指導コース</option>
-        <option value="4">集団指導</option>
-        <option value="5">その他・自習</option>
-    </x-input.select>
-
-    @elseif((isset( $editData['kind']) && $editData['kind'] != 9))
-    <x-bs.form-title>コース名</x-bs.form-title>
-    <p class="edit-disp-indent">個別指導コース</p>
-    <x-input.hidden id="course_cd" :editData=$editData value="1"/>
-    @endif
-
     @if (!isset( $editData['kind']) || (isset( $editData['kind']) && $editData['kind'] != 9))
     <x-input.select vShow="form.course_cd != 5" caption="講師" id="tid" :select2=true :editData="$editData">
         <option value="1">CWテスト教師１</option>
@@ -87,7 +84,7 @@
     </div>
 
     <div v-cloak>
-    <x-input.select vShow="form.course_cd != 5" caption="教科" id="subject_cd" :select2=true :select2Search=false :editData="$editData">
+    <x-input.select vShow="form.course_cd != 5" caption="科目" id="subject_cd" :select2=true :select2Search=false :editData="$editData">
         <option value="1" selected>国語</option>
         <option value="2">数学</option>
         <option value="3">理科</option>
@@ -134,12 +131,12 @@
         <option value="0" selected>実施前・出席</option>
         <option value="1">当日欠席（講師出勤なし）</option>
         <option value="2">当日欠席（講師出勤あり）</option>
-        <option value="3">振替中・未振替</option>
-        <option value="4">振替済</option>
+        <option value="3">未振替</option>
+        <option value="4">振替中</option>
+        <option value="5">振替済</option>
     </x-input.select>
 
     @endif
-    <x-input.textarea id="text" caption="メモ" :rules=$rules :editData=$editData />
 
     @if (request()->routeIs('room_calendar-new'))
     {{-- 登録時 --}}
@@ -161,6 +158,7 @@
         <option value="3">CWテスト生徒３</option>
     </x-input.select>
     @endif
+    <x-input.textarea id="text" caption="メモ" :rules=$rules :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">
