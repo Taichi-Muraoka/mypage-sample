@@ -4,25 +4,17 @@
 
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true>
-    {{-- <tr>
-        <th width="35%">スケジュール種別</th>
-        <td>@{{item.mdTypeName}}</td>
-    </tr> --}}
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }}">
-        <th width="35%">スケジュール種別</th>
-        <td>授業・自習</td>
-    </tr>
-    <tr v-Show="item.mdType == {{ App\Consts\AppConst::CODE_MASTER_21_6 }}">
-        <th width="35%">スケジュール種別</th>
-        <td>面談</td>
-    </tr>
     <tr>
         <th width="35%">校舎</th>
         <td>@{{item.mdClassName}}</td>
     </tr>
     <tr>
-        <th width="35%">指導スペース</th>
+        <th width="35%">ブース</th>
         <td>Aテーブル</td>
+    </tr>
+    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type != 3">
+        <th>授業区分</th>
+        <td>通常</td>
     </tr>
     <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type == 0">
         <th width="35%">コース名</th>
@@ -36,9 +28,9 @@
         <th width="35%">コース名</th>
         <td>自習・その他</td>
     </tr>
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type != 3">
-        <th>授業区分</th>
-        <td>通常</td>
+    <tr v-Show="item.mdType == {{ App\Consts\AppConst::CODE_MASTER_21_6 }}">
+        <th width="35%">コース名</th>
+        <td>面談</td>
     </tr>
     <tr>
         <th>日付</th>
@@ -66,11 +58,11 @@
         <td>CWテスト生徒１</td>
     </tr>
     <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type == 1">
-        <th>参加生徒名</th>
+        <th>受講生徒名</th>
         <td>CWテスト生徒１<br>CWテスト生徒２<br>CWテスト生徒３</td>
     </tr>
     <tr v-show="item.mdSubject">
-        <th>教科</th>
+        <th>科目</th>
         <td>@{{item.mdSubject}}</td>
     </tr>
     <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type != 3">
@@ -81,11 +73,11 @@
         <th>授業代講</th>
         <td>なし</td>
     </tr>
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type != 3">
+    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type == 0">
         <th>出欠ステータス</th>
         <td>未実施・出席</td>
     </tr>
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }}">
+    <tr>
         <th>メモ</th>
         <td></td>
     </tr>

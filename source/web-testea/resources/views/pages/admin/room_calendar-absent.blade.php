@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '集団授業欠席登録'))
+@section('title', '授業欠席登録'))
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -15,7 +15,7 @@
     <x-input.hidden id="roomcd" :editData=$editData />
     <x-input.hidden id="schedule_id" :editData=$editData />
 
-    <p>集団授業の欠席登録を行います。</p>
+    <p>１対多授業の欠席登録を行います。</p>
 
     <x-bs.table :hover=false :vHeader=true>
         <tr>
@@ -23,8 +23,12 @@
             <td>久我山</td>
         </tr>
         <tr>
-            <th>指導スペース</th>
+            <th>ブース</th>
             <td>Aテーブル</td>
+        </tr>
+        <tr>
+            <th>コース名</th>
+            <td>集団授業</td>
         </tr>
         <tr>
             <th>授業日・時限</th>

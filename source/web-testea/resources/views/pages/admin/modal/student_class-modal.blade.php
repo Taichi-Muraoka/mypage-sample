@@ -9,7 +9,7 @@
         <td>久我山</td>
     </tr>
     <tr>
-        <th width="35%">指導スペース</th>
+        <th width="35%">ブース</th>
         <td>Aテーブル</td>
     </tr>
     <tr>
@@ -45,7 +45,7 @@
         <td>CWテスト生徒５</td>
     </tr>
     <tr>
-        <th>教科</th>
+        <th>科目</th>9
         <td>英語</td>
     </tr>
     <tr>

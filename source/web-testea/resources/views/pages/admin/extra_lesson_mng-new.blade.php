@@ -22,12 +22,6 @@
         <option value="6">自由が丘</option>
     </x-input.select>
 
-    <x-input.select caption="指導スペース" id="classroomcd" :select2=true :editData="$editData">
-        <option value="1" selected>Aテーブル</option>
-        <option value="2">Bテーブル</option>
-        <option value="3">Cテーブル</option>
-    </x-input.select>
-
     <x-input.date-picker caption="授業日" id="curDate" :editData=$editData />
 
     <x-input.select caption="時限" id="period" :select2=true :editData="$editData">
@@ -45,8 +39,15 @@
 
     <x-input.time-picker caption="終了時刻" id="end_time" :rules=$rules :editData=$editData />
 
+    <x-input.select caption="コース名" id="course_cd" :select2=true :select2Search=false :editData="$editData">
+        <option value="1" selected>個別指導コース</option>
+        <option value="2">家庭教師</option>
+        <option value="3">演習</option>
+        <option value="4">ハイプラン</option>
+    </x-input.select>
+
     <x-input.select caption="生徒" id="sid" :select2=true :editData="$editData">
-        <option value="1">CWテスト生徒１</option>
+        <option value="1" selected>CWテスト生徒１</option>
         <option value="2">CWテスト生徒２</option>
         <option value="3">CWテスト生徒３</option>
     </x-input.select>
@@ -56,7 +57,7 @@
         <option value="2">CWテスト教師２</option>
     </x-input.select>
 
-    <x-input.select caption="教科" id="subject_cd" :select2=true :select2Search=false :editData="$editData">
+    <x-input.select caption="科目" id="subject_cd" :select2=true :select2Search=false :editData="$editData">
         <option value="1" selected>国語</option>
         <option value="2">数学</option>
         <option value="3">理科</option>
