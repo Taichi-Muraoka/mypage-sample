@@ -38,7 +38,7 @@
         <option value="3">CWテスト生徒３</option>
     </x-input.select>
 
-    <x-input.textarea caption="特記事項" id="conference_comment" :rules=$rules :editData=$editData />
+    <x-input.textarea caption="管理者メモ" id="conference_comment" :rules=$rules :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">
