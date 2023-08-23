@@ -26,7 +26,8 @@ export default class CalendarCom {
             },
             themeSystem: "bootstrap",
             locale: "ja",
-            height: 700,
+            //height: 700,
+            height: "auto",
             // v5対応
             //plugins: ["bootstrap", "interaction", "dayGrid", "timeGrid"],
             selectable: false,

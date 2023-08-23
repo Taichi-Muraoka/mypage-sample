@@ -22,7 +22,7 @@
         <option value="6">自由が丘</option>
     </x-input.select>
 
-    <x-input.select caption="指導スペース" id="classroomcd" :select2=true :editData="$editData">
+    <x-input.select caption="ブース" id="classroomcd" :select2=true :editData="$editData">
         <option value="1" selected>Aテーブル</option>
         <option value="2">Bテーブル</option>
         <option value="3">Cテーブル</option>
@@ -56,7 +56,7 @@
         <option value="2">CWテスト教師２</option>
     </x-input.select>
 
-    <x-input.select caption="教科" id="subject_cd" :select2=true :select2Search=false :editData="$editData">
+    <x-input.select caption="科目" id="subject_cd" :select2=true :select2Search=false :editData="$editData">
         <option value="1" selected>国語</option>
         <option value="2">数学</option>
         <option value="3">理科</option>
