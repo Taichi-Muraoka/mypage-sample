@@ -90,15 +90,6 @@
         </x-bs.form-group>
     </x-bs.card>
 
-    @if (request()->routeIs('tutor_mng-edit'))
-    {{-- 編集時 講師ステータス--}}
-    <x-input.select id="tutor_status" caption="講師ステータス" :select2=false >
-        <option value="1">在籍</option>
-        <option value="2">退職処理中</option>
-        <option value="3">退職</option>
-    </x-input.select>
-    @endif
-
     <x-input.textarea id="text" caption="メモ" :rules=$rules :editData=$editData />
 
     {{-- hidden --}}
