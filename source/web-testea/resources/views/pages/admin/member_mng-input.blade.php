@@ -29,9 +29,9 @@
     @endif
 
     {{-- 共通フォーム --}}
-    <x-input.text caption="外部サービス顧客ID" id="external_id" :rules=$rules :editData=$editData/>
     <x-input.text caption="生徒名" id="name" :rules=$rules :editData=$editData/>
-    <x-input.text caption="生徒名カナ" id="name_kana" :rules=$rules :editData=$editData/>
+    <x-input.text caption="生徒名かな" id="name_kana" :rules=$rules :editData=$editData/>
+
     <x-bs.form-group name="campas_groups">
         <x-bs.form-title>所属校舎</x-bs.form-title>
         {{-- 校舎チェックボックス --}}
@@ -102,7 +102,7 @@
         <x-input.date-picker caption="休塾開始日" id="recess_start_date" vShow="form.stu_status == 2 || form.stu_status == 3"/>
         <x-input.date-picker caption="休塾終了日" id="recess_end_date" vShow="form.stu_status == 2 || form.stu_status == 3"/>
     </div>
-
+    <x-input.text caption="外部サービス顧客ID" id="external_id" :rules=$rules :editData=$editData/>
     <x-input.text caption="ストレージURL" id="storage_url" :rules=$rules :editData=$editData/>
 
     <x-input.textarea id="memo" caption="メモ" :rules=$rules :editData=$editData />
