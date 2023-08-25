@@ -1127,4 +1127,56 @@ class TutorMngController extends Controller
 
         return $teacher;
     }
+
+    //==========================
+    // 学校検索
+    //==========================
+
+    /**
+     * 検索結果取得(学校検索)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 検索結果
+     */
+    public function searchSchool(Request $request)
+    {
+        // TODO: 実装 適当ですので修正してください
+        $query = Account::query();
+        $students = $query
+            ->select(
+                \DB::raw("'100' as 'school_id'"),
+                \DB::raw("'D113299902058' as 'school_code'"),
+                \DB::raw("'高校' as 'school_type'"),
+                \DB::raw("'東京' as 'school_pref'"),
+                \DB::raw("'公立' as 'school_div'"),
+                \DB::raw("'東京都立青山高等学校' as 'school_name'"),
+            );
+
+        // ページネータで返却
+        return $this->getListAndPaginator($request, $students);
+    }
+
+    /**
+     * バリデーション(学校検索用)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed バリデーション結果
+     */
+    public function validationForSearchSchool(Request $request)
+    {
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForSearchSchool());
+        return $validator->errors();
+    }
+
+    /**
+     * バリデーションルールを取得(学校検索用)
+     *
+     * @return array ルール
+     */
+    private function rulesForSearchSchool()
+    {
+        // TODO: 実装してください
+        return array();
+    }
 }

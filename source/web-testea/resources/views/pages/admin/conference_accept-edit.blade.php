@@ -54,7 +54,7 @@
         <option value="3">Cテーブル</option>
     </x-input.select>
 
-    <x-input.textarea caption="特記事項" id="conference_comment" :rules=$rules :editData=$editData />
+    <x-input.textarea caption="管理者メモ" id="conference_comment" :rules=$rules :editData=$editData />
 
     <x-bs.callout title="登録の際の注意事項" type="warning">
         登録ボタンを押下すると、指定した日時で面談スケジュールが登録されます。

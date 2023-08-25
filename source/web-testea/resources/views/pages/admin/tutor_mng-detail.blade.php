@@ -30,7 +30,11 @@
         </tr>
         <tr>
             <th>講師名</th>
-            <td>CWテスト教師１０１</td>
+            <td>CWテスト講師１０１</td>
+        </tr>
+        <tr>
+            <th>講師名かな</th>
+            <td>てすとこうし</td>
         </tr>
         <tr>
             <th>電話番号</th>
@@ -41,13 +45,34 @@
             <td>teacher0101@mp-sample.rulez.jp</td>
         </tr>
         <tr>
+            <th>住所</th>
+            <td>千代田区九段南1‑2‑1</td>
+        </tr>
+        <tr>
             <th>生年月日</th>
             <td>2003/04/10</td>
         </tr>
         <tr>
+            <th>性別</th>
+            <td>男性</td>
+        </tr>
+        <tr>
             <th>学年</th>
             <td>大学１年</td>
-        </tr>        <tr>
+        </tr>
+        <tr>
+            <th>所属大学</th>
+            <td>青山学院大学</td>
+        </tr>
+        <tr>
+            <th>所属高校</th>
+            <td>青山高等学校</td>
+        </tr>
+        <tr>
+            <th>所属中学</th>
+            <td>青山中学校</td>
+        </tr>
+        <tr>
             <th>授業時給（ベース給）</th>
             <td>1300</td>
         </tr>
@@ -94,7 +119,7 @@
         <x-slot name="thead">
             <th width="20%">校舎</th>
             <th>交通費</th>
-            <th width="10%"></th>
+            <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}

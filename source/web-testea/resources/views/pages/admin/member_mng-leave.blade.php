@@ -24,10 +24,6 @@
             <th width="15%">生徒名</th>
             <td>CWテスト生徒１</td>
         </tr>
-        <tr>
-            <th width="15%">会員ステータス</th>
-            <td>在籍</td>
-        </tr>
     </x-bs.table>
 
     {{-- 余白 --}}

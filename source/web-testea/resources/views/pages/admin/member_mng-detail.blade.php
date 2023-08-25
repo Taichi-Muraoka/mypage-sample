@@ -28,8 +28,8 @@
             <td>{{$student->name}}</td>
         </tr>
         <tr>
-            <th>生徒名カナ</th>
-            <td>テストセイト</td>
+            <th>生徒名かな</th>
+            <td>てすとせいと</td>
         </tr>
         <tr>
             <th>生徒電話番号</th>
@@ -46,6 +46,10 @@
         <tr>
             <th>保護者メールアドレス</th>
             <td>parent0001@ap.jeez.jp</td>
+        </tr>
+        <tr>
+            <th>生年月日</th>
+            <td>2010/12/12</td>
         </tr>
         <tr>
             <th>学年</th>
@@ -76,22 +80,38 @@
             <td>2020/04/01</td>
         </tr>
         <tr>
+            <th>退会日</th>
+            <td></td>
+        </tr>
+        <tr>
+            <th>通塾期間</th>
+            <td></td>
+        </tr>
+        <tr>
+            <th>外部サービス顧客ID</th>
+            <td>11</td>
+        </tr>
+        <tr>
             <th>ストレージURL</th>
             <td>
                 <a href="https://drive.google.com/drive/folders/1GiSWPRMHYohxQ04OujILYQvjBtciXLiC?usp=drive_link">https://drive.google.com/drive/folders/1GiSWPRMHYohxQ04OujILYQvjBtciXLiC?usp=drive_link</a>
             </td>
+        </tr>
+        <tr>
+            <th>メモ</th>
+            <td></td>
         </tr>
     </x-bs.table>
 </x-bs.card>
 
 <x-bs.card>
     <x-slot name="tools">
-        <x-button.new href="{{ route('desired_mng-new', $student->sid) }}" caption="受験校登録" :small=true />
-        <x-button.edit href="{{ route('desired_mng', $student->sid) }}" caption="受験校管理" icon="" :small=true />
+        <x-button.new href="{{ route('record-new', $student->sid) }}" caption="記録登録" :small=true />
+        <x-button.edit href="{{ route('record', $student->sid) }}" caption="記録管理" icon="" :small=true />
     </x-slot>
 
     <x-slot name="card_title">
-        受験校情報
+        連絡記録
     </x-slot>
 
     {{-- テーブル --}}
@@ -99,48 +119,35 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="10%">受験年度</th>
-            <th width="10%">志望順</th>
-            <th>受験校</th>
-            <th>学部・学科名</th>
-            <th>受験日程名</th>
-            <th>受験日</th>
-            <th>合否</th>
+            <th width="20%">対応日時</th>
+            <th>記録種別</th>
+            <th>校舎</th>
+            <th>担当者名</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <td>2022</td>
-            <td>1</td>
-            <td>青山高等学校</td>
-            <td>普通科</td>
-            <td>A日程</td>
-            <td>2023/03/03</td>
-            <td>合格</td>
-            @php
-            $ids = ['roomcd' => 110, 'seq' => 1, 'sid' => 1];
-            @endphp
+            <td>2023/01/10 17:00</td>
+            <td>面談記録</td>
+            <td>久我山</td>
+            <td>山田　太郎</td>
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-desired" :dataAttr="$ids" />
+                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
             </td>
-        </tr>
         <tr>
-            <td>2022</td>
-            <td>2</td>
-            <td>成城第二高等学校</td>
-            <td>特進科</td>
-            <td>B日程</td>
-            <td>2023/02/01</td>
-            <td>合格</td>
-            @php
-            $ids = ['roomcd' => 110, 'seq' => 1, 'sid' => 1];
-            @endphp
+            <td>2023/01/09 19:30</td>
+            <td>電話記録</td>
+            <td>久我山</td>
+            <td>鈴木　花子</td>
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-desired" :dataAttr="$ids" />
+                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
             </td>
         </tr>
     </x-bs.table>
+
+    <div class="text-right">他3件</div>
+
 </x-bs.card>
 
 <x-bs.card>
@@ -268,12 +275,12 @@
 
 <x-bs.card>
     <x-slot name="tools">
-        <x-button.new href="{{ route('record-new', $student->sid) }}" caption="記録登録" :small=true />
-        <x-button.edit href="{{ route('record', $student->sid) }}" caption="記録管理" icon="" :small=true />
+        <x-button.new href="{{ route('desired_mng-new', $student->sid) }}" caption="受験校登録" :small=true />
+        <x-button.edit href="{{ route('desired_mng', $student->sid) }}" caption="受験校管理" icon="" :small=true />
     </x-slot>
 
     <x-slot name="card_title">
-        連絡記録
+        受験校情報
     </x-slot>
 
     {{-- テーブル --}}
@@ -281,32 +288,50 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="20%">対応日時</th>
-            <th>記録種別</th>
-            <th>校舎</th>
-            <th>担当者名</th>
+            <th width="10%">受験年度</th>
+            <th width="10%">志望順</th>
+            <th>受験校</th>
+            <th>学部・学科名</th>
+            <th>受験日程名</th>
+            <th>受験日</th>
+            <th>合否</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <td>2023/01/10 17:00</td>
-            <td>面談記録</td>
-            <td>久我山</td>
-            <td>山田　太郎</td>
+            <td>2022</td>
+            <td>1</td>
+            <td>青山高等学校</td>
+            <td>普通科</td>
+            <td>A日程</td>
+            <td>2023/03/03</td>
+            <td>合格</td>
+            @php
+            $ids = ['roomcd' => 110, 'seq' => 1, 'sid' => 1];
+            @endphp
             <td>
-                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
+                <x-button.list-dtl dataTarget="#modal-dtl-desired" :dataAttr="$ids" />
             </td>
+        </tr>
         <tr>
-            <td>2023/01/09 19:30</td>
-            <td>電話記録</td>
-            <td>久我山</td>
-            <td>鈴木　花子</td>
+            <td>2022</td>
+            <td>2</td>
+            <td>成城第二高等学校</td>
+            <td>特進科</td>
+            <td>B日程</td>
+            <td>2023/02/01</td>
+            <td>合格</td>
+            @php
+            $ids = ['roomcd' => 110, 'seq' => 1, 'sid' => 1];
+            @endphp
             <td>
-                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
+                <x-button.list-dtl dataTarget="#modal-dtl-desired" :dataAttr="$ids" />
             </td>
         </tr>
     </x-bs.table>
+
+    <div class="text-right">他3件</div>
 
 </x-bs.card>
 
@@ -349,6 +374,9 @@
             </td>
         </tr>
     </x-bs.table>
+
+    <div class="text-right">他3件</div>
+
 </x-bs.card>
 
 <x-bs.card>
@@ -407,6 +435,8 @@
             <td>成績UP</td>
         </tr>
     </x-bs.table>
+
+    <div class="text-right">他3件</div>
 
     {{-- フッター --}}
     <x-slot name="footer">
