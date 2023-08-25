@@ -26,9 +26,14 @@ class AuthEx
             return ($user->account_type == AppConst::CODE_MASTER_7_3);
         });
 
+        // 全体管理者のみ
+        Gate::define('allAdmin', function ($user) {
+            // 本部の教室コード:0
+            return ($user->account_type == AppConst::CODE_MASTER_7_3 && $user->roomcd == AppConst::CODE_MASTER_6_0);
+        });
+
         // 教室管理者のみ
         Gate::define('roomAdmin', function ($user) {
-            // 本部の教室コード:0
             return ($user->account_type == AppConst::CODE_MASTER_7_3 && $user->roomcd !== AppConst::CODE_MASTER_6_0);
         });
 
