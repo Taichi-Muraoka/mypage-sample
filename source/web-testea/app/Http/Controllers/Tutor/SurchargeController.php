@@ -65,7 +65,7 @@ class SurchargeController extends Controller
     }
 
     //==========================
-    // 登録
+    // 登録・編集
     //==========================
 
     /**
@@ -75,7 +75,7 @@ class SurchargeController extends Controller
      */
     public function new()
     {
-        return view('pages.tutor.surcharge-new', [
+        return view('pages.tutor.surcharge-input', [
             'rules' => $this->rulesForInput(),
             'editData' => null,
         ]);
@@ -89,6 +89,33 @@ class SurchargeController extends Controller
      */
     public function create(Request $request)
     {
+        return;
+    }
+
+    /**
+     * 編集画面
+     *
+     * @param int $surchargeId 追加請求ID
+     * @return view
+     */
+    public function edit($surchargeId)
+    {
+
+        return view('pages.tutor.surcharge-input', [
+            'editData' => null,
+            'rules' => $this->rulesForInput(null),
+        ]);
+    }
+
+    /**
+     * 編集処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function update(Request $request)
+    {
+
         return;
     }
 

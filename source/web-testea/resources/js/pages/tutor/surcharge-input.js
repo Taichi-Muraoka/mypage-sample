@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 追加請求登録
+ * 追加請求登録・編集
  */
 export default class AppClass extends PageBase {
     /**

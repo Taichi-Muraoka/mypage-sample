@@ -596,6 +596,12 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // 新規登録処理
     Route::post('/surcharge/create', [SurchargeController::class, 'create'])->name('surcharge-create');
 
+    // 編集
+    Route::get('/surcharge/edit/{surchargeId}', [SurchargeController::class, 'edit'])->name('surcharge-edit');
+
+    // 編集処理
+    Route::post('/surcharge/update', [SurchargeController::class, 'update'])->name('surcharge-update');
+
     // バリデーション(登録用)
     Route::post('/surcharge/vd_input', [SurchargeController::class, 'validationForInput'])->name('surcharge-vd_input');
 
