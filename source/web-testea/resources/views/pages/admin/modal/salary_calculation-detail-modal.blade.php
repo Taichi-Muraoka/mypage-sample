@@ -10,95 +10,116 @@
         <td>2023年03月</td>
     </tr>
     <tr>
-        <th>講師名</th>
+        <th width="35%">講師名</th>
         <td>CWテスト講師１０１</td>
     </tr>
     <tr>
-        <th>出社回数</th>
-        <td>10</td>
+        <th width="35%">授業時給(ベース給)</th>
+        <td class="t-price">1,300</td>
     </tr>
     <tr>
-        <th>授業時給(ベース給)</th>
-        <td>1300</td>
+        <th>事務作業給（一律）</th>
+        <td class="t-price">1,072</td>
     </tr>
 
 </x-bs.table>
 
-{{-- 最大10件なのでページネータなし --}}
-<x-bs.table :smartPhoneModal=true>
+{{-- 余白 --}}
+<div class="mb-3"></div>
+
+<x-bs.form-title>授業時間・経費</x-bs.form-title>
+
+    {{-- ページネータなし --}}
+<x-bs.table :hover=false :smartPhoneModal=true>
 
     <x-slot name="thead">
-        <th width="25%">費目</th>
-        <th width="25%">時間・回数</th>
-        <th width="25%">金額</th>
-        <th width="25%">備考</th>
+        <th width="35%">費目</th>
+        <th width="30%">時間</th>
+        <th>金額</th>
     </x-slot>
 
     <tr>
         <td>個別</td>
-        <td>18</td>
-        <td></td>
-        <td></td>
+        <td class="t-price">18</td>
+        <td class="t-price"></td>
     </tr>
     <tr>
         <td>１対２</td>
-        <td>3</td>
-        <td></td>
-        <td></td>
+        <td class="t-price">3</td>
+        <td class="t-price"></td>
     </tr>
     <tr>
         <td>１対３</td>
-        <td>4.5</td>
-        <td></td>
-        <td></td>
+        <td class="t-price">4.5</td>
+        <td class="t-price"></td>
     </tr>
     <tr>
         <td>集団</td>
-        <td>3</td>
-        <td></td>
-        <td></td>
+        <td class="t-price">3</td>
+        <td class="t-price"></td>
     </tr>
     <tr>
         <td>家庭教師</td>
-        <td>6</td>
-        <td></td>
-        <td></td>
+        <td class="t-price">6</td>
+        <td class="t-price"></td>
     </tr>
     <tr>
         <td>演習</td>
-        <td>2</td>
-        <td></td>
-        <td></td>
+        <td class="t-price">2</td>
+        <td class="t-price"></td>
     </tr>
     <tr>
         <td>ハイプラン</td>
-        <td>10</td>
-        <td></td>
-        <td></td>
+        <td class="t-price">10</td>
+        <td class="t-price"></td>
     </tr>
     <tr>
         <td>事務作業</td>
-        <td>2</td>
-        <td>6,000</td>
-        <td></td>
+        <td class="t-price">2</td>
+        <td class="t-price">2,144</td>
     </tr>
     <tr>
-        <td>その他費用</td>
-        <td>1</td>
-        <td>1,500</td>
-        <td>教材購入</td>
+        <td>経費（源泉計算対象）</td>
+        <td></td>
+        <td class="t-price">1,500</td>
     </tr>
+    <tr>
+        <td>経費（源泉計算対象外）</td>
+        <td></td>
+        <td class="t-price">800</td>
+    </tr>
+</x-bs.table>
+
+{{-- 余白 --}}
+<div class="mb-3"></div>
+
+<x-bs.form-title>交通費</x-bs.form-title>
+
+<x-bs.table :hover=false :smartPhoneModal=true>
+
+    <x-slot name="thead">
+        <th width="35%">費目</th>
+        <th width="20%">単価</th>
+        <th width="20%">回数</th>
+        <th>金額</th>
+    </x-slot>
     <tr>
         <td>交通費1</td>
-        <td>2</td>
-        <td>1,000</td>
-        <td>久我山</td>
+        <td class="t-price">500</td>
+        <td class="t-price">8</td>
+        <td class="t-price">4,000</td>
     </tr>
     <tr>
-        <td>交通費２</td>
-        <td>8</td>
-        <td>2,200</td>
-        <td>渋谷</td>
+        <td>交通費2</td>
+        <td class="t-price">600</td>
+        <td class="t-price">2</td>
+        <td class="t-price">1,200</td>
+    </tr>
+    <tr>
+        <td>交通費3</td>
+        <td class="t-price">0</td>
+        <td class="t-price">0</td>
+        <td class="t-price">0</td>
     </tr>
 </x-bs.table>
 

@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '給与算出情報一覧')
+@section('title', '給与情報集計・データ出力')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -26,8 +26,8 @@
     </x-bs.table>
 
     <div class="d-flex justify-content-end">
-        <x-button.submit-exec caption="集計実行" dataTarget="#modal-dtl-output" />
-        <x-button.submit-exec caption="確定処理" dataTarget="#modal-dtl-new" />
+        <x-button.submit-exec caption="集計実行" dataTarget="#modal-dtl-calc" />
+        <x-button.submit-exec caption="確定処理" dataTarget="#modal-dtl-confirm" />
     </div>
 
     {{-- 余白 --}}
@@ -51,8 +51,7 @@
             <x-slot name="thead">
                 <th width="10%">講師ID</th>
                 <th width="10%">講師名</th>
-                <th width="10%">出社回数</th>
-                <th width="10%">授業時給(ベース給)</th>
+                <th width="5%">ベース給</th>
                 <th width="5%">個別</th>
                 <th width="5%">１対２</th>
                 <th width="5%">１対３</th>
@@ -61,8 +60,11 @@
                 <th width="5%">演習</th>
                 <th width="5%">ハイプラン</th>
                 <th width="5%">事務作業</th>
-                <th width="5%">その他経費</th>
-                <th width="5%">交通費</th>
+                <th width="5%">経費(対象)</th>
+                <th width="5%">経費(対象外)</th>
+                <th width="5%">交通費1</th>
+                <th width="5%">交通費2</th>
+                <th width="5%">交通費3</th>
                 <th width="5%"></th>
             </x-slot>
 
@@ -70,18 +72,20 @@
             <tr>
                 <td>101</td>
                 <td>CWテスト講師１０１</td>
-                <td>10</td>
-                <td>1300</td>
-                <td>18</td>
-                <td>3</td>
-                <td>4.5</td>
-                <td>3</td>
-                <td>6</td>
-                <td>2</td>
-                <td>10</td>
-                <td>2</td>
-                <td>1200</td>
-                <td>3200</td>
+                <td class="t-price">1,300</td>
+                <td class="t-price">18</td>
+                <td class="t-price">3</td>
+                <td class="t-price">4.5</td>
+                <td class="t-price">3</td>
+                <td class="t-price">6</td>
+                <td class="t-price">2</td>
+                <td class="t-price">10</td>
+                <td class="t-price">2</td>
+                <td class="t-price">1,500</td>
+                <td class="t-price">800</td>
+                <td class="t-price">4,000</td>
+                <td class="t-price">1,200</td>
+                <td class="t-price">0</td>
                 <td>
                     {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                     <x-button.list-dtl/>
@@ -104,7 +108,16 @@
     </x-slot>
 </x-bs.card>
 
-{{-- モーダル --}}
+{{-- モーダル(詳細) --}}
 @include('pages.admin.modal.salary_calculation-detail-modal')
+{{-- モーダル(集計実行) --}}
+@include('pages.admin.modal.salary_calculation-calc-modal', 
+    ['modal_send_confirm' => true, 'modal_id' =>'modal-dtl-calc'])
+{{-- モーダル(経費確定) --}}
+@include('pages.admin.modal.salary_calculation-confirm-modal', 
+    ['modal_send_confirm' => true, 'modal_id' =>'modal-dtl-confirm'])
+{{-- モーダル(CSV出力実行) --}}
+@include('pages.admin.modal.salary_calculation-output-modal', 
+    ['modal_send_confirm' => true, 'modal_id' =>'modal-dtl-output'])
 
 @stop
