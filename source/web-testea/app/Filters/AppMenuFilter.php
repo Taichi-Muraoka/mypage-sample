@@ -63,7 +63,7 @@ class AppMenuFilter implements FilterInterface
 
                 // 合計件数
                 $item["label"] = $countCourse->count + $countLeave->count;
-                $item["label_color"] = "info";
+                $item["label"] === 0 ? $item["label_color"] = "info" : $item["label_color"] = "danger";
 
                 // サブメニューの件数表示
                 foreach ($item["submenu"] as &$submenu) {
@@ -71,19 +71,19 @@ class AppMenuFilter implements FilterInterface
                     if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_course_accept")) {
                         // コース変更・授業追加
                         $submenu["label"] = $countCourse->count;
-                        $submenu["label_color"] = "info";
+                        $submenu["label"] === 0 ? $submenu["label_color"] = "info" : $submenu["label_color"] = "danger";
                     }
 
                     if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_leave_accept")) {
                         // 退会申請
                         $submenu["label"] = $countLeave->count;
-                        $submenu["label_color"] = "info";
+                        $submenu["label"] === 0 ? $submenu["label_color"] = "info" : $submenu["label_color"] = "danger";
                     }
 
                     if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_conference_accept")) {
                         // 面談日程受付
                         $submenu["label"] = $countLeave->count;
-                        $submenu["label_color"] = "info";
+                        $submenu["label"] === 0 ? $submenu["label_color"] = "info" : $submenu["label_color"] = "danger";
                     }
                 }
             }
@@ -123,7 +123,7 @@ class AppMenuFilter implements FilterInterface
 
                 // 合計件数
                 $item["label"] = $countAbsent->count + $countTransfer->count;
-                $item["label_color"] = "info";
+                $item["label"] === 0 ? $item["label_color"] = "info" : $item["label_color"] = "danger";
 
                 // サブメニューの件数表示
                 foreach ($item["submenu"] as &$submenu) {
@@ -131,31 +131,31 @@ class AppMenuFilter implements FilterInterface
                     if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_absent_accept")) {
                         // 欠席申請
                         $submenu["label"] = $countAbsent->count;
-                        $submenu["label_color"] = "info";
+                        $submenu["label"] === 0 ? $submenu["label_color"] = "info" : $submenu["label_color"] = "danger";
                     }
 
                     if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_transfer_check")) {
                         // 振替授業調整
                         $submenu["label"] = $countTransfer->count;
-                        $submenu["label_color"] = "info";
+                        $submenu["label"] === 0 ? $submenu["label_color"] = "info" : $submenu["label_color"] = "danger";
                     }
 
                     if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_transfer_required")) {
                         // 要振替授業管理
                         $submenu["label"] = $countTransfer->count;
-                        $submenu["label_color"] = "info";
+                        $submenu["label"] === 0 ? $submenu["label_color"] = "info" : $submenu["label_color"] = "danger";
                     }
 
                     if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_extra_lesson_mng")) {
                         // 追加授業依頼受付
                         $submenu["label"] = $countTransfer->count;
-                        $submenu["label_color"] = "info";
+                        $submenu["label"] === 0 ? $submenu["label_color"] = "info" : $submenu["label_color"] = "danger";
                     }
 
                     if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_report_check")) {
                         // 授業報告書
                         $submenu["label"] = $countTransfer->count;
-                        $submenu["label_color"] = "info";
+                        $submenu["label"] === 0 ? $submenu["label_color"] = "info" : $submenu["label_color"] = "danger";
                     }
                 }
             }
@@ -181,7 +181,7 @@ class AppMenuFilter implements FilterInterface
                 // 合計件数
                 // $item["label"] = $countCard->count;
                 $item["label"] = $countSeasonStutent;
-                $item["label_color"] = "info";
+                $item["label"] === 0 ? $item["label_color"] = "info" : $item["label_color"] = "danger";
 
                 // サブメニューの件数表示
                 foreach ($item["submenu"] as &$submenu) {
@@ -189,7 +189,7 @@ class AppMenuFilter implements FilterInterface
                     if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_season_mng_student")) {
                         // 生徒日程・コマ組み
                         $submenu["label"] = $countSeasonStutent;
-                        $submenu["label_color"] = "info";
+                        $submenu["label"] === 0 ? $submenu["label_color"] = "info" : $submenu["label_color"] = "danger";
                     }
                 }
             }
@@ -296,7 +296,7 @@ class AppMenuFilter implements FilterInterface
 
                 // 合計件数
                 $item["label"] = $countContact->count;
-                $item["label_color"] = "info";
+                $item["label"] === 0 ? $item["label_color"] = "info" : $item["label_color"] = "danger";
 
                 // サブメニューの件数表示
                 foreach ($item["submenu"] as &$submenu) {
@@ -304,7 +304,7 @@ class AppMenuFilter implements FilterInterface
                     if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_contact_mng")) {
                         // 問い合わせ管理
                         $submenu["label"] = $countContact->count;
-                        $submenu["label_color"] = "info";
+                        $submenu["label"] === 0 ? $submenu["label_color"] = "info" : $submenu["label_color"] = "danger";
                     }
                 }
             }
@@ -330,7 +330,7 @@ class AppMenuFilter implements FilterInterface
                 // 合計件数
                 // $item["label"] = $countCard->count;
                 $item["label"] = $countSurcharge;
-                $item["label_color"] = "info";
+                $item["label"] === 0 ? $item["label_color"] = "info" : $item["label_color"] = "danger";
 
                 // サブメニューの件数表示
                 foreach ($item["submenu"] as &$submenu) {
@@ -338,7 +338,7 @@ class AppMenuFilter implements FilterInterface
                     if ((isset($submenu["menuid"])) && ($submenu["menuid"] === "id_surcharge_accept")) {
                         // 追加請求受付
                         $submenu["label"] = $countSurcharge;
-                        $submenu["label_color"] = "info";
+                        $submenu["label"] === 0 ? $submenu["label_color"] = "info" : $submenu["label_color"] = "danger";
                     }
                 }
             }
@@ -365,7 +365,7 @@ class AppMenuFilter implements FilterInterface
 
                 // 合計件数
                 $item["label"] = $countTransferStudent;
-                $item["label_color"] = "info";
+                $item["label"] === 0 ? $item["label_color"] = "info" : $item["label_color"] = "danger";
 
             }
 
@@ -391,7 +391,7 @@ class AppMenuFilter implements FilterInterface
 
                 // 合計件数
                 $item["label"] = $countTransferTutor;
-                $item["label_color"] = "info";
+                $item["label"] === 0 ? $item["label_color"] = "info" : $item["label_color"] = "danger";
 
             }
             // 授業報告書
@@ -401,7 +401,7 @@ class AppMenuFilter implements FilterInterface
 
                 // 合計件数
                 $item["label"] = $countReportTutor;
-                $item["label_color"] = "info";
+                $item["label"] === 0 ? $item["label_color"] = "info" : $item["label_color"] = "danger";
 
             }
             // 追加請求申請
@@ -411,7 +411,7 @@ class AppMenuFilter implements FilterInterface
 
                 // 合計件数
                 $item["label"] = $countSurchargeTutor;
-                $item["label_color"] = "info";
+                $item["label"] === 0 ? $item["label_color"] = "info" : $item["label_color"] = "danger";
 
             }
             // 研修受講
@@ -421,7 +421,7 @@ class AppMenuFilter implements FilterInterface
 
                 // 合計件数
                 $item["label"] = $countReportTutor;
-                $item["label_color"] = "info";
+                $item["label"] === 0 ? $item["label_color"] = "info" : $item["label_color"] = "danger";
 
             }
         }

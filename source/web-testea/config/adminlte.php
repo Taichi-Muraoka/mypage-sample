@@ -63,9 +63,11 @@ return [
     |
     */
 
-    'logo' => 'TESTEA マイページ',
-    'login_logo_img' => 'img/co_logo_board_ol.svg',  // ログイン画面のロゴ
-    'logo_img' => 'img/cw_logo.png',
+    'logo' => 'マイページ',
+    //'login_logo_img' => 'img/co_logo_board_ol.svg',  // ログイン画面のロゴ
+    'login_logo_img' => 'img/testea_logo_white.png',  // ログイン画面のロゴ
+    //'logo_img' => 'img/cw_logo.png',
+    'logo_img' => 'img/testea_logo_green.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -87,7 +89,8 @@ return [
     'auth_logo' => [
         'enabled' => true,
         'img' => [
-            'path' => 'img/cw_logo.png',
+            //'path' => 'img/cw_logo.png',
+            'path' => 'img/testea_logo_green.png',
             'alt' => 'TESTEA',
             'class' => '',
             'width' => 50,
@@ -110,7 +113,8 @@ return [
     'preloader' => [
         'enabled' => false,
         'img' => [
-            'path' => 'img/cw_logo.png',
+            //'path' => 'img/cw_logo.png',
+            'path' => 'img/testea_logo_green.png',
             'alt' => 'TESTEA Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
@@ -168,12 +172,14 @@ return [
     |
     */
 
+    //'classes_auth_card' => 'card-outline',
     'classes_auth_card' => 'card-outline',
     'classes_auth_header' => '',
     'classes_auth_body' => '',
-    'classes_auth_footer' => '',
+    'classes_auth_footer' => 'bg-gradient-white',
     'classes_auth_icon' => '',
-    'classes_auth_btn' => 'btn-flat btn-primary',
+    //'classes_auth_btn' => 'btn-flat btn-primary',
+    'classes_auth_btn' => 'btn-flat btn-info',
 
     /*
     |--------------------------------------------------------------------------

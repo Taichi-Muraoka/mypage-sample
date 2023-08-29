@@ -3,8 +3,9 @@
 // button
 /*@import "button.scss";*/
 
-// アップル様カラー
-$apple-color: #1f4d98;
+//$apple-color: #1f4d98;
+// テスティ―様カラー
+$testea-color: #00a89e;
 
 // メイン背景色
 $main-bg-color: #f4f6f9;
@@ -49,7 +50,8 @@ body {
 */
 .sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active,
 .sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active {
-    background-color: $apple-color;
+    //background-color: $apple-color;
+    background-color: $testea-color;
     color: #fff;
 }
 
@@ -182,13 +184,16 @@ body {
 
 /* アクティブ時の色 */
 .page-item.active .page-link {
-    background-color: $apple-color;
-    border-color: $apple-color;
+    //background-color: $apple-color;
+    //border-color: $apple-color;
+    background-color: $testea-color;
+    border-color: $testea-color;
 }
 
 /* 非アクティブ時の色 */
 .page-link {
-    color: $apple-color;
+    //color: $apple-color;
+    color: $testea-color;
 }
 
 /* bootboxのローディング ------------------------*/
@@ -251,6 +256,10 @@ body {
     background: #fff;
 }
 */
+.login-page,
+.register-page {
+    background: $testea-color;
+}
 
 /* ログイン画面のタイトルなどの幅 */
 /*
@@ -272,16 +281,17 @@ label:not(.form-check-label):not(.custom-file-label) {
 
 /* ログイン画面のロゴの色 */
 .login-logo a {
-    color: $apple-color;
+//    color: $apple-color;
+    color: $testea-color;
 }
 
 /* ログイン画面のロゴ画像 */
 .login-logo-img {
     width: 100%;
-    border: 1px solid rgba(0, 0, 0, 0.125);
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
+    //border: 1px solid rgba(0, 0, 0, 0.125);
+    //-moz-border-radius: 5px;
+    //-webkit-border-radius: 5px;
+    //border-radius: 5px;
 }
 
 /* コールアウト */
@@ -377,14 +387,18 @@ label:not(.form-check-label):not(.custom-file-label) {
 
 /* 個別授業の予定の背景色 */
 [id^="calendar"] .cal_class {
-    background: #f39c12;
-    border-color: #f39c12;
+    //background: #f39c12;
+    //border-color: #f39c12;
+    background: #0073b7;
+    border-color: #0073b7;
 }
 
 /* 個別授業 振替日の予定の背景色 */
 [id^="calendar"] .cal_class_furikae {
-    background: #8b9b00;
-    border-color: #8b9b00;
+//    background: #8b9b00;
+//    border-color: #8b9b00;
+    background: #7ac143;
+    border-color: #7ac143;
 }
 
 /* 個別授業 後日振替の予定の背景色（短期講習も同様） */
@@ -439,16 +453,18 @@ label:not(.form-check-label):not(.custom-file-label) {
 
 /* ハイプランの予定の背景色 */
 [id^="calendar"] .cal_highplan {
-    background: salmon;
-    border-color: salmon;
+    //background: salmon;
+    //border-color: salmon;
+    background: #f39c12;
+    border-color: #f39c12;
 }
 
 /* 自習の予定の背景色 */
 [id^="calendar"] .cal_tanki_moshi {
-    //background: #af0058;
-    //border-color: #af0058;
-    background: #0073b7;
-    border-color: #0073b7;
+    //background: #0073b7;
+    //border-color: #0073b7;
+    background: salmon;
+    border-color: salmon;
 }
 
 /* イベントの予定の背景色 */
@@ -506,7 +522,7 @@ label:not(.form-check-label):not(.custom-file-label) {
 }
 
 .chk-wt.except + div {
-    background-color: darkslategray;
+    background-color: #4c4c4c;
 }
 
 /* 特別期間講習 授業コマ枠 */
@@ -515,7 +531,7 @@ label:not(.form-check-label):not(.custom-file-label) {
 }
 
 .chk-wt2:checked + div {
-    background-color: darkslategray;
+    background-color: #4c4c4c;
 }
 
 /*  授業登録済みの枠 */
