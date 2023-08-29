@@ -14,12 +14,22 @@ export default class AppClass extends PageBase {
     /**
      * 開始処理
      */
-    start() {
+     start() {
+        // Vue: 検索フォーム
+        var searchForm = this.getVueSearchForm();
+
         // Vue: モーダル
         this.getVueModal();
 
-        // 検索一覧の表示
-        var $vueSearchList = this.getVueSearchList();
-        $vueSearchList.search();
+        // Vue: モーダル(受付)
+        this.getVueModal({
+            id: "#modal-dtl-acceptance",
+
+            // 完了処理後
+            afterExec: () => {
+                // 一覧を再表示する
+                searchForm.vueSearchList.refresh();
+            }
+        });
     }
 }

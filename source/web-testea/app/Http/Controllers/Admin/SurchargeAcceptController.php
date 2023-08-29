@@ -80,7 +80,41 @@ class SurchargeAcceptController extends Controller
      */
     public function getData(Request $request)
     {
-        return ['id' => $request->id];
+        // モーダルによって処理を行う
+        $modal = $request->input('target');
+
+        switch ($modal) {
+            case "#modal-dtl-acceptance":
+                //---------
+                // 承認
+                //---------
+                return;
+
+                break;
+
+            case "#modal-dtl":
+                //---------
+                // 詳細
+                //---------
+                return ['id' => $request->id];
+
+                break;
+
+            default:
+                // 該当しない場合
+                $this->illegalResponseErr();
+        }
+    }
+
+    /**
+     * モーダル処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function execModal(Request $request)
+    {
+        return;
     }
 
     /**
@@ -90,7 +124,9 @@ class SurchargeAcceptController extends Controller
      */
     private function rulesForSearch()
     {
-        return;
+        $rules = array();
+
+        return $rules;
     }
 
     //==========================
@@ -100,7 +136,7 @@ class SurchargeAcceptController extends Controller
     /**
      * 編集画面
      *
-     * @param int reportId 授業報告書ID
+     * @param int surchargeId 追加請求ID
      * @return view
      */
     public function edit($reportId)

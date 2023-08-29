@@ -18,12 +18,35 @@
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="teacher" caption="講師名" />
+            <x-input.select caption="講師名" id="tname" :select2=true>
+                <option value="1">CWテスト教師１０１</option>
+                <option value="2">CWテスト教師１０２</option>
+            </x-input.select>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="" caption="曜日" :select2=true>
+            <x-input.select id="" caption="性別" :select2=true >
+                <option value="1">男性</option>
+                <option value="2">女性</option>
+                <option value="3">その他</option>
+            </x-input.select>
+        </x-bs.col2>
+        <x-bs.col2>
+            <x-input.text id="school_cd_u" caption="在籍大学" />
+        </x-bs.col2>
+    </x-bs.row>
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.text id="school_cd_h" caption="出身高校" />
+        </x-bs.col2>
+        <x-bs.col2>
+            <x-input.text id="school_cd_j" caption="出身中学" />
+        </x-bs.col2>
+    </x-bs.row>
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.select id="day" caption="曜日" :select2=true>
                 <option value="1">月曜</option>
                 <option value="2">火曜</option>
                 <option value="3">水曜</option>
@@ -34,7 +57,7 @@
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="" caption="時限" :select2=true>
+            <x-input.select id="period_no" caption="時限" :select2=true>
                 <option value="1">1限</option>
                 <option value="2">2限</option>
                 <option value="3">3限</option>

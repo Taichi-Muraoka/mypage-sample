@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '追加請求申請承認')
+@section('title', '追加請求申請編集')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -10,7 +10,7 @@
 {{-- formを指定 --}}
 <x-bs.card :form=true>
 
-    <p>以下の追加請求申請について、承認を行います。</p>
+    <p>以下の追加請求申請について、編集を行います。</p>
 
     {{-- 種別：事務作業の場合 --}}
     <x-bs.table :hover=false :vHeader=true>
@@ -20,7 +20,7 @@
         </tr>
         <tr>
             <th width="35%">請求種別</th>
-            <td>事務作業</td>
+            <td>業務依頼（教室）</td>
         </tr>
         <tr>
             <th>校舎</th>
@@ -47,30 +47,6 @@
             <td>教材プリントコピー作業</td>
         </tr>
     </x-bs.table>
-
-    {{-- 種別：その他経費の場合 --}}
-    {{-- <x-bs.table :hover=false :vHeader=true>
-        <tr>
-            <th>講師名</th>
-            <td>CWテスト教師１０１</td>
-        </tr>
-        <tr>
-            <th width="35%">請求種別</th>
-            <td>その他経費</td>
-        </tr>
-        <tr>
-            <th>校舎</th>
-            <td>久我山</td>
-        </tr>
-        <tr>
-            <th>金額</th>
-            <td>2000</td>
-        </tr>
-        <tr>
-            <th>内容（作業・費目等）</th>
-            <td>テキスト購入</td>
-        </tr>
-    </x-bs.table> --}}
 
     {{-- 余白 --}}
     <div class="mb-3"></div>

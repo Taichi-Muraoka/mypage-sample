@@ -30,7 +30,7 @@
         {{-- テーブル行 --}}
         <tr>
             <td>2023/01/10</td>
-            <td>事務作業</td>
+            <td>業務依頼（本部）</td>
             <td>60</td>
             <td>1000</td>
             <td>承認</td>
@@ -38,18 +38,20 @@
             <td>未処理</td>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => '1']"/>
+                <x-button.list-edit disabled/>
             </td>
         </tr>
         <tr>
             <td>2023/01/09</td>
-            <td>その他経費</td>
+            <td>経費</td>
             <td></td>
             <td>2000</td>
-            <td>承認</td>
-            <td>2023/03</td>
-            <td>未処理</td>
+            <td>差戻し</td>
+            <td></td>
+            <td></td>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => '2']"/>
+                <x-button.list-edit href="{{ route('surcharge-edit', 1) }}" />
             </td>
         </tr>
     </x-bs.table>

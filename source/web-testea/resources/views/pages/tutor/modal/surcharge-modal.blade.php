@@ -6,7 +6,7 @@
 <x-bs.table :hover=false :vHeader=true :smartPhoneModal=true  vShow="item.id == 1">
     <tr>
         <th>請求種別</th>
-        <td>事務作業</td>
+        <td>業務依頼（本部）</td>
     </tr>
     <tr>
         <th>校舎</th>
@@ -55,11 +55,15 @@
 <x-bs.table :hover=false :vHeader=true :smartPhoneModal=true  vShow="item.id == 2">
     <tr>
         <th>請求種別</th>
-        <td>その他経費</td>
+        <td>経費</td>
     </tr>
     <tr>
         <th>校舎</th>
         <td>久我山</td>
+    </tr>
+    <tr>
+        <th>実施日</th>
+        <td>2023/01/09</td>
     </tr>
     <tr>
         <th>金額</th>
@@ -71,21 +75,21 @@
     </tr>
     <tr>
         <th>ステータス</th>
-        <td>承認</td>
+        <td>差戻し</td>
     </tr>
     <tr>
         <th>管理者コメント</th>
-        <td></td>
+        <td>再申請してください</td>
     </tr>
 
     {{-- ステータスが「承認」時のみ以下表示 --}}
     <tr>
         <th>支払年月</th>
-        <td>2023/03</td>
+        <td></td>
     </tr>
     <tr>
         <th>支払状況</th>
-        <td>未処理</td>
+        <td></td>
     </tr>
 </x-bs.table>
 
