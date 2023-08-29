@@ -19,14 +19,23 @@
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="teacher" caption="講師名" />
+            <x-input.select caption="講師名" id="tname" :select2=true :editData=$editData>
+                <option value="1">CWテスト教師１０１</option>
+                <option value="2">CWテスト教師１０２</option>
+            </x-input.select>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
             <x-input.select id="kinds" caption="請求種別" :select2=true>
-                <option value="1">事務作業</option>
-                <option value="2">その他経費</option>
+                <option value="1">研修（本部）</option>
+                <option value="2">研修（教室）</option>
+                <option value="3">特別交通費</option>
+                <option value="4">生徒獲得</option>
+                <option value="5">業務依頼（本部）</option>
+                <option value="6">業務依頼（教室）</option>
+                <option value="7">経費</option>
+                <option value="8">その他</option>
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
@@ -68,7 +77,7 @@
             <th>講師名</th>
             <th>請求種別</th>
             <th>校舎</th>
-            <th>時間</th>
+            <th>時間（分）</th>
             <th>金額</th>
             <th>ステータス</th>
             <th>支払年月</th>
@@ -80,7 +89,7 @@
         <tr>
             <td>2023/01/10</td>
             <td>CWテスト教師１０１</td>
-            <td>事務作業</td>
+            <td>業務依頼（教室）</td>
             <td>久我山</td>
             <td>60</td>
             <td>1000</td>
@@ -89,22 +98,24 @@
             <td>未処理</td>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => '1']"/>
-                <x-button.list-edit href="{{ route('surcharge_accept-edit', 1) }}" caption="承認"/>
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-acceptance" disabled/>
+                <x-button.list-edit href="{{ route('surcharge_accept-edit', 1) }}" />
             </td>
         </tr>
         <tr>
             <td>2023/01/09</td>
             <td>CWテスト教師１０１</td>
-            <td>その他経費</td>
+            <td>経費</td>
             <td>久我山</td>
             <td></td>
             <td>2000</td>
-            <td>承認</td>
-            <td>2023/03</td>
-            <td>未処理</td>
+            <td>承認待ち</td>
+            <td></td>
+            <td></td>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => '2']"/>
-                <x-button.list-edit href="{{ route('surcharge_accept-edit', 1) }}" caption="承認"/>
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-acceptance"/>
+                <x-button.list-edit href="{{ route('surcharge_accept-edit', 1) }}" />
             </td>
         </tr>
     </x-bs.table>
@@ -113,5 +124,8 @@
 
 {{-- モーダル --}}
 @include('pages.admin.modal.surcharge_accept-modal')
+{{-- モーダル(送信確認モーダル) --}}
+@include('pages.admin.modal.surcharge_accept_acceptance-modal', ['modal_send_confirm' => true, 'modal_id' =>
+'modal-dtl-acceptance'])
 
 @stop

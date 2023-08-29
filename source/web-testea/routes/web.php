@@ -2298,7 +2298,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::get('/surcharge_accept', [SurchargeAcceptController::class, 'index'])->name('surcharge_accept');
 
     // バリデーション(検索用)
-    Route::post('/surcharge_acceptg/vd_search', [SurchargeAcceptController::class, 'validationForSearch'])->name('surcharge_accept-vd_search');
+    Route::post('/surcharge_accept/vd_search', [SurchargeAcceptController::class, 'validationForSearch'])->name('surcharge_accept-vd_search');
 
     // 検索結果取得
     Route::post('/surcharge_accept/search', [SurchargeAcceptController::class, 'search'])->name('surcharge_accept-search');
@@ -2306,8 +2306,11 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 詳細取得用
     Route::post('/surcharge_accept/get_data', [SurchargeAcceptController::class, 'getData'])->name('surcharge_accept-get_data');
 
+    // モーダル処理
+    Route::post('/surcharge_accept/exec_modal', [SurchargeAcceptController::class, 'execModal'])->name('surcharge_accept-exec_modal');
+
     // 編集
-    Route::get('/surcharge_accept/edit/{gradesId}', [SurchargeAcceptController::class, 'edit'])->name('surcharge_accept-edit');
+    Route::get('/surcharge_accept/edit/{surchargeId}', [SurchargeAcceptController::class, 'edit'])->name('surcharge_accept-edit');
 
     // 編集処理
     Route::post('/surcharge_accept/update', [SurchargeAcceptController::class, 'update'])->name('surcharge_accept-update');
