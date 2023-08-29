@@ -13,6 +13,14 @@
         <td>CWテスト教師１０１</td>
     </tr>
     <tr>
+        <th width="35%">講師電話番号</th>
+        <td>070-1111-2222</td>
+    </tr>
+    <tr>
+        <th width="35%">講師メールアドレス</th>
+        <td>teacher0101@mp-sample.rulez.jp</td>
+    </tr>
+    <tr>
         <th width="35%">曜日</th>
         <td>月曜</td>
     </tr>
