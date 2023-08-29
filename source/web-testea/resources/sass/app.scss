@@ -487,8 +487,21 @@ label:not(.form-check-label):not(.custom-file-label) {
     border-color: #474747;
 }
 
+/* マーカー表示（オンライン） */
+[id^="calendar"] .class_marker {
+    font-weight: bold;
+    background:linear-gradient(transparent 50%, yellow 85%);
+}
 
-/* 空き時間・特別期間講習 コマ枠*/
+/* 授業特記表示（振替・初回・体験・追加） */
+[id^="calendar"] .class_special {
+    font-size: 110%;
+    font-weight: bold;
+    background: red;
+    padding: 2px 2px;
+}
+
+/* 空き時間・特別期間講習 コマ枠 ----------*/
 //.card.pa-table-checked {
 //    overflow-x: scroll;
 //}

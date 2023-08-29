@@ -858,16 +858,16 @@ trait FuncCalendarTrait
             //$schedule['title'] = $schedule['title'] . '<br>通常 ';
             // 体験授業
             if ($schedule['diff_time'] == 1) {
-                $schedule['title'] = $schedule['title'] . '<br><span style="font-size:125%; font-weight: bold; background: red; padding: 5px 3px;">' .'体験授業１回目' . '</span>';
+                $schedule['title'] = $schedule['title'] . '<br><span class="class_special">' .'体験授業１回目' . '</span>';
             }
             // 体験授業
             if ($schedule['diff_time'] == 6) {
-                $schedule['title'] = $schedule['title'] . '<br><span style="font-size:125%; font-weight: bold; background: red; padding: 5px 3px;">' .'追加' . '</span>';
+                $schedule['title'] = $schedule['title'] . '<br><span class="class_special">' .'追加' . '</span>';
             }
             // 振替
             if ($schedule['create_kind_cd'] == AppConst::CREATE_KIND_CD_2) {
                 //$schedule['title'] = $schedule['title'] . '<br>振替';
-                $schedule['title'] = $schedule['title'] . '<br><span style="font-size:125%; font-weight: bold; background: red; padding: 5px 3px;">' .'振替' . '</span>';
+                $schedule['title'] = $schedule['title'] . '<br><span class="class_special">' .'振替' . '</span>';
             }
             //$schedule['title'] = $schedule['title'] . '<br>個別指導コース<br>' . $schedule['mdSubject'];
             if ($schedule['diff_time'] == 3) {
@@ -885,7 +885,8 @@ trait FuncCalendarTrait
             $schedule['title'] = $schedule['title'] . '<br>stu：';
             //if ($schedule['diff_time'] == 2) {
             if ($schedule['atd_status_cd'] != AppConst::ATD_STATUS_CD_2) {
-                $schedule['title'] = $schedule['title'] . '<span style="font-weight: bold; background:linear-gradient(transparent 50%, red 65%);">' . $schedule['name'] . '</span>';
+                //$schedule['title'] = $schedule['title'] . '<span style="font-weight: bold; background:linear-gradient(transparent 50%, yellow 85%);">' . $schedule['name'] . '</span>';
+                $schedule['title'] = $schedule['title'] . '<span class="class_marker">' . $schedule['name'] . '</span>';
             } else {
                 $schedule['title'] = $schedule['title'] . $schedule['name'];
             }
@@ -984,7 +985,7 @@ trait FuncCalendarTrait
             $schedule['title'] = $schedule['start_time']->format('H:i') . '-'
              . $schedule['end_time']->format('H:i');
             if ($schedule['diff_time'] >= 3) {
-                $schedule['title'] = $schedule['title'] . '<br><span style="font-size:125%; font-weight: bold; background: red; padding: 5px 3px;">' .'初回授業' . '</span>';
+                $schedule['title'] = $schedule['title'] . '<br><span class="class_special">' .'初回授業' . '</span>';
             }
             if ($schedule['diff_time'] == 3) {
                 $schedule['title'] = $schedule['title'] . '<br>１対２コース<br>' . $schedule['mdSubject'];
@@ -996,7 +997,8 @@ trait FuncCalendarTrait
             //$schedule['title'] = $schedule['title'] . '<br>tea：' . $schedule['mdTitleVal'];
             $schedule['title'] = $schedule['title'] . '<br>tea：';
             //if ($schedule['diff_time'] == 2) {
-                $schedule['title'] = $schedule['title'] . '<span style="font-weight: bold; background:linear-gradient(transparent 50%, red 65%);">' . $schedule['mdTitleVal'] . '</span>';
+                //$schedule['title'] = $schedule['title'] . '<span style="font-weight: bold; background:linear-gradient(transparent 50%, yellow 85%);">' . $schedule['mdTitleVal'] . '</span>';
+                $schedule['title'] = $schedule['title'] . '<span class="class_marker">' . $schedule['mdTitleVal'] . '</span>';
             //} else {
             //    $schedule['title'] = $schedule['title'] . $schedule['name'];
             //}
