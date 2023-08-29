@@ -7,6 +7,7 @@
 
 <ul>
     <li>ステータスを「承認」に変更</li>
+    <li>支払年月を設定</li>
 </ul>
 
 <x-bs.table :hover=false :vHeader=true>
@@ -30,6 +31,10 @@
     <tr>
         <th>金額</th>
         <td>2000</td>
+    </tr>
+    <tr>
+        <th>支払年月</th>
+        <td>2023/02</td>
     </tr>
 
     {{-- 本番用処理 --}}

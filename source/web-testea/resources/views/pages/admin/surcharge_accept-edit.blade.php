@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '追加請求申請承認')
+@section('title', '追加請求申請編集')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -10,7 +10,7 @@
 {{-- formを指定 --}}
 <x-bs.card :form=true>
 
-    <p>以下の追加請求申請について、承認を行います。</p>
+    <p>以下の追加請求申請について、編集を行います。</p>
 
     {{-- 種別：事務作業の場合 --}}
     <x-bs.table :hover=false :vHeader=true>
