@@ -78,6 +78,13 @@
         @endif
     </x-bs.table>
 
+    {{-- 余白 --}}
+    <div class="mb-4"></div>
+
+    {{-- TODO:校舎メールアドレスは校舎マスタより取得する --}}
+    <p>お月謝についてのお問い合わせは、校舎のメールアドレス（kugayama@testea.net）または、<br>
+    マイページの「問い合わせ」ページへお願いいたします。</p>
+
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">

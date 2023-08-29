@@ -23,7 +23,6 @@
 <br>
 <br>
 <br>
-<br>
 <p style="text-align:center;font-size:14pt;text-decoration: underline;">{{$invoice->invoice_date->format('Y年n月')}}分 お月謝のお知らせ</p>
 
 <table>
@@ -93,6 +92,8 @@
 <br>
 <br>
 <br>
-
+お月謝についてのお問い合わせは、校舎のメールアドレス（kugayama@testea.net）
+または、マイページの「問い合わせ」ページへお願いいたします。<br>
+<br>
 どうぞよろしくお願いいたします。<br>
 
