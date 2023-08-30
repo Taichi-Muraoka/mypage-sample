@@ -22,10 +22,16 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.text caption="生徒名" id="student_name" :rules=$rules />
+            <x-input.select caption="生徒名" id="student_name" :select2=true :editData=$editData>
+                <option value="1">CWテスト生徒１</option>
+                <option value="2">CWテスト生徒２</option>
+            </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text caption="講師名" id="teacher_name" :rules=$rules />
+            <x-input.select caption="講師名" id="teacher_name" :select2=true :editData=$editData>
+                <option value="1">CWテスト講師１</option>
+                <option value="2">CWテスト講師２</option>
+            </x-input.select>
         </x-bs.col2>
     </x-bs.row>
 

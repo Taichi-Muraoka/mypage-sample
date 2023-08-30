@@ -32,7 +32,9 @@
     <x-input.select caption="記録種別" id="karte_kind" :select2=true :editData="$editData">
         <option value="1">面談記録</option>
         <option value="2">電話記録</option>
-        <option value="3">その他</option>
+        <option value="3">メール</option>
+        <option value="4">LINE</option>
+        <option value="5">その他</option>
     </x-input.select>
 
     <x-input.select caption="対応校舎" id="roomcd" :select2=true :editData="$editData">
