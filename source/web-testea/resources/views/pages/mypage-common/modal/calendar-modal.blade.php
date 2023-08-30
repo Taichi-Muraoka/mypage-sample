@@ -4,14 +4,6 @@
 
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true>
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }}">
-        <th width="35%">スケジュール種別</th>
-        <td>授業・自習</td>
-    </tr>
-    <tr v-Show="item.mdType == {{ App\Consts\AppConst::CODE_MASTER_21_6 }}">
-        <th width="35%">スケジュール種別</th>
-        <td>面談</td>
-    </tr>
     <tr>
         <th width="35%">校舎</th>
         <td>@{{item.mdClassName}}</td>
@@ -31,6 +23,10 @@
     <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type == 3">
         <th width="35%">コース名</th>
         <td>自習・その他</td>
+    </tr>
+    <tr v-Show="item.mdType == {{ App\Consts\AppConst::CODE_MASTER_21_6 }}">
+        <th width="35%">コース名</th>
+        <td>面談</td>
     </tr>
     <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type != 3">
         <th>授業種別</th>
