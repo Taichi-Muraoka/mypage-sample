@@ -45,9 +45,19 @@ class MasterMngGradeSubjectController extends Controller
      */
     public function index()
     {
-        return view('pages.admin.master_mng_grade_subject', [
-            'editData' => null
-        ]);
+        return view('pages.admin.master_mng_grade_subject');
+    }
+
+    /**
+     * 検索結果取得
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 検索結果
+     */
+    public function search(Request $request)
+    {
+        // ページネータで返却（モック用）
+        return $this->getListAndPaginatorMock();
     }
 
     /**
@@ -56,11 +66,11 @@ class MasterMngGradeSubjectController extends Controller
      * @param \Illuminate\Http\Request $request リクエスト
      * @return mixed 詳細データ
      */
-    public function getData(Request $request)
-    {
-        return [
-        ];
-    }
+    //public function getData(Request $request)
+    //{
+    //    return [
+    //    ];
+    //}
 
     //==========================
     // 登録・編集・削除

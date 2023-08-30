@@ -42,9 +42,9 @@
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
-			<th>単元分類コード</th>
-			<th>学年</th>
-			<th>教材科目コード</th>
+			<th width="20%">単元分類コード</th>
+			<th width="10%">学年</th>
+			<th width="20%">教材科目</th>
 			<th>名称</th>
 			<th width="7%"></th>
 		</x-slot>
@@ -53,7 +53,7 @@
 		<tr>
 			<td>0710201</td>
 			<td>中1</td>
-			<td>102（数学）</td>
+			<td>数学</td>
 			<td>正負の数</td>
 			<td>
                 <x-button.list-edit href="{{ route('master_mng_category-edit',1) }}" />
@@ -62,7 +62,7 @@
 		<tr>
 			<td>0710202</td>
 			<td>中1</td>
-			<td>102（数学）</td>
+			<td>数学</td>
 			<td>方程式</td>
 			<td>
                 <x-button.list-edit href="{{ route('master_mng_category-edit',1) }}" />
@@ -71,7 +71,7 @@
 		<tr>
 			<td>0710299</td>
 			<td>中1</td>
-			<td>102（数学）</td>
+			<td>数学</td>
 			<td>その他</td>
 			<td>
                 <x-button.list-edit href="{{ route('master_mng_category-edit',1) }}" />

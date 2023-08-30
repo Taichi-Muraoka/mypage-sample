@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '指導ブースマスタ管理')
+@section('title', 'ブースマスタ管理')
 
 @section('content')
 
@@ -38,11 +38,10 @@
     </x-slot>
 
 	{{-- テーブル --}}
-	<x-bs.table>
+    <x-bs.table :button=true>
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
-			<th>ブースID</th>
 			<th>校舎</th>
 			<th>ブースコード</th>
 			<th>用途種別</th>
@@ -53,7 +52,6 @@
 
 		{{-- テーブル行 --}}
 		<tr>
-			<td>001</td>
 			<td>久我山</td>
 			<td>110</td>
 			<td>授業用</td>
@@ -64,7 +62,6 @@
 			</td>
 		</tr>
 		<tr>
-			<td>002</td>
 			<td>久我山</td>
 			<td>111</td>
 			<td>授業用</td>
@@ -75,7 +72,6 @@
 			</td>
 		</tr>
 		<tr>
-			<td>003</td>
 			<td>久我山</td>
 			<td>112</td>
 			<td>授業用</td>

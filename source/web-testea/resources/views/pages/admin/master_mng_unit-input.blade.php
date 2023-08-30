@@ -18,19 +18,19 @@
 
     @else
     {{-- 登録時 --}}
-    <p>授業単元の登録を行います。</p>
+    <p>授業単元情報の登録を行います。</p>
     @endif
 
     {{-- 共通フォーム --}}
     <x-input.select caption="学年" id="grade_cd" :select2=true :editData=$editData>
-        <option value="1">中1</option>
-        <option value="2">中2</option>
-        <option value="3">中3</option>
+        <option value="7">中1</option>
+        <option value="8">中2</option>
+        <option value="9">中3</option>
     </x-input.select>
     <x-input.select caption="教材科目コード" id="t_subject_cd" :select2=true :editData=$editData>
-        <option value="1">101（英語）</option>
-        <option value="2">102（数学）</option>
-        <option value="3">103（国語）</option>
+        <option value="101">101（英語）</option>
+        <option value="102">102（数学）</option>
+        <option value="103">103（国語）</option>
     </x-input.select>
     <x-input.select caption="単元分類" id="unit_category_cd" :select2=true :editData=$editData>
         <option value="1">正負の数</option>

@@ -35,38 +35,55 @@
     </x-slot>
 
 	{{-- テーブル --}}
-	<x-bs.table>
+    <x-bs.table :button=true>
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
-			<th width="15%">時間割ID</th>
 			<th width="15%">校舎</th>
-			<th width="10%">時限</th>
+			<th>時間割区分</th>
+			<th width="15%">時限</th>
 			<th width="15%">開始時刻</th>
 			<th width="15%">終了時刻</th>
-			<th width="15%">時間割区分</th>
-			<th width="7%"></th>
+			<th width="10%"></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}
 		<tr>
-			<td>001</td>
 			<td>久我山</td>
+			<td>通常</td>
 			<td>3限</td>
 			<td>15:00</td>
 			<td>16:30</td>
-			<td>特別期間</td>
 			<td>
                 <x-button.list-edit href="{{ route('master_mng_timetable-edit',1) }}" />
 			</td>
 		</tr>
 		<tr>
-			<td>002</td>
 			<td>久我山</td>
+			<td>通常</td>
 			<td>4限</td>
 			<td>16:45</td>
 			<td>18:15</td>
-			<td>通常</td>
+			<td>
+                <x-button.list-edit href="{{ route('master_mng_timetable-edit',1) }}" />
+			</td>
+		</tr>
+		<tr>
+			<td>久我山</td>
+			<td>特別期間</td>
+			<td>3限</td>
+			<td>15:30</td>
+			<td>17:00</td>
+			<td>
+                <x-button.list-edit href="{{ route('master_mng_timetable-edit',1) }}" />
+			</td>
+		</tr>
+		<tr>
+			<td>久我山</td>
+			<td>特別期間</td>
+			<td>4限</td>
+			<td>17:15</td>
+			<td>18:45</td>
 			<td>
                 <x-button.list-edit href="{{ route('master_mng_timetable-edit',1) }}" />
 			</td>

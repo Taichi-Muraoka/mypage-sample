@@ -56,10 +56,47 @@ class MasterMngUnitController extends Controller
      * @param \Illuminate\Http\Request $request リクエスト
      * @return mixed 詳細データ
      */
-    public function getData(Request $request)
+    //public function getData(Request $request)
+    //{
+    //    return [
+    //    ];
+    //}
+
+    /**
+     * バリデーション(検索用)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed バリデーション結果
+     */
+    public function validationForSearch(Request $request)
     {
-        return [
-        ];
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForSearch());
+        return $validator->errors();
+    }
+
+    /**
+     * 検索結果取得
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 検索結果
+     */
+    public function search(Request $request)
+    {
+        // ページネータで返却（モック用）
+        return $this->getListAndPaginatorMock();
+    }
+
+    /**
+     * バリデーションルールを取得(検索用)
+     *
+     * @return array ルール
+     */
+    private function rulesForSearch()
+    {
+        $rules = array();
+
+        return $rules;
     }
 
     //==========================
