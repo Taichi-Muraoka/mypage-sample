@@ -12,10 +12,6 @@
         <th width="35%">ブース</th>
         <td>Aテーブル</td>
     </tr>
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type != 3">
-        <th>授業区分</th>
-        <td>通常</td>
-    </tr>
     <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type == 0">
         <th width="35%">コース名</th>
         <td>個別指導コース</td>
@@ -31,6 +27,10 @@
     <tr v-Show="item.mdType == {{ App\Consts\AppConst::CODE_MASTER_21_6 }}">
         <th width="35%">コース名</th>
         <td>面談</td>
+    </tr>
+    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type != 3">
+        <th>授業区分</th>
+        <td>通常</td>
     </tr>
     <tr>
         <th>日付</th>

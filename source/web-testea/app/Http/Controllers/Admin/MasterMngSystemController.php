@@ -51,16 +51,28 @@ class MasterMngSystemController extends Controller
     }
 
     /**
+     * 検索結果取得
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 検索結果
+     */
+    public function search(Request $request)
+    {
+        // ページネータで返却（モック用）
+        return $this->getListAndPaginatorMock();
+    }
+
+    /**
      * 詳細取得
      *
      * @param \Illuminate\Http\Request $request リクエスト
      * @return mixed 詳細データ
      */
-    public function getData(Request $request)
-    {
-        return [
-        ];
-    }
+    //public function getData(Request $request)
+    //{
+    //    return [
+    //    ];
+    //}
 
     //==========================
     // 編集

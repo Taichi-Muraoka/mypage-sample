@@ -33,30 +33,25 @@
 {{-- 結果リスト --}}
 <x-bs.card-list :mock=true>
 
-    {{-- カードヘッダ右 --}}
-    <x-slot name="tools">
-        <x-button.submit-exec caption="CSVダウンロード" icon="fas fa-download" />
-    </x-slot>
-
     {{-- テーブル --}}
     <x-bs.table :button=true>
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
             <th width="10%">講師ID</th>
-            <th width="15%">講師名</th>
+            <th width="20%">講師名</th>
             <th width="5%">個別</th>
             <th width="6%">１対２</th>
             <th width="6%">１対３</th>
             <th width="5%">集団</th>
             <th width="5%">家庭教師</th>
             <th width="5%">演習</th>
-            <th width="6%">ハイプラン</th>
-            <th width="6%">代講授業数（受）</th>
-            <th width="6%">緊急代講授業数（受）</th>
-            <th width="6%">代講授業数（出）</th>
-            <th width="6%">緊急代講授業数（出）</th>
-            <th width="6%">初回授業数</th>
+            <th width="5%">ハイプラン</th>
+            <th width="5%">代講(受)</th>
+            <th width="5%">緊急代講(受)</th>
+            <th width="5%">代講(出)</th>
+            <th width="5%">緊急代講(出)</th>
+            <th width="5%">初回体験授業</th>
             <th></th>
         </x-slot>
 
@@ -96,7 +91,7 @@
             <td class="t-price">0</td>
             <td class="t-price">0</td>
             <td>
-                <x-button.list-dtl  disabled/>
+                <x-button.list-dtl/>
             </td>
         </tr>
 

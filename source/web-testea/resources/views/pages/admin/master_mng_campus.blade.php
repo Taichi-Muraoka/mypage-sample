@@ -12,7 +12,7 @@
     </x-slot>
 
 	{{-- テーブル --}}
-	<x-bs.table>
+    <x-bs.table :button=true>
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
@@ -23,7 +23,7 @@
 			<th>校舎電話番号</th>
 			<th>表示順</th>
 			<th>非表示フラグ</th>
-			<th width="7%"></th>
+            <th></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}

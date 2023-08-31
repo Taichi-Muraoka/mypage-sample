@@ -7,7 +7,7 @@
 <x-bs.card-list>
 
 	{{-- テーブル --}}
-	<x-bs.table>
+    <x-bs.table :button=true>
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
@@ -23,7 +23,7 @@
 		<tr>
 			<td>101</td>
 			<td>事務作業時給</td>
-			<td>1000</td>
+			<td class="text-right">1072</td>
 			<td></td>
 			<td>可</td>
 			<td>
@@ -33,7 +33,7 @@
 		<tr>
 			<td>111</td>
 			<td>振替調整スキップ回数</td>
-			<td>2</td>
+			<td class="text-right">2</td>
 			<td></td>
 			<td>可</td>
 			<td>
@@ -43,11 +43,11 @@
 		<tr>
 			<td>201</td>
 			<td>現年度</td>
-			<td>2023</td>
+			<td class="text-right">2023</td>
 			<td></td>
-			<td>可</td>
+			<td>不可</td>
 			<td>
-                <x-button.list-edit href="{{ route('master_mng_system-edit',1) }}" />
+                <x-button.list-edit href="{{ route('master_mng_system-edit',1) }}" disabled=true />
 			</td>
 		</tr>
 

@@ -12,7 +12,7 @@
     </x-slot>
 
 	{{-- テーブル --}}
-	<x-bs.table>
+    <x-bs.table :button=true>
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">

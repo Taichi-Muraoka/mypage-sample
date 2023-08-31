@@ -53,8 +53,8 @@
 		<x-slot name="thead">
 			<th>教材コード</th>
 			<th>学年</th>
-			<th>授業科目コード</th>
-			<th>教材科目コード</th>
+			<th>授業科目</th>
+			<th>教材科目</th>
 			<th>名称</th>
 			<th width="7%"></th>
 		</x-slot>
@@ -63,8 +63,8 @@
 		<tr>
 			<td>07101001</td>
 			<td>中1</td>
-			<td>101（英語）</td>
-			<td>101（英語）</td>
+			<td>英語</td>
+			<td>英語</td>
 			<td>中1英語基礎テキスト</td>
 			<td>
                 <x-button.list-edit href="{{ route('master_mng_text-edit',1) }}" />
@@ -73,8 +73,8 @@
 		<tr>
 			<td>07501201</td>
 			<td>中1</td>
-			<td>501（数学・英語）</td>
-			<td>102（数学）</td>
+			<td>数学・英語</td>
+			<td>数学</td>
 			<td>中1数学ドリル</td>
 			<td>
                 <x-button.list-edit href="{{ route('master_mng_text-edit',1) }}" />
@@ -83,9 +83,9 @@
 		<tr>
 			<td>07102099</td>
 			<td>中1</td>
-			<td>102（数学）</td>
-			<td>102（数学）</td>
-			<td>中1その他</td>
+			<td>数学</td>
+			<td>数学</td>
+			<td>中1数学その他</td>
 			<td>
                 <x-button.list-edit href="{{ route('master_mng_text-edit',1) }}" />
 			</td>

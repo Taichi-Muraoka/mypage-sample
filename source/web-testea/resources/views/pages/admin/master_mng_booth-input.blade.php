@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', (request()->routeIs('master_mng_booth-edit')) ? '指導ブースマスタデータ編集' : '指導ブースマスタデータ登録')
+@section('title', (request()->routeIs('master_mng_booth-edit')) ? 'ブースマスタデータ編集' : 'ブースマスタデータ登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -12,13 +12,13 @@
 
     @if (request()->routeIs('master_mng_booth-edit'))
     {{-- 編集時 --}}
-    <p>以下の指導ブース情報について編集を行います。</p>
+    <p>以下のブース情報について編集を行います。</p>
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
     @else
     {{-- 登録時 --}}
-    <p>指導ブースの登録を行います。</p>
+    <p>ブース情報の登録を行います。</p>
     @endif
 
     {{-- 共通フォーム --}}

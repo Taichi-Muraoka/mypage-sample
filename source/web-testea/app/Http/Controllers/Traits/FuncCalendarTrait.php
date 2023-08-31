@@ -86,6 +86,8 @@ trait FuncCalendarTrait
                 'atd_status_cd',
                 'create_kind_cd',
                 'transefer_kind_cd',
+                'status_info',
+                'diff_time',
                 'room_name AS mdClassName',
                 'room_name_symbol AS symbol',
                 'ext_rirekisho.name AS mdTitleVal',
@@ -164,6 +166,8 @@ trait FuncCalendarTrait
                 'atd_status_cd',
                 'create_kind_cd',
                 'transefer_kind_cd',
+                'status_info',
+                'diff_time',
                 'room_name AS mdClassName',
                 'room_name_symbol AS symbol',
                 'ext_rirekisho.name AS mdTitleVal',
@@ -261,7 +265,7 @@ trait FuncCalendarTrait
         foreach ($trial_schedules as $schedule) {
 
             $schedule_type = ['type' => AppConst::CODE_MASTER_21_3, 'className' => 'cal_tanki_moshi', 'mdFurikae' => ''];
-            $schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdTitleVal'];
+            $schedule['title'] = 'その他・自習';
             if (empty($schedule['start_time'])) {
                 $schedule['start_time'] = "00:00";
             }
@@ -323,7 +327,7 @@ trait FuncCalendarTrait
         foreach ($tutor_schedules as $schedule) {
 
             $schedule_type = ['type' => AppConst::CODE_MASTER_21_6, 'className' => 'cal_meeting', 'mdFurikae' => ''];
-            $schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdTitleVal'];
+            $schedule['title'] = '面談';
             $schedule['start'] = $schedule['start_date']->format('Y-m-d') . ' ' . $schedule['start_time']->format('H:i');
             $schedule['end'] = $schedule['start_date']->format('Y-m-d') . ' ' . $schedule['end_time']->format('H:i');
             $schedule['classNames'] = $schedule_type['className'];
@@ -514,6 +518,8 @@ trait FuncCalendarTrait
                 'atd_status_cd',
                 'create_kind_cd',
                 'transefer_kind_cd',
+                'status_info',
+                'diff_time',
                 'room_name AS mdClassName',
                 'room_name_symbol AS symbol',
                 'ext_generic_master.name1 AS mdSubject'
@@ -640,70 +646,6 @@ trait FuncCalendarTrait
         }
 
         $schedules = collect($regular_schedules)->merge($tanki_schedules);
-
-        // 打ち合わせの取得
-        $query = TutorSchedule::query();
-        $tutor_schedules = $query
-            ->select(
-                'tutor_schedule_id AS id',
-                'title AS mdTitleVal',
-                'start_date',
-                'start_time',
-                'end_time',
-                'room_name AS mdClassName',
-                'room_name_symbol AS symbol',
-                'roomcd'
-            )
-            // 教科名の取得
-            ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('tutor_schedule.roomcd', '=', 'room_names.code');
-            })
-            ->where('tutor_schedule.tid', '=', $tid)
-            // カレンダーの表示範囲で絞る
-            ->whereBetween('tutor_schedule.start_date', [$start_date, $end_date])
-            ->orderBy('tutor_schedule.start_date', 'asc')
-            ->orderBy('tutor_schedule.start_time', 'asc')
-            ->get();
-
-        // 教室管理者の場合、更新ボタンの有無をチェックするため
-        if (AuthEx::isRoomAdmin()) {
-            $account = Auth::user();
-        }
-
-        foreach ($tutor_schedules as $schedule) {
-
-            $schedule_type = ['type' => AppConst::CODE_MASTER_21_6, 'className' => 'cal_meeting', 'mdFurikae' => ''];
-            $schedule['title'] = $schedule['symbol'] . ' ' . $schedule['mdTitleVal'];
-            $schedule['start'] = $schedule['start_date']->format('Y-m-d') . ' ' . $schedule['start_time']->format('H:i');
-            $schedule['end'] = $schedule['start_date']->format('Y-m-d') . ' ' . $schedule['end_time']->format('H:i');
-            $schedule['classNames'] = $schedule_type['className'];
-
-            // モーダル表示用
-            $schedule['mdType'] = AppConst::CODE_MASTER_21_6;
-            $schedule['mdTypeName'] = $schedule_type_names[(string) $schedule_type['type']]['name'];
-            $schedule['mdDt'] = $schedule['start_date'];
-            $schedule['mdStartTime'] = $schedule['start_time'];
-            $schedule['mdEndTime'] = $schedule['end_time'];
-            $schedule['mdTitle'] = '打ち合わせ名';
-            $schedule['mdSubject'] = '';
-            $schedule['mdFurikae'] = $schedule_type['mdFurikae'];
-            $schedule['mdEditBtn'] = true;
-            if (AuthEx::isRoomAdmin()) {
-                if ($account->roomcd != $schedule->roomcd) {
-                    // 教室管理者の場合、更新ボタンの有無をチェックするため
-                    $schedule['mdEditBtn'] = false;
-                }
-            }
-
-            // 不要な要素の削除
-            unset($schedule['start_date']);
-            unset($schedule['start_time']);
-            unset($schedule['end_time']);
-            unset($schedule['symbol']);
-            unset($schedule['roomcd']);
-        }
-
-        $schedules = collect($schedules)->merge($tutor_schedules);
 
         // 教師の所属教室の事前取得
         $query = TutorRelate::query();

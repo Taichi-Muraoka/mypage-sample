@@ -21,7 +21,7 @@ use App\Libs\AuthEx;
 use App\Http\Controllers\Traits\FuncTransferTrait;
 
 /**
- * 指導ブースマスタ管理 - コントローラ
+ * ブースマスタ管理 - コントローラ
  */
 class MasterMngBoothController extends Controller
 {
@@ -51,15 +51,40 @@ class MasterMngBoothController extends Controller
     }
 
     /**
-     * 詳細取得
+     * バリデーション(検索用)
      *
      * @param \Illuminate\Http\Request $request リクエスト
-     * @return mixed 詳細データ
+     * @return mixed バリデーション結果
      */
-    public function getData(Request $request)
+    public function validationForSearch(Request $request)
     {
-        return [
-        ];
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForSearch());
+        return $validator->errors();
+    }
+
+    /**
+     * 検索結果取得
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 検索結果
+     */
+    public function search(Request $request)
+    {
+        // ページネータで返却（モック用）
+        return $this->getListAndPaginatorMock();
+    }
+
+    /**
+     * バリデーションルールを取得(検索用)
+     *
+     * @return array ルール
+     */
+    private function rulesForSearch()
+    {
+        $rules = array();
+
+        return $rules;
     }
 
     //==========================
