@@ -701,6 +701,8 @@ use App\Http\Controllers\Admin\MasterMngCourseController;
 use App\Http\Controllers\Admin\MasterMngAgreementController;
 use App\Http\Controllers\Admin\MasterMngTimetableController;
 use App\Http\Controllers\Admin\MasterMngSystemController;
+use App\Http\Controllers\Admin\TutorClassController;
+use App\Http\Controllers\Admin\TutorAssignController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -2320,20 +2322,32 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     //---------------------
     // 空き講師検索 モック
     //---------------------
+    // 一覧画面
+    Route::get('/tutor_assign', [TutorAssignController::class, 'index'])->name('tutor_assign');
 
-    // 空き講師検索一覧
-    Route::get('/tutor_assign', function () {
-        return view('pages.admin.tutor_assign');
-    })->name('tutor_assign');
+    // バリデーション(検索用)
+    Route::post('/tutor_assign/vd_search', [TutorAssignController::class, 'validationForSearch'])->name('tutor_assign-vd_search');
+
+    // 検索結果取得
+    Route::post('/tutor_assign/search', [TutorAssignController::class, 'search'])->name('tutor_assign-search');
+
+    // 詳細取得用
+    Route::post('/tutor_assign/get_data', [TutorAssignController::class, 'getData'])->name('tutor_assign-get_data');
 
     //---------------------
     // 講師授業時間 モック
     //---------------------
+    // 一覧画面
+    Route::get('/tutor_class', [TutorClassController::class, 'index'])->name('tutor_class');
 
-    // 講師授業時間一覧
-    Route::get('/tutor_class', function () {
-        return view('pages.admin.tutor_class');
-    })->name('tutor_class');
+    // バリデーション(検索用)
+    Route::post('/tutor_class/vd_search', [TutorClassController::class, 'validationForSearch'])->name('tutor_class-vd_search');
+
+    // 検索結果取得
+    Route::post('/tutor_class/search', [TutorClassController::class, 'search'])->name('tutor_class-search');
+
+    // 詳細取得用
+    Route::post('/tutor_class/get_data', [TutorClassController::class, 'getData'])->name('tutor_class-get_data');
 
     //---------------------
     // 追加請求申請受付 モック

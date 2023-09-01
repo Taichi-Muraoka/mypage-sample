@@ -26,7 +26,7 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="" caption="性別" :select2=true >
+            <x-input.select id="gender_cd" caption="性別" :select2=true >
                 <option value="1">男性</option>
                 <option value="2">女性</option>
                 <option value="3">その他</option>
