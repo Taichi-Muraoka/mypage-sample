@@ -372,6 +372,7 @@ return [
             'route' => 'season_student',
             'icon' => 'fas fa-chalkboard',
             'can'  => 'student',
+            'active' => ['season_student/*']
         ],
         [
             'text' => '欠席連絡（1対多）',
@@ -470,6 +471,7 @@ return [
             'route' => 'season_tutor',
             'icon' => 'fas fa-chalkboard',
             'can'  => 'tutor',
+            'active' => ['season_tutor/*']
         ],
         [
             'text' => '追加請求申請',
