@@ -40,10 +40,3 @@
 </x-bs.table>
 
 @overwrite
-
-@section('modal-button')
-
-{{-- 打ち合わせのみ更新ボタンを表示 --}}
-<x-button.edit vueHref="'{{ route('tutor_mng-calendar-edit',[$editData['tid'], '']) }}/' + item.id" icon="" caption="打ち合わせ更新" vShow="item.mdType == 6 && item.mdEditBtn" />
-
-@overwrite

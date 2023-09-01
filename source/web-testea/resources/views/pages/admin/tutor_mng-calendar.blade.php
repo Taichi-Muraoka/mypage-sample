@@ -10,11 +10,6 @@
 {{-- IDはローディング用 --}}
 <x-bs.card :p0=true id="card-calendar">
 
-    {{-- カードヘッダ右 --}}
-    <x-slot name="tools">
-        <x-button.new href="{{ route('tutor_mng-calendar-new', $editData['tid']) }}" caption="打ち合わせ登録" :small=true />
-    </x-slot>
-
     <x-slot name="card_title">
         {{$name}}
     </x-slot>
