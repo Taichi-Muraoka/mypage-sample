@@ -819,7 +819,7 @@ return [
             'can'  => 'allAdmin',
             'submenu' => [
                 [
-                    'text' => '生徒学年情報更新',
+                    'text' => '学年更新管理',
                     'route' => 'all_member_import',
                     'active' => ['all_member_import*']
                 ],

@@ -40,7 +40,7 @@ class TransferResetController extends Controller
      */
     public function search(Request $request)
     {
-        return;
+        return $this->getListAndPaginatorMock();
     }
 
     /**
@@ -50,10 +50,7 @@ class TransferResetController extends Controller
      */
     public function index()
     {
-        return view('pages.admin.transfer_reset', [
-            'rules' => $this->rulesForInput(),
-            'editData' => ["this_year"=>"2022"]
-        ]);
+        return view('pages.admin.transfer_reset');
     }
 
     /**
