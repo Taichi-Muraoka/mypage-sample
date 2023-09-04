@@ -40,7 +40,7 @@ class DataResetController extends Controller
      */
     public function search(Request $request)
     {
-        return;
+        return $this->getListAndPaginatorMock();
     }
 
     /**
@@ -50,10 +50,7 @@ class DataResetController extends Controller
      */
     public function index()
     {
-        return view('pages.admin.data_reset', [
-            'rules' => $this->rulesForInput(),
-            'editData' => ["this_year"=>"2023年2月"]
-        ]);
+        return view('pages.admin.data_reset');
     }
 
     /**
