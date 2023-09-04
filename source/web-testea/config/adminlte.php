@@ -985,21 +985,23 @@ return [
                     'type' => 'js',
                     'asset' => true,
                     //'location' => 'vendor/fullcalendar/main.min.js',
-                    'location' => 'vendor/fullcalendar-scheduler/main.min.js',
+                    //'location' => 'vendor/fullcalendar-scheduler/main.min.js',
+                    // v6 premium
+                    'location' => 'vendor/fullcalendar-scheduler/dist/index.global.min.js',
                 ],
-                [
-                    'type' => 'js',
-                    'asset' => true,
-                    //'location' => 'vendor/fullcalendar/locales/ja.js',
-                    'location' => 'vendor/fullcalendar-scheduler/locales/ja.js',
-                ],
-                [
-                    'type' => 'css',
-                    'asset' => true,
-                    //'location' => 'vendor/fullcalendar/main.min.css',
-                    //'location' => 'vendor/fullcalendar/main.css',
-                    'location' => 'vendor/fullcalendar-scheduler/main.min.css',
-                ],
+                //[
+                //    'type' => 'js',
+                //    'asset' => true,
+                //    //'location' => 'vendor/fullcalendar/locales/ja.js',
+                //    'location' => 'vendor/fullcalendar-scheduler/locales/ja.js',
+                //],
+                //[
+                //    'type' => 'css',
+                //    'asset' => true,
+                //    //'location' => 'vendor/fullcalendar/main.min.css',
+                //    //'location' => 'vendor/fullcalendar/main.css',
+                //    'location' => 'vendor/fullcalendar-scheduler/main.min.css',
+                //],
             ],
         ],
 

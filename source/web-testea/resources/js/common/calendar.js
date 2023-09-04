@@ -24,7 +24,14 @@ export default class CalendarCom {
                 center: "title",
                 right: "dayGridMonth,timeGridWeek,timeGridDay"
             },
-            themeSystem: "bootstrap",
+            buttonText: {
+                today:    '今日',
+                month:    '月',
+                week:     '週',
+                day:      '日'
+            },
+            allDayText: "終日",
+            //themeSystem: "bootstrap",
             locale: "ja",
             //height: 700,
             height: "auto",
@@ -127,7 +134,13 @@ export default class CalendarCom {
                 //right: "datePickerButton timeGridWeek,resourceTimeGridDay"
                 right: "datePickerButton"
             },
-            themeSystem: "bootstrap",
+            buttonText: {
+                today:    '今日',
+                month:    '月',
+                week:     '週',
+                day:      '日'
+            },
+            //themeSystem: "bootstrap",
             locale: "ja",
             //height: 700,
             height: 1700,
@@ -205,7 +218,7 @@ export default class CalendarCom {
                 const week = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][weekNum];
                 return week;
             },
-            themeSystem: "bootstrap",
+            //themeSystem: "bootstrap",
             locale: "ja",
             //height: 700,
             height: 1700,

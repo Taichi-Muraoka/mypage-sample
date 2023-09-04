@@ -501,6 +501,46 @@ label:not(.form-check-label):not(.custom-file-label) {
     padding: 2px 2px;
 }
 
+/* fullcalendar v6 対応 */
+/* 週・日付表示 */
+[id^="calendar"] .fc-col-header-cell a,a:hover,
+[id^="calendar"] .fc-daygrid-day-top a,a:hover {
+    // リンクの色を変えないようにする
+    color: inherit;
+}
+
+/* ボタンカラー変更（v5と同じものにする） */
+.fc .fc-button-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    }
+
+.fc .fc-button-primary:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+    }
+
+.fc .fc-button-primary:disabled { /* not DRY */
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.fc .fc-button-primary:focus {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+.fc .fc-button-primary:not(:disabled):active,
+  .fc .fc-button-primary:not(:disabled).fc-button-active {
+    background-color: #0062cc;
+    border-color: #005cbf;
+    }
+
+.fc .fc-button-primary:not(:disabled):active:focus,
+  .fc .fc-button-primary:not(:disabled).fc-button-active:focus {
+    box-shadow: 0 0 0 0 rgba(38, 143, 255, 0.5);
+}
+
 /* 空き時間・特別期間講習 コマ枠 ----------*/
 //.card.pa-table-checked {
 //    overflow-x: scroll;
