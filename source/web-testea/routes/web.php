@@ -1406,6 +1406,14 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/overtime/search', [OvertimeController::class, 'search'])->name('overtime-search');
 
+});
+
+//===============================================
+// 以下は全体管理者のみアクセス可とする
+//===============================================
+
+Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
+
     //---------------------
     // 給与算出
     //---------------------
