@@ -21,12 +21,12 @@
         <td>個別指導</td>
     </tr>
     <tr>
-        <th>科目</th>
-        <td>数学</td>
-    </tr>
-    <tr>
         <th>生徒名</th>
         <td>CWテスト生徒１</td>
+    </tr>
+    <tr>
+        <th>科目</th>
+        <td>数学</td>
     </tr>
     <tr>
         <th>今月の目標</th>
