@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Traits\FuncCourseTrait;
+//use App\Http\Controllers\Traits\FuncCourseTrait;
 
 /**
  * 特別期間講習 生徒提出スケジュール - コントローラ

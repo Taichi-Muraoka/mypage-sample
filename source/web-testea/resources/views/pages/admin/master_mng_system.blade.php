@@ -54,7 +54,4 @@
 	</x-bs.table>
 </x-bs.card-list>
 
-{{-- 詳細 --}}
-@include('pages.admin.modal.master_mng_system-modal')
-
 @stop

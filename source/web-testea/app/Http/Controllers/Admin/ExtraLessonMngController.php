@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Traits\FuncCourseTrait;
+//use App\Http\Controllers\Traits\FuncCourseTrait;
 
 /**
  * 追加授業申請受付 - コントローラ
@@ -25,7 +25,7 @@ class ExtraLessonMngController extends Controller
 {
 
     // 機能共通処理：コース変更・授業追加
-    use FuncCourseTrait;
+    //use FuncCourseTrait;
 
     /**
      * コンストラクタ
