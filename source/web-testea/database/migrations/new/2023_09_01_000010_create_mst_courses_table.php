@@ -13,20 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tutor_campuses', function (Blueprint $table) {
+        Schema::create('mst_courses', function (Blueprint $table) {
             /* カラム */
-            $table->increments('tutor_campus_id')->comment('講師所属ID');
-            $table->unsignedInteger('tutor_id')->comment('講師ID');
-            $table->string('campus_cd', 2)->comment('校舎コード');
-            $table->decimal('travel_cost', 4, 0)->default(0)->comment('交通費');
+            $table->string('course_cd', 5)->comment('コースコード');
+            $table->string('name', 50)->comment('名称');
+            $table->unsignedSmallInteger('course_kind_cd')->comment('コース種別（1:授業単、2:授業複、3:その他）');
             $table->timestamps();
             $table->softDeletes();
 
             /* インデックス */
-            $table->unique(['tutor_id','campus_cd'],'tutor_campuses_UNIQUE');
+            $table->primary('course_cd');
 
             /* テーブル名コメント */
-            $table->comment('講師所属情報');
+            $table->comment('学校マスタ');
         });
     }
 
@@ -37,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tutor_campuses');
+        Schema::dropIfExists('mst_courses');
     }
 };
