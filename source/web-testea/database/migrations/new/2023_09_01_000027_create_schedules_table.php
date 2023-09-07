@@ -43,8 +43,8 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            /* スケジュール情報 */
-            $table->comment('講師情報');
+            /* テーブル名コメント */
+            $table->comment('スケジュール情報');
         });
     }
 
