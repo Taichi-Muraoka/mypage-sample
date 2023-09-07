@@ -12,6 +12,11 @@
 
     <p>以下の成績の{{(request()->routeIs('grades-edit')) ? '変更' : '登録'}}を行います。</p>
 
+    @if (request()->routeIs('grades-edit'))
+    <x-bs.form-title>成績登録時の学年</x-bs.form-title>
+    <p class="edit-disp-indent">中学1年</p>
+    @endif
+
     <x-input.select caption="種別" id="exam_type" :blank=false :select2=true :select2Search=false :rules=$rules :editData=$editData >
         <option value="1">模試</option>
         <option value="2">定期考査</option>
@@ -61,7 +66,7 @@
             <td>偏差値</td>
         </x-slot>
 
-        {{-- 小6、中7、高10項目用意する --}}
+        {{-- 小6、中高10項目用意する --}}
         @for ($i = 0; $i < 7; $i++) <tr v-cloak>
             {{-- hidden --}}
             <x-input.hidden id="grades_seq_{{$i}}" :editData=$editDataDtls[$i] />
@@ -131,7 +136,7 @@
             <td>評定値</td>
         </x-slot>
 
-        {{-- 中9、高15項目用意する --}}
+        {{-- 中高15項目用意する --}}
         @for ($i = 0; $i < 9; $i++) <tr v-cloak>
             {{-- hidden --}}
             <x-input.hidden id="grades_seq_{{$i}}" />
