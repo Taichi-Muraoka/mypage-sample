@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('mst_timetables', function (Blueprint $table) {
             /* カラム */
-            $table->increments('taimetable_id', 7)->comment('時間割ID');
+            $table->increments('timetable_id', 7)->comment('時間割ID');
             $table->string('campus_cd', 2)->comment('校舎コード');
             $table->unsignedSmallInteger('period_no')->comment('時限');
             $table->time('start_time')->comment('開始時刻');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->softDeletes();
 
             /* インデックス */
-            $table->unique(['campus_cd,period_no,kind_cd'], 'mst_timetables_UNIQUE');
+            $table->unique(['campus_cd','period_no','timetable_kind'], 'mst_timetables_UNIQUE');
 
             /* テーブル名コメント */
             $table->comment('時間割マスタ');

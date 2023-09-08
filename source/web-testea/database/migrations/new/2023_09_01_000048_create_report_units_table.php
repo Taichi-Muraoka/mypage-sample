@@ -37,7 +37,6 @@ return new class extends Migration
             $table->softDeletes();
 
             /*インデックス*/
-            $table->index('tutor_id','report_units_INDEX1');
             $table->unique(['report_id','sub_cd'],'report_units_UNIQUE');
 
             /* テーブル名コメント */

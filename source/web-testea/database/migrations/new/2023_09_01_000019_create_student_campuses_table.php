@@ -22,7 +22,7 @@ return new class extends Migration
             $table->softDeletes();
 
             /* インデックス */
-            $table->unique(['student_id, campus_cd'], 'student_campuses_UNIQUE');
+            $table->unique(['student_id', 'campus_cd'], 'student_campuses_UNIQUE');
 
             /* テーブル名コメント */
             $table->comment('生徒所属情報');
