@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('notice_type')->comment('お知らせ種別（4:その他、5:面談、6:特別期間講習、7:成績登録、8:請求、9:給与、10:追加請求）');
             $table->unsignedInteger('adm_id')->comment('送信者ID');
             $table->string('campus_cd', 2)->comment('送信元校舎コード');
-            $table->timestamp('regist_time')->comment('登録日時');
+            $table->timestamp('regist_time')->useCurrent()->comment('登録日時');
             $table->timestamps();
             $table->softDeletes();
 
