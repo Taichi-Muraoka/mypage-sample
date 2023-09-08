@@ -88,7 +88,7 @@
             <td>偏差値</td>
         </x-slot>
 
-        {{-- 小6、中高10項目用意する --}}
+        {{-- 小6、中7、高10項目用意する --}}
         @for ($i = 0; $i < 7; $i++) <tr v-cloak>
             {{-- hidden --}}
             <x-input.hidden id="grades_seq_{{$i}}" :editData=$editDataDtls[$i] />
