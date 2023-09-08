@@ -13,18 +13,20 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('mst_prefectures', function (Blueprint $table) {
-            /*カラム*/
-            $table->string('prefecture_cd', 2)->comment('都道府県番号');
-            $table->string('name', 10)->comment('名称');
+        Schema::create('training_browses', function (Blueprint $table) {
+            /* カラム */
+            $table->unsignedInteger('trn_id')->comment('研修ID');
+            $table->unsignedInteger('tid')->comment('講師ID');
+            $table->timestamp('browse_time')->nullable()->comment('閲覧日時');
             $table->timestamps();
             $table->softDeletes();
 
             /*インデックス*/
-            $table->primary('prefecture_cd');
+            $table->primary(['trn_id','tid']);
+            $table->index('tid','training_browse_tid_idx');
 
             /* テーブル名コメント */
-            $table->comment('都道府県マスタ');
+            $table->comment('研修閲覧');
         });
     }
 
@@ -35,6 +37,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('mst_prefectures');
+        Schema::dropIfExists('training_browses');
     }
 };
