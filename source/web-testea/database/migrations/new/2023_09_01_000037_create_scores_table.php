@@ -29,7 +29,7 @@ return new class extends Migration
             $table->softDeletes();
 
             /* インデックス */
-            $table->index('sid','grades_sid_idx');
+            $table->index('student_id','grades_sid_idx');
            
             /* テーブル名コメント */
             $table->comment('生徒成績情報');

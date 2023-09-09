@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('record_kind')->comment('記録種別（1:面談、2:電話、3:退会、4:その他）');
             $table->date('received_date')->comment('対応日');
             $table->time('received_time')->comment('対応時刻');
-            $table->timestamps('registered_at')->comment('登録日時');
+            $table->timestamp('regist_time')->useCurrent()->comment('登録日時');
             $table->unsignedInteger('adm_id')->comment('担当者ID');
             $table->text('memo')->comment('内容');
             $table->timestamps();

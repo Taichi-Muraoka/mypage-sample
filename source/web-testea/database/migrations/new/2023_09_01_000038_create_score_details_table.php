@@ -26,7 +26,7 @@ return new class extends Migration
             $table->softDeletes();
 
             /* インデックス */
-            $table->unique(['score_id','subject_cd'], 'score_details_UNIQUE');
+            $table->unique(['score_id','g_subject_cd'], 'score_details_UNIQUE');
            
             /* テーブル名コメント */
             $table->comment('生徒成績詳細情報');
