@@ -57,6 +57,7 @@
             <th>授業日</th>
             <th>生徒名</th>
             <th>講師名</th>
+            <th>出欠ステータス</th>
             <th></th>
         </x-slot>
 
@@ -66,6 +67,7 @@
             <td>2023/01/30</td>
             <td>CWテスト生徒１</td>
             <td>CWテスト教師１０１</td>
+            <td>振替中（未振替）</td>
             <td>
                 <x-button.list-dtl />
             </td>
@@ -75,6 +77,7 @@
             <td>2023/01/31</td>
             <td>CWテスト生徒２</td>
             <td>CWテスト教師１０２</td>
+            <td>振替中（未振替）</td>
             <td>
                 <x-button.list-dtl />
             </td>
