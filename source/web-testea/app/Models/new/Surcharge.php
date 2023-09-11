@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 請求情報 - モデル
+ * 追加請求情報 - モデル
  */
 class Surcharge extends Model
 {
