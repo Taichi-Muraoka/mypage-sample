@@ -26,6 +26,9 @@
     <x-bs.form-title>生徒名</x-bs.form-title>
     <p class="edit-disp-indent">CWテスト生徒１</p>
 
+    <x-bs.form-title>担当者名</x-bs.form-title>
+    <p class="edit-disp-indent">本部事務局</p>
+
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
