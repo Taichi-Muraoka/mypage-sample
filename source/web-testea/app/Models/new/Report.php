@@ -1,0 +1,142 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+/**
+ * 授業報告書情報 - モデル
+ */
+class Report extends Model
+{
+
+    // モデルの共通処理
+    use \App\Traits\ModelTrait;
+
+    // 論理削除
+    use SoftDeletes;
+
+    /**
+     * モデルと関連しているテーブル
+     *
+     * @var string
+     */
+    protected $table = 'reports';
+
+    /**
+     * テーブルの主キー
+     *
+     * @var array
+     */
+
+    protected $primaryKey = 'report_id';
+
+    /**
+     * IDが自動増分されるか
+     *
+     * @var bool
+     */
+    public $incrementing = true;
+
+    /**
+     * 複数代入する属性
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'tutor_id',
+        'schedule_id',
+        'course_cd',
+        'lesson_date',
+        'period_no',
+        'student_id',
+        'monthly_goal',
+        'test_contents',
+        'test_score',
+        'test_full_score',
+        'achievement',
+        'goodbad_point',
+        'solution',
+        'others_comment',
+        'approval_status',
+        'admin_comment',
+        'regist_date'
+    ];
+
+    /**
+     * 日付項目の定義
+     *
+     * @var array
+     */
+    protected $dates = [];
+
+    /**
+     * 属性に対するモデルのデフォルト値
+     *
+     * @var array
+     */
+    protected $attributes = [];
+
+    /**
+     * 配列に含めない属性
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'created_at', 'updated_at', 'deleted_at'
+    ];
+
+    /**
+     * モデルの「初期起動」メソッド
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        // 更新時、空白をnullに変換する処理
+        self::whenSaveEmptyToNull();
+
+        // テーブル操作時、ログを残す処理
+        self::saveToLog();
+    }
+
+    //-------------------------------
+    // 項目定義
+    //-------------------------------
+
+    /**
+     * テーブル項目の定義
+     *
+     * @return array
+     */
+    protected static function getFieldRules()
+    {
+        static $_fieldRules = [
+            'report_id' => ['integer'],
+            'tutor_id' => ['integer'],
+            'schedule_id' => ['integer'],
+            'course_cd' => ['string', 'max:5'],
+            'lesson_date' => ['date_format:Y-m-d'],
+            'period_no' => ['integer', 'min:0', 'max:99'],
+            'student_id' => ['integer'],
+            'monthly_goal' => ['string', 'max:1000'],
+            'test_contents' => ['string', 'max:50'],
+            'test_score' => ['integer'],
+            'test_full_score' => ['integer'],
+            'achievement' => ['integer', 'min:0', 'max:999'],
+            'goodbad_point' => ['string', 'max:1000'],
+            'solution' => ['string', 'max:1000'],
+            'others_comment' => ['string', 'max:1000'],
+            'approval_status' => ['integer', 'in:1,2,3'],
+            'admin_comment' => ['string', 'max:1000'],
+            'regist_date' => ['date_format:Y-m-d']
+        ];
+        return $_fieldRules;
+    }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+
+}
