@@ -25,7 +25,7 @@ return new class extends Migration
             $table->primary('course_cd');
 
             /* テーブル名コメント */
-            $table->comment('学校マスタ');
+            $table->comment('コースマスタ');
         });
     }
 

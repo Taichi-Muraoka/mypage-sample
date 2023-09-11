@@ -25,8 +25,8 @@ return new class extends Migration
             $table->string('booth_cd', 3)->comment('ブースコード');
             $table->string('course_cd', 5)->comment('コースコード');
             $table->unsignedInteger('student_id')->nullable()->comment('生徒ID');
-            $table->unsignedInteger('tutor_id')->comment('講師ID');
-            $table->string('subject_cd', 3)->comment('科目コード');
+            $table->unsignedInteger('tutor_id')->nullable()->comment('講師ID');
+            $table->string('subject_cd', 3)->nullable()->comment('科目コード');
             $table->unsignedSmallInteger('how_to_kind')->nullable()->default(0)->comment('通塾種別（0:両者通塾、1:生徒オンライン、2:両者オンライン、3:講師オンライン、4:家庭教師）');
             $table->timestamps();
             $table->softDeletes();
