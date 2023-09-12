@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 生徒所属情報 - モデル
+ * 給与算出交通費情報View - モデル
  */
-class StudentCampus extends Model
+class SalaryTravelCostVIew extends Model
 {
 
     // モデルの共通処理
@@ -22,7 +22,7 @@ class StudentCampus extends Model
      *
      * @var string
      */
-    protected $table = 'student_campuses';
+    protected $table = 'salary_travel_costs_view';
 
     /**
      * テーブルの主キー
@@ -30,14 +30,14 @@ class StudentCampus extends Model
      * @var array
      */
 
-    protected $primaryKey = 'student_campus_id';
+    protected $primaryKey = 'salary_travel_costs_view_id';
 
     /**
      * IDが自動増分されるか
      *
      * @var bool
      */
-    public $incrementing = true;
+    public $incrementing = false;
 
     /**
      * 複数代入する属性
@@ -45,8 +45,6 @@ class StudentCampus extends Model
      * @var array
      */
     protected $fillable = [
-        'student_id',
-        'campus_cd'
     ];
 
     /**
@@ -89,20 +87,6 @@ class StudentCampus extends Model
     //-------------------------------
     // 項目定義
     //-------------------------------
-
-    /**
-     * テーブル項目の定義
-     *
-     * @return array
-     */
-    protected static function getFieldRules()
-    {
-        static $_fieldRules = [
-            'student_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2']
-        ];
-        return $_fieldRules;
-    }
 
     //-------------------------------
     // 検索条件
