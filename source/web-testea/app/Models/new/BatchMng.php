@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * コースマスタ - モデル
+ * バッチ管理 - モデル
  */
-class MstCourse extends Model
+class BatchMng extends Model
 {
 
     // モデルの共通処理
@@ -22,7 +22,7 @@ class MstCourse extends Model
      *
      * @var string
      */
-    protected $table = 'mst_courses';
+    protected $table = 'batch_mng';
 
     /**
      * テーブルの主キー
@@ -30,7 +30,7 @@ class MstCourse extends Model
      * @var array
      */
 
-    protected $primaryKey = 'course_cd';
+    protected $primaryKey = 'batch_id';
 
     /**
      * IDが自動増分されるか
@@ -45,9 +45,11 @@ class MstCourse extends Model
      * @var array
      */
     protected $fillable = [
-        'course_cd',
-        'name',
-        'course_kind_cd'
+        'batch_type',
+        'start_time',
+        'end_time',
+        'batch_state',
+        'adm_id',
     ];
 
     /**
@@ -99,9 +101,12 @@ class MstCourse extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'course_cd' => ['string', 'max:5'],
-            'name' => ['string', 'max:50'],
-            'gender_cd' => ['integer', 'in:1,2,3']
+            'batch_id' => ['integer'],
+            'batch_type' => ['integer', 'in:1,2,3,4,5,11,12,13,14,21'],
+            'start_time' => ['date_format:Y-m-d H:i:s'],
+            'end_time' => ['date_format:Y-m-d H:i:s'],
+            'batch_state' => ['integer', 'in:0,1,99'],
+            'adm_id' => ['integer'],
         ];
         return $_fieldRules;
     }

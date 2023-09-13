@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * コースマスタ - モデル
+ * 給与算出管理情報 - モデル
  */
-class MstCourse extends Model
+class SalaryMng extends Model
 {
 
     // モデルの共通処理
@@ -22,7 +22,7 @@ class MstCourse extends Model
      *
      * @var string
      */
-    protected $table = 'mst_courses';
+    protected $table = 'salary_mng';
 
     /**
      * テーブルの主キー
@@ -30,14 +30,14 @@ class MstCourse extends Model
      * @var array
      */
 
-    protected $primaryKey = 'course_cd';
+    protected $primaryKey = 'salary_date';
 
     /**
      * IDが自動増分されるか
      *
      * @var bool
      */
-    public $incrementing = true;
+    public $incrementing = false;
 
     /**
      * 複数代入する属性
@@ -45,9 +45,9 @@ class MstCourse extends Model
      * @var array
      */
     protected $fillable = [
-        'course_cd',
-        'name',
-        'course_kind_cd'
+        'salary_date',
+        'confirm_date',
+        'state'
     ];
 
     /**
@@ -99,9 +99,9 @@ class MstCourse extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'course_cd' => ['string', 'max:5'],
-            'name' => ['string', 'max:50'],
-            'gender_cd' => ['integer', 'in:1,2,3']
+            'salary_date' => ['date_format:Y-m-d'],
+            'confirm_date' => ['date_format:Y-m-d'],
+            'state' => ['integer', 'in:0,1,2'],
         ];
         return $_fieldRules;
     }

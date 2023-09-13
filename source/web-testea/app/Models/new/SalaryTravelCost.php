@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * コースマスタ - モデル
+ * 給与算出交通費情報 - モデル
  */
-class MstCourse extends Model
+class SalaryTravelCost extends Model
 {
 
     // モデルの共通処理
@@ -22,7 +22,7 @@ class MstCourse extends Model
      *
      * @var string
      */
-    protected $table = 'mst_courses';
+    protected $table = 'salary_travel_costs';
 
     /**
      * テーブルの主キー
@@ -30,7 +30,7 @@ class MstCourse extends Model
      * @var array
      */
 
-    protected $primaryKey = 'course_cd';
+    protected $primaryKey = 'salary_travel_cost_id';
 
     /**
      * IDが自動増分されるか
@@ -45,9 +45,13 @@ class MstCourse extends Model
      * @var array
      */
     protected $fillable = [
-        'course_cd',
-        'name',
-        'course_kind_cd'
+        'salary_date',
+        'tutor_id',
+        'seq',
+        'campus_cd',
+        'unit_price',
+        'times',
+        'amount',
     ];
 
     /**
@@ -99,9 +103,14 @@ class MstCourse extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'course_cd' => ['string', 'max:5'],
-            'name' => ['string', 'max:50'],
-            'gender_cd' => ['integer', 'in:1,2,3']
+            'salary_travel_cost_id' => ['integer'],
+            'salary_date' => ['date_format:Y-m-d'],
+            'tutor_id' => ['integer'],
+            'seq' => ['integer'],
+            'campus_cd' => ['string', 'max:2'],
+            'unit_price' => ['integer', 'min:0', 'max:9999'],
+            'times' => ['integer'],
+            'amount' => ['integer', 'min:0', 'max:9999'],
         ];
         return $_fieldRules;
     }

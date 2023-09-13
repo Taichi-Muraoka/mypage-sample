@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * 生徒所属情報 - モデル
  */
-class Student extends Model
+class StudentCampus extends Model
 {
 
     // モデルの共通処理
@@ -30,7 +30,7 @@ class Student extends Model
      * @var array
      */
 
-    protected $primaryKey = 'student_campuses_id';
+    protected $primaryKey = 'student_campus_id';
 
     /**
      * IDが自動増分されるか
