@@ -67,7 +67,7 @@
             <td>2023/01/30</td>
             <td>CWテスト生徒１</td>
             <td>CWテスト教師１０１</td>
-            <td>振替中（未振替）</td>
+            <td>振替中</td>
             <td>
                 <x-button.list-dtl />
             </td>
@@ -77,7 +77,7 @@
             <td>2023/01/31</td>
             <td>CWテスト生徒２</td>
             <td>CWテスト教師１０２</td>
-            <td>振替中（未振替）</td>
+            <td>未振替</td>
             <td>
                 <x-button.list-dtl />
             </td>
