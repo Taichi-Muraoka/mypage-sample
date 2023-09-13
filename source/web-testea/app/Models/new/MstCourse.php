@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * コースマスタ - モデル
  */
-class Course extends Model
+class MstCourse extends Model
 {
 
     // モデルの共通処理
