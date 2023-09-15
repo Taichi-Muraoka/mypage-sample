@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 給与情報明細 - モデル
+ * 給与明細情報 - モデル
  */
 class SalaryDetail extends Model
 {
@@ -22,32 +22,37 @@ class SalaryDetail extends Model
      *
      * @var string
      */
-    protected $table = 'salary_detail';
+    protected $table = 'salary_details';
 
     /**
      * テーブルの主キー
      *
      * @var array
      */
-    protected $primaryKey = [
-        'tid',
-        'salary_date',
-        'salary_seq'
-    ];
+
+    protected $primaryKey = 'salary_detail_id';
 
     /**
      * IDが自動増分されるか
      *
      * @var bool
      */
-    public $incrementing = false;
+    public $incrementing = true;
 
     /**
      * 複数代入する属性
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'salary_id',
+        'salary_seq',
+        'salary_group',
+        'item_name',
+        'hour_payment',
+        'hour',
+        'amount',
+    ];
 
     /**
      * 日付項目の定義
@@ -97,7 +102,21 @@ class SalaryDetail extends Model
      */
     protected static function getFieldRules()
     {
-        static $_fieldRules = [];
+        static $_fieldRules = [
+            'salary_detail_id' => ['integer'],
+            'salary_id' => ['integer'],
+            'salary_seq' => ['integer'],
+            'salary_group' => ['integer'],
+            'item_name' => ['string', 'max:50'],
+            'hour_payment' => ['integer', 'min:0', 'max:99999999'],
+            'hour' => ['integer', 'min:0', 'max:999'],
+            'amount' => ['integer', 'min:0', 'max:99999999'],
+        ];
         return $_fieldRules;
     }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+
 }

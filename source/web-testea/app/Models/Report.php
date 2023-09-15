@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 授業報告書 - モデル
+ * 授業報告書情報 - モデル
  */
 class Report extends Model
 {
@@ -22,13 +22,14 @@ class Report extends Model
      *
      * @var string
      */
-    protected $table = 'report';
+    protected $table = 'reports';
 
     /**
      * テーブルの主キー
      *
      * @var array
      */
+
     protected $primaryKey = 'report_id';
 
     /**
@@ -44,19 +45,23 @@ class Report extends Model
      * @var array
      */
     protected $fillable = [
-        'sid',
+        'tutor_id',
+        'schedule_id',
+        'course_cd',
         'lesson_date',
-        'start_time',
-        'tid',
-        'lesson_type',
-        'roomcd',
-        'id',
-        'r_minutes',
-        'content',
-        'homework',
-        'teacher_comment',
-        'parents_comment',
-        'regist_time'
+        'period_no',
+        'student_id',
+        'monthly_goal',
+        'test_contents',
+        'test_score',
+        'test_full_score',
+        'achievement',
+        'goodbad_point',
+        'solution',
+        'others_comment',
+        'approval_status',
+        'admin_comment',
+        'regist_date'
     ];
 
     /**
@@ -64,11 +69,7 @@ class Report extends Model
      *
      * @var array
      */
-    protected $dates = [
-        'lesson_date',
-        'start_time',
-        'regist_time'
-    ];
+    protected $dates = [];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -113,19 +114,23 @@ class Report extends Model
     {
         static $_fieldRules = [
             'report_id' => ['integer'],
-            'sid' => ['integer'],
+            'tutor_id' => ['integer'],
+            'schedule_id' => ['integer'],
+            'course_cd' => ['string', 'max:5'],
             'lesson_date' => ['date_format:Y-m-d'],
-            'start_time' => ['vdTime'],
-            'tid' => ['integer'],
-            'lesson_type' => ['integer'],
-            'roomcd' => ['string', 'max:4'],
-            'id' => ['integer'],
-            'r_minutes' => ['integer', 'max:999'],
-            'content' => ['string', 'max:1000'],
-            'homework' => ['string', 'max:1000'],
-            'teacher_comment' => ['string', 'max:1000'],
-            'parents_comment' => ['string', 'max:1000'],
-            'regist_time' => ['date_format:Y-m-d']
+            'period_no' => ['integer', 'min:0', 'max:99'],
+            'student_id' => ['integer'],
+            'monthly_goal' => ['string', 'max:1000'],
+            'test_contents' => ['string', 'max:50'],
+            'test_score' => ['integer'],
+            'test_full_score' => ['integer'],
+            'achievement' => ['integer', 'min:0', 'max:999'],
+            'goodbad_point' => ['string', 'max:1000'],
+            'solution' => ['string', 'max:1000'],
+            'others_comment' => ['string', 'max:1000'],
+            'approval_status' => ['integer', 'in:1,2,3'],
+            'admin_comment' => ['string', 'max:1000'],
+            'regist_date' => ['date_format:Y-m-d']
         ];
         return $_fieldRules;
     }
@@ -134,27 +139,4 @@ class Report extends Model
     // 検索条件
     //-------------------------------
 
-    /**
-     * 検索 sid
-     */
-    public function scopeSearchSid($query, $obj)
-    {
-        $key = 'sid';
-        $col = $this->getTable() . '.' . $key;
-        if (isset($obj[$key]) && filled($obj[$key])) {
-            $query->where($col, $obj[$key]);
-        }
-    }
-
-    /**
-     * 検索 roomcd
-     */
-    public function scopeSearchRoom($query, $obj)
-    {
-        $key = 'roomcd';
-        $col = $this->getTable() . '.' . $key;
-        if (isset($obj[$key]) && filled($obj[$key])) {
-            $query->where($col, $obj[$key]);
-        }
-    }
 }

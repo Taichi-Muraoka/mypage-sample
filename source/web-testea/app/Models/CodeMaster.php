@@ -22,7 +22,7 @@ class CodeMaster extends Model
      *
      * @var string
      */
-    protected $table = 'code_master';
+    protected $table = 'mst_codes';
 
     /**
      * テーブルの主キー

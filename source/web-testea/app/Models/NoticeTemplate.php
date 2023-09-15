@@ -22,13 +22,14 @@ class NoticeTemplate extends Model
      *
      * @var string
      */
-    protected $table = 'notice_template';
+    protected $table = 'notice_templates';
 
     /**
      * テーブルの主キー
      *
      * @var array
      */
+
     protected $primaryKey = 'template_id';
 
     /**
@@ -101,12 +102,17 @@ class NoticeTemplate extends Model
     {
         static $_fieldRules = [
             'template_id' => ['integer'],
-            'template_name' => ['string', 'max:100'],
-            'title' => ['string', 'max:100'],
+            'template_name' => ['string', 'max:50'],
+            'title' => ['string', 'max:50'],
             'text' => ['string', 'max:1000'],
-            'notice_type' => ['integer'],
-            'order_code' => ['integer', 'min:1', 'max:32767']
+            'notice_type' => ['integer', 'in:4,5,6,7,8,9,10'],
+            'order_code' => ['integer'],
         ];
         return $_fieldRules;
     }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+
 }

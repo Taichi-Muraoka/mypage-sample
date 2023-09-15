@@ -22,13 +22,15 @@ class TrainingBrowse extends Model
      *
      * @var string
      */
-    protected $table = 'training_browse';
+    protected $table = 'training_browses';
+
 
     /**
      * テーブルの主キー
      *
      * @var array
      */
+
     protected $primaryKey = [
         'trn_id',
         'tid'
@@ -99,4 +101,9 @@ class TrainingBrowse extends Model
         static $_fieldRules = [];
         return $_fieldRules;
     }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+
 }

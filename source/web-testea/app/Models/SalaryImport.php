@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 給与情報取込 - モデル
+ * 給与取込情報 - モデル
  */
 class SalaryImport extends Model
 {
@@ -29,6 +29,7 @@ class SalaryImport extends Model
      *
      * @var array
      */
+
     protected $primaryKey = 'salary_date';
 
     /**
@@ -50,9 +51,7 @@ class SalaryImport extends Model
      *
      * @var array
      */
-    protected $dates = [
-        'salary_date'
-    ];
+    protected $dates = [];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -95,7 +94,17 @@ class SalaryImport extends Model
      */
     protected static function getFieldRules()
     {
-        static $_fieldRules = [];
+        static $_fieldRules = [
+            'salary_date' => ['date_format:Y-m-d'],
+            'payment_date' => ['date_format:Y-m-d'],
+            'import_state' => ['integer', 'in:0,1'],
+            'import_date' => ['date_format:Y-m-d H:i:s']
+        ];
         return $_fieldRules;
     }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+
 }

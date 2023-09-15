@@ -22,40 +22,41 @@ class Salary extends Model
      *
      * @var string
      */
-    protected $table = 'salary';
+    protected $table = 'salaries';
 
     /**
      * テーブルの主キー
      *
      * @var array
      */
-    protected $primaryKey = [
-        'tid',
-        'salary_date'
-    ];
+
+    protected $primaryKey = 'salary_id';
 
     /**
      * IDが自動増分されるか
      *
      * @var bool
      */
-    public $incrementing = false;
+    public $incrementing = true;
 
     /**
      * 複数代入する属性
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'tutor_id',
+        'salary_date',
+        'total_amount',
+        'memo',
+    ];
 
     /**
      * 日付項目の定義
      *
      * @var array
      */
-    protected $dates = [
-        'salary_date'
-    ];
+    protected $dates = [];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -99,13 +100,17 @@ class Salary extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'tid' => ['integer', 'min:1', 'max:999999'],
-            'tax_table' => ['string'],
-            'dependents' => ['integer', 'max:99', 'min:0'],
-
-            // CSV取り込み向け
-            'tid_csv' => ['numeric', 'min:1', 'max:999999'],
+            'salary_id' => ['integer'],
+            'tutor_id' => ['integer'],
+            'salary_date' => ['date_format:Y-m-d'],
+            'total_amount' => ['integer', 'min:0', 'max:99999999'],
+            'memo' => ['string', 'max:1000'],
         ];
         return $_fieldRules;
     }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+
 }

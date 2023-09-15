@@ -22,13 +22,14 @@ class NoticeGroup extends Model
      *
      * @var string
      */
-    protected $table = 'notice_group';
+    protected $table = 'notice_groups';
 
     /**
      * テーブルの主キー
      *
      * @var array
      */
+
     protected $primaryKey = 'notice_group_id';
 
     /**
@@ -96,4 +97,9 @@ class NoticeGroup extends Model
         static $_fieldRules = [];
         return $_fieldRules;
     }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+
 }

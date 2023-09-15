@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * お知らせ宛先情報 - モデル
+ * ブースマスタ - モデル
  */
-class NoticeDestination extends Model
+class MstBooth extends Model
 {
 
     // モデルの共通処理
@@ -22,7 +22,7 @@ class NoticeDestination extends Model
      *
      * @var string
      */
-    protected $table = 'notice_destinations';
+    protected $table = 'mst_booths';
 
     /**
      * テーブルの主キー
@@ -30,24 +30,27 @@ class NoticeDestination extends Model
      * @var array
      */
 
-    protected $primaryKey = [
-        'notice_id',
-        'destination_seq'
-    ];
+    protected $primaryKey = 'booth_id';
 
     /**
      * IDが自動増分されるか
      *
      * @var bool
      */
-    public $incrementing = false;
+    public $incrementing = true;
 
     /**
      * 複数代入する属性
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'campus_cd',
+        'booth_cd',
+        'usage_kind',
+        'name',
+        'disp_order'
+    ];
 
     /**
      * 日付項目の定義
@@ -98,7 +101,12 @@ class NoticeDestination extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'destination_type' => ['integer']
+            'booth_id' => ['integer'],
+            'campus_cd' => ['string', 'max:2'],
+            'booth_cd' => ['string', 'max:3'],
+            'usage_kind' => ['integer', 'in:1,2,3,4,5'],
+            'name' => ['string', 'max:50'],
+            'disp_order' => ['integer']
         ];
         return $_fieldRules;
     }
@@ -106,5 +114,25 @@ class NoticeDestination extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
+    /**
+     * 検索 校舎コード
+     */
+    public function scopeSearchCampusCd($query, $obj)
+    {
+        $key = 'campus_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 用途種別
+     */
+    public function scopeSearchUsageKind($query, $obj)
+    {
+        $key = 'usage_kind';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
 
 }

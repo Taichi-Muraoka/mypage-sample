@@ -29,6 +29,7 @@ class BatchMng extends Model
      *
      * @var array
      */
+
     protected $primaryKey = 'batch_id';
 
     /**
@@ -43,17 +44,20 @@ class BatchMng extends Model
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'batch_type',
+        'start_time',
+        'end_time',
+        'batch_state',
+        'adm_id',
+    ];
 
     /**
      * 日付項目の定義
      *
      * @var array
      */
-    protected $dates = [
-        'start_time',
-        'end_time'
-    ];
+    protected $dates = [];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -98,12 +102,17 @@ class BatchMng extends Model
     {
         static $_fieldRules = [
             'batch_id' => ['integer'],
-            'batch_type' => ['integer'],
+            'batch_type' => ['integer', 'in:1,2,3,4,5,11,12,13,14,21'],
             'start_time' => ['date_format:Y-m-d H:i:s'],
             'end_time' => ['date_format:Y-m-d H:i:s'],
-            'batch_state' => ['integer'],
+            'batch_state' => ['integer', 'in:0,1,99'],
             'adm_id' => ['integer'],
         ];
         return $_fieldRules;
     }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+
 }

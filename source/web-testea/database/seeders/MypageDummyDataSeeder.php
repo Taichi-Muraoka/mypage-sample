@@ -26,33 +26,37 @@ class MypageDummyDataSeeder extends Seeder
 
         // CSVから読み込みと登録
 
-        $this->loadCsv('database/csv/account.csv', 'account');
-        $this->loadCsv('database/csv/ext_room.csv', 'ext_room');
-        $this->loadCsv('database/csv/ext_student_kihon.csv', 'ext_student_kihon');
-        $this->loadCsv('database/csv/ext_rirekisho.csv', 'ext_rirekisho');
-        $this->loadCsv('database/csv/office.csv', 'office');
-
-        $this->loadCsv('database/csv/ext_generic_master.csv', 'ext_generic_master');
-        $this->loadCsv('database/csv/code_master.csv', 'code_master');
-        $this->loadCsv('database/csv/notice_group.csv', 'notice_group');
-
-        $this->loadCsv('database/csv/ext_regular.csv', 'ext_regular');
-        $this->loadCsv('database/csv/ext_regular_detail.csv', 'ext_regular_detail');
-        $this->loadCsv('database/csv/ext_home_teacher_std.csv', 'ext_home_teacher_std');
-        $this->loadCsv('database/csv/ext_home_teacher_std_detail.csv', 'ext_home_teacher_std_detail');
-        $this->loadCsv('database/csv/ext_extra_individual.csv', 'ext_extra_individual');
-        $this->loadCsv('database/csv/ext_extra_ind_detail.csv', 'ext_extra_ind_detail');
-        $this->loadCsv('database/csv/tutor_relate.csv', 'tutor_relate');
-
-        $this->loadCsv('database/csv/ext_schedule.csv', 'ext_schedule');
-        $this->loadCsv('database/csv/ext_trial_master.csv', 'ext_trial_master');
-
+        $this->loadCsv('database/csv/accounts.csv', 'accounts');
+        $this->loadCsv('database/csv/admin_users.csv', 'admin_users');
+        $this->loadCsv('database/csv/mst_codes.csv', 'mst_codes');
+        $this->loadCsv('database/csv/mst_campuses.csv', 'mst_campuses');
+        $this->loadCsv('database/csv/mst_booths.csv', 'mst_booths');
+        $this->loadCsv('database/csv/mst_courses.csv', 'mst_courses');
+        $this->loadCsv('database/csv/mst_grades.csv', 'mst_grades');
+        $this->loadCsv('database/csv/mst_tutor_grades.csv', 'mst_tutor_grades');
+        $this->loadCsv('database/csv/mst_subjects.csv', 'mst_subjects');
+        $this->loadCsv('database/csv/mst_grade_subjects.csv', 'mst_grade_subjects');
+        $this->loadCsv('database/csv/mst_prefectures.csv', 'mst_prefectures');
+        $this->loadCsv('database/csv/mst_schools.csv', 'mst_schools');
+        $this->loadCsv('database/csv/mst_systems.csv', 'mst_systems');
+        $this->loadCsv('database/csv/mst_timetables.csv', 'mst_timetables');
+        $this->loadCsv('database/csv/students.csv', 'students');
+        $this->loadCsv('database/csv/student_campuses.csv', 'student_campuses');
+        $this->loadCsv('database/csv/tutors.csv', 'tutors');
+        $this->loadCsv('database/csv/tutor_campuses.csv', 'tutor_campuses');
+        $this->loadCsv('database/csv/tutor_subjects.csv', 'tutor_subjects');
+        $this->loadCsv('database/csv/regular_classes.csv', 'regular_classes');
+        $this->loadCsv('database/csv/regular_class_members.csv', 'regular_class_members');
+        $this->loadCsv('database/csv/yearly_schedules.csv', 'yearly_schedules');
+        $this->loadCsv('database/csv/schedules.csv', 'schedules');
+        $this->loadCsv('database/csv/class_members.csv', 'class_members');
+        $this->loadCsv('database/csv/notice_group.csv', 'notice_groups');
+        $this->loadCsv('database/csv/season_mng.csv', 'season_mng');
+        $this->loadCsv('database/csv/season_student_requests.csv', 'season_student_requests');
         $this->loadCsv('database/csv/invoice_import.csv', 'invoice_import');
-        $this->loadCsv('database/csv/invoice.csv', 'invoice');
-        $this->loadCsv('database/csv/invoice_detail.csv', 'invoice_detail');
+        $this->loadCsv('database/csv/salary_mng.csv', 'salary_mng');
         $this->loadCsv('database/csv/salary_import.csv', 'salary_import');
-        $this->loadCsv('database/csv/salary.csv', 'salary');
-        $this->loadCsv('database/csv/salary_detail.csv', 'salary_detail');
+        $this->loadCsv('database/csv/yearly_schedules_import.csv', 'yearly_schedules_import');
 
     }
 

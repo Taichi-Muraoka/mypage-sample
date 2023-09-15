@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 請求情報明細 - モデル
+ * 請求明細情報 - モデル
  */
 class InvoiceDetail extends Model
 {
@@ -22,33 +22,36 @@ class InvoiceDetail extends Model
      *
      * @var string
      */
-    protected $table = 'invoice_detail';
+    protected $table = 'invoice_details';
 
     /**
      * テーブルの主キー
      *
      * @var array
      */
-    protected $primaryKey = [
-        'sid',
-        'invoice_date',
-        'lesson_type',
-        'invoice_seq'
-    ];
+
+    protected $primaryKey = 'invoice_detail_id';
 
     /**
      * IDが自動増分されるか
      *
      * @var bool
      */
-    public $incrementing = false;
+    public $incrementing = true;
 
     /**
      * 複数代入する属性
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'invoice_id',
+        'invoice_seq',
+        'description',
+        'unit_price',
+        'times',
+        'amount',
+    ];
 
     /**
      * 日付項目の定義
@@ -98,7 +101,20 @@ class InvoiceDetail extends Model
      */
     protected static function getFieldRules()
     {
-        static $_fieldRules = [];
+        static $_fieldRules = [
+            'invoice_detail_id' => ['integer'],
+            'invoice_id' => ['integer'],
+            'invoice_seq' => ['integer'],
+            'description'=> ['string', 'max:50'],
+            'unit_price' => ['integer', 'min:0', 'max:99999999'],
+            'times' => ['integer'],
+            'amount' => ['integer', 'min:0', 'max:99999999'],
+        ];
         return $_fieldRules;
     }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+
 }

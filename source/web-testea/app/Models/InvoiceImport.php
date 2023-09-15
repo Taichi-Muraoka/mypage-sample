@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 請求情報取込 - モデル
+ * 請求取込情報 - モデル
  */
 class InvoiceImport extends Model
 {
@@ -29,6 +29,7 @@ class InvoiceImport extends Model
      *
      * @var array
      */
+
     protected $primaryKey = 'invoice_date';
 
     /**
@@ -50,9 +51,7 @@ class InvoiceImport extends Model
      *
      * @var array
      */
-    protected $dates = [
-        'invoice_date'
-    ];
+    protected $dates = [];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -95,7 +94,22 @@ class InvoiceImport extends Model
      */
     protected static function getFieldRules()
     {
-        static $_fieldRules = [];
+        static $_fieldRules = [
+            'invoice_date' => ['date_format:Y-m-d'],
+            'issue_date' => ['date_format:Y-m-d'],
+            'bill_date' => ['date_format:Y-m-d'],
+            'start_date' => ['date_format:Y-m-d'],
+            'end_date' => ['date_format:Y-m-d'],
+            'term_text1' => ['string', 'max:50'],
+            'term_text2' => ['string', 'max:50'],
+            'import_state' => ['integer', 'in:0,1'],
+            'import_date' => ['date_format:Y-m-d H:i:s']
+        ];
         return $_fieldRules;
     }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+
 }

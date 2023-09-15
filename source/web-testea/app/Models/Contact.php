@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * 問い合わせ情報 - モデル
  */
-class Contact extends Model
+class Report extends Model
 {
 
     // モデルの共通処理
@@ -22,13 +22,14 @@ class Contact extends Model
      *
      * @var string
      */
-    protected $table = 'contact';
+    protected $table = 'contacts';
 
     /**
      * テーブルの主キー
      *
      * @var array
      */
+
     protected $primaryKey = 'contact_id';
 
     /**
@@ -44,16 +45,15 @@ class Contact extends Model
      * @var array
      */
     protected $fillable = [
-        'sid',
+        'student_id',
         'title',
         'text',
-        'roomcd',
+        'campus_cd',
         'regist_time',
         'contact_state',
-        'answer_time',
-        'answer_text',
         'adm_id',
-        'contact_id',
+        'answer_text',
+        'answer_time'
     ];
 
     /**
@@ -105,15 +105,16 @@ class Contact extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'roomcd' => ['string'],
-            'title' => ['string', 'max:100'],
+            'contact_id' => ['integer'],
+            'student_id' => ['integer'],
+            'title' => ['string', 'max:50'],
             'text' => ['string', 'max:1000'],
+            'campus_cd' => ['string', 'max:2'],
             'regist_time' => ['date_format:Y-m-d'],
-            'sid' => ['integer'],
+            'contact_state' => ['integer', 'in:0,1'],
             'adm_id' => ['integer'],
-            'answer_time' => ['date_format:Y-m-d'],
             'answer_text' => ['string', 'max:1000'],
-            'contact_state' => ['integer']
+            'answer_time' => ['date_format:Y-m-d'],
         ];
         return $_fieldRules;
     }
@@ -122,26 +123,4 @@ class Contact extends Model
     // 検索条件
     //-------------------------------
 
-    /**
-     * 検索 roomcd
-     */
-    public function scopeSearchRoomcd($query, $obj)
-    {
-        $key = 'roomcd';
-        $col = 'contact.roomcd';
-        if (isset($obj[$key]) && filled($obj[$key])) {
-            $query->where($col, $obj[$key]);
-        }
-    }
-
-    /**
-     * 検索 contact_state
-     */
-    public function scopeSearchContactStates($query, $obj)
-    {
-        $key = 'contact_state';
-        if (isset($obj[$key]) && filled($obj[$key])) {
-            $query->where($key, $obj[$key]);
-        }
-    }
 }

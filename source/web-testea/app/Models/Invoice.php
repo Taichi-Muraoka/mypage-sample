@@ -22,25 +22,22 @@ class Invoice extends Model
      *
      * @var string
      */
-    protected $table = 'invoice';
+    protected $table = 'invoices';
 
     /**
      * テーブルの主キー
      *
      * @var array
      */
-    protected $primaryKey = [
-        'sid',
-        'invoice_date',
-        'lesson_type'
-    ];
+
+    protected $primaryKey = 'invoice_id';
 
     /**
      * IDが自動増分されるか
      *
      * @var bool
      */
-    public $incrementing = false;
+    public $incrementing = true;
 
     /**
      * 複数代入する属性
@@ -48,14 +45,11 @@ class Invoice extends Model
      * @var array
      */
     protected $fillable = [
-        'sid',
+        'student_id',
         'invoice_date',
-        'lesson_type',
+        'campus_cd',
         'pay_type',
-        'agreement',
-        'issue_date',
-        'bill_date',
-        'note'
+        'total_amount',
     ];
 
     /**
@@ -63,12 +57,7 @@ class Invoice extends Model
      *
      * @var array
      */
-    protected $dates = [
-        'invoice_date',
-        'lesson_type',
-        'issue_date',
-        'bill_date',
-    ];
+    protected $dates = [];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -111,7 +100,19 @@ class Invoice extends Model
      */
     protected static function getFieldRules()
     {
-        static $_fieldRules = [];
+        static $_fieldRules = [
+            'invoice_id' => ['integer'],
+            'student_id' => ['integer'],
+            'invoice_date' => ['date_format:Y-m-d'],
+            'campus_cd'=> ['string', 'max:2'],
+            'pay_type' => ['integer', 'in:1,2'],
+            'total_amount' => ['integer', 'min:0', 'max:99999999'],
+        ];
         return $_fieldRules;
     }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+
 }

@@ -22,13 +22,14 @@ class Notice extends Model
      *
      * @var string
      */
-    protected $table = 'notice';
+    protected $table = 'notices';
 
     /**
      * テーブルの主キー
      *
      * @var array
      */
+
     protected $primaryKey = 'notice_id';
 
     /**
@@ -45,7 +46,11 @@ class Notice extends Model
      */
     protected $fillable = [
         'title',
-        'text'
+        'text',
+        'notice_type',
+        'adm_id',
+        'campus_cd',
+        'regist_time'
     ];
 
     /**
@@ -53,9 +58,7 @@ class Notice extends Model
      *
      * @var array
      */
-    protected $dates = [
-        'regist_time'
-    ];
+    protected $dates = [];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -99,11 +102,13 @@ class Notice extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'title' => ['string', 'max:100'],
+            'notice_id' => ['integer'],
+            'title' => ['string', 'max:50'],
             'text' => ['string', 'max:1000'],
-            'notice_type' => ['integer'],
-            'tmid_event_id' => ['integer'],
-            'roomcd' => ['string', 'max:4'],
+            'notice_type' => ['integer', 'in:4,5,6,7,8,9,10'],
+            'adm_id' => ['integer'],
+            'campus_cd' => ['string', 'max:2'],
+            'regist_time' => ['date_format:Y-m-d H:i:s']
         ];
         return $_fieldRules;
     }
@@ -112,26 +117,4 @@ class Notice extends Model
     // 検索条件
     //-------------------------------
 
-    /**
-     * 検索 タイトル
-     */
-    public function scopeSearchTitle($query, $obj)
-    {
-        $key = 'title';
-        if (isset($obj[$key]) && filled($obj[$key])) {
-            $query->where($key, 'LIKE',  '%' . $obj[$key] . '%');
-        }
-    }
-
-    /**
-     * 検索 roomcd
-     */
-    public function scopeSearchRoomcd($query, $obj)
-    {
-        $key = 'roomcd';
-        $col = 'notice.roomcd';
-        if (isset($obj[$key]) && filled($obj[$key])) {
-            $query->where($col, $obj[$key]);
-        }
-    }
 }

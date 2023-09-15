@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\PasswordResetNotification;
-use App\Models\ExtStudentKihon;
-use App\Consts\AppConst;
 
 /**
  * アカウント情報 - モデル
@@ -31,7 +29,7 @@ class Account extends Authenticatable
      *
      * @var string
      */
-    protected $table = 'account';
+    protected $table = 'accounts';
 
     /**
      * テーブルの主キー
