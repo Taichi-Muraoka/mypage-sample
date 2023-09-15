@@ -4,10 +4,13 @@ namespace App\Providers;
 
 use App\Consts\AppConst;
 use Illuminate\Auth\EloquentUserProvider;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtRirekisho;
-use App\Models\Office;
+use App\Models\AdminUser;
+use App\Models\Tutor;
+use App\Models\Student;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Contracts\Support\Arrayable;
+use Closure;
+//use Illuminate\Support\Facades\Log;
 
 /**
  * 独自のログイン認証のプロバイダー(accountテーブル対応)
@@ -55,6 +58,8 @@ class AuthAccountProvider extends EloquentUserProvider
         foreach (array_map(NULL, $primaryKey, $ids) as [$key, $val]) {
             $query->where($key, $val);
         }
+        // ログイン可否フラグの条件を付加
+        $query->where('login_flg', 0);
 
         // 最低限の情報のみ取得
         $query->select('account_id', 'account_type', 'remember_token');
@@ -71,27 +76,27 @@ class AuthAccountProvider extends EloquentUserProvider
         switch ($account_type) {
             case AppConst::CODE_MASTER_7_1:
                 // 生徒
-                $student = ExtStudentKihon::where('sid', $account_id)
+                $student = Student::where('student_id', $account_id)
                     ->firstOrFail();
                 // 名前を取得
                 $resultAccount['name'] = $student['name'];
                 break;
             case AppConst::CODE_MASTER_7_2:
                 // 教師
-                $tutor = ExtRirekisho::where('tid', $account_id)
+                $tutor = Tutor::where('tutor_id', $account_id)
                     ->firstOrFail();
                 // 名前を取得
                 $resultAccount['name'] = $tutor['name'];
                 break;
             case AppConst::CODE_MASTER_7_3:
                 // 管理者
-                $admin = Office::where('adm_id', $account_id)
+                $admin = AdminUser::where('adm_id', $account_id)
                     ->firstOrFail();
                 // 名前を取得
                 $resultAccount['name'] = $admin['name'];
                 // 教室コード（管理教室）
                 // 教室管理者かどうかチェックするため
-                $resultAccount['roomcd'] = $admin['roomcd'];
+                $resultAccount['campus_cd'] = $admin['campus_cd'];
                 break;
             default:
                 // 該当しない場合
@@ -99,7 +104,7 @@ class AuthAccountProvider extends EloquentUserProvider
         }
 
         // LOG出したら、大丈夫っぽい。論理削除。生徒、教師、管理者もOK
-        //'query' => 'select * from `account` where `account_id` = ? and `account_type` = ? and `account`.`deleted_at` is null limit 1',
+        //'query' => 'select * from `account` where `account_id` = ? and `account_type` = ? and `login_flg` = ? and `account`.`deleted_at` is null limit 1',
         //Log::debug(\DB::getQueryLog());
 
         // アカウント情報を返却
@@ -146,9 +151,47 @@ class AuthAccountProvider extends EloquentUserProvider
         // ログイン時はnameがなく、普通のaccoutしか来ない
         // なのでとりあえずnameは消すでよい
         unset($user->{"name"});
-        unset($user->{"roomcd"});
+        unset($user->{"campus_cd"});
 
         // 元の処理を呼ぶ
         parent::updateRememberToken($user, $token);
+    }
+
+    /**
+     * Retrieve a user by the given credentials.
+     *
+     * @param  array  $credentials
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    public function retrieveByCredentials(array $credentials)
+    {
+        // ログイン条件追加のため、retrieveByCredentials をラップする
+
+        $credentials = array_filter(
+            $credentials,
+            fn ($key) => ! str_contains($key, 'password'),
+            ARRAY_FILTER_USE_KEY
+        );
+
+        if (empty($credentials)) {
+            return;
+        }
+
+        // First we will add each credential element to the query as a where clause.
+        // Then we can execute the query and, if we found a user, return it in a
+        // Eloquent User "model" that will be utilized by the Guard instances.
+        $query = $this->newModelQuery();
+
+        foreach ($credentials as $key => $value) {
+            if (is_array($value) || $value instanceof Arrayable) {
+                $query->whereIn($key, $value);
+            } elseif ($value instanceof Closure) {
+                $value($query);
+            } else {
+                $query->where($key, $value);
+            }
+        }
+        // ログイン可否フラグの条件を付加
+        return $query->where('login_flg', 0)->first();
     }
 }
