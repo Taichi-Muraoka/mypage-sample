@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * 問い合わせ情報 - モデル
  */
-class Report extends Model
+class Contact extends Model
 {
 
     // モデルの共通処理
@@ -122,5 +122,27 @@ class Report extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
+
+    /**
+     * 検索 校舎コード
+     */
+    public function scopeSearchCampusCd($query, $obj)
+    {
+        $key = 'campus_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 contact_state
+     */
+    public function scopeSearchContactStates($query, $obj)
+    {
+        $key = 'contact_state';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
 
 }

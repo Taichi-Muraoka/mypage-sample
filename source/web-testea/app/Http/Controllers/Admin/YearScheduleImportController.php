@@ -50,15 +50,15 @@ class YearScheduleImportController extends Controller
                 'start_time',
                 'end_time',
                 'batch_state',
-                'code_master.name AS batch_state_name',
-                'room_names.room_name_full AS room_name',
+                'mst_codes.name AS batch_state_name',
+                'room_names.room_name AS room_name',
                 'office.name AS executor'
             )
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('batch_state', '=', 'code_master.code')
-                    ->where('code_master.data_type', AppConst::CODE_MASTER_22);
+                $join->on('batch_state', '=', 'mst_codes.code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_22);
             })
-            ->sdLeftJoin(Office::class, function ($join) {
+            ->sdLeftJoin(AdminUser::class, function ($join) {
                 $join->on('batch_mng.adm_id', '=', 'office.adm_id');
             })
             ->leftJoinSub($room, 'room_names', function ($join) {

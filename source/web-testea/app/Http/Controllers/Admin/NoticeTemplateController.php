@@ -58,10 +58,10 @@ class NoticeTemplateController extends Controller
             'notice_template.order_code',
             'template_name',
             'title',
-            'code_master.name as type_name'
+            'mst_codes.name as type_name'
         )
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('notice_template.notice_type', '=', 'code_master.code')
+                $join->on('notice_template.notice_type', '=', 'mst_codes.code')
                     ->where('data_type', AppConst::CODE_MASTER_14);
             })
             ->orderBy('notice_template.order_code')
@@ -90,12 +90,12 @@ class NoticeTemplateController extends Controller
         //     'template_name',
         //     'title',
         //     'text',
-        //     'code_master.name as type_name',
+        //     'mst_codes.name as type_name',
         //     'notice_template.order_code'
         // )
         //     ->where('template_id', $request->template_id)
         //     ->sdLeftJoin(CodeMaster::class, function ($join) {
-        //         $join->on('notice_template.notice_type', '=', 'code_master.code')
+        //         $join->on('notice_template.notice_type', '=', 'mst_codes.code')
         //             ->where('data_type', AppConst::CODE_MASTER_14);
         //     })
         //     ->firstOrFail();

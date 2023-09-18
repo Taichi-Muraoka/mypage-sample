@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Traits;
 
 use App\Consts\AppConst;
 use App\Models\ExtStudentKihon;
-use App\Models\Grades;
-use App\Models\GradesDetail;
+use App\Models\Score;
+use App\Models\ScoreDetail;
 use App\Models\ExtSchedule;
 use App\Models\ExtTrialMaster;
 use App\Models\CodeMaster;
@@ -110,22 +110,22 @@ trait FuncGradesTrait
     private function getGradesDetail($gradesId)
     {
         // クエリを作成（生徒成績詳細）
-        $query = GradesDetail::query();
+        $query = ScoreDetail::query();
 
         // データを取得（生徒成績詳細）
         return $query
             // IDを指定
-            ->where('grades_detail.grades_id', $gradesId)
+            ->where('score_details.score_id', $gradesId)
             // データを取得
             ->select(
                 'curriculum_name',
                 'score',
                 'average',
-                'code_master.name as updown'
+                'mst_codes.name as updown'
             )
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('grades_detail.previoustime', '=', 'code_master.code')
-                    ->where('code_master.data_type', AppConst::CODE_MASTER_11);
+                $join->on('score_details.previoustime', '=', 'mst_codes.code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_11);
             })
             ->orderBy('grades_seq')
             ->get();
@@ -146,7 +146,7 @@ trait FuncGradesTrait
 
         // データを取得（生徒成績詳細）
         for ($i = 0; $i < $count; $i++) {
-            $gradesDetails[$i] = GradesDetail::select(
+            $gradesDetails[$i] = ScoreDetail::select(
                 'grades_seq as grades_seq_' . $i,
                 'curriculumcd as curriculumcd_' . $i,
                 'curriculum_name as curriculum_name_' . $i,
@@ -155,9 +155,9 @@ trait FuncGradesTrait
                 'average as average_' . $i
             )
                 // IDを指定
-                ->where('grades_detail.grades_id', $gradesId)
+                ->where('score_details.score_id', $gradesId)
                 // grades_seqを指定
-                ->where('grades_detail.grades_seq', $i + 1)
+                ->where('score_details.grades_seq', $i + 1)
                 // 取得できない場合はNULLとしてセット
                 ->first();
         }
@@ -235,7 +235,7 @@ trait FuncGradesTrait
         for ($i = 0; $i < $count; $i++) {
             // gradesDatailテーブルよりupdate対象データを取得(PKでユニークに取る)
             if (isset($request['grades_seq_' . $i]) && filled($request['grades_seq_' . $i])) {
-                GradesDetail::where('grades_id', $request['grades_id'])
+                ScoreDetail::where('grades_id', $request['grades_id'])
                     ->where('grades_seq', $request['grades_seq_' . $i])
                     // MEMO: 取得できない場合はエラーとする
                     ->firstOrFail();
@@ -293,7 +293,7 @@ trait FuncGradesTrait
         }
 
         // 対象データを取得(ログイン者のデータ)
-        $grades = Grades::where('sid', $sid)
+        $grades = Score::where('sid', $sid)
             ->where('exam_type', AppConst::CODE_MASTER_9_1)
             ->where('exam_id', $request['moshi_id']);
 
@@ -328,7 +328,7 @@ trait FuncGradesTrait
         }
 
         // 対象データを取得(ログイン者のデータ)
-        $grades = Grades::where('sid', $sid)
+        $grades = Score::where('sid', $sid)
             ->where('exam_type', AppConst::CODE_MASTER_9_2)
             ->where('exam_id', $request['teiki_id']);
 
@@ -357,11 +357,11 @@ trait FuncGradesTrait
         $count = $this->getGradesDetailCount();
 
         // 生徒成績詳細 項目のバリデーションルールをベースにする
-        $ruleCurriculumName = GradesDetail::getFieldRule('curriculum_name');
-        $ruleCurriculumcd = GradesDetail::getFieldRule('curriculumcd');
-        $ruleScore = GradesDetail::getFieldRule('score');
-        $rulePrevioustime = GradesDetail::getFieldRule('previoustime');
-        $ruleAvarage = GradesDetail::getFieldRule('average');
+        $ruleCurriculumName = ScoreDetail::getFieldRule('curriculum_name');
+        $ruleCurriculumcd = ScoreDetail::getFieldRule('curriculumcd');
+        $ruleScore = ScoreDetail::getFieldRule('score');
+        $rulePrevioustime = ScoreDetail::getFieldRule('previoustime');
+        $ruleAvarage = ScoreDetail::getFieldRule('average');
 
         // // 独自バリデーション: リストのチェック 教科
         $validationCurriculumList =  function ($attribute, $value, $fail) use ($sid) {

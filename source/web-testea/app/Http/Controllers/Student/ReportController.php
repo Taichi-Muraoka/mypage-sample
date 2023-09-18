@@ -63,7 +63,7 @@ class ReportController extends Controller
                 'report_id as id',
                 'lesson_date',
                 'start_time',
-                'room_names.room_name_full as room_name',
+                'room_names.room_name as room_name',
                 'ext_rirekisho.name as tname',
                 'r_minutes'
             )
@@ -111,7 +111,7 @@ class ReportController extends Controller
         //     ->select(
         //         'lesson_date',
         //         'start_time',
-        //         'room_names.room_name_full as room_name',
+        //         'room_names.room_name as room_name',
         //         'ext_rirekisho.name as tname',
         //         'r_minutes',
         //         'content',
@@ -174,7 +174,7 @@ class ReportController extends Controller
                 'lesson_type',
                 'lesson_date',
                 'start_time',
-                'room_names.room_name_full as class_name',
+                'room_names.room_name as class_name',
                 'ext_rirekisho.name as tname',
                 'r_minutes',
                 'content',

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Contact;
 use Illuminate\Support\Facades\Auth;
 use App\Consts\AppConst;
-use App\Models\Office;
+use App\Models\AdminUser;
 use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncContactTrait;
 use Illuminate\Support\Carbon;

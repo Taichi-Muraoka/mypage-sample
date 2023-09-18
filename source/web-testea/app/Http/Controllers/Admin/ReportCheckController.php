@@ -119,7 +119,7 @@ class ReportCheckController extends Controller
                 'regist_time',
                 'lesson_date',
                 'start_time',
-                'room_names.room_name_full as room_name',
+                'room_names.room_name as room_name',
                 'ext_student_kihon.name as sname',
                 'ext_rirekisho.name as tname',
                 'r_minutes',
@@ -171,10 +171,10 @@ class ReportCheckController extends Controller
         //     ->select(
         //         'regist_time',
         //         'ext_rirekisho.name as tname',
-        //         'code_master.name as lesson_type_name',
+        //         'mst_codes.name as lesson_type_name',
         //         'lesson_date',
         //         'start_time',
-        //         'room_names.room_name_full as room_name',
+        //         'room_names.room_name as room_name',
         //         'ext_student_kihon.name as sname',
         //         'r_minutes',
         //         'content',
@@ -192,8 +192,8 @@ class ReportCheckController extends Controller
         //     ->sdLeftJoin(ExtRirekisho::class, 'report.tid', '=', 'ext_rirekisho.tid')
         //     // 授業種別名の取得
         //     ->sdLeftJoin(CodeMaster::class, function ($join) {
-        //         $join->on('report.lesson_type', '=', 'code_master.code')
-        //             ->where('code_master.data_type', AppConst::CODE_MASTER_8);
+        //         $join->on('report.lesson_type', '=', 'mst_codes.code')
+        //             ->where('mst_codes.data_type', AppConst::CODE_MASTER_8);
         //     })
         //     ->firstOrFail();
 
@@ -500,7 +500,7 @@ class ReportCheckController extends Controller
         //---------------------------
         // 教室を返却する
         //---------------------------
-        $room_name_full = null;
+        $room_name = null;
         if (filled($schedule_id)) {
             // idが指定されている場合のみ
 
@@ -511,12 +511,12 @@ class ReportCheckController extends Controller
             $lesson = $this->mdlGetScheduleDtl($schedule_id);
 
             // 変数にセット
-            $room_name_full = $lesson->room_name_full;
+            $room_name = $lesson->room_name;
         }
 
         return [
             'selectItems' => $this->objToArray($scheduleMaster),
-            'class_name' => $room_name_full
+            'class_name' => $room_name
         ];
     }
 

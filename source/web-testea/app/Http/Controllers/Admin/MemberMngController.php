@@ -120,8 +120,8 @@ class MemberMngController extends Controller
             })
             // アカウントテーブルとJOIN（退会生徒非表示対応）
             ->sdJoin(Account::class, function ($join) {
-                $join->on('ext_student_kihon.sid', '=', 'account.account_id')
-                    ->where('account.account_type', '=', AppConst::CODE_MASTER_7_1);
+                $join->on('ext_student_kihon.sid', '=', 'accounts.account_id')
+                    ->where('accounts.account_type', '=', AppConst::CODE_MASTER_7_1);
             })
             ->orderBy('ext_student_kihon.sid', 'asc');
 

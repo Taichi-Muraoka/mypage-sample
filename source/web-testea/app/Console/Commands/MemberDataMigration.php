@@ -1842,8 +1842,8 @@ class MemberDataMigration extends Command
             ->whereIn('sid', $sidList)
             // アカウントテーブルとJOIN（削除教師非表示対応）
             ->sdJoin(Account::class, function ($join) {
-                $join->on('ext_regular_detail.tid', '=', 'account.account_id')
-                    ->where('account.account_type', AppConst::CODE_MASTER_7_2);
+                $join->on('ext_regular_detail.tid', '=', 'accounts.account_id')
+                    ->where('accounts.account_type', AppConst::CODE_MASTER_7_2);
             });
 
         // 個別講習情報明細テーブルから更新対象sidのデータを取得する
@@ -1851,8 +1851,8 @@ class MemberDataMigration extends Command
             ->whereIn('sid', $sidList)
             // アカウントテーブルとJOIN（削除教師非表示対応）
             ->sdJoin(Account::class, function ($join) {
-                $join->on('ext_extra_ind_detail.tid', '=', 'account.account_id')
-                    ->where('account.account_type', AppConst::CODE_MASTER_7_2);
+                $join->on('ext_extra_ind_detail.tid', '=', 'accounts.account_id')
+                    ->where('accounts.account_type', AppConst::CODE_MASTER_7_2);
             });
 
         // 家庭教師情報詳細テーブルから更新対象sidのデータを取得する
@@ -1860,8 +1860,8 @@ class MemberDataMigration extends Command
             ->whereIn('sid', $sidList)
             // アカウントテーブルとJOIN（削除教師非表示対応）
             ->sdJoin(Account::class, function ($join) {
-                $join->on('ext_home_teacher_std_detail.tid', '=', 'account.account_id')
-                    ->where('account.account_type', AppConst::CODE_MASTER_7_2);
+                $join->on('ext_home_teacher_std_detail.tid', '=', 'accounts.account_id')
+                    ->where('accounts.account_type', AppConst::CODE_MASTER_7_2);
             });
 
         // 3つのqueryをUNION

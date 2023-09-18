@@ -12,7 +12,7 @@ use App\Consts\AppConst;
 use App\Models\CodeMaster;
 use App\Models\Notice;
 use App\Models\NoticeDestination;
-use App\Models\Office;
+use App\Models\AdminUser;
 use App\Models\NoticeGroup;
 use App\Models\ExtStudentKihon;
 use App\Models\ExtRirekisho;
@@ -124,7 +124,7 @@ class NoticeRegistController extends Controller
                 'notice.notice_id AS id',
                 'notice.regist_time AS date',
                 'notice.title',
-                'code_master.name AS type_name',
+                'mst_codes.name AS type_name',
                 'room_name'
             )
             // お知らせ宛先
@@ -134,8 +134,8 @@ class NoticeRegistController extends Controller
             })
             // 宛先種別
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('code_master.code', '=', 'notice_destination.destination_type')
-                    ->where('code_master.data_type', '=', AppConst::CODE_MASTER_15);
+                $join->on('mst_codes.code', '=', 'notice_destination.destination_type')
+                    ->where('mst_codes.data_type', '=', AppConst::CODE_MASTER_15);
             })
             // 教室名取得
             ->leftJoinSub($room_names, 'room_names', function ($join) {
@@ -187,7 +187,7 @@ class NoticeRegistController extends Controller
         //         'notice.title',
         //         'notice.text',
         //         'notice.notice_type',
-        //         'code_master.name AS type_name',
+        //         'mst_codes.name AS type_name',
         //         'room_name',
         //         'office.name AS sender',
         //         'ext_trial_master.name AS trial_name',
@@ -203,11 +203,11 @@ class NoticeRegistController extends Controller
         //     })
         //     // 宛先種別
         //     ->sdLeftJoin(CodeMaster::class, function ($join) {
-        //         $join->on('code_master.code', '=', 'notice_destination.destination_type')
-        //             ->where('code_master.data_type', '=', AppConst::CODE_MASTER_15);
+        //         $join->on('mst_codes.code', '=', 'notice_destination.destination_type')
+        //             ->where('mst_codes.data_type', '=', AppConst::CODE_MASTER_15);
         //     })
         //     // 事務局マスタ(送信者名)
-        //     ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+        //     ->sdLeftJoin(AdminUser::class, 'office.adm_id', '=', 'notice.adm_id')
         //     // 教室名
         //     ->leftJoinSub($room_names, 'room_names', function ($join) {
         //         $join->on('notice.roomcd', '=', 'room_names.code');
@@ -996,8 +996,8 @@ class NoticeRegistController extends Controller
             )
             // アカウントテーブルとJOIN（削除教師非表示対応）
             ->sdJoin(Account::class, function ($join) {
-                $join->on('ext_rirekisho.tid', '=', 'account.account_id')
-                    ->where('account.account_type', AppConst::CODE_MASTER_7_2);
+                $join->on('ext_rirekisho.tid', '=', 'accounts.account_id')
+                    ->where('accounts.account_type', AppConst::CODE_MASTER_7_2);
             })
             ->orderBy('tid', 'asc')
             ->get()

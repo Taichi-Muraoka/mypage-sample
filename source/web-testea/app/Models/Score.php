@@ -123,4 +123,40 @@ class Score extends Model
     // 検索条件
     //-------------------------------
 
+    /**
+     * 検索 student_id
+     */
+    public function scopeSearchSid($query, $obj)
+    {
+        $key = 'student_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 生徒(student_id)に紐づく教室
+     */
+    public function scopeSearchRoom($query, $obj)
+    {
+        $key = 'campus_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // sidで教室で絞り込む(共通処理)
+            $this->mdlWhereSidByRoomQuery($query, self::class, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 生徒(student_id)に紐づく教室（講師向け画面からの検索）
+     */
+    public function scopeSearchRoomForT($query, $obj)
+    {
+        $key = 'campus_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // student_idで教室で絞り込む(共通処理・講師用)
+            $this->mdlWhereSidByRoomQueryForT($query, self::class, $obj[$key]);
+        }
+    }
+
 }

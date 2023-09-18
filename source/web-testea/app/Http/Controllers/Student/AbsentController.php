@@ -166,7 +166,7 @@ class AbsentController extends Controller
         $lesson = $this->getScheduleDetail($schedule_id);
 
         return [
-            'class_name' => $lesson->room_name_full,
+            'class_name' => $lesson->room_name,
             'teacher_name' => $lesson->name
         ];
     }
@@ -208,7 +208,7 @@ class AbsentController extends Controller
                     'start_time',
                     'ext_schedule.tid',
                     'ext_rirekisho.name AS teacher_name',
-                    'room_name_full'
+                    'room_name'
                 )
                 ->leftJoinSub($room_names, 'room_names', function ($join) {
                     $join->on('ext_schedule.roomcd', '=', 'room_names.code');
@@ -223,7 +223,7 @@ class AbsentController extends Controller
             $lesson_date = $lesson->lesson_date->format('Y/m/d');
             $start_time = $lesson->start_time->format('H:i');
             $tid = $lesson->tid;
-            $room_name = $lesson->room_name_full;
+            $room_name = $lesson->room_name;
             $teacher_name = $lesson->teacher_name;
         } elseif ($request->input('lesson_type') == AppConst::CODE_MASTER_8_2) {
             //---------------

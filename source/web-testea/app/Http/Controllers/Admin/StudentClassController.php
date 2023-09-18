@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtSchedule;
+//use App\Models\ExtStudentKihon;
+//use App\Models\ExtSchedule;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
 //use App\Http\Controllers\Traits\FuncReportTrait;
@@ -112,14 +112,14 @@ class StudentClassController extends Controller
     private function getStudentName($sid)
     {
         // 生徒名を取得する
-        $query = ExtStudentKihon::query();
-        $student = $query
-            ->select(
-                'name'
-            )
-            ->where('ext_student_kihon.sid', '=', $sid)
-            ->firstOrFail();
+        //$query = ExtStudentKihon::query();
+        //$student = $query
+        //    ->select(
+        //        'name'
+        //    )
+        //    ->where('ext_student_kihon.sid', '=', $sid)
+        //    ->firstOrFail();
 
-        return $student;
+        //return $student;
     }
 }

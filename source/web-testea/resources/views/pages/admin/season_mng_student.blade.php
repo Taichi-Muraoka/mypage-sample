@@ -16,11 +16,15 @@
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="room" caption="校舎" :select2=true :select2Search=false>
-                <option value="1">久我山</option>
-                <option value="2">春日部</option>
-                <option value="3">本郷</option>
-            </x-input.select>
+            @can('roomAdmin')
+            {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+				:select2Search=false :blank=false />
+            @else
+            {{-- 全体管理者の場合、検索を非表示・未選択を表示する --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+				:select2Search=false :blank=true />
+            @endcan
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>

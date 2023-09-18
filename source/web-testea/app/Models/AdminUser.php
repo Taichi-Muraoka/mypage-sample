@@ -110,7 +110,7 @@ class AdminUser extends Model
     /**
      * 検索 campus_cd
      */
-    public function scopeSearchCampusCode($query, $obj)
+    public function scopeSearchCampusCd($query, $obj)
     {
         $key = 'campus_cd';
         if (isset($obj[$key]) && filled($obj[$key])) {

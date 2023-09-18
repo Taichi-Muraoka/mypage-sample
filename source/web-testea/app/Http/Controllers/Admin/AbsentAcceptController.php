@@ -128,7 +128,7 @@ class AbsentAcceptController extends Controller
             'start_time',
             'room_names.room_name',
             'ext_rirekisho.name as tname',
-            'code_master.name as status',
+            'mst_codes.name as status',
             'state as statecd',
             'absent_apply.created_at'
         )
@@ -146,8 +146,8 @@ class AbsentAcceptController extends Controller
             })
             // ステータス
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('absent_apply.state', '=', 'code_master.code')
-                    ->where('code_master.data_type', AppConst::CODE_MASTER_1);
+                $join->on('absent_apply.state', '=', 'mst_codes.code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_1);
             })
             ->orderby('absent_apply.apply_time', 'desc')
             ->orderby('absent_apply.created_at', 'desc');
@@ -242,7 +242,7 @@ class AbsentAcceptController extends Controller
         //             'room_names.room_name',
         //             'ext_rirekisho.name as tname',
         //             'absent_reason',
-        //             'code_master.name as status'
+        //             'mst_codes.name as status'
         //         )
         //             ->where('absent_apply_id', $absentApplyId)
         //             // 生徒名の取得
@@ -259,8 +259,8 @@ class AbsentAcceptController extends Controller
         //             })
         //             // ステータス
         //             ->sdLeftJoin(CodeMaster::class, function ($join) {
-        //                 $join->on('absent_apply.state', '=', 'code_master.code')
-        //                     ->where('code_master.data_type', AppConst::CODE_MASTER_1);
+        //                 $join->on('absent_apply.state', '=', 'mst_codes.code')
+        //                     ->where('mst_codes.data_type', AppConst::CODE_MASTER_1);
         //             })
         //             // 授業種別
         //             ->sdLeftJoin(CodeMaster::class, function ($join) {
@@ -630,7 +630,7 @@ class AbsentAcceptController extends Controller
         $lesson = $this->getScheduleDetail($schedule_id);
 
         return [
-            'class_name' => $lesson->room_name_full,
+            'class_name' => $lesson->room_name,
             'teacher_name' => $lesson->name
         ];
     }

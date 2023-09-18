@@ -106,7 +106,7 @@ trait FuncAbsentTrait
         $query = ExtSchedule::query();
         $lesson = $query
             ->select(
-                'room_name_full',
+                'room_name',
                 'name'
             )
             ->leftJoinSub($room_names, 'room_names', function ($join) {

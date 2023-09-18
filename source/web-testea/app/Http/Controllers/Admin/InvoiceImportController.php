@@ -73,8 +73,8 @@ class InvoiceImportController extends Controller
             )
             // 取り込み状態
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('invoice_import.import_state', '=', 'code_master.code')
-                    ->where('code_master.data_type', AppConst::CODE_MASTER_20);
+                $join->on('invoice_import.import_state', '=', 'mst_codes.code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_20);
             })
             ->where('invoice_date', '<=', $present_month)
             ->orderBy('invoice_date', 'desc');

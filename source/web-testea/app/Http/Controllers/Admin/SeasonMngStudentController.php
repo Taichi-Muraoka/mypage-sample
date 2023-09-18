@@ -48,14 +48,14 @@ class SeasonMngStudentController extends Controller
     public function index()
     {
         // 教室リストを取得
-        //$rooms = $this->mdlGetRoomList(false);
+        $rooms = $this->mdlGetRoomList(false);
 
         // ステータスのプルダウン取得
         $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_2);
 
         return view('pages.admin.season_mng_student', [
             'statusList' => $statusList,
-            //'rooms' => $rooms,
+            'rooms' => $rooms,
             'editData' => null,
             'rules' => $this->rulesForSearch()
         ]);

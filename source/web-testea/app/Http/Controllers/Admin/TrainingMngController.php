@@ -99,13 +99,13 @@ class TrainingMngController extends Controller
                 'regist_time',
                 'release_date',
                 'limit_date',
-                'code_master.name as trn_type',
+                'mst_codes.name as trn_type',
                 'training_contents.created_at'
             )
             // 形式
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('code_master.code', '=', 'training_contents.trn_type')
-                    ->where('code_master.data_type', '=', AppConst::CODE_MASTER_12);
+                $join->on('mst_codes.code', '=', 'training_contents.trn_type')
+                    ->where('mst_codes.data_type', '=', AppConst::CODE_MASTER_12);
             })
             ->orderBy('training_contents.release_date', 'desc')
             ->orderBy('training_contents.created_at', 'desc');
@@ -164,12 +164,12 @@ class TrainingMngController extends Controller
                 'regist_time',
                 'release_date',
                 'limit_date',
-                'code_master.name as trn_type'
+                'mst_codes.name as trn_type'
             )
             // 形式
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('code_master.code', '=', 'training_contents.trn_type')
-                    ->where('code_master.data_type', '=', AppConst::CODE_MASTER_12);
+                $join->on('mst_codes.code', '=', 'training_contents.trn_type')
+                    ->where('mst_codes.data_type', '=', AppConst::CODE_MASTER_12);
             })
             // 条件
             ->where('training_contents.trn_id', $trnId)

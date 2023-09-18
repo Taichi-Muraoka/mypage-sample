@@ -40,15 +40,15 @@ trait FuncAgreementTrait
                 'sid',
                 'name',
                 'ext_generic_master.name1 AS cls_name',
-                'account.email'
+                'accounts.email'
             )
             ->sdLeftJoin(ExtGenericMaster::class, function ($join) {
                 $join->on('ext_generic_master.code', '=', 'ext_student_kihon.cls_cd')
                     ->where('ext_generic_master.codecls', '=', AppConst::EXT_GENERIC_MASTER_000_112);
             })
             ->sdLeftJoin(Account::class, function ($join) {
-                $join->on('account.account_id', '=', 'ext_student_kihon.sid')
-                    ->where('account.account_type', '=', AppConst::CODE_MASTER_7_1);
+                $join->on('accounts.account_id', '=', 'ext_student_kihon.sid')
+                    ->where('accounts.account_type', '=', AppConst::CODE_MASTER_7_1);
             })
             ->where('ext_student_kihon.sid', '=', $sid)
             ->firstOrFail();
@@ -206,14 +206,14 @@ trait FuncAgreementTrait
                 'r_count',
                 'ext_rirekisho.name AS teacher_name',
                 'ext_generic_master.name1 AS curriculum_name',
-                'code_master.name AS weekday'
+                'mst_codes.name AS weekday'
             )
             ->sdLeftJoin(ExtRirekisho::class, function ($join) {
                 $join->on('ext_rirekisho.tid', '=', 'ext_regular_detail.tid');
             })
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('code_master.code', '=', 'ext_regular_detail.weekdaycd')
-                    ->where('code_master.data_type', '=', AppConst::CODE_MASTER_16);
+                $join->on('mst_codes.code', '=', 'ext_regular_detail.weekdaycd')
+                    ->where('mst_codes.data_type', '=', AppConst::CODE_MASTER_16);
             })
             ->sdLeftJoin(ExtGenericMaster::class, function ($join) {
                 $join->on('ext_generic_master.code', '=', 'ext_regular_detail.curriculumcd')

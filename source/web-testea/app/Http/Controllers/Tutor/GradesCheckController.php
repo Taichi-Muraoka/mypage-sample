@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Grades;
-use App\Models\TutorRelate;
+use App\Models\Score;
+use App\Models\Schedule;
 use App\Models\CodeMaster;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtTrialMaster;
+use App\Models\Student;
+//use App\Models\ExtTrialMaster;
 use App\Consts\AppConst;
 use App\Http\Controllers\Traits\FuncGradesTrait;
 use Illuminate\Support\Facades\Lang;
@@ -63,21 +63,20 @@ class GradesCheckController extends Controller
     public function getDataSelect(Request $request)
     {
         // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'id');
-
-        // roomcdを取得
-        $roomcd = $request->input('id');
+        //$this->validateIdsFromRequest($request, 'id');
+        // campus_cdを取得
+        $campus_cd = $request->input('id');
         // ログイン者の情報を取得する
         $account = Auth::user();
         $account_id = $account->account_id;
 
-        // $requestのroomcdから、生徒IDリストを取得し、検索結果を返却する。
+        // $requestのcampus_cdから、生徒IDリストを取得し、検索結果を返却する。
         // 生徒リスト取得
-        if ($roomcd == -1 || !filled($roomcd)) {
+        if ($campus_cd == -1 || !filled($campus_cd)) {
             // -1 または 空白の場合、自分の受け持ちの生徒だけに絞り込み
             $students = $this->mdlGetStudentListForT(null, $account_id);
         } else {
-            $students = $this->mdlGetStudentListForT($roomcd, $account_id);
+            $students = $this->mdlGetStudentListForT($campus_cd, $account_id);
         }
 
         return [
@@ -100,11 +99,11 @@ class GradesCheckController extends Controller
         $form = $request->all();
 
         // クエリを作成
-        $query = Grades::query();
+        $query = Score::query();
 
-        // 教室コード選択による絞り込み条件
-        // -1 は未選択状態のため、-1以外の場合に教室コードの絞り込みを行う
-        if (isset($form['roomcd']) && filled($form['roomcd']) && $form['roomcd'] != -1) {
+        // 校舎コード選択による絞り込み条件
+        // -1 は未選択状態のため、-1以外の場合に校舎コードの絞り込みを行う
+        if (isset($form['campus_cd']) && filled($form['campus_cd']) && $form['campus_cd'] != -1) {
             // 検索フォームから取得（スコープ）
             $query->SearchRoomForT($form);
         }
@@ -116,39 +115,40 @@ class GradesCheckController extends Controller
         $query->where($this->guardTutorTableWithSid());
 
         // データを取得
-        $grades = $query
-            ->select(
-                'grades_id as id',
-                'regist_time',
-                'ext_student_kihon.name as sname',
-                'code_master_9.name as type_name',
-                'code_master.name as teiki_name',
-                'ext_trial_master.name as moshi_name',
-                'grades.created_at'
-            )
-            // 試験種別名の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('grades.exam_type', '=', 'code_master_9.code')
-                    ->where('code_master_9.data_type', AppConst::CODE_MASTER_9);
-            }, 'code_master_9')
-            // 定期試験名の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('grades.exam_id', '=', 'code_master.code')
-                    ->where('code_master.data_type', AppConst::CODE_MASTER_10)
-                    ->where('grades.exam_type', AppConst::CODE_MASTER_9_2);
-            })
-            // 模擬試験名の取得
-            ->sdLeftJoin(ExtTrialMaster::class, function ($join) {
-                $join->on('grades.exam_id', '=', 'ext_trial_master.tmid')
-                    ->where('grades.exam_type', AppConst::CODE_MASTER_9_1);
-            })
-            // 生徒名の取得
-            ->sdLeftJoin(ExtStudentKihon::class, 'grades.sid', '=', 'ext_student_kihon.sid')
-            ->orderBy('grades.regist_time', 'desc')
-            ->orderBy('grades.created_at', 'desc');
+        //$grades = $query
+        //    ->select(
+        //        'grades_id as id',
+        //        'regist_time',
+        //        'students.name as sname',
+        //        'mst_codes_9.name as type_name',
+        //        'mst_codes.name as teiki_name',
+        //        'ext_trial_master.name as moshi_name',
+        //        'scores.created_at'
+        //    )
+        //    // 試験種別名の取得
+        //    ->sdLeftJoin(CodeMaster::class, function ($join) {
+        //        $join->on('scores.exam_type', '=', 'mst_codes_9.code')
+        //            ->where('mst_codes_9.data_type', AppConst::CODE_MASTER_9);
+        //    }, 'mst_codes_9')
+        //    // 定期試験名の取得
+        //    ->sdLeftJoin(CodeMaster::class, function ($join) {
+        //        $join->on('scores.exam_id', '=', 'mst_codes.code')
+        //            ->where('mst_codes.data_type', AppConst::CODE_MASTER_10)
+        //            ->where('scores.exam_type', AppConst::CODE_MASTER_9_2);
+        //    })
+        //    // 模擬試験名の取得
+        //    ->sdLeftJoin(ExtTrialMaster::class, function ($join) {
+        //        $join->on('scores.exam_id', '=', 'ext_trial_master.tmid')
+        //            ->where('scores.exam_type', AppConst::CODE_MASTER_9_1);
+        //    })
+        //    // 生徒名の取得
+        //    ->sdLeftJoin(Student::class, 'scores.student_id', '=', 'students.student_id')
+        //    ->orderBy('scores.regist_time', 'desc')
+        //    ->orderBy('scores.created_at', 'desc');
 
         // ページネータで返却
-        return $this->getListAndPaginator($request, $grades);
+        //return $this->getListAndPaginator($request, $grades);
+        return $this->getListAndPaginatorMock();
     }
 
     /**
@@ -164,9 +164,9 @@ class GradesCheckController extends Controller
 
         return ['id' => $request->id];
 
-    //==========================
-    // 本番用処理
-    //==========================
+        //==========================
+        // 本番用処理
+        //==========================
         // // IDのバリデーション
         // $this->validateIdsFromRequest($request, 'id');
 
@@ -174,7 +174,7 @@ class GradesCheckController extends Controller
         // $id = $request->input('id');
 
         // // クエリを作成
-        // $query = Grades::query();
+        // $query = Score::query();
 
         // // 受け持ち生徒に限定するガードを掛ける
         // $query->where($this->guardTutorTableWithSid());
@@ -182,34 +182,34 @@ class GradesCheckController extends Controller
         // // データを取得（生徒成績）
         // $grades = $query
         //     // IDを指定
-        //     ->where('grades.grades_id', $id)
+        //     ->where('scores.grades_id', $id)
         //     // データを取得
         //     ->select(
-        //         'grades.regist_time',
-        //         'ext_student_kihon.name as sname',
-        //         'code_master_9.name as type_name',
-        //         'code_master.name as teiki_name',
+        //         'scores.regist_time',
+        //         'students.name as sname',
+        //         'mst_codes_9.name as type_name',
+        //         'mst_codes.name as teiki_name',
         //         'ext_trial_master.name as moshi_name',
         //         'student_comment'
         //     )
         //     // 試験種別名の取得
         //     ->sdLeftJoin(CodeMaster::class, function ($join) {
-        //         $join->on('grades.exam_type', '=', 'code_master_9.code')
-        //             ->where('code_master_9.data_type', AppConst::CODE_MASTER_9);
-        //     }, 'code_master_9')
+        //         $join->on('scores.exam_type', '=', 'mst_codes_9.code')
+        //             ->where('mst_codes_9.data_type', AppConst::CODE_MASTER_9);
+        //     }, 'mst_codes_9')
         //     // 定期試験名の取得
         //     ->sdLeftJoin(CodeMaster::class, function ($join) {
-        //         $join->on('grades.exam_id', '=', 'code_master.code')
-        //             ->where('code_master.data_type', AppConst::CODE_MASTER_10)
-        //             ->where('grades.exam_type', AppConst::CODE_MASTER_9_2);
+        //         $join->on('scores.exam_id', '=', 'mst_codes.code')
+        //             ->where('mst_codes.data_type', AppConst::CODE_MASTER_10)
+        //             ->where('scores.exam_type', AppConst::CODE_MASTER_9_2);
         //     })
         //     // 模擬試験名の取得
         //     ->sdLeftJoin(ExtTrialMaster::class, function ($join) {
-        //         $join->on('grades.exam_id', '=', 'ext_trial_master.tmid')
-        //             ->where('grades.exam_type', AppConst::CODE_MASTER_9_1);
+        //         $join->on('scores.exam_id', '=', 'ext_trial_master.tmid')
+        //             ->where('scores.exam_type', AppConst::CODE_MASTER_9_1);
         //     })
         //     // 生徒名の取得
-        //     ->sdLeftJoin(ExtStudentKihon::class, 'grades.sid', '=', 'ext_student_kihon.sid')
+        //     ->sdLeftJoin(Student::class, 'scores.student_id', '=', 'students.student_id')
         //     ->firstOrFail();
 
         // // データを取得（生徒成績詳細）
@@ -275,8 +275,8 @@ class GradesCheckController extends Controller
         };
         $rules = array();
 
-        $rules += TutorRelate::fieldRules('roomcd', [$validationRoomList]);
-        $rules += Grades::fieldRules('sid', [$validationStudentList]);
+        $rules += Schedule::fieldRules('campus_cd', [$validationRoomList]);
+        $rules += Score::fieldRules('student_id', [$validationStudentList]);
 
         return $rules;
     }

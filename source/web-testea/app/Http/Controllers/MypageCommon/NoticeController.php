@@ -5,14 +5,14 @@ namespace App\Http\Controllers\MypageCommon;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtRoom;
+use App\Models\Student;
+use App\Models\StudentCampus;
 use App\Models\NoticeDestination;
 use App\Models\Notice;
 use App\Models\NoticeGroup;
-use App\Models\Office;
-use App\Models\ExtTrialMaster;
-use App\Models\Event;
+use App\Models\AdminUser;
+//use App\Models\ExtTrialMaster;
+//use App\Models\Event;
 use App\Consts\AppConst;
 use App\Http\Controllers\Traits\FuncNoticeTrait;
 
@@ -75,7 +75,7 @@ class NoticeController extends Controller
                 $notice_ids = $this->getStudentNoticeIds();
 
                 // 生徒情報の取得
-                $student = $this->getStudentKihon();
+                $student = $this->getStudentInfo();
 
                 // 生徒入会日
                 $enter_date = $student->enter_date;
@@ -84,28 +84,28 @@ class NoticeController extends Controller
                 $query = Notice::query();
                 $notices = $query
                     ->select(
-                        'notice.notice_id AS id',
+                        'notices.notice_id AS id',
                         'title',
                         'notice_type',
-                        'tmid_event_id',
+                        //'tmid_event_id',
                         'regist_time AS date',
-                        'office.name AS sender',
+                        'admin_users.name AS sender',
                         'room_name'
                     )
                     // 送信者名の取得
-                    ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+                    ->sdLeftJoin(AdminUser::class, 'admin_users.adm_id', '=', 'notices.adm_id')
                     // 教室名の取得
                     ->leftJoinSub($room_names, 'room_names', function ($join) {
-                        $join->on('notice.roomcd', '=', 'room_names.code');
+                        $join->on('notices.campus_cd', '=', 'room_names.code');
                     })
                     // 対象のお知らせIDで絞る
-                    ->whereIn('notice.notice_id', $notice_ids)
+                    ->whereIn('notices.notice_id', $notice_ids)
                     // 入会日がある場合は、入会日以降のデータを取得
                     ->when($enter_date, function ($query, $enter_date) {
-                        return $query->where('notice.regist_time', '>=', $enter_date);
+                        return $query->where('notices.regist_time', '>=', $enter_date);
                     })
                     // ソート順
-                    ->orderBy('notice.regist_time', 'desc');
+                    ->orderBy('notices.regist_time', 'desc');
 
                 break;
             case AppConst::CODE_MASTER_7_2:
@@ -120,24 +120,24 @@ class NoticeController extends Controller
                 $query = Notice::query();
                 $notices = $query
                     ->select(
-                        'notice.notice_id AS id',
+                        'notices.notice_id AS id',
                         'title',
                         'notice_type',
-                        'tmid_event_id',
+                        //'tmid_event_id',
                         'regist_time AS date',
-                        'office.name AS sender',
+                        'admin_users.name AS sender',
                         'room_name'
                     )
                     // 送信者名の取得
-                    ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+                    ->sdLeftJoin(AdminUser::class, 'admin_users.adm_id', '=', 'notices.adm_id')
                     // 教室名の取得
                     ->leftJoinSub($room_names, 'room_names', function ($join) {
-                        $join->on('notice.roomcd', '=', 'room_names.code');
+                        $join->on('notices.campus_cd', '=', 'room_names.code');
                     })
                     // 対象のお知らせIDで絞る
-                    ->whereIn('notice.notice_id', $notice_ids)
+                    ->whereIn('notices.notice_id', $notice_ids)
                     // ソート順
-                    ->orderBy('notice.regist_time', 'desc');
+                    ->orderBy('notices.regist_time', 'desc');
 
                 break;
             default:
@@ -207,17 +207,17 @@ class NoticeController extends Controller
         //                 'title',
         //                 'text AS body',
         //                 'notice_type AS type',
-        //                 'tmid_event_id AS id',
-        //                 'office.name AS sender',
+        //                 //'tmid_event_id AS id',
+        //                 'admin_users.name AS sender',
         //                 'room_name'
         //             )
         //             // 送信者名の取得
-        //             ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+        //             ->sdLeftJoin(AdminUser::class, 'admin_users.adm_id', '=', 'notices.adm_id')
         //             // 教室名の取得
         //             ->leftJoinSub($room_names, 'room_names', function ($join) {
-        //                 $join->on('notice.roomcd', '=', 'room_names.code');
+        //                 $join->on('notices.campus_cd', '=', 'room_names.code');
         //             })
-        //             ->where('notice.notice_id', '=', $notice_id)
+        //             ->where('notices.notice_id', '=', $notice_id)
         //             ->firstOrFail();
 
         //         $notice['tmid_event_name'] = '';
@@ -280,16 +280,16 @@ class NoticeController extends Controller
         //                 'regist_time AS date',
         //                 'title',
         //                 'text AS body',
-        //                 'office.name AS sender',
+        //                 'admin_users.name AS sender',
         //                 'room_name'
         //             )
         //             // 送信者名の取得
-        //             ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+        //             ->sdLeftJoin(AdminUser::class, 'admin_users.adm_id', '=', 'notices.adm_id')
         //             // 教室名の取得
         //             ->leftJoinSub($room_names, 'room_names', function ($join) {
-        //                 $join->on('notice.roomcd', '=', 'room_names.code');
+        //                 $join->on('notices.campus_cd', '=', 'room_names.code');
         //             })
-        //             ->where('notice.notice_id', '=', $notice_id)
+        //             ->where('notices.notice_id', '=', $notice_id)
         //             ->firstOrFail();
 
         //         return $notice;
@@ -306,16 +306,16 @@ class NoticeController extends Controller
         //                 'regist_time AS date',
         //                 'title',
         //                 'text AS body',
-        //                 'office.name AS sender',
+        //                 'admin_users.name AS sender',
         //                 'room_name'
         //             )
         //             // 送信者名の取得
-        //             ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+        //             ->sdLeftJoin(AdminUser::class, 'admin_users.adm_id', '=', 'notices.adm_id')
         //             // 教室名の取得
         //             ->leftJoinSub($room_names, 'room_names', function ($join) {
-        //                 $join->on('notice.roomcd', '=', 'room_names.code');
+        //                 $join->on('notices.campus_cd', '=', 'room_names.code');
         //             })
-        //             ->where('notice.notice_id', '=', $notice_id)
+        //             ->where('notices.notice_id', '=', $notice_id)
         //             ->firstOrFail();
 
         //         return $notice;
@@ -333,16 +333,16 @@ class NoticeController extends Controller
         //                 'title',
         //                 'text AS body',
         //                 'notice_type AS type',
-        //                 'office.name AS sender',
+        //                 'admin_users.name AS sender',
         //                 'room_name'
         //             )
         //             // 送信者名の取得
-        //             ->sdLeftJoin(Office::class, 'office.adm_id', '=', 'notice.adm_id')
+        //             ->sdLeftJoin(AdminUser::class, 'admin_users.adm_id', '=', 'notices.adm_id')
         //             // 教室名の取得
         //             ->leftJoinSub($room_names, 'room_names', function ($join) {
-        //                 $join->on('notice.roomcd', '=', 'room_names.code');
+        //                 $join->on('notices.campus_cd', '=', 'room_names.code');
         //             })
-        //             ->where('notice.notice_id', '=', $notice_id)
+        //             ->where('notices.notice_id', '=', $notice_id)
         //             ->firstOrFail();
 
         //             return $notice;
@@ -360,20 +360,20 @@ class NoticeController extends Controller
      *
      * @return mixed 生徒情報
      */
-    private function getStudentKihon()
+    private function getStudentInfo()
     {
         // ログイン者の情報を取得する。
         $account = Auth::user();
         $account_id = $account->account_id;
 
         // 生徒情報から学年・入会日を取得する。
-        $query = ExtStudentKihon::query();
+        $query = Student::query();
         $student = $query
             ->select(
-                'cls_cd',
+                'grade_cd',
                 'enter_date'
             )
-            ->where('ext_student_kihon.sid', '=', $account_id)
+            ->where('student_id', '=', $account_id)
             ->firstOrFail();
 
         return $student;
@@ -398,22 +398,22 @@ class NoticeController extends Controller
         $prev_fiscal_end_date = $this->dtGetFiscalDate("prev", "end", true);
 
         // 生徒情報から学年・入会日を取得する。
-        $student = $this->getStudentKihon();
-        $present_cls = $student->cls_cd;
+        $student = $this->getStudentInfo();
+        $present_cls = $student->grade_cd;
 
         // 生徒No.から所属教室を取得する。
-        $query = ExtRoom::query();
+        $query = StudentCampus::query();
         $rooms = $query
             ->select(
-                'roomcd'
+                'campus_cd'
             )
-            ->where('ext_room.sid', '=', $account_id)
+            ->where('student_id', '=', $account_id)
             ->get();
 
-        // 複数所属の場合を考慮し、roomcdを取り出す。
+        // 複数所属の場合を考慮し、campus_cdを取り出す。
         $roomcds = [];
         foreach ($rooms as $room) {
-            array_push($roomcds, $room->roomcd);
+            array_push($roomcds, $room->campus_cd);
         }
 
         // 生徒の学年からお知らせグループIDを取り出す。
@@ -422,7 +422,7 @@ class NoticeController extends Controller
             ->select(
                 'notice_group_id'
             )
-            ->where('notice_group.cls_cd', '=', $present_cls)
+            ->where('cls_cd', '=', $present_cls)
             ->first();
 
         if (isset($notice_groups['notice_group_id'])) {
@@ -438,7 +438,7 @@ class NoticeController extends Controller
                 'notice_group_id',
                 'cls_cd'
             )
-            ->Where('notice_group.cls_cd_next', '=', $student->cls_cd)
+            ->Where('cls_cd_next', '=', $student->grade_cd)
             ->first();
 
         if (isset($notice_groups_prev['notice_group_id'])) {
@@ -451,39 +451,39 @@ class NoticeController extends Controller
         $query = NoticeDestination::query();
         $notice_destinations = $query
             ->select(
-                'notice_destination.notice_id'
+                'notice_destinations.notice_id'
             )
-            ->sdLeftJoin(Notice::class, 'notice.notice_id', '=', 'notice_destination.notice_id')
-            ->where('notice_destination.destination_type', '=', AppConst::CODE_MASTER_15_2)
-            ->where('notice_destination.sid', '=', $account_id)
-            ->whereBetween('notice.regist_time', [$prev_fiscal_start_date, $fiscal_end_date])
+            ->sdLeftJoin(Notice::class, 'notices.notice_id', '=', 'notice_destinations.notice_id')
+            ->where('destination_type', '=', AppConst::CODE_MASTER_15_2)
+            ->where('student_id', '=', $account_id)
+            ->whereBetween('notices.regist_time', [$prev_fiscal_start_date, $fiscal_end_date])
             ->get();
 
         // 宛先情報から対象となるグループ一斉のお知らせIDを抽出する。
         $query = NoticeDestination::query();
         $notice_destinations_group = $query
             ->select(
-                'notice_destination.notice_id',
+                'notice_destinations.notice_id',
                 'regist_time'
             )
-            ->sdLeftJoin(Notice::class, 'notice.notice_id', '=', 'notice_destination.notice_id')
-            ->where('notice_destination.destination_type', '=', AppConst::CODE_MASTER_15_1)
+            ->sdLeftJoin(Notice::class, 'notices.notice_id', '=', 'notice_destinations.notice_id')
+            ->where('destination_type', '=', AppConst::CODE_MASTER_15_1)
             ->where(function ($orQuery) use ($present_group_id, $prev_group_id, $fiscal_start_date, $fiscal_end_date, $prev_fiscal_start_date, $prev_fiscal_end_date) {
                 $orQuery
                     ->where(function ($orQuery) use ($present_group_id, $fiscal_start_date, $fiscal_end_date) {
                         $orQuery
-                            ->where('notice_destination.notice_group_id', '=', $present_group_id)
-                            ->whereBetween('notice.regist_time', [$fiscal_start_date, $fiscal_end_date]);
+                            ->where('notice_group_id', '=', $present_group_id)
+                            ->whereBetween('notices.regist_time', [$fiscal_start_date, $fiscal_end_date]);
                     })
                     ->orWhere(function ($orQuery) use ($prev_group_id, $prev_fiscal_start_date, $prev_fiscal_end_date) {
                         $orQuery
-                            ->where('notice_destination.notice_group_id', '=', $prev_group_id)
-                            ->whereBetween('notice.regist_time', [$prev_fiscal_start_date, $prev_fiscal_end_date]);
+                            ->where('notice_group_id', '=', $prev_group_id)
+                            ->whereBetween('notices.regist_time', [$prev_fiscal_start_date, $prev_fiscal_end_date]);
                     });
             })
             ->where(function ($orQuery) use ($roomcds) {
-                $orQuery->whereIn('notice_destination.roomcd', $roomcds)
-                    ->orWhereNull('notice_destination.roomcd');
+                $orQuery->whereIn('notice_destinations.campus_cd', $roomcds)
+                    ->orWhereNull('notice_destinations.campus_cd');
             })
             ->get();
 
@@ -524,7 +524,7 @@ class NoticeController extends Controller
             ->select(
                 'notice_group_id'
             )
-            ->where('notice_group.group_type', AppConst::NOTICE_GROUP_TYPE_2)
+            ->where('group_type', AppConst::NOTICE_GROUP_TYPE_2)
             ->get();
 
         $notice_group_ids = [];
@@ -539,24 +539,24 @@ class NoticeController extends Controller
         $query = NoticeDestination::query();
         $notice_destinations = $query
             ->select(
-                'notice_destination.notice_id'
+                'notice_destinations.notice_id'
             )
-            ->sdLeftJoin(Notice::class, 'notice.notice_id', '=', 'notice_destination.notice_id')
-            ->where('notice_destination.destination_type', '=', AppConst::CODE_MASTER_15_3)
-            ->where('notice_destination.tid', '=', $account_id)
-            ->whereBetween('notice.regist_time', [$prev_fiscal_start_date, $fiscal_end_date])
+            ->sdLeftJoin(Notice::class, 'notices.notice_id', '=', 'notice_destinations.notice_id')
+            ->where('destination_type', '=', AppConst::CODE_MASTER_15_3)
+            ->where('tutor_id', '=', $account_id)
+            ->whereBetween('notices.regist_time', [$prev_fiscal_start_date, $fiscal_end_date])
             ->get();
 
         // 宛先情報から対象となるグループ一斉のお知らせIDを抽出する。
         $query = NoticeDestination::query();
         $notice_destinations_group = $query
             ->select(
-                'notice_destination.notice_id'
+                'notice_destinations.notice_id'
             )
-            ->sdLeftJoin(Notice::class, 'notice.notice_id', '=', 'notice_destination.notice_id')
-            ->where('notice_destination.destination_type', '=', AppConst::CODE_MASTER_15_1)
-            ->whereIn('notice_destination.notice_group_id', $notice_group_ids)
-            ->whereBetween('notice.regist_time', [$prev_fiscal_start_date, $fiscal_end_date])
+            ->sdLeftJoin(Notice::class, 'notices.notice_id', '=', 'notice_destinations.notice_id')
+            ->where('destination_type', '=', AppConst::CODE_MASTER_15_1)
+            ->whereIn('.notice_group_id', $notice_group_ids)
+            ->whereBetween('notices.regist_time', [$prev_fiscal_start_date, $fiscal_end_date])
             ->get();
 
         // お知らせIDを抽出する。
@@ -598,7 +598,7 @@ class NoticeController extends Controller
                 $notice_ids = $this->getStudentNoticeIds();
 
                 // 生徒情報の取得
-                $student = $this->getStudentKihon();
+                $student = $this->getStudentInfo();
 
                 // 生徒入会日
                 $enter_date = $student->enter_date;
@@ -606,13 +606,13 @@ class NoticeController extends Controller
                 // お知らせIDから生徒入会日以降のお知らせを取得する。
                 Notice::query()
                     // 対象のお知らせIDで絞る
-                    ->whereIn('notice.notice_id', $notice_ids)
+                    ->whereIn('notice_id', $notice_ids)
                     // 入会日がある場合は、入会日以降のデータを取得
                     ->when($enter_date, function ($query, $enter_date) {
-                        return $query->where('notice.regist_time', '>=', $enter_date);
+                        return $query->where('regist_time', '>=', $enter_date);
                     })
                     // キー項目指定されたお知らせID
-                    ->where('notice.notice_id', '=', $noticeId)
+                    ->where('notice_id', '=', $noticeId)
                     // 見つからない場合はエラー
                     ->firstOrFail();
 
@@ -629,9 +629,9 @@ class NoticeController extends Controller
                 // こっちはSQL発行しなくても$notice_idsの存在チェックで良いが、生徒に合わせた
                 Notice::query()
                     // 対象のお知らせIDで絞る
-                    ->whereIn('notice.notice_id', $notice_ids)
+                    ->whereIn('notice_id', $notice_ids)
                     // キー項目指定されたお知らせID
-                    ->where('notice.notice_id', '=', $noticeId)
+                    ->where('notice_id', '=', $noticeId)
                     // 見つからない場合はエラー
                     ->firstOrFail();
 

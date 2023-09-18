@@ -45,7 +45,7 @@ use App\Models\ExtRoom;
 use App\Models\Account;
 use App\Models\LeaveApply;
 use App\Models\WeeklyShift;
-use App\Models\Office;
+use App\Models\AdminUser;
 use App\Models\ExtRirekisho;
 use App\Models\ExtStudentKihon;
 use App\Models\PasswordResets;
@@ -503,7 +503,7 @@ class ExceedingDataDelete extends Command
                 // 事務局アカウントから削除
                 $office_count = 0;
                 foreach ($officers as $data) {
-                    $count = Office::where('adm_id', '=', $data->account_id)
+                    $count = AdminUser::where('adm_id', '=', $data->account_id)
                         ->forceDelete();
                     $office_count += $count;
                 }

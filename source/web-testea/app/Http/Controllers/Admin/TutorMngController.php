@@ -96,12 +96,12 @@ class TutorMngController extends Controller
                 'tid',
                 'name',
                 // メールアドレス
-                'account.email',
+                'accounts.email',
             )
             // アカウントテーブルをLeftJOIN ->JOINとする（削除教師非表示対応）
             ->sdJoin(Account::class, function ($join) {
-                $join->on('ext_rirekisho.tid', '=', 'account.account_id')
-                    ->where('account.account_type', AppConst::CODE_MASTER_7_2);
+                $join->on('ext_rirekisho.tid', '=', 'accounts.account_id')
+                    ->where('accounts.account_type', AppConst::CODE_MASTER_7_2);
             })
             ->orderby('tid');
 
@@ -160,12 +160,12 @@ class TutorMngController extends Controller
         //     'tid',
         //     'name',
         //     // メールアドレス
-        //     'account.email',
+        //     'accounts.email',
         // )
         //     // アカウントテーブルをLeftJOIN
         //     ->sdLeftJoin(Account::class, function ($join) {
-        //         $join->on('ext_rirekisho.tid', '=', 'account.account_id')
-        //             ->where('account.account_type', AppConst::CODE_MASTER_7_2);
+        //         $join->on('ext_rirekisho.tid', '=', 'accounts.account_id')
+        //             ->where('accounts.account_type', AppConst::CODE_MASTER_7_2);
         //     })
         //     // IDを指定
         //     ->where('tid', $tid)

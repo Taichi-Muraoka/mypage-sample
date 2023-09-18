@@ -128,7 +128,7 @@ class ReportRegistController extends Controller
                 'report_id as id',
                 'lesson_date',
                 'start_time',
-                'room_names.room_name_full as room_name',
+                'room_names.room_name as room_name',
                 'ext_student_kihon.name as sname',
                 'r_minutes'
             )
@@ -237,7 +237,7 @@ class ReportRegistController extends Controller
         //     ->select(
         //         'lesson_date',
         //         'start_time',
-        //         'room_names.room_name_full as room_name',
+        //         'room_names.room_name as room_name',
         //         'ext_student_kihon.name as sname',
         //         'r_minutes',
         //         'content',
@@ -311,7 +311,7 @@ class ReportRegistController extends Controller
         //---------------------------
         // 教室を返却する
         //---------------------------
-        $room_name_full = null;
+        $room_name = null;
         if (filled($schedule_id)) {
             // idが指定されている場合のみ
 
@@ -325,7 +325,7 @@ class ReportRegistController extends Controller
             $query = ExtSchedule::query();
             $lesson = $query
                 ->select(
-                    'room_name_full'
+                    'room_name'
                 )
                 // 教室名の取得
                 ->leftJoinSub($room_names, 'room_names', function ($join) {
@@ -338,12 +338,12 @@ class ReportRegistController extends Controller
                 ->firstOrFail();
 
             // 変数にセット
-            $room_name_full = $lesson->room_name_full;
+            $room_name = $lesson->room_name;
         }
 
         return [
             'selectItems' => $this->objToArray($scheduleMaster),
-            'class_name' => $room_name_full
+            'class_name' => $room_name
         ];
     }
 
@@ -488,7 +488,7 @@ class ReportRegistController extends Controller
         //         'lesson_type',
         //         'lesson_date',
         //         'start_time',
-        //         'room_names.room_name_full as class_name',
+        //         'room_names.room_name as class_name',
         //         'ext_student_kihon.name as student_name',
         //         'r_minutes',
         //         'content',

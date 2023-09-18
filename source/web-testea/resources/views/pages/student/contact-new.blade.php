@@ -15,7 +15,7 @@
 
     <p>教室または本部へ問い合わせを行います。</p>
 
-    <x-input.select caption="宛先" id="roomcd" :select2=true >
+    <x-input.select caption="宛先" id="campus_cd" :select2=true >
         <option value="110">久我山</option>
         <option value="160">西永福</option>
         <option value="900">本郷</option>

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Contact;
 use Illuminate\Support\Facades\Auth;
 use App\Consts\AppConst;
-use App\Models\Office;
+use App\Models\AdminUser;
 use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncContactTrait;
 use Illuminate\Support\Carbon;
@@ -65,20 +65,20 @@ class ContactController extends Controller
                 'regist_time',
                 'title',
                 'answer_time',
-                'office.name',
+                'admin_users.name',
                 'rooms.room_name',
-                'contact.created_at'
+                'contacts.created_at'
             )
             // 管理者名を取得
-            ->sdLeftJoin(Office::class, 'contact.adm_id', '=', 'office.adm_id')
+            ->sdLeftJoin(AdminUser::class, 'contacts.adm_id', '=', 'admin_users.adm_id')
             // 教室名を取得
             ->leftJoinSub($rooms, 'rooms', function ($join) {
-                $join->on('contact.roomcd', '=', 'rooms.code');
+                $join->on('contacts.campus_cd', '=', 'rooms.code');
             })
             // 自分の生徒IDのみにガードを掛ける
             ->where($this->guardStudentTableWithSid())
             ->orderBy('regist_time', 'desc')
-            ->orderBy('contact.created_at', 'desc');
+            ->orderBy('contacts.created_at', 'desc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $contactList);
@@ -111,20 +111,20 @@ class ContactController extends Controller
                 'title',
                 'text',
                 'answer_time',
-                'office.name',
+                'admin_users.name',
                 'answer_text',
                 'roomContact.room_name',
-                'roomOffice.room_name as affiliation'
+                'roomAdmin.room_name as affiliation'
             )
             // キー項目
             ->where('contact_id', $id)
-            ->sdLeftJoin(Office::class, 'contact.adm_id', '=', 'office.adm_id')
+            ->sdLeftJoin(AdminUser::class, 'contacts.adm_id', '=', 'admin_users.adm_id')
             // 教室・所属の取得
             ->leftJoinSub($rooms, 'roomContact', function ($join) {
-                $join->on('contact.roomcd', '=', 'roomContact.code');
+                $join->on('contacts.campus_cd', '=', 'roomContact.code');
             })
-            ->leftJoinSub($rooms, 'roomOffice', function ($join) {
-                $join->on('office.roomcd', '=', 'roomOffice.code');
+            ->leftJoinSub($rooms, 'roomAdmin', function ($join) {
+                $join->on('admin_users.campus_cd', '=', 'roomAdmin.code');
             })
             // 自分の生徒IDのみにガードを掛ける
             ->where($this->guardStudentTableWithSid())
@@ -171,7 +171,7 @@ class ContactController extends Controller
         // フォームから受け取った値を格納
         $form = $request->only(
             // roomcdのガードのチェックはvalidationRoomListのバリデーションで行っている
-            'roomcd',
+            'campus_cd',
             'title',
             'text'
         );
@@ -223,7 +223,7 @@ class ContactController extends Controller
 
         $rules = array();
 
-        $rules += Contact::fieldRules('roomcd', ['required', $validationRoomList]);
+        $rules += Contact::fieldRules('campus_cd', ['required', $validationRoomList]);
         $rules += Contact::fieldRules('title', ['required']);
         $rules += Contact::fieldRules('text', ['required']);
 

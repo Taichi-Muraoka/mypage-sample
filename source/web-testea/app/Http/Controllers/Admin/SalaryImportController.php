@@ -71,8 +71,8 @@ class SalaryImportController extends Controller
                 'name AS state_name'
             )
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('salary_import.import_state', '=', 'code_master.code')
-                    ->where('code_master.data_type', AppConst::CODE_MASTER_20);
+                $join->on('salary_import.import_state', '=', 'mst_codes.code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_20);
             })
             ->where('salary_date', '<=', $present_month)
             ->orderBy('salary_date', 'desc');

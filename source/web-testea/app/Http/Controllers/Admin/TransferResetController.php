@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Lang;
 use App\Exceptions\ReadDataValidateException;
 use App\Models\ExtStudentKihon;
 use App\Models\BatchMng;
-use App\Models\Office;
+use App\Models\AdminUser;
 use App\Models\CodeMaster;
 use App\Consts\AppConst;
 

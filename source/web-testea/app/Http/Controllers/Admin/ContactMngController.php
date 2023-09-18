@@ -5,15 +5,14 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Office;
+use App\Models\AdminUser;
 use App\Consts\AppConst;
 use App\Models\CodeMaster;
 use App\Models\Contact;
-use App\Models\ExtStudentKihon;
+use App\Models\Student;
 use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncContactTrait;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 /**
  * 問い合わせ管理 - コントローラ
@@ -94,7 +93,7 @@ class ContactMngController extends Controller
 
         // MEMO: 一覧検索の条件はスコープで指定する
         // 問い合わせの宛先の教室の検索
-        $query->SearchRoomcd($form);
+        $query->SearchCampusCd($form);
 
         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
         $query->where($this->guardRoomAdminTableWithRoomCd());
@@ -103,33 +102,33 @@ class ContactMngController extends Controller
         $query->SearchContactStates($form);
 
         // 生徒名の検索(生徒基本情報参照)
-        (new ExtStudentKihon)->scopeSearchName($query, $form);
+        (new Student)->scopeSearchName($query, $form);
 
         $contactList = $query
             ->select(
                 'contact_id',
                 'regist_time',
                 'room.room_name',
-                'ext_student_kihon.name as sname',
+                'students.name as sname',
                 'title',
-                'code_master.name as contact_state',
-                'contact.created_at'
+                'mst_codes.name as contact_state',
+                'contacts.created_at'
             )
             // 名前を検索できるようにテーブルを結合
-            ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
-                $join->on('contact.sid', '=', 'ext_student_kihon.sid');
+            ->sdLeftJoin(Student::class, function ($join) {
+                $join->on('contacts.student_id', '=', 'students.student_id');
             })
             // 宛先と教室名の結合
             ->Leftjoinsub($rooms, 'room', function ($join) {
-                $join->on('contact.roomcd', '=', 'room.code');
+                $join->on('contacts.campus_cd', '=', 'room.code');
             })
             // 回答状態取得
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('contact.contact_state', '=', 'code_master.code')
+                $join->on('contacts.contact_state', '=', 'mst_codes.code')
                     ->where('data_type', AppConst::CODE_MASTER_17);
             })
             ->orderBy('regist_time', 'desc')
-            ->orderBy('contact.created_at', 'desc');
+            ->orderBy('contacts.created_at', 'desc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $contactList);
@@ -164,33 +163,33 @@ class ContactMngController extends Controller
         $contactList = $query
             ->select(
                 'regist_time',
-                'room_contact.room_name',
-                'ext_student_kihon.name as sname',
+                'room_contacts.room_name',
+                'students.name as sname',
                 'title',
                 'text',
                 'answer_time',
-                'room_office.room_name as affiliation',
-                'office.name as answer_name',
+                'room_admin.room_name as affiliation',
+                'admin_users.name as answer_name',
                 'answer_text',
-                'code_master.name as contact_state'
+                'mst_codes.name as contact_state'
             )
             ->where('contact_id', $id)
             // 宛先と教室名の結合
             ->leftJoinSub($rooms, 'room_contact', function ($join) {
-                $join->on('contact.roomcd', '=', 'room_contact.code');
+                $join->on('contacts.campus_cd', '=', 'room_contacts.code');
             })
             // 生徒名取得
-            ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
-                $join->on('contact.sid', '=', 'ext_student_kihon.sid');
+            ->sdLeftJoin(Student::class, function ($join) {
+                $join->on('contacts.student_id', '=', 'students.student_id');
             })
             // 回答者所属取得
-            ->sdLeftJoin(Office::class, 'contact.adm_id', '=', 'office.adm_id')
-            ->leftJoinSub($rooms, 'room_office', function ($join) {
-                $join->on('office.roomcd', '=', 'room_office.code');
+            ->sdLeftJoin(AdminUser::class, 'contacts.adm_id', '=', 'admin_users.adm_id')
+            ->leftJoinSub($rooms, 'room_admin', function ($join) {
+                $join->on('admin_users.campus_cd', '=', 'room_admin_users.code');
             })
             // 回答状態取得
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('contact.contact_state', '=', 'code_master.code')
+                $join->on('contacts.contact_state', '=', 'mst_codes.code')
                     ->where('data_type', AppConst::CODE_MASTER_17);
             })
             ->firstOrFail();
@@ -231,9 +230,9 @@ class ContactMngController extends Controller
             }
         };
 
-        $rules += Contact::fieldRules('roomcd', [$validationRoomList]);
+        $rules += Contact::fieldRules('campus_cd', [$validationRoomList]);
         $rules += Contact::fieldRules('contact_state', [$validationStateList]);
-        $rules += ExtStudentKihon::fieldRules('name');
+        $rules += Student::fieldRules('name');
 
         return $rules;
     }
@@ -266,11 +265,11 @@ class ContactMngController extends Controller
         $editData = Contact::select(
             '*',
             // 生徒名の取得
-            'ext_student_kihon.name'
+            'students.name'
         )
             // 生徒基本情報とJOIN
-            ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
-                $join->on('contact.sid', '=', 'ext_student_kihon.sid');
+            ->sdLeftJoin(Student::class, function ($join) {
+                $join->on('contacts.student_id', '=', 'students.student_id');
             })
             ->where('contact_id', $contactId)
             // 教室管理者の場合、自分の教室コードのみにガードを掛ける
@@ -309,7 +308,7 @@ class ContactMngController extends Controller
         $form = $request->only(
             'contact_id',
             'regist_time',
-            'roomcd',
+            'campus_cd',
             'title',
             'text',
             'adm_id',
@@ -413,7 +412,7 @@ class ContactMngController extends Controller
         };
 
         $rules += Contact::fieldRules('regist_time', ['required']);
-        $rules += Contact::fieldRules('roomcd', ['required', $validationRoomList]);
+        $rules += Contact::fieldRules('campus_cd', ['required', $validationRoomList]);
         $rules += Contact::fieldRules('title', ['required']);
         $rules += Contact::fieldRules('text', ['required']);
         $rules += Contact::fieldRules('adm_id', [$validationAdmList]);

@@ -31,11 +31,11 @@ export default class AppClass extends PageBase {
                 // 教室プルダウン変更イベント
                 selectChangeGetRoom: function(event) {
                     // 生徒プルダウンをクリア
-                    this.form.sid = "";
+                    this.form.student_id = "";
                     Vue.set(this, "selectGetItem", {});
 
                     // チェンジイベントを発生させる
-                    var selected = this.form.roomcd;
+                    var selected = this.form.campus_cd;
                     self._selectChangeGet(this, selected, this.option);
                 }
             }

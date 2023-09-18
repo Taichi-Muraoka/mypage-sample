@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Account;
-use App\Models\Office;
+use App\Models\AdminUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -79,7 +79,7 @@ class AccountMngController extends Controller
         $form = $request->all();
 
         // クエリを作成
-        $query = Office::query();
+        $query = AdminUser::query();
 
         // MEMO: 一覧検索の条件はスコープで指定する
         // 教室の検索
@@ -88,7 +88,7 @@ class AccountMngController extends Controller
             $query->where($this->guardRoomAdminTableWithRoomCd());
         } else {
             // 管理者の場合検索フォームから取得
-            $query->SearchRoomcd($form);
+            $query->SearchCampusCd($form);
         }
         // 氏名の検索
         $query->SearchName($form);
@@ -101,17 +101,17 @@ class AccountMngController extends Controller
             ->select(
                 'adm_id',
                 'name',
-                'roomcd',
+                'campus_cd',
                 // 汎用マスタの教室名称2
                 'rooms.room_name'
             )
             ->leftJoinSub($subquery, 'rooms', function ($join) {
-                $join->on('office.roomcd', '=', 'rooms.code');
+                $join->on('admin_users.campus_cd', '=', 'rooms.code');
             })
             // アカウントテーブルとJOIN（削除管理者非表示対応）
             ->sdJoin(Account::class, function ($join) {
-                $join->on('office.adm_id', '=', 'account.account_id')
-                    ->where('account.account_type', '=', AppConst::CODE_MASTER_7_3);
+                $join->on('admin_users.adm_id', '=', 'accounts.account_id')
+                    ->where('accounts.account_type', '=', AppConst::CODE_MASTER_7_3);
             })
             ->orderby('adm_id');
 
@@ -134,7 +134,7 @@ class AccountMngController extends Controller
         $id = $request->input('id');
 
         // クエリを作成
-        $query = Office::query();
+        $query = AdminUser::query();
 
         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
         $query->where($this->guardRoomAdminTableWithRoomCd());
@@ -144,21 +144,21 @@ class AccountMngController extends Controller
 
         $office = $query
             // IDを指定
-            ->where('office.adm_id', $id)
+            ->where('admin_users.adm_id', $id)
             // データを取得
             ->select(
-                'account.email',
-                'office.name',
+                'accounts.email',
+                'admin_users.name',
                 'rooms.room_name'
             )
             // アカウントテーブルをLeftJOIN
             ->sdLeftJoin(Account::class, function ($join) {
-                $join->on('office.adm_id', '=', 'account.account_id')
-                    ->where('account.account_type', AppConst::CODE_MASTER_7_3);
+                $join->on('admin_users.adm_id', '=', 'accounts.account_id')
+                    ->where('accounts.account_type', AppConst::CODE_MASTER_7_3);
             })
             // 教室名取得のサブクエリをLeftJOIN
             ->leftJoinSub($subquery, 'rooms', function ($join) {
-                $join->on('office.roomcd', '=', 'rooms.code');
+                $join->on('admin_users.campus_cd', '=', 'rooms.code');
             })
             // MEMO: 取得できない場合はエラーとする
             ->firstOrFail();
@@ -187,8 +187,8 @@ class AccountMngController extends Controller
         };
         // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
         // その他を第二引数で指定する
-        $rules += Office::fieldRules('name');
-        $rules += Office::fieldRules('roomcd', [$validationRoomList]);
+        $rules += AdminUser::fieldRules('name');
+        $rules += AdminUser::fieldRules('campus_cd', [$validationRoomList]);
 
         return $rules;
     }
@@ -229,7 +229,7 @@ class AccountMngController extends Controller
         // 教室管理者の場合、自分の教室コード以外はエラーとする
         if (AuthEx::isRoomAdmin()) {
             $account = Auth::user();
-            if ($request['roomcd'] !== $account->roomcd) {
+            if ($request['campus_cd'] !== $account->campus_cd) {
                 return $this->responseErr();
             }
         }
@@ -239,7 +239,7 @@ class AccountMngController extends Controller
             // Officeテーブルへのinsert
             $form = $request->only(
                 'name',
-                'roomcd'
+                'campus_cd'
             );
             $office = new Office;
             // 登録
@@ -285,13 +285,13 @@ class AccountMngController extends Controller
         $rooms = $this->mdlGetRoomList(true);
 
         // クエリを作成(PKでユニークに取る)
-        $office = Office::select('office.adm_id', 'account.email', 'office.name', 'office.roomcd', 'account.email as before_email')
+        $office = AdminUser::select('admin_users.adm_id', 'accounts.email', 'admin_users.name', 'admin_users.campus_cd', 'accounts.email as before_email')
             // アカウントテーブルをLeftJOIN
             ->sdLeftJoin(Account::class, function ($join) {
-                $join->on('office.adm_id', '=', 'account.account_id')
-                    ->where('account.account_type', AppConst::CODE_MASTER_7_3);
+                $join->on('admin_users.adm_id', '=', 'accounts.account_id')
+                    ->where('accounts.account_type', AppConst::CODE_MASTER_7_3);
             })
-            ->where('office.adm_id', $admId)
+            ->where('admin_users.adm_id', $admId)
             // 教室管理者の場合、自分の教室コードのみにガードを掛ける
             ->where($this->guardRoomAdminTableWithRoomCd())
             // 該当データがない場合はエラーを返す
@@ -318,7 +318,7 @@ class AccountMngController extends Controller
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
         // officeテーブルより対象データを取得(PKでユニークに取る)
-        $office = Office::where('adm_id', $request['adm_id'])
+        $office = AdminUser::where('adm_id', $request['adm_id'])
             // 教室管理者の場合、自分の教室コードのみにガードを掛ける
             ->where($this->guardRoomAdminTableWithRoomCd())
             // 該当データがない場合はエラーを返す
@@ -335,7 +335,7 @@ class AccountMngController extends Controller
             // officeテーブルのupdate
             $form = $request->only(
                 'name',
-                'roomcd'
+                'campus_cd'
             );
             // 登録
             $office->fill($form)->save();
@@ -375,7 +375,7 @@ class AccountMngController extends Controller
         $form = $request->all();
 
         // officeテーブルより対象データを取得(PKでユニークに取る)
-        Office::where('adm_id', $request['adm_id'])
+        AdminUser::where('adm_id', $request['adm_id'])
             // 教室管理者の場合、自分の教室コードのみにガードを掛ける
             ->where($this->guardRoomAdminTableWithRoomCd())
             // 該当データがない場合はエラーを返す
@@ -463,8 +463,8 @@ class AccountMngController extends Controller
         // 新規登録時は必須。更新時は任意。
         $rules += Account::fieldRules('password', ['required_without:adm_id']);
 
-        $rules += Office::fieldRules('name', ['required']);
-        $rules += Office::fieldRules('roomcd', ['required', $validationRoomList]);
+        $rules += AdminUser::fieldRules('name', ['required']);
+        $rules += AdminUser::fieldRules('campus_cd', ['required', $validationRoomList]);
 
         return $rules;
     }
