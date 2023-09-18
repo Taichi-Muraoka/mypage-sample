@@ -12,85 +12,50 @@
 <x-bs.card :form=true>
 
     {{-- hidden --}}
-    <x-input.hidden id="roomcd" :editData=$editData />
+    <x-input.hidden id="campus_cd" :editData=$editData />
     <x-input.hidden id="kind" :editData=$editData />
     <x-input.hidden id="schedule_id" :editData=$editData />
 
     <p>スケジュールの{{(request()->routeIs('room_calendar-edit')) ? '変更' : ((request()->routeIs('room_calendar-new')) ? '登録' : 'コピー登録')}}を行います。</p>
 
     <x-bs.form-title>校舎</x-bs.form-title>
-    <p class="edit-disp-indent">久我山</p>
+    <p class="edit-disp-indent">{{$editData['name']}}</p>
 
     @if (!isset( $editData['kind']))
-    <x-input.select caption="コース名" id="course_cd" :select2=true :select2Search=false :editData="$editData">
-        <option value="1" selected>個別指導コース</option>
-        <option value="2">１対２コース</option>
-        <option value="3">１対３コース</option>
-        <option value="4">集団指導</option>
-        <option value="6">演習</option>
-        <option value="7">ハイプラン</option>
-        <option value="5">その他・自習</option>
-        <option value="9">面談</option>
-    </x-input.select>
-
+        <x-input.select id="course_cd" caption="コース" :select2=true :mastrData=$courses :editData=$editData
+            :select2Search=false :blank=false />
     @elseif(isset( $editData['kind']))
     <x-bs.form-title>コース名</x-bs.form-title>
     <p class="edit-disp-indent">個別指導コース</p>
-    <x-input.hidden id="course_cd" :editData=$editData value="1"/>
+    <x-input.hidden id="course_cd" :editData=$editData />
     @endif
 
-    <x-input.select caption="ブース" id="classroomcd" :select2=true :editData="$editData">
-        <option value="1" selected>Aテーブル</option>
-        <option value="2">Bテーブル</option>
-        <option value="3">Cテーブル</option>
-    </x-input.select>
+    <x-input.select id="booth_cd" caption="ブース" :select2=true :mastrData=$booths :editData=$editData
+        :select2Search=true :blank=true />
 
-    <x-input.date-picker caption="日付" id="curDate" :editData=$editData />
+    <x-input.date-picker caption="日付" id="target_date" :editData=$editData />
 
-    @if (!isset( $editData['kind']) || (isset( $editData['kind']) && $editData['kind'] != 9))
-    <x-input.select caption="時限" id="period" :select2=true :editData="$editData">
-        <option value="1">1限</option>
-        <option value="2">2限</option>
-        <option value="3">3限</option>
-        <option value="4">4限</option>
-        <option value="5">5限</option>
-        <option value="6">6限</option>
-        <option value="7">7限</option>
-    </x-input.select>
-    @endif
+    <x-input.select id="period_no" caption="時限" :select2=true :mastrData=$periods :editData=$editData
+        :select2Search=false :blank=true />
 
     <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules :editData=$editData />
 
     <x-input.time-picker caption="終了時刻" id="end_time" :rules=$rules :editData=$editData />
 
     @if (!isset( $editData['kind']) || (isset( $editData['kind']) && $editData['kind'] != 9))
-    <x-input.select vShow="form.course_cd != 5" caption="講師" id="tid" :select2=true :editData="$editData">
-        <option value="1">CWテスト教師１</option>
-        <option value="2">CWテスト教師２</option>
-    </x-input.select>
-
+    <x-input.select vShow="form.course_cd != '90100'" caption="講師" id="tutor_id" :select2=true :mastrData=$tutors :editData=$editData
+        :select2Search=true :blank=true />
     <div v-cloak>
-        <x-input.select vShow="form.course_cd != 4" caption="生徒" id="sid" :select2=true :editData="$editData">
-            <option value="1">CWテスト生徒１</option>
-            <option value="2">CWテスト生徒２</option>
-            <option value="3">CWテスト生徒３</option>
-        </x-input.select>
+        <x-input.select vShow="form.course_cd != '20100'" caption="生徒" id="student_id" :select2=true :mastrData=$students :editData="$editData"
+            :select2Search=true :blank=true />
 
-        <x-input.select vShow="form.course_cd == 4" caption="受講生徒選択" id="sid2" :select2=true :editData="$editData" multiple>
-            <option value="1">CWテスト生徒１</option>
-            <option value="2">CWテスト生徒２</option>
-            <option value="3">CWテスト生徒３</option>
-        </x-input.select>
+        <x-input.select vShow="form.course_cd == '20100'" caption="受講生徒選択" id="sid2" :select2=true :mastrData=$students :editData="$editData"
+            :select2Search=true :blank=true multiple />
     </div>
 
     <div v-cloak>
-    <x-input.select vShow="form.course_cd != 5" caption="科目" id="subject_cd" :select2=true :select2Search=false :editData="$editData">
-        <option value="1" selected>国語</option>
-        <option value="2">数学</option>
-        <option value="3">理科</option>
-        <option value="4">社会</option>
-        <option value="5">英語</option>
-    </x-input.select>
+    <x-input.select vShow="form.course_cd != 5" caption="科目" id="subject_cd"  :select2=true :mastrData=$subjects :editData="$editData"
+        :select2Search=true :blank=true />
 
     <x-input.select vShow="form.course_cd != 5" caption="授業区分" id="status" :select2=true :select2Search=false :editData="$editData">
         <option value="1" selected>通常</option>
@@ -135,9 +100,7 @@
         <option value="4">振替中</option>
         <option value="5">振替済</option>
     </x-input.select>
-
     @endif
-
     @if (request()->routeIs('room_calendar-new'))
     {{-- 登録時 --}}
     {{-- 余白 --}}

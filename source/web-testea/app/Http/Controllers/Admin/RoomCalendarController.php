@@ -7,8 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
-use App\Models\ExtSchedule;
-use App\Models\ExtGenericMaster;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Schedule;
+use App\Models\YearlySchedule;
+use App\Models\MstTimetable;
+use App\Models\MstCampus;
 use App\Models\CodeMaster;
 use App\Models\Account;
 use App\Http\Controllers\Traits\FuncCalendarTrait;
@@ -45,8 +48,8 @@ class RoomCalendarController extends Controller
     public function calendar()
     {
 
-//        // IDのバリデーション
-//        $this->validateIds($roomcd);
+        //        // IDのバリデーション
+        //        $this->validateIds($roomcd);
 
         // 教室リストを取得
         //$rooms = $this->mdlGetRoomList(false);
@@ -78,8 +81,8 @@ class RoomCalendarController extends Controller
     public function defaultWeek()
     {
 
-//        // IDのバリデーション
-//        $this->validateIds($roomcd);
+        //        // IDのバリデーション
+        //        $this->validateIds($roomcd);
 
         // 教室リストを取得
         $rooms = $this->mdlGetRoomList(false);
@@ -113,8 +116,8 @@ class RoomCalendarController extends Controller
     public function eventCalendar()
     {
 
-//        // IDのバリデーション
-//        $this->validateIds($roomcd);
+        //        // IDのバリデーション
+        //        $this->validateIds($roomcd);
 
         // 教室リストを取得
         $rooms = $this->mdlGetRoomList(false);
@@ -218,7 +221,7 @@ class RoomCalendarController extends Controller
      * @param \Illuminate\Http\Request $request リクエスト
      * @return view
      */
-    public function new($roomcd, $date, $startTime, $endTime)
+    public function new($campusCd, $datetimeStr, $boothCd)
     //public function new(Request $request)
     {
 
@@ -226,31 +229,109 @@ class RoomCalendarController extends Controller
         //$date = $request->query('date');
         //$start_time = $request->query('start_time');
         //$end_time = $request->query('end_time');
-        $start_time = $startTime;
-        $end_time = $endTime;
+        $date = substr($datetimeStr, 0, 4) . '-' . substr($datetimeStr, 4, 2) . '-' . substr($datetimeStr, 6, 2);
+        $time = substr($datetimeStr, 8, 2) . ':' . substr($datetimeStr, 10, 2);
 
-        // IDのバリデーション
-        //$this->validateIds($roomcd);
+        $param = [
+            'campus_cd' => $campusCd,
+            'target_date' => $date,
+            'start_time' => $time,
+            'booth_cd' => $boothCd,
+        ];
 
-        // 教室リストを取得
-        $rooms = $this->mdlGetRoomList(false);
+        // パラメータのバリデーション
+        $this->validateFromParam($param, $this->rulesForNew());
 
         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        $this->guardRoomAdminRoomcd($roomcd);
+        $this->guardRoomAdminRoomcd($campusCd);
 
-        // 生徒のidを渡しておく
+        // 教室名を取得する
+        $roomName = $this->getRoomName($campusCd);
+
+        // ブースリストを取得
+        $booths = $this->mdlGetBoothList($campusCd);
+
+        // コースリストを取得
+        $courses = $this->mdlGetCourseList();
+
+        // 科目リストを取得
+        $subjects = $this->mdlGetSubjectList();
+
+        // 生徒リストを取得
+        $students = $this->mdlGetStudentList($campusCd);
+
+        // 講師リストを取得
+        $tutors = $this->mdlGetTutorList($campusCd);
+
+        // 日付から時間割区分を取得
+        $timetableKind = $this->getTimeTableKind($campusCd, $date);
+
+        // 時限リストを取得（校舎・時間割区分から）
+        $periods = $this->mdlGetPeriodList($campusCd, $timetableKind);
+
+        // 指定時刻から、対応する時限の情報を取得
+        $periodInfo = $this->getPeriodTime($campusCd, $timetableKind, $time);
+        if (isset($periodInfo)) {
+            $periodNo = $periodInfo->timetable_id;
+            $startTime = $periodInfo->start_time;
+            $endTime = $periodInfo->end_time;
+        } else {
+            $periodNo = null;
+            $startTime = null;
+            $endTime = null;
+        }
+
+        // 初期表示データをセット
         $editData = [
-            'roomcd' => $roomcd,
-            'curDate' => substr($date, 0, 4) . '/' . substr($date, 4, 2) . '/' . substr($date, 6, 2),
-            'start_time' => substr($start_time, 0, 2) . ':' . substr($start_time, 2, 2),
-            'end_time' => substr($end_time, 0, 2) . ':' . substr($end_time, 2, 2)
+            'campus_cd' => $campusCd,
+            'name' => $roomName,
+            'target_date' => $date,
+            'booth_cd' => $boothCd,
+            'period_no' => $periodNo,
+            'start_time' => $startTime,
+            'end_time' => $endTime
         ];
 
         return view('pages.admin.room_calendar-input', [
-            'rooms' => $rooms,
             'rules' => null,
+            'booths' => $booths,
+            'courses' => $courses,
+            'periods' => $periods,
+            'tutors' => $tutors,
+            'students' => $students,
+            'subjects' => $subjects,
             'editData' => $editData
         ]);
+    }
+
+    /**
+     * バリデーションルールを取得(登録画面パラメータ用)
+     *
+     * @return array ルール
+     */
+    private function rulesForNew()
+    {
+        $rules = array();
+
+        // 独自バリデーション: リストのチェック 校舎
+        $validationRoomList =  function ($attribute, $value, $fail) {
+
+            // 校舎リストを取得
+            $rooms = $this->mdlGetRoomList(false);
+            if (!isset($rooms[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
+        // その他を第二引数で指定する
+        $rules += Schedule::fieldRules('campus_cd', ['required', $validationRoomList]);
+        $rules += Schedule::fieldRules('target_date', ['required']);
+        $rules += Schedule::fieldRules('start_time', ['required']);
+        $rules += Schedule::fieldRules('booth_cd', ['required']);
+
+        return $rules;
     }
 
     /**
@@ -387,7 +468,6 @@ class RoomCalendarController extends Controller
             'editData' => $editData,
             'rules' => $this->rulesForInput(null)
         ]);
-
     }
 
     /**
@@ -573,27 +653,90 @@ class RoomCalendarController extends Controller
     //==========================
 
     /**
-     * 教室名の取得
+     * 校舎名の取得
      *
-     * @param int $sid 生徒Id
+     * @param string $campusCd 校舎コード
      * @return object
      */
-    private function getRoomName($roomcd)
+    private function getRoomName($campusCd)
     {
-
-        // コードマスタより教室情報を取得
-        $codemasters = CodeMaster::select('gen_item1', 'gen_item2')
-            ->where('data_type', AppConst::CODE_MASTER_6)
-            ->first();
-
-        // 教室名を取得
-        $query = ExtGenericMaster::query();
+        // 校舎名を取得
+        $query = MstCampus::query();
         $room = $query
-            ->select('name2 as room_name')
-            ->where('codecls', $codemasters->gen_item1)
-            ->where('code', $roomcd)
+            ->select('name as room_name')
+            ->where('campus_cd', $campusCd)
             ->firstOrFail();
 
         return $room->room_name;
+    }
+
+    /**
+     * 校舎・日付から時間割区分の取得
+     *
+     * @param string $campusCd 校舎コード
+     * @param date $date 対象日
+     * @return object
+     */
+    private function getTimeTableKind($campusCd, $date)
+    {
+        $query = MstTimetable::query();
+
+        $account = Auth::user();
+
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('campus_cd', $account->campus_cd);
+        }
+        // 年間予定情報とJOIN
+        $query->sdJoin(YearlySchedule::class, function ($join) use ($date) {
+            $join->on('mst_timetables.campus_cd', 'yearly_schedules.campus_cd')
+                ->where('yearly_schedules.lesson_date', $date);
+        })
+            // 期間区分
+            ->sdJoin(CodeMaster::class, function ($join) {
+                $join->on('yearly_schedules.date_kind', '=', 'mst_codes.code')
+                    ->on('mst_timetables.timetable_kind', '=', 'mst_codes.sub_code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
+            })
+            // 校舎は指定されている前提として絞り込み
+            ->where('mst_timetables.campus_cd', $campusCd);
+
+        $timeTable = $query
+            ->select('timetable_kind')
+            ->distinct()
+            // 該当データがない場合はエラーを返す
+            ->firstOrFail();
+
+        return $timeTable->timetable_kind;
+    }
+
+    /**
+     * 校舎・時間割区分から時間割情報の取得
+     *
+     * @param string $campusCd 校舎コード
+     * @param int $timetableKind 時間割区分
+     * @return object
+     */
+    private function getPeriodTime($campusCd, $timetableKind, $time)
+    {
+        $query = MstTimetable::query();
+
+        $account = Auth::user();
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('campus_cd', $account->campus_cd);
+        }
+
+        $timeTable = $query
+            // 指定校舎で絞り込み
+            ->where('campus_cd', $campusCd)
+            // 時間割区分で絞り込み
+            ->where('timetable_kind', $timetableKind)
+            // 時間から対象時限を絞り込み
+            ->where('start_time', '<=', $time)
+            ->where('end_time', '>=', $time)
+            ->first();
+
+        return $timeTable;
     }
 }
