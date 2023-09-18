@@ -902,7 +902,7 @@ return [
         JeroenNoten\LaravelAdminLte\Menu\Filters\LangFilter::class,
         JeroenNoten\LaravelAdminLte\Menu\Filters\DataFilter::class,
         // カスタムメニュー
-        App\Filters\AppMenuFilter::class
+        //App\Filters\AppMenuFilter::class
     ],
 
     /*

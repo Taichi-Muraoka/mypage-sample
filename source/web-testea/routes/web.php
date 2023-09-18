@@ -551,7 +551,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 教室カレンダー登録画面
     //Route::get('/room_calendar/new', [RoomCalendarController::class, 'new'])->name('room_calendar-new');
-    Route::get('/room_calendar/new/{roomcd}/{date}/{startTime}/{endTime}', [RoomCalendarController::class, 'new'])->name('room_calendar-new');
+    Route::get('/room_calendar/new/{campusCd}/{datetimeStr}/{boothCd}', [RoomCalendarController::class, 'new'])->name('room_calendar-new');
 
     // 新規登録処理
     Route::post('/room_calendar/create', [RoomCalendarController::class, 'create'])->name('room_calendar-create');
@@ -1406,13 +1406,13 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/overtime/search', [OvertimeController::class, 'search'])->name('overtime-search');
 
-});
+//});
 
 //===============================================
 // 以下は全体管理者のみアクセス可とする
 //===============================================
 
-Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
+//Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
 
     //---------------------
     // 給与算出
