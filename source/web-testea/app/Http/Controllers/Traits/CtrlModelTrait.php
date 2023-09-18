@@ -5,15 +5,23 @@ namespace App\Http\Controllers\Traits;
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
 use Illuminate\Support\Facades\Auth;
-use App\Models\ExtGenericMaster;
 use App\Models\CodeMaster;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtRoom;
-use App\Models\TutorRelate;
-use App\Models\Office;
+use App\Models\MstCampus;
+use App\Models\MstBooth;
+use App\Models\MstCourse;
+use App\Models\MstTimetable;
+use App\Models\MstSubject;
+use App\Models\MstGradeSubject;
+use App\Models\Student;
+use App\Models\StudentCampus;
+use App\Models\Tutor;
+use App\Models\TutorCampus;
+use App\Models\AdminUser;
+use App\Models\Schedule;
 use App\Models\Account;
-use App\Models\ExtSchedule;
+use App\Models\YearlySchedule;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 /**
  * モデル - コントローラ共通処理
@@ -37,26 +45,36 @@ trait CtrlModelTrait
      * @param string $codecls
      * @return array
      */
-    protected function mdlMenuFromExtGenericMaster($codecls)
-    {
-        return  ExtGenericMaster::select('code', 'name1 as value')
-            ->where('codecls', $codecls)
-            ->orderby('disp_order')
-            ->orderby('code')
-            ->get()
-            ->keyBy('code');
-    }
+    //protected function mdlMenuFromExtGenericMaster($codecls)
+    //{
+    //    return  ExtGenericMaster::select('code', 'name1 as value')
+    //        ->where('codecls', $codecls)
+    //        ->orderby('disp_order')
+    //        ->orderby('code')
+    //        ->get()
+    //        ->keyBy('code');
+    //}
 
     /**
      * コードマスタからプルダウンメニューのリストを取得
      * data_typeを指定する
      *
      * @param integer $dataType
+     * @param integer $subCode
      * @return array
      */
-    protected function mdlMenuFromCodeMaster($dataType)
+    protected function mdlMenuFromCodeMaster($dataType, $subCode = null)
     {
-        return CodeMaster::select('code', 'name as value')
+
+        $query = CodeMaster::query();
+
+        // サブコードが指定された場合絞り込み
+        $query->when($subCode, function ($query) use ($subCode) {
+            return $query->where('sub_code', $subCode);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('code', 'name as value')
             ->where('data_type', $dataType)
             ->orderby('order_code')
             ->get()
@@ -65,34 +83,65 @@ trait CtrlModelTrait
 
     /**
      * 生徒プルダウンメニューのリストを取得
-     * 管理者向け（教室管理者の場合は自分の教室のみ）
-     * 教室管理者以外は、指定されたroomcdで検索
+     * 管理者向け（教室管理者の場合は自分の校舎のみ）
+     * 教室管理者以外は、指定されたcampusCdで検索
      *
+     * @param string $campusCd 校舎コード 指定なしの場合null
      * @return array
      */
-    protected function mdlGetStudentList($roomcd)
+    protected function mdlGetTutorList($campusCd = null)
     {
-        $query = ExtStudentKihon::query();
+        // 生徒情報の検索
+        $query = Tutor::query();
 
-        // 生徒の教室の検索(生徒基本情報参照)
         if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、強制的に教室コードで検索する
+            // 教室管理者の場合、強制的に校舎コードで絞り込み
             $account = Auth::user();
-            $this->mdlWhereSidByRoomQuery($query, ExtStudentKihon::class, $account->roomcd);
+            $this->mdlWhereTidByRoomQuery($query, Tutor::class, $account->campus_cd);
         } else {
-            // 管理者の場合検索フォームから取得
-            $query->SearchRoom([
-                'roomcd' => $roomcd
-            ]);
+            if (isset($campusCd)) {
+                // 本部管理者で指定ありの場合、指定された校舎コードで絞り込み
+                $this->mdlWhereTidByRoomQuery($query, Tutor::class, $campusCd);
+            }
         }
-        // アカウントテーブルとJOIN（退会生徒非表示対応）
-        $query->sdJoin(Account::class, function ($join) {
-            $join->on('ext_student_kihon.sid', '=', 'account.account_id')
-                ->where('account.account_type', '=', AppConst::CODE_MASTER_7_1);
-        });
+        // 退会会員を除外
+        $query->where('tutor_status', '<>', AppConst::CODE_MASTER_29_3);
 
         // プルダウンリストを取得する
-        return $query->select('sid as id', 'name as value')
+        return $query->select('tutor_id as id', 'name as value')
+            ->orderby('id')
+            ->get()
+            ->keyBy('id');
+    }
+
+    /**
+     * 講師プルダウンメニューのリストを取得
+     * 管理者向け（教室管理者の場合は自分の校舎のみ）
+     * 教室管理者以外は、指定されたcampusCdで検索
+     *
+     * @param string $campusCd 校舎コード 指定なしの場合null
+     * @return array
+     */
+    protected function mdlGetStudentList($campusCd = null)
+    {
+        // 生徒情報の検索
+        $query = Student::query();
+
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、強制的に校舎コードで絞り込み
+            $account = Auth::user();
+            $this->mdlWhereSidByRoomQuery($query, Student::class, $account->campus_cd);
+        } else {
+            if (isset($campusCd)) {
+                // 本部管理者で指定ありの場合、指定された校舎コードで絞り込み
+                $this->mdlWhereSidByRoomQuery($query, Student::class, $campusCd);
+            }
+        }
+        // 退会会員を除外
+        $query->where('stu_status', '<>', AppConst::CODE_MASTER_28_5);
+
+        // プルダウンリストを取得する
+        return $query->select('student_id as id', 'name as value')
             ->orderby('id')
             ->get()
             ->keyBy('id');
@@ -100,36 +149,34 @@ trait CtrlModelTrait
 
     /**
      * 生徒プルダウンメニューのリストを取得（お知らせ登録用・生徒ID付き）
-     * 管理者向け（教室管理者の場合は自分の教室のみ）
-     * 教室管理者以外は、指定されたroomcdで検索
+     * 管理者向け（教室管理者の場合は自分の校舎のみ）
+     * 教室管理者以外は、指定されたcampusCdで検索
      *
+     * @param string $campusCd 校舎コード 指定なしの場合null
      * @return array
      */
-    protected function mdlGetStudentListWithSid($roomcd)
+    protected function mdlGetStudentListWithSid($campusCd = null)
     {
-        $query = ExtStudentKihon::query();
+        // 生徒情報の検索
+        $query = Student::query();
 
-        // 生徒の教室の検索(生徒基本情報参照)
         if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、強制的に教室コードで検索する
+            // 教室管理者の場合、強制的に校舎コードで絞り込み
             $account = Auth::user();
-            $this->mdlWhereSidByRoomQuery($query, ExtStudentKihon::class, $account->roomcd);
+            $this->mdlWhereSidByRoomQuery($query, Student::class, $account->campus_cd);
         } else {
-            // 管理者の場合検索フォームから取得
-            $query->SearchRoom([
-                'roomcd' => $roomcd
-            ]);
+            if (isset($campusCd)) {
+                // 本部管理者で指定ありの場合、指定された校舎コードで絞り込み
+                $this->mdlWhereSidByRoomQuery($query, Student::class, $campusCd);
+            }
         }
-        // アカウントテーブルとJOIN（退会生徒非表示対応）
-        $query->sdJoin(Account::class, function ($join) {
-            $join->on('ext_student_kihon.sid', '=', 'account.account_id')
-                ->where('account.account_type', '=', AppConst::CODE_MASTER_7_1);
-        });
+        // 退会会員を除外
+        $query->where('stu_status', '<>', AppConst::CODE_MASTER_28_5);
 
         // プルダウンリストを取得する
         return $query->select(
-            'sid as id',
-            DB::raw('CONCAT(sid, "：", name) AS value')
+            'student_id as id',
+            DB::raw('CONCAT(student_id, "：", name) AS value')
         )
             ->orderby('id')
             ->get()
@@ -138,34 +185,25 @@ trait CtrlModelTrait
 
     /**
      * 生徒プルダウンメニューのリストを取得
-     * 教師向け
+     * 講師向け
      *
-     * @param string $roomcd 教室コード 指定なしの場合null
-     * @param string $tid 教師No 
-     * @param string $excludeRoomcd 除外する教室コード
+     * @param string $campusCd 校舎コード 指定なしの場合null
+     * @param int $tid 講師ID 
+     * @param string $excludeCampusCd 除外する校舎コード(削除予定)
      * @return array
      */
-    protected function mdlGetStudentListForT($roomcd, $tid, $excludeRoomcd = null)
+    //protected function mdlGetStudentListForT($campusCd, $tid, $excludeCampusCd = null)
+    protected function mdlGetStudentListForT($campusCd, $tutorId)
     {
-        $query = ExtStudentKihon::query();
+        $query = Student::query();
 
-        $query->sdJoin(TutorRelate::class, function ($join) use ($tid, $roomcd, $excludeRoomcd) {
-            // sidをjoin
-            $join->on('tutor_relate.sid', '=', 'ext_student_kihon.sid')
-                // $roomcdの指定があるときのみ、教室コードで絞る
-                ->when(isset($roomcd), function ($queryRoomcd) use ($roomcd) {
-                    return $queryRoomcd->where('roomcd', $roomcd);
-                })
-                // $roomcdの指定があるときのみ、教室コードで除外する
-                ->when(isset($excludeRoomcd), function ($queryRoomcd) use ($excludeRoomcd) {
-                    return $queryRoomcd->where('roomcd', '!=', $excludeRoomcd);
-                })
-                // 指定の教師の担当生徒のみに絞り込み
-                ->where('tid', $tid);
-        });
+        $this->mdlWhereSidByRoomQueryForT($query, Student::class, $tutorId, $campusCd);
+
+        // 退会会員を除外
+        $query->where('stu_status', '<>', AppConst::CODE_MASTER_28_5);
 
         // プルダウンリストを取得する
-        return $query->select('ext_student_kihon.sid as id', 'name as value')
+        return $query->select('student_id as id', 'name as value')
             ->distinct()
             ->orderby('id')
             ->get()
@@ -174,22 +212,22 @@ trait CtrlModelTrait
 
     /**
      * 事務局アカウントプルダウンメニューのリストを取得
-     * 管理者向け（教室管理者の場合は自分の教室のみ）
+     * 管理者向け（教室管理者の場合は自分の校舎のみ）
      *
      * @return array
      */
     protected function mdlGetOfficeList()
     {
-        $query = Office::query();
+        $query = AdminUser::query();
 
         if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、教室コードで絞る
+            // 教室管理者の場合、校舎コードで絞る
             $account = Auth::user();
-            $query->where('roomcd', $account->roomcd);
+            $query->where('campus_cd', $account->campus_cd);
         }
         // アカウントテーブルとJOIN（削除管理者アカウント非表示対応）
         $query->sdJoin(Account::class, function ($join) {
-            $join->on('office.adm_id', '=', 'account.account_id')
+            $join->on('admin_users.adm_id', '=', 'accounts.account_id')
                 ->where('account.account_type', '=', AppConst::CODE_MASTER_7_3);
         });
 
@@ -201,7 +239,7 @@ trait CtrlModelTrait
     }
 
     /**
-     * 教室プルダウンメニューのリストを取得
+     * 校舎プルダウンメニューのリストを取得
      * 権限によってメニューが違う
      *
      * @param boolean $honbu 本部を表示するかどうか
@@ -209,18 +247,11 @@ trait CtrlModelTrait
      */
     protected function mdlGetRoomList($honbu = true)
     {
-        // コードマスタより教室情報を取得
-        $codemasters = CodeMaster::select('gen_item1', 'gen_item2')
-            ->where('data_type', AppConst::CODE_MASTER_6)
-            ->first();
-
-        $query = ExtGenericMaster::query();
-        $query->select('code', 'name2 as value', 'disp_order')
-            ->where('codecls', $codemasters->gen_item1)
-            ->where('code', '<=', $codemasters->gen_item2);
-
-        // プルダウンに含めない教室コードを除外する
-        $query->whereNotIn('code', config('appconf.excluded_roomcd'));
+        // 校舎マスタより校舎情報を取得
+        $query = MstCampus::query();
+        $query->select('mst_campuses.campus_cd as code', 'name as value', 'disp_order')
+            // 非表示フラグの条件を付加
+            ->where('is_hidden', AppConst::CODE_MASTER_11_1);
 
         // ログインユーザ
         $account = Auth::user();
@@ -233,7 +264,7 @@ trait CtrlModelTrait
 
             // 教室管理者の場合、自分の管理教室のみ絞り込み
             // なのでここでは本部は絶対に追加されない
-            $query->where('code', $account->roomcd);
+            $query->where('campus_cd', $account->campus_cd);
         } else {
 
             if (AuthEx::isStudent()) {
@@ -241,39 +272,39 @@ trait CtrlModelTrait
                 // 生徒の場合
                 //-------------
 
-                // 自分の在籍している教室のみ対応する（教室情報とJOIN）
-                $query->sdJoin(ExtRoom::class, function ($join) use ($account) {
-                    // codeとroomcdをjoin
-                    $join->on('ext_room.roomcd', '=', 'code')
+                // 自分の在籍している校舎のみ対応する（生徒所属情報とJOIN）
+                $query->sdJoin(StudentCampus::class, function ($join) use ($account) {
+                    // campus_cdでjoin
+                    $join->on('student_campuses.campus_cd', '=', 'mst_campuses.campus_cd')
                         // 自分のものだけ
-                        ->where('sid', $account->account_id);
+                        ->where('student_id', $account->account_id);
                 });
             } else if (AuthEx::isTutor()) {
                 //-------------
-                // 教師の場合
+                // 講師の場合
                 //-------------
 
-                // 自分の受け持ち生徒が在籍している教室のみ（教師関連情報とJOIN）
-                $query->sdJoin(TutorRelate::class, function ($join) use ($account) {
-                    // codeとroomcdをjoin
-                    $join->on('tutor_relate.roomcd', '=', 'code')
+                // 自分の在籍している校舎のみ対応する（講師所属情報とJOIN）
+                $query->sdJoin(TutorCampus::class, function ($join) use ($account) {
+                    // campus_cdでjoin
+                    $join->on('tutor_campuses.campus_cd', '=', 'mst_campuses.campus_cd')
                         // 自分のものだけ
-                        ->where('tid', $account->account_id);
+                        ->where('tutor_id', $account->account_id);
                 });
             }
 
             // 本部を追加するかどうか
             if ($honbu) {
-                // 教室リストをプルダウンで表示する
+                // コードマスタより「本部」名称取得
                 $queryHonbu = CodeMaster::select('code', 'name as value', 'order_code as disp_order')
                     ->where('data_type', AppConst::CODE_MASTER_6);
 
-                // 本部管理者の場合、コードマスタより「本部」名称取得
+                // UNIONで校舎リストに加える
                 $query->union($queryHonbu);
             }
         }
 
-        // 教室リストを取得
+        // 校舎リストを取得
         $rooms = $query->orderBy('disp_order')
             ->get()->keyBy('code');
 
@@ -281,10 +312,189 @@ trait CtrlModelTrait
     }
 
     /**
+     * ブースプルダウンメニューのリストを取得
+     * 管理者向け（教室管理者の場合は自分の校舎のみ）
+     *
+     * @param string $campusCd 校舎コード 指定なしの場合null
+     * @param int $usageKind 用途種別 省略可
+     * @return array
+     */
+    protected function mdlGetBoothList($campusCd, $usageKind = null)
+    {
+        $query = MstBooth::query();
+
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、校舎コードで絞る
+            $account = Auth::user();
+            $query->where('campus_cd', $account->campus_cd);
+        }
+        // 校舎が指定された場合絞り込み
+        $query->when($campusCd, function ($query) use ($campusCd) {
+            return $query->where('campus_cd', $campusCd);
+        });
+        // 用途種別が指定された場合絞り込み
+        $query->when($usageKind, function ($query) use ($usageKind) {
+            return $query->where('usage_kind', $usageKind);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('booth_cd as code', 'name as value')
+            ->orderby('campus_cd')->orderby('disp_order')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * コースプルダウンメニューのリストを取得
+     * 管理者向け
+     *
+     * @param int $courseKind コース種別 省略可
+     * @return array
+     */
+    protected function mdlGetCourseList($courseKind = null)
+    {
+        $query = MstCourse::query();
+
+        // コース種別が指定された場合絞り込み
+        $query->when($courseKind, function ($query) use ($courseKind) {
+            return $query->where('course_kind', $courseKind);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('course_cd as code', 'name as value')
+            ->orderby('course_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 時限プルダウンメニューのリストを取得（校舎・時間割区分から）
+     *
+     * @param string $courseCd 校舎コード
+     * @param int $timetableKind 時間割区分
+     * @return array
+     */
+    protected function mdlGetPeriodList($campusCd, $timetableKind)
+    {
+        $query = MstTimetable::query();
+        $account = Auth::user();
+
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('campus_cd', $account->campus_cd);
+        } else if (AuthEx::isTutor()) {
+            // 講師の場合、所属校舎で絞る（ガード）
+            $this->mdlWhereRoomByTidQuery($query, MstTimetable::class, $account->account_id);
+        } else if (AuthEx::isStudent()) {
+            // 生徒の場合、所属校舎で絞る（ガード）
+            $this->mdlWhereRoomBySidQuery($query, MstTimetable::class, $account->account_id);
+        }
+
+        // 校舎は指定されている前提として絞り込み
+        $query->where('campus_cd', $campusCd);
+        // 時間割区分は指定されている前提として絞り込み
+        $query->where('timetable_kind', $timetableKind);
+
+        // プルダウンリストを取得する
+        return $query->select(
+            'timetable_id as code',
+            DB::raw('CONCAT(period_no, " 限") AS value')
+        )
+            ->orderby('campus_cd')->orderby('period_no')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 時限プルダウンメニューのリストを取得（校舎・日付から）
+     *
+     * @param string $courseCd 校舎コード
+     * @param date $date 日付
+     * @return array
+     */
+    protected function mdlGetPeriodListByDate($campusCd, $date)
+    {
+        $query = MstTimetable::query();
+        $account = Auth::user();
+
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('campus_cd', $account->campus_cd);
+        } else if (AuthEx::isTutor()) {
+            // 講師の場合、所属校舎で絞る（ガード）
+            $this->mdlWhereRoomByTidQuery($query, MstTimetable::class, $account->account_id);
+        } else if (AuthEx::isStudent()) {
+            // 生徒の場合、所属校舎で絞る（ガード）
+            $this->mdlWhereRoomBySidQuery($query, MstTimetable::class, $account->account_id);
+        }
+        // 年間予定情報とJOIN
+        $query->sdJoin(YearlySchedule::class, function ($join) use ($date) {
+            $join->on('mst_timetables.campus_cd', 'yearly_schedules.campus_cd')
+                ->where('yearly_schedules.lesson_date', $date);
+        })
+            // 期間区分
+            ->sdJoin(CodeMaster::class, function ($join) {
+                $join->on('yearly_schedules.date_kind', '=', 'mst_codes.code')
+                    ->on('mst_timetables.timetable_kind', '=', 'mst_codes.sub_code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
+            })
+            // 校舎は指定されている前提として絞り込み
+            ->where('mst_timetables.campus_cd', $campusCd);
+
+        // プルダウンリストを取得する
+        return $query->select(
+            'timetable_id as code',
+            DB::raw('CONCAT(period_no, " 限") AS value')
+        )
+            ->orderby('mst_timetables.campus_cd')->orderby('period_no')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 授業科目プルダウンメニューのリストを取得
+     *
+     * @param int $courseKind コース種別 省略可
+     * @return array
+     */
+    protected function mdlGetSubjectList()
+    {
+        $query = MstSubject::query();
+
+        // プルダウンリストを取得する
+        return $query->select('subject_cd as code', 'name as value')
+            ->orderby('subject_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 成績科目プルダウンメニューのリストを取得
+     *
+     * @param int $schoolKind 学校区分 省略可
+     * @return array
+     */
+    protected function mdlGetGradeSubjectList($schoolKind = null)
+    {
+        $query = MstGradeSubject::query();
+
+        // 学校区分が指定された場合絞り込み
+        $query->when($schoolKind, function ($query) use ($schoolKind) {
+            return $query->where('school_kind', $schoolKind);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('g_subject_cd as code', 'name as value')
+            ->orderby('g_subject_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
      * 抽出したスケジュールより日時のプルダウンメニューのリストを取得
      *
-     * @param array $lessons ExtScheduleよりget
-     * @return array プルダウンメニュー用日時 Y/m/d H:i
+     * @param array $lessons schedulesよりget
+     * @return array プルダウンメニュー用日時 Y/m/d n限
      */
     protected function mdlGetScheduleMasterList($lessons)
     {
@@ -293,10 +503,10 @@ trait CtrlModelTrait
         $scheduleMasterKeys = [];
         if (count($lessons) > 0) {
             foreach ($lessons as $lesson) {
-                $lesson['lesson_datetime'] = $lesson['lesson_date']->format('Y/m/d') . " " . $lesson->start_time->format('H:i');
+                //$lesson['target_datetime'] = $lesson['target_date']->format('Y/m/d') . " " . $lesson['period'] . "限";
                 $schedule = [
                     'id' => $lesson['id'],
-                    'value' => $lesson['lesson_date']->format('Y/m/d') . " " . $lesson->start_time->format('H:i')
+                    'value' => $lesson['target_date']->format('Y/m/d') . " " . $lesson['period'] . "限"
                 ];
                 $schedule = (object) $schedule;
                 array_push($scheduleMasterKeys, $lesson['id']);
@@ -313,7 +523,7 @@ trait CtrlModelTrait
      * スケジュールIDをもとにスケジュールの詳細を取得する
      * 権限によって制御をかける
      * getDataSelectで使用される想定
-     * 教室名と生徒名を返却する。機能のみではなかったのでここに定義
+     * 校舎名と生徒名を返却する。機能のみではなかったのでここに定義
      * 
      * @param int $schedule_id スケジュールID
      */
@@ -324,14 +534,14 @@ trait CtrlModelTrait
         $room_names = $this->mdlGetRoomQuery();
 
         // $requestからidを取得し、検索結果を返却する。idはスケジュールID
-        $query = ExtSchedule::query();
+        $query = Schedule::query();
 
         if (AuthEx::isRoomAdmin()) {
             // 教室管理者
-            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+            // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
             $query->where($this->guardRoomAdminTableWithRoomCd());
         } else if (AuthEx::isTutor()) {
-            // 教師は無し(使用しない)
+            // 講師は無し(使用しない)
         } else if (AuthEx::isStudent()) {
             // 生徒は無し(使用しない)
             return;
@@ -339,16 +549,16 @@ trait CtrlModelTrait
 
         $lesson = $query
             ->select(
-                'room_name_full',
-                'name'
+                'room_name',
+                'name as '
             )
             ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('ext_schedule.roomcd', '=', 'room_names.code');
+                $join->on('schedules.campus_cd', '=', 'room_names.code');
             })
-            ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
-                $join->on('ext_student_kihon.sid', '=', 'ext_schedule.sid');
+            ->sdLeftJoin(Student::class, function ($join) {
+                $join->on('students.student_id', '=', 'schedules.student_id');
             })
-            ->where('ext_schedule.id', '=', $schedule_id)
+            ->where('schedules.schedule_id', '=', $schedule_id)
             ->firstOrFail();
 
         return $lesson;
@@ -359,28 +569,21 @@ trait CtrlModelTrait
     //------------------------------
 
     /**
-     * 教室のJOINクエリを取得
+     * 校舎のJOINクエリを取得
      * 権限共通。leftJoinSubされる想定
      *
      * @return array
      */
     protected function mdlGetRoomQuery()
     {
-        // コードマスタより教室情報を取得
-        $codemasters = CodeMaster::select('gen_item1', 'gen_item2')
-            ->where('data_type', AppConst::CODE_MASTER_6)
-            ->first();
+        // 校舎一覧を取得
+        $query = MstCampus::query();
+        $query->select('campus_cd as code', 'name as room_name',  'short_name as room_name_symbol', 'disp_order')
+            // 非表示フラグの条件を付加
+            ->where('is_hidden', AppConst::CODE_MASTER_11_1);
 
-        // 教室一覧を取得
-        $query = ExtGenericMaster::query();
-        $query->select('code', 'name1 as room_name_full', 'name2 as room_name', 'name3 as room_name_symbol', 'disp_order')
-            ->where('codecls', $codemasters->gen_item1)
-            // JOIN用なのでcodeによる絞り込みはしないとする。
-            //->where('code', '<=', $codemasters->gen_item2)
-        ;
-
-        // 本部管理者の場合、コードマスタより「本部」名称取得
-        $queryHonbu = CodeMaster::select('code', 'name as room_name_full', 'name as room_name', 'name as room_name_symbol', 'order_code as disp_order')
+        // コードマスタより「本部」名称取得
+        $queryHonbu = CodeMaster::select('code', 'name as room_name', 'name as room_name_symbol', 'order_code as disp_order')
             ->where('data_type', AppConst::CODE_MASTER_6);
         $query->union($queryHonbu);
 
@@ -392,8 +595,8 @@ trait CtrlModelTrait
     //------------------------------
 
     /**
-     * 指定された教室コードのsidのみを絞り込む
-     * 教室管理者の場合、ログインされている教室管理者の教室で絞り込み
+     * 指定された校舎コードの生徒IDのみを絞り込む
+     * 教室管理者の場合、ログインされている教室管理者の校舎で絞り込み
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param \Illuminate\Database\Eloquent\Model $model sidを絞るテーブルのモデルクラス
@@ -401,26 +604,26 @@ trait CtrlModelTrait
     protected function mdlWhereSidForRoomAdminQuery($query, $model)
     {
         if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、強制的に教室コードで検索する
+            // 教室管理者の場合、強制的に校舎コードで検索する
             $account = Auth::user();
-            $this->mdlWhereSidByRoomQuery($query, $model, $account->roomcd);
+            $this->mdlWhereSidByRoomQuery($query, $model, $account->campus_cd);
         }
     }
 
     /**
-     * 指定された教室コードのsidのみを絞り込む
-     * 教室情報を検索。主に教室管理者の場合、
-     * 任意の教室の一覧を取得したい場合のwhereに指定する条件を取得する
+     * 指定された校舎コードの生徒IDのみを絞り込む
+     * 生徒所属情報を検索
+     * whereに指定する条件を取得する
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Model $model sidを絞るテーブルのモデルクラス
-     * @param string $roomcd 教室コード
+     * @param \Illuminate\Database\Eloquent\Model $model 生徒IDを絞るテーブルのモデルクラス
+     * @param string $campusCd 校舎コード
      */
-    protected function mdlWhereSidByRoomQuery($query, $model, $roomcd)
+    protected function mdlWhereSidByRoomQuery($query, $model, $campusCd)
     {
 
-        // 教室情報に存在するかチェックする。existsを使用した
-        $query->whereExists(function ($query) use ($model, $roomcd) {
+        // 生徒所属情報に存在するかチェックする。existsを使用した
+        $query->whereExists(function ($query) use ($model, $campusCd) {
 
             // 対象テーブル(モデルから取得)
             $modelObj = new $model();
@@ -428,38 +631,48 @@ trait CtrlModelTrait
             // テーブル名取得
             $table = $modelObj->getTable();
 
-            // 教室情報テーブル
-            $extRoom = (new ExtRoom)->getTable();
+            // 生徒所属情報テーブル
+            $studentCampus = (new StudentCampus)->getTable();
 
             // 1件存在するかチェック
             $query->select(DB::raw(1))
-                ->from($extRoom)
-                // 生徒基本情報と教室情報のsidを連結
-                ->whereRaw($table . '.sid = ' . $extRoom . '.sid')
-                // 指定された教室ID
-                ->where($extRoom . '.roomcd', $roomcd)
+                ->from($studentCampus)
+                // 対象テーブルと生徒所属情報のstudent_idを連結
+                ->whereRaw($table . '.student_id = ' . $studentCampus . '.student_id')
+                // 指定された校舎コード
+                ->where($studentCampus . '.campus_cd', $campusCd)
                 // delete_dt条件の追加
-                ->whereNull($extRoom . '.deleted_at');
+                ->whereNull($studentCampus . '.deleted_at');
         });
     }
 
     /**
-     * 指定された教室コードのsidのみを絞り込む（教師向け画面用）
-     * 教師関連情報を検索。
-     * 任意の教室の一覧を取得したい場合のwhereに指定する条件を取得する
+     * 講師の受け持ちの生徒IDを絞り込む
+     * 講師向け
+     * whereに指定する条件を取得する
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Model $model sidを絞るテーブルのモデルクラス
-     * @param string $roomcd 教室コード
+     * @param \Illuminate\Database\Eloquent\Model $model 生徒IDを絞るテーブルのモデルクラス
+     * @param int $tutorId 講師ID（講師向け画面からの場合null）
+     * @param string $campusCd 校舎コード
      */
-    protected function mdlWhereSidByRoomQueryForT($query, $model, $roomcd = null)
+    protected function mdlWhereSidByRoomQueryForT($query, $model, $tutorId, $campusCd = null)
     {
 
         // ログインユーザ情報取得
         $account = Auth::user();
 
-        // 教室情報に存在するかチェックする。existsを使用した
-        $query->whereExists(function ($query) use ($model, $roomcd, $account) {
+        // 講師の場合はアカウントIDをセットする
+        if (AuthEx::isTutor()) {
+            $tutorId = $account->account_id;
+        }
+
+        // スケジュール情報に存在するかチェックする。existsを使用した
+        $query->whereExists(function ($query) use ($model, $campusCd, $tutorId, $account) {
+
+            // 受け持ち判定期間（当日日付の1ヶ月前から1ヶ月後）
+            $startDate = Carbon::parse('- 1 month')->startOfMonth()->format('y-m-d');
+            $endDate = Carbon::parse('+ 1 month')->endOfMonth()->format('y-m-d');
 
             // 対象テーブル(モデルから取得)
             $modelObj = new $model();
@@ -467,39 +680,41 @@ trait CtrlModelTrait
             // テーブル名取得
             $table = $modelObj->getTable();
 
-            // 教師関連情報テーブル
-            $tutorRelate = (new TutorRelate)->getTable();
+            // スケジュール情報テーブル
+            $schedule = (new Schedule)->getTable();
 
             // 1件存在するかチェック
             $query->select(DB::raw(1))
-                ->from($tutorRelate)
-                // 対象テーブルと教師関連情報のsidを連結
-                ->whereRaw($table . '.sid = ' . $tutorRelate . '.sid')
-                // ログインユーザのID（tid）
-                ->where($tutorRelate . '.tid', $account->account_id)
+                ->from($schedule)
+                // 対象テーブルとスケジュール情報のsidを連結
+                ->whereRaw($table . '.student_id = ' . $schedule . '.student_id')
+                // ログインユーザのID または指定のtutor_id
+                ->where($schedule . '.tutor_id', $tutorId)
+                // スケジュール情報を受け持ち判定期間で絞り込み
+                ->whereBetween($schedule . '.target_date', [$startDate, $endDate])
                 // 教室が指定された場合のみ絞り込み
-                ->when($roomcd, function ($query) use ($tutorRelate, $roomcd) {
-                    return $query->where($tutorRelate . '.roomcd', $roomcd);
+                ->when($campusCd, function ($query) use ($schedule, $campusCd) {
+                    return $query->where($schedule . '.campus_cd', $campusCd);
                 })
                 // delete_dt条件の追加
-                ->whereNull($tutorRelate . '.deleted_at');
+                ->whereNull($schedule . '.deleted_at');
         });
     }
 
     /**
-     * 指定された教室コードのtidのみを絞り込む（管理者向け画面用）
-     * 教師関連情報を検索。
-     * 任意の教室の一覧を取得したい場合のwhereに指定する条件を取得する
+     * 指定された校舎コードの講師IDのみを絞り込む（管理者向け画面用）
+     * 講師所属情報を検索
+     * whereに指定する条件を取得する
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string $roomcd 教室コード
+     * @param string $campusCd 校舎コード
      */
-    protected function mdlWhereTidByRoomQuery($query, $model, $roomcd)
+    protected function mdlWhereTidByRoomQuery($query, $model, $campusCd)
     {
 
-        // 教室情報に存在するかチェックする。existsを使用した
-        $query->whereExists(function ($query) use ($model, $roomcd) {
+        // 生徒所属情報に存在するかチェックする。existsを使用した
+        $query->whereExists(function ($query) use ($model, $campusCd) {
 
             // 対象テーブル(モデルから取得)
             $modelObj = new $model();
@@ -507,20 +722,102 @@ trait CtrlModelTrait
             // テーブル名取得
             $table = $modelObj->getTable();
 
-            // 教師関連情報テーブル
-            $tutorRelate = (new TutorRelate)->getTable();
+            // 生徒所属情報テーブル
+            $tutorCampus = (new TutorCampus)->getTable();
 
             // 1件存在するかチェック
             $query->select(DB::raw(1))
-                ->from($tutorRelate)
-                // 対象テーブルと教師関連情報のtidを連結
-                ->whereRaw($table . '.tid = ' . $tutorRelate . '.tid')
-                // 教室が指定された場合のみ絞り込み
-                ->when($roomcd, function ($query) use ($tutorRelate, $roomcd) {
-                    return $query->where($tutorRelate . '.roomcd', $roomcd);
-                })
+                ->from($tutorCampus)
+                // 対象テーブルと講師所属情報の講師IDを連結
+                ->whereRaw($table . '.tutor_id = ' . $tutorCampus . '.tutor_id')
+                // 指定された校舎コード
+                ->where($tutorCampus . '.campus_cd', $campusCd)
                 // delete_dt条件の追加
-                ->whereNull($tutorRelate . '.deleted_at');
+                ->whereNull($tutorCampus . '.deleted_at');
+        });
+    }
+
+    /**
+     * 指定された生徒IDの所属校舎のみを絞り込む
+     * 生徒所属情報を検索
+     * whereに指定する条件を取得する
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param \Illuminate\Database\Eloquent\Model $model 校舎を絞るテーブルのモデルクラス
+     * @param int $studentId 生徒ID
+     */
+    protected function mdlWhereRoomBySidQuery($query, $model, $studentId)
+    {
+
+        // 生徒所属情報に存在するかチェックする。existsを使用した
+        $query->whereExists(function ($query) use ($model, $studentId) {
+
+            // 対象テーブル(モデルから取得)
+            $modelObj = new $model();
+
+            // テーブル名取得
+            $table = $modelObj->getTable();
+
+            // 生徒所属情報テーブル
+            $studentCampus = (new StudentCampus)->getTable();
+            // 生徒情報テーブル
+            $student = (new Student)->getTable();
+
+            // 1件存在するかチェック
+            $query->select(DB::raw(1))
+                ->from($studentCampus)
+                // 生徒情報とJOIN
+                ->Join($student, $studentCampus . '.student_id', '=', $student . '.student_id')
+                // 対象テーブルと生徒所属情報のcampus_cdを連結
+                ->whereRaw($table . '.campus_cd = ' . $studentCampus . '.campus_cd')
+                // 指定された生徒ID
+                ->where($student . '.student_id', $studentId)
+                // delete_dt条件の追加
+                ->whereNull($studentCampus . '.deleted_at')
+                // delete_dt条件の追加
+                ->whereNull($student . '.deleted_at');
+        });
+    }
+
+    /**
+     * 指定された講師IDの所属校舎のみを絞り込む
+     * 講師所属情報を検索
+     * whereに指定する条件を取得する
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param \Illuminate\Database\Eloquent\Model $model 校舎を絞るテーブルのモデルクラス
+     * @param int $tutorId 講師ID
+     */
+    protected function mdlWhereRoomByTidQuery($query, $model, $tutorId)
+    {
+
+        // 講師所属情報に存在するかチェックする。existsを使用した
+        $query->whereExists(function ($query) use ($model, $tutorId) {
+
+            // 対象テーブル(モデルから取得)
+            $modelObj = new $model();
+
+            // テーブル名取得
+            $table = $modelObj->getTable();
+
+            // 講師所属情報テーブル
+            $tutorCampus = (new TutorCampus)->getTable();
+            // 講師情報テーブル
+            $tutor = (new Tutor)->getTable();
+
+            // 1件存在するかチェック
+            $query->select(DB::raw(1))
+                ->from($tutorCampus)
+                // 講師情報とJOIN
+                ->Join($tutor, $tutorCampus . '.tutor_id', '=', $tutor . '.tutor_id')
+                // 対象テーブルと講師所属情報のcampus_cdを連結
+                ->whereRaw($table . '.campus_cd = ' . $tutorCampus . '.campus_cd')
+                // 指定された生徒ID
+                ->where($tutor . '.tutor_id', $tutorId)
+                // delete_dt条件の追加
+                ->whereNull($tutorCampus . '.deleted_at')
+                // delete_dt条件の追加
+                ->whereNull($tutor . '.deleted_at');
         });
     }
 

@@ -89,7 +89,6 @@ trait CtrlFormTrait
             $window['last'],
         ]);
 
-        $this->debug($items);
         // 結果を返却
         return ['paginator' => $paginator, 'elements' => $elements];
     }
@@ -243,6 +242,22 @@ trait CtrlFormTrait
 
         // 可変引数で呼び出す
         $this->validateDates(...$arrCheck);
+    }
+
+    /**
+     * ルートパラメータのチェック
+     * 
+     * @param  mixed  $params チェック対象のパラメータ
+     * @param  mixed  $rules バリデーションルール
+     */
+    protected function validateFromParam($params, $rules)
+    {
+        // パラメータのバリデーション
+        $validator = Validator::make($params, $rules);
+        if ($validator->fails()) {
+            // エラー時。エラー時は不正な値としてエラーレスポンスを返却
+            $this->illegalResponseErr();
+        }
     }
 
     //------------------------------

@@ -13,150 +13,6 @@ class AppConst
     // \AppConst::GENDER_MAN;
 
     //==========================
-    // 汎用マスタ
-    //==========================
-
-    /**
-     * コード区分 000
-     */
-    const EXT_GENERIC_MASTER_000 = '000';
-
-    /**
-     * コード区分 000 教室名
-     */
-    const EXT_GENERIC_MASTER_000_101 = '101';
-
-    /**
-     * コード区分 000 授業分類
-     */
-    const EXT_GENERIC_MASTER_000_109 = '109';
-
-    /**
-     * コード区分 000 学年
-     */
-    const EXT_GENERIC_MASTER_000_112 = '112';
-
-    /**
-     * コード区分 000 教科
-     */
-    const EXT_GENERIC_MASTER_000_114 = '114';
-
-    /**
-     * コード区分 101 家庭教師
-     */
-    const EXT_GENERIC_MASTER_101_900 = '900';
-
-    /**
-     * コード区分 102 請求情報
-     */
-    const EXT_GENERIC_MASTER_102 = '102';
-
-    /**
-     * コード区分 102 請求情報 振込
-     */
-    const EXT_GENERIC_MASTER_102_1 = '1';
-
-    /**
-     * コード区分 102 請求情報 カード
-     */
-    const EXT_GENERIC_MASTER_102_2 = '2';
-
-    /**
-     * コード区分 102 請求情報 持込
-     */
-    const EXT_GENERIC_MASTER_102_3 = '3';
-
-    /**
-     * コード区分 102 請求情報 郵貯
-     */
-    const EXT_GENERIC_MASTER_102_4 = '4';
-
-    /**
-     * コード区分 102 請求情報 七十七
-     */
-    const EXT_GENERIC_MASTER_102_5 = '5';
-
-    /**
-     * コード区分 102 請求情報 他行
-     */
-    const EXT_GENERIC_MASTER_102_6 = '6';
-
-    /**
-     * コード区分 102 請求情報 JC引落
-     */
-    const EXT_GENERIC_MASTER_102_7 = '7';
-
-    /**
-     * コード区分 109 レギュラー
-     */
-    const EXT_GENERIC_MASTER_109_0 = '0';
-
-    /**
-     * コード区分 109 個別講習
-     */
-    const EXT_GENERIC_MASTER_109_1 = '1';
-
-    /**
-     * コード区分 109 模擬試験
-     */
-    const EXT_GENERIC_MASTER_109_3 = '3';
-
-    /**
-     * コード区分 109 家庭教師
-     */
-    const EXT_GENERIC_MASTER_109_4 = '4';
-
-    /**
-     * コード区分 112 学年
-     */
-    const EXT_GENERIC_MASTER_112 = '112';
-
-    /**
-     * コード区分 114 教科
-     */
-    const EXT_GENERIC_MASTER_114 = '114';
-
-    /**
-     * コード区分 114 教科 小学
-     */
-    const EXT_GENERIC_MASTER_114_0 = '0';
-
-    /**
-     * コード区分 114 教科 小学 表示上限
-     */
-    const EXT_GENERIC_MASTER_114_0_MAX = '005';
-
-    /**
-     * コード区分 114 教科 中学
-     */
-    const EXT_GENERIC_MASTER_114_1 = '1';
-
-    /**
-     * コード区分 114 教科 中学 表示上限
-     */
-    const EXT_GENERIC_MASTER_114_1_MAX = '105';
-
-    /**
-     * コード区分 114 教科 高校
-     */
-    const EXT_GENERIC_MASTER_114_2 = '2';
-
-    /**
-     * コード区分 114 教科 高校 表示上限
-     */
-    const EXT_GENERIC_MASTER_114_2_MAX = '250';
-
-    /**
-     * コード区分 114 教科 一般
-     */
-    const EXT_GENERIC_MASTER_114_9 = '9';
-
-    /**
-     * コード区分 114 教科 一般 表示上限
-     */
-    const EXT_GENERIC_MASTER_114_9_MAX = '950';
-
-    //==========================
     // コードマスタ
     //==========================
 
@@ -169,129 +25,57 @@ class AppConst
     //-----------
 
     /**
-     * 状態
+     * 申請ステータス
      */
     const CODE_MASTER_1 = 1;
 
     /**
-     * 状態	未対応
+     * 申請ステータス 未対応
      */
     const CODE_MASTER_1_0 = 0;
 
     /**
-     * 状態 対応済み
+     * 申請ステータス 対応済
      */
     const CODE_MASTER_1_1 = 1;
 
     //-----------
-    // 変更状態
+    // 承認ステータス
     //-----------
 
     /**
-     * 変更状態
+     * 承認ステータス
      */
     const CODE_MASTER_2 = 2;
 
     /**
-     * 変更状態	未対応
+     * 承認ステータス 承認待ち
      */
-    const CODE_MASTER_2_0 = 0;
+    const CODE_MASTER_2_0 = 1;
 
     /**
-     * 変更状態 受付
+     * 承認ステータス 承認
      */
-    const CODE_MASTER_2_1 = 1;
+    const CODE_MASTER_2_1 = 2;
 
     /**
-     * 変更状態	対応済
+     * 承認ステータス 差戻し
      */
-    const CODE_MASTER_2_2 = 2;
+    const CODE_MASTER_2_2 = 3;
 
     //-----------
-    // 申込状態
-    //-----------
-
-    /**
-     * 申込状態
-     */
-    const CODE_MASTER_3 = 3;
-
-    /**
-     * 申込状態	未対応
-     */
-    const CODE_MASTER_3_0 = 0;
-
-    /**
-     * 申込状態	受付済
-     */
-    const CODE_MASTER_3_1 = 1;
-
-    //-----------
-    // ギフトカード状態
+    // 校舎コード
     //-----------
 
     /**
-     * ギフトカード状態
-     */
-    const CODE_MASTER_4 = 4;
-
-    /**
-     * ギフトカード状態 未使用
-     */
-    const CODE_MASTER_4_0 = 0;
-
-    /**
-     * ギフトカード状態 申請中
-     */
-    const CODE_MASTER_4_1 = 1;
-
-    /**
-     * ギフトカード状態 使用受付
-     */
-    const CODE_MASTER_4_2 = 2;
-
-    //-----------
-    // 退会状態
-    //-----------
-
-    /**
-     * 退会状態
-     */
-    const CODE_MASTER_5 = 5;
-
-    /**
-     * 退会状態	未対応
-     */
-    const CODE_MASTER_5_0 = 0;
-
-    /**
-     * 退会状態	受付
-     */
-    const CODE_MASTER_5_1 = 1;
-
-    /**
-     * 退会状態	退会済
-     */
-    const CODE_MASTER_5_3 = 3;
-
-    //-----------
-    // 教室コード
-    //-----------
-
-    /**
-     * 教室コード
+     * 校舎コード
      */
     const CODE_MASTER_6 = 6;
 
     /**
-     * 本部の教室コード
+     * 校舎の教室コード
      */
     const CODE_MASTER_6_0 = '0';
-
-    /**
-     * 教室コード（汎用マスタのコード区分）
-     */
-    const CODE_MASTER_6_0_101 = 101;
 
     //-----------
     // アカウント種類
@@ -308,7 +92,7 @@ class AppConst
     const CODE_MASTER_7_1 = 1;
 
     /**
-     * 教師
+     * 講師
      */
     const CODE_MASTER_7_2 = 2;
 
@@ -318,60 +102,42 @@ class AppConst
     const CODE_MASTER_7_3 = 3;
 
     //-----------
-    // 授業種類
+    // 可否フラグ
     //-----------
 
     /**
-     * 授業種類
-     */
-    const CODE_MASTER_8 = 8;
-
-    /**
-     * 個別教室
-     */
-    const CODE_MASTER_8_1 = 1;
-
-    /**
-     * 家庭教師
-     */
-    const CODE_MASTER_8_2 = 2;
-
-    //-----------
-    // 試験種別
-    //-----------
-
-    /**
-     * 試験種別
+     * 非表示フラグ
      */
     const CODE_MASTER_9 = 9;
 
     /**
-     * 模試
+     * 非表示フラグ 可
      */
-    const CODE_MASTER_9_1 = 1;
+    const CODE_MASTER_9_1 = 0;
 
     /**
-     * 定期考査
+     * 非表示フラグ 不可
      */
-    const CODE_MASTER_9_2 = 2;
+    const CODE_MASTER_9_2 = 1;
 
     //-----------
-    // 定期考査
-    //-----------
-
-    /**
-     * 定期考査名
-     */
-    const CODE_MASTER_10 = 10;
-
-    //-----------
-    // 前回比
+    // 非表示フラグ
     //-----------
 
     /**
-     * 前回比
+     * 非表示フラグ
      */
     const CODE_MASTER_11 = 11;
+
+    /**
+     * 非表示フラグ 表示
+     */
+    const CODE_MASTER_11_1 = 0;
+
+    /**
+     * 非表示フラグ 非表示
+     */
+    const CODE_MASTER_11_2 = 1;
 
     //-----------
     // 研修
@@ -391,20 +157,6 @@ class AppConst
      * 研修 動画
      */
     const CODE_MASTER_12_2 = 2;
-
-    //-----------
-    // コース変更種別
-    //-----------
-
-    /**
-     * コース変更種別
-     */
-    const CODE_MASTER_13 = 13;
-
-    /**
-     * コース変更種別 （個別）短期講習申込
-     */
-    const CODE_MASTER_13_4 = 4;
 
     //-----------
     // お知らせ種別
@@ -488,14 +240,19 @@ class AppConst
     //-----------
 
     /**
+     * 回答状態種別
+     */
+    const CODE_MASTER_17 = 17;
+
+    /**
      * 回答状態 未回答
      */
     const CODE_MASTER_17_0 = 0;
 
     /**
-     * 回答状態種別
+     * 回答状態 回答済
      */
-    const CODE_MASTER_17 = 17;
+    const CODE_MASTER_17_1 = 1;
 
     //-----------
     // 請求情報ファイル項目定義
@@ -504,17 +261,8 @@ class AppConst
     /**
      * 請求情報ファイル項目定義
      */
-    const CODE_MASTER_18 = 18;
+//    const CODE_MASTER_18 = 18;
 
-    /**
-     * 請求情報ファイル項目定義 サブコード 個別教室
-     */
-    const CODE_MASTER_18_SUB_1 = 1;
-
-    /**
-     * 請求情報ファイル項目定義 サブコード 家庭教師
-     */
-    const CODE_MASTER_18_SUB_2 = 2;
 
     //-----------
     // 給与情報ファイル項目定義
@@ -545,45 +293,6 @@ class AppConst
     const CODE_MASTER_20_1 = 1;
 
     //-----------
-    // スケジュール種別
-    //-----------
-
-    /**
-     * スケジュール種別
-     */
-    const CODE_MASTER_21 = 21;
-
-    /**
-     * スケジュール種別 個別授業
-     */
-    const CODE_MASTER_21_1 = 1;
-
-    /**
-     * スケジュール種別 短期講習
-     */
-    const CODE_MASTER_21_2 = 2;
-
-    /**
-     * スケジュール種別 模試
-     */
-    const CODE_MASTER_21_3 = 3;
-
-    /**
-     * スケジュール種別 イベント
-     */
-    const CODE_MASTER_21_4 = 4;
-
-    /**
-     * スケジュール種別 休業日
-     */
-    const CODE_MASTER_21_5 = 5;
-
-    /**
-     * スケジュール種別 打ち合せ
-     */
-    const CODE_MASTER_21_6 = 6;
-
-    //-----------
     // バッチ状態
     //-----------
 
@@ -606,6 +315,118 @@ class AppConst
      * バッチ状態 実行中
      */
     const CODE_MASTER_22_99 = 99;
+
+    //-----------
+    // 生徒会員ステータス
+    //-----------
+
+    /**
+     * 生徒会員ステータス
+     */
+    const CODE_MASTER_28 = 28;
+
+    /**
+     * 生徒会員ステータス 見込客
+     */
+    const CODE_MASTER_28_0 = 0;
+
+    /**
+     * 生徒会員ステータス 在籍
+     */
+    const CODE_MASTER_28_1 = 1;
+
+    /**
+     * 生徒会員ステータス 休塾予定
+     */
+    const CODE_MASTER_28_2 = 2;
+
+    /**
+     * 生徒会員ステータス 休塾
+     */
+    const CODE_MASTER_28_3 = 3;
+
+    /**
+     * 生徒会員ステータス 退会処理中
+     */
+    const CODE_MASTER_28_4 = 4;
+
+    /**
+     * 生徒会員ステータス 退会済
+     */
+    const CODE_MASTER_28_5 = 5;
+
+    /**
+     * 生徒会員ステータス
+     */
+    const CODE_MASTER_29 = 29;
+
+    /**
+     * 生徒会員ステータス 在籍
+     */
+    const CODE_MASTER_29_1 = 1;
+
+    /**
+     * 生徒会員ステータス 退会処理中
+     */
+    const CODE_MASTER_29_2 = 2;
+
+    /**
+     * 生徒会員ステータス 退会
+     */
+    const CODE_MASTER_29_3 = 3;
+
+    //-----------
+    // 時間割区分
+    //-----------
+
+    /**
+     * 時間割区分
+     */
+    const CODE_MASTER_37 = 37;
+
+    //-----------
+    // 期間区分
+    //-----------
+
+    /**
+     * 期間区分
+     */
+    const CODE_MASTER_38 = 38;
+
+
+    //-----------
+    // 用途種別
+    //-----------
+
+    /**
+     * 用途種別
+     */
+    const CODE_MASTER_41 = 41;
+
+    /**
+     * 用途種別 授業用
+     */
+    const CODE_MASTER_41_1 = 1;
+
+    /**
+     * 用途種別 オンライン専用
+     */
+    const CODE_MASTER_41_2 = 2;
+
+    /**
+     * 用途種別 面談用
+     */
+    const CODE_MASTER_41_3 = 3;
+
+    /**
+     * 用途種別 両者オンライン（システム登録用）
+     */
+    const CODE_MASTER_41_4 = 4;
+
+    /**
+     * 用途種別 家庭教師（システム登録用）
+     */
+    const CODE_MASTER_41_5 = 5;
 
     //==========================
     // アカウント情報
@@ -641,12 +462,12 @@ class AppConst
     const NOTICE_GROUP_TYPE_1 = 1;
 
     /**
-     * グループ種類	教師
+     * グループ種類	講師
      */
     const NOTICE_GROUP_TYPE_2 = 2;
 
     /**
-     * お知らせグループID 教師
+     * お知らせグループID 講師
      */
     const NOTICE_GROUP_ID_15 = 15;
 
