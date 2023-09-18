@@ -59,7 +59,7 @@ class AuthAccountProvider extends EloquentUserProvider
             $query->where($key, $val);
         }
         // ログイン可否フラグの条件を付加
-        $query->where('login_flg', 0);
+        $query->where('login_flg', AppConst::CODE_MASTER_9_1);
 
         // 最低限の情報のみ取得
         $query->select('account_id', 'account_type', 'remember_token');
@@ -192,6 +192,6 @@ class AuthAccountProvider extends EloquentUserProvider
             }
         }
         // ログイン可否フラグの条件を付加
-        return $query->where('login_flg', 0)->first();
+        return $query->where('login_flg', AppConst::CODE_MASTER_9_1)->first();
     }
 }
