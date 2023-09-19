@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * 受講生徒情報 - モデル
  */
-class Schedule extends Model
+class ClassMember extends Model
 {
 
     // モデルの共通処理
