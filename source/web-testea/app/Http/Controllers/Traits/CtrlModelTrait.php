@@ -18,6 +18,7 @@ use App\Models\Tutor;
 use App\Models\TutorCampus;
 use App\Models\AdminUser;
 use App\Models\Schedule;
+use App\Models\ClassMember;
 use App\Models\Account;
 use App\Models\YearlySchedule;
 use Illuminate\Support\Facades\DB;
@@ -668,11 +669,17 @@ trait CtrlModelTrait
         }
 
         // スケジュール情報に存在するかチェックする。existsを使用した
-        $query->whereExists(function ($query) use ($model, $campusCd, $tutorId, $account) {
+        $query->whereExists(function ($query) use ($model, $campusCd, $tutorId) {
 
-            // 受け持ち判定期間（当日日付の1ヶ月前から1ヶ月後）
-            $startDate = Carbon::parse('- 1 month')->startOfMonth()->format('y-m-d');
-            $endDate = Carbon::parse('+ 1 month')->endOfMonth()->format('y-m-d');
+            // 受け持ち判定期間（当日日付の1ヶ月前月初から1ヶ月後月末）
+            //$startDate = Carbon::parse('- 1 month')->startOfMonth()->format('y-m-d');
+            //$endDate = Carbon::parse('+ 1 month')->endOfMonth()->format('y-m-d');
+            // 受け持ち判定期間（当日日付の30日前から30日後）
+            $startDate = Carbon::parse('- 30 day')->format('y-m-d');
+            $endDate = Carbon::parse('+ 30 day')->format('y-m-d');
+            // デバッグ用出力（削除してからcommit/pushすること）
+            //$this->debug($startDate);
+            //$this->debug($endDate);
 
             // 対象テーブル(モデルから取得)
             $modelObj = new $model();
@@ -682,12 +689,23 @@ trait CtrlModelTrait
 
             // スケジュール情報テーブル
             $schedule = (new Schedule)->getTable();
+            // 受講生徒情報テーブル
+            $classMember = (new ClassMember)->getTable();
 
             // 1件存在するかチェック
             $query->select(DB::raw(1))
                 ->from($schedule)
-                // 対象テーブルとスケジュール情報のsidを連結
-                ->whereRaw($table . '.student_id = ' . $schedule . '.student_id')
+                ->leftJoin($classMember, function ($join) use ($classMember, $schedule){
+                    $join->on($classMember . '.schedule_id', '=', $schedule . '.schedule_id')
+                    ->whereNull($classMember . '.deleted_at');
+                })
+                // 以下の条件はクロージャで記述(orを含むため)
+                ->where(function ($query) use ($table, $schedule, $classMember) {
+                    // 対象テーブルとスケジュール情報のstudent_idを連結（１対１授業）
+                    $query->whereRaw($table . '.student_id = ' . $schedule . '.student_id')
+                        // または対象テーブルと受講生徒情報のstudent_idを連結（１対多授業）
+                        ->orWhereRaw($table . '.student_id = ' . $classMember . '.student_id');
+                })
                 // ログインユーザのID または指定のtutor_id
                 ->where($schedule . '.tutor_id', $tutorId)
                 // スケジュール情報を受け持ち判定期間で絞り込み
