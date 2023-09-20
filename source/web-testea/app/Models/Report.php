@@ -146,8 +146,9 @@ class Report extends Model
     public function scopeSearchCampusCd($query, $obj)
     {
         $key = 'campus_cd';
+        $col = $this->getTable() . '.' . $key;
         if (isset($obj[$key]) && filled($obj[$key])) {
-            $query->where($key, $obj[$key]);
+            $query->where($col, $obj[$key]);
         }
     }
 
