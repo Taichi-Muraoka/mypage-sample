@@ -47,7 +47,8 @@ class MstCourse extends Model
     protected $fillable = [
         'course_cd',
         'name',
-        'course_kind_cd'
+        'course_kind_cd',
+        'summary_kind'
     ];
 
     /**
@@ -101,7 +102,8 @@ class MstCourse extends Model
         static $_fieldRules = [
             'course_cd' => ['string', 'max:5'],
             'name' => ['string', 'max:50'],
-            'gender_cd' => ['integer', 'in:1,2,3']
+            'course_kind' => ['integer', 'in:1,2,3'],
+            'summary_kind' => ['integer', 'in:0,1,2,3,4,5,6,7']
         ];
         return $_fieldRules;
     }
