@@ -7,8 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Report;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtSchedule;
+use App\Models\Student;
+use App\Models\Tutor;
+use App\Models\Schedule;
+use App\Models\ClassMember;
+use App\Models\MstCourse;
+use App\Models\CodeMaster;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncReportTrait;
@@ -43,12 +47,21 @@ class ReportRegistController extends Controller
      */
     public function index()
     {
-        // 教室リストを取得
+        // 校舎リストを取得
         $rooms = $this->mdlGetRoomList(false);
+
+        // コースリストを取得
+        $courses = $this->mdlGetCourseList();
+
+        // 報告書承認リストを取得（サブコード指定で絞り込み）
+        $subCodes = [1];
+        $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4, $subCodes);
 
         return view('pages.tutor.report_regist', [
             'rules' => $this->rulesForSearch(),
             'rooms' => $rooms,
+            'courses' => $courses,
+            'statusList' => $statusList,
             'editData' => null
         ]);
     }
@@ -63,22 +76,22 @@ class ReportRegistController extends Controller
     {
         // $requestからidを取得し、検索結果を返却する
         // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'id');
+        //$this->validateIdsFromRequest($request, 'id');
 
         // ログイン者の情報を取得する
         $account = Auth::user();
         $account_id = $account->account_id;
 
-        // roomcdを取得
-        $roomcd = $request->input('id');
+        // campus_cdを取得
+        $campus_cd = $request->input('id');
 
-        // $requestのroomcdから、生徒IDリストを取得し、検索結果を返却する。
+        // $requestのcampus_cdから、生徒IDリストを取得し、検索結果を返却する。
         // 生徒リスト取得
-        if ($roomcd == -1 || !filled($roomcd)) {
+        if ($campus_cd == -1 || !filled($campus_cd)) {
             // -1 または 空白の場合、自分の受け持ちの生徒だけに絞り込み
             $students = $this->mdlGetStudentListForT(null, $account_id);
         } else {
-            $students = $this->mdlGetStudentListForT($roomcd, $account_id);
+            $students = $this->mdlGetStudentListForT($campus_cd, $account_id);
         }
 
         return [
@@ -100,46 +113,84 @@ class ReportRegistController extends Controller
         // formを取得
         $form = $request->all();
 
+        // ログイン者の情報を取得する
+        $account = Auth::user();
+        $account_id = $account->account_id;
+
         // クエリを作成
         $query = Report::query();
 
-        // 教室コード選択による絞り込み条件
-        // -1 は未選択状態のため、-1以外の場合に教室コードの絞り込みを行う
-        if (isset($form['roomcd']) && filled($form['roomcd']) && $form['roomcd'] != -1) {
+        // 校舎コード選択による絞り込み条件
+        // -1 は未選択状態のため、-1以外の場合に校舎コードの絞り込みを行う
+        if (isset($form['campus_cd']) && filled($form['campus_cd']) && $form['campus_cd'] != -1) {
             // 検索フォームから取得（スコープ）
-            $query->SearchRoom($form);
+            $query->SearchCampusCd($form);
         }
 
         // 生徒IDの検索（スコープで指定する）
         $query->SearchSid($form);
 
-        // 受け持ち生徒に限定するガードを掛ける
-        $query->where($this->guardTutorTableWithSid());
-
-        // 自分のアカウントIDでガードを掛ける（tid）
-        $query->where($this->guardTutorTableWithTid());
-
         // 教室名取得のサブクエリ
         $room_names = $this->mdlGetRoomQuery();
+
+        // 受け持ち生徒リスト（配列）取得
+        $myStudents = $this->mdlGetStudentArrayForT();
 
         // データを取得
         $reports = $query
             ->select(
-                'report_id as id',
-                'lesson_date',
-                'start_time',
+                'reports.report_id as id',
+                'reports.lesson_date',
+                'reports.period_no',
+                'reports.tutor_id',
+                'reports.approval_status',
                 'room_names.room_name as room_name',
-                'ext_student_kihon.name as sname',
-                'r_minutes'
+                'mst_courses.name as course_name',
+                'mst_codes.name as status_name',
+                'tutors.name as tutor_name',
+                'students.name as student_name'
             )
-            // 教室名の取得
+            // スケジュール情報のJOIN
+            ->sdJoin(Schedule::class, 'reports.schedule_id', '=', 'schedules.schedule_id')
+            // 受講生徒情報のJOIN
+            ->sdLeftJoin(ClassMember::class, 'schedules.schedule_id', '=', 'class_members.schedule_id')
+            // 校舎名の取得
             ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('report.roomcd', '=', 'room_names.code');
+                $join->on('schedules.campus_cd', '=', 'room_names.code');
             })
+            // 講師名の取得
+            ->sdLeftJoin(Tutor::class, 'reports.tutor_id', '=', 'tutors.tutor_id')
             // 生徒名の取得
-            ->sdLeftJoin(ExtStudentKihon::class, 'report.sid', '=', 'ext_student_kihon.sid')
+            ->sdLeftJoin(Student::class, 'reports.student_id', '=', 'students.student_id')
+            // コース名の取得
+            ->sdLeftJoin(MstCourse::class, 'reports.course_cd', '=', 'mst_courses.course_cd')
+            // 報告書承認ステータス名の取得
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('reports.approval_status', 'mst_codes.code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_4);
+            })
+            // ガード）担当生徒で絞り込み
+            // 以下の条件はクロージャで記述(orを含むため)
+            ->where(function ($query) use ($myStudents){
+                // スケジュール情報から絞り込み（１対１授業）
+                $query->whereIn('schedules.student_id', $myStudents)
+                // または受講生徒情報から絞り込み（１対多授業）
+                    ->orWhereIn('class_members.student_id', $myStudents);
+            })
+            // 自分の報告書かどうかで取得条件切り分け
+            // 以下の条件はクロージャで記述(orを含むため)
+            ->where(function ($query) use ($account_id){
+                // 自分の報告書は承認ステータス全て取得
+                $query->where('reports.tutor_id', $account_id)
+                    // 自分以外の報告書は承認済みのもののみ
+                    ->OrWhere(function ($query) use ($account_id){
+                        $query->where('reports.tutor_id', '<>', $account_id)
+                        ->where('reports.approval_status', AppConst::CODE_MASTER_4_2);
+                    });
+            })
+            ->distinct()
             ->orderby('lesson_date', 'desc')
-            ->orderby('start_time', 'desc');
+            ->orderby('period_no', 'desc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $reports);
@@ -195,8 +246,8 @@ class ReportRegistController extends Controller
 
         $rules = array();
 
-        $rules += Report::fieldRules('roomcd', [$validationRoomList]);
-        $rules += Report::fieldRules('sid', [$validationStudentsList]);
+        $rules += Schedule::fieldRules('campus_cd', [$validationRoomList]);
+        $rules += Report::fieldRules('student_id', [$validationStudentsList]);
 
         return $rules;
     }
@@ -233,7 +284,7 @@ class ReportRegistController extends Controller
         // // データを取得
         // $report = $query
         //     // IDを指定
-        //     ->where('report.report_id', $id)
+        //     ->where('reports.report_id', $id)
         //     ->select(
         //         'lesson_date',
         //         'start_time',
@@ -247,10 +298,10 @@ class ReportRegistController extends Controller
         //     )
         //     // 教室名の取得
         //     ->leftJoinSub($room_names, 'room_names', function ($join) {
-        //         $join->on('report.roomcd', '=', 'room_names.code');
+        //         $join->on('reports.campus_cd', '=', 'room_names.code');
         //     })
         //     // 生徒名の取得
-        //     ->sdLeftJoin(ExtStudentKihon::class, 'report.sid', '=', 'ext_student_kihon.sid')
+        //     ->sdLeftJoin(ExtStudentKihon::class, 'reports.sid', '=', 'ext_student_kihon.sid')
         //     ->firstOrFail();
 
         // return [
@@ -322,19 +373,19 @@ class ReportRegistController extends Controller
             $room_names = $this->mdlGetRoomQuery();
 
             // $requestからidを取得し、検索結果を返却する。idはスケジュールID
-            $query = ExtSchedule::query();
+            $query = Schedule::query();
             $lesson = $query
                 ->select(
                     'room_name'
                 )
                 // 教室名の取得
                 ->leftJoinSub($room_names, 'room_names', function ($join) {
-                    $join->on('ext_schedule.roomcd', '=', 'room_names.code');
+                    $join->on('schedules.campus_cd', '=', 'room_names.code');
                 })
                 // 自分のアカウントIDでガードを掛ける（tid）
                 ->where($this->guardTutorTableWithTid())
                 // キーの指定
-                ->where('ext_schedule.id', '=', $schedule_id)
+                ->where('schedules.schedule_id', '=', $schedule_id)
                 ->firstOrFail();
 
             // 変数にセット
@@ -482,7 +533,7 @@ class ReportRegistController extends Controller
         // // データを取得
         // $report = $query
         //     // IDを指定
-        //     ->where('report.report_id', $reportId)
+        //     ->where('reports.report_id', $reportId)
         //     ->select(
         //         'report_id',
         //         'lesson_type',
@@ -498,10 +549,10 @@ class ReportRegistController extends Controller
         //     )
         //     // 教室名の取得
         //     ->leftJoinSub($room_names, 'room_names', function ($join) {
-        //         $join->on('report.roomcd', '=', 'room_names.code');
+        //         $join->on('reports.campus_cd', '=', 'room_names.code');
         //     })
         //     // 生徒名の取得
-        //     ->sdLeftJoin(ExtStudentKihon::class, 'report.sid', '=', 'ext_student_kihon.sid')
+        //     ->sdLeftJoin(ExtStudentKihon::class, 'reports.sid', '=', 'ext_student_kihon.sid')
         //     // 受け持ち生徒に限定するガードを掛ける
         //     ->where($this->guardTutorTableWithSid())
         //     // 自分のアカウントIDでガードを掛ける（tid）
