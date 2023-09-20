@@ -18,6 +18,7 @@ return new class extends Migration
             $table->bigIncrements('report_id')->comment('授業報告書ID');
             $table->unsignedInteger('tutor_id')->comment('講師ID');
             $table->unsignedBigInteger('schedule_id')->comment('スケジュールID');
+            $table->string('campus_cd', 2)->comment('校舎コード');
             $table->string('course_cd', 5)->comment('コースコード');
             $table->date('lesson_date')->comment('授業日');
             $table->unsignedSmallInteger('period_no')->comment('時限');

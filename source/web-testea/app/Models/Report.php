@@ -47,6 +47,7 @@ class Report extends Model
     protected $fillable = [
         'tutor_id',
         'schedule_id',
+        'campus_cd',
         'course_cd',
         'lesson_date',
         'period_no',
@@ -116,6 +117,7 @@ class Report extends Model
             'report_id' => ['integer'],
             'tutor_id' => ['integer'],
             'schedule_id' => ['integer'],
+            'campus_cd' => ['string', 'max:2'],
             'course_cd' => ['string', 'max:5'],
             'lesson_date' => ['date_format:Y-m-d'],
             'period_no' => ['integer', 'min:0', 'max:99'],
@@ -138,5 +140,27 @@ class Report extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
+    /**
+     * 検索 校舎コード
+     */
+    public function scopeSearchCampusCd($query, $obj)
+    {
+        $key = 'campus_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 student_id
+     */
+    public function scopeSearchSid($query, $obj)
+    {
+        $key = 'student_id';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // 生徒IDでスケジュールを絞り込む(共通処理)
+            $this->mdlWhereScheduleBySidQuery($query, self::class, $obj[$key]);
+        }
+    }
 
 }
