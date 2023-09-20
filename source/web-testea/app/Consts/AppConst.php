@@ -64,6 +64,35 @@ class AppConst
     const CODE_MASTER_2_2 = 3;
 
     //-----------
+    // 承認ステータス
+    //-----------
+
+    /**
+     * 報告書承認ステータス
+     */
+    const CODE_MASTER_4 = 4;
+
+    /**
+     * 承認ステータス 対象外
+     */
+    const CODE_MASTER_4_0 = 0;
+
+    /**
+     * 承認ステータス 承認待ち
+     */
+    const CODE_MASTER_4_1 = 1;
+
+    /**
+     * 承認ステータス 承認
+     */
+    const CODE_MASTER_4_2 = 2;
+
+    /**
+     * 承認ステータス 差戻し
+     */
+    const CODE_MASTER_4_3 = 3;
+
+    //-----------
     // 校舎コード
     //-----------
 

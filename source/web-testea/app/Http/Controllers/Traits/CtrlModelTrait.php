@@ -61,17 +61,17 @@ trait CtrlModelTrait
      * data_typeを指定する
      *
      * @param integer $dataType
-     * @param integer $subCode
+     * @param array $subCode サブコード（配列で指定）省略可
      * @return array
      */
-    protected function mdlMenuFromCodeMaster($dataType, $subCode = null)
+    protected function mdlMenuFromCodeMaster($dataType, $subCodes = null)
     {
 
         $query = CodeMaster::query();
 
         // サブコードが指定された場合絞り込み
-        $query->when($subCode, function ($query) use ($subCode) {
-            return $query->where('sub_code', $subCode);
+        $query->when($subCodes, function ($query) use ($subCodes) {
+            return $query->whereIn('sub_code', $subCodes);
         });
 
         // プルダウンリストを取得する
@@ -83,7 +83,7 @@ trait CtrlModelTrait
     }
 
     /**
-     * 生徒プルダウンメニューのリストを取得
+     * 講師プルダウンメニューのリストを取得
      * 管理者向け（教室管理者の場合は自分の校舎のみ）
      * 教室管理者以外は、指定されたcampusCdで検索
      *
@@ -92,7 +92,7 @@ trait CtrlModelTrait
      */
     protected function mdlGetTutorList($campusCd = null)
     {
-        // 生徒情報の検索
+        // 講師情報の検索
         $query = Tutor::query();
 
         if (AuthEx::isRoomAdmin()) {
@@ -105,7 +105,7 @@ trait CtrlModelTrait
                 $this->mdlWhereTidByRoomQuery($query, Tutor::class, $campusCd);
             }
         }
-        // 退会会員を除外
+        // 退職講師を除外
         $query->where('tutor_status', '<>', AppConst::CODE_MASTER_29_3);
 
         // プルダウンリストを取得する
@@ -116,7 +116,7 @@ trait CtrlModelTrait
     }
 
     /**
-     * 講師プルダウンメニューのリストを取得
+     * 生徒プルダウンメニューのリストを取得
      * 管理者向け（教室管理者の場合は自分の校舎のみ）
      * 教室管理者以外は、指定されたcampusCdで検索
      *
@@ -189,7 +189,7 @@ trait CtrlModelTrait
      * 講師向け
      *
      * @param string $campusCd 校舎コード 指定なしの場合null
-     * @param int $tid 講師ID 
+     * @param int $tutorId 講師ID 
      * @param string $excludeCampusCd 除外する校舎コード(削除予定)
      * @return array
      */
@@ -369,9 +369,9 @@ trait CtrlModelTrait
     }
 
     /**
-     * 時限プルダウンメニューのリストを取得（校舎・時間割区分から）
+     * 時限プルダウンメニューのリストを取得（校舎・時間割区分指定）
      *
-     * @param string $courseCd 校舎コード
+     * @param string $campusCd 校舎コード
      * @param int $timetableKind 時間割区分
      * @return array
      */
@@ -399,7 +399,7 @@ trait CtrlModelTrait
         // プルダウンリストを取得する
         return $query->select(
             'timetable_id as code',
-            DB::raw('CONCAT(period_no, " 限") AS value')
+            DB::raw('CONCAT(period_no, "限") AS value')
         )
             ->orderby('campus_cd')->orderby('period_no')
             ->get()
@@ -407,9 +407,9 @@ trait CtrlModelTrait
     }
 
     /**
-     * 時限プルダウンメニューのリストを取得（校舎・日付から）
+     * 時限プルダウンメニューのリストを取得（校舎・日付指定）
      *
-     * @param string $courseCd 校舎コード
+     * @param string $campusCd 校舎コード
      * @param date $date 日付
      * @return array
      */
@@ -445,7 +445,7 @@ trait CtrlModelTrait
         // プルダウンリストを取得する
         return $query->select(
             'timetable_id as code',
-            DB::raw('CONCAT(period_no, " 限") AS value')
+            DB::raw('CONCAT(period_no, "限") AS value')
         )
             ->orderby('mst_timetables.campus_cd')->orderby('period_no')
             ->get()
@@ -565,6 +565,38 @@ trait CtrlModelTrait
         return $lesson;
     }
 
+    /**
+     * 担当生徒リスト（配列）を取得
+     * 講師向け
+     * selectのIN句に指定する想定
+     *
+     * @param int $tutorId 講師ID 
+     * @return array
+     */
+    protected function mdlGetStudentArrayForT($tutorId = null)
+    {
+        $query = Student::query();
+
+        $this->mdlWhereSidByRoomQueryForT($query, Student::class, $tutorId);
+
+        // 退会会員を除外
+        $query->where('stu_status', '<>', AppConst::CODE_MASTER_28_5);
+
+        // 生徒リストを取得する
+        $students = $query->select('student_id')
+            ->distinct()
+            ->orderby('student_id')
+            ->get();
+
+        // 配列に格納
+        $arrStudents = [];
+        foreach ($students as $student) {
+            array_push($arrStudents, $student->student_id);
+        }
+
+        return $arrStudents;
+    }
+
     //------------------------------
     // join向けリストの作成
     //------------------------------
@@ -596,8 +628,8 @@ trait CtrlModelTrait
     //------------------------------
 
     /**
-     * 指定された校舎コードの生徒IDのみを絞り込む
-     * 教室管理者の場合、ログインされている教室管理者の校舎で絞り込み
+     * 教室管理者向け 自分の校舎で生徒IDを絞り込む
+     * whereに指定する条件を取得する
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param \Illuminate\Database\Eloquent\Model $model sidを絞るテーブルのモデルクラス
@@ -648,13 +680,12 @@ trait CtrlModelTrait
     }
 
     /**
-     * 講師の受け持ちの生徒IDを絞り込む
-     * 講師向け
+     * 指定された校舎コードで講師の受け持ちの生徒IDを絞り込む
      * whereに指定する条件を取得する
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param \Illuminate\Database\Eloquent\Model $model 生徒IDを絞るテーブルのモデルクラス
-     * @param int $tutorId 講師ID（講師向け画面からの場合null）
+     * @param int $tutorId 講師ID（講師向け画面からの場合null許可）
      * @param string $campusCd 校舎コード
      */
     protected function mdlWhereSidByRoomQueryForT($query, $model, $tutorId, $campusCd = null)
@@ -677,9 +708,6 @@ trait CtrlModelTrait
             // 受け持ち判定期間（当日日付の30日前から30日後）
             $startDate = Carbon::parse('- 30 day')->format('y-m-d');
             $endDate = Carbon::parse('+ 30 day')->format('y-m-d');
-            // デバッグ用出力（削除してからcommit/pushすること）
-            //$this->debug($startDate);
-            //$this->debug($endDate);
 
             // 対象テーブル(モデルから取得)
             $modelObj = new $model();
@@ -713,6 +741,54 @@ trait CtrlModelTrait
                 // 教室が指定された場合のみ絞り込み
                 ->when($campusCd, function ($query) use ($schedule, $campusCd) {
                     return $query->where($schedule . '.campus_cd', $campusCd);
+                })
+                // delete_dt条件の追加
+                ->whereNull($schedule . '.deleted_at');
+        });
+    }
+
+    /**
+     * 指定された生徒IDのスケジュールのみを絞り込む
+     * 授業報告書検索用
+     * whereに指定する条件を取得する
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param \Illuminate\Database\Eloquent\Model $model 生徒IDを絞るテーブルのモデルクラス
+     * @param int $studentId 生徒ID
+     */
+    protected function mdlWhereScheduleBySidQuery($query, $model, $studentId)
+    {
+
+        // スケジュール情報に存在するかチェックする。existsを使用した
+        $query->whereExists(function ($query) use ($model, $studentId) {
+
+            // 対象テーブル(モデルから取得)
+            $modelObj = new $model();
+
+            // テーブル名取得
+            $table = $modelObj->getTable();
+
+            // スケジュール情報テーブル
+            $schedule = (new Schedule)->getTable();
+            // 受講生徒情報テーブル
+            $classMember = (new ClassMember)->getTable();
+
+            // 1件存在するかチェック
+            $query->select(DB::raw(1))
+                ->from($schedule)
+                // 対象テーブルとスケジュール情報のschedule_idを連結
+                ->whereRaw($table . '.schedule_id = ' . $schedule . '.schedule_id')
+                // スケジュール情報と受講生徒情報を連結
+                ->leftJoin($classMember, function ($join) use ($classMember, $schedule){
+                    $join->on($classMember . '.schedule_id', '=', $schedule . '.schedule_id')
+                    ->whereNull($classMember . '.deleted_at');
+                })
+                // 以下の条件はクロージャで記述(orを含むため)
+                ->where(function ($query) use ($schedule, $classMember, $studentId) {
+                    // 対象テーブルとスケジュール情報のstudent_idを連結（１対１授業）
+                    $query->where($schedule . '.student_id', $studentId)
+                        // または対象テーブルと受講生徒情報のstudent_idを連結（１対多授業）
+                        ->orWhere($classMember . '.student_id', $studentId);
                 })
                 // delete_dt条件の追加
                 ->whereNull($schedule . '.deleted_at');
