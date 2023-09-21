@@ -47,7 +47,7 @@ class MstCourse extends Model
     protected $fillable = [
         'course_cd',
         'name',
-        'course_kind_cd',
+        'course_kind',
         'summary_kind'
     ];
 

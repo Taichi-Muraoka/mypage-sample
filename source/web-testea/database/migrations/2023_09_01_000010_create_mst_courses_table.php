@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('course_cd', 5)->comment('コースコード');
             $table->string('name', 50)->comment('名称');
             $table->unsignedSmallInteger('course_kind')->comment('コース種別（1:授業単、2:授業複、3:その他）');
-            $table->unsignedSmallInteger('summary_kind')->->default(0)comment('給与集計種別');
+            $table->unsignedSmallInteger('summary_kind')->default(0)->comment('給与集計種別');
             $table->timestamps();
             $table->softDeletes();
 
