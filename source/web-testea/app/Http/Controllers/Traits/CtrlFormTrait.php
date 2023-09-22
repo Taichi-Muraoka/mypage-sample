@@ -54,6 +54,8 @@ trait CtrlFormTrait
             ->offset($offset)
             ->limit($countPage)
             ->get();
+        // クエリ出力（デバッグ用。削除してからcommit/pushすること）
+        //$this->debug(\DB::getQueryLog());
 
         // トータル件数の取得
         // 直接カウントは取得できないのでサブクエリとしてカウントを取得
