@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('name_kana', 50)->comment('名前かな');
             $table->unsignedSmallInteger('grade_cd')->comment('学年コード');
             $table->string('grade_year', 4)->comment('学年設定年度');
-            $table->date('birth_date')->nullable()->comment('生年月日');
+            $table->date('birth_date')->comment('生年月日');
             $table->string('school_cd_e', 13)->nullable()->comment('所属学校コード（小）');
             $table->string('school_cd_j', 13)->nullable()->comment('所属学校コード（中）');
             $table->string('school_cd_h', 13)->nullable()->comment('所属学校コード（高）');
