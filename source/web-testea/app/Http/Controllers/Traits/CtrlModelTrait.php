@@ -109,8 +109,8 @@ trait CtrlModelTrait
         $query->where('tutor_status', '<>', AppConst::CODE_MASTER_29_3);
 
         // プルダウンリストを取得する
-        return $query->select('tutor_id as id', 'name as value')
-            ->orderby('id')
+        return $query->select('tutor_id as id', 'name as value', 'name_kana')
+            ->orderby('name_kana')
             ->get()
             ->keyBy('id');
     }
@@ -142,8 +142,8 @@ trait CtrlModelTrait
         $query->where('stu_status', '<>', AppConst::CODE_MASTER_28_5);
 
         // プルダウンリストを取得する
-        return $query->select('student_id as id', 'name as value')
-            ->orderby('id')
+        return $query->select('student_id as id', 'name as value', 'name_kana')
+            ->orderby('name_kana')
             ->get()
             ->keyBy('id');
     }
@@ -177,9 +177,10 @@ trait CtrlModelTrait
         // プルダウンリストを取得する
         return $query->select(
             'student_id as id',
-            DB::raw('CONCAT(student_id, "：", name) AS value')
-        )
-            ->orderby('id')
+            DB::raw('CONCAT(student_id, "：", name) AS value'),
+            'name_kana'
+            )
+            ->orderby('name_kana')
             ->get()
             ->keyBy('id');
     }
@@ -204,9 +205,9 @@ trait CtrlModelTrait
         $query->where('stu_status', '<>', AppConst::CODE_MASTER_28_5);
 
         // プルダウンリストを取得する
-        return $query->select('student_id as id', 'name as value')
+        return $query->select('student_id as id', 'name as value', 'name_kana')
             ->distinct()
-            ->orderby('id')
+            ->orderby('name_kana')
             ->get()
             ->keyBy('id');
     }

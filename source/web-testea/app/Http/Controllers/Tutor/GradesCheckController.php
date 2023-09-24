@@ -80,7 +80,7 @@ class GradesCheckController extends Controller
         }
 
         return [
-            'selectItems' => $students
+            'selectItems' => $this->objToArray($students)
         ];
     }
 
