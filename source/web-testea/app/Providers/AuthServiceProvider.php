@@ -27,7 +27,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerPolicies();
+        //$this->registerPolicies();
 
         // 権限の追加
         AuthEx::addGateDefine();

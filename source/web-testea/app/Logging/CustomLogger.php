@@ -6,6 +6,7 @@ use Monolog\Logger;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\WebProcessor;
+use Monolog\LogRecord;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -71,7 +72,7 @@ class CustomLogger
      *
      * @return array
      */
-    public function addExtraData(array $record): array
+    public function addExtraData(LogRecord $record): LogRecord
     {
         // ログインしているかチェック
         $account_id = 'Not logged in.';
@@ -83,7 +84,7 @@ class CustomLogger
         }
 
         // アカウントのキーを取得
-        $record['extra'] += [
+        $record->extra += [
             // アカウントID
             'account_id' => $account_id,
             // アカウント種別
