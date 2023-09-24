@@ -60,11 +60,11 @@ class RegularClass extends Model
     ];
 
     /**
-     * 日付項目の定義
+     * 属性のキャスト
      *
      * @var array
      */
-    protected $dates = [];
+    protected $casts = [];
 
     /**
      * 属性に対するモデルのデフォルト値
