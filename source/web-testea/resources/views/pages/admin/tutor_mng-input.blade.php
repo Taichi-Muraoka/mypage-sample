@@ -58,15 +58,19 @@
     <x-input.text caption="学年設定年度" id="grade_year" :rules=$rules :editData=$editData/>
 
     <x-input.modal-select caption="所属大学" id="school_cd_u" btnCaption="学校検索" :editData=$editData />
-    <x-input.modal-select caption="所属高校" id="school_cd_h" btnCaption="学校検索" :editData=$editData />
-    <x-input.modal-select caption="所属中学" id="school_cd_j" btnCaption="学校検索" :editData=$editData />
+    <x-input.modal-select caption="出身高校" id="school_cd_h" btnCaption="学校検索" :editData=$editData />
+    <x-input.modal-select caption="出身中学" id="school_cd_j" btnCaption="学校検索" :editData=$editData />
 
     <x-input.text caption="授業時給（ベース給）" id="hourly_wage" :rules=$rules :editData=$editData/>
+
+    @if (request()->routeIs('tutor_mng-edit'))
     <x-input.select id="tutor_status" caption="講師ステータス" :select2=true :select2Search=false >
         <option value="1">在籍</option>
         <option value="2">退職処理中</option>
         <option value="3">退職済</option>
     </x-input.select>
+    @endif
+
     <x-input.date-picker caption="勤務開始日" id="enter_date" />
 
     @if (request()->routeIs('tutor_mng-edit'))
