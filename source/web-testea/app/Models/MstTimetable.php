@@ -57,7 +57,10 @@ class MstTimetable extends Model
      *
      * @var array
      */
-    protected $dates = [];
+    protected $dates = [
+        'start_time',
+        'end_time',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値

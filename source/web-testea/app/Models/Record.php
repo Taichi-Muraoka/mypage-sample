@@ -60,7 +60,10 @@ class Record extends Model
      *
      * @var array
      */
-    protected $dates = [];
+    protected $dates = [
+        'received_time',
+        'regist_time',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値

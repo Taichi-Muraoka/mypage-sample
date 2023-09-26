@@ -65,7 +65,9 @@ class Surcharge extends Model
      *
      * @var array
      */
-    protected $dates = [];
+    protected $dates = [
+        'start_time'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
