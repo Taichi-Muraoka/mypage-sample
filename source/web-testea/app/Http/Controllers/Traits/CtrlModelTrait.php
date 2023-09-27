@@ -179,7 +179,7 @@ trait CtrlModelTrait
             'student_id as id',
             DB::raw('CONCAT(student_id, "：", name) AS value'),
             'name_kana'
-            )
+        )
             ->orderby('name_kana')
             ->get()
             ->keyBy('id');
@@ -376,7 +376,7 @@ trait CtrlModelTrait
      * @param int $timetableKind 時間割区分
      * @return array
      */
-    protected function mdlGetPeriodList($campusCd, $timetableKind)
+    protected function mdlGetPeriodListByKind($campusCd, $timetableKind)
     {
         $query = MstTimetable::query();
         $account = Auth::user();
@@ -399,7 +399,8 @@ trait CtrlModelTrait
 
         // プルダウンリストを取得する
         return $query->select(
-            'timetable_id as code',
+            //'timetable_id as code',
+            'period_no as code',
             DB::raw('CONCAT(period_no, "限") AS value')
         )
             ->orderby('campus_cd')->orderby('period_no')
@@ -445,7 +446,8 @@ trait CtrlModelTrait
 
         // プルダウンリストを取得する
         return $query->select(
-            'timetable_id as code',
+            //'timetable_id as code',
+            'period_no as code',
             DB::raw('CONCAT(period_no, "限") AS value')
         )
             ->orderby('mst_timetables.campus_cd')->orderby('period_no')
@@ -599,6 +601,68 @@ trait CtrlModelTrait
     }
 
     //------------------------------
+    // 名称取得（共通で使用されるもの）
+    //------------------------------
+
+    /**
+     * 校舎名の取得
+     *
+     * @param string $campusCd 校舎コード
+     * @return string
+     */
+    protected function mdlGetRoomName($campusCd)
+    {
+        // 校舎名を取得
+        $query = MstCampus::query();
+        $campus = $query
+            ->select('name')
+            ->where('campus_cd', $campusCd)
+            ->firstOrFail();
+
+        return $campus->name;
+    }
+
+    /**
+     * 生徒名の取得
+     *
+     * @param int $studentId 生徒Id
+     * @return string
+     */
+    protected function mdlGetStudentName($studentId)
+    {
+        // 生徒名を取得する
+        $query = Student::query();
+        $student = $query
+            ->select(
+                'name'
+            )
+            ->where('student_id', '=', $studentId)
+            ->firstOrFail();
+
+        return $student->name;
+    }
+
+    /**
+     * 講師名の取得
+     *
+     * @param int $tutorId 講師ID
+     * @return string
+     */
+    protected function mdlGetTeacherName($tutorId)
+    {
+        // 講師名を取得する
+        $query = Tutor::query();
+        $tutor = $query
+            ->select(
+                'name'
+            )
+            ->where('tutor_id', '=', $tutorId)
+            ->firstOrFail();
+
+        return $tutor->name;
+    }
+
+    //------------------------------
     // join向けリストの作成
     //------------------------------
 
@@ -724,9 +788,9 @@ trait CtrlModelTrait
             // 1件存在するかチェック
             $query->select(DB::raw(1))
                 ->from($schedule)
-                ->leftJoin($classMember, function ($join) use ($classMember, $schedule){
+                ->leftJoin($classMember, function ($join) use ($classMember, $schedule) {
                     $join->on($classMember . '.schedule_id', '=', $schedule . '.schedule_id')
-                    ->whereNull($classMember . '.deleted_at');
+                        ->whereNull($classMember . '.deleted_at');
                 })
                 // 以下の条件はクロージャで記述(orを含むため)
                 ->where(function ($query) use ($table, $schedule, $classMember) {
@@ -780,9 +844,9 @@ trait CtrlModelTrait
                 // 対象テーブルとスケジュール情報のschedule_idを連結
                 ->whereRaw($table . '.schedule_id = ' . $schedule . '.schedule_id')
                 // スケジュール情報と受講生徒情報を連結
-                ->leftJoin($classMember, function ($join) use ($classMember, $schedule){
+                ->leftJoin($classMember, function ($join) use ($classMember, $schedule) {
                     $join->on($classMember . '.schedule_id', '=', $schedule . '.schedule_id')
-                    ->whereNull($classMember . '.deleted_at');
+                        ->whereNull($classMember . '.deleted_at');
                 })
                 // 以下の条件はクロージャで記述(orを含むため)
                 ->where(function ($query) use ($schedule, $classMember, $studentId) {

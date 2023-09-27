@@ -61,7 +61,10 @@ class Conference extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値

@@ -30,6 +30,14 @@ class ValidatorServiceProvider extends ServiceProvider
     public function boot()
     {
         //-----------------------
+        // 半角英数字チェック
+        //-----------------------
+        // 半角英数字のみ
+        Validator::extend('vdAlphaNum', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^[a-zA-Z0-9]+$/', $value);
+        });
+
+        //-----------------------
         // 時刻の形式チェック
         //-----------------------
         // デフォルトのチェックの場合、'date_format:H:i'でできるが、以下のメッセージになるため
@@ -45,6 +53,14 @@ class ValidatorServiceProvider extends ServiceProvider
         // 半角英数字混合（少なくとも各1文字以上の英字と数字。英字は大文字でも可） 8文字以上20文字以下
         Validator::extend('vdPassword', function ($attribute, $value, $parameters, $validator) {
             return preg_match('/^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{8,20}$/', $value);
+        });
+
+        //-----------------------
+        // 電話番号の形式チェック
+        //-----------------------
+        // ハイフンありなしどちらも許容する
+        Validator::extend('vdTelephone', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^(0{1}\d{1,4}-{0,1}\d{1,4}-{0,1}\d{4})$/', $value);
         });
 
         //-----------------------
