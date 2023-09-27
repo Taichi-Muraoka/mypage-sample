@@ -9,6 +9,7 @@
 - [3. ブランチ運用手順](#3-ブランチ運用手順)
   - [作業者](#作業者)
   - [レビュアー](#レビュアー)
+  - [developブランチから最新のソースコードをマージ](#developブランチから最新のソースコードをマージ)
 
 <!-- /TOC -->
 
@@ -39,9 +40,9 @@ Githubのプロジェクトのページで、Issueを作成する。
   * 機能名は、ルーティングやファイル名を参考にする
 ```
 例）
-生徒向け　カレンダー		        ：　feature/student-calender
-講師向け　給与明細			    ：　feature/tutor-salary
-運用管理　マスタ管理-ブースマスタ ：　feature/manage-booth-master
+生徒向け　カレンダー				：　feature/student-calender
+講師向け　給与明細				：　feature/tutor-salary
+運用管理　マスタ管理-ブースマスタ	：　feature/manage-booth-master
 ```
 
 ## 3. ブランチ運用手順
@@ -67,7 +68,7 @@ Githubのプロジェクトのページで、Issueを作成する。
 10. 画面右の[Reviewers]で、レビューを依頼する人を選択する
 11. プルリクエストコメント下部の[Create pull request]ボタンを押下し、プルリクエストを作成する
 
-![ブランチ操作手順](./img\09_Github運用ルール・操作手順\01.png)
+![ブランチ操作手順](./img/09_Github運用ルール・操作手順/01.png)
 
 ### レビュアー
 1. プルリクエストのページで内容を確認する
