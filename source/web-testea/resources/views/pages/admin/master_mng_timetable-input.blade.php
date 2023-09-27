@@ -35,8 +35,8 @@
         :select2Search=false :blank=true />
     <x-input.select caption="時限" id="period_no" :select2=true :mastrData=$periodNo :editData=$editData
         :select2Search=false :blank=true />
-    <x-input.text caption="開始時刻" id="start_time" :rules=$rules :editData=$editData/>
-    <x-input.text caption="終了時刻" id="end_time" :rules=$rules :editData=$editData/>
+    <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules :editData=$editData/>
+    <x-input.time-picker caption="終了時刻" id="end_time" :rules=$rules :editData=$editData/>
 
     {{-- hidden --}}
     <x-input.hidden id="timetable_id" :editData=$editData/>
