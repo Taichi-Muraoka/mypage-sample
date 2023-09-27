@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 校舎マスタ登録・編集
+ * コースマスタ登録・編集
  */
 export default class AppClass extends PageBase {
     /**

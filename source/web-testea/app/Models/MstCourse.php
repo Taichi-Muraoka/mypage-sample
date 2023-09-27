@@ -103,7 +103,7 @@ class MstCourse extends Model
             'course_cd' => ['string', 'max:5'],
             'name' => ['string', 'max:50'],
             'course_kind' => ['integer', 'in:1,2,3'],
-            'summary_kind' => ['integer', 'in:0,1,2,3,4,5,6,7']
+            'summary_kind' => ['integer', 'in:0,1,2,3,4,5,6,7,8,9,10']
         ];
         return $_fieldRules;
     }
