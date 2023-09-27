@@ -17,7 +17,7 @@ export default class AppClass extends PageBase {
     start() {
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            UrlCom.redirect(self._getFuncUrl());
+            UrlCom.redirect(UrlCom.getFuncUrl());
         };
 
         // Vue: 入力フォーム
@@ -30,12 +30,12 @@ export default class AppClass extends PageBase {
             vueMethods: {
                 // 定型文プルダウン変更イベント
                 selectChangeGetTemplate: function (event) {
-                    self._getPromise()
+                    AjaxCom.getPromise()
                         .then(() => {
                             // 入力中の場合は確認する
                             if (
-                                !self._isEmpty(this.form.title) ||
-                                !self._isEmpty(this.form.text)
+                                !ValueCom.isEmpty(this.form.title) ||
+                                !ValueCom.isEmpty(this.form.text)
                             ) {
                                 return appDialogCom.confirm(
                                     "入力内容がクリアされますがよろしいですか？",

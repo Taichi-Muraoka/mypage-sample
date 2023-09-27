@@ -17,7 +17,7 @@ export default class AppClass extends PageBase {
     start() {
         // 編集完了後は一覧へ戻る
         //var afterEdit = () => {
-        //    UrlCom.redirect(self._getFuncUrl());
+        //    UrlCom.redirect(UrlCom.getFuncUrl());
         //};
         var afterEdit = () => {
             // 本画面は三階層目なので二階層目に戻る(親画面)

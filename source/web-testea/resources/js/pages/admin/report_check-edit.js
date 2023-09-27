@@ -17,7 +17,7 @@ export default class AppClass extends PageBase {
     start() {
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            UrlCom.redirect(self._getFuncUrl());
+            UrlCom.redirect(UrlCom.getFuncUrl());
         };
 
         // Vue: 入力フォーム
@@ -35,7 +35,7 @@ export default class AppClass extends PageBase {
                 // この画面では複数のプルダウン選択があるので対応する
                 selectChangeGetMulti: function (event) {
                     // 生徒名が無ければクリア
-                    if (self._isEmpty(this.form.sidKobetsu)) {
+                    if (ValueCom.isEmpty(this.form.sidKobetsu)) {
                         this.form.id = "";
                         this.selectGetItem = {};
                         return;

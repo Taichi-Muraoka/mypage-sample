@@ -30,7 +30,7 @@ export default class AppClass extends PageBase {
                     // form再読み込み
                     this.form = FormCom.getFormArrayData(this.appId);
                     var curDate = null;
-                    if (!self._isEmpty(this.form.curDate)) {
+                    if (!ValueCom.isEmpty(this.form.curDate)) {
                         curDate = this.form.curDate;
                     }
                     self.roomCalendar(curDate);

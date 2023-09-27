@@ -17,7 +17,7 @@ export default class AppClass extends PageBase {
     start() {
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            UrlCom.redirect(self._getFuncUrl());
+            UrlCom.redirect(UrlCom.getFuncUrl());
         };
         // Vue: 入力フォーム
         this.getVueInputForm({
@@ -31,7 +31,7 @@ export default class AppClass extends PageBase {
                 selectChangeGetMulti: function(event) {
                     // スケジュールIDがあれば送信
                     var selected = null;
-                    if (!self._isEmpty(this.form.id)) {
+                    if (!ValueCom.isEmpty(this.form.id)) {
                         selected = {
                             id: this.form.id,
                             // ガード用に欠席申請IDを送信する

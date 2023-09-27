@@ -20,7 +20,7 @@ export default class AppClass extends PageBase {
             vueMounted: function($vue, option) {
                 // カレンダー表示
                 var curDate = null;
-                if (!self._isEmpty($vue.form.curDate)) {
+                if (!ValueCom.isEmpty($vue.form.curDate)) {
                     curDate = $vue.form.curDate;
                 }
 
@@ -31,7 +31,7 @@ export default class AppClass extends PageBase {
                 selectChangeRoom: function(event) {
                     // カレンダー再表示
                     var curDate = null;
-                    if (!self._isEmpty(this.form.curDate)) {
+                    if (!ValueCom.isEmpty(this.form.curDate)) {
                         curDate = this.form.curDate;
                     }
                     self.defaultWeekCalendar();

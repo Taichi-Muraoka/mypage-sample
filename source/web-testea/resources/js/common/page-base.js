@@ -28,57 +28,6 @@ export default class PageBase {
     }
 
     /**
-     * Promiseを取得
-     */
-    // TODO: AjaxCom.getPromiseへ移動
-    _getPromise() {
-        return new Promise((resolve) => {
-            return resolve();
-        });
-    }
-
-    /**
-     * 空白チェック
-     *
-     * @param val チェック文字列
-     */
-    // TODO: ValueCom.isEmptyへ移行
-    _isEmpty(val) {
-        return !val ? (!(val === 0 || val === false) ? true : false) : false;
-    }
-
-    /**
-     * 機能URLを取得
-     * http://localhost/xxxxx/xxxx/
-     * http://localhost/xxxxx/xxxx/xxx/xx/
-     *
-     * ↓以下の一階層目のURLを取得(ここが一覧だったりするので)
-     * http://localhost/xxxxx/
-     */
-    // TODO: UrlCom.getFuncUrlへ移動
-    _getFuncUrl() {
-        // 現在のURL
-        var loc = window.location.href;
-
-        // appInfoのrootにはアプリのルートがあるのでそれを利用する
-        // appInfo
-        //   root: "http://localhost:8000"
-
-        // 先頭部分を削除
-        var url = loc.replace(appInfo.root + "/", "");
-
-        // /まで取得
-        var func = "";
-        if (url.indexOf("/") < 0) {
-            func = url;
-        } else {
-            func = url.substring(0, url.indexOf("/"));
-        }
-
-        return appInfo.root + "/" + func;
-    }
-
-    /**
      * 親ページへリダイレクト
      */
     redirectToParent() {
@@ -132,7 +81,7 @@ export default class PageBase {
                         });
 
                         // 詳細データを取得
-                        var url = self._getFuncUrl() + "/get_calendar";
+                        var url = UrlCom.getFuncUrl() + "/get_calendar";
                         return axios.post(url, sendData);
                     })
                     .then((response) => {
@@ -175,7 +124,7 @@ export default class PageBase {
         //console.log("page-base into roomCalendar");
         var $vueModal = this.getVueModal({ useShowEvent: false });
         var initDate;
-        if (!self._isEmpty(initDateText)) {
+        if (!ValueCom.isEmpty(initDateText)) {
             initDate = new Date(initDateText);
         }
         // カレンダーの作成
@@ -207,7 +156,7 @@ export default class PageBase {
                         });
 
                         // 詳細データを取得
-                        var url = self._getFuncUrl() + "/get_calendar";
+                        var url = UrlCom.getFuncUrl() + "/get_calendar";
                         return axios.post(url, sendData);
                     })
                     .then((response) => {
@@ -252,13 +201,13 @@ export default class PageBase {
                     info.resource._resource.id !== "800"
                 ) {
                     // 登録画面に遷移
-                    //var url = self._getFuncUrl() + "/new?"
+                    //var url = UrlCom.getFuncUrl() + "/new?"
                     //        + "roomcd=" + "110"
                     //        + "&date=" + moment(info.start).format("YYYYMMDD")
                     //        + "&start_time=" + moment(info.start).format("HHmm")
                     //        + "&end_time=" + moment(info.end).format("HHmm");
                     var url =
-                        self._getFuncUrl() +
+                        UrlCom.getFuncUrl() +
                         "/new" +
                         "/" +
                         "110" +
@@ -330,7 +279,7 @@ export default class PageBase {
                             });
 
                             // 詳細データを取得
-                            var url = self._getFuncUrl() + "/get_calendar";
+                            var url = UrlCom.getFuncUrl() + "/get_calendar";
                             return axios.post(url, sendData);
                         })
                         .then((response) => {
@@ -372,7 +321,7 @@ export default class PageBase {
 
                     // 詳細データを取得
                     var url =
-                        self._getFuncUrl() +
+                        UrlCom.getFuncUrl() +
                         "/new?" +
                         "roomcd=" +
                         "110" +

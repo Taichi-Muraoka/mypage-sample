@@ -17,7 +17,7 @@ export default class AppClass extends PageBase {
     start() {
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            //UrlCom.redirect(self._getFuncUrl());
+            //UrlCom.redirect(UrlCom.getFuncUrl());
             self.redirectToParent();
         };
 
@@ -90,7 +90,7 @@ export default class AppClass extends PageBase {
                 selectChange: function (event) {
                     // 講師名を取得しHiddenに退避する
                     const idx = event.target.selectedIndex;
-                    if (self._isEmpty(event.target.options[idx].value)) {
+                    if (ValueCom.isEmpty(event.target.options[idx].value)) {
                         // 未選択
                         this.form.tname = "";
                     } else {
