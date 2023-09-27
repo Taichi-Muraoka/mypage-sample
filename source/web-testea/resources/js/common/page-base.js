@@ -20,12 +20,11 @@ export default class PageBase {
         if (this.start === undefined) {
             throw new TypeError("Must override start method.");
         }
-
-        // TODO: selfがグローバルで扱われているので以下は消す
-        // const selfで、関数内で呼べばよい。
-        // このインスタンスを保持
-        self = this;
     }
+
+    //--------------------------------------------
+    // 共通処理
+    //--------------------------------------------
 
     /**
      * 親ページへリダイレクト

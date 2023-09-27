@@ -57,7 +57,6 @@ export default class PageSearchList extends PageComponentBase {
         // Vueの定義
         //--------------------
 
-        const self = this;
         const vueApp = {
             data() {
                 return {

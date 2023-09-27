@@ -15,16 +15,18 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+        const self = this;
+
         // Vue: 入力フォーム
         this.getVueInputForm({
-            vueMounted: function($vue, option) {
+            vueMounted: function ($vue, option) {
                 // カレンダー表示
                 var curDate = null;
                 self.roomCalendar(curDate);
             },
             vueMethods: {
                 // 教室プルダウン変更イベント
-                selectChangeRoom: function(event) {
+                selectChangeRoom: function (event) {
                     // カレンダー再表示
                     //console.log("room change!!");
                     // form再読み込み
@@ -34,8 +36,8 @@ export default class AppClass extends PageBase {
                         curDate = this.form.curDate;
                     }
                     self.roomCalendar(curDate);
-                }
-            }
+                },
+            },
         });
     }
 }

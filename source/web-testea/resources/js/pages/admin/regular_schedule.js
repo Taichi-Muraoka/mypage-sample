@@ -15,6 +15,8 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+        const self = this;
+
         // Vue: 入力フォーム
         this.getVueInputForm({
             vueMounted: function($vue, option) {

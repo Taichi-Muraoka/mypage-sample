@@ -15,10 +15,13 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+        const self = this;
+
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
             UrlCom.redirect(UrlCom.getFuncUrl());
         };
+        
         // Vue: 入力フォーム
         this.getVueInputForm({
             afterEdit: afterEdit,

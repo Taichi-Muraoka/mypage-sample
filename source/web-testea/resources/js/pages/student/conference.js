@@ -15,6 +15,8 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+        const self = this;
+
         // 編集完了後は同じ画面へ
         var afterEdit = () => {
             UrlCom.redirect(UrlCom.getFuncUrl());
