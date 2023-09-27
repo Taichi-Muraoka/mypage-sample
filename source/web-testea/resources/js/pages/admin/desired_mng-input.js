@@ -44,13 +44,10 @@ export default class AppClass extends PageBase {
 
             // 学校名とIDを更新
             // 名称
-            Vue.set(
-                vueForm.form,
-                "text_" + modalSelectId,
-                selectedDatas["school_name"]
-            );
+            vueForm.form["text_" + modalSelectId] =
+                selectedDatas["school_name"];
             // ID
-            Vue.set(vueForm.form, modalSelectId, selectedDatas["school_id"]);
+            vueForm.form[modalSelectId] = selectedDatas["school_id"];
         };
 
         // Vue: 選択モーダル(学校検索)

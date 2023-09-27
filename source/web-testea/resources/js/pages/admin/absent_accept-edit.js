@@ -40,7 +40,7 @@ export default class AppClass extends PageBase {
                     }
 
                     // チェンジイベントを発生させる
-                    self._selectChangeGet(this, selected, this.option);
+                    self.selectChangeGet(this, selected, this.option);
                 }
             }
         });

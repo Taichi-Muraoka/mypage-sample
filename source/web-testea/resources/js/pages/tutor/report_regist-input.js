@@ -26,32 +26,32 @@ export default class AppClass extends PageBase {
             // Vueにメソッド追加
             vueMethods: {
                 // この画面では複数のプルダウン選択があるので対応する
-                selectChangeGetMulti: function(event) {
+                selectChangeGetMulti: function (event) {
                     // 生徒名が無ければクリア
                     if (self._isEmpty(this.form.sidKobetsu)) {
                         this.form.id = "";
-                        Vue.set(this, "selectGetItem", {});
+                        this.selectGetItem = {};
                         return;
                     }
 
                     // 生徒名のチェンジの場合はスケジュールをクリア
                     if (event && event.target.id == "sidKobetsu") {
                         this.form.id = "";
-                        Vue.set(this, "selectGetItem", {});
+                        this.selectGetItem = {};
                     }
 
                     // チェンジイベントを発生させる
-                    self._selectChangeGet(
+                    self.selectChangeGet(
                         this,
                         {
                             // sidで送信する
                             sid: this.form.sidKobetsu,
-                            id: this.form.id
+                            id: this.form.id,
                         },
                         this.option
                     );
-                }
-            }
+                },
+            },
         });
     }
 }

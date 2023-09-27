@@ -27,7 +27,7 @@ export default class AppClass extends PageBase {
                 // 編集時、プルダウンチェンジイベントを発生させる。
                 // 該当のプルダウンの値を取得しチェンジイベントを直接呼ぶ
                 var selected = $vue.form.id;
-                self._selectChangeGet($vue, selected, option);
+                self.selectChangeGet($vue, selected, option);
             }
         });
     }

@@ -28,7 +28,7 @@ export default class AppClass extends PageBase {
                     // カレンダー再表示
                     //console.log("room change!!");
                     // form再読み込み
-                    this.form = self._getVueFormData(this.appId);
+                    this.form = FormCom.getFormArrayData(this.appId);
                     var curDate = null;
                     if (!self._isEmpty(this.form.curDate)) {
                         curDate = this.form.curDate;

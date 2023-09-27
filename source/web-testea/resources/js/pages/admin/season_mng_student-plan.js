@@ -38,9 +38,9 @@ export default class AppClass extends PageBase {
             const chkPlanId = modalButtonData.chk_plan_id;
 
             // 講師名
-            Vue.set(vueForm.form, "hd_text_" + chkPlanId, formDatas["tname"]);
+            vueForm.form["hd_text_" + chkPlanId] = formDatas["tname"];
             // ID
-            Vue.set(vueForm.form, "hd_" + chkPlanId, formDatas["tid"]);
+            vueForm.form["hd_" + chkPlanId] = formDatas["tid"];
         };
 
         // Vue: 講師選択モーダル
@@ -58,8 +58,8 @@ export default class AppClass extends PageBase {
                 const selectedValue = vueForm.form["hd_" + chkPlanId];
 
                 // プルダウンを取得
-                Vue.set($vue.vueInputForm, "selectGetItem", {});
-                self._selectChangeGetCallBack(
+                $vue.vueInputForm.selectGetItem = {};
+                self.selectChangeGetCallBack(
                     $vue.vueInputForm,
                     {
                         // TODO: サンプル(日付・時限単位で設定)。どういう持ち方にするかは要検討
@@ -70,7 +70,7 @@ export default class AppClass extends PageBase {
                     },
                     // 受信後のコールバック
                     (data) => {
-                        Vue.set($vue.vueInputForm, "selectGetItem", data);
+                        $vue.vueInputForm.selectGetItem = data;
 
                         for (const [key, value] of Object.entries(
                             $vue.vueInputForm.selectGetItem
