@@ -14,7 +14,7 @@
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="35%">授業日・時限</th>
-            <td>2023/01/30 4限 15:00</td>
+            <td>2023/01/30 4限</td>
         </tr>
         <tr>
             <th>校舎</th>

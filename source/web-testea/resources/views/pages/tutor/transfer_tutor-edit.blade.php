@@ -14,7 +14,7 @@
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="35%">授業日・時限</th>
-            <td>2023/01/30 4限 15:00</td>
+            <td>2023/01/30 4限</td>
         </tr>
         <tr>
             <th>校舎</th>
@@ -29,7 +29,7 @@
             <td>CWテスト生徒１</td>
         </tr>
         <tr>
-            <th>振替理由／要望など</th>
+            <th>振替理由／連絡事項など</th>
             <td>学校行事のため</td>
         </tr>
     </x-bs.table>
