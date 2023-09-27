@@ -116,5 +116,24 @@ class MstTimetable extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
-
+    /**
+     * 検索 校舎コード
+     */
+    public function scopeSearchCampusCd($query, $obj)
+    {
+        $key = 'campus_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 時間割区分
+     */
+    public function scopeSearchTimetableKind($query, $obj)
+    {
+        $key = 'timetable_kind';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
 }

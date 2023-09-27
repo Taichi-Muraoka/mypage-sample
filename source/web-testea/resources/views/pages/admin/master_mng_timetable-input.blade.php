@@ -22,22 +22,24 @@
     @endif
 
     {{-- 共通フォーム --}}
-    <x-input.select caption="校舎" id="campus_cd" :select2=true :editData=$editData>
-        <option value="1">久我山</option>
-        <option value="2">西永福</option>
-        <option value="3">下高井戸</option>
-    </x-input.select>
-    <x-input.select caption="時間割区分" id="kind_cd" :select2=true :editData=$editData>
-        <option value="1">通常</option>
-        <option value="2">特別期間</option>
-    </x-input.select>
-    <x-input.select caption="時限" id="period_no" :select2=true :editData=$editData>
-        <option value="1">1限</option>
-        <option value="2">2限</option>
-        <option value="3">3限</option>
-    </x-input.select>
+    @can('roomAdmin')
+    {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
+    <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+        :select2Search=false :blank=false />
+    @else
+    {{-- 全体管理者の場合、検索を非表示・未選択を表示する --}}
+    <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+        :select2Search=false :blank=true />
+    @endcan
+    <x-input.select caption="時間割区分" id="timetable_kind" :select2=true :mastrData=$timetablekind :editData=$editData
+        :select2Search=false :blank=true />
+    <x-input.select caption="時限" id="period_no" :select2=true :mastrData=$periodNo :editData=$editData
+        :select2Search=false :blank=true />
     <x-input.text caption="開始時刻" id="start_time" :rules=$rules :editData=$editData/>
     <x-input.text caption="終了時刻" id="end_time" :rules=$rules :editData=$editData/>
+
+    {{-- hidden --}}
+    <x-input.hidden id="timetable_id" :editData=$editData/>
 
     {{-- フッター --}}
     <x-slot name="footer">
