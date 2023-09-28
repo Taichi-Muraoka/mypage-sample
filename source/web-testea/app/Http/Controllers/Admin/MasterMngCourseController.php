@@ -77,15 +77,6 @@ class MasterMngCourseController extends Controller
             }, 'mst_codes_25')
             ->orderby('mst_courses.course_cd');
 
-        // // SQLの表示（デバッグ用。削除してからcommit/pushすること）
-        // \DB::enableQueryLog();
-
-        // // デバッグ用出力（削除してからcommit/pushすること）
-        // $this->debug($mstCourse->course_cd);
-
-        // // クエリ出力（デバッグ用。削除してからcommit/pushすること）
-        // $this->debug(\DB::getQueryLog());
-
         // ページネータで返却
         return $this->getListAndPaginator($request, $mstCourse);
     }
@@ -149,9 +140,6 @@ class MasterMngCourseController extends Controller
      */
     public function edit($courseId)
     {
-        // IDのバリデーション
-        $this->validateIds($courseId);
-
         // コース種別リストを取得
         $courseKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_42);
 
@@ -159,8 +147,14 @@ class MasterMngCourseController extends Controller
         $summaryKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_25);
 
         // クエリを作成(PKでユニークに取る)
-        $mstCourse = MstCourse::where('course_cd', $courseId)
-            // 該当データがない場合はエラーを返す
+        $mstCourse = MstCourse::select(
+                'mst_courses.course_cd',
+                'mst_courses.course_cd as _course_cd',
+                'mst_courses.name',
+                'mst_courses.course_kind',
+                'mst_courses.summary_kind',
+            )
+            ->where('course_cd', $courseId)
             ->firstOrFail();
 
         return view('pages.admin.master_mng_course-input', [
@@ -190,8 +184,8 @@ class MasterMngCourseController extends Controller
             'summary_kind'
         );
 
-        // 対象データを取得(IDでユニークに取る)
-        $mstCourse = MstCourse::where('course_cd', $request['course_cd'])
+        // 対象データを取得(hiddenのコードでユニークに取る)
+        $mstCourse = MstCourse::where('course_cd', $request['_course_cd'])
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
@@ -209,19 +203,21 @@ class MasterMngCourseController extends Controller
      */
     public function delete(Request $request)
     {
-        // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'course_cd');
-
         // Formを取得
         $form = $request->all();
+
+        // コースコードを編集し削除ボタンを押した場合はエラーを返す
+        if($form['course_cd'] != $form['_course_cd']){
+            return $fail(Lang::get('validation.invalid_input'));
+        }
 
         // 対象データを取得(IDでユニークに取る)
         $mstCourse = MstCourse::where('course_cd', $form['course_cd'])
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
-        // 削除
-        $mstCourse->delete();
+        // 物理削除
+        $mstCourse->forceDelete();
 
         return;
     }
@@ -278,17 +274,13 @@ class MasterMngCourseController extends Controller
                 return;
             }
 
-            // キーを変えた時だけバリデーション
+            $exists = null;
 
-            // 対象データを取得(UNIQUEキーで取得)
-            $mstCourse = MstCourse::where('course_cd', $request['course_cd']);
-
-            // // 変更時は自分のキー以外を検索
-            // if (filled($request['course_cd'])) {
-            //     $mstCourse->where('course_cd', '!=', $request['course_cd']);
-            // }
-
-            $exists = $mstCourse->exists();
+            // コースコード編集ありの場合にバリデーション
+            if($request['course_cd'] != $request['_course_cd']){
+                $exists = MstCourse::where('course_cd', $request['course_cd'])
+                ->exists();
+            }
 
             if ($exists) {
                 // 登録済みエラー

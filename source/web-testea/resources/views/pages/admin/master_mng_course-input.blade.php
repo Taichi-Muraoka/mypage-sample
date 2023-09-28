@@ -29,6 +29,9 @@
     <x-input.select id="summary_kind" caption="給与集計種別" :select2=true :mastrData=$summaryKindList :editData=$editData
         :select2Search=false :blank=false />
 
+    {{-- hidden --}}
+    <x-input.hidden id="_course_cd" :editData=$editData />
+
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
