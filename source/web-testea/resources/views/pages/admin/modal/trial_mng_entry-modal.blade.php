@@ -7,7 +7,7 @@
 
     <tr>
         <th width="35%">申込日</th>
-        <td>@{{item.apply_time|formatYmd}}</td>
+        <td>@{{$filters.formatYmd(item.apply_time)}}</td>
     </tr>
     <tr>
         <th>生徒名</th>

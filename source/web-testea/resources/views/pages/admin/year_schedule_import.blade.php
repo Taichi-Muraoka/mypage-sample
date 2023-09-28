@@ -38,8 +38,8 @@
             <td><x-button.list-send vueHref="'{{ route('year_schedule_import-import', '')}}/' + '本郷'" caption="取込" /></td>
         </tr>
         {{-- <tr v-for="item in paginator.data" v-cloak>
-            <td>@{{item.start_time|formatYmdHms}}</td>
-            <td>@{{item.end_time|formatYmdHms}}</td>
+            <td>@{{$filters.formatYmdHms(item.start_time)}}</td>
+            <td>@{{$filters.formatYmdHms(item.end_time)}}</td>
             <td><span v-if="item.batch_state == {{ App\Consts\AppConst::CODE_MASTER_22_1 }}" class="text-danger">@{{item.batch_state_name}}</span><span v-else>@{{item.batch_state_name}}</span></td>
             <td>@{{item.room_name}}</td>
             <td>@{{item.executor}}</td>

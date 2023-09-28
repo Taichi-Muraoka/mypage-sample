@@ -66,7 +66,7 @@
     </tr>
     <tr>
         <th>講習料</th>
-        <td>@{{item.dtl_price|toLocaleString}}</td>
+        <td>@{{$filters.toLocaleString(item.dtl_price)}}</td>
     </tr>
     <tr>
         <th>講習名</th>
@@ -90,9 +90,9 @@
 
     <tr v-for="extra_ind_detail in item.extra_ind_details" v-cloak>
         <x-bs.td-sp caption="講師名">@{{extra_ind_detail.teacher_name}}</x-bs.td-sp>
-        <x-bs.td-sp caption="日付" class="resp-column wide">@{{extra_ind_detail.extra_date|formatYmd}}</x-bs.td-sp>
+        <x-bs.td-sp caption="日付" class="resp-column wide">@{{$filters.formatYmd(extra_ind_detail.extra_date)}}</x-bs.td-sp>
         <td class="resp-clear"></td>
-        <x-bs.td-sp caption="開始時刻" class="resp-column no-border">@{{extra_ind_detail.start_time|formatHm}}</x-bs.td-sp>
+        <x-bs.td-sp caption="開始時刻" class="resp-column no-border">@{{$filters.formatHm(extra_ind_detail.start_time)}}</x-bs.td-sp>
         <x-bs.td-sp caption="授業時間" class="resp-column no-border">@{{extra_ind_detail.r_minutes}}分</x-bs.td-sp>
         <x-bs.td-sp caption="教科" class="resp-column no-border">@{{extra_ind_detail.curriculum_name}}</x-bs.td-sp>
         <td class="resp-clear"></td>

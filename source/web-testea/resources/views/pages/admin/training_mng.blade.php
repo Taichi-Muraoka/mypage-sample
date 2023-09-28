@@ -48,9 +48,9 @@
         <tr v-for="item in paginator.data" v-cloak>
             <td>@{{item.trn_type}}</td>
             <td>@{{item.text}}</td>
-            <td>@{{item.regist_time|formatYmd}}</td>
-            <td><span v-if="item.limit_date">@{{item.limit_date|formatYmd}}</span><span v-else>無期限</span></td>
-            <td>@{{item.release_date|formatYmd}}</td>
+            <td>@{{$filters.formatYmd(item.regist_time)}}</td>
+            <td><span v-if="item.limit_date">@{{$filters.formatYmd(item.limit_date)}}</span><span v-else>無期限</span></td>
+            <td>@{{$filters.formatYmd(item.release_date)}}</td>
 
             <td>
                 <x-button.list-dtl vueHref="'{{ route('training_mng-state', '') }}/' + item.trn_id" caption="閲覧状況" />

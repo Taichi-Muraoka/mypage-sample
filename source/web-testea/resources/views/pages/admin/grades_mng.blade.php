@@ -68,7 +68,7 @@
         {{-- 本番用処理 --}}
         {{-- テーブル行 --}}
         {{-- <tr v-for="item in paginator.data" v-cloak>
-            <x-bs.td-sp caption="登録日">@{{item.regist_time|formatYmd}}</x-bs.td-sp>
+            <x-bs.td-sp caption="登録日">@{{$filters.formatYmd(item.regist_time)}}</x-bs.td-sp>
             <x-bs.td-sp caption="生徒名">@{{item.sname}}</x-bs.td-sp>
             <x-bs.td-sp caption="試験種別">@{{item.type_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="試験名">@{{item.teiki_name}}@{{item.moshi_name}}</x-bs.td-sp>

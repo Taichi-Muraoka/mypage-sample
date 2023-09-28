@@ -27,10 +27,10 @@
 
         {{-- テーブル行 --}}
         <tr v-for="item in paginator.data" v-cloak>
-            <x-bs.td-sp caption="問い合わせ日" class="t-minimum">@{{item.regist_time|formatYmd}}</x-bs.td-sp>
+            <x-bs.td-sp caption="問い合わせ日" class="t-minimum">@{{$filters.formatYmd(item.regist_time)}}</x-bs.td-sp>
             <x-bs.td-sp caption="宛先">@{{item.room_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="件名">@{{item.title}}</x-bs.td-sp>
-            <x-bs.td-sp caption="回答日" class="t-minimum">@{{item.answer_time|formatYmd}}</x-bs.td-sp>
+            <x-bs.td-sp caption="回答日" class="t-minimum">@{{$filters.formatYmd(item.answer_time)}}</x-bs.td-sp>
             <x-bs.td-sp caption="回答者名" class="t-minimum">@{{item.name}}</x-bs.td-sp>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.contact_id']" />

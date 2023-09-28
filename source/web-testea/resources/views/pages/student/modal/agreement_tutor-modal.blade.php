@@ -7,15 +7,15 @@
 
     <tr>
         <th width="35%">開始日</th>
-        <td>@{{item.dtl_startdate|formatYmd}}</td>
+        <td>@{{$filters.formatYmd(item.dtl_startdate)}}</td>
     </tr>
     <tr>
         <th>終了日</th>
-        <td>@{{item.dtl_enddate|formatYmd}}</td>
+        <td>@{{$filters.formatYmd(item.dtl_enddate)}}</td>
     </tr>
     <tr>
         <th>月額</th>
-        <td>@{{item.dtl_tuition|toLocaleString}}</td>
+        <td>@{{$filters.toLocaleString(item.dtl_tuition)}}</td>
     </tr>
     <tr>
         <th>家庭教師標準</th>
