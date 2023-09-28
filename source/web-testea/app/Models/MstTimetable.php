@@ -107,7 +107,7 @@ class MstTimetable extends Model
             'campus_cd' => ['string', 'max:2'],
             'period_no' => ['integer'],
             'start_time' => ['vdTime'],
-            'end_time' => ['vdTime'],
+            'end_time' => ['vdTime', 'after:start_time'],
             'timetable_kind' => ['integer', 'in:0,1']
         ];
         return $_fieldRules;
