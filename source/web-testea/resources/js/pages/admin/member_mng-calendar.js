@@ -1,5 +1,7 @@
 "use strict";
 
+import DefaultCalendar from "../../calendar/default-calendar";
+
 /*
  * カレンダー
  */
@@ -15,7 +17,8 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
-        // カレンダーの処理
-        this.calendar();
+        // カレンダー表示
+        const calendar = new DefaultCalendar();
+        calendar.create();
     }
 }

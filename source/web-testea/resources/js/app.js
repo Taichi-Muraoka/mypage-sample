@@ -27,9 +27,6 @@ import DialogCom from "./common/dialog";
 // ダイアログのインスタンス
 window.appDialogCom = new DialogCom();
 
-import CalendarCom from "./common/calendar";
-window.CalendarCom = CalendarCom;
-
 import ModalCom from "./common/modal";
 window.ModalCom = ModalCom;
 // モーダル初期化(複数モーダルを開く対応など)

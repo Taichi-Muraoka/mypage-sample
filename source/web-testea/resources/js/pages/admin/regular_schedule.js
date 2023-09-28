@@ -1,5 +1,7 @@
 "use strict";
 
+import WeekCalendar from "../../calendar/week-calendar";
+
 /*
  * カレンダー
  */
@@ -19,26 +21,22 @@ export default class AppClass extends PageBase {
 
         // Vue: 入力フォーム
         this.getVueInputForm({
-            vueMounted: function($vue, option) {
+            vueData: {
+                // カレンダー
+                calendar: null,
+            },
+            vueMounted: function ($vue, option) {
                 // カレンダー表示
-                var curDate = null;
-                if (!ValueCom.isEmpty($vue.form.curDate)) {
-                    curDate = $vue.form.curDate;
-                }
-
-                self.defaultWeekCalendar();
+                $vue.calendar = new WeekCalendar();
+                $vue.calendar.createWeek();
             },
             vueMethods: {
                 // 教室プルダウン変更イベント
-                selectChangeRoom: function(event) {
+                selectChangeRoom: function (event) {
                     // カレンダー再表示
-                    var curDate = null;
-                    if (!ValueCom.isEmpty(this.form.curDate)) {
-                        curDate = this.form.curDate;
-                    }
-                    self.defaultWeekCalendar();
-                }
-            }
+                    this.calendar.refetchEvents();
+                },
+            },
         });
     }
 }
