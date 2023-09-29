@@ -129,7 +129,7 @@ class MasterMngTimetableController extends Controller
                 $join->on('mst_timetables.timetable_kind', '=', 'mst_codes.code')
                     ->where('data_type', AppConst::CODE_MASTER_37);
             })
-            ->orderby('campus_cd')->orderby('period_no')->orderby('timetable_kind');
+            ->orderby('campus_cd')->orderby('timetable_kind')->orderby('period_no');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $mstTimetable);
