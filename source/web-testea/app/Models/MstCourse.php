@@ -104,7 +104,7 @@ class MstCourse extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'course_cd' => ['string', 'size:5', 'max:5', 'vdAlphaNum'],
+            'course_cd' => ['integer', 'max:99999'],
             'name' => ['string', 'max:50'],
             'course_kind' => ['integer', 'in:1,2,3'],
             'summary_kind' => ['integer', 'in:0,1,2,3,4,5,6,7,8,9,10']
