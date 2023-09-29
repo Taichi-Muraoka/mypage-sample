@@ -41,6 +41,7 @@ class MypageDummyDataSeeder extends Seeder
         $this->loadCsv('database/csv/mst_systems.csv', 'mst_systems');
         $this->loadCsv('database/csv/mst_texts.csv', 'mst_texts');
         $this->loadCsv('database/csv/mst_timetables.csv', 'mst_timetables');
+        $this->loadCsv('database/csv/mst_unit_categories.csv', 'mst_unit_categories');
         $this->loadCsv('database/csv/students.csv', 'students');
         $this->loadCsv('database/csv/student_campuses.csv', 'student_campuses');
         $this->loadCsv('database/csv/tutors.csv', 'tutors');
