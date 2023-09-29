@@ -400,9 +400,9 @@ class MasterMngTimetableController extends Controller
 
         // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
         // その他を第二引数で指定する
-        $rules += MstTimetable::fieldRules('campus_cd', ['required', $validationRoomList]);
-        $rules += MstTimetable::fieldRules('period_no', ['required']);
-        $rules += MstTimetable::fieldRules('timetable_kind', ['required', $validationKindList]);
+        $rules += MstTimetable::fieldRules('campus_cd', ['required', $validationRoomList, $validationKey]);
+        $rules += MstTimetable::fieldRules('period_no', ['required', $validationKey]);
+        $rules += MstTimetable::fieldRules('timetable_kind', ['required', $validationKindList, $validationKey]);
         $rules += MstTimetable::fieldRules('start_time', ['required']);
         $rules += MstTimetable::fieldRules('end_time', ['required']);
 

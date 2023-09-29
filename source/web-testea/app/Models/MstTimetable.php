@@ -57,9 +57,9 @@ class MstTimetable extends Model
      *
      * @var array
      */
-    protected $dates = [
-        'start_time',
-        'end_time',
+    protected $casts = [
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
     ];
 
     /**
