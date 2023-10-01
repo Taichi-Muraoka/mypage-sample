@@ -7,7 +7,7 @@
 
     <tr>
         <th width="35%">通知日</th>
-        <td>@{{item.date|formatYmd}}</td>
+        <td>@{{$filters.formatYmd(item.date)}}</td>
     </tr>
     <tr>
         <th>タイトル</th>
@@ -30,7 +30,7 @@
     </tr>
     <tr>
         <th>模試・イベント情報</th>
-        <td>@{{item.tmid_event_name}}（@{{item.tmid_event_date|formatYmd}}）</td>
+        <td>@{{item.tmid_event_name}}（@{{$filters.formatYmd(item.tmid_event_date)}}）</td>
     </tr>
 
 </x-bs.table>

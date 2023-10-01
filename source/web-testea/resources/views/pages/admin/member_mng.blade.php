@@ -177,7 +177,7 @@
             <td>@{{item.name}}</td>
             <td>@{{item.mailaddress1}}</td>
             <td>@{{item.cls_name}}</td>
-            <td>@{{item.enter_date|formatYmd}}</td>
+            <td>@{{$filters.formatYmd(item.enter_date)}}</td>
             <td>3年5ヶ月</td>
             <td>1</td>
             <td>数学</td>

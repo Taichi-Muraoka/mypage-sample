@@ -18,7 +18,7 @@
         </x-slot>
 
         <tr v-for="item in paginator.data" v-cloak>
-            <td>@{{item.invoice_date|formatYmString}}分</td>
+            <td>@{{$filters.formatYmString(item.invoice_date)}}分</td>
             <td><span v-if="item.import_state == {{ App\Consts\AppConst::CODE_MASTER_20_0 }}"
                     class="text-danger">@{{item.state_name}}</span><span v-else>@{{item.state_name}}</span></td>
             <td>

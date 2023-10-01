@@ -42,7 +42,7 @@
     {{-- 本番用処理 --}}
     {{-- <tr>
         <th width="35%">申請日</th>
-        <td>@{{item.apply_time|formatYmd}}</td>
+        <td>@{{$filters.formatYmd(item.apply_time)}}</td>
     </tr>
     <tr>
         <th>生徒名</th>
@@ -58,7 +58,7 @@
     </tr>
     <tr>
         <th>授業日時</th>
-        <td>@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</td>
+        <td>@{{$filters.formatYmd(item.lesson_date)}} @{{$filters.formatHm(item.start_time)}}</td>
     </tr>
     <tr>
         <th>講師名</th>

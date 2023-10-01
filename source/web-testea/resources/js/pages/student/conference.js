@@ -15,9 +15,11 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+        const self = this;
+
         // 編集完了後は同じ画面へ
         var afterEdit = () => {
-            UrlCom.redirect(self._getFuncUrl());
+            UrlCom.redirect(UrlCom.getFuncUrl());
         };
 
         // Vue: 入力フォーム
@@ -27,7 +29,7 @@ export default class AppClass extends PageBase {
                 // 編集時、プルダウンチェンジイベントを発生させる。
                 // 該当のプルダウンの値を取得しチェンジイベントを直接呼ぶ
                 var selected = $vue.form.id;
-                self._selectChangeGet($vue, selected, option);
+                self.selectChangeGet($vue, selected, option);
             }
         });
     }

@@ -15,10 +15,13 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+        const self = this;
+
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            UrlCom.redirect(self._getFuncUrl());
+            UrlCom.redirect(UrlCom.getFuncUrl());
         };
+        
         // Vue: 入力フォーム
         this.getVueInputForm({
             afterEdit: afterEdit,
@@ -31,7 +34,7 @@ export default class AppClass extends PageBase {
                 selectChangeGetMulti: function(event) {
                     // スケジュールIDがあれば送信
                     var selected = null;
-                    if (!self._isEmpty(this.form.id)) {
+                    if (!ValueCom.isEmpty(this.form.id)) {
                         selected = {
                             id: this.form.id,
                             // ガード用に欠席申請IDを送信する
@@ -40,7 +43,7 @@ export default class AppClass extends PageBase {
                     }
 
                     // チェンジイベントを発生させる
-                    self._selectChangeGet(this, selected, this.option);
+                    self.selectChangeGet(this, selected, this.option);
                 }
             }
         });

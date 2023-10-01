@@ -15,6 +15,8 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+        const self = this;
+
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
             // 編集の場合は、一覧画面（三階層目）に戻る

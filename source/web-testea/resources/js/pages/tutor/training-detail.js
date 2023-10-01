@@ -21,10 +21,10 @@ export default class AppClass extends PageBase {
             vueMethods: {
                 // 動画の閲覧
                 submitMovieBrowse: function(event) {
-                    self._getPromise()
+                    AjaxCom.getPromise()
                         .then(() => {
                             // 動画の閲覧を更新
-                            var url = self._getFuncUrl() + "/movie_browse";
+                            var url = UrlCom.getFuncUrl() + "/movie_browse";
 
                             // 送信(Vueのフォームごと送信)
                             return axios.post(url, this.form);

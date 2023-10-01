@@ -88,9 +88,9 @@
 
         {{-- 本番用処理 --}}
         {{-- <tr v-for="item in paginator.data" v-cloak>
-            <td>@{{item.apply_time|formatYmd}}</td>
+            <td>@{{$filters.formatYmd(item.apply_time)}}</td>
             <td>@{{item.sname}}</td>
-            <td>@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</td>
+            <td>@{{$filters.formatYmd(item.lesson_date)}} @{{$filters.formatHm(item.start_time)}}</td>
             <td>@{{item.room_name}}</td>
             <td>@{{item.tname}}</td>
             <td>@{{item.status}}</td>

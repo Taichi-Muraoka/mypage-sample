@@ -15,13 +15,15 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+        const self = this;
+
         // Vue: モーダル
         this.getVueModal();
 
         // Vue: 検索フォーム
         this.getVueSearchForm({
             // 画面読み込み時
-            vueMounted: function($vue, option) {
+            vueMounted: function ($vue, option) {
                 // 初期表示時に、生徒プルダウンを初期化する。
                 // -1の場合、自分の受け持ちの生徒だけに絞り込み
                 $vue.selectChangeGetRoom();
@@ -29,16 +31,16 @@ export default class AppClass extends PageBase {
             // Vueにメソッド追加
             vueMethods: {
                 // 教室プルダウン変更イベント
-                selectChangeGetRoom: function(event) {
+                selectChangeGetRoom: function (event) {
                     // 生徒プルダウンをクリア
                     this.form.student_id = "";
-                    Vue.set(this, "selectGetItem", {});
+                    this.selectGetItem = {};
 
                     // チェンジイベントを発生させる
                     var selected = this.form.campus_cd;
-                    self._selectChangeGet(this, selected, this.option);
-                }
-            }
+                    self.selectChangeGet(this, selected, this.option);
+                },
+            },
         });
     }
 }

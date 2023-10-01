@@ -57,7 +57,7 @@
             {{-- テーブル行 --}}
             <tr v-for="item in paginator.data" v-cloak>
                 <td>@{{item.name}}</td>
-                <td>@{{item.browse_time|formatYmd}}</td>
+                <td>@{{$filters.formatYmd(item.browse_time)}}</td>
             </tr>
             
         </x-bs.table>

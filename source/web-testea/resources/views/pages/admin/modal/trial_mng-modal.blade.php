@@ -15,16 +15,16 @@
     </tr>
     <tr>
         <th>開催日</th>
-        <td>@{{item.trial_date|formatYmd}}</td>
+        <td>@{{$filters.formatYmd(item.trial_date)}}</td>
     </tr>
     <tr>
         <th>開始時刻</th>
-        <td>@{{item.start_time|formatHm}}</td>
+        <td>@{{$filters.formatHm(item.start_time)}}</td>
 
     </tr>
     <tr>
         <th>終了時刻</th>
-        <td>@{{item.end_time|formatHm}}</td>
+        <td>@{{$filters.formatHm(item.end_time)}}</td>
     </tr>
 
 </x-bs.table>

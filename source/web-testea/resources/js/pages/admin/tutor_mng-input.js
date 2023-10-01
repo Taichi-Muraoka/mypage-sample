@@ -15,10 +15,12 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+        const self = this;
+
         // 編集完了後は一覧へ戻る
         var afterNew = () => {
             // 新規登録の場合は、会員一覧に戻る
-            UrlCom.redirect(self._getFuncUrl());
+            UrlCom.redirect(UrlCom.getFuncUrl());
         };
         var afterEdit = () => {
             // 編集の場合は、講師詳細画面（二階層目）に戻る
@@ -42,13 +44,10 @@ export default class AppClass extends PageBase {
 
             // 学校名とIDを更新
             // 名称
-            Vue.set(
-                vueForm.form,
-                "text_" + modalSelectId,
-                selectedDatas["school_name"]
-            );
+            vueForm.form["text_" + modalSelectId] =
+                selectedDatas["school_name"];
             // ID
-            Vue.set(vueForm.form, modalSelectId, selectedDatas["school_id"]);
+            vueForm.form[modalSelectId] = selectedDatas["school_id"];
         };
 
         // Vue: 選択モーダル(学校検索)

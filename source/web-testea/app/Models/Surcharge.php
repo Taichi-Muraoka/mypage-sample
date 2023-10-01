@@ -61,12 +61,12 @@ class Surcharge extends Model
     ];
 
     /**
-     * 日付項目の定義
+     * 属性のキャスト
      *
      * @var array
      */
-    protected $dates = [
-        'start_time'
+    protected $casts = [
+        'start_time' => 'datetime:H:i',
     ];
 
     /**
