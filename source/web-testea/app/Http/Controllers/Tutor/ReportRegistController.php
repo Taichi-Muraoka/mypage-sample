@@ -95,7 +95,7 @@ class ReportRegistController extends Controller
         }
 
         return [
-            'selectItems' => $students
+            'selectItems' => $this->objToArray($students)
         ];
     }
 
