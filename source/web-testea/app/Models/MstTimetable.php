@@ -58,8 +58,8 @@ class MstTimetable extends Model
      * @var array
      */
     protected $casts = [
-        'start_time' => 'datetime:H:i',
-        'end_time' => 'datetime:H:i',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
     ];
 
     /**
@@ -107,7 +107,7 @@ class MstTimetable extends Model
             'campus_cd' => ['string', 'max:2'],
             'period_no' => ['integer'],
             'start_time' => ['vdTime'],
-            'end_time' => ['vdTime'],
+            'end_time' => ['vdTime', 'after:start_time'],
             'timetable_kind' => ['integer', 'in:0,1']
         ];
         return $_fieldRules;
@@ -116,5 +116,24 @@ class MstTimetable extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
-
+    /**
+     * 検索 校舎コード
+     */
+    public function scopeSearchCampusCd($query, $obj)
+    {
+        $key = 'campus_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 時間割区分
+     */
+    public function scopeSearchTimetableKind($query, $obj)
+    {
+        $key = 'timetable_kind';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
 }
