@@ -702,6 +702,11 @@ class AppConst
     const CODE_MASTER_25 = 25;
 
     /**
+     * 授業給算出対象外
+     */
+    const CODE_MASTER_25_0 = 0;
+
+    /**
      * 授業給（個別）
      */
     const CODE_MASTER_25_1 = 1;
