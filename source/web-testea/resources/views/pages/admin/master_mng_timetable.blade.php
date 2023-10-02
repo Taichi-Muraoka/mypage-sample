@@ -53,8 +53,8 @@
             <td>@{{item.campus_name}}</td>
             <td>@{{item.kind_name}}</td>
             <td>@{{item.period_no}}</td>
-            <td>@{{item.start_time|formatHm}}</td>
-            <td>@{{item.end_time|formatHm}}</td>
+            <td>@{{item.start_time}}</td>
+            <td>@{{item.end_time}}</td>
             <td>
                 {{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
                 <x-button.list-edit vueHref="'{{ route('master_mng_timetable-edit', '') }}/' + item.id" />
