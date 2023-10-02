@@ -70,8 +70,6 @@ export default class PageModalForm extends PageComponentBase {
                     vueMethods: option["vueInputFormMethods"],
                 });
             },
-            // フィルターをセット
-            filters: filters,
             methods: {
                 //---------------------------
                 // モーダル閉じる

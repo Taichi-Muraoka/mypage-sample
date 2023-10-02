@@ -8,20 +8,20 @@
 <x-bs.card :search=true>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="roomcd" caption="校舎" :select2=true >
-                <option value="1">久我山</option>
-                <option value="2">西永福</option>
-                <option value="3">下高井戸</option>
-                <option value="4">駒込</option>
-                <option value="5">日吉</option>
-                <option value="6">自由が丘</option>
-            </x-input.select>
+            @can('roomAdmin')
+            {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+                :select2Search=false :blank=false />
+            @else
+            {{-- 全体管理者の場合、検索を非表示・未選択を表示する --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+                :select2Search=false :blank=true />
+            @endcan
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="時間割区分" id="timetable_kind" :select2=true :select2Search=false>
-                <option value="0">通常</option>
-                <option value="1">特別期間</option>
-            </x-input.select>
+            {{-- ステータスや種別は、検索を非表示とする --}}
+            <x-input.select caption="時間割区分" id="timetable_kind" :select2=true :mastrData=$timetablekind :editData=$editData
+                :select2Search=false :blank=true />
         </x-bs.col2>
     </x-bs.row>
 </x-bs.card>
@@ -29,67 +29,39 @@
 {{-- 結果リスト --}}
 <x-bs.card-list>
 
-	{{-- カードヘッダ右 --}}
+    {{-- カードヘッダ右 --}}
     <x-slot name="tools">
         <x-button.new href="{{ route('master_mng_timetable-new') }}" :small=true />
     </x-slot>
 
-	{{-- テーブル --}}
+    {{-- テーブル --}}
     <x-bs.table :button=true>
 
-		{{-- テーブルタイトル行 --}}
-		<x-slot name="thead">
-			<th width="15%">校舎</th>
-			<th>時間割区分</th>
-			<th width="15%">時限</th>
-			<th width="15%">開始時刻</th>
-			<th width="15%">終了時刻</th>
-			<th width="10%"></th>
-		</x-slot>
+        {{-- テーブルタイトル行 --}}
+        <x-slot name="thead">
+            <th width="15%">校舎</th>
+            <th>時間割区分</th>
+            <th width="15%">時限</th>
+            <th width="15%">開始時刻</th>
+            <th width="15%">終了時刻</th>
+            <th width="10%"></th>
+        </x-slot>
 
-		{{-- テーブル行 --}}
-		<tr>
-			<td>久我山</td>
-			<td>通常</td>
-			<td>3限</td>
-			<td>15:00</td>
-			<td>16:30</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_timetable-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>久我山</td>
-			<td>通常</td>
-			<td>4限</td>
-			<td>16:45</td>
-			<td>18:15</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_timetable-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>久我山</td>
-			<td>特別期間</td>
-			<td>3限</td>
-			<td>15:30</td>
-			<td>17:00</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_timetable-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>久我山</td>
-			<td>特別期間</td>
-			<td>4限</td>
-			<td>17:15</td>
-			<td>18:45</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_timetable-edit',1) }}" />
-			</td>
-		</tr>
-
-	</x-bs.table>
+        {{-- テーブル行 --}}
+        <tr v-for="item in paginator.data" v-cloak>
+            {{-- MEMO: 日付フォーマットを指定する --}}
+            <td>@{{item.campus_name}}</td>
+            <td>@{{item.kind_name}}</td>
+            <td>@{{item.period_no}}</td>
+            <td>@{{item.start_time|formatHm}}</td>
+            <td>@{{item.end_time|formatHm}}</td>
+            <td>
+                {{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
+                <x-button.list-edit vueHref="'{{ route('master_mng_timetable-edit', '') }}/' + item.id" />
+            </td>
+        </tr>
+        
+    </x-bs.table>
 </x-bs.card-list>
 
 @stop
