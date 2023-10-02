@@ -59,8 +59,8 @@ class MstTimetable extends Model
      */
     protected $casts = [
         'campus_cd' => 'string',
-        'start_time' => 'datetime',
-        'end_time' => 'datetime'
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i'
     ];
 
     /**
