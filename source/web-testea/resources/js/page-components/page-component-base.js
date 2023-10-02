@@ -135,7 +135,7 @@ export default class PageComponentBase {
     initLibs($vue, option = {}) {
         // datepickerイベント
         if (option["datepickerOnChange"] == undefined) {
-            option["datepickerOnChange"] = (id, value) => {};
+            option["datepickerOnChange"] = ($vue, id, value) => {};
         }
 
         //---------------------
@@ -211,7 +211,7 @@ export default class PageComponentBase {
                 // hiddenも調整しておく
                 $vue.form[id] = dateVal.format(localeDate.format2);
                 // イベント発生
-                option["datepickerOnChange"](id, $vue.form[id]);
+                option["datepickerOnChange"]($vue, id, $vue.form[id]);
             }
 
             $(element)
@@ -242,7 +242,7 @@ export default class PageComponentBase {
                         $(this).val("");
                         $vue.form[id] = "";
                         // イベント発生
-                        option["datepickerOnChange"](id, $vue.form[id]);
+                        option["datepickerOnChange"]($vue, id, $vue.form[id]);
                         return;
                     }
 
@@ -253,7 +253,7 @@ export default class PageComponentBase {
                         $(this).val("");
                         $vue.form[id] = "";
                         // イベント発生
-                        option["datepickerOnChange"](id, $vue.form[id]);
+                        option["datepickerOnChange"]($vue, id, $vue.form[id]);
                         // エラーダイアログ
                         appDialogCom.alert("正しい日付を入力してください");
                     } else {
@@ -268,7 +268,7 @@ export default class PageComponentBase {
                             localeDate.format2
                         );
                         // イベント発生
-                        option["datepickerOnChange"](id, $vue.form[id]);
+                        option["datepickerOnChange"]($vue, id, $vue.form[id]);
                     }
                 })
                 .on("apply.daterangepicker", function (ev, picker) {
@@ -277,14 +277,14 @@ export default class PageComponentBase {
                     // hiddenにセット
                     $vue.form[id] = picker.startDate.format(localeDate.format2);
                     // イベント発生
-                    option["datepickerOnChange"](id, $vue.form[id]);
+                    option["datepickerOnChange"]($vue, id, $vue.form[id]);
                 })
                 .on("cancel.daterangepicker", function (ev, picker) {
                     // キャンセルボタンはクリアとした
                     $(this).val("");
                     $vue.form[id] = "";
                     // イベント発生
-                    option["datepickerOnChange"](id, $vue.form[id]);
+                    option["datepickerOnChange"]($vue, id, $vue.form[id]);
                 });
         });
     }
