@@ -55,7 +55,10 @@ class SeasonTutorPeriod extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'lesson_date' => 'date',
+
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値

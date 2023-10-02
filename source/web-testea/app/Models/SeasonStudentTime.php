@@ -55,7 +55,9 @@ class SeasonStudentTime extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'subject_cd' => 'string',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -101,7 +103,7 @@ class SeasonStudentTime extends Model
         static $_fieldRules = [
             'season_times_id' => ['integer'],
             'season_student_id' => ['integer'],
-            'subject_cd' => ['string', 'max:3'],
+            'subject_cd' => ['string', 'max:3', 'digits:3'],
             'times' => ['integer', 'min:0', 'max:99']
         ];
         return $_fieldRules;

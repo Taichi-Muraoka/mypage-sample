@@ -70,7 +70,12 @@ class Report extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'campus_cd' => 'string',
+        'course_cd' => 'string',
+        'lesson_date' => 'date',
+        'regist_date' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -117,8 +122,8 @@ class Report extends Model
             'report_id' => ['integer'],
             'tutor_id' => ['integer'],
             'schedule_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2'],
-            'course_cd' => ['string', 'max:5'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
+            'course_cd' => ['string', 'max:5', 'digits:5'],
             'lesson_date' => ['date_format:Y-m-d'],
             'period_no' => ['integer', 'min:0', 'max:99'],
             'student_id' => ['integer'],
