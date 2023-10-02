@@ -55,7 +55,9 @@ class TrainingBrowse extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'browse_time' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -98,7 +100,11 @@ class TrainingBrowse extends Model
      */
     protected static function getFieldRules()
     {
-        static $_fieldRules = [];
+        static $_fieldRules = [
+            'trn_id' => ['integer'],
+            'tutor_id' => ['integer'],
+            'browse_time' => ['date_format:Y-m-d H:i:s'],
+        ];
         return $_fieldRules;
     }
 

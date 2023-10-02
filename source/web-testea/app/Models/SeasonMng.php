@@ -61,7 +61,15 @@ class SeasonMng extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'season_cd' => 'string',
+        'campus_cd' => 'string',
+        't_start_date' => 'date',
+        't_end_date' => 'date',
+        's_start_date' => 'date',
+        's_end_date' => 'date',
+        'confirm_date' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -106,8 +114,8 @@ class SeasonMng extends Model
     {
         static $_fieldRules = [
             'season_mng_id' => ['integer'],
-            'season_cd' => ['string', 'max:6'],
-            'campus_cd' => ['string', 'max:2'],
+            'season_cd' => ['string', 'max:6', 'digits:6'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             't_start_date' => ['date_format:Y-m-d'],
             't_end_date' => ['date_format:Y-m-d'],
             's_start_date' => ['date_format:Y-m-d'],

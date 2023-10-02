@@ -61,7 +61,11 @@ class Contact extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'campus_cd' => 'string',
+        'regist_time' => 'date',
+        'answer_time' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -109,7 +113,7 @@ class Contact extends Model
             'student_id' => ['integer'],
             'title' => ['string', 'max:50'],
             'text' => ['string', 'max:1000'],
-            'campus_cd' => ['string', 'max:2'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'regist_time' => ['date_format:Y-m-d'],
             'contact_state' => ['integer', 'in:0,1'],
             'adm_id' => ['integer'],

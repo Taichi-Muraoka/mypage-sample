@@ -55,7 +55,10 @@ class SalaryMng extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'salary_date' => 'date',
+        'confirm_date' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値

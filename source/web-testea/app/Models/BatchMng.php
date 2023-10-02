@@ -57,7 +57,10 @@ class BatchMng extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'start_time' => 'date',
+        'end_time' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値

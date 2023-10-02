@@ -56,7 +56,10 @@ class SeasonTutorRequest extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'season_cd' => 'string',
+        'apply_date' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -102,7 +105,7 @@ class SeasonTutorRequest extends Model
         static $_fieldRules = [
             'season_tutor_id' => ['integer'],
             'tutor_id' => ['integer'],
-            'season_cd' => ['string', 'max:6'],
+            'season_cd' => ['string', 'max:6', 'digits:6'],
             'apply_date' => ['date_format:Y-m-d'],
             'comment' => ['string', 'max:1000'],
         ];

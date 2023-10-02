@@ -102,6 +102,11 @@ class AppConst
      */
     const CODE_MASTER_3_5 = 5;
 
+    /**
+     * 承認ステータス サブコード 生徒用
+     */
+    const CODE_MASTER_3_SUB_1 = 1;
+
     //-----------
     // 報告書承認ステータス
     //-----------
@@ -130,6 +135,11 @@ class AppConst
      * 承認ステータス 差戻し
      */
     const CODE_MASTER_4_3 = 3;
+
+    /**
+     * 承認ステータス サブコード 報告書用
+     */
+    const CODE_MASTER_4_SUB_1 = 1;
 
     //-----------
     // 登録ステータス
@@ -1086,6 +1096,21 @@ class AppConst
      */
     const CODE_MASTER_35_7 = 7;
 
+    /**
+     * 出欠ステータス サブコード 共通
+     */
+    const CODE_MASTER_35_SUB_0 = 0;
+
+    /**
+     * 出欠ステータス サブコード １対１のみ
+     */
+    const CODE_MASTER_35_SUB_1 = 1;
+
+    /**
+     * 出欠ステータス サブコード １対多のみ
+     */
+    const CODE_MASTER_35_SUB_2 = 2;
+
     //-----------
     // 仮登録フラグ
     //-----------
@@ -1199,17 +1224,17 @@ class AppConst
     /**
      * 大学
      */
-    const CODE_MASTER_40_1 = 1;
+    const CODE_MASTER_40_1 = 5;
 
     /**
      * 大学院
      */
-    const CODE_MASTER_40_2 = 2;
+    const CODE_MASTER_40_2 = 6;
 
     /**
      * その他
      */
-    const CODE_MASTER_40_3 = 3;
+    const CODE_MASTER_40_3 = 7;
 
     //-----------
     // 用途種別
@@ -1762,17 +1787,17 @@ class AppConst
     // MEMO: 給与表示グループ
 
     /**
-     * 給与表示グループ 支給
+     * 給与表示グループ 源泉計算対象
      */
     const SALARY_GROUP_1 = 1;
 
     /**
-     * 給与表示グループ 控除
+     * 給与表示グループ 源泉計算対象外
      */
     const SALARY_GROUP_2 = 2;
 
     /**
-     * 給与表示グループ その他
+     * 給与表示グループ 控除
      */
     const SALARY_GROUP_3 = 3;
 
