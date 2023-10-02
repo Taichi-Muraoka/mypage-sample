@@ -59,7 +59,9 @@ class MstCampus extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'campus_cd' => 'string'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -103,11 +105,11 @@ class MstCampus extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'campus_cd' => ['string', 'max:2'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'name' => ['string', 'max:50'],
             'short_name' => ['string', 'max:10'],
             'email_campus' => ['string', 'email:rfc,filter', 'max:100'],
-            'tel_campus' => ['string', 'max:20'],
+            'tel_campus' => ['string', 'max:20', 'vdTelephone'],
             'disp_order' => ['integer'],
             'is_hidden' => ['integer', 'in:0,1']
         ];

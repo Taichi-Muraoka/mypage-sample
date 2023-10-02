@@ -61,6 +61,8 @@ class Record extends Model
      * @var array
      */
     protected $casts = [
+        'campus_cd' => 'string',
+        'received_date' => 'date',
         'received_time' => 'datetime:H:i',
         'regist_time' => 'datetime',
     ];
@@ -109,7 +111,7 @@ class Record extends Model
         static $_fieldRules = [
             'record_id' => ['integer'],
             'student_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'record_kind' => ['integer', 'in:1,2,3,4'],
             'received_date' => ['date_format:Y-m-d'],
             'received_time' => ['vdTime'],

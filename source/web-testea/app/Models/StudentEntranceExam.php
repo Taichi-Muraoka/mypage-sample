@@ -61,7 +61,10 @@ class StudentEntranceExam extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'school_cd' => 'string',
+        'exam_date' => 'date'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -106,7 +109,7 @@ class StudentEntranceExam extends Model
     {
         static $_fieldRules = [
             'student_id' => ['integer'],
-            'school_cd' => ['string', 'max:13'],
+            'school_cd' => ['string', 'max:13', 'digits:13'],
             'department_name' => ['string', 'max:50'],
             'priority_no' => ['integer'],
             'exam_year' => ['string', 'max:4'],

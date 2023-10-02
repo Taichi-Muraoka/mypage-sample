@@ -55,7 +55,9 @@ class MstGradeSubject extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'g_subject_cd' => 'string'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -99,7 +101,7 @@ class MstGradeSubject extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'g_subject_cd' => ['string', 'max:3'],
+            'g_subject_cd' => ['string', 'max:3', 'digits:3'],
             'usage_kind' => ['integer', 'in:1,2,3'],
             'name' => ['string', 'max:50'],
         ];

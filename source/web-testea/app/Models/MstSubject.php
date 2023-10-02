@@ -54,7 +54,9 @@ class MstSubject extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'campus_cd' => 'string'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -98,7 +100,7 @@ class MstSubject extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'campus_cd' => ['string', 'max:3'],
+            'campus_cd' => ['string', 'max:3', 'digits:3'],
             'name' => ['string', 'max:30']
         ];
         return $_fieldRules;

@@ -56,7 +56,9 @@ class TransferApplicationDate extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'transfer_date' => 'date'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値

@@ -69,7 +69,13 @@ class Tutor extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'birth_date' => 'date',
+        'grade_year' => 'string',
+        'school_cd_j' => 'string',
+        'school_cd_h' => 'string',
+        'school_cd_u' => 'string'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -116,16 +122,16 @@ class Tutor extends Model
             'tutor_id' => ['integer'],
             'name' => ['string', 'max:50'],
             'name_kana' => ['string', 'max:50'],
-            'tel' => ['string', 'max:20'],
+            'tel' => ['string', 'max:20', 'vdAlphaNum'],
             'email' => ['string', 'email:rfc,filter', 'max:100'],
             'address' => ['string', 'max:100'],
             'birth_date' => ['date_format:Y-m-d'],
             'gender_cd' => ['integer', 'in:1,2,9'],
             'grade_cd' => ['integer'],
-            'grade_year' => ['string', 'max:4'],
-            'school_cd_j' => ['string', 'max:13'],
-            'school_cd_h' => ['string', 'max:13'],
-            'school_cd_u' => ['string', 'max:13'],
+            'grade_year' => ['string', 'max:4', 'digits:4'],
+            'school_cd_j' => ['string', 'max:13', 'digits:13'],
+            'school_cd_h' => ['string', 'max:13', 'digits:13'],
+            'school_cd_u' => ['string', 'max:13', 'digits:13'],
             'hourly_base_wage' => ['integer', 'min:0', 'max:9999'],
             'gender_cd' => ['integer', 'in:1,2,3'],
             'enter_date' => ['date_format:Y-m-d'],

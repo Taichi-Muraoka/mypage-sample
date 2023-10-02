@@ -57,6 +57,7 @@ class ConferenceDate extends Model
      * @var array
      */
     protected $casts = [
+        'conference_date' => 'date',
         'start_time' => 'datetime:H:i',
     ];
 

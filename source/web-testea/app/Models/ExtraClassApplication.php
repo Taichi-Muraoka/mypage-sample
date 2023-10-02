@@ -59,7 +59,10 @@ class ExtraClassApplication extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'campus_cd' => 'string',
+        'apply_date' => 'date'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -105,7 +108,7 @@ class ExtraClassApplication extends Model
         static $_fieldRules = [
             'extra_apply_id' => ['integer'],
             'student_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'status' => ['integer', 'in:0,1'],
             'schedule_id' => ['integer'],
             'request' => ['string', 'max:1000'],

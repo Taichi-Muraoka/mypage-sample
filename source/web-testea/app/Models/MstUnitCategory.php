@@ -56,7 +56,10 @@ class MstUnitCategory extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'unit_category_cd' => 'string',
+        't_subject_cd' => 'string'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -100,9 +103,9 @@ class MstUnitCategory extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'unit_category_cd' => ['string', 'max:7'],
+            'unit_category_cd' => ['string', 'max:7', 'digits:7'],
             'grade_cd' => ['integer'],
-            't_subject_cd' => ['string', 'max:3'],
+            't_subject_cd' => ['string', 'max:3', 'digits:3'],
             'name' => ['string', 'max:50']
         ];
         return $_fieldRules;

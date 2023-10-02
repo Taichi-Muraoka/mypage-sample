@@ -62,8 +62,11 @@ class Conference extends Model
      * @var array
      */
     protected $casts = [
+        'campus_cd' => 'string',
+        'apply_date' => 'date',
+        'conference_date' => 'date',
         'start_time' => 'datetime:H:i',
-        'end_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i'
     ];
 
     /**
@@ -110,7 +113,7 @@ class Conference extends Model
         static $_fieldRules = [
             'conference_id' => ['integer'],
             'student_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'comment' => ['string', 'max:1000'],
             'status' => ['integer', 'in:0,1'],
             'apply_date' => ['date_format:Y-m-d'],

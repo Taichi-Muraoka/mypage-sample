@@ -75,7 +75,15 @@ class Student extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'school_cd_e' => 'string',
+        'school_cd_j' => 'string',
+        'school_cd_h' => 'string',
+        'enter_date' => 'date',
+        'leave_date' => 'date',
+        'recess_start_date' => 'date',
+        'recess_end_date' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -129,8 +137,8 @@ class Student extends Model
             'school_cd_j' => ['string', 'max:13'],
             'school_cd_h' => ['string', 'max:13'],
             'is_jukensei' => ['integer', 'in:0,1'],
-            'tel_stu' => ['string', 'max:20'],
-            'tel_par' => ['string', 'max:20'],
+            'tel_stu' => ['string', 'max:20', 'vdAlphaNum'],
+            'tel_par' => ['string', 'max:20', 'vdAlphaNum'],
             'email_stu' => ['string', 'email:rfc,filter', 'max:100'],
             'email_par' => ['string', 'email:rfc,filter', 'max:100'],
             'login_kind' => ['integer', 'in:1,2'],

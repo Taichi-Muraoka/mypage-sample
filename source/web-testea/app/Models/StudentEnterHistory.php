@@ -56,7 +56,10 @@ class StudentEnterHistory extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'enter_date' => 'date',
+        'leave_date' => 'date'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値

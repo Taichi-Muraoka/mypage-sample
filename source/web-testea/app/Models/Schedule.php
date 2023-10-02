@@ -77,9 +77,13 @@ class Schedule extends Model
      * @var array
      */
     protected $casts = [
+        'campus_cd' => 'string',
+        'booth_cd' => 'string',
+        'course_cd' => 'string',
+        'subject_cd' => 'string',
         'target_date' => 'date',
         'start_time' => 'datetime:H:i',
-        'end_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i'
     ];
 
     /**
@@ -125,17 +129,17 @@ class Schedule extends Model
     {
         static $_fieldRules = [
             'schedule_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'target_date' => ['date_format:Y-m-d'],
             'period_no' => ['integer', 'min:0', 'max:99'],
             'start_time' => ['vdTime'],
             'end_time' => ['vdTime'],
             'minites' => ['integer', 'min:0', 'max:999'],
-            'booth_cd' => ['string', 'max:3'],
-            'course_cd' => ['string', 'max:5'],
+            'booth_cd' => ['string', 'max:3', 'digits:3'],
+            'course_cd' => ['string', 'max:5', 'digits:5'],
             'student_id' => ['integer'],
             'tutor_id' => ['integer'],
-            'subject_cd' => ['string', 'max:3'],
+            'subject_cd' => ['string', 'max:3', 'digits:3'],
             'create_kind' => ['integer', 'in:0,1,2'],
             'lesson_kind' => ['integer', 'in:1,2,3,4,5,6,7'],
             'how_to_kind' => ['integer', 'in:0,1,2,3,4'],
