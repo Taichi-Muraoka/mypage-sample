@@ -56,7 +56,9 @@ class MstCourse extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'course_cd' => 'string',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -72,10 +74,6 @@ class MstCourse extends Model
      */
     protected $hidden = [
         'created_at', 'updated_at', 'deleted_at'
-    ];
-
-    protected $casts = [
-        'course_cd' => 'string',
     ];
 
     /**
