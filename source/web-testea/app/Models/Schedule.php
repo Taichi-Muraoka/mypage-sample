@@ -77,6 +77,7 @@ class Schedule extends Model
      * @var array
      */
     protected $casts = [
+        'target_date' => 'date',
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
     ];
