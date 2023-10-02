@@ -53,7 +53,7 @@ class MstTimetable extends Model
     ];
 
     /**
-     * 日付項目の定義
+     * 属性のキャスト
      *
      * @var array
      */

@@ -34,7 +34,7 @@
     </tr>
     <tr>
         <th>日付</th>
-        <td>@{{item.mdDt|formatYmd}}</td>
+        <td>@{{$filters.formatYmd(item.mdDt)}}</td>
     </tr>
     {{-- v-showは、スケジュール種別によって非表示の場合があるため --}}
     <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }}">
@@ -43,11 +43,11 @@
     </tr>
     <tr v-show="item.mdStartTime">
         <th>開始時刻</th>
-        <td>@{{item.mdStartTime|formatHm}}</td>
+        <td>@{{$filters.formatHm(item.mdStartTime)}}</td>
     </tr>
     <tr v-show="item.mdEndTime">
         <th>終了時刻</th>
-        <td>@{{item.mdEndTime|formatHm}}</td>
+        <td>@{{$filters.formatHm(item.mdEndTime)}}</td>
     </tr>
 
     {{-- 生徒のみ表示 --}}

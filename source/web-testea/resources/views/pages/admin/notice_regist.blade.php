@@ -69,7 +69,7 @@
 
         {{-- 本番用 --}}
         {{-- <tr v-for="item in paginator.data" v-cloak>
-            <td>@{{item.date|formatYmd}}</td>
+            <td>@{{$filters.formatYmd(item.date)}}</td>
             <td>@{{item.title}}</td>
             <td>@{{item.type_name}}</td>
             <td>@{{item.room_name}}</td>

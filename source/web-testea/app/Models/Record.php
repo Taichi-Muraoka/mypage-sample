@@ -56,13 +56,13 @@ class Record extends Model
     ];
 
     /**
-     * 日付項目の定義
+     * 属性のキャスト
      *
      * @var array
      */
-    protected $dates = [
-        'received_time',
-        'regist_time',
+    protected $casts = [
+        'received_time' => 'datetime:H:i',
+        'regist_time' => 'datetime',
     ];
 
     /**

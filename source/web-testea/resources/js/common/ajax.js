@@ -5,6 +5,15 @@
  */
 export default class AjaxCom {
     /**
+     * Promiseを取得
+     */
+    static getPromise() {
+        return new Promise((resolve) => {
+            return resolve();
+        });
+    }
+
+    /**
      * 非同期処理 処理Exit
      *
      * Connect.failにてエラーとしない

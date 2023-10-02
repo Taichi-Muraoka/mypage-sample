@@ -7,7 +7,7 @@
 
     <tr>
         <th width="35%">問い合わせ日</th>
-        <td>@{{item.regist_time|formatYmd}}</td>
+        <td>@{{$filters.formatYmd(item.regist_time)}}</td>
     </tr>
     <tr>
         <th>宛先</th>
@@ -23,7 +23,7 @@
     </tr>
     <tr>
         <th>回答日</th>
-        <td>@{{item.answer_time|formatYmd}}</td>
+        <td>@{{$filters.formatYmd(item.answer_time)}}</td>
     </tr>
     <tr>
         <th>回答者所属</th>

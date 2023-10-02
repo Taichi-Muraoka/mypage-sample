@@ -15,9 +15,11 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+        const self = this;
+
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            UrlCom.redirect(self._getFuncUrl());
+            UrlCom.redirect(UrlCom.getFuncUrl());
         };
 
         // Vue: 入力フォーム
@@ -25,15 +27,18 @@ export default class AppClass extends PageBase {
             afterEdit: afterEdit,
             vueData: {
                 // 定型文プルダウン変更用のプロパティを用意
-                selectGetItemTemplate: {}
+                selectGetItemTemplate: {},
             },
             vueMethods: {
                 // 定型文プルダウン変更イベント
-                selectChangeGetTemplate: function(event) {
-                    self._getPromise()
+                selectChangeGetTemplate: function (event) {
+                    AjaxCom.getPromise()
                         .then(() => {
                             // 入力中の場合は確認する
-                            if (!self._isEmpty(this.form.title) || !self._isEmpty(this.form.text)) {
+                            if (
+                                !ValueCom.isEmpty(this.form.title) ||
+                                !ValueCom.isEmpty(this.form.text)
+                            ) {
                                 return appDialogCom.confirm(
                                     "入力内容がクリアされますがよろしいですか？",
                                     null,
@@ -43,34 +48,30 @@ export default class AppClass extends PageBase {
                                 return true;
                             }
                         })
-                        .then(flg => {
+                        .then((flg) => {
                             if (!flg) {
                                 // いいえを押した場合
                                 return AjaxCom.exit();
                             }
 
                             // 初期化
-                            Vue.set(this, "selectGetItemTemplate", {});
+                            this.selectGetItemTemplate = {};
                             this.form.title = "";
                             this.form.text = "";
 
                             // チェンジイベントを発生させる
                             var selected = this.form.template_id;
-                            self._selectChangeGetCallBack(
+                            self.selectChangeGetCallBack(
                                 this,
                                 selected,
                                 // URLを分けた
                                 {
-                                    urlSuffix: "template"
+                                    urlSuffix: "template",
                                 },
                                 // 受信後のコールバック
-                                data => {
+                                (data) => {
                                     // データをセット
-                                    Vue.set(
-                                        this,
-                                        "selectGetItemTemplate",
-                                        data
-                                    );
+                                    this.selectGetItemTemplate = data;
                                     this.form.title = data.title;
                                     this.form.text = data.text;
                                 }
@@ -79,25 +80,24 @@ export default class AppClass extends PageBase {
                         .catch(AjaxCom.fail);
                 },
                 // 宛先種別
-                selectChangeGetMulti: function(event) {
-
+                selectChangeGetMulti: function (event) {
                     var destinationType = this.form.destination_type;
                     var roomcdStudent = this.form.roomcd_student;
 
                     // 生徒プルダウンは動的に変わるので、一旦クリアする
-                    this.form.sid = '';
+                    this.form.sid = "";
 
                     // チェンジイベントを発生させる
-                    self._selectChangeGet(
+                    self.selectChangeGet(
                         this,
                         {
                             destinationType: destinationType,
-                            roomcdStudent: roomcdStudent
+                            roomcdStudent: roomcdStudent,
                         },
                         this.option
                     );
-                }
-            }
+                },
+            },
         });
     }
 }

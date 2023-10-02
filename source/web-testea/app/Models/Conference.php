@@ -57,13 +57,13 @@ class Conference extends Model
     ];
 
     /**
-     * 日付項目の定義
+     * 属性のキャスト
      *
      * @var array
      */
-    protected $dates = [
-        'start_time',
-        'end_time',
+    protected $casts = [
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i',
     ];
 
     /**

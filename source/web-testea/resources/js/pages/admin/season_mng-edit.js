@@ -17,7 +17,7 @@ export default class AppClass extends PageBase {
     start() {
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            UrlCom.redirect(self._getFuncUrl());
+            UrlCom.redirect(UrlCom.getFuncUrl());
         };
 
         // Vue: 入力フォーム

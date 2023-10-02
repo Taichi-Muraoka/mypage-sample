@@ -70,15 +70,15 @@
     </tr>
     <tr>
         <th>開始日</th>
-        <td>@{{item.dtl_startdate|formatYmd}}</td>
+        <td>@{{$filters.formatYmd(item.dtl_startdate)}}</td>
     </tr>
     <tr>
         <th>終了日</th>
-        <td>@{{item.dtl_enddate|formatYmd}}</td>
+        <td>@{{$filters.formatYmd(item.dtl_enddate)}}</td>
     </tr>
     <tr>
         <th>月額</th>
-        <td>@{{item.dtl_tuition|toLocaleString}}</td>
+        <td>@{{$filters.toLocaleString(item.dtl_tuition)}}</td>
     </tr>
     <tr>
         <th>契約情報</th>
@@ -104,7 +104,7 @@
     <tr v-for="regular_detail in item.regular_details" v-cloak>
         <x-bs.td-sp caption="講師名">@{{regular_detail.teacher_name}}</x-bs.td-sp>
         <x-bs.td-sp caption="曜日" class="resp-column">@{{regular_detail.weekday}}</x-bs.td-sp>
-        <x-bs.td-sp caption="開始時刻" class="resp-column">@{{regular_detail.start_time|formatHm}}</x-bs.td-sp>
+        <x-bs.td-sp caption="開始時刻" class="resp-column">@{{$filters.formatHm(regular_detail.start_time)}}</x-bs.td-sp>
         <x-bs.td-sp caption="授業時間" class="resp-column">@{{regular_detail.r_minutes}}分</x-bs.td-sp>
         <td class="resp-clear"></td>
         <x-bs.td-sp caption="回数" class="resp-column no-border">@{{regular_detail.r_count}}</x-bs.td-sp>

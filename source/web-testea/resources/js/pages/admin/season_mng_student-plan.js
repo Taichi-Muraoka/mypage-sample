@@ -15,9 +15,11 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+        const self = this;
+
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            //UrlCom.redirect(self._getFuncUrl());
+            //UrlCom.redirect(UrlCom.getFuncUrl());
             self.redirectToParent();
         };
 
@@ -38,9 +40,9 @@ export default class AppClass extends PageBase {
             const chkPlanId = modalButtonData.chk_plan_id;
 
             // 講師名
-            Vue.set(vueForm.form, "hd_text_" + chkPlanId, formDatas["tname"]);
+            vueForm.form["hd_text_" + chkPlanId] = formDatas["tname"];
             // ID
-            Vue.set(vueForm.form, "hd_" + chkPlanId, formDatas["tid"]);
+            vueForm.form["hd_" + chkPlanId] = formDatas["tid"];
         };
 
         // Vue: 講師選択モーダル
@@ -58,8 +60,8 @@ export default class AppClass extends PageBase {
                 const selectedValue = vueForm.form["hd_" + chkPlanId];
 
                 // プルダウンを取得
-                Vue.set($vue.vueInputForm, "selectGetItem", {});
-                self._selectChangeGetCallBack(
+                $vue.vueInputForm.selectGetItem = {};
+                self.selectChangeGetCallBack(
                     $vue.vueInputForm,
                     {
                         // TODO: サンプル(日付・時限単位で設定)。どういう持ち方にするかは要検討
@@ -70,7 +72,7 @@ export default class AppClass extends PageBase {
                     },
                     // 受信後のコールバック
                     (data) => {
-                        Vue.set($vue.vueInputForm, "selectGetItem", data);
+                        $vue.vueInputForm.selectGetItem = data;
 
                         for (const [key, value] of Object.entries(
                             $vue.vueInputForm.selectGetItem
@@ -90,7 +92,7 @@ export default class AppClass extends PageBase {
                 selectChange: function (event) {
                     // 講師名を取得しHiddenに退避する
                     const idx = event.target.selectedIndex;
-                    if (self._isEmpty(event.target.options[idx].value)) {
+                    if (ValueCom.isEmpty(event.target.options[idx].value)) {
                         // 未選択
                         this.form.tname = "";
                     } else {

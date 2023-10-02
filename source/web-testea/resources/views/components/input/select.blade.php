@@ -60,7 +60,7 @@
     data-minimum-results-for-search="Infinity"
     @endif
 
-    {{-- 検索を無効にする場合 --}}
+    {{-- 複数選択指定の場合 --}}
     @if ($multiple)
     multiple
     @endif
@@ -76,8 +76,16 @@
     @foreach ($mastrData as $key => $obj) 
     <option value="{{$key}}"
       {{-- 選択 --}}
-      @if (isset($editData[$id]) && $editData[$id] == $key)
-      selected
+      {{-- 複数選択指定の場合 --}}
+      @if (($multiple) && isset($editData[$id]))
+        @foreach(explode("," , $editData[$id]) as $val)
+          @if (!empty($val) && $val == $key)
+          selected
+          @endif
+        @endforeach
+      {{-- 単一選択の場合 --}}
+      @elseif (isset($editData[$id]) && $editData[$id] == $key)
+        selected
       @endif
       {{-- 表示名は、オブジェクトでも配列でも良いとした --}}
     >@if (is_object($obj)) {{$obj->value}} @else {{$obj['value']}} @endif</option>

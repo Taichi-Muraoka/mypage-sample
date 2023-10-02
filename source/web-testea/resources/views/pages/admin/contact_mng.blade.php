@@ -52,7 +52,7 @@
 
         {{-- テーブル行 --}}
         <tr v-for="item in paginator.data" v-cloak>
-            <td>@{{item.regist_time|formatYmd}}</td>
+            <td>@{{$filters.formatYmd(item.regist_time)}}</td>
             <td>@{{item.room_name}}</td>
             <td>@{{item.sname}}</td>
             <td>@{{item.title}}</td>

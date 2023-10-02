@@ -44,7 +44,7 @@
     </tr>
     <tr>
         <th>授業日時</th>
-        <td>@{{item.lesson_date|formatYmd}} @{{item.start_time|formatHm}}</td>
+        <td>@{{$filters.formatYmd(item.lesson_date)}} @{{$filters.formatHm(item.start_time)}}</td>
     </tr>
     <tr>
         <th>校舎</th>

@@ -27,11 +27,11 @@
     </tr>
     <tr v-show="item.mdStartTime">
         <th>開始時刻</th>
-        <td>@{{item.mdStartTime|formatHm}}</td>
+        <td>@{{$filters.formatHm(item.mdStartTime)}}</td>
     </tr>
     <tr v-show="item.mdEndTime">
         <th>終了時刻</th>
-        <td>@{{item.mdEndTime|formatHm}}</td>
+        <td>@{{$filters.formatHm(item.mdEndTime)}}</td>
     </tr>
     <tr>
         <th>講師名</th>
