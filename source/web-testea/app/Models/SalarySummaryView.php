@@ -45,6 +45,20 @@ class SalarySummaryView extends Model
      * @var array
      */
     protected $fillable = [
+        'salary_date',
+        'tutor_id',
+        'hourly_base_wage',
+        'hour_personal',
+        'hour_two',
+        'hour_three',
+        'hour_group',
+        'hour_home',
+        'hour_practice',
+        'hour_high',
+        'hourly_work_wage',
+        'hour_work',
+        'cost',
+        'untaxed_cost',
     ];
 
     /**
@@ -52,7 +66,9 @@ class SalarySummaryView extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'salary_date' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -87,6 +103,12 @@ class SalarySummaryView extends Model
     //-------------------------------
     // 項目定義
     //-------------------------------
+    protected static function getFieldRules()
+    {
+        static $_fieldRules = [
+        ];
+        return $_fieldRules;
+    }
 
     //-------------------------------
     // 検索条件
