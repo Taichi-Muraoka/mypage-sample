@@ -55,7 +55,9 @@
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.adm_id']" />
-                    {{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
+                <!-- スペース -->
+                &nbsp;
+                {{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
                 <x-button.list-edit
                     vueHref="'{{ route('account_mng-edit', '') }}/' + item.adm_id" />
             </td>
