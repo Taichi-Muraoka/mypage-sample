@@ -58,8 +58,9 @@ class MstTimetable extends Model
      * @var array
      */
     protected $casts = [
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
+        'campus_cd' => 'string',
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i'
     ];
 
     /**
@@ -104,7 +105,7 @@ class MstTimetable extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'campus_cd' => ['string', 'max:2'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'period_no' => ['integer'],
             'start_time' => ['vdTime'],
             'end_time' => ['vdTime', 'after:start_time'],

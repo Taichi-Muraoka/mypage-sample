@@ -54,7 +54,9 @@ class MstPrefecture extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'prefecture_cd' => 'string'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -98,7 +100,7 @@ class MstPrefecture extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'prefecture_cd' => ['string', 'max:2'],
+            'prefecture_cd' => ['string', 'max:2', 'digits:2'],
             'name' => ['string', 'max:10']
         ];
         return $_fieldRules;

@@ -58,7 +58,10 @@ class Badge extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'campus_cd' => 'string',
+        'authorization_date' => 'date'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -104,7 +107,7 @@ class Badge extends Model
         static $_fieldRules = [
             'badge_id' => ['integer'],
             'student_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'badge_type' => ['integer', 'in:1,2,3,4'],
             'reason' => ['string', 'max:1000'],
             'authorization_date' => ['date_format:Y-m-d'],

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * 給与算出交通費情報View - モデル
  */
-class SalaryTravelCostVIew extends Model
+class SalaryTravelCostView extends Model
 {
 
     // モデルの共通処理
@@ -45,6 +45,20 @@ class SalaryTravelCostVIew extends Model
      * @var array
      */
     protected $fillable = [
+        'salary_date',
+        'tutor_id',
+        'unit_price1',
+        'times1',
+        'amount1',
+        'unit_price2',
+        'times2',
+        'amount2',
+        'unit_price3',
+        'times3',
+        'amount3',
+        'hour_work',
+        'cost',
+        'untaxed_cost',
     ];
 
     /**
@@ -52,7 +66,9 @@ class SalaryTravelCostVIew extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'salary_date' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -87,6 +103,17 @@ class SalaryTravelCostVIew extends Model
     //-------------------------------
     // 項目定義
     //-------------------------------
+    /**
+     * テーブル項目の定義
+     *
+     * @return array
+     */
+    protected static function getFieldRules()
+    {
+        static $_fieldRules = [
+        ];
+        return $_fieldRules;
+    }
 
     //-------------------------------
     // 検索条件

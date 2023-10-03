@@ -66,7 +66,11 @@ class Surcharge extends Model
      * @var array
      */
     protected $casts = [
+        'campus_cd' => 'string',
+        'apply_date' => 'date',
+        'working_date' => 'date',
         'start_time' => 'datetime:H:i',
+        'payment_date' => 'date',
     ];
 
     /**
@@ -113,7 +117,7 @@ class Surcharge extends Model
         static $_fieldRules = [
             'surcharge_id' => ['integer'],
             'tutor_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'apply_date' => ['date_format:Y-m-d'],
             'surcharge_kind' => ['integer', 'in:11,12,13,14,21,22,31,32'],
             'working_date' => ['date_format:Y-m-d'],

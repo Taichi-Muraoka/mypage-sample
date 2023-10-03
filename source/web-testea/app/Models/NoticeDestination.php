@@ -54,7 +54,9 @@ class NoticeDestination extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'campus_cd' => 'string',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -98,7 +100,13 @@ class NoticeDestination extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'destination_type' => ['integer']
+            'notice_id' => ['integer'],
+            'destination_seq' => ['integer'],
+            'destination_type' => ['integer', 'in:1,2,3,4'],
+            'student_id' => ['integer'],
+            'tutor_id' => ['integer'],
+            'notice_group_id' => ['integer'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
         ];
         return $_fieldRules;
     }

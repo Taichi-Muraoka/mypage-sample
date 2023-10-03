@@ -58,7 +58,11 @@ class TrainingContent extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'regist_time' => 'date',
+        'release_date' => 'date',
+        'limit_date' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値

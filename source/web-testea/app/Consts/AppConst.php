@@ -172,7 +172,7 @@ class AppConst
     /**
      * 校舎コード 本部
      */
-    const CODE_MASTER_6_0 = '0';
+    const CODE_MASTER_6_0 = '00';
 
     //-----------
     // アカウント種類

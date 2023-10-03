@@ -59,7 +59,12 @@ class YearlySchedule extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'school_year' => 'string',
+        'campus_cd' => 'string',
+        'lesson_date' => 'date',
+        'school_month' => 'string',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -104,12 +109,12 @@ class YearlySchedule extends Model
     {
         static $_fieldRules = [
             'yearly_schedule_id' => ['integer'],
-            'school_year' => ['string', 'max:4'],
-            'campus_cd' => ['string', 'max:2'],
+            'school_year' => ['string', 'max:4', 'digits:4'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'lesson_date' => ['date_format:Y-m-d'],
             'day_cd' => ['integer', 'in:1,2,3,4,5,6,7'],
             'date_kind' => ['integer', 'in:0,1,2,3,9'],
-            'school_month' => ['string', 'max:2'],
+            'school_month' => ['string', 'max:2', 'digits:2'],
             'week_count' => ['integer'],
         ];
         return $_fieldRules;

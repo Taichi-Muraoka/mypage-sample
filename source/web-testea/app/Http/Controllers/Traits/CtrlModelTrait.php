@@ -298,7 +298,7 @@ trait CtrlModelTrait
             // 本部を追加するかどうか
             if ($honbu) {
                 // コードマスタより「本部」名称取得
-                $queryHonbu = CodeMaster::select('code', 'name as value', 'order_code as disp_order')
+                $queryHonbu = CodeMaster::select('gen_item1', 'name as value', 'order_code as disp_order')
                     ->where('data_type', AppConst::CODE_MASTER_6);
 
                 // UNIONで校舎リストに加える
@@ -681,7 +681,7 @@ trait CtrlModelTrait
             ->where('is_hidden', AppConst::CODE_MASTER_11_1);
 
         // コードマスタより「本部」名称取得
-        $queryHonbu = CodeMaster::select('code', 'name as room_name', 'name as room_name_symbol', 'order_code as disp_order')
+        $queryHonbu = CodeMaster::select('gen_item1', 'name as room_name', 'name as room_name_symbol', 'order_code as disp_order')
             ->where('data_type', AppConst::CODE_MASTER_6);
         $query->union($queryHonbu);
 

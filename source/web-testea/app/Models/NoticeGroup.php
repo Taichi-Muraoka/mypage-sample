@@ -94,7 +94,13 @@ class NoticeGroup extends Model
      */
     protected static function getFieldRules()
     {
-        static $_fieldRules = [];
+        static $_fieldRules = [
+            'notice_group_id' => ['integer'],
+            'group_type' => ['integer', 'in:1,2'],
+            'cls_cd' => ['integer'],
+            'cls_cd_next' => ['integer'],
+            'group_name' => ['string', 'max:50'],
+        ];
         return $_fieldRules;
     }
 

@@ -58,7 +58,10 @@ class Notice extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'campus_cd' => 'string',
+        'regist_time' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -107,7 +110,7 @@ class Notice extends Model
             'text' => ['string', 'max:1000'],
             'notice_type' => ['integer', 'in:4,5,6,7,8,9,10'],
             'adm_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'regist_time' => ['date_format:Y-m-d H:i:s']
         ];
         return $_fieldRules;

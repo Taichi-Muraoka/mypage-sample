@@ -59,7 +59,11 @@ class SeasonStudentRequest extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'season_cd' => 'string',
+        'campus_cd' => 'string',
+        'apply_date' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -105,8 +109,8 @@ class SeasonStudentRequest extends Model
         static $_fieldRules = [
             'season_student_id' => ['integer'],
             'student_id' => ['integer'],
-            'season_cd' => ['string', 'max:6'],
-            'campus_cd' => ['string', 'max:2'],
+            'season_cd' => ['string', 'max:6', 'digits:6'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'apply_date' => ['date_format:Y-m-d'],
             'comment' => ['string', 'max:1000'],
             'regist_status' => ['integer', 'in:0,1'],

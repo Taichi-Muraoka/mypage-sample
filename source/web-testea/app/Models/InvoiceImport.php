@@ -51,7 +51,14 @@ class InvoiceImport extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'invoice_date' => 'date',
+        'issue_date' => 'date',
+        'bill_date' => 'date',
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'import_date' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値

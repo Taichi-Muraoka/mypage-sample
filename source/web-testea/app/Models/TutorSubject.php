@@ -54,7 +54,9 @@ class TutorSubject extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'subject_cd' => 'string'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -100,7 +102,7 @@ class TutorSubject extends Model
         static $_fieldRules = [
             'tutor_subject_id' => ['integer'],
             'tutor_id' => ['integer'],
-            'subject_cd' => ['string', 'max:3']
+            'subject_cd' => ['string', 'max:3', 'digits:3']
         ];
         return $_fieldRules;
     }

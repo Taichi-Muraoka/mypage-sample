@@ -58,7 +58,9 @@ class ScoreDetail extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'g_subject_cd' => 'string'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -104,7 +106,7 @@ class ScoreDetail extends Model
         static $_fieldRules = [
             'score_datail_id' => ['integer'],
             'score_id' => ['integer'],
-            'g_subject_cd' => ['string', 'max:3'],
+            'g_subject_cd' => ['string', 'max:3', 'digits:3'],
             'score' => ['integer'],
             'full_score' => ['integer'],
             'average' => ['integer'],

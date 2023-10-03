@@ -57,7 +57,10 @@ class Invoice extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'invoice_date' => 'date',
+        'campus_cd'=> 'string',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -104,7 +107,7 @@ class Invoice extends Model
             'invoice_id' => ['integer'],
             'student_id' => ['integer'],
             'invoice_date' => ['date_format:Y-m-d'],
-            'campus_cd'=> ['string', 'max:2'],
+            'campus_cd'=> ['string', 'max:2', 'digits:2'],
             'pay_type' => ['integer', 'in:1,2'],
             'total_amount' => ['integer', 'min:0', 'max:99999999'],
         ];

@@ -69,7 +69,16 @@ class ReportUnit extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'sub_cd' => 'string',
+        'text_cd' => 'string',
+        'unit_category_cd1' => 'string',
+        'unit_cd1' => 'string',
+        'unit_category_cd2' => 'string',
+        'unit_cd2' => 'string',
+        'unit_category_cd3' => 'string',
+        'unit_cd3' => 'string',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -115,21 +124,21 @@ class ReportUnit extends Model
         static $_fieldRules = [
             'report_unit_id' => ['integer'],
             'report_id' => ['integer'],
-            'sub_cd' => ['string', 'max:2'],
-            'text_cd' => ['string', 'max:8'],
+            'sub_cd' => ['string', 'max:2', 'digits:2'],
+            'text_cd' => ['string', 'max:8', 'digits:8'],
             'free_text_name' => ['string', 'max:50'],
             'text_page' => ['string', 'max:50'],
-            'unit_category_cd1' => ['string', 'max:7'],
+            'unit_category_cd1' => ['string', 'max:7', 'digits:7'],
             'free_category_name1' => ['string', 'max:50'],
-            'unit_cd1' => ['string', 'max:2'],
+            'unit_cd1' => ['string', 'max:2', 'digits:2'],
             'free_unit_name1' => ['string', 'max:50'],
-            'unit_category_cd2' => ['string', 'max:7'],
+            'unit_category_cd2' => ['string', 'max:7', 'digits:7'],
             'free_category_name2' => ['string', 'max:50'],
-            'unit_cd2' => ['string', 'max:2'],
+            'unit_cd2' => ['string', 'max:2', 'digits:2'],
             'free_unit_name2' => ['string', 'max:50'],
-            'unit_category_cd3' => ['string', 'max:7'],
+            'unit_category_cd3' => ['string', 'max:7', 'digits:7'],
             'free_category_name3' => ['string', 'max:50'],
-            'unit_cd3' => ['string', 'max:2'],
+            'unit_cd3' => ['string', 'max:2', 'digits:2'],
             'free_unit_name3' => ['string', 'max:50']
         ];
         return $_fieldRules;

@@ -55,7 +55,9 @@ class TutorCampus extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'campus_cd' => 'string'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -100,7 +102,7 @@ class TutorCampus extends Model
     {
         static $_fieldRules = [
             'tutor_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'travel_cost' => ['integer', 'min:0', 'max:9999']
         ];
         return $_fieldRules;

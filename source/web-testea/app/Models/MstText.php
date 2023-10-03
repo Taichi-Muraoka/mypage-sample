@@ -57,7 +57,11 @@ class MstText extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'text_cd' => 'string',
+        'l_subject_cd' => 'string',
+        't_subject_cd' => 'string'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -101,10 +105,10 @@ class MstText extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'text_cd' => ['string', 'max:8'],
-            'l_subject_cd' => ['string', 'max:3'],
+            'text_cd' => ['string', 'max:8', 'digits:8'],
+            'l_subject_cd' => ['string', 'max:3', 'digits:3'],
             'grade_cd' => ['integer'],
-            't_subject_cd' => ['string', 'max:8'],
+            't_subject_cd' => ['string', 'max:8', 'digits:8'],
             'name' => ['string', 'max:50']
         ];
         return $_fieldRules;

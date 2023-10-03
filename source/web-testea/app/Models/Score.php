@@ -61,7 +61,10 @@ class Score extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'exam_date' => 'date',
+        'regist_date' => 'date'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値

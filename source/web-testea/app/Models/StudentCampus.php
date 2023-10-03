@@ -54,7 +54,9 @@ class StudentCampus extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'campus_cd' => 'string'
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -99,7 +101,7 @@ class StudentCampus extends Model
     {
         static $_fieldRules = [
             'student_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2']
+            'campus_cd' => ['string', 'max:2', 'digits:2']
         ];
         return $_fieldRules;
     }

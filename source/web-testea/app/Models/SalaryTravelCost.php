@@ -59,7 +59,10 @@ class SalaryTravelCost extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'salary_date' => 'date',
+        'campus_cd' => 'string',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -107,7 +110,7 @@ class SalaryTravelCost extends Model
             'salary_date' => ['date_format:Y-m-d'],
             'tutor_id' => ['integer'],
             'seq' => ['integer'],
-            'campus_cd' => ['string', 'max:2'],
+            'campus_cd' => ['string', 'max:2', 'digits:2'],
             'unit_price' => ['integer', 'min:0', 'max:9999'],
             'times' => ['integer'],
             'amount' => ['integer', 'min:0', 'max:9999'],
