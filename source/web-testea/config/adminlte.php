@@ -328,10 +328,6 @@ return [
             'active' => ['contact/*']
         ],
         [
-            'header' => '生徒向け',
-            'can'  => 'student',
-        ],
-        [
             'text' => '振替授業調整',
             'route'  => 'transfer_student',
             'icon' => 'fas fa-exchange-alt',
@@ -395,11 +391,6 @@ return [
             'can'  => 'student',
             'active' => ['invoice/*']
         ],
-
-        [
-            'header' => 'アカウント設定',
-            'can'  => 'student',
-        ],
         [
             'text' => 'パスワード変更',
             'route'  => 'password_change',
@@ -424,10 +415,6 @@ return [
             'icon' => 'far fa-calendar-alt',
             'can'  => 'tutor',
             'active' => ['calendar/*']
-        ],
-        [
-            'header' => '講師向け',
-            'can'  => 'tutor',
         ],
         [
             'text' => '授業報告書',
@@ -495,10 +482,6 @@ return [
             'can'  => 'tutor',
             'active' => ['training/*'],
             'menuid' => 'id_training',
-        ],
-        [
-            'header' => 'アカウント設定',
-            'can'  => 'tutor',
         ],
         [
             'text' => 'パスワード変更',
