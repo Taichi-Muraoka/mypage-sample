@@ -97,7 +97,7 @@ class AccountMngController extends Controller
         $subquery = $this->mdlGetRoomQuery();
 
         // データを取得
-        $offices = $query
+        $adminUsers = $query
             ->select(
                 'adm_id',
                 'name',
@@ -116,7 +116,7 @@ class AccountMngController extends Controller
             ->orderby('adm_id');
 
         // ページネータで返却
-        return $this->getListAndPaginator($request, $offices);
+        return $this->getListAndPaginator($request, $adminUsers);
     }
 
     /**
@@ -142,7 +142,7 @@ class AccountMngController extends Controller
         // サブクエリを作成
         $subquery = $this->mdlGetRoomQuery();
 
-        $office = $query
+        $adminUser = $query
             // IDを指定
             ->where('admin_users.adm_id', $id)
             // データを取得
@@ -163,7 +163,7 @@ class AccountMngController extends Controller
             // MEMO: 取得できない場合はエラーとする
             ->firstOrFail();
 
-        return $office;
+        return $adminUser;
     }
 
     /**
@@ -236,19 +236,19 @@ class AccountMngController extends Controller
 
         // トランザクション(例外時は自動的にロールバック)
         DB::transaction(function () use ($request) {
-            // Officeテーブルへのinsert
+            // adminUserテーブルへのinsert
             $form = $request->only(
                 'name',
                 'campus_cd'
             );
-            $office = new Office;
+            $adminUser = new AdminUser;
             // 登録
-            $office->fill($form)->save();
+            $adminUser->fill($form)->save();
 
             // accountテーブルへのinsert
             $account = new Account;
             // 登録
-            $account->account_id = $office->adm_id;
+            $account->account_id = $adminUser->adm_id;
             $account->account_type = AppConst::CODE_MASTER_7_3;
             $account->password_reset = AppConst::ACCOUNT_PWRESET_0;
             $account->email = $request['email'];
@@ -285,7 +285,7 @@ class AccountMngController extends Controller
         $rooms = $this->mdlGetRoomList(true);
 
         // クエリを作成(PKでユニークに取る)
-        $office = AdminUser::select('admin_users.adm_id', 'accounts.email', 'admin_users.name', 'admin_users.campus_cd', 'accounts.email as before_email')
+        $adminUser = AdminUser::select('admin_users.adm_id', 'accounts.email', 'admin_users.name', 'admin_users.campus_cd', 'accounts.email as before_email')
             // アカウントテーブルをLeftJOIN
             ->sdLeftJoin(Account::class, function ($join) {
                 $join->on('admin_users.adm_id', '=', 'accounts.account_id')
@@ -298,7 +298,7 @@ class AccountMngController extends Controller
             ->firstOrFail();
 
         return view('pages.admin.account_mng-input', [
-            'editData' => $office,
+            'editData' => $adminUser,
             'rules' => $this->rulesForInput(null),
             'rooms' => $rooms,
             'delBtnSts' => $delBtnSts
@@ -317,8 +317,8 @@ class AccountMngController extends Controller
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        // officeテーブルより対象データを取得(PKでユニークに取る)
-        $office = AdminUser::where('adm_id', $request['adm_id'])
+        // adminUserテーブルより対象データを取得(PKでユニークに取る)
+        $adminUser = AdminUser::where('adm_id', $request['adm_id'])
             // 教室管理者の場合、自分の教室コードのみにガードを掛ける
             ->where($this->guardRoomAdminTableWithRoomCd())
             // 該当データがない場合はエラーを返す
@@ -330,15 +330,15 @@ class AccountMngController extends Controller
             ->firstOrFail();
 
         // トランザクション(例外時は自動的にロールバック)
-        DB::transaction(function () use ($request, $office, $account) {
+        DB::transaction(function () use ($request, $adminUser, $account) {
             // MEMO: 必ず登録する項目のみに絞る。
-            // officeテーブルのupdate
+            // adminUserテーブルのupdate
             $form = $request->only(
                 'name',
                 'campus_cd'
             );
             // 登録
-            $office->fill($form)->save();
+            $adminUser->fill($form)->save();
 
             // MEMO: 必ず登録する項目のみに絞る。
             // accountテーブルのupdate
@@ -374,7 +374,7 @@ class AccountMngController extends Controller
         // Formを取得
         $form = $request->all();
 
-        // officeテーブルより対象データを取得(PKでユニークに取る)
+        // adminUserテーブルより対象データを取得(PKでユニークに取る)
         AdminUser::where('adm_id', $request['adm_id'])
             // 教室管理者の場合、自分の教室コードのみにガードを掛ける
             ->where($this->guardRoomAdminTableWithRoomCd())
@@ -388,7 +388,7 @@ class AccountMngController extends Controller
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
-        // officeテーブルは削除しない
+        // adminUserテーブルは削除しない
         // accountテーブルのdeleteを行う前に、emailを更新する（「DEL年月日時分秒@」を付加）
         $delStr = config('appconf.delete_email_prefix') . date("YmdHis") . config('appconf.delete_email_suffix');
         $account->email = $account->email . $delStr;
