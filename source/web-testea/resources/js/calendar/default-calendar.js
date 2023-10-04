@@ -80,6 +80,9 @@ export default class DefaultCalendar {
             slotMinTime: "08:00:00",
             slotMaxTime: "23:00:00",
             eventTextColor: "white",
+            dayCellContent: function(arg){
+                return arg.date.getDate();
+            }
         });
 
         this._calendar.render();

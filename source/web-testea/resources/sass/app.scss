@@ -372,6 +372,11 @@ label:not(.form-check-label):not(.custom-file-label) {
     overflow: visible !important;
 }
 
+[id^="calendar"] .fc-daygrid-day-top {
+    display: flex;
+    flex-direction: row;
+}
+
 [id^="calendar"] .fc-timegrid-slot {
     height: 1.5em !important;
 }
@@ -410,7 +415,7 @@ label:not(.form-check-label):not(.custom-file-label) {
 }
 
 /* 集団授業の予定の背景色 */
-[id^="calendar"] .cal_tanki_koshu {
+[id^="calendar"] .cal_group {
     //background: #7507b4;
     //border-color: #7507b4;
 //    background: #af0058;
@@ -460,7 +465,7 @@ label:not(.form-check-label):not(.custom-file-label) {
 }
 
 /* 自習の予定の背景色 */
-[id^="calendar"] .cal_tanki_moshi {
+[id^="calendar"] .cal_jisyu {
     //background: #0073b7;
     //border-color: #0073b7;
     background: salmon;
