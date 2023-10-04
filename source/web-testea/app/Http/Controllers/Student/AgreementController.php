@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Traits\FuncAgreementTrait;
+use App\Models\Badge;
+use App\Models\MstCampus;
 
 /**
- * 契約内容 - コントローラ
+ * 生徒情報（旧；契約内容） - コントローラ
  */
 class AgreementController extends Controller
 {
@@ -42,76 +44,49 @@ class AgreementController extends Controller
         $account = Auth::user();
         $account_id = $account->account_id;
 
-        // 生徒の契約内容を取得
+        // 生徒情報を取得
         $agreement = $this->getStudentAgreement($account_id);
 
         return view('pages.student.agreement', $agreement);
     }
 
     /**
-     * 詳細取得
+     * 詳細取得（バッジ付与情報）
      *
      * @param \Illuminate\Http\Request $request リクエスト
      * @return array 詳細データ
      */
     public function getData(Request $request)
     {
-        //==========================
-        // モック用処理
-        //==========================
-        return;
+        // MEMO: ログインアカウントのIDでデータを取得するのでガードは不要
 
-        //==========================
-        // 本番処理
-        //==========================
-        // // MEMO: ログインアカウントのIDでデータを取得するのでガードは不要
-        // // seqに関するガードはFuncAgreementTraitの処理の中でした
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request, 'student_id');
 
-        // // IDのバリデーション
-        // $this->validateIdsFromRequest($request, 'roomcd');
+        // ログイン情報
+        $account = Auth::user();
+        $account_id = $account->account_id;
+        $sid = $account_id;
 
-        // // モーダルによって処理を行う
-        // $modal = $request->input('target');
+        // クエリ作成
+        $query = Badge::query();
 
-        // // ログイン情報
-        // $account = Auth::user();
-        // $account_id = $account->account_id;
-        // $sid = $account_id;
+        // データを取得
+        $badgeList = $query
+            ->select(
+                'badges.badge_id',
+                'badges.student_id',
+                'badges.campus_cd',
+                // 校舎マスタの名称
+                'mst_campuses.name as campus_name',
+                'badges.reason',
+                'badges.authorization_date',
+            )
+            ->where('badges.student_id', '=', $sid)
+            ->sdLeftJoin(MstCampus::class, 'badges.campus_cd', '=', 'mst_campuses.campus_cd')
+            ->orderBy('badges.authorization_date', 'desc')
+            ->get();
 
-        // // MEMO: sidを条件にするのでroomcdに対するガードは不要
-        // $roomcd = $request->input('roomcd');
-
-        // switch ($modal) {
-        //     case "#modal-dtl-regulation":
-
-        //         // IDのバリデーション
-        //         $this->validateIdsFromRequest($request, 'r_seq');
-        //         $r_seq = $request->input('r_seq');
-
-        //         // 規定情報を取得する
-        //         return $this->getStudentRegular($sid, $roomcd, $r_seq);
-
-        //     case "#modal-dtl-tutor":
-
-        //         // IDのバリデーション
-        //         $this->validateIdsFromRequest($request, 'std_seq');
-        //         $std_seq = $request->input('std_seq');
-
-        //         // 家庭教師標準情報を取得する
-        //         return $this->getStudentHomeTeacherStd($sid, $roomcd, $std_seq);
-
-        //     case "#modal-dtl-course":
-
-        //         // IDのバリデーション
-        //         $this->validateIdsFromRequest($request, 'i_seq');
-        //         $i_seq = $request->input('i_seq');
-
-        //         // 短期個別講習を取得する
-        //         return $this->getStudentExtraIndividual($sid, $roomcd, $i_seq);
-
-        //     default:
-        //         // 該当しない場合
-        //         $this->illegalResponseErr();
-        // }
+        return ['badgeList' => $badgeList];
     }
 }
