@@ -29,29 +29,15 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.select caption="バッジ種別" id="badge_kind" :select2=true :select2Search=false :editData="$editData">
-        <option value="1">通塾</option>
-        <option value="2">成績</option>
-        <option value="3">紹介</option>
-        <option value="4">その他</option>
-    </x-input.select>
+    <x-input.select id="badge_type" caption="バッジ種別" :select2=true onChange="selectChangeGetTemplate" :mastrData=$kindList :editData=$editData
+        :select2Search=false :blank=false />
+    {{-- <x-input.select id="badge_type" caption="バッジ種別" :select2=true :mastrData=$kindList :editData=$editData
+        :select2Search=false :blank=false /> --}}
 
-    <x-input.select caption="校舎" id="roomcd" :select2=true :editData="$editData">
-        <option value="1">久我山</option>
-        <option value="2">西永福</option>
-        <option value="3">本郷</option>
-    </x-input.select>
+    <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+        :select2Search=false :blank=false />
 
-    <x-input.textarea caption="認定理由" id="reason" :editData=$editData vShow="form.badge_kind == 1">
-        通塾期間が年を超えた
-    </x-input.textarea>
-    <x-input.textarea caption="認定理由" id="reason2" :editData=$editData vShow="form.badge_kind == 2">
-        成績UP
-    </x-input.textarea>
-    <x-input.textarea caption="認定理由" id="reason3" :editData=$editData vShow="form.badge_kind == 3">
-        生徒紹介（さん）
-    </x-input.textarea>
-    <x-input.textarea caption="認定理由" id="reason4" :editData=$editData vShow="form.badge_kind == 4" />
+    <x-input.textarea id="reason" caption="認定理由" />
 
     {{-- hidden --}}
     <x-input.hidden id="badge_id" :editData=$editData />

@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtSchedule;
+use App\Models\Badge;
+use App\Models\Student;
+use App\Models\AdminUser;
+use App\Models\CodeMaster;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
-//use App\Http\Controllers\Traits\FuncReportTrait;
 use Carbon\Carbon;
 
 /**
@@ -45,18 +46,12 @@ class BadgeController extends Controller
         // IDのバリデーション
         $this->validateIds($sid);
 
-        // 教室リストを取得
-        $rooms = $this->mdlGetRoomList(false);
-
         // 生徒名を取得する
         $student = $this->getStudentName($sid);
 
         return view('pages.admin.badge', [
-            'rules' => $this->rulesForSearch(),
             'name' => $student->name,
             'sid' => $sid,
-            'rooms' => $rooms,
-            'editData' => null
         ]);
     }
 
@@ -68,53 +63,88 @@ class BadgeController extends Controller
      */
     public function search(Request $request)
     {
-        // バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForSearch())->validate();
-        // ページネータで返却（モック用）
-        return $this->getListAndPaginatorMock();
-    }
+        // 校舎名取得(JOIN)
+        $campus_names = $this->mdlGetRoomQuery();
 
-    /**
-     * バリデーション(検索用)
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return mixed バリデーション結果
-     */
-    public function validationForSearch(Request $request)
-    {
-        // リクエストデータチェック
-        $validator = Validator::make($request->all(), $this->rulesForSearch());
-        return $validator->errors();
-    }
+        // クエリ作成
+        $query = Badge::query();
 
-    /**
-     * バリデーションルールを取得(検索用)
-     *
-     * @return array ルール
-     */
-    private function rulesForSearch()
-    {
+        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        $query->where($this->guardRoomAdminTableWithRoomCd());
 
-        $rules = array();
+        $badgeList = $query
+            ->select(
+                'badges.badge_id',
+                'badges.student_id',
+                // 生徒情報の名前
+                'students.name as student_name',
+                'badges.campus_cd',
+                // 校舎の名称
+                'campus_names.room_name as campus_name',
+                'badges.badge_type',
+                // コードマスタの名称（バッジ種別）
+                'mst_codes.name as kind_name',
+                'badges.reason',
+                'badges.authorization_date',
+                'badges.adm_id',
+                // 管理者アカウントの名前
+                'admin_users.name as admin_name',
+            )
+            // 校舎名の取得
+            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
+                $join->on('badges.campus_cd', '=', 'campus_names.code');
+            })
+            // 生徒名を取得
+            ->sdLeftJoin(Student::class, 'badges.student_id', '=', 'students.student_id')
+            // 管理者名を取得
+            ->sdLeftJoin(AdminUser::class, 'badges.adm_id', '=', 'admin_users.adm_id')
+            // コードマスターとJOIN
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('badges.badge_type', '=', 'mst_codes.code')
+                    ->where('data_type', AppConst::CODE_MASTER_55);
+            })
+            ->orderBy('badges.authorization_date', 'desc');
 
-        return $rules;
-    }
-
-    /**
-     * 詳細取得
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return array 詳細データ
-     */
-    public function getData(Request $request)
-    {
-        return [
-        ];
+        // ページネータで返却
+        return $this->getListAndPaginator($request, $badgeList);
     }
 
     //==========================
     // 登録・編集・削除
     //==========================
+
+    /**
+     * バッジ付与テンプレート文取得
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed テンプレート
+     */
+    public function getDataSelectTemplate(Request $request)
+    {
+        // // バッジ種別のバリデーション
+        // $this->validateIdsFromRequest($request, 'badge_type');
+
+        // 定型文ID
+        $badgeType = $request->input('badge_type');
+
+        // \DB::enableQueryLog();
+
+        $query = CodeMaster::query();
+        $codeMaster = $query
+            ->select(
+                'gen_item1'
+            )
+            ->where('data_type', AppConst::CODE_MASTER_55)
+            ->where('code', $badgeType)
+            ->firstOrFail();
+
+        // $this->debug($codeMaster->gen_item1);
+        // $this->debug(\DB::getQueryLog());
+
+        return [
+            'reason' => $codeMaster->gen_item1,
+        ];
+    }
 
     /**
      * 登録画面
@@ -124,6 +154,13 @@ class BadgeController extends Controller
      */
     public function new($sid)
     {
+        // 教室管理者の場合、自分の教室の生徒のみにガードを掛ける
+
+        // バッジ種別リストを取得
+        $kindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_55);
+
+        // 校舎リストを取得
+        $rooms = $this->mdlGetRoomList(false);
 
         $editData = [
             'sid' => $sid
@@ -132,6 +169,8 @@ class BadgeController extends Controller
 
         // テンプレートは編集と同じ
         return view('pages.admin.badge-input', [
+            'kindList' => $kindList,
+            'rooms' => $rooms,
             'editData' => $editData,
         ]);
     }
@@ -217,6 +256,7 @@ class BadgeController extends Controller
 
         return $rules;
     }
+
     //==========================
     // クラス内共通処理
     //==========================
@@ -230,12 +270,12 @@ class BadgeController extends Controller
     private function getStudentName($sid)
     {
         // 生徒名を取得する
-        $query = ExtStudentKihon::query();
+        $query = Student::query();
         $student = $query
             ->select(
                 'name'
             )
-            ->where('ext_student_kihon.sid', '=', $sid)
+            ->where('students.student_id', '=', $sid)
             ->firstOrFail();
 
         return $student;
