@@ -121,11 +121,10 @@ class BadgeController extends Controller
      */
     public function getDataSelectTemplate(Request $request)
     {
-        // // バッジ種別のバリデーション
-        // $this->validateIdsFromRequest($request, 'badge_type');
-
+        // バッジ種別のバリデーション
+        $this->validateIdsFromRequest($request, 'id');
         // 定型文ID
-        $badgeType = $request->input('badge_type');
+        $badgeType = $request->input('id');
 
         // \DB::enableQueryLog();
 
