@@ -125,5 +125,16 @@ class Record extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
-
+    /**
+     * 検索 student_id
+     */
+    public function scopeSearchSid($query, $obj)
+    {
+        $key = 'student_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // 生徒IDでスケジュールを絞り込む(共通処理)
+            $query->where($col, $obj[$key]);
+        }
+    }
 }
