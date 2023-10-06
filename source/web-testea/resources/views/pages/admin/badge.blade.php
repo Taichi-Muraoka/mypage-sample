@@ -6,7 +6,7 @@
 @section('child_page', true)
 
 {{-- 三階層目の場合：親ページを指定(URLとタイトル) --}}
-@section('parent_page', route('member_mng-detail', $sid))
+@section('parent_page', route('member_mng-detail', $editData['student_id']))
 
 @section('parent_page_title', '生徒カルテ')
 
@@ -19,6 +19,9 @@
 
 {{-- 結果リスト --}}
 <x-bs.card-list>
+
+    {{-- hidden 検索一覧用--}}
+    <x-input.hidden id="student_id" :editData=$editData />
 
     {{-- テーブル --}}
     <x-bs.table :button=true>
@@ -41,7 +44,7 @@
             <td>@{{item.admin_name}}</td>
             <td>@{{item.reason}}</td>
             <td>
-                <x-button.list-edit :vueDataAttr="['id' => 'item.badge_id']" />
+                <x-button.list-edit vueHref="'{{ route('badge-edit', '') }}/' + item.badge_id" />
             </td>
         </tr>
 
@@ -52,7 +55,7 @@
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
             {{-- 二階層目に戻る --}}
-            <x-button.back url="{{route('member_mng-detail', $sid)}}" />
+            <x-button.back url="{{route('member_mng-detail', $editData['student_id'])}}" />
         </div>
     </x-slot>
 </x-bs.card>
