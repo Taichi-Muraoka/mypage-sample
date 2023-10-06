@@ -285,16 +285,30 @@ class RecordController extends Controller
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
+        $this->debug(now()->format('H:i:00'));
+
         $record = new Record;
 
         $record->student_id = $request['student_id'];
         $record->campus_cd = $request['campus_cd'];
         $record->record_kind = $request['record_kind'];
-        $record->received_date = $request['received_date'];
-        $record->received_time = $request['received_time'];
+        if($request['received_date'] == null) {
+            $record->received_date = now()->format('Y-m-d');
+        }
+        else {
+            $record->received_date = $request['received_date'];
+        }
+        if($request['received_time'] == null) {
+            $record->received_time = now()->format('H:i:00');
+        }
+        else {
+            $record->received_time = $request['received_time'];
+        }
         $record->regist_time = now();
         $record->adm_id = $request['adm_id'];
         $record->memo = $request['memo'];
+
+        // $this->debug($record);
 
         $record->save();
 
@@ -371,8 +385,18 @@ class RecordController extends Controller
 
         $record->campus_cd = $request['campus_cd'];
         $record->record_kind = $request['record_kind'];
-        $record->received_date = $request['received_date'];
-        $record->received_time = $request['received_time'];
+        if($request['received_date'] == null) {
+            $record->received_date = now()->format('Y-m-d');
+        }
+        else {
+            $record->received_date = $request['received_date'];
+        }
+        if($request['received_time'] == null) {
+            $record->received_time = now()->format('H:i:00');
+        }
+        else {
+            $record->received_time = $request['received_time'];
+        }
         $record->regist_time = now();
         $record->memo = $request['memo'];
 
@@ -454,37 +478,13 @@ class RecordController extends Controller
             }
         };
 
-        // 独自バリデーション: 重複チェック
-        $validationKey = function ($attribute, $value, $fail) use ($request) {
-
-            if (!$request) {
-                return;
-            }
-
-            // 対象データを取得(UNIQUEキーで取得)
-            $record = Record::where('campus_cd', $request['campus_cd'])
-                ->where('timetable_kind', $request['timetable_kind'])->where('period_no', $request['period_no']);
-
-            // 変更時は自分のキー以外を検索
-            if (filled($request['timetable_id'])) {
-                $record->where('timetable_id', '!=', $request['timetable_id']);
-            }
-
-            $exists = $record->exists();
-
-            if ($exists) {
-                // 登録済みエラー
-                return $fail(Lang::get('validation.duplicate_data'));
-            }
-        };
-
         // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
         // その他を第二引数で指定する
         $rules += Record::fieldRules('campus_cd', ['required', $validationRoomList]);
         $rules += Record::fieldRules('record_kind', ['required', $validationKindList]);
         $rules += Record::fieldRules('memo', ['required']);
-        $rules += Record::fieldRules('received_date', ['required']);
-        $rules += Record::fieldRules('received_time', ['required']);
+        $rules += Record::fieldRules('received_date');
+        $rules += Record::fieldRules('received_time');
 
         return $rules;
     }
