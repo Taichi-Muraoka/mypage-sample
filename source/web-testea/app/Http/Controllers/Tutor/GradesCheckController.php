@@ -275,7 +275,7 @@ class GradesCheckController extends Controller
         };
         $rules = array();
 
-        $rules += Schedule::fieldRules('campus_cd', [$validationRoomList]);
+        $rules += ['campus_cd' => [$validationRoomList]];
         $rules += Score::fieldRules('student_id', [$validationStudentList]);
 
         return $rules;

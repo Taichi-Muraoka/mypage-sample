@@ -246,7 +246,7 @@ class ReportRegistController extends Controller
 
         $rules = array();
 
-        $rules += Schedule::fieldRules('campus_cd', [$validationRoomList]);
+        $rules += ['campus_cd' => [$validationRoomList]];
         $rules += Report::fieldRules('student_id', [$validationStudentsList]);
 
         return $rules;

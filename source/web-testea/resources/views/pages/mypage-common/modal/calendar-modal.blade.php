@@ -6,53 +6,40 @@
 <x-bs.table :hover=false :vHeader=true>
     <tr>
         <th width="35%">校舎</th>
-        <td>@{{item.mdClassName}}</td>
+        <td>@{{item.name}}</td>
     </tr>
     <tr>
         <th width="35%">ブース</th>
         <td>Aテーブル</td>
     </tr>
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type == 0">
+    <tr>
         <th width="35%">コース名</th>
-        <td>個別指導コース</td>
+        <td>@{{item.course_name}}</td>
     </tr>
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type == 1">
-        <th width="35%">コース名</th>
-        <td>集団授業</td>
-    </tr>
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type == 3">
-        <th width="35%">コース名</th>
-        <td>自習・その他</td>
-    </tr>
-    <tr v-Show="item.mdType == {{ App\Consts\AppConst::CODE_MASTER_21_6 }}">
-        <th width="35%">コース名</th>
-        <td>面談</td>
-    </tr>
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type != 3">
+    <tr v-Show="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }} && item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_4 }}">
         <th>授業種別</th>
         <td>通常</td>
     </tr>
     <tr>
         <th>日付</th>
-        <td>@{{$filters.formatYmd(item.mdDt)}}</td>
+        <td>@{{$filters.formatYmd(item.target_date)}}</td>
     </tr>
-    {{-- v-showは、スケジュール種別によって非表示の場合があるため --}}
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }}">
-            <th>時限</th>
-        <td>5時限</td>
+    <tr>
+        <th>時限</th>
+        <td>@{{item.period_no}}</td>
     </tr>
-    <tr v-show="item.mdStartTime">
+    <tr>
         <th>開始時刻</th>
-        <td>@{{$filters.formatHm(item.mdStartTime)}}</td>
+        <td>@{{item.start_time}}</td>
     </tr>
-    <tr v-show="item.mdEndTime">
+    <tr>
         <th>終了時刻</th>
-        <td>@{{$filters.formatHm(item.mdEndTime)}}</td>
+        <td>@{{item.end_time}}</td>
     </tr>
 
     {{-- 生徒のみ表示 --}}
     @can('student')
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type != 3">
+    <tr v-Show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }}">
         <th>講師名</th>
         <td>CWテスト教師１０１</td>
     </tr>
@@ -61,38 +48,41 @@
     {{-- 講師のみ表示 --}}
     {{-- 個別指導の場合 --}}
     @can('tutor')
-    <tr v-show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_2 }}">
+    <tr v-show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }}">
         <th>生徒名</th>
         <td>CWテスト生徒１</td>
     </tr>
     {{-- 集団授業の場合 --}}
-    <tr v-show="item.mdType == {{ App\Consts\AppConst::CODE_MASTER_21_2 }}">
+    <tr v-show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }}">
         <th>受講生徒名</th>
         <td>CWテスト生徒１<br>CWテスト生徒２<br>CWテスト生徒３</td>
     </tr>
     @endcan
 
-    <tr v-show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.mdSubject">
+    <tr v-show="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }} && item.subject_name">
         <th>科目</th>
-        <td>@{{item.mdSubject}}</td>
+        <td>@{{item.subject_name}}</td>
     </tr>
-
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type != 3">
+    <tr v-Show="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
         <th>通塾</th>
         <td>生徒オンライン－教師通塾</td>
     </tr>
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type != 3">
+    <tr v-Show="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
         <th>授業代講</th>
         <td>なし</td>
     </tr>
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }} && item.lesson_type != 3">
+    <tr v-Show="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
         <th>出欠ステータス</th>
         <td>未実施・出席</td>
     </tr>
-    <tr v-Show="item.mdType != {{ App\Consts\AppConst::CODE_MASTER_21_6 }}">
+    {{-- 管理者のみ表示 --}}
+    @can('admin')
+    <tr>
         <th>メモ</th>
         <td></td>
     </tr>
+    @endcan
+
 </x-bs.table>
 
 @overwrite

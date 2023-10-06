@@ -1290,9 +1290,14 @@ class AppConst
     const CODE_MASTER_42_2 = 2;
 
     /**
-     * その他
+     * 面談
      */
     const CODE_MASTER_42_3 = 3;
+
+    /**
+     * その他
+     */
+    const CODE_MASTER_42_4 = 4;
 
     //-----------
     // 種別
