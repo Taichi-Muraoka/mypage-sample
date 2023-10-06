@@ -33,6 +33,40 @@ export default class AppClass extends PageBase {
             afterNew: afterNew,
             // 別画面でも更新・削除を使用するのでURLを変更
             urlSuffix: "badge",
+
+            vueData: {
+                // 定型文プルダウン変更用のプロパティを用意
+                selectGetItemTemplate: {},
+            },
+            vueMethods: {
+                // 定型文プルダウン変更イベント
+                selectChangeGetTemplate: function (event) {
+                    AjaxCom.getPromise()
+                        .then(() => {
+                            // 初期化
+                            this.selectGetItemTemplate = {};
+                            this.form.reason = "";
+
+                            // チェンジイベントを発生させる
+                            var selected = this.form.badge_type;
+                            self.selectChangeGetCallBack(
+                                this,
+                                selected,
+                                // URLを分けた
+                                {
+                                    urlSuffix: "badge",
+                                },
+                                // 受信後のコールバック
+                                (data) => {
+                                    // データをセット
+                                    this.selectGetItemTemplate = data;
+                                    this.form.reason = data.reason;
+                                }
+                            );
+                        })
+                        .catch(AjaxCom.fail);
+                },
+            }
         });
 
     }

@@ -15,13 +15,6 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
-        // Vue: モーダル
-        //this.getVueModal();
-        this.getVueModal({
-            // 別画面でもモーダルを使用するのでURLを変更
-            urlSuffix: "badge"
-        });
-
         // Vue: 検索フォーム
         //this.getVueSearchForm();
         // 検索一覧の表示
