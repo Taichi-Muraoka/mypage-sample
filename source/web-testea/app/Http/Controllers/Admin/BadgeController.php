@@ -117,7 +117,8 @@ class BadgeController extends Controller
                     ->where('data_type', AppConst::CODE_MASTER_55);
             })
             ->orderBy('badges.authorization_date', 'desc')
-            ->orderBy('badges.badge_id', 'desc');
+            ->orderBy('badges.badge_type', 'asc')
+            ->orderBy('badges.campus_cd', 'asc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $badgeList);
