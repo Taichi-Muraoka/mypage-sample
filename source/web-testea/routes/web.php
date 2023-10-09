@@ -966,14 +966,11 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // バッジ一覧
     Route::get('/member_mng/badge/{sid}', [BadgeController::class, 'index'])->name('badge');
 
-    // 詳細取得用
-    Route::post('/member_mng/get_data_badge', [BadgeController::class, 'getData'])->name('badge-get_data');
-
     // 検索結果取得
     Route::post('/member_mng/search_badge', [BadgeController::class, 'search'])->name('badge-search');
 
-    // バリデーション(検索用)
-    Route::post('/member_mng/vd_search_badge', [BadgeController::class, 'validationForSearch'])->name('badge-vd_search');
+    // バッジ種別プルダウンを選択された際にコードマスタ汎用項目1の情報を返却する
+    Route::post('/member_mng/get_data_select_badge', [BadgeController::class, 'getDataSelectTemplate'])->name('badge-get_data_select');
 
     // 登録画面
     Route::get('/member_mng/badge/{sid}/new', [BadgeController::class, 'new'])->name('badge-new');
