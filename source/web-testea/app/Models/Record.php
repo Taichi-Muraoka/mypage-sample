@@ -112,7 +112,7 @@ class Record extends Model
             'record_id' => ['integer'],
             'student_id' => ['integer'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
-            'record_kind' => ['integer', 'in:1,2,3,4'],
+            'record_kind' => ['integer', 'in:1,2,3,4,5,6'],
             'received_date' => ['date_format:Y-m-d'],
             'received_time' => ['vdTime'],
             'regist_time' => ['vdTime'],

@@ -123,7 +123,7 @@ class RecordController extends Controller
         })
         // 管理者名を取得
         ->sdLeftJoin(AdminUser::class, 'records.adm_id', '=', 'admin_users.adm_id')
-        ->orderby('records.received_date')->orderby('records.received_time');
+        ->orderby('records.received_date', 'desc')->orderby('records.received_time', 'desc');
 
         // ページネータで返却（モック用）
         return $this->getListAndPaginator($request, $record);
