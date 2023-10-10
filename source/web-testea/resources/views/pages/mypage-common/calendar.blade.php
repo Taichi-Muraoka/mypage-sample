@@ -1,7 +1,5 @@
 @extends('adminlte::page')
 
-@section('title', 'カレンダー')
-
 @section('content')
 
 {{-- IDはローディング用 --}}
