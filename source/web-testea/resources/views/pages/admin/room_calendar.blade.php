@@ -33,6 +33,6 @@
 </x-bs.card>
 
 {{-- モーダル(スケジュール詳細モーダル) --}}
-@include('pages.admin.modal.room_calendar-modal')
+{{-- @include('pages.admin.modal.room_calendar-modal') --}}
 
 @stop

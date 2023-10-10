@@ -225,13 +225,12 @@ export default class RoomCalendar {
                 UrlCom.getFuncUrl() +
                 "/new" +
                 "/" +
-                "110" +
+                "01" +
                 "/" +
                 moment(info.start).format("YYYYMMDD") +
-                "/" +
                 moment(info.start).format("HHmm") +
                 "/" +
-                moment(info.end).format("HHmm");
+                "101";
             location.href = url;
         }
     };
