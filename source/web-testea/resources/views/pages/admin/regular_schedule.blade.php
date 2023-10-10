@@ -43,6 +43,6 @@
 </x-bs.card>
 
 {{-- モーダル(スケジュール詳細モーダル) --}}
-@include('pages.admin.modal.regular_schedule-modal')
+{{--@include('pages.admin.modal.regular_schedule-modal') --}}
 
 @stop

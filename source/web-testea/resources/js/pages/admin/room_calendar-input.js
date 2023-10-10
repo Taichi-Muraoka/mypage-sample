@@ -19,44 +19,35 @@ export default class AppClass extends PageBase {
 
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            //UrlCom.redirect(UrlCom.getFuncUrl());
-            // 教室カレンダー表示ができるまでの暫定表示
-            UrlCom.redirect(appInfo.root);
+            UrlCom.redirect(UrlCom.getFuncUrl());
         };
 
         // 日付ピッカーイベント
-        var datepickerOnChange = (id, value) => {
-            console.log(id, value);
-            //AjaxCom.getPromise()
-            //.then(() => {
-            //    // 初期化
-            //    this.selectGetItemDate = {};
-            //    var campusCd = this.form.campus_cd;
-            //    var targetDate = this.form._target_date;
-            //    var periodNo = this.form.period_no_bef;
-            //    // 時限プルダウンは動的に変わるので、一旦クリアする
-            //    //this.form.period_no = '';
-            //    // チェンジイベントを発生させる
-            //    self.selectChangeGetCallBack(
-            //        this,
-            //        {
-            //            campus_cd: campusCd,
-            //            target_date: targetDate,
-            //            period_no: periodNo
-            //        },
-            //        this.option,
-            //        // 受信後のコールバック
-            //        (data) => {
-            //            // データをセット
-            //            this.selectGetItemDate = data;
-            //            // 時限リストが取得できた場合のみ、時限(selected)をセット
-            //            if (data.selectItems.length != 0) {
-            //                this.form.period_no = data.period_no;
-            //            }
-            //        }
-            //    );
-            //})
-            //.catch(AjaxCom.fail);
+        var datepickerOnChange = ($vue, id, value) => {
+            // 初期化
+            $vue.selectGetItemDate = {};
+            var campusCd = $vue.form.campus_cd;
+            var targetDate = value;
+            // 時限プルダウンは動的に変わるので、一旦クリアする
+            $vue.form.period_no = "";
+            // チェンジイベントを発生させる
+            self.selectChangeGetCallBack(
+                $vue,
+                {
+                    campus_cd: campusCd,
+                    target_date: targetDate,
+                },
+                $vue.option,
+                // 受信後のコールバック
+                (data) => {
+                    // データをセット
+                    $vue.selectGetItemDate = data;
+                    // 時限リストが取得できた場合のみ、時限(selected)をセット
+                    if (data.selectItems.length != 0) {
+                        $vue.form.period_no = $vue.form.period_no_bef;
+                    }
+                }
+            );
         };
 
         // Vue: 入力フォーム
@@ -74,7 +65,7 @@ export default class AppClass extends PageBase {
             vueMethods: {
                 // コースプルダウン変更
                 selectChangeGetCourse: function (event) {
-                        AjaxCom.getPromise()
+                    AjaxCom.getPromise()
                         .then(() => {
                             // 初期化
                             this.selectGetItemCourse = {};
@@ -101,6 +92,12 @@ export default class AppClass extends PageBase {
                 // 時限プルダウン変更
                 selectChangeGetTimetable: function (event) {
                     AjaxCom.getPromise()
+                        .then(() => {
+                            // 時限が未選択の場合はスキップ
+                            if (ValueCom.isEmpty(this.form.period_no)) {
+                                return AjaxCom.exit();
+                            }
+                        })
                         .then(() => {
                             // 初期化
                             this.selectGetItemTimetable = {};
@@ -135,13 +132,6 @@ export default class AppClass extends PageBase {
                         .catch(AjaxCom.fail);
                 },
             },
-            vueMounted: function($vue, option) {
-                // プルダウンが動的になるので、退避したものをセットする
-                $vue.form.period_no = $vue.form.period_no_bef;
-
-                // 編集時、プルダウンチェンジイベントを発生させる。
-                //$vue.selectChangeGetDate();
-            }
         });
     }
 }

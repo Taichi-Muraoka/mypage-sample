@@ -6,15 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
-//use App\Libs\AuthEx;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Schedule;
 use App\Models\ClassMember;
-//use App\Models\YearlySchedule;
-//use App\Models\MstTimetable;
 use App\Models\Tutor;
 use App\Models\MstCourse;
-use App\Models\CodeMaster;
 use App\Http\Controllers\Traits\FuncCalendarTrait;
 use App\Http\Controllers\Traits\FuncScheduleTrait;
 use Illuminate\Support\Facades\Lang;
@@ -31,6 +27,13 @@ class RoomCalendarController extends Controller
     use FuncCalendarTrait;
     // 機能共通処理：スケジュール関連
     use FuncScheduleTrait;
+
+    /**
+     * スケジュール追加更新種別
+     */
+    const SCHE_KIND_NEW = 1;
+    const SCHE_KIND_UPD = 2;
+    const SCHE_KIND_CPY = 3;
 
     /**
      * コンストラクタ
@@ -99,7 +102,8 @@ class RoomCalendarController extends Controller
         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
         //$this->guardRoomAdminRoomcd($roomcd);
 
-        return $this->getRoomCalendar($request, $roomcd, false);
+        //return $this->getRoomCalendar($request, $roomcd, false);
+        return;
     }
 
     //==========================
@@ -107,9 +111,12 @@ class RoomCalendarController extends Controller
     //==========================
 
     /**
-     * 登録画面
+     * 新規登録画面
      *
      * @param \Illuminate\Http\Request $request リクエスト
+     * @param string $campusCd 校舎コード
+     * @param string $targetDate 日付時刻文字列(年月日時分)
+     * @param string $boothCd ブースコード
      * @return view
      */
     public function new($campusCd, $datetimeStr, $boothCd)
@@ -154,9 +161,6 @@ class RoomCalendarController extends Controller
         // 日付から時間割区分を取得
         $timetableKind = $this->fncScheGetTimeTableKind($campusCd, $targetDate);
 
-        // 時限リストを取得（校舎・時間割区分から）
-        $periods = $this->mdlGetPeriodListByKind($campusCd, $timetableKind);
-
         // 指定時刻から、対応する時限の情報を取得
         $periodInfo = $this->fncScheGetPeriodTime($campusCd, $timetableKind, $time);
 
@@ -179,6 +183,9 @@ class RoomCalendarController extends Controller
         // 仮登録フラグリストを取得
         $tentativeStatusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_36);
 
+        // 繰り返し回数リスト
+        $times = config('appconf.repeat_times');
+
         // 初期表示データをセット
         $editData = [
             'campus_cd' => $campusCd,
@@ -189,14 +196,16 @@ class RoomCalendarController extends Controller
             'period_no' => $periodNo,
             'period_no_bef' => $periodNo,
             'start_time' => $startTime,
-            'end_time' => $endTime
+            'end_time' => $endTime,
+            // スケジュール更新区分=NEW
+            'kind' => self::SCHE_KIND_NEW
         ];
 
         return view('pages.admin.room_calendar-input', [
             'rules' => null,
             'booths' => $booths,
             'courses' => $courses,
-            'periods' => $periods,
+            'periods' => null,
             'tutors' => $tutors,
             'students' => $students,
             'subjects' => $subjects,
@@ -205,128 +214,9 @@ class RoomCalendarController extends Controller
             'tentativeStatusList' => $tentativeStatusList,
             'substituteKindList' => null,
             'todayabsentList' => null,
+            'times' => $times,
             'editData' => $editData
         ]);
-    }
-
-    /**
-     * コース情報取得（コース種別）
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return array コース情報
-     */
-    public function getDataSelectCourse(Request $request)
-    {
-        // コースコードは文字列型なのでidチェックはしない
-
-        // コースコードを取得
-        $courseCd = $request->input('id');
-
-        //------------------------
-        // [ガード] リスト自体を取得して、
-        // 値が正しいかチェックする
-        //------------------------
-
-        // コースプルダウンを取得
-        $courses = $this->mdlGetCourseList();
-
-        // [ガード] コースコードがプルダウンの中にあるかチェック
-        $this->guardListValue($courses, $courseCd);
-
-        //---------------------------
-        // コース情報（コース種別）を返却する
-        //---------------------------
-        // コース情報を取得
-        $course = $this->fncScheGetCourseInfo($courseCd);
-
-        return [
-            'course_kind' => $course->course_kind
-        ];
-    }
-
-    /**
-     * 時間割情報取得（時限プルダウン選択時）
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return array 時間割情報
-     */
-    public function getDataSelectTimetable(Request $request)
-    {
-        // 時限のバリデーション
-        $this->validateIdsFromRequest($request, 'period_no');
-        // 日付のバリデーション
-        $this->validateDatesFromRequest($request, 'target_date');
-
-        // 校舎コード・日付・時限を取得
-        $campusCd = $request->input('campus_cd');
-        $targetDate = $request->input('target_date');
-        $periodNo = $request->input('period_no');
-
-        //------------------------
-        // [ガード] リスト自体を取得して、
-        // 値が正しいかチェックする
-        //------------------------
-
-        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        $this->guardRoomAdminRoomcd($campusCd);
-
-        // 時限リストを取得
-        $periods = $this->mdlGetPeriodListByDate($campusCd, $targetDate);
-
-        // [ガード] 時限がプルダウンの中にあるかチェック
-        $this->guardListValue($periods, $periodNo);
-
-        //---------------------------
-        // 時間割情報（開始時刻・終了時刻）を返却する
-        //---------------------------
-
-        // 日付から時間割区分を取得
-        $timetableKind = $this->fncScheGetTimeTableKind($campusCd, $targetDate);
-
-        // 時間割区分・指定時限から、対応する時間割情報を取得
-        $periodInfo = $this->fncScheGetTimetableByPeriod($campusCd, $timetableKind, $periodNo);
-        $startTime = $periodInfo->start_time;
-        $endTime = $periodInfo->end_time;
-
-        return [
-            'start_time' => $startTime->format('H:i'),
-            'end_time' => $endTime->format('H:i')
-        ];
-    }
-
-    /**
-     * 時限情報取得（実装中）
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return array 時限情報
-     */
-    public function getDataSelect(Request $request)
-    {
-        // 日付のバリデーション
-        //$this->validateDatesFromRequest($request, 'target_date');
-
-        // 校舎コード・日付を取得
-        $campusCd = $request->input('campus_cd');
-        $targetDate = $request->input('target_date');
-        $periodNo = $request->input('period_no');
-
-        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        $this->guardRoomAdminRoomcd($campusCd);
-
-        //---------------------------
-        // 時限リストを返却する
-        //---------------------------
-        $this->debug($campusCd);
-        $this->debug($targetDate);
-        $this->debug($periodNo);
-        // 時限リストを取得（校舎・時間割区分から）
-        $periods = $this->mdlGetPeriodListByDate($campusCd, $targetDate);
-        $this->debug($periods);
-
-        return [
-            'selectItems' => $this->objToArray($periods),
-            'period_no' => $periodNo
-        ];
     }
 
     /**
@@ -409,8 +299,6 @@ class RoomCalendarController extends Controller
                 'student_id',
                 'schedules.tutor_id',
                 'subject_cd',
-                'create_kind',
-                'mst_codes.name as create_kind_name',
                 'lesson_kind',
                 'how_to_kind',
                 'substitute_kind',
@@ -433,11 +321,6 @@ class RoomCalendarController extends Controller
             ->sdLeftJoin(Tutor::class, function ($join) {
                 $join->on('schedules.absent_tutor_id', '=', 'tutors.tutor_id');
             })
-            // データ作成区分
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('schedules.create_kind', '=', 'mst_codes.code')
-                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_32);
-            })
             // IDを指定
             ->where('schedule_id', $scheduleId)
             ->firstOrFail();
@@ -458,9 +341,7 @@ class RoomCalendarController extends Controller
                 array_push($arrClassMembers, $classMember['student_id']);
             }
         }
-        $this->debug($classMembers);
         $schedule['class_member_id'] = implode(',', $arrClassMembers);
-        $this->debug($schedule['class_member_id']);
 
         $campusCd = $schedule['campus_cd'];
         $targetDate = $schedule['target_date'];
@@ -477,11 +358,8 @@ class RoomCalendarController extends Controller
         // 講師リストを取得
         $tutors = $this->mdlGetTutorList($campusCd);
 
-        // 日付から時間割区分を取得
-        $timetableKind = $this->fncScheGetTimeTableKind($campusCd, $targetDate);
-
-        // 時限リストを取得（校舎・時間割区分から）
-        $periods = $this->mdlGetPeriodListByKind($campusCd, $timetableKind);
+        // 時限リストを取得（校舎・日付から）
+        $periods = $this->mdlGetPeriodListByDate($campusCd, $targetDate);
 
         // 授業区分リストを取得
         $lessonKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_31);
@@ -496,7 +374,10 @@ class RoomCalendarController extends Controller
         $substituteKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_34);
 
         // 出欠ステータスリストを取得
-        $todayabsentList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_35);
+        $todayabsentList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_35, [AppConst::CODE_MASTER_35_SUB_0, AppConst::CODE_MASTER_35_SUB_1]);
+
+        // スケジュール更新区分=UPDATE
+        $schedule['kind'] = self::SCHE_KIND_UPD;
 
         return view('pages.admin.room_calendar-input', [
             'rules' => $this->rulesForInput(null),
@@ -604,11 +485,8 @@ class RoomCalendarController extends Controller
         // 講師リストを取得
         $tutors = $this->mdlGetTutorList($campusCd);
 
-        // 日付から時間割区分を取得
-        $timetableKind = $this->fncScheGetTimeTableKind($campusCd, $targetDate);
-
-        // 時限リストを取得（校舎・時間割区分から）
-        $periods = $this->mdlGetPeriodListByKind($campusCd, $timetableKind);
+        // 時限リストを取得（校舎・日付から）
+        $periods = $this->mdlGetPeriodListByDate($campusCd, $targetDate);
 
         // 授業区分リストを取得
         $lessonKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_31);
@@ -618,6 +496,9 @@ class RoomCalendarController extends Controller
 
         // 仮登録フラグリストを取得
         $tentativeStatusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_36);
+
+        // スケジュール更新区分=COPY
+        $schedule['kind'] = self::SCHE_KIND_CPY;
 
         return view('pages.admin.room_calendar-input', [
             'rules' => $this->rulesForInput(null),
@@ -634,6 +515,122 @@ class RoomCalendarController extends Controller
             'todayabsentList' => null,
             'editData' => $schedule
         ]);
+    }
+
+    /**
+     * コース情報取得（コースプルダウン選択）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array コース情報
+     */
+    public function getDataSelectCourse(Request $request)
+    {
+        // コースコードは文字列型なのでidチェックはしない
+
+        // コースコードを取得
+        $courseCd = $request->input('id');
+
+        //------------------------
+        // [ガード] リスト自体を取得して、
+        // 値が正しいかチェックする
+        //------------------------
+
+        // コースプルダウンを取得
+        $courses = $this->mdlGetCourseList();
+
+        // [ガード] コースコードがプルダウンの中にあるかチェック
+        $this->guardListValue($courses, $courseCd);
+
+        //---------------------------
+        // コース情報（コース種別）を返却する
+        //---------------------------
+        // コース情報を取得
+        $course = $this->fncScheGetCourseInfo($courseCd);
+
+        return [
+            'course_kind' => $course->course_kind
+        ];
+    }
+
+    /**
+     * 時限情報取得（日付ピッカー変更）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 時限情報
+     */
+    public function getDataSelect(Request $request)
+    {
+        // 日付のバリデーション
+        if ($request->input('target_date')) {
+            $this->validateDatesFromRequest($request, 'target_date');
+        }
+
+        // 校舎コード・日付を取得
+        $campusCd = $request->input('campus_cd');
+        $targetDate = $request->input('target_date');
+
+        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        $this->guardRoomAdminRoomcd($campusCd);
+
+        //---------------------------
+        // 時限リストを返却する
+        //---------------------------
+        // 時限リストを取得（校舎・日付から）
+        $periods = $this->mdlGetPeriodListByDate($campusCd, $targetDate);
+
+        return [
+            'selectItems' => $this->objToArray($periods),
+        ];
+    }
+
+    /**
+     * 時間割情報取得（時限プルダウン選択時）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 時間割情報
+     */
+    public function getDataSelectTimetable(Request $request)
+    {
+        // 時限のバリデーション
+        $this->validateIdsFromRequest($request, 'period_no');
+        // 日付のバリデーション
+        $this->validateDatesFromRequest($request, 'target_date');
+
+        // 校舎コード・日付・時限を取得
+        $campusCd = $request->input('campus_cd');
+        $targetDate = $request->input('target_date');
+        $periodNo = $request->input('period_no');
+
+        //------------------------
+        // [ガード] リスト自体を取得して、
+        // 値が正しいかチェックする
+        //------------------------
+
+        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        $this->guardRoomAdminRoomcd($campusCd);
+
+        // 時限リストを取得
+        $periods = $this->mdlGetPeriodListByDate($campusCd, $targetDate);
+
+        // [ガード] 時限がプルダウンの中にあるかチェック
+        $this->guardListValue($periods, $periodNo);
+
+        //---------------------------
+        // 時間割情報（開始時刻・終了時刻）を返却する
+        //---------------------------
+
+        // 日付から時間割区分を取得
+        $timetableKind = $this->fncScheGetTimeTableKind($campusCd, $targetDate);
+
+        // 時間割区分・指定時限から、対応する時間割情報を取得
+        $periodInfo = $this->fncScheGetTimetableByPeriod($campusCd, $timetableKind, $periodNo);
+        $startTime = $periodInfo->start_time;
+        $endTime = $periodInfo->end_time;
+
+        return [
+            'start_time' => $startTime->format('H:i'),
+            'end_time' => $endTime->format('H:i')
+        ];
     }
 
     /**
@@ -689,7 +686,7 @@ class RoomCalendarController extends Controller
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        if (!$request['schedule_id']) {
+        if ($request['kind'] == self::SCHE_KIND_NEW) {
             // 新規登録処理
             $this->createNew($request);
         } else {
@@ -711,7 +708,6 @@ class RoomCalendarController extends Controller
         DB::transaction(function () use ($request) {
 
             $form = $request->only(
-                // 教室管理者の場合の校舎コードのチェックはバリデーション(validationRoomList)で行っている
                 'campus_cd',
                 'target_date',
                 'period_no',
@@ -726,17 +722,10 @@ class RoomCalendarController extends Controller
                 'subject_cd',
                 'lesson_kind',
                 'how_to_kind',
-                //'substitute_kind',
-                //'substitute_tid',
-                //'absent_tutor_id',
-                //'absent_status',
                 'tentative_status',
-                //'transfer_id',
-                //'transfer_class_id',
-                //'report_id',
                 'memo',
                 'repeat_chk',
-                'kaisu',
+                'repeat_times',
             );
 
             // 時間（分）の算出
@@ -746,35 +735,64 @@ class RoomCalendarController extends Controller
 
             // 登録者の設定
             $account = Auth::user();
-            // SQLの表示（デバッグ用。削除してからcommit/pushすること）
-            \DB::enableQueryLog();
 
             // 繰り返し登録時の設定
             $targetDates = [];
-            if ($form['repeat_chk'] != 'true') {
+            if ($form['course_kind'] == AppConst::CODE_MASTER_42_3 || $form['repeat_chk'] != 'true') {
+                // 繰り返し登録なしの場合
                 array_push($targetDates, $form['target_date']);
             } else {
-                $kaisu = intval($form['kaisu']) + 1;
-                // 対象日と同一曜日の授業日を取得
-                $targetDates = $this->fncScheGetScheduleDate($form['campus_cd'], $form['target_date'], $kaisu, null);
-                $this->debug($targetDates);
+                // 繰り返し登録ありの場合
+                $repeatTimes = intval($form['repeat_times']) + 1;
+                // 対象日と同一曜日の授業日リストを取得
+                $targetDates = $this->fncScheGetScheduleDate($form['campus_cd'], $form['target_date'], $repeatTimes, null);
             }
 
             foreach ($targetDates as $targetDate) {
-
-                // ブースのチェック・取得
-                //$booth = $this->fncScheSearchBooth($form['campus_cd'], $form['booth_cd'], $targetDate);
+                // ブースのチェック・空きブース取得
+                if ($form['course_kind'] == AppConst::CODE_MASTER_42_3) {
+                    // コースが面談の場合
+                    $booth = $this->fncScheSearchBoothForConference(
+                        $form['campus_cd'],
+                        $form['booth_cd'],
+                        $targetDate,
+                        $form['start_time'],
+                        $form['end_time'],
+                        null,
+                        false
+                    );
+                } else {
+                    // コースが面談以外の場合
+                    $booth = $this->fncScheSearchBooth(
+                        $form['campus_cd'],
+                        $form['booth_cd'],
+                        $targetDate,
+                        $form['period_no'],
+                        $form['how_to_kind'],
+                        null,
+                        false
+                    );
+                }
+                if (!$booth) {
+                    // 空きなし時は不正な値としてエラーレスポンスを返却（事前にバリデーションを行っているため）
+                    $this->illegalResponseErr();
+                }
 
                 // スケジュール情報登録
                 // schedulesテーブルへのinsert
                 $schedule = new Schedule;
                 $schedule->campus_cd = $form['campus_cd'];
                 $schedule->target_date = $targetDate;
-                $schedule->period_no = $form['period_no'];
+                if ($form['course_kind'] == AppConst::CODE_MASTER_42_3) {
+                    // 面談の場合 時限はnullを設定
+                    $schedule->period_no = null;
+                } else {
+                    $schedule->period_no = $form['period_no'];
+                }
                 $schedule->start_time = $form['start_time'];
                 $schedule->end_time = $form['end_time'];
                 $schedule->minites = $minites;
-                $schedule->booth_cd = $form['booth_cd'];
+                $schedule->booth_cd = $booth;
                 $schedule->course_cd = $form['course_cd'];
                 $schedule->student_id = $form['student_id'];
                 $schedule->tutor_id = $form['tutor_id'];
@@ -793,6 +811,8 @@ class RoomCalendarController extends Controller
                     // schedulesテーブル登録時のスケジュールIDをセット
                     $scheduleId = $schedule->schedule_id;
 
+                    // class_member_idはカンマ区切り文字列で入ってくる
+                    // 分割して１件ずつ登録
                     foreach (explode(",", $form['class_member_id']) as $member) {
                         // 受講生徒情報テーブルへのinsert
                         $classmember = new ClassMember;
@@ -804,8 +824,6 @@ class RoomCalendarController extends Controller
                     }
                 }
             }
-            // クエリ出力（デバッグ用。削除してからcommit/pushすること）
-            $this->debug(\DB::getQueryLog());
         });
         return;
     }
@@ -818,15 +836,11 @@ class RoomCalendarController extends Controller
      */
     private function createCopy(Request $request)
     {
-        // 登録前バリデーション。NGの場合はレスポンスコード422を返却
-        //Validator::make($request->all(), $this->rulesForInput($request))->validate();
-
         // トランザクション(例外時は自動的にロールバック)
         DB::transaction(function () use ($request) {
 
             $form = $request->only(
                 'schedule_id',
-                // 教室管理者の場合の校舎コードのチェックはバリデーション(validationRoomList)で行っている
                 'campus_cd',
                 'target_date',
                 'period_no',
@@ -839,7 +853,7 @@ class RoomCalendarController extends Controller
                 'class_member_id',
                 'tutor_id',
                 'subject_cd',
-                'create_kind',
+                //'create_kind',
                 'lesson_kind',
                 'how_to_kind',
                 'tentative_status',
@@ -854,21 +868,48 @@ class RoomCalendarController extends Controller
             // 登録者の設定
             $account = Auth::user();
 
-            // ブースのチェック・取得
-
-            // SQLの表示（デバッグ用。削除してからcommit/pushすること）
-            \DB::enableQueryLog();
+            // ブースのチェック・空きブース取得
+            if ($form['course_kind'] == AppConst::CODE_MASTER_42_3) {
+                // コースが面談の場合
+                $booth = $this->fncScheSearchBoothForConference(
+                    $form['campus_cd'],
+                    $form['booth_cd'],
+                    $form['target_date'],
+                    $form['start_time'],
+                    $form['end_time'],
+                    null,
+                    false
+                );
+            } else {
+                // コースが面談以外の場合
+                $booth = $this->fncScheSearchBooth(
+                    $form['campus_cd'],
+                    $form['booth_cd'],
+                    $form['target_date'],
+                    $form['period_no'],
+                    $form['how_to_kind'],
+                    null,
+                    false
+                );
+            }
+            if (!$booth) {
+                // エラー時。エラー時は不正な値としてエラーレスポンスを返却
+                $this->illegalResponseErr();
+            }
 
             // スケジュール情報
             // schedulesテーブルへのinsert
             $schedule = new Schedule;
             $schedule->campus_cd = $form['campus_cd'];
             $schedule->target_date = $form['target_date'];
-            $schedule->period_no = $form['period_no'];
+            if ($form['course_kind'] != AppConst::CODE_MASTER_42_3) {
+                // 時限は面談以外の場合のみ設定
+                $schedule->period_no = $form['period_no'];
+            }
             $schedule->start_time = $form['start_time'];
             $schedule->end_time = $form['end_time'];
             $schedule->minites = $minites;
-            $schedule->booth_cd = $form['booth_cd'];
+            $schedule->booth_cd = $booth;
             $schedule->course_cd = $form['course_cd'];
             $schedule->student_id = $form['student_id'];
             $schedule->tutor_id = $form['tutor_id'];
@@ -887,6 +928,8 @@ class RoomCalendarController extends Controller
                 // schedulesテーブル登録時のスケジュールIDをセット
                 $scheduleId = $schedule->schedule_id;
 
+                // class_member_idはカンマ区切り文字列で入ってくる
+                // 分割して１件ずつ登録
                 foreach (explode(",", $form['class_member_id']) as $member) {
                     // class_membersテーブルへのinsert
                     $classmember = new ClassMember;
@@ -897,8 +940,6 @@ class RoomCalendarController extends Controller
                     $classmember->save();
                 }
             }
-            // クエリ出力（デバッグ用。削除してからcommit/pushすること）
-            $this->debug(\DB::getQueryLog());
         });
 
         return;
@@ -920,7 +961,6 @@ class RoomCalendarController extends Controller
 
             $form = $request->only(
                 'schedule_id',
-                // 教室管理者の場合の校舎コードのチェックはバリデーション(validationRoomList)で行っている
                 'campus_cd',
                 'target_date',
                 'period_no',
@@ -941,9 +981,6 @@ class RoomCalendarController extends Controller
                 'absent_tutor_id',
                 'absent_status',
                 'tentative_status',
-                //'transfer_id',
-                //'transfer_class_id',
-                //'report_id',
                 'memo',
             );
 
@@ -975,9 +1012,6 @@ class RoomCalendarController extends Controller
                 }
             }
 
-            // SQLの表示（デバッグ用。削除してからcommit/pushすること）
-            \DB::enableQueryLog();
-
             // スケジュール情報更新（UPDATE）
             // 対象データを取得(IDでユニークに取る)
             $schedule = Schedule::where('schedule_id', $form['schedule_id'])
@@ -986,18 +1020,18 @@ class RoomCalendarController extends Controller
                 // 該当データがない場合はエラーを返す
                 ->firstOrFail();
 
-            //$schedule->campus_cd = $form['campus_cd'];
             $schedule->target_date = $form['target_date'];
-            $schedule->period_no = $form['period_no'];
+            if ($form['course_kind'] != AppConst::CODE_MASTER_42_3) {
+                // 時限は面談以外の場合のみ設定
+                $schedule->period_no = $form['period_no'];
+            }
             $schedule->start_time = $form['start_time'];
             $schedule->end_time = $form['end_time'];
             $schedule->minites = $minites;
             $schedule->booth_cd = $form['booth_cd'];
-            //$schedule->course_cd = $form['course_cd'];
             $schedule->student_id = $form['student_id'];
             $schedule->tutor_id = $tutorId;
             $schedule->subject_cd = $form['subject_cd'];
-            //$schedule->create_kind = AppConst::CODE_MASTER_32_1;
             $schedule->lesson_kind = $form['lesson_kind'];
             $schedule->how_to_kind = $form['how_to_kind'];
             $schedule->tentative_status = $form['tentative_status'];
@@ -1006,7 +1040,6 @@ class RoomCalendarController extends Controller
             $schedule->tentative_status = $form['tentative_status'];
             $schedule->absent_status = $form['absent_status'];
             $schedule->memo = $form['memo'];
-            //$schedule->adm_id = $account->account_id;
             // 更新
             $schedule->save();
 
@@ -1031,14 +1064,12 @@ class RoomCalendarController extends Controller
                 }
 
                 // 変更後の生徒リスト（requestから取得）
+                // カンマ区切りで入ってくるので配列に格納
                 $arrMembersAft = explode(",", $form['class_member_id']);
 
-                $this->debug($arrMembersBef);
-                $this->debug($arrMembersAft);
                 // 受講生徒情報削除処理
                 // 変更前の生徒 - 変更後の生徒 で差分を取得
                 $arrMembersDel = array_diff($arrMembersBef, $arrMembersAft);
-                $this->debug($arrMembersDel);
 
                 if (count($arrMembersDel) > 0) {
                     // 対象データを削除
@@ -1052,7 +1083,6 @@ class RoomCalendarController extends Controller
                 // 受講生徒情報追加処理
                 // 変更後の生徒 - 変更前の生徒 で差分を取得
                 $arrMembersAdd = array_diff($arrMembersAft, $arrMembersBef);
-                $this->debug($arrMembersAdd);
 
                 foreach ($arrMembersAdd as $member) {
                     // class_membersテーブルへのinsert
@@ -1064,9 +1094,6 @@ class RoomCalendarController extends Controller
                     $classmember->save();
                 }
             }
-
-            // クエリ出力（デバッグ用。削除してからcommit/pushすること）
-            $this->debug(\DB::getQueryLog());
         });
         return;
     }
@@ -1079,13 +1106,20 @@ class RoomCalendarController extends Controller
      */
     public function validationForInput(Request $request)
     {
-        // リクエストデータチェック
+        // リクエストデータチェック（項目チェック）
         $validator = Validator::make($request->all(), $this->rulesForInput($request));
-        return $validator->errors();
+        if (count($validator->errors()) != 0) {
+            // 項目チェックエラーがある場合はここでエラー情報を返す
+            return $validator->errors();
+        }
+        // リクエストデータチェック（関連チェック追加）
+        $validatorRerated = Validator::make($request->all(), $this->rulesForInputRelated($request));
+        // 項目チェックエラー無し時は関連チェックを行い、結果を返す
+        return $validatorRerated->errors();
     }
 
     /**
-     * バリデーションルールを取得(登録用)
+     * バリデーションルールを取得(登録用・項目チェック)
      *
      * @param \Illuminate\Http\Request $request リクエスト
      * @return array ルール
@@ -1107,21 +1141,172 @@ class RoomCalendarController extends Controller
 
         // 独自バリデーション: リストのチェック コース
         $validationCourseList =  function ($attribute, $value, $fail) {
-
-            // 校舎リストを取得
-            $courses = $this->mdlGetCourseList(false);
-            if (!isset($courses[$value])) {
+            // コースリストを取得
+            $list = $this->mdlGetCourseList();
+            if (!isset($list[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
         };
 
-        // 独自バリデーション: リストのチェック 用途種別
-        $validationKindList =  function ($attribute, $value, $fail) {
+        // 独自バリデーション: リストのチェック ブース
+        $validationBoothList =  function ($attribute, $value, $fail) use ($request) {
+
+            if (!$request->filled('campus_cd')) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+            // ブースリストを取得
+            $list = $this->mdlGetBoothList($request['campus_cd']);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 時限
+        $validationPeriodList =  function ($attribute, $value, $fail) use ($request) {
+
+            if (!$request->filled('course_kind')) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+            if ($request['course_kind'] == AppConst::CODE_MASTER_42_3) {
+                // コースが面談の場合はチェックしない
+                return;
+            }
+            // 時限リストを取得
+            $list = $this->mdlGetPeriodListByDate($request['campus_cd'], $request['target_date']);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 講師
+        $validationTutorList =  function ($attribute, $value, $fail) use ($request) {
+
+            if (!$request->filled('campus_cd')) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+            // 講師リストを取得
+            $list = $this->mdlGetTutorList($request['campus_cd']);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 生徒
+        $validationStudentList =  function ($attribute, $value, $fail) use ($request) {
+
+            if (!$request->filled('campus_cd')) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+            // 生徒リストを取得
+            $list = $this->mdlGetStudentList($request['campus_cd']);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 生徒（複数選択）
+        $validationStudentListMulti =  function ($attribute, $value, $fail) use ($request) {
+
+            if (!$request->filled('campus_cd')) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+            $list = $this->mdlGetStudentList($request['campus_cd']);
+            // カンマ区切りで入ってくるので分割してチェック
+            foreach (explode(",", $value) as $member) {
+                // 生徒リストを取得
+                if (!isset($list[$member])) {
+                    // 不正な値エラー
+                    return $fail(Lang::get('validation.invalid_input'));
+                }
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 科目
+        $validationSubjectList =  function ($attribute, $value, $fail) use ($request) {
+
+            // 科目リストを取得
+            $list = $this->mdlGetSubjectList();
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 授業区分
+        $validationLessonKindList =  function ($attribute, $value, $fail) {
 
             // リストを取得し存在チェック
-            $states = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_41);
-            if (!isset($states[$value])) {
+            $list = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_31);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 通塾種別
+        $validationHowToKindList =  function ($attribute, $value, $fail) {
+
+            // リストを取得し存在チェック
+            $list = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_33);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 仮登録フラグ
+        $validationTentativeStatusList =  function ($attribute, $value, $fail) {
+
+            // リストを取得し存在チェック
+            $list = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_36);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 授業代講区分
+        $validationSubstituteKindList =  function ($attribute, $value, $fail) {
+
+            // リストを取得し存在チェック
+            $list = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_34);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 出欠ステータス
+        $validationAbsentStatusList =  function ($attribute, $value, $fail) {
+
+            // リストを取得し存在チェック
+            $list = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_35);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 繰り返し回数
+        $validationRepeatTimes =  function ($attribute, $value, $fail) use ($request) {
+
+            if ($request['repeat_chk'] != "true") {
+                // 繰り返し登録が選択されていない場合はチェックしない
+                return;
+            }
+            // リストを取得し存在チェック
+            $list = config('appconf.repeat_times');
+            if (!isset($list[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
@@ -1131,10 +1316,365 @@ class RoomCalendarController extends Controller
         // その他を第二引数で指定する
         $rules += Schedule::fieldRules('campus_cd', ['required', $validationRoomList]);
         $rules += Schedule::fieldRules('course_cd', ['required', $validationCourseList]);
-        $rules += Schedule::fieldRules('booth_cd', ['required']);
+        $rules += ['course_kind' => ['required']];
+        $rules += Schedule::fieldRules('target_date', ['required']);
+        $rules += Schedule::fieldRules('start_time', ['required']);
+        $rules += Schedule::fieldRules('end_time', ['required']);
+        $rules += Schedule::fieldRules('memo');
+        $rules += Schedule::fieldRules('booth_cd', ['required', $validationBoothList]);
+
+        if ($request && $request->filled('course_kind') && $request['course_kind'] != AppConst::CODE_MASTER_42_3) {
+            // コース種別が面談以外の場合のみチェック
+            $rules += Schedule::fieldRules('period_no', ['required', $validationPeriodList]);
+            $rules += Schedule::fieldRules('subject_cd', ['required', $validationSubjectList]);
+        }
+        if (
+            $request && $request->filled('course_kind') &&
+            $request['course_kind'] != AppConst::CODE_MASTER_42_3 && $request['course_kind'] != AppConst::CODE_MASTER_42_4
+        ) {
+            // コース種別が面談・自習以外の場合のみチェック
+            $rules += Schedule::fieldRules('lesson_kind', ['required', $validationLessonKindList]);
+            $rules += Schedule::fieldRules('how_to_kind', ['required', $validationHowToKindList]);
+            $rules += Schedule::fieldRules('tutor_id', ['required', $validationTutorList]);
+
+            if ($request->filled('course_kind') && $request['lesson_kind'] == AppConst::CODE_MASTER_31_2) {
+                // 特別期間講習の場合のみ、仮登録フラグをチェック
+                $rules += Schedule::fieldRules('tentative_status', ['required', $validationTentativeStatusList]);
+            }
+        }
+        if ($request && $request->filled('course_kind') && $request['course_kind'] == AppConst::CODE_MASTER_42_1) {
+            // コース種別が授業単の場合、生徒（単数指定）をチェック（必須あり）
+            $rules += Schedule::fieldRules('student_id', ['required', $validationStudentList]);
+        } else if ($request && $request->filled('course_kind') && $request['course_kind'] == AppConst::CODE_MASTER_42_2) {
+            // コース種別が授業複の場合、受講生徒（複数指定）をチェック
+            $rules += ['class_member_id' => ['required', $validationStudentListMulti]];
+        } else {
+            // コース種別が面談・自習の場合、生徒（単数指定）をチェック（必須なし）
+            $rules += Schedule::fieldRules('student_id', [$validationStudentList]);
+        }
+        if ($request && $request->filled('kind') && $request['kind'] == self::SCHE_KIND_NEW) {
+            // 新規登録の場合
+            if ($request && $request->filled('repeat_chk') && $request['repeat_chk'] == "true") {
+                // 繰り返し登録有りの場合、繰り返し回数のチェック
+                $rules += ['repeat_times' => [$validationRepeatTimes]];
+            }
+        }
+        if ($request && $request->filled('kind') && $request['kind'] == self::SCHE_KIND_UPD) {
+            // 更新登録の場合
+            $rules += Schedule::fieldRules('substitute_kind', ['required', $validationSubstituteKindList]);
+            if (
+                $request && $request->filled('substitute_kind')
+                && $request['substitute_kind'] != AppConst::CODE_MASTER_34_0
+            ) {
+                // 代講種別が「なし」以外の場合
+                $rules += ['substitute_tid' => ['required', $validationTutorList]];
+            }
+            $rules += Schedule::fieldRules('absent_status', ['required', $validationAbsentStatusList]);
+        }
+        return $rules;
+    }
+
+    /**
+     * バリデーションルールを取得(登録用・関連チェック)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array ルール
+     */
+    private function rulesForInputRelated(?Request $request)
+    {
+        $rules = array();
+
+        // 独自バリデーション: ブース重複チェック（面談以外）
+        $validationDupBooth =  function ($attribute, $value, $fail) use ($request) {
+
+            if (
+                !$request->filled('campus_cd') || !$request->filled('booth_cd')
+                || !$request->filled('target_date') || !$request->filled('period_no')
+                || !$request->filled('how_to_kind')
+            ) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+
+            $scheduleId = null;
+            if ($request['kind'] == self::SCHE_KIND_UPD && $request->filled('schedule_id')) {
+                // 更新の場合のみ、スケジュールIDをセット（除外用）
+                $scheduleId = $request['schedule_id'];
+            }
+            // ブース重複チェック（空きブース検索なし）
+            $booth = $this->fncScheSearchBooth(
+                $request['campus_cd'],
+                $request['booth_cd'],
+                $request['target_date'],
+                $request['period_no'],
+                $request['how_to_kind'],
+                $scheduleId,
+                true
+            );
+            if (!$booth) {
+                // ブース空きなしエラー
+                return $fail(Lang::get('validation.duplicate_booth'));
+            }
+
+            // 繰り返し登録有無チェック
+            if (!$request->filled('repeat_chk') || !$request->filled('repeat_times')) {
+                // 繰り返し登録対象外時はチェックしない
+                return;
+            }
+            if ($request['repeat_chk'] != 'true' || intval($request['repeat_times']) == 0) {
+                // 繰り返し登録対象外時はチェックしない
+                return;
+            }
+            // 繰り返し登録有りの場合
+            $targetDates = [];
+            $repeatTimes = intval($request['repeat_times']) + 1;
+            // 対象日と同一曜日の授業日を取得
+            $targetDates = $this->fncScheGetScheduleDate($request['campus_cd'], $request['target_date'], $repeatTimes, null);
+            // チェック済みの日付を除外
+            $targetDatesAfter = array_diff($targetDates, [$request['target_date']]);
+
+            foreach ($targetDatesAfter as $targetDate) {
+                // ブース重複チェック（空きブース検索あり）
+                $booth = $this->fncScheSearchBooth(
+                    $request['campus_cd'],
+                    $request['booth_cd'],
+                    $targetDate,
+                    $request['period_no'],
+                    $request['how_to_kind'],
+                    $scheduleId,
+                    false
+                );
+                if (!$booth) {
+                    // ブース空きなしエラー
+                    return $fail(Lang::get('validation.duplicate_booth'));
+                }
+            }
+        };
+
+        // 独自バリデーション: ブース重複チェック（面談）
+        $validationDupBoothConference =  function ($attribute, $value, $fail) use ($request) {
+
+            if (
+                !$request->filled('campus_cd') || !$request->filled('booth_cd')
+                || !$request->filled('target_date') || !$request->filled('start_time')
+                || !$request->filled('end_time')
+            ) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+
+            $scheduleId = null;
+            if ($request['kind'] == self::SCHE_KIND_UPD && $request->filled('schedule_id')) {
+                // 更新の場合のみ、スケジュールIDをセット（除外用）
+                $scheduleId = $request['schedule_id'];
+            }
+            // ブースの重複チェック
+            $booth = $this->fncScheSearchBoothForConference(
+                $request['campus_cd'],
+                $request['booth_cd'],
+                $request['target_date'],
+                $request['start_time'],
+                $request['end_time'],
+                $scheduleId,
+                true
+            );
+            if (!$booth) {
+                // ブース空きなしエラー
+                return $fail(Lang::get('validation.duplicate_booth'));
+            }
+        };
+
+        // 独自バリデーション: 時限と開始時刻の相関チェック
+        $validationPeriodStartTime =  function ($attribute, $value, $fail) use ($request) {
+
+            if (
+                !$request->filled('campus_cd') || !$request->filled('target_date')
+                || !$request->filled('period_no') || !$request->filled('start_time')
+            ) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+            // 時限と開始時刻の相関チェック
+            $chk = $this->fncScheCheckStartTime(
+                $request['campus_cd'],
+                $request['target_date'],
+                $request['period_no'],
+                $request['start_time']
+            );
+            if (!$chk) {
+                // 開始時刻範囲エラー
+                return $fail(Lang::get('validation.out_of_range_period'));
+            }
+        };
+
+        // 独自バリデーション: 生徒スケジュール重複チェック
+        $validationDupStudent =  function ($attribute, $value, $fail) use ($request) {
+
+            if (
+                !$request->filled('target_date') || !$request->filled('start_time')
+                || !$request->filled('end_time') || !$request->filled('student_id')
+            ) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+
+            $scheduleId = null;
+            if ($request['kind'] == self::SCHE_KIND_UPD && $request->filled('schedule_id')) {
+                // 更新の場合のみ、スケジュールIDをセット（除外用）
+                $scheduleId = $request['schedule_id'];
+            }
+            // 生徒スケジュール重複チェック
+            $chk = $this->fncScheChkDuplidateSid(
+                $request['target_date'],
+                $request['start_time'],
+                $request['end_time'],
+                $request['student_id'],
+                $scheduleId
+            );
+            if (!$chk) {
+                // 生徒スケジュール重複エラー
+                return $fail(Lang::get('validation.duplicate_student'));
+            }
+        };
+
+        // 独自バリデーション: 生徒スケジュール重複チェック（複数指定）
+        $validationDupStudentMulti =  function ($attribute, $value, $fail) use ($request) {
+
+            if (
+                !$request->filled('target_date') || !$request->filled('start_time')
+                || !$request->filled('end_time') || !$request->filled('class_member_id')
+            ) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+
+            $scheduleId = null;
+            if ($request['kind'] == self::SCHE_KIND_UPD && $request->filled('schedule_id')) {
+                // 更新の場合のみ、スケジュールIDをセット（除外用）
+                $scheduleId = $request['schedule_id'];
+            }
+            foreach (explode(",", $value) as $member) {
+                // 生徒リストを取得
+                // 生徒スケジュール重複チェック（一人ずつ）
+                $chk = $this->fncScheChkDuplidateSid(
+                    $request['target_date'],
+                    $request['start_time'],
+                    $request['end_time'],
+                    $member,
+                    $scheduleId
+                );
+                if (!$chk) {
+                    // 生徒スケジュール重複エラー
+                    return $fail(Lang::get('validation.duplicate_student'));
+                }
+            }
+        };
+
+        // 独自バリデーション: 講師スケジュール重複チェック
+        $validationDupTutor =  function ($attribute, $value, $fail) use ($request) {
+
+            if (
+                !$request->filled('target_date') || !$request->filled('start_time')
+                || !$request->filled('end_time') || !$request->filled('tutor_id')
+            ) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+
+            $scheduleId = null;
+            if ($request['kind'] == self::SCHE_KIND_UPD && $request->filled('schedule_id')) {
+                // 更新の場合のみ、スケジュールIDをセット（除外用）
+                $scheduleId = $request['schedule_id'];
+            }
+            // 生徒スケジュール重複チェック
+            $chk = $this->fncScheChkDuplidateTid(
+                $request['target_date'],
+                $request['start_time'],
+                $request['end_time'],
+                $request['tutor_id'],
+                $scheduleId
+            );
+            if (!$chk) {
+                // 講師スケジュール重複
+                return $fail(Lang::get('validation.duplicate_tutor'));
+            }
+        };
+
+        // 独自バリデーション: 授業区分（見込客）
+        $validationLessonKindTrial =  function ($attribute, $value, $fail) use ($request) {
+
+            if (!$request->filled('student_id')) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+            // 生徒情報を取得
+            $student = $this->fncScheGetStudentInfo($request['student_id']);
+            if ($student->stu_status == AppConst::CODE_MASTER_28_0) {
+                // 見込客の場合、体験授業以外ならエラー
+                if (
+                    $value != AppConst::CODE_MASTER_31_5
+                    && $value != AppConst::CODE_MASTER_31_6
+                    && $value != AppConst::CODE_MASTER_31_7
+                ) {
+                    // 不正な値エラー
+                    return $fail(Lang::get('validation.invalid_input'));
+                }
+            } else {
+                // 見込客以外の場合、体験授業ならエラー
+                if (
+                    $value == AppConst::CODE_MASTER_31_5
+                    || $value == AppConst::CODE_MASTER_31_6
+                    || $value == AppConst::CODE_MASTER_31_7
+                ) {
+                    // 不正な値エラー
+                    return $fail(Lang::get('validation.invalid_input'));
+                }
+            }
+        };
+
+        // 関連チェックは項目チェックと分けて行う
+        // ブース重複チェック
+        if ($request->filled('course_kind') && $request['course_kind'] == AppConst::CODE_MASTER_42_3) {
+            // コース種別が面談の場合
+            $rules += ['booth_cd' => [$validationDupBoothConference]];
+        } else if ($request->filled('course_kind') && $request['course_kind'] != AppConst::CODE_MASTER_42_3) {
+            // コース種別が面談の場合
+            $rules += ['booth_cd' => [$validationDupBooth]];
+        }
+        // 時限と開始時刻の相関チェック
+        if ($request->filled('course_kind') && $request['course_kind'] != AppConst::CODE_MASTER_42_3) {
+            // コース種別が面談以外の場合のみチェック
+            $rules += ['start_time' => [$validationPeriodStartTime]];
+        }
+        // 授業区分（見込客）チェック
+        if (
+            $request->filled('course_kind') &&
+            $request['course_kind'] != AppConst::CODE_MASTER_42_3 && $request['course_kind'] != AppConst::CODE_MASTER_42_4
+        ) {
+            // コース種別が面談・自習以外の場合のみチェック
+            $rules += ['lesson_kind' => [$validationLessonKindTrial]];
+        }
+        // 講師の重複チェック
+        if (
+            $request->filled('course_kind') &&
+            $request['course_kind'] != AppConst::CODE_MASTER_42_3 && $request['course_kind'] != AppConst::CODE_MASTER_42_4
+        ) {
+            // コース種別が面談・自習以外の場合のみチェック
+            $rules += ['tutor_id' => [$validationDupTutor]];
+        }
+        // 生徒の重複チェック
+        if ($request->filled('course_kind') && $request['course_kind'] == AppConst::CODE_MASTER_42_1) {
+            // コース種別が授業単の場合のみ、生徒（単数指定）をチェック
+            $rules += ['student_id' => [$validationDupStudent]];
+        }
+        if ($request->filled('course_kind') && $request['course_kind'] == AppConst::CODE_MASTER_42_2) {
+            // コース種別が授業複以外の場合のみ、受講生徒（複数指定）をチェック
+            $rules += ['class_member_id' => [$validationDupStudentMulti]];
+        }
 
         return $rules;
     }
+
 
     /**
      * 削除処理
@@ -1176,9 +1716,4 @@ class RoomCalendarController extends Controller
 
         return;
     }
-
-    //==========================
-    // クラス内共通処理
-    //==========================
-
 }
