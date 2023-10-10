@@ -14,11 +14,13 @@
 
 <x-bs.card>
     <x-slot name="card_title">
-        {{$name}}
+        {{$student_name}}
     </x-slot>
 
 {{-- 結果リスト --}}
 <x-bs.card-list>
+    {{-- hidden --}}
+    <x-input.hidden id="student_id" :editData=$editData />
 
     {{-- テーブル --}}
     <x-bs.table :button=true>
@@ -33,24 +35,17 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/01/10 17:00</td>
-            <td>面談記録</td>
-            <td>久我山</td>
-            <td>山田　太郎</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmd(item.received_date)}}&nbsp;@{{item.received_time}}</td>
+            <td>@{{item.kind_name}}</td>
+            <td>@{{item.campus_name}}</td>
+            <td>@{{item.admin_name}}</td>
             <td>
-                <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('record-edit', 1) }}" />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/01/09 19:30</td>
-            <td>電話記録</td>
-            <td>久我山</td>
-            <td>鈴木　花子</td>
-            <td>
-                <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('record-edit', 2) }}" />
+                {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
+                <x-button.list-dtl :vueDataAttr="['id' => 'item.record_id']" />
+                {{-- スペース --}}
+                &nbsp;
+                <x-button.list-edit vueHref="'{{ route('record-edit', '') }}/' + item.record_id" />
             </td>
         </tr>
 

@@ -6,13 +6,13 @@
 @section('child_page', true)
 
 {{-- 四階層目の場合：親ページ（二・三階層目）を指定(URLとタイトル) --}}
-@section('parent_page', route('member_mng-detail', $editData['sid']))
+@section('parent_page', route('member_mng-detail', $editData['student_id']))
 
 @section('parent_page_title', '生徒カルテ')
 
 {{-- 編集画面の場合のみ、一覧を経由し四階層とする --}}
 @if (request()->routeIs('record-edit'))
-@section('parent_page2', route('record', $editData['sid']))
+@section('parent_page2', route('record', $editData['student_id']))
 @section('parent_page_title2', '連絡記録一覧')
 @endif
 
@@ -24,29 +24,31 @@
     <p>以下の連絡記録の{{(request()->routeIs('record-edit')) ? '変更' : '登録'}}を行います。</p>
 
     <x-bs.form-title>生徒名</x-bs.form-title>
-    <p class="edit-disp-indent">CWテスト生徒１</p>
+    <p class="edit-disp-indent">{{$student_name}}</p>
 
     <x-bs.form-title>担当者名</x-bs.form-title>
-    <p class="edit-disp-indent">本部事務局</p>
+    <p class="edit-disp-indent">{{$manager_name}}</p>
 
+    @can('roomAdmin')
+    {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
+    <x-bs.form-title>担当者名</x-bs.form-title>
+    <p class="edit-disp-indent">{{$campus_name}}</p>
     {{-- 余白 --}}
     <div class="mb-3"></div>
+    {{-- hidden --}}
+    <x-input.hidden id="campus_cd" :editData=$editData/>
+    @else
+    {{-- 余白 --}}
+    <div class="mb-3"></div>
+    {{-- 全体管理者の場合、検索を非表示・未選択を表示する --}}
+    <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+        :select2Search=false :blank=true />
+    @endcan
 
-    <x-input.select caption="記録種別" id="karte_kind" :select2=true :editData="$editData">
-        <option value="1">面談記録</option>
-        <option value="2">電話記録</option>
-        <option value="3">メール</option>
-        <option value="4">LINE</option>
-        <option value="5">その他</option>
-    </x-input.select>
+    <x-input.select caption="記録種別" id="record_kind" :select2=true :mastrData=$recordKind :editData=$editData
+        :select2Search=false :blank=true />
 
-    <x-input.select caption="対応校舎" id="roomcd" :select2=true :editData="$editData">
-        <option value="1">久我山</option>
-        <option value="2">西永福</option>
-        <option value="3">本郷</option>
-    </x-input.select>
-
-    <x-input.textarea caption="内容" id="karte_text" :editData=$editData />
+    <x-input.textarea caption="内容" id="memo" :editData=$editData />
 
     <x-input.date-picker caption="対応日" id="received_date" :editData=$editData />
 
@@ -54,6 +56,9 @@
 
     {{-- hidden --}}
     <x-input.hidden id="karte_id" :editData=$editData />
+    <x-input.hidden id="student_id" :editData=$editData/>
+    <x-input.hidden id="adm_id" :editData=$editData/>
+    <x-input.hidden id="record_id" :editData=$editData/>
 
     {{-- フッター --}}
     <x-slot name="footer">
@@ -61,7 +66,7 @@
             @if (request()->routeIs('record-edit'))
             {{-- 編集時 --}}
             {{-- 前の階層に戻る --}}
-            <x-button.back url="{{route('record', $editData['sid'])}}" />
+            <x-button.back url="{{route('record', $editData['student_id'])}}" />
             @else
             {{-- 登録時 --}}
             {{-- 生徒カルテに戻る --}}
