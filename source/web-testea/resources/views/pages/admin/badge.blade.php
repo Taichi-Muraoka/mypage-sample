@@ -6,7 +6,7 @@
 @section('child_page', true)
 
 {{-- 三階層目の場合：親ページを指定(URLとタイトル) --}}
-@section('parent_page', route('member_mng-detail', $sid))
+@section('parent_page', route('member_mng-detail', $editData['student_id']))
 
 @section('parent_page_title', '生徒カルテ')
 
@@ -14,11 +14,14 @@
 
 <x-bs.card>
     <x-slot name="card_title">
-        {{$name}}
+    {{$name}}
     </x-slot>
 
 {{-- 結果リスト --}}
 <x-bs.card-list>
+
+    {{-- hidden 検索一覧用--}}
+    <x-input.hidden id="student_id" :editData=$editData />
 
     {{-- テーブル --}}
     <x-bs.table :button=true>
@@ -34,44 +37,14 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/05/10</td>
-            <td>紹介</td>
-            <td>久我山</td>
-            <td>鈴木　花子</td>
-            <td>生徒紹介（佐藤次郎さん）</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmd(item.authorization_date)}}</td>
+            <td>@{{item.kind_name}}</td>
+            <td>@{{item.campus_name}}</td>
+            <td>@{{item.admin_name}}</td>
+            <td>@{{item.reason}}</td>
             <td>
-                <x-button.list-edit href="{{ route('badge-edit', 1) }}" />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/04/01</td>
-            <td>通塾</td>
-            <td>久我山</td>
-            <td>鈴木　花子</td>
-            <td>契約期間が３年を超えた</td>
-            <td>
-                <x-button.list-edit href="{{ route('badge-edit', 1) }}" />
-            </td>
-        </tr>
-        <tr>
-            <td>2022/03/20</td>
-            <td>紹介</td>
-            <td>久我山</td>
-            <td>鈴木　花子</td>
-            <td>生徒紹介（仙台太郎さん）</td>
-            <td>
-                <x-button.list-edit href="{{ route('badge-edit', 1) }}" />
-            </td>
-        </tr>
-        <tr>
-            <td>2022/02/20</td>
-            <td>成績</td>
-            <td>久我山</td>
-            <td>鈴木　花子</td>
-            <td>成績UP</td>
-            <td>
-                <x-button.list-edit href="{{ route('badge-edit', 1) }}" />
+                <x-button.list-edit vueHref="'{{ route('badge-edit', '') }}/' + item.badge_id" />
             </td>
         </tr>
 
@@ -82,7 +55,7 @@
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
             {{-- 二階層目に戻る --}}
-            <x-button.back url="{{route('member_mng-detail', $sid)}}" />
+            <x-button.back url="{{route('member_mng-detail', $editData['student_id'])}}" />
         </div>
     </x-slot>
 </x-bs.card>
