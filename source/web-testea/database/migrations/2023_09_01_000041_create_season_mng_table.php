@@ -22,7 +22,6 @@ return new class extends Migration
             $table->date('t_end_date')->comment('講師受付終了日');
             $table->date('s_start_date')->comment('生徒受付開始日');
             $table->date('s_end_date')->comment('生徒受付終了日');
-            $table->unsignedSmallInteger('lesson_times')->comment('受講回数目安');
             $table->date('confirm_date')->comment('確定日');
             $table->unsignedSmallInteger('status')->default(0)->comment('処理状態（0:未確定、1:確定済）');
             $table->timestamps();
