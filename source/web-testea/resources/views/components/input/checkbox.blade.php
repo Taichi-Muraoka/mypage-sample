@@ -9,13 +9,19 @@
   value: 値
   checked: デフォルトのチェック状態。値がない場合などデフォルトで選択される
   disabled: disabled（選択不可）にするかどうか
+  vShow: Vue.jsのv-show
   editData: 編集データ
   exceptData: チェック対象外データ
   class: クラス
   icheck: icheckを使うかどうか
 --}}
 @props(['caption' => '', 'id' => '', 'name' => '', 'value' => '', 'checked' => false, 
-'disabled' => false, 'editData' => [], 'exceptData' => [],'class' => '', 'icheck' => true])
+'disabled' => false, 'editData' => [],'vShow' => '', 'exceptData' => [],'class' => '', 'icheck' => true])
+
+{{-- v-show --}}
+@if ($vShow)
+<div v-show="{{ $vShow }}">
+@endif
 
 @if ($icheck)
 <div class="icheck-primary d-inline mr-3">
@@ -54,5 +60,9 @@
   @endif
 
 @if ($icheck)
+</div>
+@endif
+{{-- v-show --}}
+@if ($vShow)
 </div>
 @endif
