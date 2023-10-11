@@ -46,7 +46,7 @@
     </x-slot>
 
     {{-- テーブル --}}
-    <x-bs.table :button=true :smartPhone=true>
+    <x-bs.table :smartPhone=true>
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
