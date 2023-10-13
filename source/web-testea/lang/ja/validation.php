@@ -141,8 +141,9 @@ return [
     //'required_without'     => ':valuesを指定しない場合は、この項目を指定してください。',
     'required_without'             => '必須入力です。',
 
+    // 学校検索モーダル用のバリデーションメッセージ
     //'required_without_all' => ':valuesのどれも指定しない場合は、この項目を指定してください。',
-    'required_without_all' => '必須入力です。',
+    'required_without_all' => 'どちらか必須入力です。',
     'same'                 => 'この項目と:otherには同じ値を指定してください。',
 
     'size'                 => [
