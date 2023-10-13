@@ -35,7 +35,7 @@
     <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
         :select2Search=false :blank=false />
 
-    <x-input.textarea id="reason" caption="認定理由" :editData=$editData />
+    <x-input.text caption="認定理由" id="reason" :rules=$rules :editData=$editData/>
 
     {{-- hidden --}}
     <x-input.hidden id="badge_id" :editData=$editData />
