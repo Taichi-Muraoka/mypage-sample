@@ -193,6 +193,7 @@ class BadgeController extends Controller
 
         // テンプレートは編集と同じ
         return view('pages.admin.badge-input', [
+            'rules' => $this->rulesForInput(null),
             'name' => $name,
             'kindList' => $kindList,
             'rooms' => $rooms,
@@ -318,6 +319,7 @@ class BadgeController extends Controller
         $kindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_55);
 
         return view('pages.admin.badge-input', [
+            'rules' => $this->rulesForInput(null),
             'name' => $name,
             'kindList' => $kindList,
             'rooms' => $rooms,
@@ -432,6 +434,7 @@ class BadgeController extends Controller
         // その他を第二引数で指定する
         $rules += Badge::fieldRules('campus_cd', ['required', $validationRoomList]);
         $rules += Badge::fieldRules('badge_type', ['required', $validationKindList]);
+        $rules += Badge::fieldRules('reason');
 
         return $rules;
     }
