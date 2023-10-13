@@ -46,36 +46,30 @@
     @else
     {{-- 登録時 --}}
     <x-bs.card>
-        <x-input.select caption="授業日・時限" id="id" :select2=true  :editData=$editData>
-            <option value="1">2023/04/24 5限</option>
-            <option value="2">2023/04/17 5限</option>
-            <option value="3">2023/04/10 5限</option>
-            <option value="4">2023/04/03 5限</option>
-        </x-input.select>
-
+        <x-input.select caption="授業日・時限" id="id" :select2=true onChange="selectChangeGet" :mastrData=$lesson_list :editData=$editData :select2Search=false :blank=true />
         {{-- 詳細を表示 --}}
         <x-bs.table vShow="form.id > 0" :hover=false :vHeader=true class="mb-4">
             <tr>
                 <th>校舎</th>
-                <td><span v-cloak>久我山</span></td>
+                <td><span v-cloak>@{{selectGetItem.campus_name}}</span></td>
             </tr>
             <tr>
                 <th>コース</th>
-                <td><span v-cloak>個別指導コース</span></td>
+                <td><span v-cloak>@{{selectGetItem.course_name}}</span></td>
             </tr>
             <tr>
                 <th>生徒</th>
-                <td><span v-cloak>CWテスト生徒１</span></td>
+                <td><span v-cloak>@{{selectGetItem.student_name}}</span></td>
             </tr>
             <tr>
                 <th>科目</th>
-                <td><span v-cloak>数学</span></td>
+                <td><span v-cloak>@{{selectGetItem.subject_name}}</span></td>
             </tr>
         </x-bs.table>
     </x-bs.card>
     @endif
 
-    <x-input.text caption="今月の目標" id="monthly_goal"/>
+    <x-input.text caption="今月の目標" id="monthly_goal" :editData=$editData />
 
     <x-bs.form-title>授業内容</x-bs.form-title>
     <x-bs.card>

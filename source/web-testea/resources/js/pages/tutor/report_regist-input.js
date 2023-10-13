@@ -25,35 +25,27 @@ export default class AppClass extends PageBase {
         // Vue: 入力フォーム
         this.getVueInputForm({
             afterEdit: afterEdit,
+
             // Vueにメソッド追加
-            vueMethods: {
-                // この画面では複数のプルダウン選択があるので対応する
-                selectChangeGetMulti: function (event) {
-                    // 生徒名が無ければクリア
-                    if (ValueCom.isEmpty(this.form.sidKobetsu)) {
-                        this.form.id = "";
-                        this.selectGetItem = {};
-                        return;
-                    }
-
-                    // 生徒名のチェンジの場合はスケジュールをクリア
-                    if (event && event.target.id == "sidKobetsu") {
-                        this.form.id = "";
-                        this.selectGetItem = {};
-                    }
-
-                    // チェンジイベントを発生させる
-                    self.selectChangeGet(
-                        this,
-                        {
-                            // sidで送信する
-                            sid: this.form.sidKobetsu,
-                            id: this.form.id,
-                        },
-                        this.option
-                    );
-                },
+            
+            vueMounted: function($vue, option) {
+                // 編集時、プルダウンチェンジイベントを発生させる。
+                // 該当のプルダウンの値を取得しチェンジイベントを直接呼ぶ
+                var selected = $vue.form.id;
+                self.selectChangeGet($vue, selected, option);
             },
+            // Vueにメソッド追加
+            // vueMethods: {
+            //     // 授業・時限プルダウン変更イベント
+            //     selectChangeGet: function (event) {
+            //         // チェンジイベントを発生させる
+            //         var selected = this.form.id;
+            //         self.selectChangeGet(
+            //             this,
+            //             selected,
+            //         );
+            //     },
+            // },
         });
     }
 }

@@ -509,11 +509,11 @@ trait CtrlModelTrait
             foreach ($lessons as $lesson) {
                 //$lesson['target_datetime'] = $lesson['target_date']->format('Y/m/d') . " " . $lesson['period'] . "限";
                 $schedule = [
-                    'id' => $lesson['id'],
-                    'value' => $lesson['target_date']->format('Y/m/d') . " " . $lesson['period'] . "限"
+                    'id' => $lesson['schedule_id'],
+                    'value' => $lesson['target_date']->format('Y/m/d') . " " . $lesson['period_no'] . "限"
                 ];
                 $schedule = (object) $schedule;
-                array_push($scheduleMasterKeys, $lesson['id']);
+                array_push($scheduleMasterKeys, $lesson['schedule_id']);
                 array_push($scheduleMasterValue, $schedule);
             }
         }
