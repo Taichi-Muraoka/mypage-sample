@@ -51,7 +51,6 @@ class SeasonMng extends Model
         't_end_date',
         's_start_date',
         's_end_date',
-        'lesson_times',
         'confirm_date',
         'status'
     ];
@@ -120,7 +119,6 @@ class SeasonMng extends Model
             't_end_date' => ['date_format:Y-m-d'],
             's_start_date' => ['date_format:Y-m-d'],
             's_end_date' => ['date_format:Y-m-d'],
-            'lesson_times' => ['integer', 'min:0', 'max:99'],
             'confirm_date' => ['date_format:Y-m-d'],
             'status' => ['integer', 'in:0,1']
         ];

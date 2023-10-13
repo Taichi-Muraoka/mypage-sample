@@ -183,25 +183,24 @@ trait FuncInvoiceTrait
 
         // 右上のロゴの表示(HTMLでは難しいのでここで指定)
         // writeHTMLの内容が長すぎる場合、2ページ目にも表示されるので、2ページ目が想定される場合は対応が必要
-        $pdf->Image(resource_path('pdf/testea_logo.png'), 155, 10, 45.0);
-        //$pdf->Image(resource_path('pdf/free-dial.png'), 149, 30.5, 5.0);
+        $pdf->Image(resource_path('pdf/testea_logo.png'), 150, 10, 48.0);
 
-        //$pdf->SetFont('ipaexg', '', 12);
-        //$pdf->SetXY(148, 15);
-        //$pdf->Write(1, '個別指導塾TESTEA（久我山校）');
+        $pdf->SetFont('ipaexg', '', 10);
+        $pdf->SetXY(148, 26);
+        $pdf->Write(1, '個別指導塾テスティー株式会社');
 
-        $pdf->SetFont('ipaexg', '', 11);
-        $pdf->SetXY(155, 25);
-        $pdf->Write(1, '個別指導塾TESTEA');
+        $pdf->SetFont('ipaexg', '', 7);
+        $pdf->SetXY(148, 31);
+        $pdf->Write(1, '登録番号：T1011301018175');
 
-        $pdf->SetFont('ipaexg', '', 8);
-        $pdf->SetXY(155, 30);
+        $pdf->SetFont('ipaexg', '', 7);
+        $pdf->SetXY(148, 35.5);
         $pdf->Write(1, '〒168-0082');
 
-        $pdf->SetFont('ipaexg', '', 9);
-        $pdf->SetXY(155, 34);
+        $pdf->SetFont('ipaexg', '', 8);
+        $pdf->SetXY(148, 39);
         $pdf->Write(1, '東京都杉並区久我山2-16-27');
-        $pdf->SetXY(155, 38);
+        $pdf->SetXY(148, 43);
         $pdf->Write(1, '関口花園ビル2F');
 
         $date_str = $data['invoice']->invoice_date->format('Y年m月');

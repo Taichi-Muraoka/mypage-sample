@@ -15,13 +15,11 @@
 
         {{-- トータル件数を表示する --}}
         @can('admin')
-        @if (!request()->routeIs('master_mng_booth'))
         @if ($mock)
         {{-- モック --}}
         <span class="text-muted">20件</span>
         @else
         <span class="text-muted" v-cloak>@{{paginator.total}}</span>
-        @endif
         @endif
         @endcan
 
