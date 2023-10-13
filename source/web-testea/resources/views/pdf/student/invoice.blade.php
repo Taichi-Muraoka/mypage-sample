@@ -23,6 +23,7 @@
 <br>
 <br>
 <br>
+<br>
 <p style="text-align:center;font-size:14pt;text-decoration: underline;">{{$invoice->invoice_date->format('Y年n月')}}分 お月謝のお知らせ</p>
 
 <table>

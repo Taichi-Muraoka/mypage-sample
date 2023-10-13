@@ -21,9 +21,9 @@
 @php( $password_reset_url = $password_reset_url ? url($password_reset_url) : '' )
 @endif
 
-{{-- メッセージ変更 --}}
+{{-- メッセージ変更->非表示 --}}
 {{--@section('auth_header', __('adminlte::adminlte.login_message'))--}}
-@section('auth_header', 'マイページへログイン')
+{{--@section('auth_header', 'マイページへログイン')--}}
 
 @section('auth_body')
 <form action="{{ $login_url }}" method="post">

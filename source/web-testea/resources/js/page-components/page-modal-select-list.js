@@ -101,8 +101,10 @@ export default class PageModalSelectList extends PageComponentBase {
                     this.vueSearchForm.initSearchCond();
                     this.vueSearchForm.searchListClear();
 
-                    // 検索する
-                    this.vueSearchForm.execSearch();
+                    // 画面読み込み時には検索しない
+                    if (option["initSearch"]) {
+                        this.vueSearchForm.execSearch();
+                    }
                 },
             },
         };
