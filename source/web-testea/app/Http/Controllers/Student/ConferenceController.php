@@ -217,11 +217,11 @@ class ConferenceController extends Controller
         // その他を第二引数で指定する
         $rules += Conference::fieldRules('student_id', [$validationStudentList]);
         $rules += Conference::fieldRules('campus_cd', ['required', $validationRoomList]);
-        $rules += ConferenceDate::fieldRules('conference_date', ['required', $validationDateTime]);
+        $rules += ConferenceDate::fieldRules('conference_date', ['required']);
         $rules += ConferenceDate::fieldRules('start_time', ['required', $validationDateTime]);
-        $rules += ['conference_date2' => ['required_with:start_time2', 'date_format:Y-m-d', $validationDateTime2]];
+        $rules += ['conference_date2' => ['required_with:start_time2', 'date_format:Y-m-d']];
         $rules += ['start_time2'=> ['required_with:conference_date2', 'vdTime', $validationDateTime2]];
-        $rules += ['conference_date3' => ['required_with:start_time3', 'date_format:Y-m-d', $validationDateTime3]];
+        $rules += ['conference_date3' => ['required_with:start_time3', 'date_format:Y-m-d']];
         $rules += ['start_time3'=> ['required_with:conference_date3', 'vdTime', $validationDateTime3]];
 
         return $rules;
