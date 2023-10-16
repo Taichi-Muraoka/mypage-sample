@@ -20,6 +20,7 @@ use App\Models\AdminUser;
 use App\Models\Schedule;
 use App\Models\ClassMember;
 use App\Models\Account;
+use App\Models\MstGrade;
 use App\Models\YearlySchedule;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -598,6 +599,29 @@ trait CtrlModelTrait
         }
 
         return $arrStudents;
+    }
+
+    /**
+     * 学年プルダウンメニューのリストを取得
+     * 管理者向け
+     *
+     * @param int $ schoolKind 学校区分 省略可
+     * @return array
+     */
+    protected function mdlGetGradeList($schoolKind = null)
+    {
+        $query = MstGrade::query();
+
+        // 学校区分が指定された場合絞り込み
+        $query->when($schoolKind, function ($query) use ($schoolKind) {
+            return $query->where('school_kind', $schoolKind);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('grade_cd as code', 'name as value')
+            ->orderby('grade_cd')
+            ->get()
+            ->keyBy('code');
     }
 
     //------------------------------
