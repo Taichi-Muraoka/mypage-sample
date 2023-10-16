@@ -106,7 +106,7 @@ class MstBooth extends Model
             'booth_id' => ['integer'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
             'booth_cd' => ['string', 'max:3', 'digits:3'],
-            'usage_kind' => ['integer', 'in:1,2,3,4,5'],
+            'usage_kind' => ['integer'],
             'name' => ['string', 'max:50'],
             'disp_order' => ['integer']
         ];

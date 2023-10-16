@@ -108,7 +108,7 @@ class Notice extends Model
             'notice_id' => ['integer'],
             'title' => ['string', 'max:50'],
             'text' => ['string', 'max:1000'],
-            'notice_type' => ['integer', 'in:4,5,6,7,8,9,10'],
+            'notice_type' => ['integer'],
             'adm_id' => ['integer'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
             'regist_time' => ['date_format:Y-m-d H:i:s']

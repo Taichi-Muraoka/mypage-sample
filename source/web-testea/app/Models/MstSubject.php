@@ -46,7 +46,8 @@ class MstSubject extends Model
      */
     protected $fillable = [
         'subject_cd',
-        'name'
+        'name',
+        'short_name'
     ];
 
     /**
@@ -101,7 +102,8 @@ class MstSubject extends Model
     {
         static $_fieldRules = [
             'campus_cd' => ['string', 'max:3', 'digits:3'],
-            'name' => ['string', 'max:30']
+            'name' => ['string', 'max:30'],
+            'short_name' => ['string', 'max:10']
         ];
         return $_fieldRules;
     }

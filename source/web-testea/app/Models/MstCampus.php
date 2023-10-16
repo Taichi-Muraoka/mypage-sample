@@ -111,7 +111,7 @@ class MstCampus extends Model
             'email_campus' => ['string', 'email:rfc,filter', 'max:100'],
             'tel_campus' => ['string', 'max:20', 'vdTelephone'],
             'disp_order' => ['integer'],
-            'is_hidden' => ['integer', 'in:0,1']
+            'is_hidden' => ['integer']
         ];
         return $_fieldRules;
     }

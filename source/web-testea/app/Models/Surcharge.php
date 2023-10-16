@@ -119,15 +119,15 @@ class Surcharge extends Model
             'tutor_id' => ['integer'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
             'apply_date' => ['date_format:Y-m-d'],
-            'surcharge_kind' => ['integer', 'in:11,12,13,14,21,22,31,32'],
+            'surcharge_kind' => ['integer'],
             'working_date' => ['date_format:Y-m-d'],
             'start_time' => ['vdTime'],
             'minutes' => ['integer'],
             'tuition' => ['integer', 'min:0', 'max:99999999'],
             'comment' => ['string', 'max:1000'],
-            'approval_status' => ['integer', 'in:1,2,3'],
+            'approval_status' => ['integer'],
             'payment_date' => ['date_format:Y-m-d'],
-            'payment_status' => ['integer', 'in:0,1'],
+            'payment_status' => ['integer'],
             'admin_comment' => ['string', 'max:1000'],
         ];
         return $_fieldRules;

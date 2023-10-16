@@ -109,7 +109,7 @@ class ExtraClassApplication extends Model
             'extra_apply_id' => ['integer'],
             'student_id' => ['integer'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
-            'status' => ['integer', 'in:0,1'],
+            'status' => ['integer'],
             'schedule_id' => ['integer'],
             'request' => ['string', 'max:1000'],
             'apply_date' => ['date_format:Y-m-d'],

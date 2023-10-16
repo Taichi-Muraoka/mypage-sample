@@ -105,7 +105,7 @@ class MstSystem extends Model
             'name' => ['string', 'max:50'],
             'value_num' => ['integer'],
             'value_str' => ['string', 'max:50'],
-            'change_flg' => ['integer', 'in:0,1']
+            'change_flg' => ['integer']
         ];
         return $_fieldRules;
     }

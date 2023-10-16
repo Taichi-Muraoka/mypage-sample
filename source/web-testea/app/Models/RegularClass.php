@@ -127,7 +127,7 @@ class RegularClass extends Model
             'student_id' => ['integer'],
             'tutor_id' => ['integer'],
             'subject_cd' => ['string', 'max:3', 'digits:3'],
-            'how_to_kind'  => ['integer', 'in:0,1,2,3,4']
+            'how_to_kind'  => ['integer']
         ];
         return $_fieldRules;
     }

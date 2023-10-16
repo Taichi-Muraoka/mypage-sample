@@ -110,7 +110,7 @@ class Score extends Model
         static $_fieldRules = [
             'score_id' => ['integer'],
             'student_id' => ['integer'],
-            'exam_type' => ['integer', 'in:1,2,3'],
+            'exam_type' => ['integer'],
             'regular_exam_cd' => ['integer'],
             'practice_exam_name' => ['string', 'max:50'],
             'term_cd' => ['integer'],

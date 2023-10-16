@@ -101,7 +101,7 @@ class SalaryImport extends Model
         static $_fieldRules = [
             'salary_date' => ['date_format:Y-m-d'],
             'payment_date' => ['date_format:Y-m-d'],
-            'import_state' => ['integer', 'in:0,1'],
+            'import_state' => ['integer'],
             'import_date' => ['date_format:Y-m-d H:i:s']
         ];
         return $_fieldRules;
