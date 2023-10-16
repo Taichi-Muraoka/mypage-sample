@@ -285,8 +285,6 @@ class RecordController extends Controller
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        $this->debug(now()->format('H:i:00'));
-
         $record = new Record;
 
         $record->student_id = $request['student_id'];
