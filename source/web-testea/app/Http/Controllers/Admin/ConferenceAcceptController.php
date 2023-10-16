@@ -10,6 +10,8 @@ use App\Models\TransferApply;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
 use App\Models\CodeMaster;
+use App\Models\Conference;
+use App\Models\ConferenceDate;
 use App\Models\ExtRirekisho;
 use App\Models\Notice;
 use Illuminate\Support\Facades\Auth;
@@ -53,12 +55,16 @@ class ConferenceAcceptController extends Controller
         $rooms = $this->mdlGetRoomList(true);
 
         // ステータスプルダウン
-        $states = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_1);
+        $states = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_5);
+
+        // 生徒リストを取得
+        $studentList = $this->mdlGetStudentList();
 
         return view('pages.admin.conference_accept', [
             'rules' => $this->rulesForSearch(),
             'rooms' => $rooms,
             'states' => $states,
+            'studentList' => $studentList,
             'editData' => null
         ]);
     }
@@ -85,7 +91,69 @@ class ConferenceAcceptController extends Controller
     public function search(Request $request)
     {
         // バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForSearch())->validate();
+        Validator::make($request->all(), $this->rulesForSearch($request))->validate();
+
+        // formを取得
+        $form = $request->all();
+
+        // クエリを作成
+        $query = Conference::query();
+
+        // MEMO: 一覧検索の条件はスコープで指定する
+        // 校舎の絞り込み条件
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithRoomCd());
+        } else {
+            // 本部管理者の場合検索フォームから取得
+            $query->SearchCampusCd($form);
+        }
+
+        // ステータスの絞り込み条件
+        $query->SearchStatus($form);
+
+        // 生徒の絞り込み条件
+        $query->SearchStudentId($form);
+
+        // 連絡日の絞り込み条件
+        $query->SearchConferenceDateFrom($form);
+        $query->SearchConferenceDateTo($form);
+
+        // 校舎名取得のサブクエリ
+        $campus_names = $this->mdlGetRoomQuery();
+
+        $conferenceList = $query
+            ->select(
+                'conferences.conference_id',
+                'conferences.student_id',
+                // 生徒情報の名前
+                'students.name as student_name',
+                'conferences.campus_cd',
+                // 校舎の名称
+                'campus_names.room_name as campus_name',
+                'conferences.status',
+                // コードマスタの名称（バッジ種別）
+                'mst_codes.name as status_name',
+                'conferences.conference_date',
+                'conferences.apply_date',
+                'conferences.start_time',
+                'conferences.conference_schedule_id'
+            )
+            // 校舎名の取得
+            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
+                $join->on('conferences.campus_cd', '=', 'campus_names.code');
+            })
+            // 生徒名を取得
+            ->sdLeftJoin(Student::class, 'conferences.student_id', '=', 'students.student_id')
+            // コードマスターとJOIN
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('conferences.status', '=', 'mst_codes.code')
+                    ->where('data_type', AppConst::CODE_MASTER_5);
+            })
+            ->orderby('apply_date', 'desc')->orderby('conference_id', 'asc');
+
+        // $this->debug($conferenceList);
+
         // ページネータで返却（モック用）
         return $this->getListAndPaginatorMock();
     }
