@@ -11,11 +11,13 @@ use App\Models\Schedule;
 use App\Models\ClassMember;
 use App\Models\Tutor;
 use App\Models\MstCourse;
+use App\Models\MstBooth;
 use App\Http\Controllers\Traits\FuncCalendarTrait;
 use App\Http\Controllers\Traits\FuncScheduleTrait;
 use Illuminate\Support\Facades\Lang;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Libs\AuthEx;
 
 /**
  * 教室カレンダー - コントローラ
@@ -49,61 +51,121 @@ class RoomCalendarController extends Controller
     //==========================
 
     /**
-     * カレンダー
+     * カレンダー初期画面
      *
-     * @param int $sid 生徒Id
      * @return view
      */
     public function calendar()
     {
 
-        //        // IDのバリデーション
-        //        $this->validateIds($roomcd);
-
         // 教室リストを取得
-        //$rooms = $this->mdlGetRoomList(false);
-
-        // 当日日付を取得
-        //$today = null;
-        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        //$this->guardRoomAdminRoomcd($roomcd);
-        //$roomcd = $rooms[0]->roomcd;
-        $roomcd = 110;
-        // 教室名を取得する
-        //$roomName = $this->($roomcd);
+        $rooms = $this->mdlGetRoomList(false);
 
         return view('pages.admin.room_calendar', [
-            //'rooms' => $rooms,
-            //'name' => $roomName,
+            'rooms' => $rooms,
             'editData' => [
-                'roomcd' => $roomcd,
-                'curDate' => null
+                'target_date' => null
             ]
         ]);
+
     }
 
     /**
-     * カレンダー取得
+     * カレンダー
+     *
+     * @param string $campusCd 校舎コード
+     * @param string $dateStr 日付文字列(年月日)
+     * @return view
+     */
+    public function calendarBack($campusCd, $dateStr)
+    {
+        // パラメータ取得・日時切り分け
+        $date = substr($dateStr, 0, 4) . '-' . substr($dateStr, 4, 2) . '-' . substr($dateStr, 6, 2);
+
+        $param = [
+            'campus_cd' => $campusCd,
+            'target_date' => $date,
+        ];
+
+        // パラメータのバリデーション
+        //$this->validateFromParam($param, $this->rulesForNew($param));
+        // 日付型に変換
+        $targetDate = new Carbon($date);
+
+        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        $this->guardRoomAdminRoomcd($campusCd);
+
+        // 教室リストを取得
+        $rooms = $this->mdlGetRoomList(false);
+
+        return view('pages.admin.room_calendar', [
+            'rooms' => $rooms,
+            'editData' => [
+                'campus_cd' => $campusCd,
+                //'target_date' => $targetDate
+                'target_date' => $date
+            ]
+        ]);
+        
+    }
+
+    /**
+     * ブース情報取得
      *
      * @param \Illuminate\Http\Request $request リクエスト
-     * @return int 生徒Id
+     * @return object ブース情報
+     */
+    public function getBooth(Request $request)
+    {
+
+        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        $campusCd = $request->input('campus_cd');
+        $this->guardRoomAdminRoomcd($campusCd);
+
+        // クエリを作成
+        $query = MstBooth::query();
+
+        // 校舎の絞り込み条件
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithRoomCd());
+        }
+        $query->where('campus_cd', $campusCd);
+
+        // データを取得
+        $mstBooth = $query
+            ->select(
+                'mst_booths.booth_cd as id',
+                'mst_booths.name as title',
+                'mst_booths.disp_order',
+            )
+            ->orderby('disp_order')
+            ->get();
+
+        // 固定の仮ブース情報を付加
+        $mstBooth->prepend(config('appconf.timetable_booth'));
+        $mstBooth->push(config('appconf.transfer_booth'));
+
+        return $mstBooth;
+    }
+
+    /**
+     * カレンダー情報取得
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return object カレンダー情報
      */
     public function getCalendar(Request $request)
     {
 
-        // バリデーション。NGの場合はレスポンスコード422を返却
-        //Validator::make($request->all(), $this->rulesForCalendar())->validate();
-
-        // IDのバリデーション
-        //$this->validateIdsFromRequest($request, 'sid');
-
-        $roomcd = $request->input('roomcd');
+        // タイムスタンプのバリデーション。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForCalendar())->validate();
 
         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        //$this->guardRoomAdminRoomcd($roomcd);
+        $campusCd = $request->input('campus_cd');
+        $this->guardRoomAdminRoomcd($campusCd);
 
-        //return $this->getRoomCalendar($request, $roomcd, false);
-        return;
+        return $this->getRoomCalendar($request);
     }
 
     //==========================
@@ -662,7 +724,7 @@ class RoomCalendarController extends Controller
 
         //$editData = [
         //    'roomcd' => $extSchedule['roomcd'],
-        //    'curDate' => $extSchedule['lesson_date'],
+        //    'target_date' => $extSchedule['lesson_date'],
         //    'start_time' => $extSchedule['start_time'],
         //    'end_time' => $extSchedule['end_time'],
         //];

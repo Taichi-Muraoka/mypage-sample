@@ -258,7 +258,7 @@ body {
 */
 .login-page,
 .register-page {
-    background: $testea-color;
+    background-color: $testea-color;
 }
 
 /* ログイン画面のタイトルなどの幅 */
@@ -383,59 +383,33 @@ label:not(.form-check-label):not(.custom-file-label) {
 
 /* 時間割の背景色 */
 [id^="calendar"] .cal_period {
-//    background: #0073b7;
-//    border-color: #0073b7;
     background: #00205b;
     border-color: #00205b;
     font-size: 1em !important;
 }
 
+/* 休業日の予定の背景色 */
+[id^="calendar"] .cal_closed {
+    background: #474747;
+    border-color: #474747;
+    font-size: 1.15em !important;
+    padding : 5px;
+}
+
 /* 個別授業の予定の背景色 */
 [id^="calendar"] .cal_class {
-    //background: #f39c12;
-    //border-color: #f39c12;
     background: #0073b7;
     border-color: #0073b7;
 }
 
-/* 個別授業 振替日の予定の背景色 */
-[id^="calendar"] .cal_class_furikae {
-//    background: #8b9b00;
-//    border-color: #8b9b00;
-    background: #7ac143;
-    border-color: #7ac143;
-}
-
-/* 個別授業 後日振替の予定の背景色（短期講習も同様） */
-[id^="calendar"] .cal_class_gojitsu_furikae {
-    //background: #9e9e9e;
-    //border-color: #9e9e9e;
-    background: #6c757d;
-    border-color: #6c757d;
-}
-
 /* 集団授業の予定の背景色 */
 [id^="calendar"] .cal_group {
-    //background: #7507b4;
-    //border-color: #7507b4;
-//    background: #af0058;
-//    border-color: #af0058;
     background: #7507b4;
     border-color: #7507b4;
 }
 
-/* 短期講習 振替日の予定の背景色 */
-[id^="calendar"] .cal_tanki_koshu_furikae {
-//    background: #007932;
-//    border-color: #007932;
-    background: #af0058;
-    border-color: #af0058;
-}
-
 /* 演習の予定の背景色 */
 [id^="calendar"] .cal_ensyu {
-//    background: yellowgreen;
-//    border-color: yellowgreen;
     background: #7ac143;
     border-color: #7ac143;
 }
@@ -452,30 +426,18 @@ label:not(.form-check-label):not(.custom-file-label) {
 [id^="calendar"] .cal_three {
     background: #00a78e;
     border-color: #00a78e;
-//    background: yellow;
-//    border-color: yellow;
 }
 
 /* ハイプランの予定の背景色 */
 [id^="calendar"] .cal_highplan {
-    //background: salmon;
-    //border-color: salmon;
     background: #f39c12;
     border-color: #f39c12;
 }
 
 /* 自習の予定の背景色 */
 [id^="calendar"] .cal_jisyu {
-    //background: #0073b7;
-    //border-color: #0073b7;
     background: salmon;
     border-color: salmon;
-}
-
-/* イベントの予定の背景色 */
-[id^="calendar"] .cal_event {
-    background: orangered;
-    border-color: orangered;
 }
 
 /* 面談の背景色 */
@@ -486,16 +448,16 @@ label:not(.form-check-label):not(.custom-file-label) {
     border-color: #af0058;
 }
 
-/* 休業日の予定の背景色 */
-[id^="calendar"] .cal_closed {
-    background: #474747;
-    border-color: #474747;
+/* 振替中・未振替の予定の背景色 */
+[id^="calendar"] .cal_class_furikae {
+    background: #6c757d;
+    border-color: #6c757d;
 }
 
-/* マーカー表示（オンライン） */
-[id^="calendar"] .class_marker {
-    font-weight: bold;
-    background:linear-gradient(transparent 50%, yellow 85%);
+/* イベントの予定の背景色 */
+[id^="calendar"] .cal_event {
+    background: orangered;
+    border-color: orangered;
 }
 
 /* 授業特記表示（振替・初回・体験・追加） */
@@ -504,6 +466,12 @@ label:not(.form-check-label):not(.custom-file-label) {
     font-weight: bold;
     background: red;
     padding: 2px 2px;
+}
+
+/* マーカー表示（オンライン） */
+[id^="calendar"] .class_marker {
+    font-weight: bold;
+    background:linear-gradient(transparent 50%, yellow 85%);
 }
 
 /* fullcalendar v6 対応 */
