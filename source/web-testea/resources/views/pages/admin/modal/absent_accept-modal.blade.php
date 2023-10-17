@@ -31,6 +31,10 @@
         <td>CWテスト教師１０１</td>
     </tr>
     <tr>
+        <th>教科</th>
+        <td>数学</td>
+    </tr>
+    <tr>
         <th>欠席理由</th>
         <td class="nl2br">学校行事のため</td>
     </tr>

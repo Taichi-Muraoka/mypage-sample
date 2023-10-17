@@ -107,7 +107,7 @@ class TrainingContent extends Model
     {
         static $_fieldRules = [
             'trn_id' => ['integer'],
-            'trn_type' => ['integer', 'in:1,2'],
+            'trn_type' => ['integer'],
             'text' => ['string', 'max:1000'],
             'url' => ['string', 'max:1000'],
             'regist_time' => ['date_format:Y-m-d'],

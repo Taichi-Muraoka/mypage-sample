@@ -104,7 +104,7 @@ class SalaryMng extends Model
         static $_fieldRules = [
             'salary_date' => ['date_format:Y-m-d'],
             'confirm_date' => ['date_format:Y-m-d'],
-            'state' => ['integer', 'in:0,1,2'],
+            'state' => ['integer'],
         ];
         return $_fieldRules;
     }

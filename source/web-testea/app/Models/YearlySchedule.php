@@ -112,8 +112,8 @@ class YearlySchedule extends Model
             'school_year' => ['string', 'max:4', 'digits:4'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
             'lesson_date' => ['date_format:Y-m-d'],
-            'day_cd' => ['integer', 'in:1,2,3,4,5,6,7'],
-            'date_kind' => ['integer', 'in:0,1,2,3,9'],
+            'day_cd' => ['integer'],
+            'date_kind' => ['integer'],
             'school_month' => ['string', 'max:2', 'digits:2'],
             'week_count' => ['integer'],
         ];

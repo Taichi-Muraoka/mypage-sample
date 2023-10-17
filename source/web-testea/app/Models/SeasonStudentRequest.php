@@ -113,8 +113,8 @@ class SeasonStudentRequest extends Model
             'campus_cd' => ['string', 'max:2', 'digits:2'],
             'apply_date' => ['date_format:Y-m-d'],
             'comment' => ['string', 'max:1000'],
-            'regist_status' => ['integer', 'in:0,1'],
-            'plan_status' => ['integer', 'in:0,1,2']
+            'regist_status' => ['integer'],
+            'plan_status' => ['integer']
         ];
         return $_fieldRules;
     }

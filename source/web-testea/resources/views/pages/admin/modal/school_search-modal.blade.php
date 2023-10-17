@@ -9,26 +9,20 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="kinds" caption="学校種" :select2=true>
-                <option value="1">小学校</option>
-                <option value="2">中学校</option>
-                <option value="3">高校</option>
-            </x-input.select>
+            <x-input.select id="school_kind_cd" caption="学校種" :select2=true :mastrData=$schoolKindList
+            :select2Search=false :blank=true />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="division" caption="設置区分" :select2=true>
-                <option value="1">国立</option>
-                <option value="2">公立</option>
-                <option value="3">私立</option>
-            </x-input.select>
+            <x-input.select id="establish_kind" caption="設置区分" :select2=true :mastrData=$establishKindList
+            :select2Search=false :blank=true />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.text id="school_id" caption="学校コード" :rules=$rules />
+            <x-input.text id="school_cd" caption="学校コード" :rules=$rulesSchool/>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="school_name" caption="学校名" :rules=$rules />
+            <x-input.text id="name" caption="学校名" :rules=$rulesSchool/>
         </x-bs.col2>
     </x-bs.row>
 
@@ -51,13 +45,13 @@
 
         {{-- テーブル行 --}}
         <tr v-for="item in paginator.data" v-cloak>
-            <td>@{{item.school_code}}</td>
-            <td>@{{item.school_type}}</td>
-            <td>@{{item.school_div}}</td>
+            <td>@{{item.school_cd}}</td>
+            <td>@{{item.school_kind_name}}</td>
+            <td>@{{item.establish_name}}</td>
             <td>@{{item.school_name}}</td>
             <td>
                 <x-button.list-select
-                    :vueDataAttr="['school_id' => 'item.school_id', 'school_name' => 'item.school_name']" />
+                    :vueDataAttr="['school_cd' => 'item.school_cd', 'school_name' => 'item.school_name']" />
             </td>
         </tr>
 

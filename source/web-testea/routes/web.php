@@ -1037,6 +1037,12 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/give_badge/search', [GiveBadgeController::class, 'search'])->name('give_badge-search');
 
+    // 詳細取得用（CSV出力）
+    Route::post('/give_badge/get_data', [GiveBadgeController::class, 'getData'])->name('give_badge-get_data');
+
+    // モーダル処理（CSV出力）
+    Route::post('/give_badge/exec_modal', [GiveBadgeController::class, 'execModal'])->name('give_badge-exec_modal');
+
     //---------------------
     // 講師管理 登録・編集・詳細・所属・カレンダー・空き時間・給与表示
     //---------------------

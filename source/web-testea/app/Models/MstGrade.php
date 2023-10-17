@@ -102,7 +102,7 @@ class MstGrade extends Model
     {
         static $_fieldRules = [
             'grade_cd' => ['integer'],
-            'school_kind' => ['integer', 'in:1,2,3,4'],
+            'school_kind' => ['integer'],
             'name' => ['string', 'max:30'],
             'short_name' => ['string', 'max:10'],
             'age' => ['integer']

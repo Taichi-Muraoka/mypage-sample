@@ -102,7 +102,7 @@ class NoticeDestination extends Model
         static $_fieldRules = [
             'notice_id' => ['integer'],
             'destination_seq' => ['integer'],
-            'destination_type' => ['integer', 'in:1,2,3,4'],
+            'destination_type' => ['integer'],
             'student_id' => ['integer'],
             'tutor_id' => ['integer'],
             'notice_group_id' => ['integer'],

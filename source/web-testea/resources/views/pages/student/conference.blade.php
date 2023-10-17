@@ -12,37 +12,34 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.select id="school" caption="校舎" :select2=true :select2Search=false :blank=false>
-        <option value="1">久我山</option>
-        <option value="2">西永福</option>
-        <option value="3">本郷</option>
-    </x-input.select>
+    <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+        :select2Search=false :blank=true />
 
     {{-- 第１希望日 --}}
     {{-- id="preferred_date" --}}
     <x-bs.card>
-        <x-input.date-picker caption="第１希望日" id="preferred_date1" :editData=$editData />
+        <x-input.date-picker caption="第１希望日" id="conference_date" :editData=$editData />
 
-        <x-input.time-picker caption="開始時刻" id="start_time1" :rules=$rules :editData=$editData />
+        <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules :editData=$editData />
     </x-bs.card>
 
     {{-- 第２希望日 --}}
     <x-bs.card>
-        <x-input.date-picker caption="第２希望日" id="preferred_date2" :editData=$editData />
+        <x-input.date-picker caption="第２希望日" id="conference_date2" :editData=$editData />
 
         <x-input.time-picker caption="開始時刻" id="start_time2" :rules=$rules :editData=$editData />
     </x-bs.card>
 
     {{-- 第３希望日 --}}
     <x-bs.card>
-        <x-input.date-picker caption="第３希望日" id="preferred_date3" :editData=$editData />
+        <x-input.date-picker caption="第３希望日" id="conference_date3" :editData=$editData />
 
         <x-input.time-picker caption="開始時刻" id="start_time3" :rules=$rules :editData=$editData />
     </x-bs.card>
 
     その他特記事項などありましたらご記載ください。
     {{-- id="notices" 特記事項 --}}
-    <x-input.textarea caption="" id="notices" :rules=$rules />
+    <x-input.textarea caption="" id="comment" :rules=$rules />
 
     {{-- フッター --}}
     <x-slot name="footer">

@@ -108,8 +108,8 @@ class Badge extends Model
             'badge_id' => ['integer'],
             'student_id' => ['integer'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
-            'badge_type' => ['integer', 'in:1,2,3,4'],
-            'reason' => ['string', 'max:1000'],
+            'badge_type' => ['integer'],
+            'reason' => ['string', 'max:30'],
             'authorization_date' => ['date_format:Y-m-d'],
             'adm_id' => ['integer']
         ];
@@ -119,5 +119,64 @@ class Badge extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
+    /**
+     * 検索 校舎コード
+     */
+    public function scopeSearchCampusCd($query, $obj)
+    {
+        $key = 'campus_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 
+    /**
+     * 検索 生徒ID
+     */
+    public function scopeSearchStudentId($query, $obj)
+    {
+        $key = 'student_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 バッジ種別
+     */
+    public function scopeSearchBadgeType($query, $obj)
+    {
+        $key = 'badge_type';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 認定日From
+     */
+    public function scopeSearchAuthorizationDateFrom($query, $obj)
+    {
+        $key = 'authorization_date_from';
+        // Ymdに変換して検索する
+        $col = $this->mdlFormatYmd('authorization_date');
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, '>=', $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 認定日To
+     */
+    public function scopeSearchAuthorizationDateTo($query, $obj)
+    {
+        $key = 'authorization_date_to';
+        // Ymdに変換して検索する
+        $col = $this->mdlFormatYmd('authorization_date');
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, '<=', $obj[$key]);
+        }
+    }
 }
