@@ -14,8 +14,6 @@ use App\Models\ClassMember;
 use App\Models\MstCourse;
 use App\Models\MstSubject;
 use App\Models\MstText;
-use App\Models\MstUnitCategory;
-use App\Models\MstUnit;
 use App\Models\CodeMaster;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
@@ -58,7 +56,7 @@ class ReportRegistController extends Controller
         $courses = $this->mdlGetCourseList();
 
         // 報告書承認リストを取得（サブコード指定で絞り込み）
-        $subCodes = [1];
+        $subCodes = [AppConst::CODE_MASTER_4_SUB_1];
         $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4, $subCodes);
 
         return view('pages.tutor.report_regist', [
@@ -378,15 +376,63 @@ class ReportRegistController extends Controller
             })
             ->firstOrFail();
         
-        // 教材を取得
-        $textQuery = MstText::query();
-        $texts = $textQuery
-            ->where('mst_texts.l_subject_cd', '=', $lesson->subject_cd)
-            ->get();
-        
-        $this->debug($texts);
+        // 教材リストを取得（授業科目コード指定）
+        $texts = $this->mdlGetTextList($lesson->subject_cd, null, null);
 
-        return $lesson;
+        return [
+            'campus_name' => $lesson->campus_name,
+            'course_name' => $lesson->course_name,
+            'student_name' => $lesson->student_name,
+            'subject_name' => $lesson->subject_name,
+            'selectItems' => $this->objToArray($texts)
+        ];
+    }
+
+    /**
+     * 単元分類情報取得（教材リスト選択時）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 単元分類リスト
+     */
+    public function getDataSelectText(Request $request)
+    {
+        // 教材コードを取得
+        $textCd = $request->input('text_cd');
+
+        $query = MstText::query();
+        $text = $query
+            ->select(
+                'grade_cd',
+                't_subject_cd'
+            )
+            ->where('text_cd', '=', $textCd)
+            ->firstOrFail();
+        
+        // 単元分類リストを取得
+        $categores = $this->mdlGetUnitCategoryList($text->grade_cd, $text->t_subject_cd);
+
+        return [
+            'selectItems' => $this->objToArray($categores)
+        ];
+    }
+
+    /**
+     * 単元情報取得（単元分類リスト選択時）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 単元リスト
+     */
+    public function getDataSelectCategory(Request $request)
+    {
+        // 単元分類コードを取得
+        $categoryCd = $request->input('unit_category_cd');
+
+        // 単元リストを取得
+        $units = $this->mdlGetUnitList($categoryCd);
+
+        return [
+            'selectItems' => $this->objToArray($units)
+        ];
     }
 
     /**
@@ -446,9 +492,9 @@ class ReportRegistController extends Controller
             'editData' => null,
             'rules' => $this->rulesForInput(null),
             'lesson_list' => $lesson_list,
-            'student_list' => $students,
-            'minutes_list' => $minutes,
-            'parents_comment' => null
+            //'student_list' => $students,
+            //'minutes_list' => $minutes,
+            //'parents_comment' => null
         ]);
     }
 
