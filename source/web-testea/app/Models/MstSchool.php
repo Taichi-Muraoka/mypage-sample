@@ -168,10 +168,12 @@ class MstSchool extends Model
      */
     public function scopeSearchSchoolName($query, $obj)
     {
-        $key = 'name';
+        // 学校検索モーダルのinput_textでidとして使う名前が異なるため、テーブル項目名を$dbKeyで指定した
+        $key = 'school_name';
+        $dbKey = 'name';
         if (isset($obj[$key]) && filled($obj[$key])) {
             // nameが他と被らないよう、テーブル名を指定した
-            $query->where($this->getTable() . '.' . $key, 'LIKE',  '%' . $obj[$key] . '%');
+            $query->where($this->getTable() . '.' . $dbKey, 'LIKE',  '%' . $obj[$key] . '%');
         }
     }
 }
