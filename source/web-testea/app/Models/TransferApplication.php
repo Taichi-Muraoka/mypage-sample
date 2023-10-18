@@ -50,7 +50,7 @@ class TransferApplication extends Model
         'student_id',
         'tutor_id',
         'transfer_reason',
-        'transfer_date',
+        'apply_date',
         'monthly_count',
         'approval_status',
         'confirm_date_id',
@@ -66,7 +66,7 @@ class TransferApplication extends Model
      * @var array
      */
     protected $casts = [
-        'transfer_date' => 'date'
+        'apply_date' => 'date'
     ];
 
     /**
@@ -117,6 +117,7 @@ class TransferApplication extends Model
             'student_id' => ['integer'],
             'tutor_id' => ['integer'],
             'transfer_reason' => ['string', 'max:1000'],
+            'apply_date' => ['date_format:Y-m-d'],
             'monthly_count' => ['integer'],
             'approval_status' => ['integer'],
             'confirm_date_id' => ['integer'],
