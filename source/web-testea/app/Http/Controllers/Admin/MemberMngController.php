@@ -7,17 +7,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtRoom;
-use App\Models\ExtGenericMaster;
 use App\Models\Invoice;
 use App\Models\Account;
+use App\Models\MstCampus;
+use App\Models\Student;
+use App\Models\StudentCampus;
+use App\Models\MstSchool;
+use App\Models\CodeMaster;
 use App\Http\Controllers\Traits\FuncCalendarTrait;
 use App\Http\Controllers\Traits\FuncInvoiceTrait;
 use App\Http\Controllers\Traits\FuncAgreementTrait;
 use Illuminate\Support\Facades\Lang;
-use App\Models\MstSchool;
-use App\Models\CodeMaster;
 
 /**
  * 会員管理 - コントローラ
@@ -536,17 +536,32 @@ class MemberMngController extends Controller
      */
     public function new()
     {
+        // 校舎チェックボックスリストを取得
+        $rooms = $this->getCampusGroup();
+        // 学年リストを取得
+        $gradeList = $this->mdlGetGradeList();
+        // 受験生フラグリストを取得
+        $jukenFlagList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_13);
+        // ログインID種別リストを取得
+        $loginKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_8);
+        // 会員ステータスリストを取得（サブコード1のデータに絞る）
+        $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_28, [AppConst::CODE_MASTER_28_SUB_1]);
+
         // 学校検索モーダル用のデータ渡し
         // 学校種リストを取得
         $schoolKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_49);
-
         // 設置区分リストを取得
         $establishKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_50);
 
         return view('pages.admin.member_mng-input', [
             'editData' => null,
+            'editDataCampus' => null,
             'rules' => $this->rulesForInput(null),
-
+            'rooms' => $rooms,
+            'gradeList' => $gradeList,
+            'jukenFlagList' => $jukenFlagList,
+            'loginKindList' => $loginKindList,
+            'statusList' => $statusList,
             // 学校検索モーダル用のバリデーションルール
             'rulesSchool' => $this->rulesForSearchSchool(),
             'schoolKindList' => $schoolKindList,
@@ -562,6 +577,45 @@ class MemberMngController extends Controller
      */
     public function create(Request $request)
     {
+        $this->debug($request);
+        // 登録前バリデーション。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForInput($request))->validate();
+
+        $form = $request->only(
+            'name',
+            'name_kana',
+            'rooms',
+            'birth_date',
+            'grade_cd',
+            'grade_year',
+            'is_jukensei',
+            'school_cd_e',
+            'school_cd_j',
+            'school_cd_h',
+            'tel_stu',
+            'tel_par',
+            'email_stu',
+            'email_par',
+            'login_kind',
+            'stu_status',
+            'enter_date',
+            'lead_id',
+            'storage_link',
+            'memo',
+        );
+
+        //-------------------------
+        // 生徒情報の登録
+        //-------------------------
+        $student = new Student;
+
+        // 保存
+        // $student->fill($form)->save();
+
+        //-------------------------
+        // 生徒所属情報の登録
+        //-------------------------
+
         return;
     }
 
@@ -576,39 +630,93 @@ class MemberMngController extends Controller
         // IDのバリデーション
         $this->validateIds($sid);
 
-        // // 生徒情報を取得する
-        // $query = Student::query();
-        // $student = $query
-        //     ->select(
-        //         'name',
-        //         'cls_cd',
-        //         'mailaddress1'
-        //     )
-        //     ->where('ext_student_kihon.sid', '=', $sid)
-        //     ->firstOrFail();
+        // 校舎チェックボックスリストを取得
+        $rooms = $this->getCampusGroup();
+        // 学年リストを取得
+        $gradeList = $this->mdlGetGradeList();
+        // 受験生フラグリストを取得
+        $jukenFlagList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_13);
+        // ログインID種別リストを取得
+        $loginKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_8);
+        // 会員ステータスリストを取得
+        $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_28);
 
-        $editData = [
-            'sid' => $sid,
-            // 'name' => $student['name'],
-            // 'cls_cd' => $student['cls_cd'],
-            // 'email_student' => $student['mailaddress1'],
+        // 生徒情報を取得する
+        $query = Student::query();
+        $student = $query
+            ->select(
+                'student_id',
+                'students.name',
+                'name_kana',
+                'grade_cd',
+                'grade_year',
+                'birth_date',
+                'school_cd_e',
+                'school_cd_j',
+                'school_cd_h',
+                // 学校マスタの名称（小中高）
+                // 画面表示用に、学校名はtext_xxxのように指定する
+                'mst_schools_e.name as text_school_cd_e',
+                'mst_schools_j.name as text_school_cd_j',
+                'mst_schools_h.name as text_school_cd_h',
+                'is_jukensei',
+                'tel_stu',
+                'tel_par',
+                'email_stu',
+                'email_par',
+                'login_kind',
+                'stu_status',
+                'enter_date',
+                'leave_date',
+                'recess_start_date',
+                'recess_end_date',
+                'lead_id',
+                'storage_link',
+                'memo',
+            )
+            // 所属学校（小）の学校名の取得
+            ->sdLeftJoin(MstSchool::class, 'students.school_cd_e', '=', 'mst_schools_e.school_cd', 'mst_schools_e')
+            // 所属学校（中）の学校名の取得
+            ->sdLeftJoin(MstSchool::class, 'students.school_cd_j', '=', 'mst_schools_j.school_cd', 'mst_schools_j')
+            // 所属学校（高）の学校名の取得
+            ->sdLeftJoin(MstSchool::class, 'students.school_cd_h', '=', 'mst_schools_h.school_cd', 'mst_schools_h')
+            ->where('student_id', '=', $sid)
+            ->firstOrFail();
 
-            // TODO: サンプル。表示用(学校名)と、ID(学校ID)を指定する
-            // 学校名はtext_xxxのように指定する
-            'text_school_cd_e' => '東京都立青山高等学校',
-            'school_cd_e' => 99
-        ];
+        // 生徒所属校舎を取得する
+        $query = StudentCampus::query();
+        $studentCampus = $query
+            ->select(
+                'campus_cd',
+            )
+            ->where('student_id', '=', $sid)
+            ->get();
+
+        // 取得した校舎コードを配列で渡す：['01','02']
+        $editDataCampus = [];
+        foreach ($studentCampus as $campus) {
+            // 配列に追加
+            array_push($editDataCampus, $campus->campus_cd);
+        }
 
         // 学校検索モーダル用のデータ渡し
         // 学校種リストを取得
         $schoolKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_49);
-
         // 設置区分リストを取得
         $establishKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_50);
 
         return view('pages.admin.member_mng-input', [
-            'editData' => $editData,
+            'editData' => $student,
+            // MEMO:チェックボックス反映のためnameを指定する
+            'editDataCampus' => [
+                'rooms' => $editDataCampus
+            ],
             'rules' => $this->rulesForInput(null),
+            'rooms' => $rooms,
+            'gradeList' => $gradeList,
+            'jukenFlagList' => $jukenFlagList,
+            'loginKindList' => $loginKindList,
+            'statusList' => $statusList,
             // 学校検索モーダル用のバリデーションルール
             'rulesSchool' => $this->rulesForSearchSchool(),
             'schoolKindList' => $schoolKindList,
@@ -624,6 +732,7 @@ class MemberMngController extends Controller
      */
     public function update(Request $request)
     {
+        $this->debug($request);
         return;
     }
 
@@ -648,7 +757,7 @@ class MemberMngController extends Controller
     private function rulesForInput(?Request $request)
     {
         $rules = array();
-
+        $rules += Student::fieldRules('birth_date');
         return $rules;
     }
 
@@ -838,5 +947,23 @@ class MemberMngController extends Controller
             ->firstOrFail();
 
         return $student;
+    }
+
+    /**
+     * 校舎チェックボックスリストの取得
+     *
+     * @return array 校舎リスト
+     */
+    private function getCampusGroup()
+    {
+        return MstCampus::select(
+            'mst_campuses.campus_cd as code',
+            'name as value',
+            'disp_order'
+        )
+            // 非表示フラグの条件を付加
+            ->where('is_hidden', AppConst::CODE_MASTER_11_1)
+            ->orderBy('disp_order')
+            ->get();
     }
 }

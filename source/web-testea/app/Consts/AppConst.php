@@ -873,6 +873,11 @@ class AppConst
      */
     const CODE_MASTER_28_5 = 5;
 
+    /**
+     * 生徒会員ステータス サブコード 見込客・在籍
+     */
+    const CODE_MASTER_28_SUB_1 = 1;
+
     //-----------
     // 講師会員ステータス
     //-----------

@@ -20,57 +20,34 @@
     {{-- 編集時 --}}
     <p>以下の会員について、編集を行います。</p>
     <x-bs.form-title>生徒ID</x-bs.form-title>
-    <p class="edit-disp-indent">1</p>
+    <p class="edit-disp-indent">{{$editData['student_id']}}</p>
 
     @else
     {{-- 登録時 --}}
     <p>会員の登録を行います。</p>
-
     @endif
 
     {{-- 共通フォーム --}}
     <x-input.text caption="生徒名" id="name" :rules=$rules :editData=$editData/>
     <x-input.text caption="生徒名かな" id="name_kana" :rules=$rules :editData=$editData/>
 
-    <x-bs.form-group name="campas_groups">
-        <x-bs.form-title>所属校舎</x-bs.form-title>
-        {{-- 校舎チェックボックス --}}
-        <x-input.checkbox caption="久我山"
-                :id="'campas_group_' . '1'"
-                name="campas_groups" :value="1" />
-        <x-input.checkbox caption="西永福"
-                :id="'campas_group_' . '2'"
-                name="campas_groups" :value="2" />
-        <x-input.checkbox caption="下高井戸"
-                :id="'campas_group_' . '3'"
-                name="campas_groups" :value="3" />
-        <x-input.checkbox caption="駒込"
-                :id="'campas_group_' . '4'"
-                name="campas_groups" :value="4" />
-        <x-input.checkbox caption="日吉"
-                :id="'campas_group_' . '5'"
-                name="campas_groups" :value="5" />
-        <x-input.checkbox caption="自由が丘"
-                :id="'campas_group_' . '6'"
-                name="campas_groups" :value="6" />
+    <x-bs.form-title>所属校舎</x-bs.form-title>
+    <x-bs.form-group name="rooms">
+        {{-- 所属校舎チェックボックス --}}
+        @for ($i = 0; $i < count($rooms); $i++)
+        <x-input.checkbox :caption="$rooms[$i]->value"
+                :id="'rooms_' . $rooms[$i]->code"
+                name="rooms" :value="$rooms[$i]->code"
+                :editData=$editDataCampus/>
+        @endfor
     </x-bs.form-group>
 
-    <x-input.date-picker caption="生年月日" id="birth_date" />
-
-    {{-- <x-input.select caption="学年" id="grade_cd" :select2=true :blank=false :editData=$editData :mastrData=$classes/> --}}
-    <x-input.select id="grade_cd" caption="学年" :select2=true >
-        <option value="1">高3</option>
-        <option value="2">高2</option>
-        <option value="3">高1</option>
-        <option value="4">中3</option>
-        <option value="5">中2</option>
-        <option value="6">中1</option>
-    </x-input.select>
+    <x-input.date-picker caption="生年月日" id="birth_date" :editData=$editData/>
+    <x-input.select id="grade_cd" caption="学年" :select2=true :mastrData=$gradeList :editData=$editData
+        :select2Search=false :blank=true />
     <x-input.text caption="学年設定年度" id="grade_year" :rules=$rules :editData=$editData/>
-    <x-input.select caption="受験生フラグ" id="is_jukensei" :select2=true :blank=false :editData=$editData>
-        <option value="1">非受験生</option>
-        <option value="2">受験生</option>
-    </x-input.select>
+    <x-input.select id="is_jukensei" caption="受験生フラグ" :select2=true :mastrData=$jukenFlagList :editData=$editData
+        :select2Search=false :blank=true />
     <x-input.modal-select caption="所属学校（小）" id="school_cd_e" btnCaption="学校検索" :editData=$editData />
     <x-input.modal-select caption="所属学校（中）" id="school_cd_j" btnCaption="学校検索" :editData=$editData />
     <x-input.modal-select caption="所属学校（高）" id="school_cd_h" btnCaption="学校検索" :editData=$editData />
@@ -78,37 +55,32 @@
     <x-input.text caption="保護者電話番号" id="tel_par" :rules=$rules :editData=$editData/>
     <x-input.text caption="生徒メールアドレス" id="email_stu" :rules=$rules :editData=$editData/>
     <x-input.text caption="保護者メールアドレス" id="email_par" :rules=$rules :editData=$editData/>
-    <x-input.select caption="ログインID種別" id="login_kind" :select2=true :blank=false :editData=$editData>
-        <option value="1">生徒</option>
-        <option value="2">保護者</option>
-    </x-input.select>
+    <x-input.select id="login_kind" caption="ログインID種別" :select2=true :mastrData=$loginKindList :editData=$editData
+        :select2Search=false :blank=true />
+    <x-input.select id="stu_status" caption="会員ステータス" :select2=true :mastrData=$statusList :editData=$editData
+        :select2Search=false :blank=true />
+    <x-input.date-picker caption="入会日" id="enter_date" :editData=$editData/>
 
-    <x-input.select caption="会員ステータス" id="stu_status" :select2=true :blank=false :editData=$editData>
-        <option value="0">見込客</option>
-        <option value="1">在籍</option>
-        <option value="2">休塾予定</option>
-        <option value="3">休塾</option>
-        <option value="4">退会処理中</option>
-        <option value="5">退会</option>
-    </x-input.select>
-
-    <x-input.date-picker caption="入会日" id="enter_date" />
-
+    {{-- 編集画面の場合、かつ、会員ステータス＝休塾予定、休塾の場合に表示 --}}
     @if (request()->routeIs('member_mng-edit'))
-    <x-input.date-picker caption="退会日" id="leave_date" vShow="form.stu_status == 4 || form.stu_status == 5" />
+    <div v-cloak>
+        <x-input.date-picker caption="休塾開始日" id="recess_start_date" :editData=$editData
+            vShow="form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_2 }} || form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_3 }}"/>
+        <x-input.date-picker caption="休塾終了日" id="recess_end_date" :editData=$editData
+            vShow="form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_2 }} || form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_3 }}"/>
+    </div>
+
+    {{-- 編集画面の場合、かつ、会員ステータス＝退会処理中、退会済の場合に表示 --}}
+    <x-input.date-picker caption="退会日" id="leave_date" :editData=$editData
+        vShow="form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_4 }} || form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_5 }}"/>
     @endif
 
-    <div v-cloak>
-        <x-input.date-picker caption="休塾開始日" id="recess_start_date" vShow="form.stu_status == 2 || form.stu_status == 3"/>
-        <x-input.date-picker caption="休塾終了日" id="recess_end_date" vShow="form.stu_status == 2 || form.stu_status == 3"/>
-    </div>
-    <x-input.text caption="外部サービス顧客ID" id="external_id" :rules=$rules :editData=$editData/>
-    <x-input.text caption="ストレージURL" id="storage_url" :rules=$rules :editData=$editData/>
-
+    <x-input.text caption="外部サービス顧客ID" id="lead_id" :rules=$rules :editData=$editData/>
+    <x-input.text caption="ストレージURL" id="storage_link" :rules=$rules :editData=$editData/>
     <x-input.textarea id="memo" caption="メモ" :rules=$rules :editData=$editData />
 
     {{-- hidden --}}
-    <x-input.hidden id="sid" :editData=$editData />
+    <x-input.hidden id="student_id" :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">
@@ -119,8 +91,6 @@
             @if (request()->routeIs('member_mng-edit'))
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
-                {{-- 削除機能なし --}}
-                {{-- <x-button.submit-delete /> --}}
                 <x-button.submit-edit />
             </div>
             @else
