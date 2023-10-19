@@ -36,6 +36,10 @@
                 <th>コース</th>
                 <td>個別指導コース</td>
             </tr>
+            <tr>
+                <th>教科</th>
+                <td>数学</td>
+            </tr>
         </x-bs.table>
     </div>
 

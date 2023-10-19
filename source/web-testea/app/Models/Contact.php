@@ -115,7 +115,7 @@ class Contact extends Model
             'text' => ['string', 'max:1000'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
             'regist_time' => ['date_format:Y-m-d'],
-            'contact_state' => ['integer', 'in:0,1'],
+            'contact_state' => ['integer'],
             'adm_id' => ['integer'],
             'answer_text' => ['string', 'max:1000'],
             'answer_time' => ['date_format:Y-m-d'],

@@ -41,6 +41,10 @@
                 <th>講師名</th>
                 <td>CWテスト教師１０１</td>
             </tr>
+            <tr>
+                <th>教科</th>
+                <td>数学</td>
+            </tr>
         </x-bs.table>
     </div>
     {{-- 余白 --}}

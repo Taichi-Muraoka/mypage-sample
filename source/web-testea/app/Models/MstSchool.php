@@ -125,4 +125,55 @@ class MstSchool extends Model
         ];
         return $_fieldRules;
     }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+    /**
+     * 検索 学校種
+     */
+    public function scopeSearchSchoolKind($query, $obj)
+    {
+        $key = 'school_kind_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 設置区分
+     */
+    public function scopeSearchEstablishKind($query, $obj)
+    {
+        $key = 'establish_kind';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 学校コード
+     */
+    public function scopeSearchSchoolCd($query, $obj)
+    {
+        $key = 'school_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // school_cdが他と被らないよう、テーブル名を指定した
+            $query->where($this->getTable() . '.' . $key, 'LIKE',  '%' . $obj[$key] . '%');
+        }
+    }
+
+    /**
+     * 検索 学校名
+     */
+    public function scopeSearchSchoolName($query, $obj)
+    {
+        // 学校検索モーダルのinput_textでidとして使う名前が異なるため、テーブル項目名を$dbKeyで指定した
+        $key = 'school_name';
+        $dbKey = 'name';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // nameが他と被らないよう、テーブル名を指定した
+            $query->where($this->getTable() . '.' . $dbKey, 'LIKE',  '%' . $obj[$key] . '%');
+        }
+    }
 }

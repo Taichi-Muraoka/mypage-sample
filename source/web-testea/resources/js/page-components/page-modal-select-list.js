@@ -97,6 +97,10 @@ export default class PageModalSelectList extends PageComponentBase {
                     const sendData = self.getDatasFromButton(button);
                     this.modalButtonData = sendData;
 
+                    // エラーメッセージをクリアする
+                    this.vueSearchForm.form_err.msg = {};
+                    this.vueSearchForm.form_err.class = {};
+
                     // 検索条件・一覧をクリアする
                     this.vueSearchForm.initSearchCond();
                     this.vueSearchForm.searchListClear();

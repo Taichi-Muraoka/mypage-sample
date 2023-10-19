@@ -17,6 +17,7 @@ return new class extends Migration
             /* カラム */
             $table->string('subject_cd', 3)->comment('科目コード');
             $table->string('name', 30)->comment('名称');
+            $table->string('short_name', 10)->comment('略称');
             $table->timestamps();
             $table->softDeletes();
 

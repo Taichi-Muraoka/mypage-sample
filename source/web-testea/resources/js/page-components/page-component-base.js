@@ -133,26 +133,12 @@ export default class PageComponentBase {
      * Vueの初期化後じゃないとうまく読めない場合
      */
     initLibs($vue, option = {}) {
-        // datepickerイベント
-        if (option["datepickerOnChange"] == undefined) {
-            option["datepickerOnChange"] = ($vue, id, value) => {};
-        }
+        this.initFileInput($vue, option);
+        this.initSelect2($vue, option);
+        this.initDatePicker($vue, option);
+    }
 
-        //---------------------
-        // select2
-        //---------------------
-
-        $(".select2").select2({});
-
-        // 複数選択プルダウンの値の変更がうまく反映されないためこちらで対応
-        $(".select2").each(function (index, element) {
-            if ($(element).attr("multiple")) {
-                $(element).change(function (e) {
-                    // 変更後のvalを$vue.formにセットする
-                    $vue.form[element.id] = $(element).val();
-                });
-            }
-        });
+    initFileInput($vue, option = {}) {
 
         //---------------------
         // bs-custom-file-input
@@ -184,6 +170,33 @@ export default class PageComponentBase {
             bsCustomFileInput.init();
         });
 
+    }
+
+    initSelect2($vue, option = {}) {
+
+        //---------------------
+        // select2
+        //---------------------
+
+        $(".select2").select2({});
+
+        // 複数選択プルダウンの値の変更がうまく反映されないためこちらで対応
+        $(".select2").each(function (index, element) {
+            if ($(element).attr("multiple")) {
+                $(element).change(function (e) {
+                    // 変更後のvalを$vue.formにセットする
+                    $vue.form[element.id] = $(element).val();
+                });
+            }
+        });
+
+    }
+
+    initDatePicker($vue, option = {}) {
+        // datepickerイベント
+        if (option["datepickerOnChange"] == undefined) {
+            option["datepickerOnChange"] = ($vue, id, value) => {};
+        }
         //---------------------
         // datepicker
         //---------------------

@@ -25,10 +25,15 @@
     <x-bs.row>
         <x-bs.col2>
             <x-input.select id="course_cd" caption="コース名" :select2=true>
-                <option value="1">個別指導コース</option>
-                <option value="4">集団指導</option>
-                <option value="5">その他・自習</option>
-                <option value="6">面談</option>
+                <option value="10100">個別指導コース</option>
+                <option value="10200">1対2コース</option>
+                <option value="10300">1対3コース</option>
+                <option value="10400">家庭教師</option>
+                <option value="10500">演習</option>
+                <option value="10600">ハイプラン</option>
+                <option value="20100">集団指導</option>
+                <option value="90100">その他・自習</option>
+                <option value="90200">面談</option>
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
@@ -38,14 +43,13 @@
     <x-bs.row>
         <x-bs.col2>
             <x-input.select id="lesson_kind" caption="授業区分" :select2=true>
-                <option value="1">通常</option>
-                <option value="2">特別</option>
-                <option value="3">追加</option>
-                <option value="4">初回授業（入会金無料）</option>
-                <option value="5">初回授業（入会金半額）</option>
-                <option value="6">体験授業１回目</option>
-                <option value="7">体験授業２回目</option>
-                <option value="8">体験授業３回目</option>
+                <option value="1">通常授業</option>
+                <option value="2">特別期間講習</option>
+                <option value="3">追加授業</option>
+                <option value="4">初回授業</option>
+                <option value="5">体験授業１回目</option>
+                <option value="6">体験授業２回目</option>
+                <option value="7">体験授業３回目</option>
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
@@ -53,7 +57,8 @@
                 <option value="1">実施前・出席</option>
                 <option value="2">当日欠席（講師出勤あり）</option>
                 <option value="3">当日欠席（講師出勤なし）</option>
-                <option value="4">振替中（未振替）</option>
+                <option value="4">未振替</option>
+                <option value="5">振替中</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
@@ -96,95 +101,95 @@
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
             <th width="10%">日付</th>
-            <th>コース名</th>
-            <th>時限</th>
-            <th>開始時刻</th>
+            <th>曜日</th>
+            <th>時限/開始</th>
+            <th>コース</th>
             <th>校舎</th>
             <th>生徒名</th>
             <th>講師名/担当者名</th>
             <th>教科</th>
             <th>授業区分</th>
-            <th>出欠ステータス</th>
-            <th>授業報告書</th>
+            <th>出欠</th>
+            <th>報告書</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
         <tr>
-            <td>2023/02/28</td>
-            <td>個別指導コース</td>
-            <td>6</td>
-            <td>16:00</td>
-            <td>久我山</td>
+            <td>2023/09/28</td>
+            <td>木</td>
+            <td>6限</td>
+            <td>個別</td>
+            <td>久</td>
             <td>CWテスト生徒５</td>
             <td>CWテスト教師１０１</td>
-            <td>英語</td>
+            <td>英</td>
             <td>追加</td>
-            <td>実施前・出席</td>
+            <td>前・出席</td>
             <td>〇</td>
             <td>
                 <x-button.list-dtl />
             </td>
         </tr>
         <tr>
-            <td>2023/02/28</td>
-            <td>個別指導コース</td>
-            <td>5</td>
-            <td>16:00</td>
-            <td>久我山</td>
+            <td>2023/09/28</td>
+            <td>木</td>
+            <td>5限</td>
+            <td>個別</td>
+            <td>久</td>
             <td>CWテスト生徒１</td>
             <td>CWテスト教師１０２</td>
-            <td>数学</td>
-            <td>通常</td>
-            <td>実施前・出席</td>
+            <td>数</td>
+            <td>通常・振替</td>
+            <td>前・出席</td>
             <td>✕</td>
             <td>
                 <x-button.list-dtl />
             </td>
         </tr>
         <tr>
-            <td>2023/02/24</td>
-            <td>個別指導コース</td>
-            <td>6</td>
-            <td>16:00</td>
-            <td>久我山</td>
+            <td>2023/09/24</td>
+            <td>日</td>
+            <td>6現</td>
+            <td>個別</td>
+            <td>久</td>
             <td>CWテスト生徒１</td>
             <td>CWテスト教師１０１</td>
-            <td>理科</td>
-            <td>体験授業１回目</td>
-            <td>当日欠席（講師出勤あり）</td>
+            <td>理</td>
+            <td>体験１</td>
+            <td>当欠(出勤)</td>
             <td>〇</td>
             <td>
                 <x-button.list-dtl />
             </td>
         </tr>
         <tr>
-            <td>2023/02/24</td>
-            <td>個別指導コース</td>
-            <td>5</td>
-            <td>16:00</td>
-            <td>久我山</td>
+            <td>2023/09/24</td>
+            <td>日</td>
+            <td>5限</td>
+            <td>個別</td>
+            <td>久</td>
             <td>CWテスト生徒３</td>
             <td>CWテスト教師１０１</td>
-            <td>社会</td>
+            <td>社</td>
             <td>通常</td>
-            <td>振替中（未振替）</td>
-            <td>〇</td>
+            <td>未振替</td>
+            <td>－</td>
             <td>
                 <x-button.list-dtl />
             </td>
         </tr>
         <tr>
-            <td>2023/02/24</td>
-            <td>個別指導コース</td>
-            <td>4</td>
-            <td>16:00</td>
-            <td>久我山</td>
+            <td>2023/09/24</td>
+            <td>日</td>
+            <td>4限</td>
+            <td>個別</td>
+            <td>久</td>
             <td>CWテスト生徒４</td>
             <td>CWテスト教師１０２</td>
-            <td>英語</td>
+            <td>国英数</td>
             <td>追加</td>
-            <td>実施前・出席</td>
+            <td>前・出席</td>
             <td>〇</td>
             <td>
                 <x-button.list-dtl />
@@ -192,12 +197,12 @@
         </tr>
         <tr>
             <td>2023/02/24</td>
-            <td>面談</td>
-            <td>3</td>
+            <td>日</td>
             <td>15:00</td>
-            <td>久我山</td>
+            <td>面談</td>
+            <td>久</td>
             <td>CWテスト生徒2</td>
-            <td>CWテスト教師１０２</td>
+            <td>久我山教室長</td>
             <td></td>
             <td></td>
             <td></td>

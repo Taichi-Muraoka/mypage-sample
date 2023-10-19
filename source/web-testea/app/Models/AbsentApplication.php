@@ -107,7 +107,7 @@ class AbsentApplication extends Model
             'schedule_id' => ['integer'],
             'student_id' => ['integer'],
             'absent_reason' => ['string', 'max:1000'],
-            'status' => ['integer', 'in:0,1'],
+            'status' => ['integer'],
             'apply_date' => ['date_format:Y-m-d']
         ];
         return $_fieldRules;

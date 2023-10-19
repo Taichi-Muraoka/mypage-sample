@@ -108,7 +108,7 @@ class Invoice extends Model
             'student_id' => ['integer'],
             'invoice_date' => ['date_format:Y-m-d'],
             'campus_cd'=> ['string', 'max:2', 'digits:2'],
-            'pay_type' => ['integer', 'in:1,2'],
+            'pay_type' => ['integer'],
             'total_amount' => ['integer', 'min:0', 'max:99999999'],
         ];
         return $_fieldRules;

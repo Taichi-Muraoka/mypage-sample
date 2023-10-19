@@ -120,7 +120,7 @@ class SeasonMng extends Model
             's_start_date' => ['date_format:Y-m-d'],
             's_end_date' => ['date_format:Y-m-d'],
             'confirm_date' => ['date_format:Y-m-d'],
-            'status' => ['integer', 'in:0,1']
+            'status' => ['integer']
         ];
         return $_fieldRules;
     }

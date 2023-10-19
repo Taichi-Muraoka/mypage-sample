@@ -115,7 +115,7 @@ class Conference extends Model
             'student_id' => ['integer'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
             'comment' => ['string', 'max:1000'],
-            'status' => ['integer', 'in:0,1'],
+            'status' => ['integer'],
             'apply_date' => ['date_format:Y-m-d'],
             'conference_date' => ['date_format:Y-m-d'],
             'start_time' => ['vdTime'],

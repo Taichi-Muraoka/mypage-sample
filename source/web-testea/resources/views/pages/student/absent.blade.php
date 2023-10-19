@@ -31,6 +31,10 @@
                 <td><span v-cloak v-show="form.id != 0">CWテスト講師１０１<span v-show="form.id != 0">先生</span></span></td>
             </tr>
             <tr>
+                <th>教科</th>
+                <td><span v-cloak v-show="form.id != 0">数学</span></td>
+            </tr>
+            <tr>
                 <th class="t-minimum" width="25%">校舎連絡先</th>
                 <td><span v-cloak v-show="form.id != 0"><a href="tel:000-1234-5678">000-1234-5678</a></span></td>
             </tr>

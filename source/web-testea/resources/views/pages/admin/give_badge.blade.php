@@ -8,39 +8,31 @@
 <x-bs.card :search=true>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="roomcd" caption="校舎" :select2=true >
-                <option value="1">久我山</option>
-                <option value="2">西永福</option>
-                <option value="3">下高井戸</option>
-                <option value="4">駒込</option>
-                <option value="5">日吉</option>
-                <option value="6">自由が丘</option>
-            </x-input.select>
+            @can('roomAdmin')
+            {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData :select2Search=false :blank=false />
+            @else
+            {{-- 全体管理者の場合、検索を非表示・未選択を表示する --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData :select2Search=false :blank=true />
+            @endcan
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="生徒名" id="student" :select2=true :editData="$editData">
-                <option value="1">CWテスト生徒１</option>
-                <option value="2">CWテスト生徒２</option>
-                <option value="3">CWテスト生徒３</option>
-            </x-input.select>
+            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$studentList :editData=$editData
+            :select2Search=true :blank=true/>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="badge_type" caption="バッジ種別" :select2=true >
-                <option value="1">紹介</option>
-                <option value="2">通塾</option>
-                <option value="3">成績</option>
-                <option value="4">その他</option>
-            </x-input.select>
+            <x-input.select id="badge_type" caption="バッジ種別" :select2=true :mastrData=$kindList :editData=$editData
+            :select2Search=false :blank=true />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="認定日 From" id="date_from" />
+            <x-input.date-picker caption="認定日 From" id="authorization_date_from" />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="認定日 To" id="date_to" />
+            <x-input.date-picker caption="認定日 To" id="authorization_date_to" />
         </x-bs.col2>
     </x-bs.row>
 </x-bs.card>
@@ -54,7 +46,7 @@
     </x-slot>
 
     {{-- テーブル --}}
-    <x-bs.table :button=true :smartPhone=true>
+    <x-bs.table :smartPhone=true>
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
@@ -67,41 +59,20 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/05/10</td>
-            <td>紹介</td>
-            <td>久我山</td>
-            <td>CWテスト生徒１</td>
-            <td>鈴木　花子</td>
-            <td>生徒紹介（佐藤次郎さん）</td>
-        </tr>
-        <tr>
-            <td>2023/04/01</td>
-            <td>通塾</td>
-            <td>久我山</td>
-            <td>CWテスト生徒１</td>
-            <td>鈴木　花子</td>
-            <td>契約期間が３年を超えた</td>
-        </tr>
-        <tr>
-            <td>2022/03/20</td>
-            <td>紹介</td>
-            <td>久我山</td>
-            <td>CWテスト生徒２</td>
-            <td>鈴木　花子</td>
-            <td>生徒紹介（仙台太郎さん）</td>
-        </tr>
-        <tr>
-            <td>2022/02/20</td>
-            <td>成績</td>
-            <td>久我山</td>
-            <td>CWテスト生徒２</td>
-            <td>鈴木　花子</td>
-            <td>成績UP</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmd(item.authorization_date)}}</td>
+            <td>@{{item.kind_name}}</td>
+            <td>@{{item.campus_name}}</td>
+            <td>@{{item.student_name}}</td>
+            <td>@{{item.admin_name}}</td>
+            <td>@{{item.reason}}</td>
         </tr>
 
     </x-bs.table>
 
 </x-bs.card-list>
+
+{{-- モーダル(送信確認モーダル) 出力 --}}
+@include('pages.admin.modal.give_badge_output-modal', ['modal_send_confirm' => true])
 
 @stop
