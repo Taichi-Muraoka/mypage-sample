@@ -5,13 +5,10 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\DB;
 use App\Models\MstGrade;
 use App\Models\MstSubject;
 use App\Models\MstText;
-use Illuminate\Database\Eloquent\Collection;
 
 /**
  * 授業教材マスタ管理 - コントローラ
@@ -79,8 +76,6 @@ class MasterMngTextController extends Controller
 
         // formを取得
         $form = $request->all();
-
-        $this->debug($request->all());    // SQLを表示
 
         // クエリを作成
         $query = MstText::query();
@@ -188,11 +183,11 @@ class MasterMngTextController extends Controller
     {
         // 学年リストを取得
         $grades = $this->mdlGetGradeList();
-        $gradeLists = $this->formatInputList($grades, 2);
+        $gradeLists = $this->mdlFormatInputList($grades, 2);
 
         // 教科リストを取得（授業教科、教材教科）
         $subjects = $this->mdlGetSubjectList();
-        $subjectLists = $this->formatInputList($subjects, 3);
+        $subjectLists = $this->mdlFormatInputList($subjects, 3);
 
         return view('pages.admin.master_mng_text-input', [
             'rules' => $this->rulesForInput(null),
@@ -241,11 +236,11 @@ class MasterMngTextController extends Controller
         // コース種別リストを取得
         // 学年リストを取得
         $grades = $this->mdlGetGradeList();
-        $gradeLists = $this->formatInputList($grades, 2);
+        $gradeLists = $this->mdlFormatInputList($grades, 2);
 
         // 教科リストを取得（授業教科、教材教科）
         $subjects = $this->mdlGetSubjectList();
-        $subjectLists = $this->formatInputList($subjects, 3);
+        $subjectLists = $this->mdlFormatInputList($subjects, 3);
 
         // クエリを作成(PKでユニークに取る)
         $mstText = MstText::select(
@@ -307,7 +302,7 @@ class MasterMngTextController extends Controller
      */
     public function delete(Request $request)
     {
-        // 登録前バリデーション。NGの場合はレスポンスコード422を返却
+        // 削除前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForDelete($request))->validate();
 
         // Formを取得
@@ -431,11 +426,11 @@ class MasterMngTextController extends Controller
 
         $rules = array();
 
-        // 独自バリデーション: 重複チェック
+        // 独自バリデーション: 削除時変更不可
         $validationKey = function ($attribute, $value, $fail) use ($request) {
             // 授業教材コードを編集し削除ボタンを押した場合はエラーを返す
             if ($request['text_cd'] != $request['_text_cd']) {
-                return $fail(Lang::get('validation.invalid_input'));
+                return $fail(Lang::get('validation.delete_cannot_change'));
             }
         };
 
@@ -446,23 +441,4 @@ class MasterMngTextController extends Controller
         return $rules;
     }
 
-    /**
-     * 登録画面プルダウン用マスタデータフォーマット
-     * name を 「コード (名称)」 の形式にする
-     *
-     * @param  Collection $collection リストデータ
-     * @param  int $digit コード0埋め桁数
-     * @return Collection フォーマット後リストデータ
-     */
-    private function formatInputList(Collection $collection, int $digit)
-    {
-        $lists = $collection->map(function ($item, $key) use ($digit) {
-            return [
-                    'code' => $item['code'], 
-                    'value' => str_pad($item['code'], $digit, '0', STR_PAD_LEFT) . ' (' . $item['value'] . ')'
-                ];
-        });
-
-        return $lists;
-    }
 }
