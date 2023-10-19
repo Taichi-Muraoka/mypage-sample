@@ -105,7 +105,7 @@ class TransferApplicationDate extends Model
             'transfer_date_id' => ['integer'],
             'transfer_apply_id' => ['integer'],
             'request_no' => ['integer'],
-            'transfer_date' => ['integer'],
+            'transfer_date' => ['date_format:Y-m-d'],
             'period_no' => ['integer']
         ];
         return $_fieldRules;

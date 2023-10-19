@@ -133,6 +133,10 @@ export default class PageInputForm extends PageComponentBase {
                 // ライブラリの初期化
                 if (!option["useModalSelect"]) {
                     self.initLibs(this, option);
+                }else{
+                    // 検索モーダルで使用するSelect2は、検索モーダルで初期化
+                    self.initDatePicker(this, option);
+                    self.initFileInput(this, option);
                 }
 
                 // 確認モーダルの表示用
