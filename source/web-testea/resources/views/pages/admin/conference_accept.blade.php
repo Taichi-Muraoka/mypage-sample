@@ -11,20 +11,26 @@
         <x-bs.col2>
             @can('roomAdmin')
             {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
-                :select2Search=false :blank=false />
+            <x-input.select id="campus_cd" caption="校舎" :select2=true onChange="selectChangeGetRoom" :mastrData=$rooms :editData=$editData
+                :select2Search=false :blank=false/>
             @else
-            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
+            <x-input.select id="campus_cd" caption="校舎" :select2=true onChange="selectChangeGetRoom" :mastrData=$rooms :editData=$editData 
+                :select2Search=false emptyValue="-1"/>
             @endcan
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="ステータス" id="state" :select2=true :mastrData=$states :editData=$editData />
+            <x-input.select caption="ステータス" id="status" :select2=true :mastrData=$states :select2Search=false :editData=$editData />
         </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select caption="生徒名" id="student_name" :select2=true :mastrData=$studentList :editData=$editData />
+            <x-input.select caption="生徒名" id="student_id" :select2=true :editData=$editData>
+                {{-- vueで動的にプルダウンを作成 --}}
+                <option v-for="item in selectGetItem.selectItems" :value="item.id">
+                    @{{ item.value }}
+                </option>
+            </x-input.select>
         </x-bs.col2>
     </x-bs.row>
 
@@ -63,30 +69,24 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/01/16</td>
-            <td>CWテスト生徒１</td>
-            <td>久我山</td>
-            <td>2023/01/30</td>
-            <td>16:00</td>
-            <td>久我山教室長</td>
-            <td>登録済</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            {{-- MEMO: 日付フォーマットを指定する --}}
+            <td>@{{$filters.formatYmd(item.apply_date)}}</td>
+            <td>@{{item.student_name}}</td>
+            <td>@{{item.campus_name}}</td>
+            <td>@{{$filters.formatYmd(item.conference_date)}}</td>
+            <td>@{{item.start_time}}</td>
+            <td>@{{item.adm_name}}</td>
+            <td>@{{item.status_name}}</td>
             <td>
-                <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('conference_accept-edit', 1) }}" caption="日程登録" disabled/>
-            </td>
-        </tr>
-        <tr>
-            <td>2023/01/17</td>
-            <td>CWテスト生徒２</td>
-            <td>久我山</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>未登録</td>
-            <td>
-                <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('conference_accept-edit', 1) }}" caption="日程登録"/>
+                {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
+                <x-button.list-dtl :vueDataAttr="['id' => 'item.conference_id']" />
+                {{-- スペース --}}
+                &nbsp;
+                {{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
+                <x-button.list-edit vueHref="'{{ route('conference_accept-edit', '') }}/' + item.conference_id" caption="日程登録" 
+                    {{-- 登録済みの場合は非活性 --}}
+                    vueDisabled="item.status == {{ App\Consts\AppConst::CODE_MASTER_5_1 }}"/>
             </td>
         </tr>
 

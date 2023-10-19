@@ -18,43 +18,54 @@
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="35%">校舎</th>
-            <td>久我山</td>
+            <td>{{$campus_name}}</td>
         </tr>
         <tr>
             <th>生徒名</th>
-            <td>CWテスト生徒１</td>
+            <td>{{$student_name}}</td>
         </tr>
         <tr>
             <th>第１希望日時</th>
-            <td>2023/01/30 16:00</td>
+            <td>{{$conference_date1}} {{$start_time1}}</td>
         </tr>
         <tr>
             <th>第２希望日時</th>
-            <td>2023/01/31 16:00</td>
+            <td>
+                @if ($conference_date2 != null)
+                    {{date('Y/m/d', strtotime($conference_date2))}}
+                    {{$start_time2}}
+                @endif
+            </td>
         </tr>
         <tr>
             <th>第３希望日時</th>
-            <td>2023/02/01 16:00</td>
+            <td>
+                @if ($conference_date2 != null)
+                    {{date('Y/m/d', strtotime($conference_date3))}}
+                    {{$start_time3}}
+                @endif
+            </td>
         </tr>
         <tr>
             <th>特記事項</th>
-            <td>特記事項等あればここに記載されます。</td>
+            <td>{{$comment}}</td>
         </tr>
     </x-bs.table>
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.date-picker caption="面談日" id="conference_date" :editData=$editData />
+    <x-input.date-picker caption="面談日" id="target_date" :editData=$editData />
 
     <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules :editData=$editData/>
 
-    <x-input.select caption="ブース" id="booth_cd" :select2=true :editData="$editData">
-        <option value="1">Aテーブル</option>
-        <option value="2">Bテーブル</option>
-        <option value="3">Cテーブル</option>
-    </x-input.select>
+    <x-input.select caption="ブース" id="booth_cd" :select2=true :mastrData=$booths :editData="$editData" :select2Search=false/>
 
-    <x-input.textarea caption="管理者メモ" id="conference_comment" :rules=$rules :editData=$editData />
+    <x-input.textarea caption="管理者メモ" id="memo" :rules=$rules :editData=$editData />
+
+    {{-- hidden --}}
+    <x-input.hidden id="campus_cd" :editData=$editData/>
+    <x-input.hidden id="student_id" :editData=$editData/>
+    <x-input.hidden id="conference_id" :editData=$editData/>
 
     <x-bs.callout title="登録の際の注意事項" type="warning">
         登録ボタンを押下すると、指定した日時で面談スケジュールが登録されます。
@@ -67,7 +78,6 @@
 
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
-                {{-- <x-button.submit-delete /> --}}
                 <x-button.submit-edit caption="登録"/>
             </div>
 

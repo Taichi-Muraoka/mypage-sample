@@ -113,7 +113,7 @@ class Conference extends Model
         static $_fieldRules = [
             'conference_id' => ['integer'],
             'student_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2', 'digits:2'],
+            'campus_cd' => ['string', 'max:2'],
             'comment' => ['string', 'max:1000'],
             'status' => ['integer'],
             'apply_date' => ['date_format:Y-m-d'],
@@ -134,8 +134,9 @@ class Conference extends Model
     public function scopeSearchCampusCd($query, $obj)
     {
         $key = 'campus_cd';
+        $col = $this->getTable() . '.' . $key;
         if (isset($obj[$key]) && filled($obj[$key])) {
-            $query->where($key, $obj[$key]);
+            $query->where($col, $obj[$key]);
         }
     }
     /**
@@ -164,7 +165,7 @@ class Conference extends Model
      */
     public function scopeSearchConferenceDateFrom($query, $obj)
     {
-        $key = 'conference_date_from';
+        $key = 'apply_date_from';
         // Ymdに変換して検索する
         $col = $this->mdlFormatYmd('apply_date');
         if (isset($obj[$key]) && filled($obj[$key])) {
@@ -176,7 +177,7 @@ class Conference extends Model
      */
     public function scopeSearchConferenceDateTo($query, $obj)
     {
-        $key = 'conference_date_to';
+        $key = 'apply_date_to';
         // Ymdに変換して検索する
         $col = $this->mdlFormatYmd('apply_date');
         if (isset($obj[$key]) && filled($obj[$key])) {
