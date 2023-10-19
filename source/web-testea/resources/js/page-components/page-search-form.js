@@ -93,7 +93,9 @@ export default class PageSearchForm extends PageComponentBase {
                 this.option = option;
 
                 // ライブラリの初期化
-                self.initLibs(this, option);
+                // self.initLibs(this, option);
+                // 検索モーダルでも使用するSelect2だけ、この画面内で初期化する
+                self.initSelect2(this, option);
 
                 // afterSearch用
                 const _self = this;

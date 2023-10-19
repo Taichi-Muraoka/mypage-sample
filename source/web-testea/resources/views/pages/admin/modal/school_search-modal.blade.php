@@ -22,7 +22,7 @@
             <x-input.text id="school_cd" caption="学校コード" :rules=$rulesSchool/>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="name" caption="学校名" :rules=$rulesSchool/>
+            <x-input.text id="school_name" caption="学校名" :rules=$rulesSchool/>
         </x-bs.col2>
     </x-bs.row>
 
