@@ -960,8 +960,10 @@ class TutorMngController extends Controller
         $rules += MstSchool::fieldRules('school_kind_cd', [$validationSchoolKindList]);
         $rules += MstSchool::fieldRules('establish_kind', [$validationEstablishKindList]);
         // 学校コードまたは学校名のどちらか必須
-        $rules += MstSchool::fieldRules('school_cd', ['required_without_all:name']);
-        $rules += MstSchool::fieldRules('name', ['required_without_all:school_cd']);
+        // 学校名はid名がテーブル項目名と異なるためルールを継承するかたちで記述した
+        $ruleName = MstSchool::getFieldRule('name');
+        $rules += ['school_name' =>  array_merge($ruleName, ['required_without_all:school_cd'])];
+        $rules += MstSchool::fieldRules('school_cd', ['required_without_all:school_name']);
 
         return $rules;
     }
