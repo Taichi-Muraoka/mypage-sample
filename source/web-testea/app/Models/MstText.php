@@ -108,7 +108,7 @@ class MstText extends Model
             'text_cd' => ['string', 'max:8', 'digits:8'],
             'l_subject_cd' => ['string', 'max:3', 'digits:3'],
             'grade_cd' => ['integer'],
-            't_subject_cd' => ['string', 'max:8', 'digits:8'],
+            't_subject_cd' => ['string', 'max:3', 'digits:3'],
             'name' => ['string', 'max:50']
         ];
         return $_fieldRules;
@@ -117,5 +117,37 @@ class MstText extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
-
+    /**
+     * 検索 学年コード
+     */
+    public function scopeSearchGradeCd($query, $obj)
+    {
+        $key = 'grade_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 授業教科コード
+     */
+    public function scopeSearchSubjectCd($query, $obj)
+    {
+        $key = 'l_subject_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 教材教科コード
+     */
+    public function scopeSearchTextSubjectCd($query, $obj)
+    {
+        $key = 't_subject_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 }
