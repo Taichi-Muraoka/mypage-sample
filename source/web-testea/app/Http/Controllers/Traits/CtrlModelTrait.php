@@ -624,6 +624,26 @@ trait CtrlModelTrait
             ->keyBy('code');
     }
 
+    /**
+     * 登録画面プルダウン用データフォーマット
+     * name を 「コード (名称)」 の形式にする
+     *
+     * @param  $collection リストデータ
+     * @param  int $digit コード0埋め桁数
+     * @return フォーマット後リストデータ
+     */
+    protected function mdlFormatInputList($collection, int $digit)
+    {
+        $lists = $collection->map(function ($item, $key) use ($digit) {
+            return [
+                    'code' => $item['code'], 
+                    'value' => str_pad($item['code'], $digit, '0', STR_PAD_LEFT) . ' (' . $item['value'] . ')'
+                ];
+        });
+
+        return $lists;
+    }
+
     //------------------------------
     // 名称取得（共通で使用されるもの）
     //------------------------------
