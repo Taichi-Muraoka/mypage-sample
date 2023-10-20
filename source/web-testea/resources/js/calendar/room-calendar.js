@@ -104,7 +104,6 @@ export default class RoomCalendar {
      * 再描画
      */
     refetchEvents() {
-        //console.log($("#target_date").val());
         this._calendar.refetchResources();
         this._calendar.refetchEvents();
     }
@@ -115,8 +114,6 @@ export default class RoomCalendar {
      * @param dateInfo
      */
     _dateChangeFunc = (dateInfo) => {
-        //console.log("date change!!");
-        //console.log(moment(dateInfo.start).format("YYYY-MM-DD"));
         $("#target_date").val(moment(dateInfo.start).format("YYYY-MM-DD"));
     };
 
@@ -187,8 +184,6 @@ export default class RoomCalendar {
                 return axios.post(url, sendData);
             })
             .then((response) => {
-                //console.log(response.data);
-
                 // コールバックで更新(eventプロパティにセットする)
                 successCallback(response.data);
 
@@ -236,12 +231,6 @@ export default class RoomCalendar {
             info.resource._resource.id !== "000" &&
             info.resource._resource.id !== "999"
         ) {
-            // 登録画面に遷移
-            //var url = UrlCom.getFuncUrl() + "/new?"
-            //        + "roomcd=" + "110"
-            //        + "&date=" + moment(info.start).format("YYYYMMDD")
-            //        + "&start_time=" + moment(info.start).format("HHmm")
-            //        + "&end_time=" + moment(info.end).format("HHmm");
             var url =
                 UrlCom.getFuncUrl() +
                 "/new" +

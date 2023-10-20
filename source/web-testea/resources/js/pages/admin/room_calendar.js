@@ -28,8 +28,6 @@ export default class AppClass extends PageBase {
             vueMounted: function ($vue, option) {
                 // カレンダー表示
                 $vue.calendar = new RoomCalendar();
-                //console.log($vue.form.target_date);
-                //console.log($vue.form.campus_cd);
                 $vue.calendar.create($vue.form.target_date);
             },
             vueMethods: {

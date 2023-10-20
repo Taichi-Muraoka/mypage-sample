@@ -13,7 +13,7 @@
         <td>@{{item.booth_name}}</td>
     </tr>
     <tr>
-        <th width="35%">コース</th>
+        <th width="35%">コース名</th>
         <td>@{{item.course_name}}</td>
     </tr>
     {{-- v-showは、コース種別によって非表示の場合があるため --}}
@@ -41,7 +41,7 @@
     {{-- v-showは、コース種別によって非表示の場合があるため --}}
     <tr v-Show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }} || item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }}">
         <th>講師名</th>
-        <td>CWテスト教師１０１</td>
+        <td>@{{item.tutor_name}}</td>
     </tr>
     {{-- v-showは、コース種別によって非表示の場合があるため --}}
     <tr v-Show="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_2 }}">
@@ -54,8 +54,8 @@
         {{-- nl2br: 改行 --}}
         <td class="nl2br">@{{item.class_student_names}}</td>
     </tr>
-    <tr v-show="item.subject_name">
-        <th>科目</th>
+    <tr v-show="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }} && item.subject_name">
+        <th>教科</th>
         <td>@{{item.subject_name}}</td>
     </tr>
     {{-- v-showは、コース種別によって非表示の場合があるため --}}
@@ -73,7 +73,7 @@
         <td>@{{item.absent_tutor_name}}</td>
     </tr>
     {{-- v-showは、コース種別によって非表示の場合があるため --}}
-    <tr v-Show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }} || item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }}">
+    <tr v-Show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }}">
         <th>出欠ステータス</th>
         <td>@{{item.absent_name}}</td>
     </tr>
@@ -87,9 +87,9 @@
         <td>@{{item.admin_name}}</td>
     </tr>
     <tr>
-        <th>メモ</th>
+        <th>管理者用メモ</th>
         {{-- nl2br: 改行 --}}
-        <td class="nl2br"></td>
+        <td class="nl2br">@{{item.memo}}</td>
     </tr>
 </x-bs.table>
 

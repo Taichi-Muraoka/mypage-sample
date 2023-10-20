@@ -392,6 +392,12 @@ label:not(.form-check-label):not(.custom-file-label) {
 [id^="calendar"] .cal_closed {
     background: #474747;
     border-color: #474747;
+}
+
+/* 休業日の予定の背景色 */
+[id^="calendar"] .cal_closed_room {
+    background: #474747;
+    border-color: #474747;
     font-size: 1.15em !important;
     padding : 5px;
 }
@@ -427,6 +433,12 @@ label:not(.form-check-label):not(.custom-file-label) {
     background: #00a78e;
     border-color: #00a78e;
 }
+
+/* 家庭教師の予定の背景色 */
+[id^="calendar"] .cal_home {
+    background: #d2691e;
+    border-color: #d2691e;
+    }
 
 /* ハイプランの予定の背景色 */
 [id^="calendar"] .cal_highplan {

@@ -65,7 +65,7 @@ return [
     'date'                 => '有効な日付を指定してください。',
     'date_equals'          => ':dateと同じ日付けを指定してください。',
     'date_format'          => ':format形式で指定してください。',
-    'different'            => ':otherには、異なった内容を指定してください。',
+    'different'            => '重複のため指定できません。',
     'digits'               => ':digits桁で指定してください。',
     'digits_between'       => ':min桁から:max桁の間で指定してください。',
     'dimensions'           => '図形サイズが正しくありません。',

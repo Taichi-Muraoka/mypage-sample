@@ -67,7 +67,7 @@
     </div>
 
     <x-input.select vShow="form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}"
-        caption="科目" id="subject_cd" :select2=true :mastrData=$subjects :editData="$editData" :select2Search=true :blank=true />
+        caption="教科" id="subject_cd" :select2=true :mastrData=$subjects :editData="$editData" :select2Search=true :blank=true />
 
     <x-input.select vShow="form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }} && form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_4 }}"
         caption="授業区分" id="lesson_kind" :select2=true :mastrData=$lessonKindList :editData="$editData" :select2Search=false :blank=false />
@@ -107,7 +107,7 @@
         :blank=false />
     @endif
 
-    <x-input.textarea id="memo" caption="メモ" :rules=$rules :editData=$editData />
+    <x-input.textarea id="memo" caption="管理者用メモ" :rules=$rules :editData=$editData />
 
     @if (request()->routeIs('room_calendar-new'))
     {{-- 登録時 --}}

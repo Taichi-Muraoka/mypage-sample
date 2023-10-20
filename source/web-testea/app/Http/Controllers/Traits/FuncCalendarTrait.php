@@ -8,7 +8,6 @@ use App\Models\MstCourse;
 use App\Models\MstSubject;
 use App\Models\CodeMaster;
 use App\Models\Student;
-
 use App\Models\Tutor;
 use App\Models\MstTimetable;
 use App\Models\YearlySchedule;
@@ -62,7 +61,17 @@ trait FuncCalendarTrait
         $schedules = $this->getSchedule($startDate, $endDate, null, $sid, null);
 
         foreach ($schedules as $schedule) {
-            $schedule['title'] = $schedule['subject_name'] . ' ' . $schedule['tutor_name'];
+            if (
+                $schedule['course_kind'] == AppConst::CODE_MASTER_42_1
+                || $schedule['course_kind'] == AppConst::CODE_MASTER_42_2
+            ) {
+                // コース種別が授業の場合 科目名を表示
+                $schedule['title'] = $schedule['subject_sname'];
+            } else {
+                // コース種別が授業以外の場合 コース名を表示
+                $schedule['title'] = $schedule['course_sname'];
+            }
+            $schedule['title'] = $schedule['title'] . ' ' . $schedule['tutor_name'];
             $schedule['start'] = $schedule['target_date']->format('Y-m-d') . ' ' . $schedule['start_time']->format('H:i');
             $schedule['end'] = $schedule['target_date']->format('Y-m-d') . ' ' . $schedule['end_time']->format('H:i');
             // 表示色クラス・リソースID判定
@@ -75,7 +84,6 @@ trait FuncCalendarTrait
             // 振替の場合、授業区分に付加する文字列を設定
             if ($schedule['create_kind'] == AppConst::CODE_MASTER_32_2) {
                 $schedule['hurikae_name'] = $schedule['create_kind_name'];
-                //$schedule['transfer_before'] = $schedule['transfer_date']->format('Y-m-d') . $schedule['transfer_period_no'] . "限";
             }
 
             // 不要な要素の削除 ※後で見直し・設定する
@@ -91,7 +99,6 @@ trait FuncCalendarTrait
             unset($schedule['tentative_status']);
         }
 
-        $this->debug($schedules);
         return $schedules;
     }
 
@@ -107,9 +114,19 @@ trait FuncCalendarTrait
         $startDate = date('Y-m-d', $request->input('start') / 1000);
         $endDate = date('Y-m-d', $request->input('end') / 1000 - 1);
 
-        // 期間区分の取得（年間授業予定） ※後で取得・設定
-        // 休業日の場合、休日表示のみ返す
-
+        // 休業日の取得（年間授業予定）
+        $holidays = $this->getYearlySchedule($startDate, $endDate, null, null, $tid);
+        foreach ($holidays as $holiday) {
+            // 開始日時
+            //$holiday['start'] = $holiday['target_date']->format('Y-m-d');
+            $holiday['start'] = $holiday['target_date'];
+            // タイトル
+            $holiday['title'] = $holiday['room_symbol'] . ' ' . '休業日';
+            // クラス名（表示色設定）
+            $holiday['classNames'] = 'cal_closed';
+            // モーダル表示用
+            $holiday['holiday_name'] = '休業日';
+        }
 
         // スケジュール情報の取得（講師IDで絞り込み）
         $schedules = $this->getSchedule($startDate, $endDate, null, null, $tid);
@@ -133,15 +150,12 @@ trait FuncCalendarTrait
             $classInfo = $this->getClassByCourse($schedule);
             // クラス名（表示色設定）
             $schedule['classNames'] = $classInfo['className'];
-            // リソースID（ブースコード）
-            //$schedule['resourceId'] = $classInfo['resourceId'];
 
             // モーダル表示用
             $schedule['hurikae_name'] = "";
             // 振替の場合、授業区分に付加する文字列を設定
             if ($schedule['create_kind'] == AppConst::CODE_MASTER_32_2) {
                 $schedule['hurikae_name'] = $schedule['create_kind_name'];
-                //$schedule['transfer_before'] = $schedule['transfer_date']->format('Y-m-d') . $schedule['transfer_period_no'] . "限";
             }
 
             // １対多授業の場合、受講生徒名を取得
@@ -162,8 +176,7 @@ trait FuncCalendarTrait
             unset($schedule['tentative_status']);
         }
 
-        $this->debug($schedules);
-        $scheduleData = collect($schedules);
+        $scheduleData = collect($holidays)->merge($schedules);
 
         return $scheduleData;
     }
@@ -180,18 +193,19 @@ trait FuncCalendarTrait
         // MEMO: Y-m-dで比較するので、条件絞り込み対象の項目が「Date型」であることに注意(DateTimeの場合はうまく行かない)
         $startDate = date('Y-m-d', $request->input('start') / 1000);
         $endDate = date('Y-m-d', $request->input('end') / 1000 - 1);
-        $campusCd = $request->input('campus_cd'); 
+        $campusCd = $request->input('campus_cd');
 
         // 期間区分の取得（年間授業予定）
         $dateKind = $this->getYearlyDateKind($campusCd, $startDate);
         if ($dateKind == AppConst::CODE_MASTER_38_9) {
             // 休業日の場合、休日表示のみ返す
-            $holiday =[
-                ['title' => '休業日',
-                 'start' => $startDate . ' 00:00',
-                 'end' => $endDate . ' 23:59',
-                 'classNames' => 'cal_closed',
-                 'resourceId' => '000'
+            $holiday = [
+                [
+                    'title' => '休業日',
+                    'start' => $startDate . ' 00:00',
+                    'end' => $endDate . ' 23:59',
+                    'classNames' => 'cal_closed_room',
+                    'resourceId' => '000'
                 ],
             ];
             return $holiday;
@@ -232,8 +246,10 @@ trait FuncCalendarTrait
             // タイトル_開始終了時刻
             $schedule['title'] = $schedule['start_time']->format('H:i') . '-' . $schedule['end_time']->format('H:i');
             // タイトル_強調表示
-            if ($schedule['lesson_kind'] != AppConst::CODE_MASTER_31_1
-                && $schedule['lesson_kind'] != AppConst::CODE_MASTER_31_2 ) {
+            if (
+                $schedule['lesson_kind'] != AppConst::CODE_MASTER_31_1
+                && $schedule['lesson_kind'] != AppConst::CODE_MASTER_31_2
+            ) {
                 // 授業種別が初回・体験・追加の場合
                 $schedule['title'] = $schedule['title'] . '<br><span class="class_special">' . $schedule['lesson_kind_name'] . '</span>';
                 if ($schedule['create_kind'] == AppConst::CODE_MASTER_32_2) {
@@ -254,8 +270,10 @@ trait FuncCalendarTrait
             }
             // タイトル_講師名
             if ($schedule['tutor_name'] != "") {
-                if ($schedule['how_to_kind'] == AppConst::CODE_MASTER_33_2
-                || $schedule['how_to_kind'] == AppConst::CODE_MASTER_33_3) {
+                if (
+                    $schedule['how_to_kind'] == AppConst::CODE_MASTER_33_2
+                    || $schedule['how_to_kind'] == AppConst::CODE_MASTER_33_3
+                ) {
                     // 講師オンラインまたは両者オンラインの場合、アンダーライン表示
                     $schedule['title'] = $schedule['title'] . '<br>tea：' . '<span class="class_marker">' . $schedule['tutor_name'] . '</span>';
                 } else {
@@ -264,8 +282,10 @@ trait FuncCalendarTrait
             }
             // タイトル_生徒名
             if ($schedule['student_name'] != "") {
-                if ($schedule['how_to_kind'] == AppConst::CODE_MASTER_33_1
-                || $schedule['how_to_kind'] == AppConst::CODE_MASTER_33_2) {
+                if (
+                    $schedule['how_to_kind'] == AppConst::CODE_MASTER_33_1
+                    || $schedule['how_to_kind'] == AppConst::CODE_MASTER_33_2
+                ) {
                     // 生徒オンラインまたは両者オンラインの場合、アンダーライン表示
                     $schedule['title'] = $schedule['title'] . '<br>stu：' . '<span class="class_marker">' . $schedule['student_name'] . '</span>';
                 } else {
@@ -298,10 +318,68 @@ trait FuncCalendarTrait
             unset($schedule['absent_status']);
             unset($schedule['tentative_status']);
         }
-        $this->debug($schedules);
         $scheduleData = collect($timeTables)->merge($schedules);
 
         return $scheduleData;
+    }
+
+    /**
+     * スケジュール種別の取得
+     *
+     * @param int $schedule スケジュール
+     * @return array スケジュール種別・詳細
+     */
+    private function getClassByCourse($schedule)
+    {
+
+        switch ($schedule['summary_kind']) {
+            case AppConst::CODE_MASTER_25_1:
+                $class = 'cal_class';
+                break;
+            case AppConst::CODE_MASTER_25_2:
+                $class = 'cal_two';
+                break;
+            case AppConst::CODE_MASTER_25_3:
+                $class = 'cal_three';
+                break;
+            case AppConst::CODE_MASTER_25_4:
+                $class = 'cal_group';
+                break;
+            case AppConst::CODE_MASTER_25_5:
+                $class = 'cal_home';
+                break;
+            case AppConst::CODE_MASTER_25_6:
+                $class = 'cal_ensyu';
+                break;
+            case AppConst::CODE_MASTER_25_7:
+                $class = 'cal_highplan';
+                break;
+            case AppConst::CODE_MASTER_25_0:
+                $schedule['course_kind'] == AppConst::CODE_MASTER_42_3 ?
+                    $class = 'cal_meeting' : $class = 'cal_jisyu';
+                break;
+            default:
+                $class = 'cal_class';
+        }
+
+        // 振替中・未振替の場合は退避エリア表示とする
+        if (
+            $schedule['absent_status'] == AppConst::CODE_MASTER_35_3
+            || $schedule['absent_status'] == AppConst::CODE_MASTER_35_4
+        ) {
+            // クラス名（表示色設定）
+            $class = "cal_class_furikae";
+            // リソースID固定
+            $resourceId = config('appconf.transfer_boothId');;
+        } else {
+            // リソースID（ブースコード）
+            $resourceId = $schedule['booth_cd'];
+        }
+
+        return [
+            'className' => $class,
+            'resourceId' => $resourceId,
+        ];
     }
 
     /**
@@ -336,57 +414,60 @@ trait FuncCalendarTrait
     }
 
     /**
-     * スケジュール種別の取得
+     * 年間授業予定（休業日情報）の取得
      *
-     * @param int $schedule スケジュール
-     * @return array スケジュール種別・詳細
+     * @param date $startDate 対象日（開始日）
+     * @param date $endDate 対象日（終了日）
+     * @param string $campusCd 校舎コード
+     * @param string $studentId 生徒ID
+     * @param string $tutorId 講師ID
+     * @return object
      */
-    private function getClassByCourse($schedule)
+    private function getYearlySchedule($startDate, $endDate, $campusCd = null, $studentId = null, $tutorId = null)
     {
+        $query = YearlySchedule::query();
 
-        switch ($schedule['summary_kind']) {
-            case AppConst::CODE_MASTER_25_1:
-                $class = 'cal_class';
-                break;
-            case AppConst::CODE_MASTER_25_2:
-                $class = 'cal_two';
-                break;
-            case AppConst::CODE_MASTER_25_3:
-                $class = 'cal_three';
-                break;
-            case AppConst::CODE_MASTER_25_6:
-                $class = 'cal_ensyu';
-                break;
-            case AppConst::CODE_MASTER_25_7:
-                $class = 'cal_highplan';
-                break;
-            case AppConst::CODE_MASTER_25_4:
-                $class = 'cal_group';
-                break;
-            case AppConst::CODE_MASTER_25_0:
-                $schedule['course_kind'] == AppConst::CODE_MASTER_42_3 ? 
-                    $class = 'cal_meeting' : $class = 'cal_jisyu';
-                break;
-            default:
-                $class = 'cal_class';
+        $account = Auth::user();
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('yearly_schedules.campus_cd', $account->campus_cd);
+        }
+        if ($campusCd) {
+            // 校舎コードで絞り込み
+            $query->where('yearly_schedules.campus_cd', $campusCd);
+        }
+        if ($studentId) {
+            // 生徒の所属校舎で絞り込み
+            $this->mdlWhereRoomBySidQuery($query, YearlySchedule::class, $studentId);
+        }
+        if ($tutorId) {
+            // 講師の所属校舎で絞り込み
+            $this->mdlWhereRoomByTidQuery($query, YearlySchedule::class, $tutorId);
         }
 
-        // 振替中・未振替の場合は退避エリア表示とする
-        if ($schedule['absent_status'] == AppConst::CODE_MASTER_35_3
-        || $schedule['absent_status'] == AppConst::CODE_MASTER_35_4 ) {
-            // クラス名（表示色設定）
-            $class = "cal_class_furikae";
-            // リソースID固定
-            $resourceId = config('appconf.transfer_boothId');;
-        } else {
-            // リソースID（ブースコード）
-            $resourceId = $schedule['booth_cd'];
-        }
+        // 教室名取得のサブクエリ
+        $room_names = $this->mdlGetRoomQuery();
 
-        return [
-            'className' => $class,
-            'resourceId' => $resourceId,
-        ];
+        // 年間授業予定情報の取得
+        $yearlySchedule = $query
+            ->select(
+                'yearly_schedules.lesson_date as target_date',
+                'yearly_schedules.campus_cd',
+                'room_names.room_name as room_name',
+                'room_names.room_name_symbol as room_symbol',
+            )
+            // 校舎名の取得
+            ->leftJoinSub($room_names, 'room_names', function ($join) {
+                $join->on('yearly_schedules.campus_cd', 'room_names.code');
+            })
+            // 期間区分で絞り込み
+            ->where('yearly_schedules.date_kind', AppConst::CODE_MASTER_38_9)
+            // カレンダーの表示範囲で絞り込み
+            ->whereBetween('yearly_schedules.lesson_date', [$startDate, $endDate])
+            ->orderBy('yearly_schedules.lesson_date', 'asc')
+            ->get();
+
+        return $yearlySchedule;
     }
 
     /**
@@ -443,8 +524,6 @@ trait FuncCalendarTrait
      */
     private function getSchedule($startDate, $endDate, $campusCd = null, $studentId = null, $tutorId = null)
     {
-        // SQLの表示（デバッグ用。削除してからcommit/pushすること）
-        \DB::enableQueryLog();
         $query = Schedule::query();
 
         $account = Auth::user();
@@ -461,9 +540,9 @@ trait FuncCalendarTrait
             // スケジュール情報に存在するかチェックする。existsを使用した
             $query->where('schedules.student_id', $studentId)
                 ->orWhereExists(function ($query) use ($studentId) {
-                $query->from('class_members')->whereColumn('class_members.schedule_id', 'schedules.schedule_id')
-                    ->where('class_members.student_id', $studentId);
-            });
+                    $query->from('class_members')->whereColumn('class_members.schedule_id', 'schedules.schedule_id')
+                        ->where('class_members.student_id', $studentId);
+                });
         }
         if ($tutorId) {
             // 講師IDで絞り込み
@@ -490,10 +569,12 @@ trait FuncCalendarTrait
                 'mst_courses.course_kind',
                 'mst_courses.summary_kind',
                 'mst_courses.name as course_name',
+                'mst_courses.short_name as course_sname',
                 'schedules.student_id',
                 'schedules.tutor_id',
                 'schedules.subject_cd',
                 'mst_subjects.name as subject_name',
+                'mst_subjects.short_name as subject_sname',
                 'schedules.lesson_kind',
                 'mst_codes_31.name as lesson_kind_name',
                 'schedules.create_kind',
@@ -526,9 +607,6 @@ trait FuncCalendarTrait
             ->sdLeftJoin(Tutor::class, function ($join) {
                 $join->on('schedules.tutor_id', '=', 'org_tutors.tutor_id');
             }, 'org_tutors')
-            ->sdLeftJoin(Tutor::class, function ($join) {
-                $join->on('schedules.tutor_id', 'tutors.tutor_id');
-            })
             // 欠席講師名取得
             ->sdLeftJoin(Tutor::class, function ($join) {
                 $join->on('schedules.absent_tutor_id', '=', 'absent_tutors.tutor_id');
@@ -585,8 +663,6 @@ trait FuncCalendarTrait
             ->orderBy('schedules.target_date', 'asc')
             ->orderBy('schedules.start_time', 'asc')
             ->get();
-        // クエリ出力（デバッグ用。削除してからcommit/pushすること）
-        $this->debug(\DB::getQueryLog());
 
         return $schedules;
     }

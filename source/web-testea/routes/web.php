@@ -589,6 +589,12 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 教室カレンダー欠席登録画面（集団のみ）
     Route::get('/room_calendar/absent/{scheduleId}', [RoomCalendarController::class, 'absent'])->name('room_calendar-absent');
 
+    // バリデーション(欠席登録用)
+    Route::post('/room_calendar/vd_input_absent', [RoomCalendarController::class, 'validationForInputAbsent'])->name('room_calendar-vd_input_absent');
+
+    // 編集処理(欠席登録用)
+    Route::post('/room_calendar/update_absent', [RoomCalendarController::class, 'updateAbsent'])->name('room_calendar-update_absent');
+
     // 教室カレンダー（登録後の遷移）※試作中
     Route::get('/room_calendar/{campusCd}/{dateStr}', [RoomCalendarController::class, 'calendarBack'])->name('room_calendar-back');
 
