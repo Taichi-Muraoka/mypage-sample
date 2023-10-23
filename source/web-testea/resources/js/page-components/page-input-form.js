@@ -133,6 +133,10 @@ export default class PageInputForm extends PageComponentBase {
                 // ライブラリの初期化
                 if (!option["useModalSelect"]) {
                     self.initLibs(this, option);
+                }else{
+                    // 検索モーダルで使用するSelect2は、検索モーダルで初期化
+                    self.initDatePicker(this, option);
+                    self.initFileInput(this, option);
                 }
 
                 // 確認モーダルの表示用
@@ -204,6 +208,11 @@ export default class PageInputForm extends PageComponentBase {
                     submitDelete: function () {
                         // 削除処理
                         self._sendDelete(this, option);
+                    },
+                    // バリデーションあり削除ボタン
+                    submitValidationDelete: function () {
+                        // 削除処理
+                        self._sendValidationDelete(this, option);
                     },
                     // プルダウンの変更イベントで詳細を取得
                     selectChangeGet: function (event) {
@@ -527,6 +536,84 @@ export default class PageInputForm extends PageComponentBase {
     _sendDelete($vue, option) {
         AjaxCom.getPromise()
             .then((response) => {
+                // 確認ダイアログ
+                return appDialogCom.confirmDel();
+            })
+            .then((flg) => {
+                if (!flg) {
+                    // いいえを押した場合
+                    return AjaxCom.exit();
+                }
+
+                // ダイアログ
+                appDialogCom.progressShow();
+
+                // 削除
+                var url = UrlCom.getFuncUrl() + "/delete" + option["urlSuffix"];
+
+                // モック時は送信しない
+                if (!option["isMock"]) {
+                    // 送信
+                    return axios.post(url, $vue.form);
+                } else {
+                    // ダミーウェイト
+                    return DummyCom.wait();
+                }
+            })
+            .then((response) => {
+                // ダイアログ
+                appDialogCom.progressHide();
+
+                // エラー応答の場合は、アラートを表示する
+                if (
+                    Object.keys(response.data).length == 1 &&
+                    response.data["error"]
+                ) {
+                    appDialogCom.alert(response.data["error"]);
+                    return AjaxCom.exit();
+                }
+
+                // 完了メッセージ
+                return appDialogCom.success("削除");
+            })
+            .then(
+                // 後処理を実行する
+                option["afterEdit"]
+            )
+            .catch(AjaxCom.fail);
+    }
+
+    /**
+     * 削除(バリデーションあり)
+     *
+     * @param vueインスタンス
+     */
+    _sendValidationDelete($vue, option) {
+        // 送信フォームのデータを取得する
+        var sendData = this._getSendFormData($vue);
+
+        const self = this;
+        AjaxCom.getPromise()
+            .then((response) => {
+                // バリデート(例：http://localhost:8000/sample/edit/1 と同じ階層を想定)
+                var url =
+                    UrlCom.getFuncUrl() + "/vd_delete" + option["urlSuffix"];
+                // モック時は送信しない
+                if (!option["isMock"]) {
+                    // バリデーション
+                    return axios.post(url, sendData.data, sendData.header);
+                }
+            })
+            .then((response) => {
+                // モック時はチェックしない
+                if (!option["isMock"]) {
+                    // バリデーション結果をチェック
+                    if (!self.validateCheck($vue, response)) {
+                        // 処理を抜ける
+                        return AjaxCom.exit();
+                    }
+                }
+
                 // 確認ダイアログ
                 return appDialogCom.confirmDel();
             })
