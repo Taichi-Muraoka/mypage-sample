@@ -17,7 +17,7 @@ return new class extends Migration
             /* カラム */
             $table->increments('unit_id', 7)->comment('単元ID');
             $table->string('unit_category_cd', 7)->comment('単元分類コード');
-            $table->string('unit_cd', 7)->comment('単元コード');
+            $table->string('unit_cd', 2)->comment('単元コード');
             $table->string('name', 50)->comment('名称');
             $table->timestamps();
             $table->softDeletes();

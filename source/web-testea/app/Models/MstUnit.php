@@ -104,7 +104,7 @@ class MstUnit extends Model
     {
         static $_fieldRules = [
             'unit_category_cd' => ['string', 'max:7', 'digits:7'],
-            'unit_cd' => ['string', 'max:7', 'digits:7'],
+            'unit_cd' => ['string', 'max:2', 'digits:2'],
             'name' => ['string', 'max:50']
         ];
         return $_fieldRules;

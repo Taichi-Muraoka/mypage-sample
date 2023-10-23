@@ -1717,7 +1717,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/master_mng_text/vd_search', [MasterMngTextController::class, 'validationForSearch'])->name('master_mng_text-vd_search');
 
     // 検索結果取得
-    Route::post('/master_mng_text/search', [MasterMngTimetableController::class, 'search'])->name('master_mng_text-search');
+    Route::post('/master_mng_text/search', [MasterMngTextController::class, 'search'])->name('master_mng_text-search');
 
     // 詳細取得用
     //Route::post('/master_mng_text/get_data', [MasterMngTextController::class, 'getData'])->name('master_mng_text-get_data');
@@ -1739,6 +1739,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/master_mng_text/delete', [MasterMngTextController::class, 'delete'])->name('master_mng_text-delete');
+
+    // バリデーション(削除用)
+    Route::post('/master_mng_text/vd_delete', [MasterMngTextController::class, 'validationForDelete'])->name('master_mng_text-vd_delete');
 
     //---------------------
     // 授業単元分類マスタ
