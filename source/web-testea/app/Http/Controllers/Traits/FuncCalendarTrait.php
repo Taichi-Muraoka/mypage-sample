@@ -247,8 +247,11 @@ trait FuncCalendarTrait
             $schedule['title'] = $schedule['start_time']->format('H:i') . '-' . $schedule['end_time']->format('H:i');
             // タイトル_強調表示
             if (
-                $schedule['lesson_kind'] != AppConst::CODE_MASTER_31_1
-                && $schedule['lesson_kind'] != AppConst::CODE_MASTER_31_2
+                $schedule['lesson_kind'] == AppConst::CODE_MASTER_31_3
+                || $schedule['lesson_kind'] == AppConst::CODE_MASTER_31_4
+                || $schedule['lesson_kind'] == AppConst::CODE_MASTER_31_5
+                || $schedule['lesson_kind'] == AppConst::CODE_MASTER_31_6
+                || $schedule['lesson_kind'] == AppConst::CODE_MASTER_31_7
             ) {
                 // 授業種別が初回・体験・追加の場合
                 $schedule['title'] = $schedule['title'] . '<br><span class="class_special">' . $schedule['lesson_kind_name'] . '</span>';
@@ -257,7 +260,7 @@ trait FuncCalendarTrait
                     $schedule['title'] = $schedule['title'] . ' <span class="class_special">' . $schedule['create_kind_name'] . '</span>';
                 }
             } else {
-                // 授業種別が通常・特別で振替の場合
+                // 授業種別が初回・体験・追加以外で振替の場合
                 if ($schedule['create_kind'] == AppConst::CODE_MASTER_32_2) {
                     $schedule['title'] = $schedule['title'] . '<br><span class="class_special">' . $schedule['create_kind_name'] . '</span>';
                 }
@@ -656,8 +659,8 @@ trait FuncCalendarTrait
             ->sdLeftJoin(Schedule::class, function ($join) {
                 $join->on('schedules.transfer_class_id', '=', 'transfer_schedules.schedule_id');
             }, 'transfer_schedules')
-            // 振替済みスケジュールを除外
-            ->where('schedules.absent_status', '!=', AppConst::CODE_MASTER_35_5)
+            // 振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             // カレンダーの表示範囲で絞り込み
             ->whereBetween('schedules.target_date', [$startDate, $endDate])
             ->orderBy('schedules.target_date', 'asc')
