@@ -83,7 +83,7 @@
         <td>@{{$filters.formatYmd(item.transfer_date)}} @{{item.transfer_period_no}}限</td>
     </tr>
     <tr v-Show="item.admin_name">
-        <th>登録・担当者</th>
+        <th>登録・担当者名</th>
         <td>@{{item.admin_name}}</td>
     </tr>
     <tr>

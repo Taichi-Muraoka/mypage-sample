@@ -62,6 +62,7 @@ export default class RoomCalendar {
             //height: 1700,
             contentHeight: "auto",
             stickyFooterScrollbar: true,
+            stickyHeaderDates: true,
             dayMinWidth: 150,
             selectable: false,
             selectMirror: false,
