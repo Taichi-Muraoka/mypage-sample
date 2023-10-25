@@ -7,7 +7,7 @@
 
 {{-- 編集画面の場合のみ、生徒カルテを経由する --}}
 @if (request()->routeIs('member_mng-edit'))
-@section('parent_page', route('member_mng-detail', 1))
+@section('parent_page', route('member_mng-detail', $editData['student_id']))
 @section('parent_page_title', '生徒カルテ')
 @endif
 
@@ -55,46 +55,73 @@
     <x-input.text caption="保護者電話番号" id="tel_par" :rules=$rules :editData=$editData/>
     <x-input.text caption="生徒メールアドレス" id="email_stu" :rules=$rules :editData=$editData/>
     <x-input.text caption="保護者メールアドレス" id="email_par" :rules=$rules :editData=$editData/>
-    <x-input.select id="login_kind" caption="ログインID種別" :select2=true :mastrData=$loginKindList :editData=$editData
-        :select2Search=false :blank=true />
     <x-input.select id="stu_status" caption="会員ステータス" :select2=true :mastrData=$statusList :editData=$editData
         :select2Search=false :blank=true />
-    <x-input.date-picker caption="入会日" id="enter_date" :editData=$editData/>
 
-    {{-- 編集画面の場合、かつ、会員ステータス＝休塾予定、休塾の場合に表示 --}}
-    @if (request()->routeIs('member_mng-edit'))
-    <div v-cloak>
-        <x-input.date-picker caption="休塾開始日" id="recess_start_date" :editData=$editData
-            vShow="form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_2 }} || form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_3 }}"/>
-        <x-input.date-picker caption="休塾終了日" id="recess_end_date" :editData=$editData
-            vShow="form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_2 }} || form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_3 }}"/>
+    {{-- 会員ステータス＝見込客 以外の場合に表示 --}}
+    <div v-cloak v-show="form.stu_status != {{ App\Consts\AppConst::CODE_MASTER_28_0 }}">
+        <x-input.select id="login_kind" caption="ログインID種別" :select2=true :mastrData=$loginKindList :editData=$editData
+            :select2Search=false :blank=true/>
+        <x-input.date-picker caption="入会日" id="enter_date" :editData=$editData/>
     </div>
 
-    {{-- 編集画面の場合、かつ、会員ステータス＝退会処理中、退会済の場合に表示 --}}
-    <x-input.date-picker caption="退会日" id="leave_date" :editData=$editData
-        vShow="form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_4 }} || form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_5 }}"/>
+    {{-- 編集時に表示 --}}
+    @if (request()->routeIs('member_mng-edit'))
+    {{-- 会員ステータス＝見込客・退会済 以外の場合に表示するようにした --}}
+    {{-- プルダウン 休塾予定、休塾 選択時に日付ピッカー表示 --}}
+    @if($editData['stu_status'] != AppConst::CODE_MASTER_28_0 && $editData['stu_status'] != AppConst::CODE_MASTER_28_5)
+    <div v-cloak v-show="form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_2 }} || form.stu_status == {{ App\Consts\AppConst::CODE_MASTER_28_3 }}">
+        <x-input.date-picker caption="休塾開始日" id="recess_start_date" :editData=$editData/>
+        <x-input.date-picker caption="休塾終了日" id="recess_end_date" :editData=$editData/>
+    </div>
     @endif
 
+    {{-- 会員ステータス＝退会処理中の場合に表示 --}}
+    @if($editData['stu_status'] == AppConst::CODE_MASTER_28_4)
+    <x-input.date-picker caption="退会日" id="leave_date" :editData=$editData/>
+    @endif
+
+    {{-- 会員ステータス＝退会済の場合に表示 --}}
+    @if($editData['stu_status'] == AppConst::CODE_MASTER_28_5)
+    <div v-cloak>
+        <x-bs.form-title>退会日</x-bs.form-title>
+        <p class="edit-disp-indent">{{$editData['leave_date']->format('Y/m/d')}}</p>
+    </div>
+    @endif
+    @endif
+    {{-- 編集時に表示 終了 --}}
+
+    {{-- 共通 --}}
     <x-input.text caption="外部サービス顧客ID" id="lead_id" :rules=$rules :editData=$editData/>
     <x-input.text caption="ストレージURL" id="storage_link" :rules=$rules :editData=$editData/>
     <x-input.textarea id="memo" caption="メモ" :rules=$rules :editData=$editData />
 
+    {{-- 編集時に注意事項表示 --}}
+    @if (request()->routeIs('member_mng-edit'))
+    <x-bs.callout title="休塾、退会の注意事項" type="danger">
+        会員ステータスを「休塾予定」とした場合、または、休塾期間が変更された場合には、登録された休塾期間の生徒スケジュールが削除されます。<br>
+        退会日が変更された場合には、退会日以降の生徒スケジュールが削除されます。<br>
+        画面からの復元はできませんのでご注意ください。<br>
+    </x-bs.callout>
+    @endif
+
     {{-- hidden --}}
     <x-input.hidden id="student_id" :editData=$editData />
+    <x-input.hidden id="leave_date" :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
-            {{-- 生徒カルテに戻る --}}
-            <x-button.back url="{{route('member_mng-detail', 1)}}" />
-
             @if (request()->routeIs('member_mng-edit'))
             {{-- 編集時 --}}
+            {{-- 生徒カルテに戻る --}}
+            <x-button.back url="{{route('member_mng-detail', $editData['student_id'])}}" />
             <div class="d-flex justify-content-end">
                 <x-button.submit-edit />
             </div>
             @else
             {{-- 登録時 --}}
+            <x-button.back />
             <x-button.submit-new />
             @endif
 

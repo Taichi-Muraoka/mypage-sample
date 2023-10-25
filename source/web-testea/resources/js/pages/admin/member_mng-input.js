@@ -27,9 +27,6 @@ export default class AppClass extends PageBase {
             self.redirectToParent();
         };
 
-        // 日付ピッカー不具合MEMO:
-        // 選択後イベント＋選択モーダル(学校検索)＋useModalSelectを消すと$requestに送られる
-
         // Vue: 入力フォーム
         const vueForm = this.getVueInputForm({
             afterEdit: afterEdit,

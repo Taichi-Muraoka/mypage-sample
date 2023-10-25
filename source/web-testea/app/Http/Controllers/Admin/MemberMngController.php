@@ -13,11 +13,21 @@ use App\Models\MstCampus;
 use App\Models\Student;
 use App\Models\StudentCampus;
 use App\Models\MstSchool;
+use App\Models\MstSystem;
+use App\Models\SeasonStudentRequest;
+use App\Models\Schedule;
+use App\Models\ClassMember;
 use App\Models\CodeMaster;
 use App\Http\Controllers\Traits\FuncCalendarTrait;
 use App\Http\Controllers\Traits\FuncInvoiceTrait;
 use App\Http\Controllers\Traits\FuncAgreementTrait;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\MypageGuideToStudent;
+use App\Mail\MypageGuideRejoinToStudent;
+use Carbon\Carbon;
 
 /**
  * 会員管理 - コントローラ
@@ -536,6 +546,15 @@ class MemberMngController extends Controller
      */
     public function new()
     {
+        // 学年設定年度の初期表示用データセット（システムマスタ「現年度」）
+        $currentYear = MstSystem::select('value_num')
+            ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
+            ->first();
+
+        $editData = [
+            'grade_year' => $currentYear->value_num
+        ];
+
         // 校舎チェックボックスリストを取得
         $rooms = $this->getCampusGroup();
         // 学年リストを取得
@@ -554,7 +573,7 @@ class MemberMngController extends Controller
         $establishKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_50);
 
         return view('pages.admin.member_mng-input', [
-            'editData' => null,
+            'editData' => $editData,
             'editDataCampus' => null,
             'rules' => $this->rulesForInput(null),
             'rooms' => $rooms,
@@ -577,10 +596,10 @@ class MemberMngController extends Controller
      */
     public function create(Request $request)
     {
-        $this->debug($request);
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
+        // 見込客・在籍 共通保存項目
         $form = $request->only(
             'name',
             'name_kana',
@@ -596,25 +615,112 @@ class MemberMngController extends Controller
             'tel_par',
             'email_stu',
             'email_par',
-            'login_kind',
             'stu_status',
-            'enter_date',
             'lead_id',
             'storage_link',
             'memo',
         );
 
-        //-------------------------
-        // 生徒情報の登録
-        //-------------------------
-        $student = new Student;
+        // 会員ステータス「在籍」の場合の登録項目
+        if ($request['stu_status'] == AppConst::CODE_MASTER_28_1) {
+            // 以下項目を追加
+            $form += [
+                'login_kind' => $request['login_kind'],
+                'enter_date' => $request['enter_date'],
+            ];
+        }
 
-        // 保存
-        // $student->fill($form)->save();
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($request, $form) {
+            //-------------------------
+            // 生徒情報の登録
+            //-------------------------
+            $student = new Student;
+            // 保存
+            $student->fill($form)->save();
 
-        //-------------------------
-        // 生徒所属情報の登録
-        //-------------------------
+            //-------------------------
+            // 生徒所属情報の登録
+            //-------------------------
+            // 所属校舎を配列にする
+            $campuses = explode(",", $request['rooms']);
+
+            foreach ($campuses as $campus) {
+                // 所属校舎分データ作成
+                $stuCampus = new StudentCampus;
+                $stuCampus->student_id = $student->student_id;
+                $stuCampus->campus_cd = $campus;
+
+                // 保存
+                $stuCampus->save();
+            }
+
+            // 会員ステータス「見込客」 で登録の場合はこの時点で処理終了
+            if($student->stu_status == AppConst::CODE_MASTER_28_0){
+                return;
+            }
+
+            // 会員ステータス「在籍」 で登録の場合は以下の処理も行う
+            //-------------------------
+            // アカウント情報の登録
+            //-------------------------
+            // 生徒メールか保護者メールか判別
+            $email = null;
+            if($student->login_kind == AppConst::CODE_MASTER_8_1){
+                $email = $student->email_stu;
+            }
+            if($student->login_kind == AppConst::CODE_MASTER_8_2){
+                $email = $student->email_par;
+            }
+
+            $account = new Account;
+            $account->account_id = $student->student_id;
+            // アカウント種類：生徒
+            $account->account_type = AppConst::CODE_MASTER_7_1;
+            $account->email = $email;
+            // 仮パスワードはハッシュ化したメールアドレスとする
+            $account->password = Hash::make($email);
+            // パスワードリセット：不要
+            $account->password_reset = AppConst::ACCOUNT_PWRESET_0;
+            // プラン種類：通常
+            $account->plan_type = AppConst::CODE_MASTER_10_0;
+            // ログイン可否：可
+            $account->login_flg = AppConst::CODE_MASTER_9_1;
+
+            // 保存
+            $account->save();
+
+            //-------------------------
+            // 特別期間講習管理 生徒連絡情報の登録
+            //-------------------------
+            // 対象年度の特別期間×対象校舎分を登録する。
+
+            // 特別期間コードリスト取得
+            $seasonCodes = $this->mdlFormatSeasonCd();
+
+            foreach ($seasonCodes as $seasonCd) {
+                // 所属校舎配列は生徒所属登録時の$campusesより転用
+                foreach ($campuses as $campus) {
+                    $seasonStuReq = new SeasonStudentRequest;
+                    $seasonStuReq->student_id = $student->student_id;
+                    $seasonStuReq->season_cd = $seasonCd;
+                    $seasonStuReq->campus_cd = $campus;
+                    // 生徒登録状態：未登録
+                    $seasonStuReq->regist_status = AppConst::CODE_MASTER_5_0;
+                    // コマ組み状態：未対応
+                    $seasonStuReq->plan_status = AppConst::CODE_MASTER_47_0;
+
+                    // 保存
+                    $seasonStuReq->save();
+                }
+            }
+
+            //-------------------------
+            // メール送信
+            //-------------------------
+            // マイページ案内のメール送信 テンプレートは別ファイル
+            Mail::to($email)->send(new MypageGuideToStudent());
+        });
 
         return;
     }
@@ -732,7 +838,273 @@ class MemberMngController extends Controller
      */
     public function update(Request $request)
     {
-        $this->debug($request);
+        // 登録前バリデーション。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForInput($request))->validate();
+
+        // 全会員ステータス 共通保存項目
+        $form = $request->only(
+            'name',
+            'name_kana',
+            'rooms',
+            'birth_date',
+            'grade_cd',
+            'grade_year',
+            'is_jukensei',
+            'school_cd_e',
+            'school_cd_j',
+            'school_cd_h',
+            'tel_stu',
+            'tel_par',
+            'email_stu',
+            'email_par',
+            'stu_status',
+            'lead_id',
+            'storage_link',
+            'memo',
+        );
+
+        // 会員ステータス「見込客」以外 共通保存項目（「退会済」はこの項目で確定 leave_date上書きしない）
+        if ($request['stu_status'] != AppConst::CODE_MASTER_28_0) {
+            $form += [
+                'login_kind' => $request['login_kind'],
+                'enter_date' => $request['enter_date'],
+            ];
+        }
+
+        // 会員ステータス「在籍」追加項目
+        if ($request['stu_status'] == AppConst::CODE_MASTER_28_1) {
+            $form += [
+                // 休塾開始日、休塾終了日、退会日をクリアする(NULL)
+                'recess_start_date' => null,
+                'recess_end_date' => null,
+                'leave_date' => null,
+            ];
+        }
+
+        // 会員ステータス「休塾予定」「休塾」追加項目
+        if ($request['stu_status'] == AppConst::CODE_MASTER_28_2 || $request['stu_status'] == AppConst::CODE_MASTER_28_3) {
+            $form += [
+                'recess_start_date' => $request['recess_start_date'],
+                'recess_end_date' => $request['recess_end_date'],
+                // 「退会処理中」→「休塾予定」に変更の場合もあるため、退会日をクリアする(NULL)
+                'leave_date' => null,
+            ];
+        }
+
+        // 会員ステータス「退会処理中」追加項目
+        if ($request['stu_status'] == AppConst::CODE_MASTER_28_4) {
+            $form += [
+                'leave_date' =>  $request['leave_date'],
+                // 休塾開始日、休塾終了日の更新なし（休塾履歴がある場合はデータが残る）
+            ];
+        }
+
+        DB::transaction(function () use ($request, $form) {
+            // MEMO:会員ステータスなど、変更前と変更後を比較して処理する内容がある関係上、生徒情報の更新は最後にした
+            // 変更前の値を$student、変更後の値を$request として記述する
+
+            // 既存の生徒情報を取得
+            $student = Student::where('student_id', $request['student_id'])
+                // 該当データがない場合はエラーを返す
+                ->firstOrFail();
+
+            // 既存のアカウント情報を取得（見込客はアカウント情報が無いのでエラー出力なし）
+            $account = Account::where('account_id', $request['student_id'])
+                ->where('account_type', AppConst::CODE_MASTER_7_1)
+                ->first();
+
+            // メールアドレス生徒／保護者分岐
+            // 1.アカウント情報作成 2.アカウント情報更新 3.メール送信 に使用
+            $email = null;
+            if($request['login_kind'] == AppConst::CODE_MASTER_8_1){
+                $email = $request['email_stu'];
+            }
+            if($request['login_kind'] == AppConst::CODE_MASTER_8_2){
+                $email = $request['email_par'];
+            }
+
+            //-------------------------
+            // 生徒所属情報の登録
+            //-------------------------
+            // forceDelete・insertとする
+
+            // 既存データ削除
+            StudentCampus::where('student_id', $request['student_id'])
+                ->forceDelete();
+
+            // 選択した所属校舎コードを配列にする
+            $campuses = explode(",", $request['rooms']);
+
+            // 新規データ作成
+            foreach ($campuses as $campus) {
+                $stuCampus = new StudentCampus;
+                $stuCampus->student_id = $request['student_id'];
+                $stuCampus->campus_cd = $campus;
+
+                // 保存
+                $stuCampus->save();
+            }
+
+            //-------------------------
+            // 特別期間講習管理 生徒連絡情報の登録
+            //-------------------------
+            // 所属校舎の、当年度の特別期間講習管理 生徒連絡情報のレコードが無い場合に作成する
+
+            // ステータス「在籍」で変更した場合に行う。
+            if ($request['stu_status'] == AppConst::CODE_MASTER_28_1) {
+
+                // 特別期間コードリスト取得（where用）
+                $seasonCodes = $this->mdlFormatSeasonCd();
+
+                // 所属校舎の当年度の特別期間講習管理 生徒連絡情報のレコードが有るか確認
+                foreach ($seasonCodes as $seasonCd ) {
+                    foreach ( $campuses as $campus) {
+                        // 生徒ID、特別期間コード、選択した校舎 で絞り込む
+                        $existsSeasonStuReq = SeasonStudentRequest::where('student_id', $request['student_id'])
+                            ->where('season_cd', $seasonCd)
+                            ->where('campus_cd', $campus)
+                            ->exists();
+
+                        // 無ければ新規登録
+                        if(!$existsSeasonStuReq){
+                            $seasonStuReq = new SeasonStudentRequest;
+                            $seasonStuReq->student_id = $request['student_id'];
+                            $seasonStuReq->season_cd = $seasonCd;
+                            $seasonStuReq->campus_cd = $campus;
+                            // 生徒登録状態：未登録
+                            $seasonStuReq->regist_status = AppConst::CODE_MASTER_5_0;
+                            // コマ組み状態：未対応
+                            $seasonStuReq->plan_status = AppConst::CODE_MASTER_47_0;
+
+                            // 保存
+                            $seasonStuReq->save();
+                        }
+                    }
+                }
+            }
+
+            //-------------------------
+            // アカウント情報の登録
+            //-------------------------
+            // 「見込客」→「在籍」に変更時、アカウント情報を新規登録（insert）する。
+
+            if ($student->stu_status == AppConst::CODE_MASTER_28_0 && $request['stu_status'] == AppConst::CODE_MASTER_28_1) {
+                $account = new Account;
+                $account->account_id = $request['student_id'];
+                // アカウント種類：生徒
+                $account->account_type = AppConst::CODE_MASTER_7_1;
+                // $emailは上部に記載
+                $account->email = $email;
+                // 仮パスワードはハッシュ化したメールアドレスとする
+                $account->password = Hash::make($email);
+                // パスワードリセット：不要
+                $account->password_reset = AppConst::ACCOUNT_PWRESET_0;
+                // プラン種類：通常
+                $account->plan_type = AppConst::CODE_MASTER_10_0;
+                // ログイン可否：可
+                $account->login_flg = AppConst::CODE_MASTER_9_1;
+
+                // 保存
+                $account->save();
+            }
+
+            //-------------------------
+            // アカウント情報の更新 メールアドレス・ログイン可否の変更
+            //-------------------------
+            // 1.ログインID種別を変更した時
+            // 2.ログインID種別で選択されている方のメールアドレスが変更された時（アカウント情報のメールアドレスが、生徒メールにも保護者メールにも一致しない時）
+            // 3.会員ステータス「退会済」から「在籍」に変更した時
+            // のいずれかの場合に行う。
+
+            // 「見込客」はアカウント情報を持たないため、この処理からは外す（エラー防止）
+            // 「見込客」→「在籍」に変更時も、この処理は行わない（アカウント新規作成を上記で行うため）
+            if ($request['stu_status'] != AppConst::CODE_MASTER_28_0
+                && !($student->stu_status == AppConst::CODE_MASTER_28_0 && $request['stu_status'] == AppConst::CODE_MASTER_28_1)
+                ) {
+                if ($student->login_kind != $request['login_kind']
+                    || ($account->email != $request['email_stu'] && $account->email != $request['email_par'])
+                    || ($student->stu_status == AppConst::CODE_MASTER_28_5 && $request['stu_status'] == AppConst::CODE_MASTER_28_1)
+                ) {
+                    // メールアドレス更新 $emailは上部に記載
+                    $account->email = $email;
+
+                    // 3.会員ステータス「退会済」から「在籍」に変更した時、ログイン可にする
+                    if ($student->stu_status == AppConst::CODE_MASTER_28_5 && $request['stu_status'] == AppConst::CODE_MASTER_28_1) {
+                        // ログイン可否：可
+                        $account->login_flg = AppConst::CODE_MASTER_9_1;
+                    }
+
+                    // 保存
+                    $account->save();
+                }
+            }
+
+            //-------------------------
+            // 休塾期間中のスケジュール削除、受講生徒情報削除
+            //-------------------------
+            // 会員ステータス「休塾予定」「休塾」で変更した場合に行う。
+
+            if ($request['stu_status'] == AppConst::CODE_MASTER_28_2 || $request['stu_status'] == AppConst::CODE_MASTER_28_3) {
+
+                // 1.スケジュール情報 削除
+                Schedule::where('student_id', $request['student_id'])
+                    ->where('target_date', '>=', $request['recess_start_date'])
+                    ->where('target_date', '<=', $request['recess_end_date'])
+                    ->delete();
+
+                // 2.受講生徒情報 削除
+                ClassMember::where('class_members.student_id', $request['student_id'])
+                    // スケジュール情報とJOIN
+                    ->sdLeftJoin(Schedule::class, 'schedules.schedule_id', '=', 'class_members.schedule_id')
+                    ->where('target_date', '>=', $request['recess_start_date'])
+                    ->where('target_date', '<=', $request['recess_end_date'])
+                    ->delete();
+            }
+
+            //-------------------------
+            // 退会日変更時のスケジュール削除、受講生徒情報削除
+            //-------------------------
+            // 会員ステータス「退会処理中」で変更した場合に行う。
+
+            if ($request['stu_status'] == AppConst::CODE_MASTER_28_4) {
+
+                // 1.スケジュール情報 削除
+                Schedule::where('student_id', $request['student_id'])
+                    ->where('target_date', '>', $request['leave_date'])
+                    ->delete();
+
+                // 2.受講生徒情報 削除
+                ClassMember::where('class_members.student_id', $request['student_id'])
+                    // スケジュール情報とJOIN
+                    ->sdLeftJoin(Schedule::class, 'schedules.schedule_id', '=', 'class_members.schedule_id')
+                    ->where('target_date', '>', $request['leave_date'])
+                    ->delete();
+            }
+
+            //-------------------------
+            // メール送信
+            //-------------------------
+            // 1.会員ステータス「見込客」→「在籍」に変更した場合、初期マイページ案内のメールを送信する
+            // 2.会員ステータス「退会済」→「在籍」に変更した場合、再入会マイページ案内のメールを送信する
+
+            // 1.会員ステータス「見込客」→「在籍」に変更した場合
+            if ($student->stu_status == AppConst::CODE_MASTER_28_0 && $request['stu_status'] == AppConst::CODE_MASTER_28_1) {
+                // メール送信 $emailは上部に記載
+                Mail::to($email)->send(new MypageGuideToStudent());
+            }
+
+            // 2.会員ステータス「退会済」→「在籍」に変更した場合
+            if ($student->stu_status == AppConst::CODE_MASTER_28_5 && $request['stu_status'] == AppConst::CODE_MASTER_28_1) {
+                Mail::to($email)->send(new MypageGuideRejoinToStudent());
+            }
+
+            //-------------------------
+            // 生徒情報の更新
+            //-------------------------
+            // 会員ステータスごとに$formで絞ったデータを上書き保存
+            $student->fill($form)->save();
+        });
+
         return;
     }
 
@@ -757,7 +1129,318 @@ class MemberMngController extends Controller
     private function rulesForInput(?Request $request)
     {
         $rules = array();
-        $rules += Student::fieldRules('birth_date');
+
+        // 独自バリデーション: チェックボックス 所属校舎
+        $validationCampusGroupList =  function ($attribute, $value, $fail) use ($request) {
+            // requestされた校舎コードを配列にする
+            $inputCampusGroup = explode(",", $request->rooms);
+            // 全校舎リスト
+            $campusGroups = $this->getCampusGroup();
+
+            // 配列にしたグループの整形
+            $group = [];
+            foreach ($inputCampusGroup as $val) {
+                $group[$val] = $val;
+            }
+
+            // 校舎コードとインデックスを合わせるため整形
+            $campusGroup = [];
+            foreach ($campusGroups as $campusGroups) {
+                $campusGroup[$campusGroups->code] = $campusGroups->code;
+            }
+
+            foreach ($group as $val) {
+                if (!isset($campusGroup[$val])) {
+                    // 不正な値エラー
+                    return $fail(Lang::get('validation.invalid_input'));
+                }
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 学年
+        $validationGradeList =  function ($attribute, $value, $fail) {
+            // 学年リストを取得
+            $grades = $this->mdlGetGradeList(false);
+            if (!isset($grades[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 受験生フラグ
+        $validationJukenFlagList =  function ($attribute, $value, $fail) {
+            // 受験生フラグリストを取得
+            $jukenFlagList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_13);
+            if (!isset($jukenFlagList[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック ログインID種別
+        $validationLoginKindList =  function ($attribute, $value, $fail) {
+            // ログインID種別リストを取得
+            $loginKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_8);
+            if (!isset($loginKindList[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 会員ステータス
+        $validationStatusList =  function ($attribute, $value, $fail) {
+            // 会員ステータスリストを取得
+            $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_28);
+            if (!isset($statusList[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: メールアドレス重複チェック ログインID種別=生徒の場合
+        $validationEmailStu = function ($attribute, $value, $fail) use ($request) {
+            // ログインID種別が生徒でない場合、または、見込客の場合は重複チェックしない
+            if ($request['login_kind'] != AppConst::CODE_MASTER_8_1 || $request['stu_status'] == AppConst::CODE_MASTER_28_0) {
+                return;
+            }
+
+            // 対象データを取得
+            $studentEmail = Account::where('email', $request['email_stu']);
+
+            // 変更時は自分のキー以外を検索
+            if (filled($request['student_id'])) {
+                $studentEmail->where('account_id', '!=', $request['student_id']);
+            }
+
+            $exists = $studentEmail->exists();
+
+            if ($exists) {
+                // 登録済みエラー
+                return $fail(Lang::get('validation.duplicate_email'));
+            }
+        };
+
+        // 独自バリデーション: メールアドレス重複チェック ログインID種別=保護者の場合
+        $validationEmailPar = function ($attribute, $value, $fail) use ($request) {
+            // ログインID種別が保護者でない場合、または、見込客の場合は重複チェックしない
+            if ($request['login_kind'] != AppConst::CODE_MASTER_8_2 || $request['stu_status'] == AppConst::CODE_MASTER_28_0) {
+                return;
+            }
+
+            // 対象データを取得
+            $parEmail = Account::where('email', $request['email_par']);
+
+            // 変更時は自分のキー以外を検索
+            if (filled($request['student_id'])) {
+                $parEmail->where('account_id', '!=', $request['student_id']);
+            }
+
+            $exists = $parEmail->exists();
+
+            if ($exists) {
+                // 登録済みエラー
+                return $fail(Lang::get('validation.duplicate_email'));
+            }
+        };
+
+        // 独自バリデーション: 会員ステータス「休塾予定」の場合、休塾開始日はシステム日付より未来日
+        $validationRecessStartDateCaseProspect = function ($attribute, $value, $fail) use ($request) {
+            // 休塾開始日の数値が現在日時の数値を下回っていないかチェック
+            if (strtotime($request['recess_start_date']) < strtotime('now')) {
+                // 下回っていた（未来日でない）場合エラー
+                return $fail(Lang::get('validation.after_tomorrow'));
+            }
+        };
+
+        // 独自バリデーション: 会員ステータス「休塾」の場合、休塾開始日はシステム日付以前（当日含む）
+        $validationRecessStartDateCaseExecution = function ($attribute, $value, $fail) use ($request) {
+            // 現在日時の数値が休塾開始日の数値を下回っていないかチェック
+            if (strtotime('now') <= strtotime($request['recess_start_date'])) {
+                // 下回っていた（システム日付以前でない）場合エラー
+                return $fail(Lang::get('validation.before_or_equal_today',));
+            }
+        };
+
+        // 独自バリデーション: 休塾終了日は休塾開始日より未来日とする
+        $validationRecessDate = function ($attribute, $value, $fail) use ($request) {
+            // 休塾終了日の数値が休塾開始日の数値を下回っていないかチェック
+            if (strtotime($request['recess_end_date']) <= strtotime($request['recess_start_date'])) {
+                // 下回っていた（休塾開始日より未来日でない）場合エラー
+                return $fail(Lang::get('validation.after',));
+            }
+        };
+
+        // 独自バリデーション: 会員ステータス「退会処理中」の場合、退会日はシステム日付より未来日
+        $validationLeaveDateProspect = function ($attribute, $value, $fail) use ($request) {
+            // 休塾開始日の数値が現在日時の数値を下回っていないかチェック
+            if (strtotime($request['leave_date']) < strtotime('now')) {
+                // 下回っていた（未来日でない）場合エラー
+                return $fail(Lang::get('validation.after_tomorrow'));
+            }
+        };
+
+        // 独自バリデーション: 会員ステータス「見込客」への更新は不可
+        $validationStatusLead = function ($attribute, $value, $fail) use ($request) {
+            // 対象データを取得（編集中のデータ）
+            $student = Student::where('student_id', $request['student_id'])
+                ->first();
+
+            // 登録時：新規登録時は対象データが無いためチェックしない
+            // 新規登録時にバリデーションエラーが出ないよう設定した
+            if (empty($student)) {
+                return;
+            }
+
+            // 編集時：編集前のデータが会員ステータス「見込客」の場合はチェックしない
+            if (isset($student) && $student->stu_status == AppConst::CODE_MASTER_28_0) {
+                return;
+            }
+
+            // リクエストデータが「見込客」を選択していたらエラー
+            if ($request['stu_status'] == AppConst::CODE_MASTER_28_0) {
+                return $fail(Lang::get('validation.status_cannot_change'));
+            }
+        };
+
+        // 独自バリデーション: 会員ステータス「休塾予定」への更新は不可
+        $validationStatusRecessProspect = function ($attribute, $value, $fail) use ($request) {
+            // 対象データを取得（編集中のデータ）
+            $student = Student::where('student_id', $request['student_id'])
+                ->first();
+
+            // 編集前のデータが会員ステータス「在籍」「休塾予定」「退会処理中」の場合はチェックしない
+            if (isset($student) && ($student->stu_status == AppConst::CODE_MASTER_28_1 || $student->stu_status == AppConst::CODE_MASTER_28_2 || $student->stu_status == AppConst::CODE_MASTER_28_4) ) {
+                return;
+            }
+
+            // リクエストデータが「休塾予定」を選択していたらエラー
+            if ($request['stu_status'] == AppConst::CODE_MASTER_28_2) {
+                return $fail(Lang::get('validation.status_cannot_change'));
+            }
+        };
+
+        // 独自バリデーション: 会員ステータス「休塾」への更新は不可
+        $validationStatusRecessExecution = function ($attribute, $value, $fail) use ($request) {
+            // 対象データを取得（編集中のデータ）
+            $student = Student::where('student_id', $request['student_id'])
+                ->first();
+
+            // 編集前のデータが会員ステータス「休塾」の場合はチェックしない
+            if (isset($student) && $student->stu_status == AppConst::CODE_MASTER_28_3) {
+                return;
+            }
+
+            // リクエストデータが「休塾」を選択していたらエラー
+            if ($request['stu_status'] == AppConst::CODE_MASTER_28_3) {
+                return $fail(Lang::get('validation.status_cannot_change'));
+            }
+        };
+
+        // 独自バリデーション: 会員ステータス「退会処理中」への更新は不可（退会登録画面を経由させる）
+        $validationStatusChangeLeaveProspect = function ($attribute, $value, $fail) use ($request) {
+            // 対象データを取得（編集中のデータ）
+            $student = Student::where('student_id', $request['student_id'])
+                ->first();
+
+            // 編集前のデータが会員ステータス「退会処理中」の場合はチェックしない
+            if (isset($student) && $student->stu_status == AppConst::CODE_MASTER_28_4) {
+                return;
+            }
+
+            // リクエストデータが「退会処理中」を選択していたらエラー
+            if ($request['stu_status'] == AppConst::CODE_MASTER_28_4) {
+                return $fail(Lang::get('validation.status_cannot_change_leave'));
+            }
+        };
+
+        // 独自バリデーション: 会員ステータス「退会」への更新は不可（退会登録画面を経由させる）
+        $validationStatusChangeLeaveExecution = function ($attribute, $value, $fail) use ($request) {
+            // 対象データを取得（編集中のデータ）
+            $student = Student::where('student_id', $request['student_id'])
+                ->first();
+
+            // 編集前のデータが会員ステータス「退会」の場合はチェックしない
+            if (isset($student) && $student->stu_status == AppConst::CODE_MASTER_28_5) {
+                return;
+            }
+
+            // リクエストデータが「退会処理中」を選択していたらエラー
+            if ($request['stu_status'] == AppConst::CODE_MASTER_28_5) {
+                return $fail(Lang::get('validation.status_cannot_change_leave'));
+            }
+        };
+
+        // 全会員ステータス共通バリデーション
+        // 必須：生徒名、生徒名かな、所属校舎、生年月日、学年、学年設定年度、受験生フラグ、保護者電話番号、会員ステータス
+        $rules += Student::fieldRules('name', ['required']);
+        $rules += Student::fieldRules('name_kana', ['required']);
+        $rules += ['rooms' => ['required', $validationCampusGroupList]];
+        $rules += Student::fieldRules('birth_date', ['required']);
+        $rules += Student::fieldRules('grade_cd', ['required', $validationGradeList]);
+        $rules += Student::fieldRules('grade_year', ['required']);
+        $rules += Student::fieldRules('is_jukensei', ['required', $validationJukenFlagList]);
+        $rules += Student::fieldRules('tel_par', ['required']);
+        // 会員ステータス「見込客」以外 → 見込客 への更新は不可
+        // 会員ステータス「在籍」「休塾予定」「退会処理中」以外 → 休塾予定 への更新は不可
+        // 会員ステータス「休塾」以外 → 休塾 への更新は不可
+        // 会員ステータス「退会処理中」以外 → 退会処理中 への更新は不可（退会登録画面を経由させる）
+        // 会員ステータス「退会済」以外 → 退会 への更新は不可（退会登録画面・日次バッチを経由させる）
+        $rules += Student::fieldRules('stu_status', ['required', $validationStatusList, $validationStatusLead, $validationStatusRecessProspect, $validationStatusRecessExecution, $validationStatusChangeLeaveProspect, $validationStatusChangeLeaveExecution]);
+
+        // メールアドレス形式チェック 重複チェック
+        if ($request && $request->filled('email_stu')) {
+            $rules += Student::fieldRules('email_stu', [$validationEmailStu]);
+        }
+        if ($request && $request->filled('email_par')) {
+            $rules += Student::fieldRules('email_par', [$validationEmailPar]);
+        }
+
+        // 電話番号形式チェック 保護者電話番号は上記でバリデーション済みのため記載省略
+        if ($request && $request->filled('tel_stu')) {
+            $rules += Student::fieldRules('tel_stu');
+        }
+
+        // 会員ステータス「見込客」以外で登録する場合
+        // 必須：ログインID種別、入会日
+        if ($request && $request['stu_status'] != AppConst::CODE_MASTER_28_0) {
+            $rules += Student::fieldRules('login_kind', ['required', $validationLoginKindList]);
+            $rules += Student::fieldRules('enter_date', ['required']);
+
+            // ログインID種別=生徒なら生徒メールアドレス必須
+            if ($request && $request['login_kind'] == AppConst::CODE_MASTER_8_1) {
+                $rules += Student::fieldRules('email_stu', ['required']);
+            }
+            // ログインID種別=保護者なら保護者メールアドレス必須
+            if ($request && $request['login_kind'] == AppConst::CODE_MASTER_8_2) {
+                $rules += Student::fieldRules('email_par', ['required']);
+            }
+        }
+
+        // 会員ステータス「休塾予定」「休塾」の場合
+        // 必須：休塾開始日、休塾終了日
+        // 休塾開始日はシステム日付より未来日とする（システム日付＜休塾開始日）
+        // 休塾終了日は休塾開始日より未来日とする（休塾開始日＜休塾終了日）
+        if ($request && $request['stu_status'] == AppConst::CODE_MASTER_28_2) {
+            $rules += Student::fieldRules('recess_start_date', ['required', $validationRecessStartDateCaseProspect]);
+            $rules += Student::fieldRules('recess_end_date', ['required', $validationRecessDate]);
+        }
+
+        // 会員ステータス「休塾」の場合
+        // 必須：休塾開始日、休塾終了日
+        // 休塾開始日はシステム日付以前とする（休塾開始日≦システム日付）
+        // 休塾終了日は休塾開始日より未来日とする（休塾開始日＜休塾終了日）
+        if ($request && $request['stu_status'] == AppConst::CODE_MASTER_28_3) {
+            $rules += Student::fieldRules('recess_start_date', ['required', $validationRecessStartDateCaseExecution]);
+            $rules += Student::fieldRules('recess_end_date', ['required', $validationRecessDate]);
+        }
+
+        // 会員ステータス「退会処理中」の場合
+        // 必須：退会日
+        // 退会日はシステム日付より未来日とする（システム日付＜退会日）
+        if ($request && $request['stu_status'] == AppConst::CODE_MASTER_28_4) {
+            $rules += Student::fieldRules('leave_date', ['required', $validationLeaveDateProspect]);
+        }
+
         return $rules;
     }
 

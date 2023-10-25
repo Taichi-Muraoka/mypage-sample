@@ -22,6 +22,7 @@ use App\Models\ClassMember;
 use App\Models\Account;
 use App\Models\MstGrade;
 use App\Models\YearlySchedule;
+use App\Models\MstSystem;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -636,12 +637,44 @@ trait CtrlModelTrait
     {
         $lists = $collection->map(function ($item, $key) use ($digit) {
             return [
-                    'code' => $item['code'], 
+                    'code' => $item['code'],
                     'value' => str_pad($item['code'], $digit, '0', STR_PAD_LEFT) . ' (' . $item['value'] . ')'
                 ];
         });
 
         return $lists;
+    }
+
+    /**
+     * 特別期間コードデータフォーマット
+     * コードマスタ期間区分コードを「01」の形式にする
+     *
+     * @param  $collection リストデータ
+     * @param  int $digit コード0埋め桁数
+     * @return フォーマット後リストデータ
+     */
+    protected function mdlFormatSeasonCd()
+    {
+        // 「特別期間コード」は、年＋期間区分のコードを生成し格納する。(例：202301)
+
+        // 年は、システムマスタの「現年度」から取得する。
+        $currentYear = MstSystem::select('value_num')
+        ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
+        ->first();
+
+        // 期間区分を取得する（サブコード1のみ：春期1,夏期2,冬期3）
+        $termList = CodeMaster::select('code')
+            ->where('data_type', AppConst::CODE_MASTER_38)
+            ->where('sub_code', AppConst::CODE_MASTER_38_SUB_1)
+            ->get();
+
+        // 特別期間コード生成 期間区分コードを2桁で0埋め
+        $seasonCodes = [];
+        foreach ($termList as $term) {
+            $seasonCodes[] = $currentYear->value_num.str_pad($term->code, 2, '0', STR_PAD_LEFT);
+        }
+
+        return $seasonCodes;
     }
 
     //------------------------------
