@@ -19,13 +19,7 @@ export default class AppClass extends PageBase {
 
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
-            console.log("afterEdit call!!");
             UrlCom.redirect(UrlCom.getFuncUrl());
-        };
-        var afterEdit2 = ($vue) => {
-            console.log("afterEdit2 call!!");
-            var dateStr = $vue.form.target_date.replaceAll("-", "");
-            UrlCom.redirect(UrlCom.getFuncUrl() + "/" + $vue.form.campus_cd + "/" + dateStr);
         };
 
         // 日付ピッカーイベント
@@ -59,7 +53,6 @@ export default class AppClass extends PageBase {
         // Vue: 入力フォーム
         this.getVueInputForm({
             afterEdit: afterEdit,
-            //afterEdit2: afterEdit2,
             datepickerOnChange: datepickerOnChange,
             vueData: {
                 // コースプルダウン変更用のプロパティを用意
@@ -108,7 +101,6 @@ export default class AppClass extends PageBase {
                         .then(() => {
                             // 初期化
                             this.selectGetItemTimetable = {};
-                            //this.form.period_no = "";
                             // チェンジイベントを発生させる
                             var campusCd = this.form.campus_cd;
                             var targetDate = this.form.target_date;

@@ -965,7 +965,6 @@ trait CtrlModelTrait
             $studentCampus = (new StudentCampus)->getTable();
 
             // 1件存在するかチェック
-            // 1件存在するかチェック
             $query->select(DB::raw(1))
                 ->from($studentCampus)
                 // 対象テーブルと生徒所属情報のcampus_cdを連結

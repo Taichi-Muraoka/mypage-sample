@@ -54,7 +54,7 @@
 
     <x-input.time-picker caption="終了時刻" id="end_time" :rules=$rules :editData=$editData />
 
-    <x-input.select vShow="form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }} && form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_4 }}" caption="講師" id="tutor_id"
+    <x-input.select vShow="form.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }} || form.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }}" caption="講師" id="tutor_id"
         :select2=true :mastrData=$tutors :editData=$editData :select2Search=true :blank=true />
 
     <x-input.select vShow="form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_2 }}" caption="生徒" id="student_id"
@@ -69,7 +69,7 @@
     <x-input.select vShow="form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}"
         caption="教科" id="subject_cd" :select2=true :mastrData=$subjects :editData="$editData" :select2Search=true :blank=true />
 
-    <x-input.select vShow="form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }} && form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_4 }}"
+    <x-input.select vShow="form.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }} || form.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }}"
         caption="授業区分" id="lesson_kind" :select2=true :mastrData=$lessonKindList :editData="$editData" :select2Search=false :blank=false />
 
     <div v-cloak>
@@ -78,13 +78,13 @@
             :editData="$editData" :select2Search=false :blank=false />
     </div>
 
-    <x-input.select vShow="form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }} && form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_4 }}"
+    <x-input.select vShow="form.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }} || form.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }}"
         caption="通塾" id="how_to_kind" :select2=true :select2Search=false :mastrData=$howToKindList :editData="$editData"
         :select2Search=false :blank=false />
 
     @if (request()->routeIs('room_calendar-edit'))
     {{-- 編集時 --}}
-    <x-input.select vShow="form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }} && form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_4 }}"
+    <x-input.select vShow="form.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }} || form.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }}"
         caption="授業代講" id="substitute_kind" :select2=true :mastrData=$substituteKindList :editData="$editData"
         :select2Search=false :blank=false />
     <x-input.hidden id="substitute_kind_bef" :editData=$editData />

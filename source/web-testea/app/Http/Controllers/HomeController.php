@@ -26,8 +26,7 @@ class HomeController extends Controller
         // それぞれのホームへリダイレクト
         if (AuthEx::isAdmin()) {
             // 管理者向けページ
-            //return redirect()->route('room_calendar');
-            return redirect()->route('student_class');
+            return redirect()->route('room_calendar');
         } else {
             // 管理者以外
             return redirect()->route('notice');

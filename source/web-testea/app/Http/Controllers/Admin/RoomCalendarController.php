@@ -82,11 +82,6 @@ class RoomCalendarController extends Controller
         // パラメータ取得・日時切り分け
         $date = substr($dateStr, 0, 4) . '-' . substr($dateStr, 4, 2) . '-' . substr($dateStr, 6, 2);
 
-        $param = [
-            'campus_cd' => $campusCd,
-            'target_date' => $date,
-        ];
-
         // パラメータのバリデーション
         $this->validateDates($date);
 
@@ -171,7 +166,6 @@ class RoomCalendarController extends Controller
     /**
      * 新規登録画面
      *
-     * @param \Illuminate\Http\Request $request リクエスト
      * @param string $campusCd 校舎コード
      * @param string $targetDate 日付時刻文字列(年月日時分)
      * @param string $boothCd ブースコード
@@ -799,22 +793,26 @@ class RoomCalendarController extends Controller
                 $schedule = new Schedule;
                 $schedule->campus_cd = $form['campus_cd'];
                 $schedule->target_date = $targetDate;
-                if ($form['course_kind'] == AppConst::CODE_MASTER_42_3) {
-                    // 面談の場合 時限はnullを設定
-                    $schedule->period_no = null;
-                } else {
+                if ($form['course_kind'] != AppConst::CODE_MASTER_42_3) {
+                    // 面談以外の場合 時限・教科を設定
                     $schedule->period_no = $form['period_no'];
+                    $schedule->subject_cd = $form['subject_cd'];
                 }
                 $schedule->start_time = $form['start_time'];
                 $schedule->end_time = $form['end_time'];
                 $schedule->minites = $minites;
                 $schedule->booth_cd = $booth;
                 $schedule->course_cd = $form['course_cd'];
-                $schedule->student_id = $form['student_id'];
-                $schedule->tutor_id = $form['tutor_id'];
-                $schedule->subject_cd = $form['subject_cd'];
+                if ($form['course_kind'] != AppConst::CODE_MASTER_42_2) {
+                    // １対多以外の場合 生徒IDを設定
+                    $schedule->student_id = $form['student_id'];
+                }
+                if ($form['course_kind'] == AppConst::CODE_MASTER_42_1 || $form['course_kind'] == AppConst::CODE_MASTER_42_2) {
+                    // 授業の場合 講師ID・授業区分を設定
+                    $schedule->tutor_id = $form['tutor_id'];
+                    $schedule->lesson_kind = $form['lesson_kind'];
+                }
                 $schedule->create_kind = AppConst::CODE_MASTER_32_1;
-                $schedule->lesson_kind = $form['lesson_kind'];
                 $schedule->how_to_kind = $form['how_to_kind'];
                 $schedule->tentative_status = $form['tentative_status'];
                 $schedule->memo = $form['memo'];
@@ -1392,13 +1390,12 @@ class RoomCalendarController extends Controller
         if ($request && $request->filled('course_kind') && $request['course_kind'] != AppConst::CODE_MASTER_42_3) {
             // コース種別が面談以外の場合のみチェック
             $rules += Schedule::fieldRules('period_no', ['required', $validationPeriodList]);
-            $rules += Schedule::fieldRules('subject_cd', ['required', $validationSubjectList]);
         }
         if (
             $request && $request->filled('course_kind') &&
-            $request['course_kind'] != AppConst::CODE_MASTER_42_3 && $request['course_kind'] != AppConst::CODE_MASTER_42_4
+            ($request['course_kind'] == AppConst::CODE_MASTER_42_1 || $request['course_kind'] == AppConst::CODE_MASTER_42_2)
         ) {
-            // コース種別が面談・自習以外の場合のみチェック
+            // コース種別が授業の場合のみチェック
             $rules += Schedule::fieldRules('lesson_kind', ['required', $validationLessonKindList]);
             $rules += Schedule::fieldRules('how_to_kind', ['required', $validationHowToKindList]);
             $rules += Schedule::fieldRules('tutor_id', ['required', $validationTutorList]);
@@ -1407,6 +1404,16 @@ class RoomCalendarController extends Controller
                 // 特別期間講習の場合のみ、仮登録フラグをチェック
                 $rules += Schedule::fieldRules('tentative_status', ['required', $validationTentativeStatusList]);
             }
+        }
+        if (
+            $request && $request->filled('course_kind') &&
+            ($request['course_kind'] == AppConst::CODE_MASTER_42_1 || $request['course_kind'] == AppConst::CODE_MASTER_42_2)
+        ) {
+            // コース種別が授業の場合、教科をチェック（必須あり）
+            $rules += Schedule::fieldRules('subject_cd', ['required', $validationSubjectList]);
+        } else if ($request && $request->filled('course_kind') && $request['course_kind'] == AppConst::CODE_MASTER_42_2) {
+            // コース種別が自習の場合、教科をチェック（必須なし）
+            $rules += Schedule::fieldRules('subject_cd', [$validationSubjectList]);
         }
         if ($request && $request->filled('course_kind') && $request['course_kind'] == AppConst::CODE_MASTER_42_1) {
             // コース種別が授業単の場合、生徒（単数指定）をチェック（必須あり）
