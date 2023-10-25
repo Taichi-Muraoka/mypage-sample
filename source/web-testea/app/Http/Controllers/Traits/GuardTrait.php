@@ -165,6 +165,13 @@ trait GuardTrait
      */
     protected function guardRoomAdminRoomcd($campusCd)
     {
+        // 校舎リストを取得
+        $rooms = $this->mdlGetRoomList(true);
+        if (!isset($rooms[$campusCd])) {
+            // 不正な値エラー
+            return $this->illegalResponseErr();
+        }
+
         // 教室管理者の場合、見れていいidかチェックする
         if (AuthEx::isRoomAdmin()) {
             $account = Auth::user();
