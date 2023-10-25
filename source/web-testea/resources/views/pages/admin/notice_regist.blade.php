@@ -14,7 +14,8 @@
             <x-input.select id="roomcd" caption="校舎（送信元）" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false :blank=false />
             @else
-            <x-input.select id="roomcd" caption="校舎（送信元）" :select2=true :mastrData=$rooms :editData=$editData />
+            <x-input.select id="roomcd" caption="校舎（送信元）" :select2=true :mastrData=$rooms :editData=$editData
+                :select2Search=false />
             @endcan
         </x-bs.col2>
         <x-bs.col2>
@@ -22,13 +23,31 @@
             {{-- <x-input.select id="destination_type" caption="宛先種別" :select2=true :mastrData=$destination_types :editData=$editData /> --}}
 
             {{-- モック用 --}}
-            <x-input.select id="destination_type" caption="宛先種別" :select2=true :mastrData=$destination_types :editData=$editData >
+            <x-input.select id="destination_type" caption="宛先種別" :select2=true :mastrData=$destination_types :editData=$editData
+                :select2Search=false >
                 <option value="4">個別（保護者メール）</option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>
+        <x-bs.col2>
+            {{-- 本番用 --}}
+            {{-- <x-input.select id="notice_type" caption="お知らせ種別" :select2=true :editData=$editData :mastrData=$typeList
+                :select2Search=false /> --}}
+
+            {{-- モック用 --}}
+            <x-input.select id="notice_type" caption="お知らせ種別" :select2=true :editData=$editData 
+                :select2Search=false >
+                <option value="4">その他</option>
+                <option value="5">面談</option>
+                <option value="6">特別期間講習</option>
+                <option value="7">成績登録</option>
+                <option value="8">請求</option>
+                <option value="9">給与</option>
+                <option value="10">追加請求</option>
+            </x-input.select>
+        </x-bs.col2>
         <x-bs.col2>
             <x-input.text caption="タイトル" id="title" :rules=$rules />
         </x-bs.col2>
@@ -51,6 +70,7 @@
         <x-slot name="thead">
             <th width="15%">通知日</th>
             <th>タイトル</th>
+            <th width="15%">お知らせ種別</th>
             <th width="15%">宛先種別</th>
             <th width="15%">送信元</th>
             <th></th>
@@ -60,6 +80,7 @@
         <tr>
             <td>2023/06/16</td>
             <td>面談のご案内</td>
+            <td>面談</td>
             <td>グルーブ一斉</td>
             <td>本部</td>
             <td>
