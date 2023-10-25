@@ -133,7 +133,7 @@ class Schedule extends Model
             'target_date' => ['date_format:Y-m-d'],
             'period_no' => ['integer', 'min:0', 'max:99'],
             'start_time' => ['vdTime'],
-            'end_time' => ['vdTime', 'after:start_time'],
+            'end_time' => ['vdTime', 'vd_after_time:start_time'],
             'minites' => ['integer', 'min:0', 'max:999'],
             'booth_cd' => ['string', 'max:3', 'digits:3'],
             'course_cd' => ['string', 'max:5', 'digits:5'],

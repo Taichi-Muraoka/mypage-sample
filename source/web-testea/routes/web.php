@@ -544,14 +544,16 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 教室カレンダー
     //---------------------
 
-    // 教室カレンダー（モック）
+    // 教室カレンダー
     Route::get('/room_calendar', [RoomCalendarController::class, 'calendar'])->name('room_calendar');
 
-    // カレンダー - 詳細取得用（モック）
+    // カレンダー - 詳細取得用
     Route::post('/room_calendar/get_calendar', [RoomCalendarController::class, 'getCalendar'])->name('room_calendar-get_calendar');
 
+    // カレンダー - ブース情報取得用
+    Route::post('/room_calendar/get_booth', [RoomCalendarController::class, 'getBooth'])->name('room_calendar-get_booth');
+
     // 教室カレンダー登録画面
-    //Route::get('/room_calendar/new', [RoomCalendarController::class, 'new'])->name('room_calendar-new');
     Route::get('/room_calendar/new/{campusCd}/{datetimeStr}/{boothCd}', [RoomCalendarController::class, 'new'])->name('room_calendar-new');
 
     // 新規登録処理
@@ -575,7 +577,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 時限プルダウンを選択された際に時間割の情報を返却する
     Route::post('/room_calendar/get_data_select_timetable', [RoomCalendarController::class, 'getDataSelectTimetable'])->name('notice_regist-get_data_select_timetable');
 
-    // 日付を変更された際に時限プルダウンを返却する（実装中）
+    // 日付を変更された際に時限プルダウンを返却する
     Route::post('/room_calendar/get_data_select', [RoomCalendarController::class, 'getDataSelect'])->name('room_calendar-get_data_select');
 
     // バリデーション(登録用)
@@ -586,6 +588,15 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 教室カレンダー欠席登録画面（集団のみ）
     Route::get('/room_calendar/absent/{scheduleId}', [RoomCalendarController::class, 'absent'])->name('room_calendar-absent');
+
+    // バリデーション(欠席登録用)
+    Route::post('/room_calendar/vd_input_absent', [RoomCalendarController::class, 'validationForInputAbsent'])->name('room_calendar-vd_input_absent');
+
+    // 編集処理(欠席登録用)
+    Route::post('/room_calendar/update_absent', [RoomCalendarController::class, 'updateAbsent'])->name('room_calendar-update_absent');
+
+    // 教室カレンダー（登録後の遷移）※試作中
+    Route::get('/room_calendar/{campusCd}/{dateStr}', [RoomCalendarController::class, 'calendarBack'])->name('room_calendar-back');
 
     //---------------------
     // レギュラーカレンダー
