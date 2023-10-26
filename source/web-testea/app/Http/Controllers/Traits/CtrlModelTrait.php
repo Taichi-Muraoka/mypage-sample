@@ -1049,22 +1049,16 @@ trait CtrlModelTrait
 
             // 生徒所属情報テーブル
             $studentCampus = (new StudentCampus)->getTable();
-            // 生徒情報テーブル
-            $student = (new Student)->getTable();
 
             // 1件存在するかチェック
             $query->select(DB::raw(1))
                 ->from($studentCampus)
-                // 生徒情報とJOIN
-                ->Join($student, $studentCampus . '.student_id', '=', $student . '.student_id')
                 // 対象テーブルと生徒所属情報のcampus_cdを連結
                 ->whereRaw($table . '.campus_cd = ' . $studentCampus . '.campus_cd')
                 // 指定された生徒ID
-                ->where($student . '.student_id', $studentId)
+                ->where($studentCampus . '.student_id', $studentId)
                 // delete_dt条件の追加
-                ->whereNull($studentCampus . '.deleted_at')
-                // delete_dt条件の追加
-                ->whereNull($student . '.deleted_at');
+                ->whereNull($studentCampus . '.deleted_at');
         });
     }
 
@@ -1091,22 +1085,16 @@ trait CtrlModelTrait
 
             // 講師所属情報テーブル
             $tutorCampus = (new TutorCampus)->getTable();
-            // 講師情報テーブル
-            $tutor = (new Tutor)->getTable();
 
             // 1件存在するかチェック
             $query->select(DB::raw(1))
                 ->from($tutorCampus)
-                // 講師情報とJOIN
-                ->Join($tutor, $tutorCampus . '.tutor_id', '=', $tutor . '.tutor_id')
                 // 対象テーブルと講師所属情報のcampus_cdを連結
                 ->whereRaw($table . '.campus_cd = ' . $tutorCampus . '.campus_cd')
                 // 指定された生徒ID
-                ->where($tutor . '.tutor_id', $tutorId)
+                ->where($tutorCampus . '.tutor_id', $tutorId)
                 // delete_dt条件の追加
-                ->whereNull($tutorCampus . '.deleted_at')
-                // delete_dt条件の追加
-                ->whereNull($tutor . '.deleted_at');
+                ->whereNull($tutorCampus . '.deleted_at');
         });
     }
 
