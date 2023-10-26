@@ -1864,4 +1864,28 @@ class AppConst
      * バッチ種別 データ移行
      */
     const BATCH_TYPE_21 = 21;
+
+    //-----------
+    // 授業報告書サブコード
+    //-----------
+
+    /**
+     * 授業報告書 授業内容教材1
+     */
+    const REPORT_SUBCODE_1 = 'L1';
+
+    /**
+     * 授業報告書 授業内容教材2
+     */
+    const REPORT_SUBCODE_2 = 'L2';
+
+    /**
+     * 授業報告書 宿題内容教材1
+     */
+    const REPORT_SUBCODE_3 = 'H1';
+
+    /**
+     * 授業報告書 宿題内容教材2
+     */
+    const REPORT_SUBCODE_4 = 'H2';
 }

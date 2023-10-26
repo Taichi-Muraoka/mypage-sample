@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Report;
+use App\Models\ReportUnit;
 use App\Models\Student;
 use App\Models\Tutor;
 use App\Models\Schedule;
@@ -14,9 +15,12 @@ use App\Models\ClassMember;
 use App\Models\MstCourse;
 use App\Models\MstSubject;
 use App\Models\MstText;
+use App\Models\MstUnitCategory;
+use App\Models\MstUnit;
 use App\Models\CodeMaster;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Traits\FuncReportTrait;
 use Carbon\Carbon;
 
@@ -78,7 +82,7 @@ class ReportRegistController extends Controller
     {
         // $requestからidを取得し、検索結果を返却する
         // IDのバリデーション
-        //$this->validateIdsFromRequest($request, 'id');
+        $this->validateIdsFromRequest($request, 'id');
 
         // ログイン者の情報を取得する
         $account = Auth::user();
@@ -265,58 +269,111 @@ class ReportRegistController extends Controller
         // ==========================
         // 本番用処理
         // ==========================
-        // // IDのバリデーション
-        // $this->validateIdsFromRequest($request, 'id');
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request, 'id');
 
-        // // IDを取得
-        // $id = $request->input('id');
+        // IDを取得
+        $id = $request->input('id');
 
-        // // クエリを作成
-        // $query = Report::query();
+        // データを取得
+        $report = $this->getReport($id);
+        
+        // 集団授業の場合受講生徒名取得
+        if ($report->course_kind == AppConst::CODE_MASTER_42_2) {
+            $class_member_names = $this->getClassMember($report->schedule_id);
+        }
+        else {
+            $class_member_names = [];
+        }
 
-        // // 受け持ち生徒に限定するガードを掛ける
-        // $query->where($this->guardTutorTableWithSid());
+        // 授業教材１の情報取得
+        $lesson_text1 = $this->getReportText($report->report_id, AppConst::REPORT_SUBCODE_1);
+        $lesson_category1_1 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_1, 1);
+        $lesson_category1_2 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_1, 2);
+        $lesson_category1_3 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_1, 3);
 
-        // // 自分のアカウントIDでガードを掛ける（tid）
-        // $query->where($this->guardTutorTableWithTid());
+        // 授業教材２があれば取得
+        if (ReportUnit::where('report_units.sub_cd', '=', AppConst::REPORT_SUBCODE_2)->exists()) {
+            $lesson_text2 = $this->getReportText($report->report_id, AppConst::REPORT_SUBCODE_2);
+            $lesson_category2_1 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_2, 1);
+            $lesson_category2_2 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_2, 2);
+            $lesson_category2_3 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_2, 3);
+        }
+        else {
+            $lesson_text2 = null;
+            $lesson_category2_1 = null;
+            $lesson_category2_2 = null;
+            $lesson_category2_3 = null;
+        }
+        
+        // 宿題教材１があれば取得
+        if (ReportUnit::where('report_units.sub_cd', '=', AppConst::REPORT_SUBCODE_3)->exists()) {
+            $homework_text1 = $this->getReportText($report->report_id, AppConst::REPORT_SUBCODE_3);
+            $homework_category1_1 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_3, 1);
+            $homework_category1_2 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_3, 2);
+            $homework_category1_3 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_3, 3);
+        }
+        else {
+            $homework_text1 = null;
+            $homework_category1_1 = null;
+            $homework_category1_2 = null;
+            $homework_category1_3 = null;
+        }
+        // 宿題教材２があれば取得
+        if (ReportUnit::where('report_units.sub_cd', '=', AppConst::REPORT_SUBCODE_4)->exists()) {
+            $homework_text2 = $this->getReportText($report->report_id, AppConst::REPORT_SUBCODE_3);
+            $homework_category2_1 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_4, 1);
+            $homework_category2_2 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_4, 2);
+            $homework_category2_3 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_4, 3);
+        }
+        else {
+            $homework_text2 = null;
+            $homework_category2_1 = null;
+            $homework_category2_2 = null;
+            $homework_category2_3 = null;
+        }
 
-        // // 教室名取得のサブクエリ
-        // $room_names = $this->mdlGetRoomQuery();
-
-        // // データを取得
-        // $report = $query
-        //     // IDを指定
-        //     ->where('reports.report_id', $id)
-        //     ->select(
-        //         'lesson_date',
-        //         'start_time',
-        //         'room_names.room_name as room_name',
-        //         'ext_student_kihon.name as sname',
-        //         'r_minutes',
-        //         'content',
-        //         'homework',
-        //         'teacher_comment',
-        //         'parents_comment'
-        //     )
-        //     // 教室名の取得
-        //     ->leftJoinSub($room_names, 'room_names', function ($join) {
-        //         $join->on('reports.campus_cd', '=', 'room_names.code');
-        //     })
-        //     // 生徒名の取得
-        //     ->sdLeftJoin(ExtStudentKihon::class, 'reports.sid', '=', 'ext_student_kihon.sid')
-        //     ->firstOrFail();
-
-        // return [
-        //     'lesson_date' => $report->lesson_date,
-        //     'start_time' => $report->start_time,
-        //     'room_name' => $report->room_name,
-        //     'sname' => $report->sname,
-        //     'r_minutes' => $report->r_minutes,
-        //     'content' => $report->content,
-        //     'homework' => $report->homework,
-        //     'teacher_comment' => $report->teacher_comment,
-        //     'parents_comment' => $report->parents_comment
-        // ];
+        return [
+            'campus_name' => $report->campus_name,
+            'regist_date' => $report->regist_date,
+            'lesson_date' => $report->lesson_date,
+            'period_no' => $report->period_no,
+            'course_name' => $report->course_name,
+            'course_kind' => $report->course_kind,
+            'student_name' => $report->student_name,
+            'class_member_name' => $class_member_names,
+            'subject_name' => $report->subject_name,
+            'monthly_goal' => $report->monthly_goal,
+            'test_contents' => $report->test_contents,
+            'test_score' => $report->test_score,
+            'test_full_score' => $report->test_full_score,
+            'achievement' => intval($report->achievement),
+            'goodbad_point' => $report->goodbad_point,
+            'solution' => $report->solution,
+            'others_comment' => $report->others_comment,
+            'status' => $report->status,
+            'admin_comment' => $report->admin_comment,
+            // 授業教材１
+            'lesson_text1' => $lesson_text1,
+            'lesson_category1_1' => $lesson_category1_1,
+            'lesson_category1_2' => $lesson_category1_2,
+            'lesson_category1_3' => $lesson_category1_3,
+            // 授業教材２
+            'lesson_text2' => $lesson_text2,
+            'lesson_category2_1' => $lesson_category2_1,
+            'lesson_category2_2' => $lesson_category2_2,
+            'lesson_category2_3' => $lesson_category2_3,
+            // 宿題教材１
+            'homework_text1' => $homework_text1,
+            'homework_category1_1' => $homework_category1_1,
+            'homework_category1_2' => $homework_category1_2,
+            'homework_category1_3' => $homework_category1_3,
+            // 宿題教材２
+            'homework_text2' => $homework_text2,
+            'homework_category2_1' => $homework_category2_1,
+            'homework_category2_2' => $homework_category2_2,
+            'homework_category2_3' => $homework_category2_3,
+        ];
     }
 
     //==========================
@@ -356,6 +413,8 @@ class ReportRegistController extends Controller
                 'schedules.course_cd',
                 // コース名
                 'mst_courses.name as course_name',
+                // コース種別
+                'mst_courses.course_kind as course_kind',
                 'schedules.subject_cd',
                 // 科目名
                 'mst_subjects.name as subject_name',
@@ -379,10 +438,20 @@ class ReportRegistController extends Controller
         // 教材リストを取得（授業科目コード指定）
         $texts = $this->mdlGetTextList($lesson->subject_cd, null, null);
 
+        // 集団授業の場合受講生徒名取得
+        if ($lesson->course_kind == AppConst::CODE_MASTER_42_2) {
+            $class_member_names = $this->getClassMember($lesson->schedule_id);
+        }
+        else {
+            $class_member_names = [];
+        }
+
         return [
             'campus_name' => $lesson->campus_name,
             'course_name' => $lesson->course_name,
+            'course_kind' => $lesson->course_kind,
             'student_name' => $lesson->student_name,
+            'class_member_name' => $class_member_names,
             'subject_name' => $lesson->subject_name,
             'selectItems' => $this->objToArray($texts)
         ];
@@ -448,12 +517,6 @@ class ReportRegistController extends Controller
 
         $query = Schedule::query();
 
-        // 教室名取得のサブクエリ
-        $room_names = $this->mdlGetRoomQuery();
-
-        // 教師の担当している生徒の一覧を取得
-        $students = $this->mdlGetStudentListForT(null, $account_id);
-
         // 授業情報を取得
         $lessons = $query
             // 自分のアカウントIDでガードを掛ける（tid）
@@ -472,29 +535,12 @@ class ReportRegistController extends Controller
             ->get();
         
         $lesson_list = $this->mdlGetScheduleMasterList($lessons);
-        
-        // $this->debug($lessons);
-
-        // 授業時間数のプルダウンメニューを作成
-        $minutes = $this->getMenuOfMinutes();
-
-        // 教材リスト取得
-        $texts = 0;
-
-        // 単元分類リスト取得
-        $unit_categories = 0;
-
-        // 単元リスト取得
-        $units = 0;
 
         // テンプレートは編集と同じ
         return view('pages.tutor.report_regist-input', [
             'editData' => null,
             'rules' => $this->rulesForInput(null),
             'lesson_list' => $lesson_list,
-            //'student_list' => $students,
-            //'minutes_list' => $minutes,
-            //'parents_comment' => null
         ]);
     }
 
@@ -509,68 +555,136 @@ class ReportRegistController extends Controller
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        // 現在日時を取得
-        $now = Carbon::now();
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($request) {
 
-        // ログイン者の情報を取得する
-        $account = Auth::user();
-        $account_id = $account->account_id;
+            // クエリ作成
+            $query = Schedule::query();
 
-        if ($request->input('lesson_type') == AppConst::CODE_MASTER_8_1) {
-            //---------------
-            // 個別教室登録
-            //---------------
-            $id = $request->input('id');
-
-            // スケジュールidから授業日・授業開始時間・教室・生徒を取得する。
-            $query = ExtSchedule::query();
+            // 授業報告書情報登録
             $lesson = $query
-                ->select(
-                    'roomcd',
-                    'lesson_date',
-                    'start_time',
-                    'sid'
-                )
-                ->where('id', '=', $id)
-                ->where('tid', '=', $account_id)
+                ->where('schedule_id', '=', $request['id'])
                 ->firstOrFail();
 
-            $roomcd = $lesson->roomcd;
-            $lesson_date = $lesson->lesson_date;
-            $start_time = $lesson->start_time;
-            $sid = $lesson->sid;
-        } elseif ($request->input('lesson_type') == AppConst::CODE_MASTER_8_2) {
-            //---------------
-            // 家庭教師登録
-            //---------------
-            $id = null;
-            $roomcd = AppConst::EXT_GENERIC_MASTER_101_900;
-            $lesson_date = $request->input('lesson_date');
-            $start_time = $request->input('start_time');
-            $sid = $request->input('sid');
-        } else {
-            $this->illegalResponseErr();
-        }
+            $report = new Report;
 
-        // フォームから受け取った値を格納
-        $form = $request->only(
-            'lesson_type',
-            'r_minutes',
-            'content',
-            'homework',
-            'teacher_comment'
-        );
+            $form = $request->only(
+                'monthly_goal',
+                'test_contents',
+                'test_score',
+                'test_full_score',
+                'achievement',
+                'goodbad_point',
+                'solution',
+                'others_comment',
+            );
 
-        // 保存
-        $report = new Report;
-        $report->id = $id;
-        $report->roomcd = $roomcd;
-        $report->lesson_date = $lesson_date;
-        $report->start_time = $start_time;
-        $report->sid = $sid;
-        $report->tid = $account_id;
-        $report->regist_time = $now;
-        $report->fill($form)->save();
+            $report->tutor_id = $lesson->tutor_id;
+            $report->schedule_id = $lesson->schedule_id;
+            $report->campus_cd = $lesson->campus_cd;
+            $report->course_cd = $lesson->course_cd;
+            $report->lesson_date = $lesson->target_date;
+            $report->period_no = $lesson->period_no;
+            $report->student_id = $lesson->student_id;
+            $report->approval_status = AppConst::CODE_MASTER_2_0;
+            $report->regist_date = now();
+            $report->fill($form)->save();
+
+            // スケジュール情報更新
+            $lesson->report_id = $report->report_id;
+            $lesson->save();
+
+            // 授業報告書教材単元情報登録
+            // 授業教材1
+            $report_unit1 = new ReportUnit;
+            $report_unit1->report_id = $report->report_id;
+            $report_unit1->sub_cd = AppConst::REPORT_SUBCODE_1;
+            $report_unit1->text_cd = $request['lesson_text1'];
+            $report_unit1->free_text_name = $request['lesson_text_name1'];
+            $report_unit1->text_page = $request['lesson_page1'];
+            $report_unit1->unit_category_cd1 = $request['lesson_category1_1'];
+            $report_unit1->free_category_name1 = $request['lesson_category_name1_1'];
+            $report_unit1->unit_cd1 = $request['lesson_unit1_1'];
+            $report_unit1->free_unit_name1 = $request['lesson_unit_name1_1'];
+            $report_unit1->unit_category_cd2 = $request['lesson_category1_2'];
+            $report_unit1->free_category_name2 = $request['lesson_category_name1_2'];
+            $report_unit1->unit_cd2 = $request['lesson_unit1_2'];
+            $report_unit1->free_unit_name2 = $request['lesson_unit_name1_2'];
+            $report_unit1->unit_category_cd3 = $request['lesson_category1_3'];
+            $report_unit1->free_category_name3 = $request['lesson_category_name1_3'];
+            $report_unit1->unit_cd3 = $request['lesson_unit1_3'];
+            $report_unit1->free_unit_name3 = $request['lesson_unit_name1_3'];
+            $report_unit1->save();
+
+            // 授業教材2
+            if ($request['lesson_text2'] != null) {
+                $report_unit2 = new ReportUnit;
+                $report_unit2->report_id = $report->report_id;
+                $report_unit2->sub_cd = AppConst::REPORT_SUBCODE_2;
+                $report_unit2->text_cd = $request['lesson_text2'];
+                $report_unit2->free_text_name = $request['lesson_text_name2'];
+                $report_unit2->text_page = $request['lesson_page2'];
+                $report_unit2->unit_category_cd1 = $request['lesson_category2_1'];
+                $report_unit2->free_category_name1 = $request['lesson_category_name2_1'];
+                $report_unit2->unit_cd1 = $request['lesson_unit2_1'];
+                $report_unit2->free_unit_name1 = $request['lesson_unit_name2_1'];
+                $report_unit2->unit_category_cd2 = $request['lesson_category2_2'];
+                $report_unit2->free_category_name2 = $request['lesson_category_name2_2'];
+                $report_unit2->unit_cd2 = $request['lesson_unit2_2'];
+                $report_unit2->free_unit_name2 = $request['lesson_unit_name2_2'];
+                $report_unit2->unit_category_cd3 = $request['lesson_category2_3'];
+                $report_unit2->free_category_name3 = $request['lesson_category_name2_3'];
+                $report_unit2->unit_cd3 = $request['lesson_unit2_3'];
+                $report_unit2->free_unit_name3 = $request['lesson_unit_name2_3'];
+                $report_unit2->save();
+            }
+
+            // 宿題教材1
+            if ($request['homework_text1'] != null) {
+                $report_unit3 = new ReportUnit;
+                $report_unit3->report_id = $report->report_id;
+                $report_unit3->sub_cd = AppConst::REPORT_SUBCODE_3;
+                $report_unit3->text_cd = $request['homework_text1'];
+                $report_unit3->free_text_name = $request['homework_text_name1'];
+                $report_unit3->text_page = $request['homework_page1'];
+                $report_unit3->unit_category_cd1 = $request['homework_category1_1'];
+                $report_unit3->free_category_name1 = $request['homework_category_name1_1'];
+                $report_unit3->unit_cd1 = $request['homework_unit1_1'];
+                $report_unit3->free_unit_name1 = $request['homework_unit_name1_1'];
+                $report_unit3->unit_category_cd2 = $request['homework_category1_2'];
+                $report_unit3->free_category_name2 = $request['homework_category_name1_2'];
+                $report_unit3->unit_cd2 = $request['homework_unit1_2'];
+                $report_unit3->free_unit_name2 = $request['homework_unit_name1_2'];
+                $report_unit3->unit_category_cd3 = $request['homework_category1_3'];
+                $report_unit3->free_category_name3 = $request['homework_category_name1_3'];
+                $report_unit3->unit_cd3 = $request['homework_unit1_3'];
+                $report_unit3->free_unit_name3 = $request['homework_unit_name1_3'];
+                $report_unit3->save();
+            }
+
+            // 宿題教材2
+            if ($request['homework_text2'] != null) {
+                $report_unit4 = new ReportUnit;
+                $report_unit4->report_id = $report->report_id;
+                $report_unit4->sub_cd = AppConst::REPORT_SUBCODE_4;
+                $report_unit4->text_cd = $request['homework_text2'];
+                $report_unit4->free_text_name = $request['homework_text_name2'];
+                $report_unit4->text_page = $request['homework_page2'];
+                $report_unit4->unit_category_cd1 = $request['homework_category2_1'];
+                $report_unit4->free_category_name1 = $request['homework_category_name2_1'];
+                $report_unit4->unit_cd1 = $request['homework_unit2_1'];
+                $report_unit4->free_unit_name1 = $request['homework_unit_name2_1'];
+                $report_unit4->unit_category_cd2 = $request['homework_category2_2'];
+                $report_unit4->free_category_name2 = $request['homework_category_name2_2'];
+                $report_unit4->unit_cd2 = $request['homework_unit2_2'];
+                $report_unit4->free_unit_name2 = $request['homework_unit_name2_2'];
+                $report_unit4->unit_category_cd3 = $request['homework_category2_3'];
+                $report_unit4->free_category_name3 = $request['homework_category_name2_3'];
+                $report_unit4->unit_cd3 = $request['homework_unit2_3'];
+                $report_unit4->free_unit_name3 = $request['homework_unit_name2_3'];
+                $report_unit4->save();
+            }
+        });
 
         return;
     }
@@ -581,59 +695,112 @@ class ReportRegistController extends Controller
      * @param int $reportId 授業報告書ID
      * @return view
      */
-    public function edit()
+    public function edit($id)
     {
+        // IDのバリデーション
+        $this->validateIds($id);
 
-        // // IDのバリデーション
-        // $this->validateIds($reportId);
+        // ログイン者の情報を取得する
+        $account = Auth::user();
+        $account_id = $account->account_id;
 
-        // // 授業時間数のプルダウンメニューを作成
-        // $minutes = $this->getMenuOfMinutes();
+        // クエリを作成
+        $query = Report::query();
 
-        // // クエリを作成
-        // $query = Report::query();
+        // データを取得
+        $report = $this->getReport($id);
 
-        // // 教室名取得のサブクエリ
-        // $room_names = $this->mdlGetRoomQuery();
+        // 教材リストを取得（授業科目コード指定）
+        $texts = $this->mdlGetTextList($report->subject_cd, null, null);
 
-        // // データを取得
-        // $report = $query
-        //     // IDを指定
-        //     ->where('reports.report_id', $reportId)
-        //     ->select(
-        //         'report_id',
-        //         'lesson_type',
-        //         'lesson_date',
-        //         'start_time',
-        //         'room_names.room_name as class_name',
-        //         'ext_student_kihon.name as student_name',
-        //         'r_minutes',
-        //         'content',
-        //         'homework',
-        //         'teacher_comment',
-        //         'parents_comment'
-        //     )
-        //     // 教室名の取得
-        //     ->leftJoinSub($room_names, 'room_names', function ($join) {
-        //         $join->on('reports.campus_cd', '=', 'room_names.code');
-        //     })
-        //     // 生徒名の取得
-        //     ->sdLeftJoin(ExtStudentKihon::class, 'reports.sid', '=', 'ext_student_kihon.sid')
-        //     // 受け持ち生徒に限定するガードを掛ける
-        //     ->where($this->guardTutorTableWithSid())
-        //     // 自分のアカウントIDでガードを掛ける（tid）
-        //     ->where($this->guardTutorTableWithTid())
-        //     ->firstOrFail();
+        // 集団授業の場合受講生徒名取得
+        if ($report->course_kind == AppConst::CODE_MASTER_42_2) {
+            $class_member_names = $this->getClassMember($report->schedule_id);
+        }
+        else {
+            $class_member_names = [];
+        }
 
-        // return view('pages.tutor.report_regist-input', [
-        //     'editData' => $report,
-        //     'rules' => $this->rulesForInput(null),
-        //     'scheduleMaster' => null,
-        //     'student_list' => null,
-        //     'minutes_list' => $minutes,
-        //     'parents_comment' => $report->parents_comment
-        // ]);
-        return view('pages.tutor.report_regist-input');
+        $editdata = [
+            'id' => $report->schedule_id,
+            'monthly_goal' => $report->monthly_goal,
+            'test_contents' => $report->test_contents,
+            'test_score' => $report->test_score,
+            'test_full_score' => $report->test_full_score,
+            'achievement' => intval($report->achievement),
+            'goodbad_point' => $report->goodbad_point,
+            'solution' => $report->solution,
+            'others_comment' => $report->others_comment
+        ];
+
+        // 授業教材１を取得
+        $lesson_unit1 = $this->getReportUnit($report->report_id, AppConst::REPORT_SUBCODE_1);
+        $editdata += [
+            'lesson_text1' => $lesson_unit1->text_name1,
+            'lesson_text_name1' => $lesson_unit1->free_text_name1,
+            'lesson_page1' => $lesson_unit1->text_page1,
+            'lesson_category1_1' => $lesson_unit1->unit_category_name1,
+            'lesson_category1_2' => $lesson_unit1->unit_category_name2,
+            'lesson_category1_3' => $lesson_unit1->unit_category_name3,
+            'lesson_unit1_1' => $lesson_unit1->unit_name1,
+            'lesson_unit1_2' => $lesson_unit1->unit_name2,
+            'lesson_unit1_3' => $lesson_unit1->unit_name3,
+            'lesson_category_name1_1' => $lesson_unit1->free_category_name1,
+            'lesson_category_name1_2' => $lesson_unit1->free_category_name2,
+            'lesson_category_name1_3' => $lesson_unit1->free_category_name2,
+            'lesson_unit_name1_1' => $lesson_unit1->free_unit_name1,
+            'lesson_unit_name1_2' => $lesson_unit1->free_unit_name2,
+            'lesson_unit_name1_3' => $lesson_unit1->free_unit_name2
+        ];
+        // 授業教材２があれば取得
+        if (ReportUnit::where('report_units.sub_cd', '=', AppConst::REPORT_SUBCODE_2)->exists()) {
+            $lesson_unit2 = $this->getReportUnit($report->report_id, AppConst::REPORT_SUBCODE_2);
+            $editdata += [
+                'lesson_text2' => $lesson_unit2->text_name1,
+                'lesson_text_name2' => $lesson_unit2->free_text_name1,
+                'lesson_page2' => $lesson_unit2->text_page1,
+                'lesson_category2_1' => $lesson_unit2->unit_category_name1,
+                'lesson_category2_2' => $lesson_unit2->unit_category_name2,
+                'lesson_category2_3' => $lesson_unit2->unit_category_name3,
+                'lesson_unit2_1' => $lesson_unit2->unit_name1,
+                'lesson_unit2_2' => $lesson_unit2->unit_name2,
+                'lesson_unit2_3' => $lesson_unit2->unit_name3,
+                'lesson_category_name2_1' => $lesson_unit2->free_category_name1,
+                'lesson_category_name2_2' => $lesson_unit2->free_category_name2,
+                'lesson_category_name2_3' => $lesson_unit2->free_category_name2,
+                'lesson_unit_name2_1' => $lesson_unit2->free_unit_name1,
+                'lesson_unit_name2_2' => $lesson_unit2->free_unit_name2,
+                'lesson_unit_name2_3' => $lesson_unit2->free_unit_name2
+            ];
+        }
+        // 宿題教材１があれば取得
+        if (ReportUnit::where('report_units.sub_cd', '=', AppConst::REPORT_SUBCODE_3)->exists()) {
+            $homework_unit1 = $this->getReportUnit($report->report_id, AppConst::REPORT_SUBCODE_3);
+        }
+        // 宿題教材２があれば取得
+        if (ReportUnit::where('report_units.sub_cd', '=', AppConst::REPORT_SUBCODE_4)->exists()) {
+            $homework_unit2 = $this->getReportUnit($report->report_id, AppConst::REPORT_SUBCODE_4);
+        }
+
+        // $this->debug($lesson_unit1);
+        // $this->debug($editdata);
+
+        return view('pages.tutor.report_regist-input', [
+            'editData' => $editdata,
+            'rules' => $this->rulesForInput(null),
+            'campus_name' => $report->campus_name,
+            'regist_date' => $report->regist_date,
+            'lesson_date' => $report->lesson_date,
+            'period_no' => $report->period_no,
+            'course_name' => $report->course_name,
+            'course_kind' => $report->course_kind,
+            'student_name' => $report->student_name,
+            'class_member_names' => $class_member_names,
+            'subject_name' => $report->subject_name,
+            'texts' => $texts,
+            'status' => $report->status,
+            'admin_comment' => $report->admin_comment,
+        ]);
     }
 
     /**
@@ -725,190 +892,362 @@ class ReportRegistController extends Controller
      */
     private function rulesForInput(?Request $request)
     {
+        $rules = array();
 
-        // // 独自バリデーション: 重複チェック(個別教室登録用)
-        // $validationDuplicateRegular = function ($attribute, $value, $fail) use ($request) {
+        // 独自バリデーション: リストのチェック 教材
+        $text_rule =  function ($attribute, $value, $fail) use ($request) {
+            // 授業報告書情報登録
+            $lesson = Schedule::query()
+                ->where('schedule_id', '=', $request['id'])
+                ->firstOrFail();
 
-        //     if (!isset($request['id'])) {
-        //         // requiredでチェックするのでreturn
-        //         return;
-        //     }
-        //     if ($request['lesson_type'] != AppConst::CODE_MASTER_8_1) {
-        //         // 種別で判断
-        //         return;
-        //     }
+            // リストを取得し存在チェック
+            // 教材リストを取得（授業科目コード指定）
+            $texts = $this->mdlGetTextList($lesson->subject_cd, null, null);
+            if (!isset($texts[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
 
-        //     // 対象データを取得(PKでユニークに取る)
-        //     // スケジュールID
-        //     $exists = Report::where('id', $request['id'])
-        //         // 授業種別
-        //         ->where('lesson_type', AppConst::CODE_MASTER_8_1)
-        //         ->exists();
+        // 独自バリデーション: リストのチェック 単元分類
+        $category_rule =  function ($attribute, $value, $fail) use ($request) {
+            // リストを取得し存在チェック
+            // 単元分類リストを取得
+            $categores = $this->mdlGetUnitCategoryList(null, null);
+            if (!isset($categores[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
 
-        //     if ($exists) {
-        //         // 登録済みエラー
-        //         return $fail(Lang::get('validation.duplicate_data'));
-        //     }
-        // };
+        // 独自バリデーション: リストのチェック 単元
+        $unit_rule =  function ($attribute, $value, $fail) use ($request) {
+            // リストを取得し存在チェック
+            // 単元リストを取得
+            $units = $this->mdlGetUnitList(null);
+            if (!isset($units[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
 
-        // // 独自バリデーション: 重複チェック(家庭教師登録用)
-        // $validationDuplicateHomeTeacher = function ($attribute, $value, $fail) use ($request) {
+        $page_rule = ReportUnit::fieldRules('text_page');
+        $text_name_rule = ReportUnit::fieldRules('free_text_name');
+        $category_name_rule = ReportUnit::fieldRules('free_category_name1');
+        $unit_name_rule = ReportUnit::fieldRules('free_unit_name1');
 
-        //     if (!isset($request['lesson_date'])) {
-        //         // requiredでチェックするのでreturn
-        //         return;
-        //     }
-        //     if ($request['lesson_type'] != AppConst::CODE_MASTER_8_2) {
-        //         // 種別で判断
-        //         return;
-        //     }
+        $rules += ['id' => ['required']];
+        $rules += Report::fieldRules('monthly_goal');
+        $rules += Report::fieldRules('test_contents');
+        $rules += Report::fieldRules('test_score');
+        $rules += Report::fieldRules('test_full_score');
+        $rules += Report::fieldRules('achievement');
+        $rules += Report::fieldRules('goodbad_point');
+        $rules += Report::fieldRules('solution');
+        $rules += Report::fieldRules('others_comment');
+        $rules += ['lesson_text1' => ['required', $text_rule]];
+        $rules += ['lesson_text2' => $text_rule];
+        $rules += ['homework_text1' => $text_rule];
+        $rules += ['homework_text2' => $text_rule];
+        $rules += ['lesson_category1_1' => $category_rule];
+        $rules += ['lesson_category1_2' => $category_rule];
+        $rules += ['lesson_category1_3' => $category_rule];
+        $rules += ['lesson_category2_1' => $category_rule];
+        $rules += ['lesson_category2_2' => $category_rule];
+        $rules += ['lesson_category2_3' => $category_rule];
+        $rules += ['homework_category1_1' => $category_rule];
+        $rules += ['homework_category1_2' => $category_rule];
+        $rules += ['homework_category1_3' => $category_rule];
+        $rules += ['homework_category2_1' => $category_rule];
+        $rules += ['homework_category2_2' => $category_rule];
+        $rules += ['homework_category2_3' => $category_rule];
+        $rules += ['lesson_unit1_1' => $unit_rule];
+        $rules += ['lesson_unit1_2' => $unit_rule];
+        $rules += ['lesson_unit1_3' => $unit_rule];
+        $rules += ['lesson_unit2_1' => $unit_rule];
+        $rules += ['lesson_unit2_2' => $unit_rule];
+        $rules += ['lesson_unit2_3' => $unit_rule];
+        $rules += ['homework_unit1_1' => $unit_rule];
+        $rules += ['homework_unit1_2' => $unit_rule];
+        $rules += ['homework_unit1_3' => $unit_rule];
+        $rules += ['homework_unit2_1' => $unit_rule];
+        $rules += ['homework_unit2_2' => $unit_rule];
+        $rules += ['homework_unit2_3' => $unit_rule];
+        $rules += ['lesson_page1' => $page_rule];
+        $rules += ['lesson_page2' => $page_rule];
+        $rules += ['homework_page1' => $page_rule];
+        $rules += ['homework_page2' => $page_rule];
+        $rules += ['lesson_text_name1' => $text_name_rule];
+        $rules += ['lesson_text_name2' => $text_name_rule];
+        $rules += ['homework_text_name1' => $text_name_rule];
+        $rules += ['homework_text_name2' => $text_name_rule];
+        $rules += ['lesson_category_name1_1' => $category_name_rule];
+        $rules += ['lesson_category_name1_2' => $category_name_rule];
+        $rules += ['lesson_category_name1_3' => $category_name_rule];
+        $rules += ['lesson_category_name2_1' => $category_name_rule];
+        $rules += ['lesson_category_name2_2' => $category_name_rule];
+        $rules += ['lesson_category_name2_3' => $category_name_rule];
+        $rules += ['homework_category_name1_1' => $category_name_rule];
+        $rules += ['homework_category_name1_2' => $category_name_rule];
+        $rules += ['homework_category_name1_3' => $category_name_rule];
+        $rules += ['homework_category_name2_1' => $category_name_rule];
+        $rules += ['homework_category_name2_2' => $category_name_rule];
+        $rules += ['homework_category_name2_3' => $category_name_rule];
+        $rules += ['lesson_unit_name1_1' => $unit_name_rule];
+        $rules += ['lesson_unit_name1_2' => $unit_name_rule];
+        $rules += ['lesson_unit_name1_3' => $unit_name_rule];
+        $rules += ['lesson_unit_name2_1' => $unit_name_rule];
+        $rules += ['lesson_unit_name2_2' => $unit_name_rule];
+        $rules += ['lesson_unit_name2_3' => $unit_name_rule];
+        $rules += ['homework_unit_name1_1' => $unit_name_rule];
+        $rules += ['homework_unit_name1_2' => $unit_name_rule];
+        $rules += ['homework_unit_name1_3' => $unit_name_rule];
+        $rules += ['homework_unit_name2_1' => $unit_name_rule];
+        $rules += ['homework_unit_name2_2' => $unit_name_rule];
+        $rules += ['homework_unit_name2_3' => $unit_name_rule];
 
-        //     // 授業日・開始時刻が現在日付時刻以前の授業のみ登録可とする
-        //     $lesson_datetime = $request['lesson_date'] . " " . $request['start_time'];
-        //     $today = date("Y/m/d H:i");
+        return $rules;
+    }
+    //==========================
+    // 授業報告書教材情報の取得
+    //==========================
+    protected function getReport($id)
+    {
+        // 校舎名取得のサブクエリ
+        $campus_names = $this->mdlGetRoomQuery();
 
-        //     if (strtotime($lesson_datetime) > strtotime($today)) {
-        //         // 日時チェックエラー
-        //         return $fail(Lang::get('validation.before_today'));
-        //     }
+        // クエリを作成
+        $query = Report::query();
 
-        //     // 教師IDを取得
-        //     $account = Auth::user();
-        //     $tid = $account->account_id;
+        // データを取得
+        $report = $query
+            // IDを指定
+            ->where('reports.report_id', $id)
+            ->select(
+                'reports.report_id',
+                'reports.schedule_id',
+                'reports.regist_date',
+                'reports.lesson_date',
+                'reports.period_no',
+                'reports.campus_cd',
+                // 校舎名
+                'campus_names.room_name as campus_name',
+                'reports.course_cd',
+                // コース名
+                'mst_courses.name as course_name',
+                'reports.student_id',
+                // 生徒情報の名前
+                'students.name as student_name',
+                'reports.monthly_goal',
+                'reports.test_contents',
+                'reports.test_score',
+                'reports.test_full_score',
+                'reports.achievement',
+                'reports.goodbad_point',
+                'reports.solution',
+                'reports.others_comment',
+                'reports.approval_status',
+                // コードマスタの名称（ステータス）
+                'mst_codes.name as status',
+                // コース種別
+                'mst_courses.course_kind as course_kind',
+                'reports.admin_comment',
+                'schedules.subject_cd as subject_cd',
+                // 科目名
+                'mst_subjects.name as subject_name',
+            )
+            // 校舎名の取得
+            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
+                $join->on('reports.campus_cd', '=', 'campus_names.code');
+            })
+            // 生徒名を取得
+            ->sdLeftJoin(Student::class, 'reports.student_id', '=', 'students.student_id')
+            // スケジュール情報とJOIN
+            ->sdLeftJoin(Schedule::class, 'reports.schedule_id', '=', 'schedules.schedule_id')
+            // コース名の取得
+            ->sdLeftJoin(MstCourse::class, function ($join) {
+                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd');
+            })
+            // 科目の取得
+            ->sdLeftJoin(MstSubject::class, 'schedules.subject_cd', '=', 'mst_subjects.subject_cd')
+            // コードマスターとJOIN
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('reports.approval_status', '=', 'mst_codes.code')
+                    ->where('data_type', AppConst::CODE_MASTER_2);
+            })
+            ->first();
+        
+        return $report;
+    }
+    //==========================
+    // 授業報告書教材情報の取得
+    //==========================
+    protected function getClassMember($schedule_id)
+    {
+        $class_members = ClassMember::query()
+                ->where('class_members.schedule_id', '=', $schedule_id)
+                ->select('class_members.student_id')
+                ->get();
+            
+        // 受講人数カウント
+        $number_people = count($class_members);
+            
+        // 受講生徒名を配列に格納
+        $class_member_names = [];
+        for ($i = 0; $i < $number_people; $i++) {
+            $class_member_names[$i] = $this->mdlGetStudentName($class_members[$i]['student_id']);
+        }
 
-        //     $lesson_date = $request['lesson_date'];
-        //     $start_time = $request['start_time'];
+        return $class_member_names;
+    }
+    //==========================
+    // 授業報告書教材情報の取得 詳細モーダル表示用
+    //==========================
+    // 教材情報取得関数
+    protected function getReportText($report_id,$sub_code)
+    {
+        $report_text = ReportUnit::query()
+            ->where('report_units.report_id', '=', $report_id)
+            ->where('report_units.sub_cd', '=', $sub_code)
+            ->select(
+                'mst_texts.name as text_name1',// 教材名
+                'report_units.free_text_name as free_text_name1',// 教材名フリー
+                'report_units.text_page as text_page1',
+            )
+            // 教材名の取得
+            ->sdLeftJoin(MstText::class, function ($join) {
+                $join->on('report_units.text_cd', '=', 'mst_texts.text_cd');
+            })
+            ->first();
 
-        //     // 対象データを取得(PKでユニークに取る)
-        //     $exists = Report::where('tid', $tid)
-        //         ->where('lesson_date', $lesson_date)
-        //         ->where('start_time', $start_time)
-        //         // 授業種別
-        //         ->where('lesson_type', AppConst::CODE_MASTER_8_2)
-        //         ->exists();
+        return $report_text;
+    }
+    // 単元分類・単元情報取得
+    protected function getReportCategory($report_id, $sub_code, $no)
+    {
+        if($no == 1) {
+            $report_category = ReportUnit::query()
+                ->where('report_units.report_id', '=', $report_id)
+                ->where('report_units.sub_cd', '=', $sub_code)
+                ->select(
+                    'mst_unit_categories.name as unit_category_name',// 単元分類名
+                    'report_units.free_category_name1 as free_category_name',// 単元分類名フリー
+                    'mst_units.name as unit_name',// 単元名
+                    'report_units.free_unit_name1 as free_unit_name',// 単元名フリー
+                )
+                // 単元分類名の取得
+                ->sdLeftJoin(MstUnitCategory::class, function ($join) {
+                    $join->on('report_units.unit_category_cd1', '=', 'mst_unit_categories.unit_category_cd');
+                })
+                // 単元名取得
+                ->sdLeftJoin(MstUnit::class, function ($join) {
+                    $join->on('report_units.unit_cd1', '=', 'mst_units.unit_cd');
+                })
+                ->first();
+        }
+        if($no == 2) {
+            $report_category = ReportUnit::query()
+                ->where('report_units.report_id', '=', $report_id)
+                ->where('report_units.sub_cd', '=', $sub_code)
+                ->select(
+                    'mst_unit_categories.name as unit_category_name',// 単元分類名
+                    'report_units.free_category_name2 as free_category_name',// 単元分類名フリー
+                    'mst_units.name as unit_name',// 単元名
+                    'report_units.free_unit_name2 as free_unit_name',// 単元名フリー
+                )
+                // 単元分類名の取得
+                ->sdLeftJoin(MstUnitCategory::class, function ($join) {
+                    $join->on('report_units.unit_category_cd2', '=', 'mst_unit_categories.unit_category_cd');
+                })
+                // 単元名取得
+                ->sdLeftJoin(MstUnit::class, function ($join) {
+                    $join->on('report_units.unit_cd2', '=', 'mst_units.unit_cd');
+                })
+                ->first();
+        }
+        if($no == 3) {
+            $report_category = ReportUnit::query()
+                ->where('report_units.report_id', '=', $report_id)
+                ->where('report_units.sub_cd', '=', $sub_code)
+                ->select(
+                    'mst_unit_categories.name as unit_category_name',// 単元分類名
+                    'report_units.free_category_name3 as free_category_name',// 単元分類名フリー
+                    'mst_units.name as unit_name',// 単元名
+                    'report_units.free_unit_name3 as free_unit_name',// 単元名フリー
+                )
+                // 単元分類名の取得
+                ->sdLeftJoin(MstUnitCategory::class, function ($join) {
+                    $join->on('report_units.unit_category_cd3', '=', 'mst_unit_categories.unit_category_cd');
+                })
+                // 単元名取得
+                ->sdLeftJoin(MstUnit::class, function ($join) {
+                    $join->on('report_units.unit_cd3', '=', 'mst_units.unit_cd');
+                })
+                ->first();
+        }
+        return $report_category;
+    }
+    //==========================
+    // 授業報告書教材情報の取得 編集画面用
+    //==========================
+    protected function getReportUnit($report_id, $sub_code)
+    {
+        $report_unit = ReportUnit::query()
+            ->where('report_units.report_id', '=', $report_id)
+            ->where('report_units.sub_cd', '=', $sub_code)
+            ->select(
+                'report_units.report_id',
+                'report_units.sub_cd',
+                'report_units.text_cd',
+                'mst_texts1.name as text_name1',// 教材名
+                'report_units.free_text_name as free_text_name1',// 教材名フリー
+                'report_units.text_page as text_page1',
+                'report_units.unit_category_cd1',
+                'mst_unit_categories1.name as unit_category_name1',// 単元分類名
+                'report_units.free_category_name1 as free_category_name1',// 単元分類名フリー
+                'report_units.unit_cd1',
+                'mst_units1.name as unit_name1',// 単元名
+                'report_units.free_unit_name1 as free_unit_name1',// 単元名フリー
+                'report_units.unit_category_cd2',
+                'mst_unit_categories2.name as unit_category_name2',// 単元分類名
+                'report_units.free_category_name2 as free_category_name2',// 単元分類名フリー
+                'report_units.unit_cd2',
+                'mst_units2.name as unit_name2',// 単元名
+                'report_units.free_unit_name2 as free_unit_name2',// 単元名フリー
+                'report_units.unit_category_cd3',
+                'mst_unit_categories3.name as unit_category_name3',// 単元分類名
+                'report_units.free_category_name3 as free_category_name3',// 単元分類名フリー
+                'report_units.unit_cd3',
+                'mst_units3.name as unit_name3',// 単元名
+                'report_units.free_unit_name3 as free_unit_name3',// 単元名フリー
+            )
+            // 教材名の取得
+            ->sdLeftJoin(MstText::class, function ($join) {
+                $join->on('report_units.text_cd', '=', 'mst_texts1.text_cd');
+            }, 'mst_texts1')
+            // 単元分類名の取得
+            ->sdLeftJoin(MstUnitCategory::class, function ($join) {
+                $join->on('report_units.unit_category_cd1', '=', 'mst_unit_categories1.unit_category_cd');
+            }, 'mst_unit_categories1')
+            ->sdLeftJoin(MstUnitCategory::class, function ($join) {
+                $join->on('report_units.unit_category_cd2', '=', 'mst_unit_categories2.unit_category_cd');
+            }, 'mst_unit_categories2')
+            ->sdLeftJoin(MstUnitCategory::class, function ($join) {
+                $join->on('report_units.unit_category_cd3', '=', 'mst_unit_categories3.unit_category_cd');
+            }, 'mst_unit_categories3')
+            // 単元名取得
+            ->sdLeftJoin(MstUnit::class, function ($join) {
+                $join->on('report_units.unit_cd1', '=', 'mst_units1.unit_cd');
+            }, 'mst_units1')
+            ->sdLeftJoin(MstUnit::class, function ($join) {
+                $join->on('report_units.unit_cd2', '=', 'mst_units2.unit_cd');
+            }, 'mst_units2')
+            ->sdLeftJoin(MstUnit::class, function ($join) {
+                $join->on('report_units.unit_cd3', '=', 'mst_units3.unit_cd');
+            }, 'mst_units3')
+            ->first();
 
-        //     if ($exists) {
-        //         // 登録済みエラー
-        //         return $fail(Lang::get('validation.duplicate_data'));
-        //     }
-        // };
-
-        // // 独自バリデーション: 授業種別（ラジオ）
-        // $validationRadioLessonType = function ($attribute, $value, $fail) use ($request) {
-
-        //     // ラジオの値のチェック
-        //     if (
-        //         $request['lesson_type'] != AppConst::CODE_MASTER_8_1 &&
-        //         $request['lesson_type'] != AppConst::CODE_MASTER_8_2
-        //     ) {
-        //         // 不正な値エラー
-        //         return $fail(Lang::get('validation.invalid_input'));
-        //     }
-        // };
-
-        // // 独自バリデーション: リストのチェック 授業時間
-        // $validationMinutesList =  function ($attribute, $value, $fail) {
-
-        //     // 授業時間数のプルダウンメニューを作成
-        //     $minutes = $this->getMenuOfMinutes();
-        //     if (!isset($minutes[$value])) {
-        //         // 不正な値エラー
-        //         return $fail(Lang::get('validation.invalid_input'));
-        //     }
-        // };
-
-        // // 独自バリデーション: リストのチェック 個別教室のスケジュール
-        // $validationScheduleMasterList =  function ($attribute, $value, $fail) use ($request) {
-
-        //     // sidの取得(チェックはvalidationSidListで行う)
-        //     $sid = $request['sid'];
-
-        //     // ログイン者の情報を取得する
-        //     $account = Auth::user();
-        //     $account_id = $account->account_id;
-
-        //     // 個別教室のスケジュールプルダウンメニューを作成
-        //     $scheduleMaster = $this->getScheduleListReport($account_id, null, $sid);
-        //     if (!isset($scheduleMaster[$value])) {
-        //         // 不正な値エラー
-        //         return $fail(Lang::get('validation.invalid_input'));
-        //     }
-        // };
-
-        // // 独自バリデーション: リストのチェック 家庭教師の受け持ち生徒名
-        // $validationStudentsList =  function ($attribute, $value, $fail) use ($request) {
-
-        //     // ログイン者の情報を取得する
-        //     $account = Auth::user();
-        //     $account_id = $account->account_id;
-
-        //     // 家庭教師の受け持ち生徒名プルダウンメニューを作成
-        //     $students = $this->mdlGetStudentListForT(AppConst::EXT_GENERIC_MASTER_101_900, $account_id);
-        //     if (!isset($students[$value])) {
-        //         // 不正な値エラー
-        //         return $fail(Lang::get('validation.invalid_input'));
-        //     }
-        // };
-
-        // // 独自バリデーション: リストのチェック 生徒ID(個別教室)
-        // $validationSidList =  function ($attribute, $value, $fail) {
-
-        //     // ログイン者の生徒No.を取得する。
-        //     $account = Auth::user();
-        //     $account_id = $account->account_id;
-
-        //     // 教師の担当している生徒の一覧を取得
-        //     $students = $this->mdlGetStudentListForT(null, $account_id, AppConst::EXT_GENERIC_MASTER_101_900);
-
-        //     if (!isset($students[$value])) {
-        //         // 不正な値エラー
-        //         return $fail(Lang::get('validation.invalid_input'));
-        //     }
-        // };
-
-        // $rules = array();
-
-        // // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
-        // // その他を第二引数で指定する
-
-        // // 新規登録の場合のみチェック
-        // if (isset($request['report_id']) && !filled($request['report_id'])) {
-
-        //     // 個別教室の生徒ID
-        //     $ruleSid = ExtSchedule::getFieldRule('sid');
-        //     $rules += ['sidKobetsu' =>  array_merge(
-        //         $ruleSid,
-        //         ['required_if:lesson_type,' . AppConst::CODE_MASTER_8_1, $validationSidList]
-        //     )];
-
-        //     // 項目のバリデーションルールをベースにする
-        //     $ruleId = Report::getFieldRule('id');
-        //     $ruleLessonDate = Report::getFieldRule('lesson_date');
-        //     $rules += Report::fieldRules('lesson_type', ['required', $validationRadioLessonType]);
-        //     // 授業種別が個別教室の場合、スケジュールIDの必須チェックと重複チェック
-        //     $rules += ['id' =>  array_merge(
-        //         $ruleId,
-        //         ['required_if:lesson_type,' . AppConst::CODE_MASTER_8_1, $validationDuplicateRegular, $validationScheduleMasterList]
-        //     )];
-
-        //     // 授業種別が家庭教師の場合、必須チェックと重複チェック
-        //     $rules += Report::fieldRules('start_time', ['required_if:lesson_type,' . AppConst::CODE_MASTER_8_2]);
-        //     $rules += Report::fieldRules('sid', ['required_if:lesson_type,' . AppConst::CODE_MASTER_8_2, $validationStudentsList]);
-        //     $rules += ['lesson_date' =>  array_merge(
-        //         $ruleLessonDate,
-        //         ['required_if:lesson_type,' . AppConst::CODE_MASTER_8_2, $validationDuplicateHomeTeacher]
-        //     )];
-        // }
-
-        // // 新規登録・更新両方でチェック
-        // // MEMO: 不正アクセス対策として、report_idもルールに追加する
-        // $rules += Report::fieldRules('report_id');
-        // $rules += Report::fieldRules('r_minutes', ['required', $validationMinutesList]);
-        // $rules += Report::fieldRules('content', ['required']);
-        // $rules += Report::fieldRules('homework');
-        // $rules += Report::fieldRules('teacher_comment', ['required']);
-
-        // return $rules;
-        return;
+        return $report_unit;
     }
 }
