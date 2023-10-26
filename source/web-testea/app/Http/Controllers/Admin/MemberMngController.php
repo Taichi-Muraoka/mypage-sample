@@ -1454,7 +1454,9 @@ class MemberMngController extends Controller
     {
 
         return view('pages.admin.member_mng-leave', [
-            'editData' => null,
+            'editData' => [
+                'leave_date' => date('Y/m/d')
+            ],
             'rules' => $this->rulesForInput(null)
         ]);
     }
