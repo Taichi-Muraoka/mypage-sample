@@ -693,7 +693,7 @@ class MemberMngController extends Controller
             //-------------------------
             // 特別期間講習管理 生徒連絡情報の登録
             //-------------------------
-            // 対象年度の特別期間×対象校舎分を登録する。
+            // 対象年度の特別期間×対象校舎分を登録する（当年度春期～翌年度春期）
 
             // 特別期間コードリスト取得
             $seasonCodes = $this->mdlFormatSeasonCd();
@@ -948,7 +948,7 @@ class MemberMngController extends Controller
             //-------------------------
             // 特別期間講習管理 生徒連絡情報の登録
             //-------------------------
-            // 所属校舎の、当年度の特別期間講習管理 生徒連絡情報のレコードが無い場合に作成する
+            // 所属校舎の、当年度春期～翌年度春期の特別期間講習管理 生徒連絡情報のレコードが無い場合に作成する
 
             // ステータス「在籍」で変更した場合に行う。
             if ($request['stu_status'] == AppConst::CODE_MASTER_28_1) {
@@ -956,7 +956,7 @@ class MemberMngController extends Controller
                 // 特別期間コードリスト取得（where用）
                 $seasonCodes = $this->mdlFormatSeasonCd();
 
-                // 所属校舎の当年度の特別期間講習管理 生徒連絡情報のレコードが有るか確認
+                // 所属校舎の当年度春期～翌年度春期の特別期間講習管理 生徒連絡情報のレコードが有るか確認
                 foreach ($seasonCodes as $seasonCd ) {
                     foreach ( $campuses as $campus) {
                         // 生徒ID、特別期間コード、選択した校舎 で絞り込む
@@ -1396,9 +1396,10 @@ class MemberMngController extends Controller
         }
 
         // 電話番号形式チェック 保護者電話番号は上記でバリデーション済みのため記載省略
-        if ($request && $request->filled('tel_stu')) {
-            $rules += Student::fieldRules('tel_stu');
-        }
+        $rules += Student::fieldRules('tel_stu');
+
+        // 外部サービス顧客ID形式チェック
+        $rules += Student::fieldRules('lead_id');
 
         // 会員ステータス「見込客」以外で登録する場合
         // 必須：ログインID種別、入会日
@@ -1634,6 +1635,7 @@ class MemberMngController extends Controller
         return $student;
     }
 
+    // MEMO:保留 他画面で同様の機能が必要であれば共通化する
     /**
      * 校舎チェックボックスリストの取得
      *

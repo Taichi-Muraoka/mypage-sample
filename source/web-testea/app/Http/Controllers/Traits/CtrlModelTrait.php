@@ -668,11 +668,14 @@ trait CtrlModelTrait
             ->where('sub_code', AppConst::CODE_MASTER_38_SUB_1)
             ->get();
 
-        // 特別期間コード生成 期間区分コードを2桁で0埋め
+        // 現年度分 特別期間コード生成 期間区分コードを2桁で0埋め
         $seasonCodes = [];
         foreach ($termList as $term) {
             $seasonCodes[] = $currentYear->value_num.str_pad($term->code, 2, '0', STR_PAD_LEFT);
         }
+
+        // 翌年度分 特別期間コード生成 春期のみ
+        $seasonCodes[] = $currentYear->value_num +1 .str_pad($termList[0]->code, 2, '0', STR_PAD_LEFT);
 
         return $seasonCodes;
     }
