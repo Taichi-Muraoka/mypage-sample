@@ -83,6 +83,7 @@ class Student extends Model
         'leave_date' => 'date',
         'recess_start_date' => 'date',
         'recess_end_date' => 'date',
+        'lead_id' => 'string',
     ];
 
     /**
@@ -137,8 +138,8 @@ class Student extends Model
             'school_cd_j' => ['string', 'max:13'],
             'school_cd_h' => ['string', 'max:13'],
             'is_jukensei' => ['integer'],
-            'tel_stu' => ['string', 'max:20', 'vdAlphaNum'],
-            'tel_par' => ['string', 'max:20', 'vdAlphaNum'],
+            'tel_stu' => ['string', 'max:20', 'vdTelephone'],
+            'tel_par' => ['string', 'max:20', 'vdTelephone'],
             'email_stu' => ['string', 'email:rfc,filter', 'max:100'],
             'email_par' => ['string', 'email:rfc,filter', 'max:100'],
             'login_kind' => ['integer'],
@@ -148,7 +149,7 @@ class Student extends Model
             'recess_start_date' => ['date_format:Y-m-d'],
             'recess_end_date' => ['date_format:Y-m-d'],
             'past_enter_term' => ['integer'],
-            'lead_id' => ['integer'],
+            'lead_id' => ['string', 'max:9', 'digits_between:1,9'],
             'storage_link' => ['string', 'max:1000'],
             'memo' => ['string', 'max:1000']
         ];
