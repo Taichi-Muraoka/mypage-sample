@@ -66,7 +66,7 @@ return [
     'date_format'          => ':format形式で指定してください。',
     'different'            => '重複のため指定できません。',
     'digits'               => '数字:digits桁で指定してください。',
-    'digits_between'       => ':min桁から:max桁の間で指定してください。',
+    'digits_between'       => '数字で:min桁から:max桁の間で指定してください。',
     'dimensions'           => '図形サイズが正しくありません。',
     'distinct'             => '異なった値を指定してください。',
     'email'                => '有効なメールアドレスを指定してください。',
