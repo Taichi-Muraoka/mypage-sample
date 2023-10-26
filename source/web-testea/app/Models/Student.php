@@ -149,7 +149,7 @@ class Student extends Model
             'recess_start_date' => ['date_format:Y-m-d'],
             'recess_end_date' => ['date_format:Y-m-d'],
             'past_enter_term' => ['integer'],
-            'lead_id' => ['string', 'max:9', 'digits:9'],
+            'lead_id' => ['string', 'max:9', 'digits_between:1,9'],
             'storage_link' => ['string', 'max:1000'],
             'memo' => ['string', 'max:1000']
         ];
