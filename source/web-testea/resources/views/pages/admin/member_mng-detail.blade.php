@@ -41,11 +41,11 @@
         </tr>
         <tr>
             <th>生徒メールアドレス</th>
-            <td>{{$student->email}}</td>
+            <td><a href="mailto:$student->email">{{$student->email}}</a></td>
         </tr>
         <tr>
             <th>保護者メールアドレス</th>
-            <td>parent0001@ap.jeez.jp</td>
+            <td><a href="mailto:parent0001@ap.jeez.jp">parent0001@ap.jeez.jp</a></td>
         </tr>
         <tr>
             <th>生年月日</th>
