@@ -69,11 +69,11 @@
             @if (!in_array($j . "_" . $periodIdList[$i], $editData["chkWs"]))
               @if ($i == 0 && $j== 0 )
               <div class="class-info">
-                <span>CW講師１０１</span>
+                <span>CW講師１０１<br>英語</span>
               </div>
               @elseif ($i == 1 && $j== 2 )
               <div class="class-info">
-                <span>CW講師１０１</span>
+                <span>CW講師１０１<br>英語</span>
               </div>
               @else
               <div class="sel-button">
