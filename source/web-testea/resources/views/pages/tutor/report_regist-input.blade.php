@@ -88,16 +88,27 @@
     <x-input.text caption="今月の目標" id="monthly_goal" :rules=$rules :editData=$editData />
 
     <x-bs.form-title>授業内容</x-bs.form-title>
-    @if (request()->routeIs('report_regist-edit'))
-    {{-- 編集時 --}}
     @for ($i = 1; $i <= 2; $i++)
     <x-bs.card>
-        {{-- <x-input.text id="id" onChange="selectChangeGet" :rules=$rules :editData=$editData/> --}}
         <x-bs.form-title>教材{{$i}}</x-bs.form-title>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.select caption="教材" id="lesson_text{{$i}}" :editData=$editData onChange="selectChangeGetCat"
-                    :mastrData=$texts :rules=$rules :select2=true :select2Search=true :blank=true/>
+                    :rules=$rules :select2=true :select2Search=true :blank=true>
+                    {{-- 編集時 --}}
+                    @if (request()->routeIs('report_regist-edit'))
+                    @foreach ($texts as $text)
+                    <option value="{{$text->code}}" @if ($text->value == $editData['lesson_text'. $i]) selected @endif>
+                        {{$text->value}}
+                    </option>
+                    @endforeach
+                    {{-- 登録時 --}}
+                    @else
+                    <option v-for="item in selectGetItem.selectItems" :value="item.code">
+                        @{{ item.value }}
+                    </option>
+                    @endif
+                </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
                 <x-input.text caption="ページ" id="lesson_page{{$i}}" :rules=$rules :editData=$editData/>
@@ -121,9 +132,17 @@
             <x-bs.col2>
                 <x-input.select caption="単元{{$j}}" id="lesson_unit{{$i}}_{{$j}}" :editData=$editData
                     :rules=$rules :select2=true :select2Search=true :blank=true>
+                    {{-- 編集時 --}}
+                    @if (request()->routeIs('report_regist-edit'))
                     <option v-for="item in $data['selectGetItemUniL' + {{$i}} + '_' + {{$j}}].selectItems" :value="item.code">
                         @{{ item.value }}
                     </option>
+                    {{-- 登録時 --}}
+                    @else
+                    <option v-for="item in $data['selectGetItemUniL' + {{$i}} + '_' + {{$j}}].selectItems" :value="item.code">
+                        @{{ item.value }}
+                    </option>
+                    @endif
                 </x-input.select>
             </x-bs.col2>
         </x-bs.row>
@@ -140,62 +159,6 @@
         @endfor
     </x-bs.card>
     @endfor
-    @else
-    {{-- 登録時 --}}
-    @for ($i = 1; $i <= 2; $i++)
-    <x-bs.card>
-        <x-bs.form-title>教材{{$i}}</x-bs.form-title>
-        <x-bs.row>
-            <x-bs.col2>
-                <x-input.select caption="教材" id="lesson_text{{$i}}" :editData=$editData onChange="selectChangeGetCat"
-                    :rules=$rules :select2=true :select2Search=true :blank=true>
-                    <option v-for="item in selectGetItem.selectItems" :value="item.code">
-                        @{{ item.value }}
-                    </option>
-                </x-input.select>
-            </x-bs.col2>
-            <x-bs.col2>
-                <x-input.text caption="ページ" id="lesson_page{{$i}}" :rules=$rules/>
-            </x-bs.col2>
-        </x-bs.row>
-        <x-bs.row>
-            <x-bs.col2>
-                <x-input.text caption="その他教材名（フリー入力）" id="lesson_text_name{{$i}}"
-                    v-Show="form.lesson_text{{$i}}.endsWith('99')" :rules=$rules/>
-            </x-bs.col2>
-        </x-bs.row>
-        @for ($j = 1; $j <= 3; $j++) <x-bs.row>
-            <x-bs.col2>
-                <x-input.select caption="単元分類{{$j}}" id="lesson_category{{$i}}_{{$j}}" :editData=$editData onChange="selectChangeGetUni"
-                    :rules=$rules :select2=true :select2Search=true :blank=true>
-                    <option v-for="item in $data['selectGetItemCatL' + {{$i}}].selectItems" :value="item.code">
-                        @{{ item.value }}
-                    </option>
-                </x-input.select>
-            </x-bs.col2>
-            <x-bs.col2>
-                <x-input.select caption="単元{{$j}}" id="lesson_unit{{$i}}_{{$j}}" :editData=$editData
-                    :rules=$rules :select2=true :select2Search=true :blank=true>
-                    <option v-for="item in $data['selectGetItemUniL' + {{$i}} + '_' + {{$j}}].selectItems" :value="item.code">
-                        @{{ item.value }}
-                    </option>
-                </x-input.select>
-            </x-bs.col2>
-        </x-bs.row>
-        <x-bs.row>
-            <x-bs.col2>
-                <x-input.text caption="その他単元分類名{{$j}}（フリー入力）" id="lesson_category_name{{$i}}_{{$j}}"
-                :rules=$rules v-Show="form.lesson_category{{$i}}_{{$j}}.endsWith('99')" />
-            </x-bs.col2>
-            <x-bs.col2>
-                <x-input.text caption="その他単元名{{$j}}（フリー入力）" id="lesson_unit_name{{$i}}_{{$j}}"
-                :rules=$rules v-Show="form.lesson_unit{{$i}}_{{$j}}.endsWith('99')" />
-            </x-bs.col2>
-        </x-bs.row>
-        @endfor
-    </x-bs.card>
-    @endfor
-    @endif
 
     <x-bs.card>
     <x-bs.form-title>確認テスト</x-bs.form-title>
@@ -227,26 +190,36 @@
         <x-bs.row>
             <x-bs.col2>
                 <x-input.select caption="教材" id="homework_text{{$i}}" :editData=$editData onChange="selectChangeGetCatHome"
-                    :rules=$rules :select2=true :select2Search=true :blank=true>
+                    :rules=$rules :select2=true :select2Search=true :blank=true :editData=$editData>
+                    {{-- 編集時 --}}
+                    @if (request()->routeIs('report_regist-edit'))
+                    @foreach ($texts as $text)
+                    <option value="{{$text->code}}" @if ($text->value == $editData['homework_text'. $i]) selected @endif>
+                        {{$text->value}}
+                    </option>
+                    @endforeach
+                    {{-- 登録時 --}}
+                    @else
                     <option v-for="item in selectGetItem.selectItems" :value="item.code">
                         @{{ item.value }}
                     </option>
+                    @endif
                 </x-input.select>
             </x-bs.col2>
             <x-bs.col2>
-                <x-input.text caption="ページ" id="homework_page{{$i}}" :rules=$rules/>
+                <x-input.text caption="ページ" id="homework_page{{$i}}" :rules=$rules :editData=$editData/>
             </x-bs.col2>
         </x-bs.row>
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他教材名（フリー入力）" id="homework_text_name{{$i}}"
-                    :rules=$rules v-Show="form.homework_text{{$i}}.endsWith('99')" />
+                    :rules=$rules :editData=$editData v-Show="form.homework_text{{$i}}.endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
         @for ($j = 1; $j <= 3; $j++) <x-bs.row>
             <x-bs.col2>
-                <x-input.select caption="単元分類{{$j}}" id="homework_category{{$i}}_{{$j}}" :editData=$editData onChange="selectChangeGetUniHome"
-                    :rules=$rules :select2=true :select2Search=true :blank=true>
+                <x-input.select caption="単元分類{{$j}}" id="homework_category{{$i}}_{{$j}}" onChange="selectChangeGetUniHome"
+                    :rules=$rules :select2=true :select2Search=true :blank=true :editData=$editData>
                     <option v-for="item in $data['selectGetItemCatHomeL' + {{$i}}].selectItems" :value="item.code">
                         @{{ item.value }}
                     </option>
@@ -264,11 +237,11 @@
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他単元分類名{{$j}}（フリー入力）" id="homework_category_name{{$i}}_{{$j}}"
-                    :rules=$rules v-Show="form.homework_category{{$i}}_{{$j}}.endsWith('99')" />
+                    :rules=$rules v-Show="form.homework_category{{$i}}_{{$j}}.endsWith('99')" :editData=$editData/>
             </x-bs.col2>
             <x-bs.col2>
                 <x-input.text caption="その他単元名{{$j}}（フリー入力）" id="homework_unit_name{{$i}}_{{$j}}"
-                    :rules=$rules v-Show="form.homework_unit{{$i}}_{{$j}}.endsWith('99')" />
+                    :rules=$rules v-Show="form.homework_unit{{$i}}_{{$j}}.endsWith('99')" :editData=$editData/>
             </x-bs.col2>
         </x-bs.row>
         @endfor

@@ -776,14 +776,48 @@ class ReportRegistController extends Controller
         // 宿題教材１があれば取得
         if (ReportUnit::where('report_units.sub_cd', '=', AppConst::REPORT_SUBCODE_3)->exists()) {
             $homework_unit1 = $this->getReportUnit($report->report_id, AppConst::REPORT_SUBCODE_3);
+            $editdata += [
+                'homework_text1' => $homework_unit1->text_name1,
+                'homework_text_name1' => $homework_unit1->free_text_name1,
+                'homework_page1' => $homework_unit1->text_page1,
+                'homework_category1_1' => $homework_unit1->unit_category_name1,
+                'homework_category1_2' => $homework_unit1->unit_category_name2,
+                'homework_category1_3' => $homework_unit1->unit_category_name3,
+                'homework_unit1_1' => $homework_unit1->unit_name1,
+                'homework_unit1_2' => $homework_unit1->unit_name2,
+                'homework_unit1_3' => $homework_unit1->unit_name3,
+                'homework_category_name1_1' => $homework_unit1->free_category_name1,
+                'homework_category_name1_2' => $homework_unit1->free_category_name2,
+                'homework_category_name1_3' => $homework_unit1->free_category_name2,
+                'homework_unit_name1_1' => $homework_unit1->free_unit_name1,
+                'homework_unit_name1_2' => $homework_unit1->free_unit_name2,
+                'homework_unit_name1_3' => $homework_unit1->free_unit_name2
+            ];
         }
         // 宿題教材２があれば取得
         if (ReportUnit::where('report_units.sub_cd', '=', AppConst::REPORT_SUBCODE_4)->exists()) {
             $homework_unit2 = $this->getReportUnit($report->report_id, AppConst::REPORT_SUBCODE_4);
+            $editdata += [
+                'homework_text2' => $homework_unit2->text_name1,
+                'homework_text_name2' => $homework_unit2->free_text_name1,
+                'homework_page2' => $homework_unit2->text_page1,
+                'homework_category2_1' => $homework_unit2->unit_category_name1,
+                'homework_category2_2' => $homework_unit2->unit_category_name2,
+                'homework_category2_3' => $homework_unit2->unit_category_name3,
+                'homework_unit2_1' => $homework_unit2->unit_name1,
+                'homework_unit2_2' => $homework_unit2->unit_name2,
+                'homework_unit2_3' => $homework_unit2->unit_name3,
+                'homework_category_name2_1' => $homework_unit2->free_category_name1,
+                'homework_category_name2_2' => $homework_unit2->free_category_name2,
+                'homework_category_name2_3' => $homework_unit2->free_category_name2,
+                'homework_unit_name2_1' => $homework_unit2->free_unit_name1,
+                'homework_unit_name2_2' => $homework_unit2->free_unit_name2,
+                'homework_unit_name2_3' => $homework_unit2->free_unit_name2
+            ];
         }
 
         // $this->debug($lesson_unit1);
-        // $this->debug($editdata);
+        $this->debug($texts);
 
         return view('pages.tutor.report_regist-input', [
             'editData' => $editdata,
@@ -811,33 +845,34 @@ class ReportRegistController extends Controller
      */
     public function update(Request $request)
     {
+        // $this->debug($request);
 
-        // 登録前バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForInput($request))->validate();
+        // // 登録前バリデーション。NGの場合はレスポンスコード422を返却
+        // Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        // 対象データを取得(IDでユニークに取る)
-        $query = Report::query();
+        // // 対象データを取得(IDでユニークに取る)
+        // $query = Report::query();
 
-        // 対象データを取得(PKでユニークに取る)
-        $report = $query
-            ->where('report_id', $request->input('report_id'))
-            // 受け持ち生徒に限定するガードを掛ける
-            ->where($this->guardTutorTableWithSid())
-            // 自分のアカウントIDでガードを掛ける（tid）
-            ->where($this->guardTutorTableWithTid())
-            // 該当データがない場合はエラーを返す
-            ->firstOrFail();
+        // // 対象データを取得(PKでユニークに取る)
+        // $report = $query
+        //     ->where('report_id', $request->input('report_id'))
+        //     // 受け持ち生徒に限定するガードを掛ける
+        //     ->where($this->guardTutorTableWithSid())
+        //     // 自分のアカウントIDでガードを掛ける（tid）
+        //     ->where($this->guardTutorTableWithTid())
+        //     // 該当データがない場合はエラーを返す
+        //     ->firstOrFail();
 
-        // フォームから受け取った値を格納
-        $form = $request->only(
-            'r_minutes',
-            'content',
-            'homework',
-            'teacher_comment'
-        );
+        // // フォームから受け取った値を格納
+        // $form = $request->only(
+        //     'r_minutes',
+        //     'content',
+        //     'homework',
+        //     'teacher_comment'
+        // );
 
-        // 保存
-        $report->fill($form)->save();
+        // // 保存
+        // $report->fill($form)->save();
 
         return;
     }
@@ -937,7 +972,6 @@ class ReportRegistController extends Controller
         $category_name_rule = ReportUnit::fieldRules('free_category_name1');
         $unit_name_rule = ReportUnit::fieldRules('free_unit_name1');
 
-        $rules += ['id' => ['required']];
         $rules += Report::fieldRules('monthly_goal');
         $rules += Report::fieldRules('test_contents');
         $rules += Report::fieldRules('test_score');
@@ -946,66 +980,66 @@ class ReportRegistController extends Controller
         $rules += Report::fieldRules('goodbad_point');
         $rules += Report::fieldRules('solution');
         $rules += Report::fieldRules('others_comment');
-        $rules += ['lesson_text1' => ['required', $text_rule]];
-        $rules += ['lesson_text2' => $text_rule];
-        $rules += ['homework_text1' => $text_rule];
-        $rules += ['homework_text2' => $text_rule];
-        $rules += ['lesson_category1_1' => $category_rule];
-        $rules += ['lesson_category1_2' => $category_rule];
-        $rules += ['lesson_category1_3' => $category_rule];
-        $rules += ['lesson_category2_1' => $category_rule];
-        $rules += ['lesson_category2_2' => $category_rule];
-        $rules += ['lesson_category2_3' => $category_rule];
-        $rules += ['homework_category1_1' => $category_rule];
-        $rules += ['homework_category1_2' => $category_rule];
-        $rules += ['homework_category1_3' => $category_rule];
-        $rules += ['homework_category2_1' => $category_rule];
-        $rules += ['homework_category2_2' => $category_rule];
-        $rules += ['homework_category2_3' => $category_rule];
-        $rules += ['lesson_unit1_1' => $unit_rule];
-        $rules += ['lesson_unit1_2' => $unit_rule];
-        $rules += ['lesson_unit1_3' => $unit_rule];
-        $rules += ['lesson_unit2_1' => $unit_rule];
-        $rules += ['lesson_unit2_2' => $unit_rule];
-        $rules += ['lesson_unit2_3' => $unit_rule];
-        $rules += ['homework_unit1_1' => $unit_rule];
-        $rules += ['homework_unit1_2' => $unit_rule];
-        $rules += ['homework_unit1_3' => $unit_rule];
-        $rules += ['homework_unit2_1' => $unit_rule];
-        $rules += ['homework_unit2_2' => $unit_rule];
-        $rules += ['homework_unit2_3' => $unit_rule];
-        $rules += ['lesson_page1' => $page_rule];
-        $rules += ['lesson_page2' => $page_rule];
-        $rules += ['homework_page1' => $page_rule];
-        $rules += ['homework_page2' => $page_rule];
-        $rules += ['lesson_text_name1' => $text_name_rule];
-        $rules += ['lesson_text_name2' => $text_name_rule];
-        $rules += ['homework_text_name1' => $text_name_rule];
-        $rules += ['homework_text_name2' => $text_name_rule];
-        $rules += ['lesson_category_name1_1' => $category_name_rule];
-        $rules += ['lesson_category_name1_2' => $category_name_rule];
-        $rules += ['lesson_category_name1_3' => $category_name_rule];
-        $rules += ['lesson_category_name2_1' => $category_name_rule];
-        $rules += ['lesson_category_name2_2' => $category_name_rule];
-        $rules += ['lesson_category_name2_3' => $category_name_rule];
-        $rules += ['homework_category_name1_1' => $category_name_rule];
-        $rules += ['homework_category_name1_2' => $category_name_rule];
-        $rules += ['homework_category_name1_3' => $category_name_rule];
-        $rules += ['homework_category_name2_1' => $category_name_rule];
-        $rules += ['homework_category_name2_2' => $category_name_rule];
-        $rules += ['homework_category_name2_3' => $category_name_rule];
-        $rules += ['lesson_unit_name1_1' => $unit_name_rule];
-        $rules += ['lesson_unit_name1_2' => $unit_name_rule];
-        $rules += ['lesson_unit_name1_3' => $unit_name_rule];
-        $rules += ['lesson_unit_name2_1' => $unit_name_rule];
-        $rules += ['lesson_unit_name2_2' => $unit_name_rule];
-        $rules += ['lesson_unit_name2_3' => $unit_name_rule];
-        $rules += ['homework_unit_name1_1' => $unit_name_rule];
-        $rules += ['homework_unit_name1_2' => $unit_name_rule];
-        $rules += ['homework_unit_name1_3' => $unit_name_rule];
-        $rules += ['homework_unit_name2_1' => $unit_name_rule];
-        $rules += ['homework_unit_name2_2' => $unit_name_rule];
-        $rules += ['homework_unit_name2_3' => $unit_name_rule];
+        // $rules += ['lesson_text1' => ['required', $text_rule]];
+        // $rules += ['lesson_text2' => $text_rule];
+        // $rules += ['homework_text1' => $text_rule];
+        // $rules += ['homework_text2' => $text_rule];
+        // $rules += ['lesson_category1_1' => $category_rule];
+        // $rules += ['lesson_category1_2' => $category_rule];
+        // $rules += ['lesson_category1_3' => $category_rule];
+        // $rules += ['lesson_category2_1' => $category_rule];
+        // $rules += ['lesson_category2_2' => $category_rule];
+        // $rules += ['lesson_category2_3' => $category_rule];
+        // $rules += ['homework_category1_1' => $category_rule];
+        // $rules += ['homework_category1_2' => $category_rule];
+        // $rules += ['homework_category1_3' => $category_rule];
+        // $rules += ['homework_category2_1' => $category_rule];
+        // $rules += ['homework_category2_2' => $category_rule];
+        // $rules += ['homework_category2_3' => $category_rule];
+        // $rules += ['lesson_unit1_1' => $unit_rule];
+        // $rules += ['lesson_unit1_2' => $unit_rule];
+        // $rules += ['lesson_unit1_3' => $unit_rule];
+        // $rules += ['lesson_unit2_1' => $unit_rule];
+        // $rules += ['lesson_unit2_2' => $unit_rule];
+        // $rules += ['lesson_unit2_3' => $unit_rule];
+        // $rules += ['homework_unit1_1' => $unit_rule];
+        // $rules += ['homework_unit1_2' => $unit_rule];
+        // $rules += ['homework_unit1_3' => $unit_rule];
+        // $rules += ['homework_unit2_1' => $unit_rule];
+        // $rules += ['homework_unit2_2' => $unit_rule];
+        // $rules += ['homework_unit2_3' => $unit_rule];
+        // $rules += ['lesson_page1' => $page_rule];
+        // $rules += ['lesson_page2' => $page_rule];
+        // $rules += ['homework_page1' => $page_rule];
+        // $rules += ['homework_page2' => $page_rule];
+        // $rules += ['lesson_text_name1' => $text_name_rule];
+        // $rules += ['lesson_text_name2' => $text_name_rule];
+        // $rules += ['homework_text_name1' => $text_name_rule];
+        // $rules += ['homework_text_name2' => $text_name_rule];
+        // $rules += ['lesson_category_name1_1' => $category_name_rule];
+        // $rules += ['lesson_category_name1_2' => $category_name_rule];
+        // $rules += ['lesson_category_name1_3' => $category_name_rule];
+        // $rules += ['lesson_category_name2_1' => $category_name_rule];
+        // $rules += ['lesson_category_name2_2' => $category_name_rule];
+        // $rules += ['lesson_category_name2_3' => $category_name_rule];
+        // $rules += ['homework_category_name1_1' => $category_name_rule];
+        // $rules += ['homework_category_name1_2' => $category_name_rule];
+        // $rules += ['homework_category_name1_3' => $category_name_rule];
+        // $rules += ['homework_category_name2_1' => $category_name_rule];
+        // $rules += ['homework_category_name2_2' => $category_name_rule];
+        // $rules += ['homework_category_name2_3' => $category_name_rule];
+        // $rules += ['lesson_unit_name1_1' => $unit_name_rule];
+        // $rules += ['lesson_unit_name1_2' => $unit_name_rule];
+        // $rules += ['lesson_unit_name1_3' => $unit_name_rule];
+        // $rules += ['lesson_unit_name2_1' => $unit_name_rule];
+        // $rules += ['lesson_unit_name2_2' => $unit_name_rule];
+        // $rules += ['lesson_unit_name2_3' => $unit_name_rule];
+        // $rules += ['homework_unit_name1_1' => $unit_name_rule];
+        // $rules += ['homework_unit_name1_2' => $unit_name_rule];
+        // $rules += ['homework_unit_name1_3' => $unit_name_rule];
+        // $rules += ['homework_unit_name2_1' => $unit_name_rule];
+        // $rules += ['homework_unit_name2_2' => $unit_name_rule];
+        // $rules += ['homework_unit_name2_3' => $unit_name_rule];
 
         return $rules;
     }
