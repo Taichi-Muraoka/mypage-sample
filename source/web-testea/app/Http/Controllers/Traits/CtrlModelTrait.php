@@ -424,7 +424,7 @@ trait CtrlModelTrait
 
         if (AuthEx::isRoomAdmin()) {
             // 教室管理者の場合、所属校舎で絞る（ガード）
-            $query->where('campus_cd', $account->campus_cd);
+            $query->where('mst_timetables.campus_cd', $account->campus_cd);
         } else if (AuthEx::isTutor()) {
             // 講師の場合、所属校舎で絞る（ガード）
             $this->mdlWhereRoomByTidQuery($query, MstTimetable::class, $account->account_id);

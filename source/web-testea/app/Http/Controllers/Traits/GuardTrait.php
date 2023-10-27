@@ -6,6 +6,7 @@ use App\Libs\AuthEx;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Traits\CtrlModelTrait;
 use App\Models\StudentCampus;
+use App\Models\TutorCampus;
 
 /**
  * ガード共通処理
@@ -145,7 +146,7 @@ trait GuardTrait
     }
 
     /**
-     * 教室管理者の校舎コードの生徒IDかチェックしガードを掛ける
+     * 教室管理者の担当校舎の生徒IDかチェックしガードを掛ける
      */
     protected function guardRoomAdminSid($sid)
     {
@@ -153,6 +154,22 @@ trait GuardTrait
         if (AuthEx::isRoomAdmin()) {
             $account = Auth::user();
             $exists = StudentCampus::where('campus_cd', $account->campus_cd)->where('student_id', $sid)->exists();
+            if (!$exists) {
+                return $this->illegalResponseErr();
+            }
+        }
+    }
+
+    /**
+     * 教室管理者の担当校舎の講師IDかチェックしガードを掛ける
+     */
+    protected function guardRoomAdminTid($tid)
+    {
+        // 教室管理者の場合、見れていいidかチェックする
+        if (AuthEx::isRoomAdmin()) {
+            $account = Auth::user();
+            $exists = TutorCampus::where('campus_cd', $account->campus_cd)
+                ->where('tutor_id', $tid)->exists();
             if (!$exists) {
                 return $this->illegalResponseErr();
             }
