@@ -7,7 +7,7 @@
 
 <ul>
     <li>ステータスを「承認」に変更</li>
-    <li>支払年月を設定</li>
+    <li>支払年月を設定（申請日の翌月に自動設定）</li>
 </ul>
 
 {{-- <x-bs.table :hover=false :vHeader=true> --}}
