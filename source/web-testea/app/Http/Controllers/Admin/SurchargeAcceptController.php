@@ -88,7 +88,7 @@ class SurchargeAcceptController extends Controller
                 //---------
                 // 承認
                 //---------
-                return;
+                return ['id' => $request->id];
 
                 break;
 

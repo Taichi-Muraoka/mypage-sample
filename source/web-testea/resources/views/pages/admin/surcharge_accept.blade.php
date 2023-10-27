@@ -94,11 +94,11 @@
             <td>60</td>
             <td>1000</td>
             <td>承認</td>
-            <td>2023/03</td>
+            <td>2023/02</td>
             <td>未処理</td>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => '1']"/>
-                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-acceptance" disabled/>
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-acceptance" :vueDataAttr="['id' => '1']" disabled/>
                 <x-button.list-edit href="{{ route('surcharge_accept-edit', 1) }}" />
             </td>
         </tr>
@@ -114,7 +114,23 @@
             <td></td>
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => '2']"/>
-                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-acceptance"/>
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-acceptance" :vueDataAttr="['id' => '2']" />
+                <x-button.list-edit href="{{ route('surcharge_accept-edit', 1) }}" />
+            </td>
+        </tr>
+        <tr>
+            <td>2023/01/5</td>
+            <td>CWテスト教師１０３</td>
+            <td>業務依頼（教室）</td>
+            <td>西永福</td>
+            <td>90</td>
+            <td>1500</td>
+            <td>承認待ち</td>
+            <td></td>
+            <td></td>
+            <td>
+                <x-button.list-dtl :vueDataAttr="['id' => '3']"/>
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-acceptance" :vueDataAttr="['id' => '3']" />
                 <x-button.list-edit href="{{ route('surcharge_accept-edit', 1) }}" />
             </td>
         </tr>
