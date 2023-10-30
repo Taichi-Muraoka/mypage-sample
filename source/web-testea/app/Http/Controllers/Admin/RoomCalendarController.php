@@ -68,7 +68,7 @@ class RoomCalendarController extends Controller
 
         // セッションデータのチェック
         if (!is_null($sessionCampus)) {
-           // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
             $this->guardRoomAdminRoomcd($sessionCampus);
         }
         if (!is_null($sessionDate)) {
