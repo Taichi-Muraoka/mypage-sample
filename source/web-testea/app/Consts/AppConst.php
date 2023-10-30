@@ -1907,4 +1907,11 @@ class AppConst
      * 授業報告書 宿題内容教材2
      */
     const REPORT_SUBCODE_4 = 'H2';
+
+    const REPORT_SUBCODES = [
+        AppConst::REPORT_SUBCODE_1,
+        AppConst::REPORT_SUBCODE_2,
+        AppConst::REPORT_SUBCODE_3,
+        AppConst::REPORT_SUBCODE_4
+    ];
 }

@@ -16,6 +16,7 @@ export default class AppClass extends PageBase {
      */
     start() {
         const self = this;
+        const subCodes = ['L1', 'L2', 'H1', 'H2'];
 
         // 編集完了後は一覧へ戻る
         var afterEdit = () => {
@@ -33,84 +34,84 @@ export default class AppClass extends PageBase {
                 selectGetItemCatL2: {},
                 selectGetItemCatL3: {},
                 // 単元分類プルダウン変更用のプロパティを用意
-                selectGetItemUniL1_1: {},
-                selectGetItemUniL1_2: {},
-                selectGetItemUniL1_3: {},
-                selectGetItemUniL2_1: {},
-                selectGetItemUniL2_2: {},
-                selectGetItemUniL2_3: {},
+                selectGetItemUni1_L1: {},
+                selectGetItemUni2_L1: {},
+                selectGetItemUni3_L1: {},
+                selectGetItemUni1_L2: {},
+                selectGetItemUni2_L2: {},
+                selectGetItemUni3_L2: {},
                 // 宿題教材プルダウン変更用のプロパティを用意
-                selectGetItemCatHomeL1: {},
-                selectGetItemCatHomeL2: {},
-                selectGetItemCatHomeL3: {},
+                selectGetItemCatH1: {},
+                selectGetItemCatH2: {},
+                selectGetItemCatH3: {},
                 // 宿題単元分類プルダウン変更用のプロパティを用意
-                selectGetItemUniHomeL1_1: {},
-                selectGetItemUniHomeL1_2: {},
-                selectGetItemUniHomeL1_3: {},
-                selectGetItemUniHomeL2_1: {},
-                selectGetItemUniHomeL2_2: {},
-                selectGetItemUniHomeL2_3: {},
+                selectGetItemUni1_H1: {},
+                selectGetItemUni2_H1: {},
+                selectGetItemUni3_H1: {},
+                selectGetItemUni1_H2: {},
+                selectGetItemUni2_H2: {},
+                selectGetItemUni3_H2: {},
+            },
+            // 画面読み込み時
+            vueMounted: function($vue, option) {
+                // 初期表示時に、授業情報リスト変更イベント実行
+                $vue.selectChangeGet();
+                // 初期表示時に、教材リスト・単元分類リスト取得処理実行
+                for (var subCode of subCodes) {
+                    $vue.selectChangeGetCatInit(subCode);
+                }
             },
             // Vueにメソッド追加
             vueMethods: {
-                // この画面では複数のプルダウン選択があるので対応する
                 // 授業情報リスト変更
                 selectChangeGet: function (event) {
-
                     this.selectGetItem = {};
-                    for (var i = 1;  i <= 2;  i++) {
+                    for (var subCode of subCodes) {
                         // 教材プルダウンの初期化
-                        this.form['lesson_text' + i] = "";
+                        this.form['text_cd_' + subCode] = "";
+                        this['selectGetItemCat' +  '_' + subCode] = {};
                         for (var j = 1;  j <= 3;  j++) {
                             // 単元分類プルダウン・単元プルダウンもクリア
-                            this.form['lesson_category' + i + '_' + j] = "";
-                            this.form['lesson_unit' + i + '_' + j] = "";
-                            this['selectGetItemCatL' + i + '_' + j] = {};
-                            this['selectGetItemUniL' + i + '_' + j] = {};
+                            this.form['unit_category_cd' + j +  '_' + subCode] = "";
+                            this.form['unit_cd' + j +  '_' + subCode] = "";
+                            this['selectGetItemUni' + j +  '_' + subCode] = {};
                         }
                     }
                     // チェンジイベントを発生させる
-                     var selected = this.form.id;
-                     self.selectChangeGet(
-                         this,
-                         selected,
-                         this.option
-                     );
-                     for (var i = 1;  i <= 2;  i++) {
-                        // 教材プルダウンの初期化
-                        this.form['homework_text' + i] = "";
-                        for (var j = 1;  j <= 3;  j++) {
-                            // 単元分類プルダウン・単元プルダウンもクリア
-                            this.form['homework_category' + i + '_' + j] = "";
-                            this.form['homework_unit' + i + '_' + j] = "";
-                            this['selectGetItemCatHomeL' + i + '_' + j] = {};
-                            this['selectGetItemUniHomeL' + i + '_' + j] = {};
-                        }
-                    }
+                    var selected = this.form.id;
                     // チェンジイベントを発生させる
-                     var selected = this.form.id;
-                     self.selectChangeGet(
-                         this,
-                         selected,
-                         this.option
-                     );
+                    self.selectChangeGetCallBack(
+                        this,
+                        selected,
+                        this.option,
+                        // 受信後のコールバック
+                        (data) => {
+                            // データをセット
+                            this.selectGetItem = data;
+                            // 教材リストが取得できた場合のみ、hiddenの教材コードをセット
+                            if (data.selectItems.length != 0) {
+                                for (var subCode of subCodes) {
+                                    this.form['text_cd_' + subCode] = this.form['bef_text_cd_' + subCode];
+                                }
+                            }
+                        }
+                    );
                  },
                 // 教材リスト変更
                 selectChangeGetCat: function (event) {
-
-                    if (!event || !event.target.id.startsWith('lesson_text')) {
+                    if (!event || !event.target.id.startsWith('text_cd_')) {
                         return;
                     }
-                    var selectkey = event.target.id.replace('lesson_text','');
+                    var selectkey = event.target.id.replace('text_cd_','');
                     for (var j = 1;  j <= 3;  j++) {
                         // 単元分類プルダウン・単元プルダウンを初期化
-                        this.form['lesson_category' + selectkey + '_' + j] = "";
-                        this.form['lesson_unit' + selectkey + '_' + j] = "";
-                        this['selectGetItemUniL' + selectkey + '_' + j] = {};
+                        this.form['unit_category_cd'  + j +  '_' + selectkey] = "";
+                        this.form['unit_cd'  + j +  '_' + selectkey] = "";
+                        this['selectGetItemUni'  + j +  '_' + selectkey] = {};
                     }
-                    this['selectGetItemCatL' + selectkey] = {};
+                    this['selectGetItemCat' + selectkey] = {};
                     // 取得情報格納用dataを設定
-                    var itemDataName = "selectGetItemCatL" + selectkey;
+                    var itemDataName = "selectGetItemCat" + selectkey;
 
                     // 未選択となった場合は復帰
                     if (ValueCom.isEmpty(this.form[event.target.id])) {
@@ -130,22 +131,63 @@ export default class AppClass extends PageBase {
                             urlSuffix: "text"
                         },
                         itemDataName
+                    );
+                },
+                // 単元分類リスト設定（画面初期表示時）
+                selectChangeGetCatInit: function (subCode) {
+                    var targetCd = this.form['bef_text_cd_' + subCode];
+                    for (var j = 1;  j <= 3;  j++) {
+                        // 単元分類プルダウンを初期化
+                        this.form['unit_category_cd'  + j +  '_' + subCode] = "";
+                    }
+                    this['selectGetItemCat' + subCode] = {};
+                    // 取得情報格納用dataを設定
+                    var itemDataName = "selectGetItemCat" + subCode;
+
+                    // 未選択となった場合は復帰
+                    if (ValueCom.isEmpty(targetCd)) {
+                        return;
+                    }
+                    // チェンジイベントを発生させる
+                    var selected = {
+                        text_cd: targetCd
+                    };
+                    // チェンジイベントを発生させる
+                    self.selectChangeGetCallBack(
+                        this,
+                        selected,
+                        // URLを分けた
+                        {
+                            urlSuffix: "text"
+                        },
+                        // 受信後のコールバック
+                        (data) => {
+                            // データをセット
+                            this[itemDataName] = data;
+                            // 単元分類リストが取得できた場合のみ、hiddenの単元分類コードをセット
+                            if (data.selectItems.length != 0) {
+                                for (var j = 1;  j <= 3;  j++) {
+                                    this.form['unit_category_cd'  + j +  '_' + subCode] = this.form['bef_unit_category_cd'  + j +  '_' + subCode];
+                                    this.selectChangeGetUniInit(subCode, j);
+                                }
+                            }
+                        }
                     );
                 },
                 // 単元分類リスト変更
                 selectChangeGetUni: function (event) {
 
-                    if (!event || !event.target.id.startsWith('lesson_category')) {
+                    if (!event || !event.target.id.startsWith('unit_category_cd')) {
                         return;
                     }
-                    var selectkey = event.target.id.replace('lesson_category','');
+                    var selectkey = event.target.id.replace('unit_category_cd','');
 
                     // 単元プルダウンを初期化
-                    this.form['lesson_unit' + selectkey] = "";
-                    this['selectGetItemUniL' + selectkey] = {};
+                    this.form['unit_cd' + selectkey] = "";
+                    this['selectGetItemUni' + selectkey] = {};
                     // 取得情報格納用dataを設定
-                    var itemDataName = "selectGetItemUniL" + selectkey;
-                    this['selectGetItemCatL' + selectkey] = {};
+                    var itemDataName = "selectGetItemUni" + selectkey;
+                    //this['selectGetItemCatL' + selectkey] = {};
 
                     // 未選択となった場合は復帰
                     if (ValueCom.isEmpty(this.form[event.target.id])) {
@@ -166,100 +208,45 @@ export default class AppClass extends PageBase {
                         itemDataName
                     );
                 },
-                // 宿題リスト変更
-                selectChangeGetHome: function (event) {
+                // 単元分類リスト変更（画面初期表示時）
+                selectChangeGetUniInit: function (subCode, j) {
 
-                    this.selectGetItem = {};
-                    for (var i = 1;  i <= 2;  i++) {
-                        // 教材プルダウンの初期化
-                        this.form['homework_text' + i] = "";
-                        for (var j = 1;  j <= 3;  j++) {
-                            // 単元分類プルダウン・単元プルダウンもクリア
-                            this.form['homework_category' + i + '_' + j] = "";
-                            this.form['homework_unit' + i + '_' + j] = "";
-                            this['selectGetItemCatHomeL' + i + '_' + j] = {};
-                            this['selectGetItemUniHomeL' + i + '_' + j] = {};
+                    var targetCd = this.form['unit_category_cd'  + j +  '_' + subCode];
+
+                    // 単元プルダウンを初期化
+                    this.form['unit_cd' + j + '_' + subCode] = "";
+                    this['selectGetItemUni' + j + '_' + subCode] = {};
+                    // 取得情報格納用dataを設定
+                    var itemDataName = "selectGetItemUni" + j + '_' + subCode;
+                    //this['selectGetItemCatL' + j] = {};
+
+                    // 未選択となった場合は復帰
+                    if (ValueCom.isEmpty(targetCd)) {
+                        return;
+                    }
+                    // チェンジイベントを発生させる
+                    var selected = {
+                        unit_category_cd: targetCd
+                    };
+                    // チェンジイベントを発生させる
+                    self.selectChangeGetCallBack(
+                        this,
+                        selected,
+                        // URLを分けた
+                        {
+                            urlSuffix: "category"
+                        },
+                        // 受信後のコールバック
+                        (data) => {
+                            // データをセット
+                            this[itemDataName] = data;
+                            // 単元リストが取得できた場合のみ、hiddenの単元コードをセット
+                            if (data.selectItems.length != 0) {
+                                this.form['unit_cd' + j + '_' + subCode] = this.form['bef_unit_cd' + j + '_' + subCode];
+                            }
                         }
-                    }
-                    // チェンジイベントを発生させる
-                     var selected = this.form.id;
-                     self.selectChangeGet(
-                         this,
-                         selected,
-                         this.option
-                     );
-                 },
-                // 教材リスト変更
-                selectChangeGetCatHome: function (event) {
-
-                    if (!event || !event.target.id.startsWith('homework_text')) {
-                        return;
-                    }
-                    var selectkey = event.target.id.replace('homework_text','');
-                    for (var j = 1;  j <= 3;  j++) {
-                        // 単元分類プルダウン・単元プルダウンを初期化
-                        this.form['homework_category' + selectkey + '_' + j] = "";
-                        this.form['homework_unit' + selectkey + '_' + j] = "";
-                        this['selectGetItemUniHomeL' + selectkey + '_' + j] = {};
-                    }
-                    this['selectGetItemCatHomeL' + selectkey] = {};
-                    // 取得情報格納用dataを設定
-                    var itemDataName = "selectGetItemCatHomeL" + selectkey;
-
-                    // 未選択となった場合は復帰
-                    if (ValueCom.isEmpty(this.form[event.target.id])) {
-                        return;
-                    }
-
-                    // チェンジイベントを発生させる
-                    var selected = {
-                        text_cd: this.form[event.target.id]
-                    };
-                    // 取得情報格納用data指定とする
-                    self.selectChangeGet2(
-                        this,
-                        selected,
-                        // URLを分けた
-                        {
-                            urlSuffix: "text"
-                        },
-                        itemDataName
                     );
                 },
-                // 単元分類リスト変更
-                selectChangeGetUniHome: function (event) {
-
-                    if (!event || !event.target.id.startsWith('homework_category')) {
-                        return;
-                    }
-                    var selectkey = event.target.id.replace('homework_category','');
-
-                    // 単元プルダウンを初期化
-                    this.form['homework_unit' + selectkey] = "";
-                    this['selectGetItemUniHomeL' + selectkey] = {};
-                    // 取得情報格納用dataを設定
-                    var itemDataName = "selectGetItemUniHomeL" + selectkey;
-                    this['selectGetItemCatHomeL' + selectkey] = {};
-
-                    // 未選択となった場合は復帰
-                    if (ValueCom.isEmpty(this.form[event.target.id])) {
-                        return;
-                    }
-                    // チェンジイベントを発生させる
-                    var selected = {
-                        unit_category_cd: this.form[event.target.id]
-                    };
-                    // 取得情報格納用data指定とする
-                    self.selectChangeGet2(
-                        this,
-                        selected,
-                        // URLを分けた
-                        {
-                            urlSuffix: "category"
-                        },
-                        itemDataName
-                    );
-                 },
             }
         });
     }
