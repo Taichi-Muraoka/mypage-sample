@@ -41,7 +41,7 @@
         </tr>
         <tr>
             <th>生徒メールアドレス</th>
-            <td><a href="mailto:$student->email">{{$student->email}}</a></td>
+            <td><a href="mailto:{{$student->email}}">{{$student->email}}</a></td>
         </tr>
         <tr>
             <th>保護者メールアドレス</th>
