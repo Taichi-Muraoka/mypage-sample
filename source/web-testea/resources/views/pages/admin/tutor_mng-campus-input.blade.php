@@ -33,7 +33,7 @@
         <option value="6">自由が丘</option>
     </x-input.select>
 
-    <x-input.text caption="交通費" id="tel" :rules=$rules />
+    <x-input.text caption="交通費(往復)" id="tel" :rules=$rules />
 
     {{-- hidden --}}
     <x-input.hidden id="tutor_id" :editData=$editData />

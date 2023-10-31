@@ -36,7 +36,7 @@ return new class extends Migration
             $table->date('recess_start_date')->nullable()->comment('休塾開始日');
             $table->date('recess_end_date')->nullable()->comment('休塾終了日');
             $table->unsignedInteger('past_enter_term')->default(0)->comment('過去通塾期間');
-            $table->unsignedInteger('lead_id')->nullable()->comment('顧客ID');
+            $table->string('lead_id', 9)->nullable()->comment('顧客ID');
             $table->text('storage_link')->nullable()->comment('ストレージリンク');
             $table->text('memo')->nullable()->comment('メモ');
             $table->timestamps();

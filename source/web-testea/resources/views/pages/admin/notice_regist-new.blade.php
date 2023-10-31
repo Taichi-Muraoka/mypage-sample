@@ -15,6 +15,16 @@
     <x-input.select id="template_id" caption="定型文選択" :select2=true onChange="selectChangeGetTemplate"
         :mastrData=$templates :editData=$editData />
 
+    {{-- モック画面用（固定） --}}
+    <div v-cloak>
+        <x-bs.table vShow="form.template_id" :hover=false :vHeader=true>
+            <tr>
+                <th>お知らせ種別</th>
+                <td>その他</td>
+            </tr>
+        </x-bs.table>
+    </div>
+    
     <x-input.text id="title" caption="タイトル" :rules=$rules />
 
     <x-input.textarea id="text" caption="内容" :rules=$rules />

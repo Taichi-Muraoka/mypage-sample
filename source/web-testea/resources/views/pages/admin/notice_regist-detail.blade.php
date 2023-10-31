@@ -35,6 +35,10 @@
                 7月1日～7月7日<br>都合の良い日をマイページからご連絡ください。</td>
         </tr>
         <tr>
+            <th>お知らせ種別</th>
+            <td>面談</td>
+        </tr>
+        <tr>
             <th>宛先種別</th>
             <td>グルーブ一斉</td>
         </tr>
@@ -74,6 +78,10 @@
             <td>{{$notice->tm_event_name}}（{{$notice->tm_event_date}}）</td>
         </tr>
         @endif
+        <tr>
+            <th>お知らせ種別</th>
+            <td></td>
+        </tr>
         <tr>
             <th>宛先種別</th>
             <td>{{$notice->type_name}}</td>

@@ -94,5 +94,14 @@ class ValidatorServiceProvider extends ServiceProvider
             // 最大文字数以下ならOK
             return strlen($price) <= $maxDigits;
         });
+
+        //-----------------------
+        // 時刻のFromToチェック（after）
+        //-----------------------
+        // $parametersより後の時間かどうか
+        Validator::extend('vdAfterTime', function ($attribute, $value, $parameters, $validator) {
+            return strtotime($validator->getData()[$parameters[0]]) < strtotime($value);
+        });
+
     }
 }

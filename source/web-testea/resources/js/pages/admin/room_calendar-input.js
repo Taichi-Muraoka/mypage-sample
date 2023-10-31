@@ -101,7 +101,6 @@ export default class AppClass extends PageBase {
                         .then(() => {
                             // 初期化
                             this.selectGetItemTimetable = {};
-                            //this.form.period_no = "";
                             // チェンジイベントを発生させる
                             var campusCd = this.form.campus_cd;
                             var targetDate = this.form.target_date;

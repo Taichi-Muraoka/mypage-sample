@@ -18,7 +18,23 @@
     </tr>
     <tr>
         <th width="35%">講師メールアドレス</th>
-        <td>teacher0101@mp-sample.rulez.jp</td>
+        <td><a href="mailto:teacher0101@mp-sample.rulez.jp">teacher0101@mp-sample.rulez.jp</a></td>
+    </tr>
+    <tr>
+        <th width="35%">性別</th>
+        <td>男性</td>
+    </tr>
+    <tr>
+        <th width="35%">在籍大学</th>
+        <td>青山学院大学</td>
+    </tr>
+    <tr>
+        <th width="35%">出身高校</th>
+        <td>青山学院高等部</td>
+    </tr>
+    <tr>
+        <th width="35%">出身中学</th>
+        <td>成城学園中等部</td>
     </tr>
     <tr>
         <th width="35%">曜日</th>

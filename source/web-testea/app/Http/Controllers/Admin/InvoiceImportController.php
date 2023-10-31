@@ -107,6 +107,8 @@ class InvoiceImportController extends Controller
 
         // dateの形式のバリデーションと変換
         $idDate = $this->fmYmToDate($invoiceDate);
+        // 請求年月の月末を取得
+        $idEnd = date('Y/m/t',strtotime($idDate));
 
         // 当月を取得
         $present_month = date('Y-m') . '-01';
@@ -125,7 +127,11 @@ class InvoiceImportController extends Controller
             'rules' => $this->rulesForInput(),
             'invoice_import' => $invoice_import,
             'editData' => [
-                'invoiceDate' => $invoiceDate
+                'invoiceDate' => $invoiceDate,
+                'issue_date' => date('Y/m/d'),
+                'start_date' => $idDate,
+                'end_date' => $idEnd,
+                'bill_date' => $idDate
             ]
         ]);
     }

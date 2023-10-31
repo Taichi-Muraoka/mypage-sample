@@ -268,7 +268,22 @@ return [
     /**
      * 授業時間チェック 開始時刻
      */
-    "lesson_start_time_min" => '08:00:00',
+    'lesson_start_time_min' => '08:00:00',
+
+    /**
+     * 教室カレンダー 固定ブースエリア定義
+     */
+    'timetable_boothId' => '000',
+    'timetable_booth' => [
+        'id' => '000',
+        'title' => '時間割'
+    ],
+
+    'transfer_boothId' => '999',
+    'transfer_booth' => [
+        'id' => '999',
+        'title' => '未振替・振替中'
+    ],
 
     /**
      * 削除アカウントのメールアドレスに付加する文字列
