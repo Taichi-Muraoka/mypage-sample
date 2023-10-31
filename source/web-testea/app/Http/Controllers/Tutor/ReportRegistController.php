@@ -22,7 +22,7 @@ use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Traits\FuncReportTrait;
-use Carbon\Carbon;
+// use Carbon\Carbon;
 
 /**
  * 授業報告書 - コントローラ
@@ -131,6 +131,18 @@ class ReportRegistController extends Controller
         if (isset($form['campus_cd']) && filled($form['campus_cd']) && $form['campus_cd'] != -1) {
             // 検索フォームから取得（スコープ）
             $query->SearchCampusCd($form);
+        }
+
+        // コースコード選択により絞り込み条件
+        if (isset($form['course_cd']) && filled($form['course_cd'])) {
+            // 検索フォームから取得（スコープ）
+            $query->SearchCourseCd($form);
+        }
+
+        // 承認ステータス選択により絞り込み条件
+        if (isset($form['approval_status']) && filled($form['approval_status'])) {
+            // 検索フォームから取得（スコープ）
+            $query->SearchApprovalStatus($form);
         }
 
         // 生徒IDの検索（スコープで指定する）
@@ -286,51 +298,33 @@ class ReportRegistController extends Controller
             $class_member_names = [];
         }
 
-        // 授業教材１の情報取得
-        $lesson_text1 = $this->getReportText($report->report_id, AppConst::REPORT_SUBCODE_1);
-        $lesson_category1_1 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_1, 1);
-        $lesson_category1_2 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_1, 2);
-        $lesson_category1_3 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_1, 3);
+        foreach (AppConst::REPORT_SUBCODES as $subCode) {
+            if (ReportUnit::where('report_units.sub_cd', '=', $subCode)->exists()) {
+                // 可変変数名をセット
+                $lesson_text = 'lesson_text'.$subCode;
 
-        // 授業教材２があれば取得
-        if (ReportUnit::where('report_units.sub_cd', '=', AppConst::REPORT_SUBCODE_2)->exists()) {
-            $lesson_text2 = $this->getReportText($report->report_id, AppConst::REPORT_SUBCODE_2);
-            $lesson_category2_1 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_2, 1);
-            $lesson_category2_2 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_2, 2);
-            $lesson_category2_3 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_2, 3);
-        }
-        else {
-            $lesson_text2 = null;
-            $lesson_category2_1 = null;
-            $lesson_category2_2 = null;
-            $lesson_category2_3 = null;
-        }
-        
-        // 宿題教材１があれば取得
-        if (ReportUnit::where('report_units.sub_cd', '=', AppConst::REPORT_SUBCODE_3)->exists()) {
-            $homework_text1 = $this->getReportText($report->report_id, AppConst::REPORT_SUBCODE_3);
-            $homework_category1_1 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_3, 1);
-            $homework_category1_2 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_3, 2);
-            $homework_category1_3 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_3, 3);
-        }
-        else {
-            $homework_text1 = null;
-            $homework_category1_1 = null;
-            $homework_category1_2 = null;
-            $homework_category1_3 = null;
-        }
-        // 宿題教材２があれば取得
-        if (ReportUnit::where('report_units.sub_cd', '=', AppConst::REPORT_SUBCODE_4)->exists()) {
-            $homework_text2 = $this->getReportText($report->report_id, AppConst::REPORT_SUBCODE_3);
-            $homework_category2_1 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_4, 1);
-            $homework_category2_2 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_4, 2);
-            $homework_category2_3 = $this->getReportCategory($report->report_id, AppConst::REPORT_SUBCODE_4, 3);
-        }
-        else {
-            $homework_text2 = null;
-            $homework_category2_1 = null;
-            $homework_category2_2 = null;
-            $homework_category2_3 = null;
+                // 教材名
+                $$lesson_text = $this->getReportText($report->report_id, $subCode);
+
+                // 単元分類・単元
+                for ($i = 1; $i <= 3; $i++) {
+                    // 可変変数名をセット
+                    $lesson_category = 'lesson_category'.$subCode. '_'.$i;
+                    $$lesson_category = $this->getReportCategory($report->report_id, $subCode, $i);
+                }
+            }
+            // 存在しない場合nullにする
+            else {
+                $lesson_text = 'lesson_text'.$subCode;
+
+                // 教材名
+                $$lesson_text = null;
+                // 単元分類・単元
+                for ($i = 1; $i <= 3; $i++) {
+                    $lesson_category = 'lesson_category'.$subCode. '_'.$i;
+                    $$lesson_category = null;
+                }
+            }
         }
 
         return [
@@ -354,25 +348,25 @@ class ReportRegistController extends Controller
             'status' => $report->status,
             'admin_comment' => $report->admin_comment,
             // 授業教材１
-            'lesson_text1' => $lesson_text1,
-            'lesson_category1_1' => $lesson_category1_1,
-            'lesson_category1_2' => $lesson_category1_2,
-            'lesson_category1_3' => $lesson_category1_3,
+            'lesson_text1' => $lesson_textL1,
+            'lesson_category1_1' => $lesson_categoryL1_1,
+            'lesson_category1_2' => $lesson_categoryL1_2,
+            'lesson_category1_3' => $lesson_categoryL1_3,
             // 授業教材２
-            'lesson_text2' => $lesson_text2,
-            'lesson_category2_1' => $lesson_category2_1,
-            'lesson_category2_2' => $lesson_category2_2,
-            'lesson_category2_3' => $lesson_category2_3,
+            'lesson_text2' => $lesson_textL2,
+            'lesson_category2_1' => $lesson_categoryL2_1,
+            'lesson_category2_2' => $lesson_categoryL2_2,
+            'lesson_category2_3' => $lesson_categoryL2_3,
             // 宿題教材１
-            'homework_text1' => $homework_text1,
-            'homework_category1_1' => $homework_category1_1,
-            'homework_category1_2' => $homework_category1_2,
-            'homework_category1_3' => $homework_category1_3,
+            'homework_text1' => $lesson_textH1,
+            'homework_category1_1' => $lesson_categoryH1_1,
+            'homework_category1_2' => $lesson_categoryH1_2,
+            'homework_category1_3' => $lesson_categoryH1_3,
             // 宿題教材２
-            'homework_text2' => $homework_text2,
-            'homework_category2_1' => $homework_category2_1,
-            'homework_category2_2' => $homework_category2_2,
-            'homework_category2_3' => $homework_category2_3,
+            'homework_text2' => $lesson_textH2,
+            'homework_category2_1' => $lesson_categoryH2_1,
+            'homework_category2_2' => $lesson_categoryH2_2,
+            'homework_category2_3' => $lesson_categoryH2_3,
         ];
     }
 
@@ -597,25 +591,25 @@ class ReportRegistController extends Controller
             // 授業報告書教材単元情報登録
             foreach (AppConst::REPORT_SUBCODES as $subCode) {
                 if ($request['text_cd_' . $subCode] != null) {
-                    $report_unit1 = new ReportUnit;
-                    $report_unit1->report_id = $report->report_id;
-                    $report_unit1->sub_cd = $subCode;
-                    $report_unit1->text_cd = $request['text_cd_' . $subCode];
-                    $report_unit1->free_text_name = $request['text_name_' . $subCode];
-                    $report_unit1->text_page = $request['text_page_' . $subCode];
-                    $report_unit1->unit_category_cd1 = $request['unit_category_cd1_' . $subCode];
-                    $report_unit1->free_category_name1 = $request['category_name1_' . $subCode];
-                    $report_unit1->unit_cd1 = $request['unit_cd1_' . $subCode];
-                    $report_unit1->free_unit_name1 = $request['unit_name1_' . $subCode];
-                    $report_unit1->unit_category_cd2 = $request['unit_category_cd2_' . $subCode];
-                    $report_unit1->free_category_name2 = $request['category_name2_' . $subCode];
-                    $report_unit1->unit_cd2 = $request['unit_cd2_' . $subCode];
-                    $report_unit1->free_unit_name2 = $request['unit_name2_' . $subCode];
-                    $report_unit1->unit_category_cd3 = $request['unit_category_cd3_' . $subCode];
-                    $report_unit1->free_category_name3 = $request['free_category_name31_' . $subCode];
-                    $report_unit1->unit_cd3 = $request['unit_cd3_' . $subCode];
-                    $report_unit1->free_unit_name3 = $request['unit_name3_' . $subCode];
-                    $report_unit1->save();
+                    $report_unit = new ReportUnit;
+                    $report_unit->report_id = $report->report_id;
+                    $report_unit->sub_cd = $subCode;
+                    $report_unit->text_cd = $request['text_cd_' . $subCode];
+                    $report_unit->free_text_name = $request['text_name_' . $subCode];
+                    $report_unit->text_page = $request['text_page_' . $subCode];
+                    $report_unit->unit_category_cd1 = $request['unit_category_cd1_' . $subCode];
+                    $report_unit->free_category_name1 = $request['category_name1_' . $subCode];
+                    $report_unit->unit_cd1 = $request['unit_cd1_' . $subCode];
+                    $report_unit->free_unit_name1 = $request['unit_name1_' . $subCode];
+                    $report_unit->unit_category_cd2 = $request['unit_category_cd2_' . $subCode];
+                    $report_unit->free_category_name2 = $request['category_name2_' . $subCode];
+                    $report_unit->unit_cd2 = $request['unit_cd2_' . $subCode];
+                    $report_unit->free_unit_name2 = $request['unit_name2_' . $subCode];
+                    $report_unit->unit_category_cd3 = $request['unit_category_cd3_' . $subCode];
+                    $report_unit->free_category_name3 = $request['category_name3_' . $subCode];
+                    $report_unit->unit_cd3 = $request['unit_cd3_' . $subCode];
+                    $report_unit->free_unit_name3 = $request['unit_name3_' . $subCode];
+                    $report_unit->save();
                 }
             }
         });
@@ -657,6 +651,7 @@ class ReportRegistController extends Controller
 
         $editdata = [
             'id' => $report->schedule_id,
+            'report_id' => $report->report_id,
             'monthly_goal' => $report->monthly_goal,
             'test_contents' => $report->test_contents,
             'test_score' => $report->test_score,
@@ -720,34 +715,90 @@ class ReportRegistController extends Controller
      */
     public function update(Request $request)
     {
-        // $this->debug($request);
+        // 登録前バリデーション。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        // // 登録前バリデーション。NGの場合はレスポンスコード422を返却
-        // Validator::make($request->all(), $this->rulesForInput($request))->validate();
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($request) {
+            // 授業報告書情報取得
+            $report = Report::query()
+                ->where('report_id', $request->input('report_id'))
+                // 該当データがない場合はエラーを返す
+                ->firstOrFail();
 
-        // // 対象データを取得(IDでユニークに取る)
-        // $query = Report::query();
+            $form = $request->only(
+                'monthly_goal',
+                'test_contents',
+                'test_score',
+                'test_full_score',
+                'achievement',
+                'goodbad_point',
+                'solution',
+                'others_comment',
+            );
 
-        // // 対象データを取得(PKでユニークに取る)
-        // $report = $query
-        //     ->where('report_id', $request->input('report_id'))
-        //     // 受け持ち生徒に限定するガードを掛ける
-        //     ->where($this->guardTutorTableWithSid())
-        //     // 自分のアカウントIDでガードを掛ける（tid）
-        //     ->where($this->guardTutorTableWithTid())
-        //     // 該当データがない場合はエラーを返す
-        //     ->firstOrFail();
+            $report->regist_date = now();
+            // 承認ステータスが差戻の場合、承認待ちに変更
+            if ($report->approval_status == AppConst::CODE_MASTER_2_2) {
+                $report->approval_status = AppConst::CODE_MASTER_2_0;
+            }
+            // 授業報告書情報更新
+            $report->fill($form)->save();
 
-        // // フォームから受け取った値を格納
-        // $form = $request->only(
-        //     'r_minutes',
-        //     'content',
-        //     'homework',
-        //     'teacher_comment'
-        // );
-
-        // // 保存
-        // $report->fill($form)->save();
+            // 授業報告書教材単元情報
+            foreach (AppConst::REPORT_SUBCODES as $subCode) {
+                $exists = ReportUnit::where('report_units.report_id', '=', $report->report_id)
+                    ->where('report_units.sub_cd', '=', $subCode)
+                    ->exists();
+                if ($exists) {
+                    $report_unit = ReportUnit::query()
+                        ->where('report_units.report_id', '=', $report->report_id)
+                        ->where('report_units.sub_cd', '=', $subCode)
+                        ->firstOrFail();
+                    if ($request['text_cd_' . $subCode] != null) {
+                        $report_unit->text_cd = $request['text_cd_' . $subCode];
+                        $report_unit->free_text_name = $request['text_name_' . $subCode];
+                        $report_unit->text_page = $request['text_page_' . $subCode];
+                        $report_unit->unit_category_cd1 = $request['unit_category_cd1_' . $subCode];
+                        $report_unit->free_category_name1 = $request['category_name1_' . $subCode];
+                        $report_unit->unit_cd1 = $request['unit_cd1_' . $subCode];
+                        $report_unit->free_unit_name1 = $request['unit_name1_' . $subCode];
+                        $report_unit->unit_category_cd2 = $request['unit_category_cd2_' . $subCode];
+                        $report_unit->free_category_name2 = $request['category_name2_' . $subCode];
+                        $report_unit->unit_cd2 = $request['unit_cd2_' . $subCode];
+                        $report_unit->free_unit_name2 = $request['unit_name2_' . $subCode];
+                        $report_unit->unit_category_cd3 = $request['unit_category_cd3_' . $subCode];
+                        $report_unit->free_category_name3 = $request['category_name3_' . $subCode];
+                        $report_unit->unit_cd3 = $request['unit_cd3_' . $subCode];
+                        $report_unit->free_unit_name3 = $request['unit_name3_' . $subCode];
+                        $report_unit->save();
+                    }
+                }
+                else {
+                    if ($request['text_cd_' . $subCode] != null) {
+                        $report_unit = new ReportUnit;
+                        $report_unit->report_id = $report->report_id;
+                        $report_unit->sub_cd = $subCode;
+                        $report_unit->text_cd = $request['text_cd_' . $subCode];
+                        $report_unit->free_text_name = $request['text_name_' . $subCode];
+                        $report_unit->text_page = $request['text_page_' . $subCode];
+                        $report_unit->unit_category_cd1 = $request['unit_category_cd1_' . $subCode];
+                        $report_unit->free_category_name1 = $request['category_name1_' . $subCode];
+                        $report_unit->unit_cd1 = $request['unit_cd1_' . $subCode];
+                        $report_unit->free_unit_name1 = $request['unit_name1_' . $subCode];
+                        $report_unit->unit_category_cd2 = $request['unit_category_cd2_' . $subCode];
+                        $report_unit->free_category_name2 = $request['category_name2_' . $subCode];
+                        $report_unit->unit_cd2 = $request['unit_cd2_' . $subCode];
+                        $report_unit->free_unit_name2 = $request['unit_name2_' . $subCode];
+                        $report_unit->unit_category_cd3 = $request['unit_category_cd3_' . $subCode];
+                        $report_unit->free_category_name3 = $request['category_name3_' . $subCode];
+                        $report_unit->unit_cd3 = $request['unit_cd3_' . $subCode];
+                        $report_unit->free_unit_name3 = $request['unit_name3_' . $subCode];
+                        $report_unit->save();
+                    }
+                }
+            }
+        });
 
         return;
     }
@@ -763,21 +814,28 @@ class ReportRegistController extends Controller
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'report_id');
 
-        // 対象データを取得(IDでユニークに取る)
-        $query = Report::query();
-
         // 対象データを取得(PKでユニークに取る)
-        $report = $query
+        $report = Report::query()
             ->where('report_id', $request->input('report_id'))
-            // 受け持ち生徒に限定するガードを掛ける
-            ->where($this->guardTutorTableWithSid())
-            // 自分のアカウントIDでガードを掛ける（tid）
-            ->where($this->guardTutorTableWithTid())
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
-
+        
         // Reportテーブルのdelete
         $report->delete();
+
+        // 授業教材情報を削除
+        foreach (AppConst::REPORT_SUBCODES as $subCode) {
+            if (ReportUnit::where('report_units.sub_cd', '=', $subCode)
+            ->where('report_units.report_id', '=', $report->report_id)
+            ->exists()) {
+                $lesson_unit = ReportUnit::query()
+                    ->where('report_units.report_id', '=', $report->report_id)
+                    ->where('report_units.sub_cd', '=', $subCode)
+                    ->firstOrFail();
+                // ReportUnitテーブルのdelete
+                $lesson_unit->delete();
+            }
+        }
 
         return;
     }
@@ -842,11 +900,7 @@ class ReportRegistController extends Controller
             }
         };
 
-        $page_rule = ReportUnit::fieldRules('text_page');
-        $text_name_rule = ReportUnit::fieldRules('free_text_name');
-        $category_name_rule = ReportUnit::fieldRules('free_category_name1');
-        $unit_name_rule = ReportUnit::fieldRules('free_unit_name1');
-
+        $rules += ['id' => ['required']];
         $rules += Report::fieldRules('monthly_goal');
         $rules += Report::fieldRules('test_contents');
         $rules += Report::fieldRules('test_score');
@@ -855,308 +909,42 @@ class ReportRegistController extends Controller
         $rules += Report::fieldRules('goodbad_point');
         $rules += Report::fieldRules('solution');
         $rules += Report::fieldRules('others_comment');
-        // $rules += ['lesson_text1' => ['required', $text_rule]];
-        // $rules += ['lesson_text2' => $text_rule];
-        // $rules += ['homework_text1' => $text_rule];
-        // $rules += ['homework_text2' => $text_rule];
-        // $rules += ['lesson_category1_1' => $category_rule];
-        // $rules += ['lesson_category1_2' => $category_rule];
-        // $rules += ['lesson_category1_3' => $category_rule];
-        // $rules += ['lesson_category2_1' => $category_rule];
-        // $rules += ['lesson_category2_2' => $category_rule];
-        // $rules += ['lesson_category2_3' => $category_rule];
-        // $rules += ['homework_category1_1' => $category_rule];
-        // $rules += ['homework_category1_2' => $category_rule];
-        // $rules += ['homework_category1_3' => $category_rule];
-        // $rules += ['homework_category2_1' => $category_rule];
-        // $rules += ['homework_category2_2' => $category_rule];
-        // $rules += ['homework_category2_3' => $category_rule];
-        // $rules += ['lesson_unit1_1' => $unit_rule];
-        // $rules += ['lesson_unit1_2' => $unit_rule];
-        // $rules += ['lesson_unit1_3' => $unit_rule];
-        // $rules += ['lesson_unit2_1' => $unit_rule];
-        // $rules += ['lesson_unit2_2' => $unit_rule];
-        // $rules += ['lesson_unit2_3' => $unit_rule];
-        // $rules += ['homework_unit1_1' => $unit_rule];
-        // $rules += ['homework_unit1_2' => $unit_rule];
-        // $rules += ['homework_unit1_3' => $unit_rule];
-        // $rules += ['homework_unit2_1' => $unit_rule];
-        // $rules += ['homework_unit2_2' => $unit_rule];
-        // $rules += ['homework_unit2_3' => $unit_rule];
-        // $rules += ['lesson_page1' => $page_rule];
-        // $rules += ['lesson_page2' => $page_rule];
-        // $rules += ['homework_page1' => $page_rule];
-        // $rules += ['homework_page2' => $page_rule];
-        // $rules += ['lesson_text_name1' => $text_name_rule];
-        // $rules += ['lesson_text_name2' => $text_name_rule];
-        // $rules += ['homework_text_name1' => $text_name_rule];
-        // $rules += ['homework_text_name2' => $text_name_rule];
-        // $rules += ['lesson_category_name1_1' => $category_name_rule];
-        // $rules += ['lesson_category_name1_2' => $category_name_rule];
-        // $rules += ['lesson_category_name1_3' => $category_name_rule];
-        // $rules += ['lesson_category_name2_1' => $category_name_rule];
-        // $rules += ['lesson_category_name2_2' => $category_name_rule];
-        // $rules += ['lesson_category_name2_3' => $category_name_rule];
-        // $rules += ['homework_category_name1_1' => $category_name_rule];
-        // $rules += ['homework_category_name1_2' => $category_name_rule];
-        // $rules += ['homework_category_name1_3' => $category_name_rule];
-        // $rules += ['homework_category_name2_1' => $category_name_rule];
-        // $rules += ['homework_category_name2_2' => $category_name_rule];
-        // $rules += ['homework_category_name2_3' => $category_name_rule];
-        // $rules += ['lesson_unit_name1_1' => $unit_name_rule];
-        // $rules += ['lesson_unit_name1_2' => $unit_name_rule];
-        // $rules += ['lesson_unit_name1_3' => $unit_name_rule];
-        // $rules += ['lesson_unit_name2_1' => $unit_name_rule];
-        // $rules += ['lesson_unit_name2_2' => $unit_name_rule];
-        // $rules += ['lesson_unit_name2_3' => $unit_name_rule];
-        // $rules += ['homework_unit_name1_1' => $unit_name_rule];
-        // $rules += ['homework_unit_name1_2' => $unit_name_rule];
-        // $rules += ['homework_unit_name1_3' => $unit_name_rule];
-        // $rules += ['homework_unit_name2_1' => $unit_name_rule];
-        // $rules += ['homework_unit_name2_2' => $unit_name_rule];
-        // $rules += ['homework_unit_name2_3' => $unit_name_rule];
 
-        return $rules;
-    }
-    //==========================
-    // 授業報告書教材情報の取得
-    //==========================
-    protected function getReport($id)
-    {
-        // 校舎名取得のサブクエリ
-        $campus_names = $this->mdlGetRoomQuery();
+        // 授業内容・宿題のバリデーション
+        foreach (AppConst::REPORT_SUBCODES as $subCode) {
+            // ID名を可変変数をセット
+            $text_cd = 'text_cd_'.$subCode;
 
-        // クエリを作成
-        $query = Report::query();
+            // 教材１のみ必須
+            if ($subCode ==  AppConst::REPORT_SUBCODE_1) {
+                $rules += [$text_cd => ['required']];
+            }
+            
+            // required_withの可変変数をセット
+            $required_with_text = 'required_with:'.$text_cd;
 
-        // データを取得
-        $report = $query
-            // IDを指定
-            ->where('reports.report_id', $id)
-            ->select(
-                'reports.report_id',
-                'reports.schedule_id',
-                'reports.regist_date',
-                'reports.lesson_date',
-                'reports.period_no',
-                'reports.campus_cd',
-                // 校舎名
-                'campus_names.room_name as campus_name',
-                'reports.course_cd',
-                // コース名
-                'mst_courses.name as course_name',
-                'reports.student_id',
-                // 生徒情報の名前
-                'students.name as student_name',
-                'reports.monthly_goal',
-                'reports.test_contents',
-                'reports.test_score',
-                'reports.test_full_score',
-                'reports.achievement',
-                'reports.goodbad_point',
-                'reports.solution',
-                'reports.others_comment',
-                'reports.approval_status',
-                // コードマスタの名称（ステータス）
-                'mst_codes.name as status',
-                // コース種別
-                'mst_courses.course_kind as course_kind',
-                'reports.admin_comment',
-                'schedules.subject_cd as subject_cd',
-                // 科目名
-                'mst_subjects.name as subject_name',
-            )
-            // 校舎名の取得
-            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
-                $join->on('reports.campus_cd', '=', 'campus_names.code');
-            })
-            // 生徒名を取得
-            ->sdLeftJoin(Student::class, 'reports.student_id', '=', 'students.student_id')
-            // スケジュール情報とJOIN
-            ->sdLeftJoin(Schedule::class, 'reports.schedule_id', '=', 'schedules.schedule_id')
-            // コース名の取得
-            ->sdLeftJoin(MstCourse::class, function ($join) {
-                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd');
-            })
-            // 科目の取得
-            ->sdLeftJoin(MstSubject::class, 'schedules.subject_cd', '=', 'mst_subjects.subject_cd')
-            // コードマスターとJOIN
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('reports.approval_status', '=', 'mst_codes.code')
-                    ->where('data_type', AppConst::CODE_MASTER_2);
-            })
-            ->first();
+            // ページのバリデーション
+            $rules += ['text_page_'.$subCode => ['string', 'max:50']];
+
+            // 教材フリー入力のバリデーション
+            $rules += ['text_name_'.$subCode => ['string', 'max:50']];
+
+            for ($i = 1; $i <= 3; $i++) {
+                // ID名を可変変数をセット
+                $category_cd = 'unit_category_cd'.$i.'_'.$subCode;
+                $unit_cd = 'unit_cd'.$i.'_'.$subCode;
+
+                // required_withの可変変数をセット
+                $required_with_category = 'required_with:'.$category_cd;
+                
+                $rules += [$text_cd => [$required_with_text, $required_with_category, $text_rule]];
+                $rules += [$category_cd => [$required_with_category, $category_rule]];
+                $rules += [$unit_cd => [$unit_rule]];
+                $rules += ['category_name'.$i. '_'.$subCode => ['string', 'max:50']];
+                $rules += ['unit_name'.$i. '_'.$subCode => ['string', 'max:50']];
+            }
+        }
         
-        return $report;
-    }
-    //==========================
-    // 授業報告書教材情報の取得
-    //==========================
-    protected function getClassMember($schedule_id)
-    {
-        $class_members = ClassMember::query()
-                ->where('class_members.schedule_id', '=', $schedule_id)
-                ->select('class_members.student_id')
-                ->get();
-            
-        // 受講人数カウント
-        $number_people = count($class_members);
-            
-        // 受講生徒名を配列に格納
-        $class_member_names = [];
-        for ($i = 0; $i < $number_people; $i++) {
-            $class_member_names[$i] = $this->mdlGetStudentName($class_members[$i]['student_id']);
-        }
-
-        return $class_member_names;
-    }
-    //==========================
-    // 授業報告書教材情報の取得 詳細モーダル表示用
-    //==========================
-    // 教材情報取得関数
-    protected function getReportText($report_id,$sub_code)
-    {
-        $report_text = ReportUnit::query()
-            ->where('report_units.report_id', '=', $report_id)
-            ->where('report_units.sub_cd', '=', $sub_code)
-            ->select(
-                'mst_texts.name as text_name1',// 教材名
-                'report_units.free_text_name as free_text_name1',// 教材名フリー
-                'report_units.text_page as text_page1',
-            )
-            // 教材名の取得
-            ->sdLeftJoin(MstText::class, function ($join) {
-                $join->on('report_units.text_cd', '=', 'mst_texts.text_cd');
-            })
-            ->first();
-
-        return $report_text;
-    }
-    // 単元分類・単元情報取得
-    protected function getReportCategory($report_id, $sub_code, $no)
-    {
-        if($no == 1) {
-            $report_category = ReportUnit::query()
-                ->where('report_units.report_id', '=', $report_id)
-                ->where('report_units.sub_cd', '=', $sub_code)
-                ->select(
-                    'mst_unit_categories.name as unit_category_name',// 単元分類名
-                    'report_units.free_category_name1 as free_category_name',// 単元分類名フリー
-                    'mst_units.name as unit_name',// 単元名
-                    'report_units.free_unit_name1 as free_unit_name',// 単元名フリー
-                )
-                // 単元分類名の取得
-                ->sdLeftJoin(MstUnitCategory::class, function ($join) {
-                    $join->on('report_units.unit_category_cd1', '=', 'mst_unit_categories.unit_category_cd');
-                })
-                // 単元名取得
-                ->sdLeftJoin(MstUnit::class, function ($join) {
-                    $join->on('report_units.unit_cd1', '=', 'mst_units.unit_cd');
-                })
-                ->first();
-        }
-        if($no == 2) {
-            $report_category = ReportUnit::query()
-                ->where('report_units.report_id', '=', $report_id)
-                ->where('report_units.sub_cd', '=', $sub_code)
-                ->select(
-                    'mst_unit_categories.name as unit_category_name',// 単元分類名
-                    'report_units.free_category_name2 as free_category_name',// 単元分類名フリー
-                    'mst_units.name as unit_name',// 単元名
-                    'report_units.free_unit_name2 as free_unit_name',// 単元名フリー
-                )
-                // 単元分類名の取得
-                ->sdLeftJoin(MstUnitCategory::class, function ($join) {
-                    $join->on('report_units.unit_category_cd2', '=', 'mst_unit_categories.unit_category_cd');
-                })
-                // 単元名取得
-                ->sdLeftJoin(MstUnit::class, function ($join) {
-                    $join->on('report_units.unit_cd2', '=', 'mst_units.unit_cd');
-                })
-                ->first();
-        }
-        if($no == 3) {
-            $report_category = ReportUnit::query()
-                ->where('report_units.report_id', '=', $report_id)
-                ->where('report_units.sub_cd', '=', $sub_code)
-                ->select(
-                    'mst_unit_categories.name as unit_category_name',// 単元分類名
-                    'report_units.free_category_name3 as free_category_name',// 単元分類名フリー
-                    'mst_units.name as unit_name',// 単元名
-                    'report_units.free_unit_name3 as free_unit_name',// 単元名フリー
-                )
-                // 単元分類名の取得
-                ->sdLeftJoin(MstUnitCategory::class, function ($join) {
-                    $join->on('report_units.unit_category_cd3', '=', 'mst_unit_categories.unit_category_cd');
-                })
-                // 単元名取得
-                ->sdLeftJoin(MstUnit::class, function ($join) {
-                    $join->on('report_units.unit_cd3', '=', 'mst_units.unit_cd');
-                })
-                ->first();
-        }
-        return $report_category;
-    }
-    //==========================
-    // 授業報告書教材情報の取得 編集画面用
-    //==========================
-    protected function getReportUnit($report_id, $sub_code)
-    {
-        $report_unit = ReportUnit::query()
-            ->where('report_units.report_id', '=', $report_id)
-            ->where('report_units.sub_cd', '=', $sub_code)
-            ->select(
-                'report_units.report_id',
-                'report_units.sub_cd',
-                'report_units.text_cd',
-                'mst_texts1.name as text_name1',// 教材名
-                'report_units.free_text_name as free_text_name',// 教材名フリー
-                'report_units.text_page as text_page1',
-                'report_units.unit_category_cd1',
-                'mst_unit_categories1.name as unit_category_name1',// 単元分類名
-                'report_units.free_category_name1 as free_category_name1',// 単元分類名フリー
-                'report_units.unit_cd1',
-                'mst_units1.name as unit_name1',// 単元名
-                'report_units.free_unit_name1 as free_unit_name1',// 単元名フリー
-                'report_units.unit_category_cd2',
-                'mst_unit_categories2.name as unit_category_name2',// 単元分類名
-                'report_units.free_category_name2 as free_category_name2',// 単元分類名フリー
-                'report_units.unit_cd2',
-                'mst_units2.name as unit_name2',// 単元名
-                'report_units.free_unit_name2 as free_unit_name2',// 単元名フリー
-                'report_units.unit_category_cd3',
-                'mst_unit_categories3.name as unit_category_name3',// 単元分類名
-                'report_units.free_category_name3 as free_category_name3',// 単元分類名フリー
-                'report_units.unit_cd3',
-                'mst_units3.name as unit_name3',// 単元名
-                'report_units.free_unit_name3 as free_unit_name3',// 単元名フリー
-            )
-            // 教材名の取得
-            ->sdLeftJoin(MstText::class, function ($join) {
-                $join->on('report_units.text_cd', '=', 'mst_texts1.text_cd');
-            }, 'mst_texts1')
-            // 単元分類名の取得
-            ->sdLeftJoin(MstUnitCategory::class, function ($join) {
-                $join->on('report_units.unit_category_cd1', '=', 'mst_unit_categories1.unit_category_cd');
-            }, 'mst_unit_categories1')
-            ->sdLeftJoin(MstUnitCategory::class, function ($join) {
-                $join->on('report_units.unit_category_cd2', '=', 'mst_unit_categories2.unit_category_cd');
-            }, 'mst_unit_categories2')
-            ->sdLeftJoin(MstUnitCategory::class, function ($join) {
-                $join->on('report_units.unit_category_cd3', '=', 'mst_unit_categories3.unit_category_cd');
-            }, 'mst_unit_categories3')
-            // 単元名取得
-            ->sdLeftJoin(MstUnit::class, function ($join) {
-                $join->on('report_units.unit_cd1', '=', 'mst_units1.unit_cd');
-            }, 'mst_units1')
-            ->sdLeftJoin(MstUnit::class, function ($join) {
-                $join->on('report_units.unit_cd2', '=', 'mst_units2.unit_cd');
-            }, 'mst_units2')
-            ->sdLeftJoin(MstUnit::class, function ($join) {
-                $join->on('report_units.unit_cd3', '=', 'mst_units3.unit_cd');
-            }, 'mst_units3')
-            ->first();
-
-        return $report_unit;
+        return $rules;
     }
 }

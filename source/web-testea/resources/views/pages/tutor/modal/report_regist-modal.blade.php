@@ -68,11 +68,15 @@
     </tr>
     <tr>
         <th>確認テスト得点</th>
-        <td v-cloak>@{{item.test_score}}/@{{item.test_full_score}}点</td>
+        <td v-cloak>
+            <span v-if="item.test_score != null && item.test_full_score != null">@{{item.test_score}}/@{{item.test_full_score}}点</span>
+        </td>
     </tr>
     <tr>
         <th>宿題達成度</th>
-        <td v-cloak>@{{item.achievement}}%</td>
+        <td v-cloak>
+            <span v-if="item.achievement != 0">@{{item.achievement}}%</span>
+        </td>
     </tr>
     <tr>
         <th>達成・課題点</th>
@@ -89,7 +93,7 @@
     </tr>
     <tr>
         <th>宿題教材１</th>
-        <td><span v-for="homework_text1 in item.lesson_text1" v-cloak>@{{homework_text1}}&nbsp;</span></td>
+        <td><span v-for="homework_text1 in item.homework_text1" v-cloak>@{{homework_text1}}&nbsp;</span></td>
     </tr>
     <tr>
         <th>宿題単元１</th>
@@ -101,7 +105,7 @@
     </tr>
     <tr>
         <th>宿題教材２</th>
-        <td><span v-for="homework_text2 in item.lesson_text2" v-cloak>@{{homework_text2}}&nbsp;</span></td>
+        <td><span v-for="homework_text2 in item.homework_text2" v-cloak>@{{homework_text2}}&nbsp;</span></td>
     </tr>
     <tr>
         <th>宿題単元２</th>

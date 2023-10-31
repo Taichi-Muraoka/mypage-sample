@@ -142,7 +142,7 @@
                 :rules=$rules v-Show="form.unit_category_cd{{$j}}_L{{$i}}.endsWith('99')" :editData=$editData/>
             </x-bs.col2>
             <x-bs.col2>
-                <x-input.text caption="その他単元名{{$j}}（フリー入力）" id="category_name{{$j}}_L{{$i}}"
+                <x-input.text caption="その他単元名{{$j}}（フリー入力）" id="unit_name{{$j}}_L{{$i}}"
                 :rules=$rules v-Show="form.unit_cd{{$j}}_L{{$i}}.endsWith('99')" :editData=$editData/>
             </x-bs.col2>
         </x-bs.row>
