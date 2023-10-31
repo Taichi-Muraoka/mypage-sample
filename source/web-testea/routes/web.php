@@ -1664,6 +1664,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 削除処理
     Route::post('/master_mng_course/delete', [MasterMngCourseController::class, 'delete'])->name('master_mng_course-delete');
 
+    // バリデーション(削除用)
+    Route::post('/master_mng_course/vd_delete', [MasterMngCourseController::class, 'validationForDelete'])->name('master_mng_course-vd_delete');
+
     //---------------------
     // 授業科目マスタ
     //---------------------

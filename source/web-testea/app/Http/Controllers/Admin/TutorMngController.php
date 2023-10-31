@@ -525,16 +525,17 @@ class TutorMngController extends Controller
      */
     public function calendar($tid)
     {
-        // MEMO: 教室管理者でも全て見れるのでガードは不要
-
         // IDのバリデーション
         $this->validateIds($tid);
 
+        // 教室管理者の場合、自校舎の講師のみにガードを掛ける
+        $this->guardRoomAdminTid($tid);
+
         // 教師名を取得する
-        $teacher = $this->getTeacherName($tid);
+        $tutor_name = $this->mdlGetTeacherName($tid);
 
         return view('pages.admin.tutor_mng-calendar', [
-            'name' => $teacher->name,
+            'name' => $tutor_name,
             // カレンダー用にIDを渡す
             'editData' => [
                 'tid' => $tid
@@ -550,9 +551,6 @@ class TutorMngController extends Controller
      */
     public function getCalendar(Request $request)
     {
-
-        // MEMO: 教室管理者でも全て見れるのでガードは不要
-
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'tid');
 
@@ -560,6 +558,9 @@ class TutorMngController extends Controller
         Validator::make($request->all(), $this->rulesForCalendar())->validate();
 
         $tid = $request->input('tid');
+
+        // 教室管理者の場合、自校舎の講師のみにガードを掛ける
+        $this->guardRoomAdminTid($tid);
 
         return $this->getTutorCalendar($request, $tid);
     }
@@ -826,30 +827,6 @@ class TutorMngController extends Controller
         $rules = array();
 
         return $rules;
-    }
-
-    //==========================
-    // クラス内共通処理
-    //==========================
-
-    /**
-     * 教師名の取得
-     *
-     * @param int $tid 教師ID
-     * @return object
-     */
-    private function getTeacherName($tid)
-    {
-        // 教師名を取得する
-        $query = ExtRirekisho::query();
-        $teacher = $query
-            ->select(
-                'name'
-            )
-            ->where('ext_rirekisho.tid', '=', $tid)
-            ->firstOrFail();
-
-        return $teacher;
     }
 
     //==========================

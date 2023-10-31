@@ -24,6 +24,7 @@
     {{-- 共通フォーム --}}
     <x-input.text caption="コースコード" id="course_cd" :rules=$rules :editData=$editData/>
     <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData/>
+    <x-input.text caption="略称" id="short_name" :rules=$rules :editData=$editData/>
     <x-input.select id="course_kind" caption="コース種別" :select2=true :mastrData=$courseKindList :editData=$editData
         :select2Search=false :blank=false />
     <x-input.select id="summary_kind" caption="給与集計種別" :select2=true :mastrData=$summaryKindList :editData=$editData
@@ -40,7 +41,7 @@
             @if (request()->routeIs('master_mng_course-edit'))
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
-                <x-button.submit-delete />
+                <x-button.submit-delete-validation />
                 <x-button.submit-edit />
             </div>
             @else

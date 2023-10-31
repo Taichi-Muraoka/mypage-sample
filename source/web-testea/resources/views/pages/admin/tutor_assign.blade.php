@@ -8,7 +8,7 @@
 <x-bs.card :search=true>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="roomcd" caption="校舎" :select2=true >
+            <x-input.select id="roomcd" caption="校舎" :select2=true :select2Search=false>
                 <option value="1">久我山</option>
                 <option value="2">西永福</option>
                 <option value="3">下高井戸</option>
@@ -26,7 +26,7 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="gender_cd" caption="性別" :select2=true >
+            <x-input.select id="gender_cd" caption="性別" :select2=true :select2Search=false>
                 <option value="1">男性</option>
                 <option value="2">女性</option>
                 <option value="3">その他</option>
@@ -46,7 +46,7 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="day" caption="曜日" :select2=true>
+            <x-input.select id="day" caption="曜日" :select2=true :select2Search=false>
                 <option value="1">月曜</option>
                 <option value="2">火曜</option>
                 <option value="3">水曜</option>
@@ -57,7 +57,7 @@
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="period_no" caption="時限" :select2=true>
+            <x-input.select id="period_no" caption="時限" :select2=true :select2Search=false>
                 <option value="1">1限</option>
                 <option value="2">2限</option>
                 <option value="3">3限</option>

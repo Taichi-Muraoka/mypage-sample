@@ -28,6 +28,6 @@
 </x-bs.card>
 
 {{-- モーダル --}}
-@include('pages.admin.modal.tutor_mng_calendar-modal')
+@include('pages.admin.modal.room_calendar-modal')
 
 @stop

@@ -293,14 +293,14 @@ class MemberMngController extends Controller
         // IDのバリデーション
         $this->validateIds($sid);
 
-        // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
+        // 教室管理者の場合、自校舎の生徒のみにガードを掛ける
         $this->guardRoomAdminSid($sid);
 
         // 生徒名を取得する
-        $student = $this->getStudentName($sid);
+        $student_name = $this->mdlGetStudentName($sid);
 
         return view('pages.admin.member_mng-calendar', [
-            'name' => $student->name,
+            'name' => $student_name,
             // カレンダー用にIDを渡す
             'editData' => [
                 'sid' => $sid
@@ -325,7 +325,7 @@ class MemberMngController extends Controller
 
         $sid = $request->input('sid');
 
-        // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
+        // 教室管理者の場合、自校舎の生徒のみにガードを掛ける
         $this->guardRoomAdminSid($sid);
 
         return $this->getStudentCalendar($request, $sid);
@@ -413,10 +413,10 @@ class MemberMngController extends Controller
         $this->guardRoomAdminSid($sid);
 
         // 生徒名を取得する
-        $student = $this->getStudentName($sid);
+        $student_name = $this->mdlGetStudentName($sid);
 
         return view('pages.admin.member_mng-invoice', [
-            'name' => $student->name,
+            'name' => $student_name,
             // 検索用にIDを渡す
             'editData' => [
                 'sid' => $sid
@@ -1454,7 +1454,9 @@ class MemberMngController extends Controller
     {
 
         return view('pages.admin.member_mng-leave', [
-            'editData' => null,
+            'editData' => [
+                'leave_date' => date('Y/m/d')
+            ],
             'rules' => $this->rulesForInput(null)
         ]);
     }
@@ -1614,26 +1616,6 @@ class MemberMngController extends Controller
     //==========================
     // クラス内共通処理
     //==========================
-
-    /**
-     * 生徒名の取得
-     *
-     * @param int $sid 生徒Id
-     * @return object
-     */
-    private function getStudentName($sid)
-    {
-        // 生徒名を取得する
-        $query = ExtStudentKihon::query();
-        $student = $query
-            ->select(
-                'name'
-            )
-            ->where('ext_student_kihon.sid', '=', $sid)
-            ->firstOrFail();
-
-        return $student;
-    }
 
     // MEMO:保留 他画面で同様の機能が必要であれば共通化する
     /**

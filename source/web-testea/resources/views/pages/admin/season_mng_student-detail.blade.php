@@ -42,6 +42,7 @@
         <x-slot name="thead">
             <th width="30%">受講希望科目</th>
             <th>科目別受講回数</th>
+            <th>登録済スケジュール数</th>
             <th></th>
         </x-slot>
 
@@ -49,12 +50,14 @@
         <tr>
             <td>数学</td>
             <td>2</td>
+            <td>2</td>
             <td>
               <x-button.list-edit href="{{ route('season_mng_student-detail', '') }}/1/plan/1" caption="コマ組み" />
             </td>
       </tr>
         <tr>
             <td>英語</td>
+            <td>2</td>
             <td>2</td>
             <td>
               <x-button.list-edit href="{{ route('season_mng_student-detail', '') }}/1/plan/1" caption="コマ組み" />

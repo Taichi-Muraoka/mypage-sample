@@ -42,7 +42,7 @@
         </tr>
         <tr>
             <th>メールアドレス</th>
-            <td>teacher0101@mp-sample.rulez.jp</td>
+            <td><a href="mailto:teacher0101@mp-sample.rulez.jp">teacher0101@mp-sample.rulez.jp</a></td>
         </tr>
         <tr>
             <th>住所</th>
@@ -118,7 +118,7 @@
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
             <th width="20%">校舎</th>
-            <th>交通費</th>
+            <th>交通費(往復)</th>
             <th></th>
         </x-slot>
 

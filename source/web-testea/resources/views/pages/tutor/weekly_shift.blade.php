@@ -44,6 +44,8 @@
 
   </x-bs.table>
 
+  <p><br>黒色：レギュラー授業　　緑色：空き時間</p>
+
   {{-- フッター --}}
   <x-slot name="footer">
     <div class="d-flex justify-content-end">
