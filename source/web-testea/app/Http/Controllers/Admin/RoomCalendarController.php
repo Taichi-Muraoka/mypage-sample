@@ -62,10 +62,25 @@ class RoomCalendarController extends Controller
         // 教室リストを取得
         $rooms = $this->mdlGetRoomList(false);
 
+        // セッションからデータを取得（取得後キー削除）
+        $sessionCampus = session()->pull('session_campus_cd', null);
+        $sessionDate = session()->pull('session_date', null);
+
+        // セッションデータのチェック
+        if (!is_null($sessionCampus)) {
+            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+            $this->guardRoomAdminRoomcd($sessionCampus);
+        }
+        if (!is_null($sessionDate)) {
+            // 日付のバリデーション
+            $this->validateDates($sessionDate);
+        }
+
         return view('pages.admin.room_calendar', [
             'rooms' => $rooms,
             'editData' => [
-                'target_date' => null
+                'campus_cd' => $sessionCampus,
+                'target_date' => $sessionDate
             ]
         ]);
     }
@@ -253,6 +268,10 @@ class RoomCalendarController extends Controller
             'kind' => self::SCHE_KIND_NEW
         ];
 
+        // 登録画面表示時の校舎コード・日付をセッションに保存
+        session(['session_campus_cd' => $campusCd]);
+        session(['session_date' => $date]);
+
         return view('pages.admin.room_calendar-input', [
             'rules' => $this->rulesForInput(null),
             'booths' => $booths,
@@ -431,6 +450,10 @@ class RoomCalendarController extends Controller
         // スケジュール更新区分=UPDATE
         $schedule['kind'] = self::SCHE_KIND_UPD;
 
+        // 編集画面表示時の校舎コード・日付をセッションに保存
+        session(['session_campus_cd' => $campusCd]);
+        session(['session_date' => $targetDate->format('Y-m-d')]);
+
         return view('pages.admin.room_calendar-input', [
             'rules' => $this->rulesForInput(null),
             'booths' => $booths,
@@ -551,6 +574,10 @@ class RoomCalendarController extends Controller
 
         // スケジュール更新区分=COPY
         $schedule['kind'] = self::SCHE_KIND_CPY;
+
+        // コピー登録画面表示時の校舎コード・日付をセッションに保存
+        session(['session_campus_cd' => $campusCd]);
+        session(['session_date' => $targetDate->format('Y-m-d')]);
 
         return view('pages.admin.room_calendar-input', [
             'rules' => $this->rulesForInput(null),
@@ -1859,6 +1886,7 @@ class RoomCalendarController extends Controller
                 'class_members.student_id',
                 'class_members.absent_status',
                 'students.name as student_name',
+                'students.name_kana'
             )
             // 生徒名の取得
             ->sdLeftJoin(Student::class, function ($join) {
@@ -1866,6 +1894,7 @@ class RoomCalendarController extends Controller
             })
             // スケジュールIDを指定
             ->where('schedule_id', $scheduleId)
+            ->orderBy('name_kana')
             ->get();
 
         // 受講生徒件数を取得
@@ -1885,6 +1914,10 @@ class RoomCalendarController extends Controller
 
         // 出欠ステータスリストを取得（１対多）
         $todayabsentList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_35, [AppConst::CODE_MASTER_35_SUB_0, AppConst::CODE_MASTER_35_SUB_2]);
+
+        // 欠席登録画面表示時の校舎コード・日付をセッションに保存
+        session(['session_campus_cd' => $schedule['campus_cd']]);
+        session(['session_date' => $schedule['target_date']->format('Y-m-d')]);
 
         return view('pages.admin.room_calendar-absent', [
             'schedule' => $schedule,
