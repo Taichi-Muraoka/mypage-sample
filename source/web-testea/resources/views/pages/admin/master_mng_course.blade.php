@@ -18,15 +18,17 @@
 		<x-slot name="thead">
 			<th width="20%">コースコード</th>
 			<th width="20%">名称</th>
+            <th width="20%">略称</th>
 			<th width="20%">コース種別</th>
 			<th width="20%">給与集計種別</th>
-			<th width="7%"></th>
+			<th></th>
 		</x-slot>
 
         {{-- テーブル行 --}}
         <tr v-for="item in paginator.data" v-cloak>
             <td>@{{item.course_cd}}</td>
             <td>@{{item.name}}</td>
+            <td>@{{item.short_name}}</td>
             <td>@{{item.course_kind_name}}</td>
 			<td>@{{item.summary_kind_name}}</td>
             <td>

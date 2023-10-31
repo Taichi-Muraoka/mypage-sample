@@ -58,6 +58,7 @@ class MasterMngCourseController extends Controller
             ->select(
                 'mst_courses.course_cd',
                 'mst_courses.name',
+                'mst_courses.short_name',
                 'mst_courses.course_kind',
                 // コードマスタの名称(コース種別)
                 'mst_codes_42.name as course_kind_name',
@@ -120,6 +121,7 @@ class MasterMngCourseController extends Controller
         $form = $request->only(
             'course_cd',
             'name',
+            'short_name',
             'course_kind',
             'summary_kind'
         );
@@ -151,6 +153,7 @@ class MasterMngCourseController extends Controller
                 'mst_courses.course_cd',
                 'mst_courses.course_cd as _course_cd',
                 'mst_courses.name',
+                'mst_courses.short_name',
                 'mst_courses.course_kind',
                 'mst_courses.summary_kind',
             )
@@ -180,6 +183,7 @@ class MasterMngCourseController extends Controller
         $form = $request->only(
             'course_cd',
             'name',
+            'short_name',
             'course_kind',
             'summary_kind'
         );
@@ -203,16 +207,17 @@ class MasterMngCourseController extends Controller
      */
     public function delete(Request $request)
     {
-        // Formを取得
-        $form = $request->all();
+        // 削除前バリデーション。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForDelete($request))->validate();
 
-        // コースコードを編集し削除ボタンを押した場合はエラーを返す
-        if($form['course_cd'] != $form['_course_cd']){
-            return $fail(Lang::get('validation.invalid_input'));
-        }
+        // Formを取得
+        $form = $request->only(
+            'course_cd',
+            '_course_cd'
+        );
 
         // 対象データを取得(IDでユニークに取る)
-        $mstCourse = MstCourse::where('course_cd', $form['course_cd'])
+        $mstCourse = MstCourse::where('course_cd', $form['_course_cd'])
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
@@ -292,8 +297,51 @@ class MasterMngCourseController extends Controller
         // その他を第二引数で指定する
         $rules += MstCourse::fieldRules('course_cd', ['required', $validationKey]);
         $rules += MstCourse::fieldRules('name', ['required']);
+        $rules += MstCourse::fieldRules('short_name', ['required']);
         $rules += MstCourse::fieldRules('course_kind', ['required', $validationCourseKindList]);
         $rules += MstCourse::fieldRules('summary_kind', ['required', $validationSummaryKindList]);
+
+        return $rules;
+    }
+
+    /**
+     * バリデーション(削除用)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed バリデーション結果
+     */
+    public function validationForDelete(Request $request)
+    {
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForDelete($request));
+        return $validator->errors();
+    }
+
+    /**
+     * バリデーションルールを取得(削除用)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array ルール
+     */
+    private function rulesForDelete(?Request $request)
+    {
+        if (!$request) {
+            return;
+        }
+
+        $rules = array();
+
+        // 独自バリデーション: 削除時変更不可
+        $validationKey = function ($attribute, $value, $fail) use ($request) {
+            // コースコードを編集し削除ボタンを押した場合はエラーを返す
+            if ($request['course_cd'] != $request['_course_cd']) {
+                return $fail(Lang::get('validation.delete_cannot_change'));
+            }
+        };
+
+        // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
+        // その他を第二引数で指定する
+        $rules += MstCourse::fieldRules('course_cd', ['required', $validationKey]);
 
         return $rules;
     }

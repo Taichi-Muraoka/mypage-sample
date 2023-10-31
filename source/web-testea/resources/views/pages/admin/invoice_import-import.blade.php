@@ -10,8 +10,7 @@
 {{-- フォーム --}}
 <x-bs.card :form=true>
 
-    <p>請求情報ファイルの取込みを行います。<br>
-    請求情報ファイル（csv）を1つにまとめたZipファイルを指定してください。</p>
+    <p>請求情報ファイルの取込みを行います。</p>
     </p>
 
     {{-- 余白 --}}
@@ -44,8 +43,8 @@
     <x-input.file caption="請求情報ファイル" id="upload_file_kobetsu" :rules=$rules />
 
     <x-bs.callout>
-        ファイル形式: Zip形式<br>
-        各校舎の請求情報ファイル（csv）をまとめて圧縮し、1つのZipファイルを作成してください。
+        ファイル形式: csv形式<br>
+        請求情報ファイル（csv）を指定してください。
     </x-bs.callout>
 
     {{-- hidden --}}

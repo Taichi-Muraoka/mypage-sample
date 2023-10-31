@@ -273,6 +273,8 @@ trait FuncScheduleTrait
                     ->where('schedules.student_id', $studentId)
                     ->orWhere('class_members.student_id', $studentId);
             })
+            // 振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->exists();
 
         if ($exists) {
@@ -311,6 +313,8 @@ trait FuncScheduleTrait
             // 日付・開始時刻・終了時刻・講師IDで絞り込み
             ->where('schedules.target_date', $targetDate)
             ->where('schedules.tutor_id', $tutorId)
+            // 振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->where('schedules.start_time', '<', $endTime)
             ->where('schedules.end_time', '>', $startTime)
             ->exists();

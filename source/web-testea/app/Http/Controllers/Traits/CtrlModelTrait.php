@@ -22,6 +22,7 @@ use App\Models\ClassMember;
 use App\Models\Account;
 use App\Models\MstGrade;
 use App\Models\YearlySchedule;
+use App\Models\MstSystem;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -423,7 +424,7 @@ trait CtrlModelTrait
 
         if (AuthEx::isRoomAdmin()) {
             // 教室管理者の場合、所属校舎で絞る（ガード）
-            $query->where('campus_cd', $account->campus_cd);
+            $query->where('mst_timetables.campus_cd', $account->campus_cd);
         } else if (AuthEx::isTutor()) {
             // 講師の場合、所属校舎で絞る（ガード）
             $this->mdlWhereRoomByTidQuery($query, MstTimetable::class, $account->account_id);
@@ -636,12 +637,47 @@ trait CtrlModelTrait
     {
         $lists = $collection->map(function ($item, $key) use ($digit) {
             return [
-                    'code' => $item['code'], 
+                    'code' => $item['code'],
                     'value' => str_pad($item['code'], $digit, '0', STR_PAD_LEFT) . ' (' . $item['value'] . ')'
                 ];
         });
 
         return $lists;
+    }
+
+    /**
+     * 特別期間コードデータフォーマット
+     * コードマスタ期間区分コードを「01」の形式にする
+     *
+     * @param  $collection リストデータ
+     * @param  int $digit コード0埋め桁数
+     * @return フォーマット後リストデータ
+     */
+    protected function mdlFormatSeasonCd()
+    {
+        // 「特別期間コード」は、年＋期間区分のコードを生成し格納する。(例：202301)
+
+        // 年は、システムマスタの「現年度」から取得する。
+        $currentYear = MstSystem::select('value_num')
+        ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
+        ->first();
+
+        // 期間区分を取得する（サブコード1のみ：春期1,夏期2,冬期3）
+        $termList = CodeMaster::select('code')
+            ->where('data_type', AppConst::CODE_MASTER_38)
+            ->where('sub_code', AppConst::CODE_MASTER_38_SUB_1)
+            ->get();
+
+        // 現年度分 特別期間コード生成 期間区分コードを2桁で0埋め
+        $seasonCodes = [];
+        foreach ($termList as $term) {
+            $seasonCodes[] = $currentYear->value_num.str_pad($term->code, 2, '0', STR_PAD_LEFT);
+        }
+
+        // 翌年度分 特別期間コード生成 春期のみ
+        $seasonCodes[] = $currentYear->value_num +1 .str_pad($termList[0]->code, 2, '0', STR_PAD_LEFT);
+
+        return $seasonCodes;
     }
 
     //------------------------------
@@ -963,22 +999,16 @@ trait CtrlModelTrait
 
             // 生徒所属情報テーブル
             $studentCampus = (new StudentCampus)->getTable();
-            // 生徒情報テーブル
-            $student = (new Student)->getTable();
 
             // 1件存在するかチェック
             $query->select(DB::raw(1))
                 ->from($studentCampus)
-                // 生徒情報とJOIN
-                ->Join($student, $studentCampus . '.student_id', '=', $student . '.student_id')
                 // 対象テーブルと生徒所属情報のcampus_cdを連結
                 ->whereRaw($table . '.campus_cd = ' . $studentCampus . '.campus_cd')
                 // 指定された生徒ID
-                ->where($student . '.student_id', $studentId)
+                ->where($studentCampus . '.student_id', $studentId)
                 // delete_dt条件の追加
-                ->whereNull($studentCampus . '.deleted_at')
-                // delete_dt条件の追加
-                ->whereNull($student . '.deleted_at');
+                ->whereNull($studentCampus . '.deleted_at');
         });
     }
 
@@ -1005,22 +1035,16 @@ trait CtrlModelTrait
 
             // 講師所属情報テーブル
             $tutorCampus = (new TutorCampus)->getTable();
-            // 講師情報テーブル
-            $tutor = (new Tutor)->getTable();
 
             // 1件存在するかチェック
             $query->select(DB::raw(1))
                 ->from($tutorCampus)
-                // 講師情報とJOIN
-                ->Join($tutor, $tutorCampus . '.tutor_id', '=', $tutor . '.tutor_id')
                 // 対象テーブルと講師所属情報のcampus_cdを連結
                 ->whereRaw($table . '.campus_cd = ' . $tutorCampus . '.campus_cd')
                 // 指定された生徒ID
-                ->where($tutor . '.tutor_id', $tutorId)
+                ->where($tutorCampus . '.tutor_id', $tutorId)
                 // delete_dt条件の追加
-                ->whereNull($tutorCampus . '.deleted_at')
-                // delete_dt条件の追加
-                ->whereNull($tutor . '.deleted_at');
+                ->whereNull($tutorCampus . '.deleted_at');
         });
     }
 

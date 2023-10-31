@@ -34,7 +34,7 @@
         :editData=$editData />
     <span v-show="form.trn_type == {{ App\Consts\AppConst::CODE_MASTER_12_1 }}">
         <x-bs.callout>
-            最大ファイルアップロードサイズ：{{ini_get('upload_max_filesize')}}
+            最大ファイルアップロードサイズ：{{ini_get('upload_max_filesize')}}B
         </x-bs.callout>
     </span>
 

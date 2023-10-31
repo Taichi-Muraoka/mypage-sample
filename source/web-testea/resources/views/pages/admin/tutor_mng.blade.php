@@ -76,7 +76,8 @@
         <x-slot name="thead">
             <th width="12%">講師ID</th>
             <th width="18%">講師名</th>
-            <th>メールアドレス</th>
+            <th>学年</th>
+            <th>ベース給</th>
             <th>講師ステータス</th>
             <th>勤続年数</th>
             <th></th>
@@ -85,7 +86,8 @@
         <tr v-for="item in paginator.data" v-cloak>
             <td>@{{item.tid}}</td>
             <td>@{{item.name}}</td>
-            <td>@{{item.email}}</td>
+            <td>大学1年</td>
+            <td>1800</td>
             <td>在籍</td>
             <td>1年3ヶ月</td>
             <td>
