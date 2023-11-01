@@ -4,28 +4,26 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\TransferApply;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
 use App\Mail\ConferenceAcceptToStudent;
 use App\Models\Account;
 use App\Models\CodeMaster;
+use App\Models\MstBooth;
+use App\Models\MstCourse;
 use App\Models\Schedule;
 use App\Models\AdminUser;
 use App\Models\Student;
 use App\Models\Conference;
 use App\Models\ConferenceDate;
-use App\Models\ExtRirekisho;
 use App\Models\Notice;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use App\Models\NoticeDestination;
-use Carbon\Carbon;
 use App\Libs\AuthEx;
 use App\Http\Controllers\Traits\FuncScheduleTrait;
-use App\Http\Controllers\Traits\FuncTransferTrait;
 
 /**
  * 面談日程連絡受付 - コントローラ
@@ -33,8 +31,6 @@ use App\Http\Controllers\Traits\FuncTransferTrait;
 class ConferenceAcceptController extends Controller
 {
 
-    // 機能共通処理：振替申請
-    use FuncTransferTrait;
     // 機能共通処理：スケジュール関連
     use FuncScheduleTrait;
 
@@ -157,7 +153,7 @@ class ConferenceAcceptController extends Controller
                 // 校舎の名称
                 'campus_names.room_name as campus_name',
                 'conferences.status',
-                // コードマスタの名称（バッジ種別）
+                // コードマスタの名称（ステータス）
                 'mst_codes.name as status_name',
                 'conferences.conference_date',
                 'conferences.apply_date',
@@ -301,6 +297,9 @@ class ConferenceAcceptController extends Controller
                 'conference_dates2.start_time as start_time2',
                 'conference_dates3.conference_date as conference_date3',
                 'conference_dates3.start_time as start_time3',
+                'schedules.booth_cd',
+                // ブース名
+                'mst_booths.name as booth_name',
                 // 面談担当者ID
                 'schedules.adm_id as adm_id',
                 // 管理者メモ
@@ -336,6 +335,10 @@ class ConferenceAcceptController extends Controller
             }, 'conference_dates3')
             // スケジュール情報とJOIN
             ->sdLeftJoin(Schedule::class, 'conferences.conference_schedule_id', '=', 'schedules.schedule_id')
+            // ブース名の取得
+            ->sdLeftJoin(MstBooth::class, function ($join) {
+                $join->on('schedules.booth_cd', '=', 'mst_booths.booth_cd');
+            })
             // アカウントテーブルをLeftJOIN
             ->sdLeftJoin(AdminUser::class, 'schedules.adm_id', '=', 'admin_users.adm_id')
             ->firstOrFail();
@@ -366,9 +369,9 @@ class ConferenceAcceptController extends Controller
         if ($campus_cd == -1 || !filled($campus_cd)) {
             // -1 または 空白の場合、全面談ブース
             // ブースリストを取得
-            $booths = $this->mdlGetBoothList(null, 3);
+            $booths = $this->mdlGetBoothList(null, AppConst::CODE_MASTER_41_3);
         } else {
-            $booths = $this->mdlGetBoothList($campus_cd, 3);
+            $booths = $this->mdlGetBoothList($campus_cd, AppConst::CODE_MASTER_41_3);
         }
         
         return [
@@ -391,7 +394,6 @@ class ConferenceAcceptController extends Controller
         // 校舎プルダウン
         $rooms = $this->mdlGetRoomList(false);
 
-        // テンプレートは編集と同じ
         return view('pages.admin.conference_accept-new', [
             'rules' => $this->rulesForInput(null),
             'rooms' => $rooms,
@@ -426,87 +428,81 @@ class ConferenceAcceptController extends Controller
             $account = Auth::user();
             $adm_id = $account->account_id;
 
-            // 終了時刻計算
-            $end_time = date("H:i", strtotime($request['start_time']) + 3600);
+            // コースコード取得
+            $course = MstCourse::query()
+                ->where('mst_courses.course_kind', '=', AppConst::CODE_MASTER_42_3)
+                ->firstOrFail();
 
             // 保存
             $schedule = new Schedule;
-            $schedule->course_cd = 90200;
-            $schedule->end_time = $end_time;
-            $schedule->minites = 60;
+            $schedule->course_cd = $course->course_cd;
+            $schedule->end_time = $this->endTime($request['start_time']);
+            $schedule->minites = config('appconf.conference_time');
             $schedule->create_kind = null;
             $schedule->lesson_kind = null;
             $schedule->adm_id = $adm_id;
             $schedule->fill($form)->save();
 
-            $conference = new Conference;
-            $conference->student_id = $request['student_id'];
-            $conference->campus_cd = $request['campus_cd'];
-            $conference->apply_date = now();
-            $conference->conference_date = $request['target_date'];
-            $conference->start_time = $request['start_time'];
-            $conference->end_time = $end_time;
-            $conference->status = 1;
-            $conference->conference_schedule_id = $schedule->schedule_id;
-            $conference->save();
+            // 入会済みの生徒のみ
+            if ($schedule->student_id != null) {
+                // お知らせメッセージ登録
+                $notice = new Notice;
 
-            // お知らせメッセージ登録
-            $notice = new Notice;
+                // 校舎名取得
+                $campus_name = $this->mdlGetRoomName($schedule->campus_cd);
 
-            // 校舎名取得
-            $campus_name = $this->mdlGetRoomName($conference->campus_cd);
+                // タイトルと本文(Langから取得する)
+                $notice->title = Lang::get('message.notice.conference_accept.title');
+                $notice->text = Lang::get(
+                    'message.notice.conference_accept.text',
+                    [
+                        'conferenceDate' => $schedule->target_date,
+                        'startTime' => $schedule->start_time,
+                        'roomName' => $campus_name
+                    ]
+                );
 
-            // タイトルと本文(Langから取得する)
-            $notice->title = Lang::get('message.notice.conference_accept.title');
-            $notice->text = Lang::get(
-                'message.notice.conference_accept.text',
-                [
-                    'conferenceDate' => $conference->conference_date,
-                    'startTime' => $conference->start_time,
-                    'roomName' => $campus_name
-                ]
-            );
+                // お知らせ種別（面談）
+                $notice->notice_type = AppConst::CODE_MASTER_14_5;
+                // 管理者ID
+                $account = Auth::user();
+                $notice->adm_id = $account->account_id;
+                $notice->campus_cd = $account->campus_cd;
 
-            // お知らせ種別（面談）
-            $notice->notice_type = AppConst::CODE_MASTER_14_5;
-            // 管理者ID
-            $account = Auth::user();
-            $notice->adm_id = $account->account_id;
-            $notice->campus_cd = $account->campus_cd;
+                // 保存
+                $notice->save();
 
-            // 保存
-            $notice->save();
+                // お知らせ宛先の登録
+                $noticeDestination = new NoticeDestination;
 
-            // お知らせ宛先の登録
-            $noticeDestination = new NoticeDestination;
+                // 先に登録したお知らせIDをセット
+                $noticeDestination->notice_id = $notice->notice_id;
+                // 宛先連番: 1固定
+                $noticeDestination->destination_seq = 1;
+                // 宛先種別（生徒）
+                $noticeDestination->destination_type = AppConst::CODE_MASTER_15_2;
+                // 生徒ID
+                $noticeDestination->student_id = $schedule->student_id;
 
-            // 先に登録したお知らせIDをセット
-            $noticeDestination->notice_id = $notice->notice_id;
-            // 宛先連番: 1固定
-            $noticeDestination->destination_seq = 1;
-            // 宛先種別（生徒）
-            $noticeDestination->destination_type = AppConst::CODE_MASTER_15_2;
-            // 生徒ID
-            $noticeDestination->student_id = $conference->student_id;
+                // 保存
+                $res = $noticeDestination->save();
 
-            // 保存
-            $res = $noticeDestination->save();
+                // save成功時のみ送信
+                if ($res) {
+                    $studentAccount = Account::select('email')
+                        ->where('account_id', $schedule->student_id)
+                        ->where('account_type', AppConst::CODE_MASTER_7_1)
+                        ->firstOrFail();
 
-            // save成功時のみ送信
-            if ($res) {
-                $mail_body = [
-                    'conference_date' => $conference->conference_date->format('Y/m/d') .
-                    ' ' . $conference->start_time->format('H:i'),
-                    'room_name' => $campus_name
-                ];
+                    $mail_body = [
+                        'conference_date' => $schedule->target_date->format('Y/m/d') .
+                        ' ' . $schedule->start_time->format('H:i'),
+                        'room_name' => $campus_name
+                    ];
 
-                $studentAccount = Account::select('email')
-                    ->where('account_id', $conference->student_id)
-                    ->where('account_type', AppConst::CODE_MASTER_7_1)
-                    ->firstOrFail();
-
-                $email = $studentAccount->email;
-                Mail::to($email)->send(new ConferenceAcceptToStudent($mail_body));
+                    $email = $studentAccount->email;
+                        Mail::to($email)->send(new ConferenceAcceptToStudent($mail_body));
+                }
             }
         });
 
@@ -622,14 +618,16 @@ class ConferenceAcceptController extends Controller
             $account = Auth::user();
             $adm_id = $account->account_id;
 
-            // 終了時刻計算
-            $end_time = date("H:i", strtotime($request['start_time']) + 3600);
+            // コースコード取得
+            $course = MstCourse::query()
+                ->where('mst_courses.course_kind', '=', AppConst::CODE_MASTER_42_3)
+                ->firstOrFail();
 
             // 保存
             $schedule = new Schedule;
-            $schedule->course_cd = 90200;
-            $schedule->end_time = $end_time;
-            $schedule->minites = 60;
+            $schedule->course_cd = $course_course_cd;
+            $schedule->end_time = $this->endTime($request['start_time']);
+            $schedule->minites = config('appconf.conference_time');
             $schedule->create_kind = null;
             $schedule->lesson_kind = null;
             $schedule->adm_id = $adm_id;
@@ -646,7 +644,7 @@ class ConferenceAcceptController extends Controller
             $conference->conference_date = $request['target_date'];
             $conference->start_time = $request['start_time'];
             $conference->end_time = $end_time;
-            $conference->status = 1;
+            $conference->status = AppConst::CODE_MASTER_5_1;
             $conference->conference_schedule_id = $schedule->schedule_id;
             $conference->save();
 
@@ -765,11 +763,15 @@ class ConferenceAcceptController extends Controller
         };
 
         // 独自バリデーション: リストのチェック 生徒ID
-        $validationStudentList =  function ($attribute, $value, $fail) {
+        $validationStudentList =  function ($attribute, $value, $fail) use ($request) {
 
             // リストを取得し存在チェック
             $students = $this->mdlGetStudentList();
             if (!isset($students[$value])) {
+                // 入会前の生徒の場合
+                if ($request['student_id'] == 'null') {
+                    return;
+                }
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
@@ -779,7 +781,7 @@ class ConferenceAcceptController extends Controller
         $validationDupBoothConference =  function ($attribute, $value, $fail) use ($request) {
 
             // 終了時刻計算
-            $end_time = date("H:i", strtotime($request['start_time']) + 3600);
+            $end_time = $this->endTime($request['start_time']);
             $scheduleId = null;
             
             if ($request->filled('schedule_id')) {
@@ -815,12 +817,24 @@ class ConferenceAcceptController extends Controller
         };
 
         $rules += Conference::fieldRules('campus_cd', ['required', $validationRoomList]);
-        $rules += Conference::fieldRules('student_id', ['required', $validationStudentList]);
+        $rules += Conference::fieldRules('student_id', [$validationStudentList]);
         $rules += Schedule::fieldRules('booth_cd', ['required', $validationBoothList, $validationDupBoothConference]);
         $rules += Schedule::fieldRules('target_date', ['required']);
         $rules += Schedule::fieldRules('start_time', ['required', $validationConferenceDateTime]);
         $rules += Schedule::fieldRules('memo');
 
         return $rules;
+    }
+    /**
+     * 終了時刻
+     *
+     * @param $start_time
+     * @return array ルール
+     */
+    private function endTime($start_time)
+    {
+        $end_time = date("H:i", strtotime($start_time) + 60 * config('appconf.conference_time'));
+
+        return $end_time;
     }
 }

@@ -10,6 +10,10 @@
         <td>@{{item.campus_name}}</td>
     </tr>
     <tr>
+        <th>ブース</th>
+        <td>@{{item.booth_name}}</td>
+    </tr>
+    <tr>
         <th>生徒名</th>
         <td>@{{item.student_name}}</td>
     </tr>
@@ -43,7 +47,7 @@
     </tr>
     <tr>
         <th>管理者メモ</th>
-        <td>@{{item.memo}}</td>
+        <td class="nl2br">@{{item.memo}}</td>
     </tr>
     <tr>
         <th>ステータス</th>

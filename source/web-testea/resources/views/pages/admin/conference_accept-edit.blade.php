@@ -40,7 +40,7 @@
         <tr>
             <th>第３希望日時</th>
             <td>
-                @if ($conference_date2 != null)
+                @if ($conference_date3 != null)
                     {{date('Y/m/d', strtotime($conference_date3))}}
                     {{$start_time3}}
                 @endif

@@ -295,6 +295,10 @@ return [
      * 削除アカウントのメールアドレスに付加する文字列の抽出条件
      * 末尾に「DELyyyymmddhhmmss@」
      */
-    "delete_email_rule" => '/^.+(DEL[0-9]{14}@)$/'
+    "delete_email_rule" => '/^.+(DEL[0-9]{14}@)$/',
 
+    /**
+     * 面談時間
+     */
+    "conference_time" => 60
 ];
