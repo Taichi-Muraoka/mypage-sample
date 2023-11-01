@@ -1511,9 +1511,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/account_mng/search', [AccountMngController::class, 'search'])->name('account_mng-search');
 
-    // 詳細取得用
-    Route::post('/account_mng/get_data', [AccountMngController::class, 'getData'])->name('account_mng-get_data');
-
     // 登録画面
     Route::get('/account_mng/new', [AccountMngController::class, 'new'])->name('account_mng-new');
 

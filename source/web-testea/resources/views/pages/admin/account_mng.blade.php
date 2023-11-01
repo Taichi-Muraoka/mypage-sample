@@ -43,6 +43,7 @@
             <th width="15%">管理者ID</th>
             <th>管理者名</th>
             <th width="30%">校舎</th>
+            <th>メールアドレス</th>
             <th></th>
         </x-slot>
 
@@ -50,13 +51,10 @@
         <tr v-for="item in paginator.data" v-cloak>
             <td>@{{item.adm_id}}</td>
             <td>@{{item.name}}</td>
+            <td>@{{item.email}}</td>
             <td>@{{item.room_name}}</td>
 
             <td>
-                {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
-                <x-button.list-dtl :vueDataAttr="['id' => 'item.adm_id']" />
-                <!-- スペース -->
-                &nbsp;
                 {{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
                 <x-button.list-edit
                     vueHref="'{{ route('account_mng-edit', '') }}/' + item.adm_id" />
@@ -68,6 +66,5 @@
 </x-bs.card-list>
 
 {{-- 詳細 --}}
-@include('pages.admin.modal.account_mng-modal')
 
 @stop
