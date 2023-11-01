@@ -42,8 +42,8 @@
         <x-slot name="thead">
             <th width="15%">管理者ID</th>
             <th>管理者名</th>
-            <th width="30%">校舎</th>
             <th>メールアドレス</th>
+            <th width="25%">校舎</th>
             <th></th>
         </x-slot>
 
