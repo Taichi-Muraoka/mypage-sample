@@ -169,8 +169,6 @@ class RecordController extends Controller
         // IDを取得
         $id = $request->input('id');
 
-        $this->debug($id);
-
         // クエリを作成
         $query = Record::query();
 

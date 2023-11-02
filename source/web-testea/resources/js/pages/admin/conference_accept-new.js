@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 面談日程連絡受付一覧
+ * 面談追加登録
  */
 export default class AppClass extends PageBase {
     /**
@@ -16,25 +16,32 @@ export default class AppClass extends PageBase {
      */
     start() {
         const self = this;
-        
-        // Vue: モーダル
-        this.getVueModal();
 
-        // Vue: 検索フォーム
-        this.getVueSearchForm({
+        // 編集完了後は一覧へ戻る
+        var afterEdit = () => {
+            UrlCom.redirect(UrlCom.getFuncUrl());
+        };
+
+        // Vue: 入力フォーム
+        this.getVueInputForm({
+            afterEdit: afterEdit,
+
             // 画面読み込み時
             vueMounted: function ($vue, option) {
                 // 初期表示時に、生徒プルダウンを初期化する。
                 // -1の場合、自分の受け持ちの生徒だけに絞り込み
-                $vue.selectChangeGetRoom();
+                $vue.selectChangeGet();
             },
             // Vueにメソッド追加
             vueMethods: {
                 // 教室プルダウン変更イベント
-                selectChangeGetRoom: function (event) {
+                selectChangeGet: function (event) {
                     // 生徒プルダウンをクリア
                     this.form.student_id = "";
                     this.selectGetItem = {};
+                    // ブースプルダウンをクリア
+                    this.form.booth_id = "";
+                    this.selectGetList = {};
 
                     // チェンジイベントを発生させる
                     var selected = this.form.campus_cd;
@@ -43,7 +50,7 @@ export default class AppClass extends PageBase {
                         selected,
                         // URLを検索用とする
                         {
-                            urlSuffix: "search",
+                            urlSuffix: "new",
                         }
                     );
                 },
