@@ -103,7 +103,9 @@ class AccountMngController extends Controller
                 'name',
                 'campus_cd',
                 // 汎用マスタの教室名称2
-                'rooms.room_name'
+                'rooms.room_name',
+                // メールアドレス
+                'accounts.email as email'
             )
             ->leftJoinSub($subquery, 'rooms', function ($join) {
                 $join->on('admin_users.campus_cd', '=', 'rooms.code');
@@ -117,53 +119,6 @@ class AccountMngController extends Controller
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $adminUsers);
-    }
-
-    /**
-     * 詳細取得
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return mixed 詳細データ
-     */
-    public function getData(Request $request)
-    {
-        // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'id');
-
-        // IDを取得
-        $id = $request->input('id');
-
-        // クエリを作成
-        $query = AdminUser::query();
-
-        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        $query->where($this->guardRoomAdminTableWithRoomCd());
-
-        // サブクエリを作成
-        $subquery = $this->mdlGetRoomQuery();
-
-        $adminUser = $query
-            // IDを指定
-            ->where('admin_users.adm_id', $id)
-            // データを取得
-            ->select(
-                'accounts.email',
-                'admin_users.name',
-                'rooms.room_name'
-            )
-            // アカウントテーブルをLeftJOIN
-            ->sdLeftJoin(Account::class, function ($join) {
-                $join->on('admin_users.adm_id', '=', 'accounts.account_id')
-                    ->where('accounts.account_type', AppConst::CODE_MASTER_7_3);
-            })
-            // 教室名取得のサブクエリをLeftJOIN
-            ->leftJoinSub($subquery, 'rooms', function ($join) {
-                $join->on('admin_users.campus_cd', '=', 'rooms.code');
-            })
-            // MEMO: 取得できない場合はエラーとする
-            ->firstOrFail();
-
-        return $adminUser;
     }
 
     /**
