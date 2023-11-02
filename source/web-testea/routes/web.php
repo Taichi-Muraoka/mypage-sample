@@ -1017,6 +1017,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // バリデーション(検索用)
     Route::post('/conference_accept/vd_search', [ConferenceAcceptController::class, 'validationForSearch'])->name('conference_accept-vd_search');
 
+    // 教室選択プルダウンを選択された際に生徒プルダウンの情報を返却する
+    Route::post('/conference_accept/get_data_select_search', [ConferenceAcceptController::class, 'getDataSelectSearch'])->name('conference_accept-get_data_select_search');
+
     // 検索結果取得
     Route::post('/conference_accept/search', [ConferenceAcceptController::class, 'search'])->name('conference_accept-search');
 
@@ -1026,14 +1029,17 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // // モーダル処理
     // Route::post('/conference_accept/exec_modal', [ConferenceAcceptController::class, 'execModal'])->name('conference_accept-exec_modal');
 
-    // 振替調整登録画面
+    // 追加登録画面
     Route::get('/conference_accept/new', [ConferenceAcceptController::class, 'new'])->name('conference_accept-new');
 
-    // 振替連絡編集
-    Route::get('/conference_accept/edit/{transferApplyId}', [ConferenceAcceptController::class, 'edit'])->name('conference_accept-edit');
+    // 教室選択プルダウンを選択された際に生徒プルダウン・ブースプルダウンの情報を返却する
+    Route::post('/conference_accept/get_data_select_new', [ConferenceAcceptController::class, 'getDataSelectNew'])->name('conference_accept-get_data_select_new');
 
-    // // カレンダーを選択された際に教室・教師の情報を返却する
-    // Route::post('/conference_accept/get_data_select', [ConferenceAcceptController::class, 'getDataSelect'])->name('conference_accept-get_data_select');
+    // 登録処理
+    Route::post('/conference_accept/create', [ConferenceAcceptController::class, 'create'])->name('conference_accept-create');
+
+    // 面談編集
+    Route::get('/conference_accept/edit/{conferenceId}', [ConferenceAcceptController::class, 'edit'])->name('conference_accept-edit');
 
     // 編集処理
     Route::post('/conference_accept/update', [ConferenceAcceptController::class, 'update'])->name('conference_accept-update');
@@ -1516,9 +1522,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 検索結果取得
     Route::post('/account_mng/search', [AccountMngController::class, 'search'])->name('account_mng-search');
-
-    // 詳細取得用
-    Route::post('/account_mng/get_data', [AccountMngController::class, 'getData'])->name('account_mng-get_data');
 
     // 登録画面
     Route::get('/account_mng/new', [AccountMngController::class, 'new'])->name('account_mng-new');
