@@ -7,13 +7,21 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Report;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtRirekisho;
+use App\Models\ReportUnit;
+use App\Models\Student;
+use App\Models\Tutor;
+use App\Models\Schedule;
+use App\Models\ClassMember;
+use App\Models\MstCourse;
+use App\Models\MstSubject;
+use App\Models\MstText;
+use App\Models\MstUnitCategory;
+use App\Models\MstUnit;
 use App\Models\CodeMaster;
-use App\Models\ExtSchedule;
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Traits\FuncReportTrait;
 
 /**
@@ -49,14 +57,54 @@ class ReportCheckController extends Controller
         $rooms = $this->mdlGetRoomList(false);
 
         // 学年リストを取得
-        $classes = $this->mdlMenuFromExtGenericMaster(AppConst::EXT_GENERIC_MASTER_112);
+        $grades = $this->mdlGetGradeList();
+
+        // 講師リストを取得
+        $tutors = $this->mdlGetTutorList();
+
+        // $this->debug($grades);
+
+        // コースリストを取得
+        $courses = $this->mdlGetCourseList();
+
+        // 報告書承認リストを取得（サブコード指定で絞り込み）
+        $subCodes = [1];
+        $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4, $subCodes);
 
         return view('pages.admin.report_check', [
             'rules' => $this->rulesForSearch(),
             'rooms' => $rooms,
-            'classes' => $classes,
+            'grades' => $grades,
+            'tutors' => $tutors,
+            'courses' => $courses,
+            'statusList' => $statusList,
             'editData' => null
         ]);
+    }
+
+    /**
+     * 生徒情報取得（校舎リスト選択時）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 生徒情報
+     */
+    public function getDataSelectSearch(Request $request)
+    {
+        // campus_cdを取得
+        $campus_cd = $request->input('id');
+
+        // 生徒リスト取得
+        if ($campus_cd == -1 || !filled($campus_cd)) {
+            // -1 または 空白の場合、自分の受け持ちの生徒だけに絞り込み
+            // 生徒リストを取得
+            $students = $this->mdlGetStudentList();
+        } else {
+            $students = $this->mdlGetStudentList($campus_cd);
+        }
+
+        return [
+            'selectItems' => $this->objToArray($students),
+        ];
     }
 
     /**
@@ -89,25 +137,42 @@ class ReportCheckController extends Controller
         // クエリを作成
         $query = Report::query();
 
-        // 教室の検索
-        if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-            $query->where($this->guardRoomAdminTableWithRoomCd());
-        } else {
-            // 管理者の場合検索フォームから取得
-            $query->SearchRoom($form);
+        $this->debug($request);
+
+        // 校舎コード選択による絞り込み条件
+        // -1 は未選択状態のため、-1以外の場合に校舎コードの絞り込みを行う
+        if (isset($form['campus_cd']) && filled($form['campus_cd']) && $form['campus_cd'] != -1) {
+            // 検索フォームから取得（スコープ）
+            $query->SearchCampusCd($form);
         }
 
-        // 学年の検索(生徒基本情報参照)
-        (new ExtStudentKihon)->scopeSearchCls($query, $form);
+        // 学年コード選択により絞り込み条件
+        if (isset($form['grade_cd']) && filled($form['grade_cd'])) {
+            // 検索フォームから取得（スコープ）
+            $query->SearchGradeCd($form);
+        }
 
-        // 生徒名の検索(生徒基本情報参照)
-        $key['name'] = $form['sname'];
-        (new ExtStudentKihon)->scopeSearchName($query, $key);
+        // コースコード選択により絞り込み条件
+        if (isset($form['course_cd']) && filled($form['course_cd'])) {
+            // 検索フォームから取得（スコープ）
+            $query->SearchCourseCd($form);
+        }
 
-        // 教師名の検索(教師履歴書情報参照)
-        $key['name'] = $form['tname'];
-        (new ExtRirekisho)->scopeSearchName($query, $key);
+        // 承認ステータス選択により絞り込み条件
+        if (isset($form['approval_status']) && filled($form['approval_status'])) {
+            // 検索フォームから取得（スコープ）
+            $query->SearchApprovalStatus($form);
+        }
+
+        // 生徒IDの検索（スコープで指定する）
+        $query->SearchSid($form);
+
+        // 講師IDの検索（スコープで指定する）
+        $query->SearchTid($form);
+
+        // 認定日の絞り込み条件
+        $query->SearchLessonDateFrom($form);
+        $query->SearchLessonDateTo($form);
 
         // 教室名取得のサブクエリ
         $room_names = $this->mdlGetRoomQuery();
@@ -115,27 +180,40 @@ class ReportCheckController extends Controller
         // データを取得
         $reports = $query
             ->select(
-                'report_id as id',
-                'regist_time',
-                'lesson_date',
-                'start_time',
+                'reports.report_id as id',
+                'reports.lesson_date',
+                'reports.period_no',
+                'reports.tutor_id',
+                'reports.approval_status',
+                'reports.regist_date',
                 'room_names.room_name as room_name',
-                'ext_student_kihon.name as sname',
-                'ext_rirekisho.name as tname',
-                'r_minutes',
-                'report.created_at'
+                'mst_courses.name as course_name',
+                'mst_codes.name as status_name',
+                'tutors.name as tutor_name',
+                'students.name as student_name'
             )
-            // 教室名の取得
+            // スケジュール情報のJOIN
+            ->sdJoin(Schedule::class, 'reports.schedule_id', '=', 'schedules.schedule_id')
+            // 受講生徒情報のJOIN
+            ->sdLeftJoin(ClassMember::class, 'schedules.schedule_id', '=', 'class_members.schedule_id')
+            // 校舎名の取得
             ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('report.roomcd', '=', 'room_names.code');
+                $join->on('schedules.campus_cd', '=', 'room_names.code');
             })
+            // 講師名の取得
+            ->sdLeftJoin(Tutor::class, 'reports.tutor_id', '=', 'tutors.tutor_id')
             // 生徒名の取得
-            ->sdLeftJoin(ExtStudentKihon::class, 'report.sid', '=', 'ext_student_kihon.sid')
-            // 教師名の取得
-            ->sdLeftJoin(ExtRirekisho::class, 'report.tid', '=', 'ext_rirekisho.tid')
-            // 登録日の降順
-            ->orderBy('report.regist_time', 'desc')
-            ->orderBy('report.created_at', 'desc');
+            ->sdLeftJoin(Student::class, 'reports.student_id', '=', 'students.student_id')
+            // コース名の取得
+            ->sdLeftJoin(MstCourse::class, 'reports.course_cd', '=', 'mst_courses.course_cd')
+            // 報告書承認ステータス名の取得
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('reports.approval_status', 'mst_codes.code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_4);
+            })
+            ->distinct()
+            ->orderby('lesson_date', 'desc')
+            ->orderby('period_no', 'desc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $reports);
@@ -229,6 +307,9 @@ class ReportCheckController extends Controller
             // 教室リストを取得
             $rooms = $this->mdlGetRoomList(false);
             if (!isset($rooms[$value])) {
+                // 初期表示の時はエラーを発生させないようにする
+                if ($value == -1) return;
+
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
@@ -238,19 +319,15 @@ class ReportCheckController extends Controller
         $validationClassesList =  function ($attribute, $value, $fail) {
 
             // 学年リストを取得
-            $classes = $this->mdlMenuFromExtGenericMaster(AppConst::EXT_GENERIC_MASTER_112);
+            $classes = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_44_4);
             if (!isset($classes[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
         };
 
-        $rules += Report::fieldRules('roomcd', [$validationRoomList]);
-        $rules += ExtStudentKihon::fieldRules('cls_cd', [$validationClassesList]);
-        $ruleSname = ExtStudentKihon::getFieldRule('name');
-        $rules += ['sname' => $ruleSname];
-        $ruleTname = ExtRirekisho::getFieldRule('name');
-        $rules += ['tname' => $ruleTname];
+        $rules += Report::fieldRules('campus_cd', [$validationRoomList]);
+        
         return $rules;
     }
 
