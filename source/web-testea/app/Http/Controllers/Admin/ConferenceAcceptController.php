@@ -625,7 +625,7 @@ class ConferenceAcceptController extends Controller
 
             // 保存
             $schedule = new Schedule;
-            $schedule->course_cd = $course_course_cd;
+            $schedule->course_cd = $course->course_cd;
             $schedule->end_time = $this->endTime($request['start_time']);
             $schedule->minites = config('appconf.conference_time');
             $schedule->create_kind = null;

@@ -31,7 +31,7 @@
     </tr>
     <tr>
         <th>特記事項</th>
-        <td>@{{item.comment}}</td>
+        <td class="nl2br">@{{item.comment}}</td>
     </tr>
     <tr>
         <th>面談日</th>

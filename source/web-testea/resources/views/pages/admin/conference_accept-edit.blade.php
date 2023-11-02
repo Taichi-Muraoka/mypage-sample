@@ -48,7 +48,7 @@
         </tr>
         <tr>
             <th>特記事項</th>
-            <td>{{$comment}}</td>
+            <td>{!! nl2br($comment) !!}</td>
         </tr>
     </x-bs.table>
     {{-- 余白 --}}
