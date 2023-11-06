@@ -127,6 +127,14 @@ class MemberMngController extends Controller
         // 通塾期間の検索
         $query->SearchEnterTerm($form);
 
+        // 通塾バッジ数集計のサブクエリ
+        $badge_count_query = Badge::query();
+        $badge_count_query->select('badges.student_id')
+            ->selectRaw('COUNT(badge_type) as badge_count')
+            ->where('badges.badge_type', AppConst::CODE_MASTER_55_2)
+            ->groupBy('badges.student_id');
+
+        // 会員情報取得
         $students = $query
             ->select(
                 'students_view.student_id',
@@ -139,9 +147,13 @@ class MemberMngController extends Controller
                 'mst_codes.name as stu_status_name',
                 'students_view.enter_date',
                 'students_view.enter_term',
+                // 通塾バッジ数
+                'badge_count_query.badge_count'
             )
-            // 通塾バッジ数をカウントして表示する
-            ->selectRaw('COUNT(badge_type) as badge_count')
+            // 通塾バッジ数の取得
+            ->leftJoinSub($badge_count_query, 'badge_count_query', function ($join) {
+                $join->on('students_view.student_id', '=', 'badge_count_query.student_id');
+            })
             // 学年マスタの名称を取得
             ->sdLeftJoin(MstGrade::class, 'students_view.grade_cd', '=', 'mst_grades.grade_cd')
             // コードマスターとJOIN
@@ -149,23 +161,6 @@ class MemberMngController extends Controller
                 $join->on('students_view.stu_status', '=', 'mst_codes.code')
                     ->where('data_type', AppConst::CODE_MASTER_28);
             })
-            // バッジ付与情報とJOIN
-            ->sdLeftJoin(Badge::class, function ($join) {
-                $join->on('students_view.student_id', '=', 'badges.student_id')
-                    // 通塾バッジのみ絞り込み
-                    ->where('badges.badge_type', AppConst::CODE_MASTER_55_2);
-            })
-            // selectで指定した項目を全て記載する 別名のas ~~ は削除する
-            ->groupBy(
-                'students_view.student_id',
-                'students_view.name',
-                'students_view.grade_cd',
-                'mst_grades.name',
-                'students_view.stu_status',
-                'mst_codes.name',
-                'students_view.enter_date',
-                'students_view.enter_term',
-            )
             ->orderBy('students_view.student_id', 'asc');
 
         return $students;
