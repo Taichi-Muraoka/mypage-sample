@@ -22,7 +22,7 @@ export default class AppClass extends PageBase {
 
         // Vue: 入力フォーム
         this.getVueInputForm({
-            afterEdit: afterEdit
+            afterEdit: afterEdit,
         });
     }
 }

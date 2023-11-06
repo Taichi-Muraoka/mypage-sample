@@ -113,7 +113,7 @@ class Conference extends Model
         static $_fieldRules = [
             'conference_id' => ['integer'],
             'student_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2', 'digits:2'],
+            'campus_cd' => ['string', 'max:2'],
             'comment' => ['string', 'max:1000'],
             'status' => ['integer'],
             'apply_date' => ['date_format:Y-m-d'],
@@ -128,5 +128,60 @@ class Conference extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
-
+    /**
+     * 検索 校舎コード
+     */
+    public function scopeSearchCampusCd($query, $obj)
+    {
+        $key = 'campus_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 ステータス
+     */
+    public function scopeSearchStatus($query, $obj)
+    {
+        $key = 'status';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 生徒ID
+     */
+    public function scopeSearchStudentId($query, $obj)
+    {
+        $key = 'student_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 連絡日From
+     */
+    public function scopeSearchConferenceDateFrom($query, $obj)
+    {
+        $key = 'apply_date_from';
+        // Ymdに変換して検索する
+        $col = $this->mdlFormatYmd('apply_date');
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, '>=', $obj[$key]);
+        }
+    }
+    /**
+     * 検索 連絡日To
+     */
+    public function scopeSearchConferenceDateTo($query, $obj)
+    {
+        $key = 'apply_date_to';
+        // Ymdに変換して検索する
+        $col = $this->mdlFormatYmd('apply_date');
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, '<=', $obj[$key]);
+        }
+    }
 }
