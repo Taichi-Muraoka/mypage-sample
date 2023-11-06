@@ -18,6 +18,9 @@ use App\Models\SeasonStudentRequest;
 use App\Models\Schedule;
 use App\Models\ClassMember;
 use App\Models\CodeMaster;
+use App\Models\MstGrade;
+use App\Models\Badge;
+use App\Models\StudentView;
 use App\Http\Controllers\Traits\FuncCalendarTrait;
 use App\Http\Controllers\Traits\FuncInvoiceTrait;
 use App\Http\Controllers\Traits\FuncAgreementTrait;
@@ -66,20 +69,101 @@ class MemberMngController extends Controller
     {
         // 教室リストを取得
         $rooms = $this->mdlGetRoomList(false);
-
         // 学年リストを取得
-        $classes = $this->mdlMenuFromExtGenericMaster(AppConst::EXT_GENERIC_MASTER_112);
-
-        // 入会状況チェックボックス
-        $statusGroup = array("在籍","見込客","休塾処理中","休塾","退会処理中","退会済");
+        $gradeList = $this->mdlGetGradeList();
+        // 会員ステータスリストを取得
+        $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_28);
+        // 通塾期間リスト appconfに定義
+        $enterTermList = config('appconf.enter_term');
 
         return view('pages.admin.member_mng', [
-            'rules' => $this->rulesForSearch(),
+            'rules' => $this->rulesForSearch(null),
             'rooms' => $rooms,
-            'classes' => $classes,
+            'gradeList' => $gradeList,
+            'statusList' => $statusList,
+            'enterTermList' => $enterTermList,
             'editData' => null,
-            'statusGroup' => $statusGroup,
         ]);
+    }
+
+    /**
+     * 検索結果取得(一覧と一覧出力CSV用)
+     * 検索結果一覧を表示するとのCSVのダウンロードが同じため共通化
+     *
+     * @param mixed $form 検索フォーム
+     */
+    private function getSearchResult($form)
+    {
+        // クエリを作成
+        // 通塾期間参照のため、Viewを利用する
+        $query = StudentView::query();
+
+        // 校舎の検索
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithSid());
+        } else {
+            // 管理者の場合検索フォームから取得
+            $query->SearchRoom($form);
+        }
+
+        // 学年の検索
+        $query->SearchGradeCd($form);
+
+        // 生徒IDの検索
+        $query->SearchStudentId($form);
+
+        // 生徒名の検索
+        $query->SearchName($form);
+
+        // 会員ステータスの検索
+        // 配列としてリクエストされた会員ステータスが、各ステータスコードと合致するように整形
+        $group = [];
+        foreach ($form['status_groups'] as $val) {
+            $group[$val] = $val;
+        }
+        $query->SearchStuStatus($form, $group);
+
+        // 通塾期間の検索
+        $query->SearchEnterTerm($form);
+
+        // 通塾バッジ数集計のサブクエリ
+        $badge_count_query = Badge::query();
+        $badge_count_query->select('badges.student_id')
+            ->selectRaw('COUNT(badge_type) as badge_count')
+            ->where('badges.badge_type', AppConst::CODE_MASTER_55_2)
+            ->groupBy('badges.student_id');
+
+        // 会員情報取得
+        $students = $query
+            ->select(
+                'students_view.student_id',
+                'students_view.name',
+                'students_view.grade_cd',
+                // 学年マスタの名称
+                'mst_grades.name as grade_name',
+                'students_view.stu_status',
+                // コードマスタの名称（会員ステータス）
+                'mst_codes.name as stu_status_name',
+                'students_view.enter_date',
+                'students_view.enter_term',
+                // 通塾バッジ数
+                'badge_count_query.badge_count'
+            )
+            // 通塾バッジ数の取得
+            ->leftJoinSub($badge_count_query, 'badge_count_query', function ($join) {
+                $join->on('students_view.student_id', '=', 'badge_count_query.student_id');
+            })
+            // 学年マスタの名称を取得
+            ->sdLeftJoin(MstGrade::class, 'students_view.grade_cd', '=', 'mst_grades.grade_cd')
+            // コードマスターとJOIN
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('students_view.stu_status', '=', 'mst_codes.code')
+                    ->where('data_type', AppConst::CODE_MASTER_28);
+            })
+            ->orderBy('students_view.student_id', 'asc');
+
+        return $students;
     }
 
     /**
@@ -90,52 +174,14 @@ class MemberMngController extends Controller
      */
     public function search(Request $request)
     {
-
         // バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForSearch())->validate();
+        Validator::make($request->all(), $this->rulesForSearch($request))->validate();
 
         // formを取得
         $form = $request->all();
 
-        // クエリを作成
-        $query = ExtStudentKihon::query();
-
-        // 生徒の教室の検索(生徒基本情報参照)
-        if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
-            $query->where($this->guardRoomAdminTableWithSid());
-        } else {
-            // 管理者の場合検索フォームから取得
-            $query->SearchRoom($form);
-        }
-
-        // 生徒名の検索(生徒基本情報参照)
-        $query->searchName($form);
-
-        // 学年の検索(生徒基本情報参照)
-        $query->searchCls($form);
-
-        // 生徒No.の検索(生徒基本情報参照)
-        $query->searchSid($form);
-
-        $students = $query
-            ->select(
-                'sid',
-                'name',
-                'mailaddress1',
-                'ext_generic_master.name1 AS cls_name',
-                'enter_date'
-            )
-            ->sdLeftJoin(ExtGenericMaster::class, function ($join) {
-                $join->on('ext_student_kihon.cls_cd', '=', 'ext_generic_master.code')
-                    ->where('ext_generic_master.codecls', '=', AppConst::EXT_GENERIC_MASTER_000_112);
-            })
-            // アカウントテーブルとJOIN（退会生徒非表示対応）
-            ->sdJoin(Account::class, function ($join) {
-                $join->on('ext_student_kihon.sid', '=', 'accounts.account_id')
-                    ->where('accounts.account_type', '=', AppConst::CODE_MASTER_7_1);
-            })
-            ->orderBy('ext_student_kihon.sid', 'asc');
+        // 検索結果を取得
+        $students = $this->getSearchResult($form);
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $students);
@@ -150,7 +196,7 @@ class MemberMngController extends Controller
     public function validationForSearch(Request $request)
     {
         // リクエストデータチェック
-        $validator = Validator::make($request->all(), $this->rulesForSearch());
+        $validator = Validator::make($request->all(), $this->rulesForSearch($request));
         return $validator->errors();
     }
 
@@ -159,15 +205,13 @@ class MemberMngController extends Controller
      *
      * @return array ルール
      */
-    private function rulesForSearch()
+    private function rulesForSearch(?Request $request)
     {
-
         $rules = array();
 
-        // 独自バリデーション: リストのチェック 教室名
+        // 独自バリデーション: リストのチェック 校舎
         $validationRoomList =  function ($attribute, $value, $fail) {
-
-            // 教室リストを取得
+            // 校舎リストを取得
             $rooms = $this->mdlGetRoomList(false);
             if (!isset($rooms[$value])) {
                 // 不正な値エラー
@@ -176,23 +220,133 @@ class MemberMngController extends Controller
         };
 
         // 独自バリデーション: リストのチェック 学年
-        $validationClasseList =  function ($attribute, $value, $fail) {
-
+        $validationGradeList =  function ($attribute, $value, $fail) {
             // 学年リストを取得
-            $classe = $this->mdlMenuFromExtGenericMaster(AppConst::EXT_GENERIC_MASTER_112);
-
-            if (!isset($classe[$value])) {
+            $gradeList = $this->mdlGetGradeList();
+            if (!isset($gradeList[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
         };
 
-        $rules += ExtStudentKihon::fieldRules('sid');
-        $rules += ExtStudentKihon::fieldRules('name');
-        $rules += ExtStudentKihon::fieldRules('cls_cd', [$validationClasseList]);
-        $rules += ExtRoom::fieldRules('roomcd', [$validationRoomList]);
+        // 独自バリデーション: チェックボックス 会員ステータス
+        $validationStatusList =  function ($attribute, $value, $fail) use ($request) {
+            // 会員ステータスリスト
+            $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_28);
+
+            // 配列としてリクエストされた会員ステータスが、各ステータスコードと合致するように整形
+            $group = [];
+            foreach ($request->status_groups as $val) {
+                $group[$val] = $val;
+            }
+
+            // ステータスコードとインデックスを合わせるため整形
+            $statusGroup = [];
+            foreach ($statusList as $statusList) {
+                $statusGroup[$statusList->code] = $statusList->code;
+            }
+
+            foreach ($group as $val) {
+                if (!isset($statusGroup[$val])) {
+                    // 不正な値エラー
+                    return $fail(Lang::get('validation.invalid_input'));
+                }
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 通塾期間
+        $validationEnterTermList =  function ($attribute, $value, $fail) {
+            // 通塾期間リストを取得
+            $enterTermList = config('appconf.enter_term');
+            if (!isset($enterTermList[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        $rules += MstCampus::fieldRules('campus_cd', [$validationRoomList]);
+        $rules += StudentView::fieldRules('grade_cd', [$validationGradeList]);
+        $rules += StudentView::fieldRules('student_id');
+        $rules += StudentView::fieldRules('name');
+        $rules += StudentView::fieldRules('stu_status', [$validationStatusList]);
+        $rules += StudentView::fieldRules('enter_term', [$validationEnterTermList]);
 
         return $rules;
+    }
+
+    /**
+     * 詳細取得（CSV出力の確認モーダル用）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed 詳細データ
+     */
+    public function getData(Request $request)
+    {
+        // ここでの処理は特になし
+        return [];
+    }
+
+    /**
+     * モーダル処理（CSV出力）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function execModal(Request $request)
+    {
+        //--------------
+        // 一覧出力
+        //--------------
+        // formを取得
+        $form = $request->all();
+
+        // 検索結果を取得
+        $students = $this->getSearchResult($form)
+            // 結果を取得
+            ->get();
+
+        //---------------------
+        // CSV出力内容を配列に保持
+        //---------------------
+        $arrayCsv = [];
+
+        // ヘッダ
+        $arrayCsv[] = Lang::get(
+            'message.file.member_output.header'
+        );
+
+        // 付与バッジ詳細
+        foreach ($students as $data) {
+            // 一行出力
+            $arrayCsv[] = [
+                $data->student_id,
+                $data->name,
+                $data->grade_name,
+                $data->enter_date->format('Y/m/d'),
+                // 通塾期間は月数を「Y年Mヶ月」にフォーマットする
+                floor($data->enter_term / 12).'年'.floor($data->enter_term % 12).'ヶ月',
+                $data->badge_count,
+                $data->stu_status_name,
+            ];
+        }
+
+        //---------------------
+        // ファイル名の取得と出力
+        //---------------------
+        $filename = Lang::get(
+            'message.file.member_output.name',
+            [
+                'outputDate' => date("Ymd")
+            ]
+        );
+
+        // ファイルダウンロードヘッダーの指定
+        $this->fileDownloadHeader($filename, true);
+
+        // CSVを出力する
+        $this->outputCsv($arrayCsv);
+
+        return;
     }
 
     //==========================

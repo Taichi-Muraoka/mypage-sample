@@ -825,6 +825,12 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 会員情報詳細 - 詳細取得用
     Route::post('/member_mng/get_data_detail', [MemberMngController::class, 'getDataDetail'])->name('member_mng-get_data_detail');
 
+    // 詳細取得用（CSV出力確認モーダル）
+    Route::post('/member_mng/get_data', [MemberMngController::class, 'getData'])->name('member_mng-get_data');
+
+    // モーダル処理（CSV出力）
+    Route::post('/member_mng/exec_modal', [MemberMngController::class, 'execModal'])->name('member_mng-exec_modal');
+
     // カレンダー
     Route::get('/member_mng/calendar/{sid}', [MemberMngController::class, 'calendar'])->name('member_mng-calendar');
 
