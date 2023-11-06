@@ -66,6 +66,23 @@ export default class AppClass extends PageBase {
                 // 授業情報リスト変更
                 selectChangeGet: function (event) {
                     this.selectGetItem = {};
+                    // 未選択となった場合は項目リセット
+                    if (ValueCom.isEmpty(this.form['id'])) {
+                        this.form.monthly_goal = "";
+                        for (var subCode of subCodes) {
+                            // 教材プルダウンの初期化
+                            this.form['bef_text_cd_' + subCode] = "";
+                            this.form['text_page_' + subCode] = "";
+                            this.form['text_name_' + subCode] = "";
+                            for (var j = 1; j <= 3; j++) {
+                                // 単元分類プルダウン・単元プルダウンもクリア
+                                this.form['bef_unit_category_cd' + j + '_' + subCode] = "";
+                                this.form['category_name' + j + '_' + subCode] = "";
+                                this.form['bef_unit_cd' + j + '_' + subCode] = "";
+                                this.form['unit_name' + j + '_' + subCode] = "";
+                            }
+                        }
+                    }
                     for (var subCode of subCodes) {
                         // 教材プルダウンの初期化
                         this.form['text_cd_' + subCode] = "";
@@ -88,15 +105,80 @@ export default class AppClass extends PageBase {
                         (data) => {
                             // データをセット
                             this.selectGetItem = data;
+                            
+                            // 初期化
+                            if (data.last_data['flag'] != 0) {
+                                this.form.monthly_goal = "";
+                                for (var subCode of subCodes) {
+                                    // 教材プルダウンの初期化
+                                    this.form['text_cd_' + subCode] = "";
+                                    this.form['bef_text_cd_' + subCode] = "";
+                                    this.form['text_page_' + subCode] = "";
+                                    this.form['text_name_' + subCode] = "";
+                                    this['selectGetItemCat' + '_' + subCode] = {};
+                                    for (var j = 1; j <= 3; j++) {
+                                        // 単元分類プルダウン・単元プルダウンもクリア
+                                        this.form['unit_category_cd' + j + '_' + subCode] = "";
+                                        this.form['bef_unit_category_cd' + j + '_' + subCode] = "";
+                                        this.form['category_name' + j + '_' + subCode] = "";
+                                        this.form['unit_cd' + j + '_' + subCode] = "";
+                                        this.form['bef_unit_cd' + j + '_' + subCode] = "";
+                                        this.form['unit_name' + j + '_' + subCode] = "";
+                                        this['selectGetItemUni' + j + '_' + subCode] = {};
+                                    }
+                                }
+                            }
+
                             // 教材リストが取得できた場合のみ、hiddenの教材コードをセット
                             if (data.selectItems.length != 0) {
                                 for (var subCode of subCodes) {
                                     this.form['text_cd_' + subCode] = this.form['bef_text_cd_' + subCode];
                                 }
                             }
+
+                            // 前回授業が存在する場合
+                            if (data.last_data.length != 1 && data.last_data['lesson_report_id'] == null)
+                            {
+                                if (data.last_data['monthly_goal'] != null) {
+                                    this.form.monthly_goal = data.last_data['monthly_goal'];
+                                }
+                                for (var subCode of subCodes) {
+                                    if (subCode == 'H1') {
+                                        break;
+                                    }
+                                    if (data.last_data['text_cd_' + subCode] != null) {
+                                        this.form['bef_text_cd_' + subCode] = data.last_data['text_cd_' + subCode];
+                                        this.form['text_cd_' + subCode] = this.form['bef_text_cd_' + subCode];
+                                    }
+                                    if (data.last_data['text_page_' + subCode] != null) {
+                                        this.form['text_page_' + subCode] = data.last_data['text_page_' + subCode];
+                                    }
+                                    if (data.last_data['text_name_' + subCode] != null) {
+                                        this.form['text_name_' + subCode] = data.last_data['text_name_' + subCode];
+                                    }
+                                    for (var j = 1; j <= 3; j++) {
+                                        if (data.last_data['unit_category_cd' + j + '_' + subCode] != null) {
+                                            this.form['bef_unit_category_cd' + j + '_' + subCode] = data.last_data['unit_category_cd' + j + '_' + subCode];
+                                            this.form['unit_category_cd' + j + '_' + subCode] = this.form['bef_unit_category_cd' + j + '_' + subCode];
+                                        }
+                                        if (data.last_data['category_name' + j + '_' + subCode] != null) {
+                                            this.form['category_name' + j + '_' + subCode] = data.last_data['category_name' + j + '_' + subCode];
+                                        }
+                                        if (data.last_data['unit_cd' + j + '_' + subCode] != null) {
+                                            this.form['bef_unit_cd' + j + '_' + subCode] = data.last_data['unit_cd' + j + '_' + subCode];
+                                            this.form['unit_cd' + j + '_' + subCode] = this.form['bef_unit_cd' + j + '_' + subCode];
+                                        }
+                                        if (data.last_data['unit_name' + j + '_' + subCode] != null) {
+                                            this.form['unit_name' + j + '_' + subCode] = data.last_data['unit_name' + j + '_' + subCode];
+                                        }
+                                    }
+                                    // 教材選択によるチェンジイベント
+                                    this.selectChangeGetCatInit(subCode);
+                                }
+                            }
                         }
                     );
-                 },
+                },
                 // 教材リスト変更
                 selectChangeGetCat: function (event) {
                     if (!event || !event.target.id.startsWith('text_cd_')) {

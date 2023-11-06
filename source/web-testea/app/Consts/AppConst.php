@@ -1914,4 +1914,9 @@ class AppConst
         AppConst::REPORT_SUBCODE_3,
         AppConst::REPORT_SUBCODE_4
     ];
+
+    /**
+     * 授業報告書 その他教材・単元の下2桁
+     */
+    const REPORT_OTHER_TEXT_UNIT_CODE = 99;
 }

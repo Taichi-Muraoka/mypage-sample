@@ -47,7 +47,7 @@
         <td v-cloak>
             <span v-for="lesson_category1_1 in item.lesson_category1_1" v-cloak>@{{lesson_category1_1}}&nbsp;</span><br>
             <span v-for="lesson_category1_2 in item.lesson_category1_2" v-cloak>@{{lesson_category1_2}}&nbsp;</span><br>
-            <span v-for="lesson_category1_3 in item.lesson_category1_3" v-cloak>@{{lesson_category1_3}}</span>
+            <span v-for="lesson_category1_3 in item.lesson_category1_3" v-cloak>@{{lesson_category1_3}}&nbsp;</span>
         </td>
     </tr>
     <tr>
@@ -59,7 +59,7 @@
         <td v-cloak>
             <span v-for="lesson_category2_1 in item.lesson_category2_1" v-cloak>@{{lesson_category2_1}}&nbsp;</span><br>
             <span v-for="lesson_category2_2 in item.lesson_category2_2" v-cloak>@{{lesson_category2_2}}&nbsp;</span><br>
-            <span v-for="lesson_category2_3 in item.lesson_category2_3" v-cloak>@{{lesson_category2_3}}</span>
+            <span v-for="lesson_category2_3 in item.lesson_category2_3" v-cloak>@{{lesson_category2_3}}&nbsp;</span>
         </td>
     </tr>
     <tr>
@@ -100,7 +100,7 @@
         <td v-cloak>
             <span v-for="homework_category1_1 in item.homework_category1_1" v-cloak>@{{homework_category1_1}}&nbsp;</span><br>
             <span v-for="homework_category1_2 in item.homework_category1_2" v-cloak>@{{homework_category1_2}}&nbsp;</span><br>
-            <span v-for="homework_category1_3 in item.homework_category1_3" v-cloak>@{{homework_category1_3}}</span>
+            <span v-for="homework_category1_3 in item.homework_category1_3" v-cloak>@{{homework_category1_3}}&nbsp;</span>
         </td>
     </tr>
     <tr>
@@ -112,7 +112,7 @@
         <td v-cloak>
             <span v-for="homework_category2_1 in item.homework_category2_1" v-cloak>@{{homework_category2_1}}&nbsp;</span><br>
             <span v-for="homework_category2_2 in item.homework_category2_2" v-cloak>@{{homework_category2_2}}&nbsp;</span><br>
-            <span v-for="homework_category2_3 in item.homework_category2_3" v-cloak>@{{homework_category2_3}}</span>
+            <span v-for="homework_category2_3 in item.homework_category2_3" v-cloak>@{{homework_category2_3}}&nbsp;</span>
         </td>
     </tr>
     <tr>
