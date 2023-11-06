@@ -125,6 +125,16 @@ export default class PageComponentBase {
                     return moment(date).format("YYYY年MM月");
                 }
             },
+            // Y年Mか月 通塾期間・勤続年数で使用
+            formatTotalMonth(num) {
+                if (ValueCom.isEmpty(num)) {
+                    return "";
+                } else {
+                    var year = Math.floor(num / 12);
+                    var month = Math.floor(num % 12);
+                    return year + '年' + month +'ヶ月';
+                }
+            },
         };
     }
 
