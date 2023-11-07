@@ -158,7 +158,7 @@ class Report extends Model
     }
 
     /**
-     * 検索 student_id
+     * 検索 生徒ID
      */
     public function scopeSearchSid($query, $obj)
     {
@@ -169,4 +169,27 @@ class Report extends Model
         }
     }
 
+    /**
+     * 検索 コースコード
+     */
+    public function scopeSearchCourseCd($query, $obj)
+    {
+        $key = 'course_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 承認ステータス
+     */
+    public function scopeSearchApprovalStatus($query, $obj)
+    {
+        $key = 'approval_status';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 }

@@ -1874,7 +1874,7 @@ class AppConst
      * バッチ種別 データ移行
      */
     const BATCH_TYPE_21 = 21;
-
+    
     //==========================
     // システムマスタ システム変数ID
     //==========================
@@ -1883,4 +1883,40 @@ class AppConst
      * システム変数ID 現年度
      */
     const SYSTEM_KEY_ID_1 = 100;
+
+    //-----------
+    // 授業報告書サブコード
+    //-----------
+
+    /**
+     * 授業報告書 授業内容教材1
+     */
+    const REPORT_SUBCODE_1 = 'L1';
+
+    /**
+     * 授業報告書 授業内容教材2
+     */
+    const REPORT_SUBCODE_2 = 'L2';
+
+    /**
+     * 授業報告書 宿題内容教材1
+     */
+    const REPORT_SUBCODE_3 = 'H1';
+
+    /**
+     * 授業報告書 宿題内容教材2
+     */
+    const REPORT_SUBCODE_4 = 'H2';
+
+    const REPORT_SUBCODES = [
+        AppConst::REPORT_SUBCODE_1,
+        AppConst::REPORT_SUBCODE_2,
+        AppConst::REPORT_SUBCODE_3,
+        AppConst::REPORT_SUBCODE_4
+    ];
+
+    /**
+     * 授業報告書 その他教材・単元の下2桁
+     */
+    const REPORT_OTHER_TEXT_UNIT_CODE = 99;
 }

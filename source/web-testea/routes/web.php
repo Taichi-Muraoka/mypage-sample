@@ -312,8 +312,14 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // 教室選択プルダウンを選択された際に生徒プルダウンの情報を返却する
     Route::post('/report_regist/get_data_select_search', [ReportRegistController::class, 'getDataSelectSearch'])->name('report_regist-get_data_select_search');
 
-    // カレンダーを選択された際に教室・教師の情報を返却する
+    // 授業リストを選択された際に授業情報・教材リストを返却する
     Route::post('/report_regist/get_data_select', [ReportRegistController::class, 'getDataSelect'])->name('report_regist-get_data_select');
+
+    // 教材リストを選択された際に単元分類リストを返却する
+    Route::post('/report_regist/get_data_select_text', [ReportRegistController::class, 'getDataSelectText'])->name('report_regist-get_data_select_text');
+
+    // 単元分類リストを選択された際に単元リストを返却する
+    Route::post('/report_regist/get_data_select_category', [ReportRegistController::class, 'getDataSelectCategory'])->name('report_regist-get_data_select_category');
 
     // 授業報告書登録
     Route::get('/report_regist/new', [ReportRegistController::class, 'new'])->name('report_regist-new');

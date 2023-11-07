@@ -12,6 +12,9 @@ use App\Models\MstCourse;
 use App\Models\MstTimetable;
 use App\Models\MstSubject;
 use App\Models\MstGradeSubject;
+use App\Models\MstText;
+use App\Models\MstUnitCategory;
+use App\Models\MstUnit;
 use App\Models\Student;
 use App\Models\StudentCampus;
 use App\Models\Tutor;
@@ -511,11 +514,11 @@ trait CtrlModelTrait
             foreach ($lessons as $lesson) {
                 //$lesson['target_datetime'] = $lesson['target_date']->format('Y/m/d') . " " . $lesson['period'] . "限";
                 $schedule = [
-                    'id' => $lesson['id'],
-                    'value' => $lesson['target_date']->format('Y/m/d') . " " . $lesson['period'] . "限"
+                    'id' => $lesson['schedule_id'],
+                    'value' => $lesson['target_date']->format('Y/m/d') . " " . $lesson['period_no'] . "限"
                 ];
                 $schedule = (object) $schedule;
-                array_push($scheduleMasterKeys, $lesson['id']);
+                array_push($scheduleMasterKeys, $lesson['schedule_id']);
                 array_push($scheduleMasterValue, $schedule);
             }
         }
@@ -626,6 +629,90 @@ trait CtrlModelTrait
     }
 
     /**
+     * 授業教材プルダウンメニューのリストを取得
+     *
+     * @param string $lSubjectCd 授業科目コード
+     * @param int $gradeCd 学年コード
+     * @param string $tSubjectCd 教材科目コード
+     * @return array
+     */
+    protected function mdlGetTextList($lSubjectCd = null, $gradeCd = null, $tSubjectCd = null)
+    {
+        $query = MstText::query();
+
+        // 授業科目コードが指定された場合絞り込み
+        $query->when($lSubjectCd, function ($query) use ($lSubjectCd) {
+            return $query->where('l_subject_cd', $lSubjectCd);
+        });
+
+        // 学年コードが指定された場合絞り込み
+        $query->when($gradeCd, function ($query) use ($gradeCd) {
+            return $query->where('grade_cd', $gradeCd);
+        });
+
+        // 教材科目コードが指定された場合絞り込み
+        $query->when($tSubjectCd, function ($query) use ($tSubjectCd) {
+            return $query->where('t_subject_cd', $tSubjectCd);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('text_cd as code', 'name as value')
+            ->orderby('text_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 授業単元分類プルダウンメニューのリストを取得
+     *
+     * @param int $gradeCd 学年コード
+     * @param string $tSubjectCd 教材科目コード
+     * @return array
+     */
+    protected function mdlGetUnitCategoryList($gradeCd = null, $tSubjectCd = null)
+    {
+        $query = MstUnitCategory::query();
+
+        // 学年コードが指定された場合絞り込み
+        $query->when($gradeCd, function ($query) use ($gradeCd) {
+            return $query->where('grade_cd', $gradeCd);
+        });
+
+        // 教材科目コードが指定された場合絞り込み
+        $query->when($tSubjectCd, function ($query) use ($tSubjectCd) {
+            return $query->where('t_subject_cd', $tSubjectCd);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('unit_category_cd as code', 'name as value')
+            ->orderby('unit_category_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 授業単元プルダウンメニューのリストを取得
+     *
+     * @param string $categoryCd 単元分類コード 省略可
+     * @return array
+     */
+    protected function mdlGetUnitList($categoryCd = null)
+    {
+        $query = MstUnit::query();
+
+        // 単元分類コードが指定された場合絞り込み
+        $query->when($categoryCd, function ($query) use ($categoryCd) {
+            return $query->where('unit_category_cd', $categoryCd);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('unit_cd as code', 'name as value')
+            ->orderby('unit_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
      * 登録画面プルダウン用データフォーマット
      * name を 「コード (名称)」 の形式にする
      *
@@ -679,7 +766,7 @@ trait CtrlModelTrait
 
         return $seasonCodes;
     }
-
+    
     //------------------------------
     // 名称取得（共通で使用されるもの）
     //------------------------------

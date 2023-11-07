@@ -111,6 +111,13 @@ export default class PageBase {
 
     /**
      * プルダウンの変更イベントで詳細を取得
+     */
+    selectChangeGet2($vue, selected, option, dataName) {
+        PageEvent.selectChangeGet2($vue, selected, option, dataName);
+    }
+
+    /**
+     * プルダウンの変更イベントで詳細を取得
      * コールバック用とした。selectGetItemは初期化しないのでcallbackで処理してもらう
      * 例：お知らせ登録
      */
