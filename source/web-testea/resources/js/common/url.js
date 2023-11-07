@@ -38,6 +38,14 @@ export default class UrlCom {
             func = url.substring(0, url.indexOf("/"));
         }
 
-        return appInfo.root + "/" + func;
+        // 「#」がある場合は「#」以下を除去
+        var func2 = "";
+        if (func.indexOf("#") < 0) {
+            func2 = func;
+        } else {
+            func2 = func.substring(0, func.indexOf("#"));
+        }
+
+        return appInfo.root + "/" + func2;
     }
 }

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Schedule;
 use App\Models\ClassMember;
 use App\Models\Student;
@@ -182,7 +181,7 @@ class RoomCalendarController extends Controller
      * 新規登録画面
      *
      * @param string $campusCd 校舎コード
-     * @param string $targetDate 日付時刻文字列(年月日時分)
+     * @param string $datetimeStr 日付時刻文字列(年月日時分)
      * @param string $boothCd ブースコード
      * @return view
      */
@@ -765,14 +764,6 @@ class RoomCalendarController extends Controller
                 'repeat_times',
             );
 
-            // 時間（分）の算出
-            $start = Carbon::createFromTimeString($form['start_time']);
-            $end = Carbon::createFromTimeString($form['end_time']);
-            $minites = $start->diffInMinutes($end);
-
-            // 登録者の設定
-            $account = Auth::user();
-
             // 繰り返し登録時の設定
             $targetDates = [];
             if ($form['course_kind'] == AppConst::CODE_MASTER_42_3 || $form['repeat_chk'] != 'true') {
@@ -816,54 +807,7 @@ class RoomCalendarController extends Controller
                 }
 
                 // スケジュール情報登録
-                // schedulesテーブルへのinsert
-                $schedule = new Schedule;
-                $schedule->campus_cd = $form['campus_cd'];
-                $schedule->target_date = $targetDate;
-                if ($form['course_kind'] != AppConst::CODE_MASTER_42_3) {
-                    // 面談以外の場合 時限・教科を設定
-                    $schedule->period_no = $form['period_no'];
-                    $schedule->subject_cd = $form['subject_cd'];
-                }
-                $schedule->start_time = $form['start_time'];
-                $schedule->end_time = $form['end_time'];
-                $schedule->minites = $minites;
-                $schedule->booth_cd = $booth;
-                $schedule->course_cd = $form['course_cd'];
-                if ($form['course_kind'] != AppConst::CODE_MASTER_42_2) {
-                    // １対多以外の場合 生徒IDを設定
-                    $schedule->student_id = $form['student_id'];
-                }
-                if ($form['course_kind'] == AppConst::CODE_MASTER_42_1 || $form['course_kind'] == AppConst::CODE_MASTER_42_2) {
-                    // 授業の場合 講師ID・授業区分を設定
-                    $schedule->tutor_id = $form['tutor_id'];
-                    $schedule->lesson_kind = $form['lesson_kind'];
-                }
-                $schedule->create_kind = AppConst::CODE_MASTER_32_1;
-                $schedule->how_to_kind = $form['how_to_kind'];
-                $schedule->tentative_status = $form['tentative_status'];
-                $schedule->memo = $form['memo'];
-                $schedule->adm_id = $account->account_id;
-                // 登録
-                $schedule->save();
-
-                // 受講生徒情報登録（コース種別が授業複の場合のみ）
-                if ($form['course_kind'] == AppConst::CODE_MASTER_42_2) {
-                    // schedulesテーブル登録時のスケジュールIDをセット
-                    $scheduleId = $schedule->schedule_id;
-
-                    // class_member_idはカンマ区切り文字列で入ってくる
-                    // 分割して１件ずつ登録
-                    foreach (explode(",", $form['class_member_id']) as $member) {
-                        // 受講生徒情報テーブルへのinsert
-                        $classmember = new ClassMember;
-                        $classmember->schedule_id = $scheduleId;
-                        $classmember->student_id = $member;
-                        $classmember->absent_status = AppConst::CODE_MASTER_35_0;
-                        // 登録
-                        $classmember->save();
-                    }
-                }
+                $this->fncScheCreateSchedule($form, $targetDate, $booth, AppConst::CODE_MASTER_32_1);
             }
         });
         return;
@@ -901,14 +845,6 @@ class RoomCalendarController extends Controller
                 'memo',
             );
 
-            // 時間（分）の算出
-            $start = Carbon::createFromTimeString($form['start_time']);
-            $end = Carbon::createFromTimeString($form['end_time']);
-            $minites = $start->diffInMinutes($end);
-
-            // 登録者の設定
-            $account = Auth::user();
-
             // ブースのチェック・空きブース取得
             if ($form['course_kind'] == AppConst::CODE_MASTER_42_3) {
                 // コースが面談の場合
@@ -938,49 +874,8 @@ class RoomCalendarController extends Controller
                 $this->illegalResponseErr();
             }
 
-            // スケジュール情報
-            // schedulesテーブルへのinsert
-            $schedule = new Schedule;
-            $schedule->campus_cd = $form['campus_cd'];
-            $schedule->target_date = $form['target_date'];
-            if ($form['course_kind'] != AppConst::CODE_MASTER_42_3) {
-                // 時限は面談以外の場合のみ設定
-                $schedule->period_no = $form['period_no'];
-            }
-            $schedule->start_time = $form['start_time'];
-            $schedule->end_time = $form['end_time'];
-            $schedule->minites = $minites;
-            $schedule->booth_cd = $booth;
-            $schedule->course_cd = $form['course_cd'];
-            $schedule->student_id = $form['student_id'];
-            $schedule->tutor_id = $form['tutor_id'];
-            $schedule->subject_cd = $form['subject_cd'];
-            $schedule->create_kind = AppConst::CODE_MASTER_32_1;
-            $schedule->lesson_kind = $form['lesson_kind'];
-            $schedule->how_to_kind = $form['how_to_kind'];
-            $schedule->tentative_status = $form['tentative_status'];
-            $schedule->memo = $form['memo'];
-            $schedule->adm_id = $account->account_id;
-            // 登録
-            $schedule->save();
-
-            // 受講生徒情報
-            if ($form['course_kind'] == AppConst::CODE_MASTER_42_2) {
-                // schedulesテーブル登録時のスケジュールIDをセット
-                $scheduleId = $schedule->schedule_id;
-
-                // class_member_idはカンマ区切り文字列で入ってくる
-                // 分割して１件ずつ登録
-                foreach (explode(",", $form['class_member_id']) as $member) {
-                    // class_membersテーブルへのinsert
-                    $classmember = new ClassMember;
-                    $classmember->schedule_id = $scheduleId;
-                    $classmember->student_id = $member;
-                    $classmember->absent_status = AppConst::CODE_MASTER_35_0;
-                    // 登録
-                    $classmember->save();
-                }
-            }
+            // スケジュール情報登録
+            $this->fncScheCreateSchedule($form, $form['target_date'], $booth, AppConst::CODE_MASTER_32_1);
         });
 
         return;
@@ -1323,7 +1218,7 @@ class RoomCalendarController extends Controller
         };
 
         // 独自バリデーション: リストのチェック 科目
-        $validationSubjectList =  function ($attribute, $value, $fail) use ($request) {
+        $validationSubjectList =  function ($attribute, $value, $fail) {
 
             // 科目リストを取得
             $list = $this->mdlGetSubjectList();
@@ -1438,7 +1333,7 @@ class RoomCalendarController extends Controller
         ) {
             // コース種別が授業の場合、教科をチェック（必須あり）
             $rules += Schedule::fieldRules('subject_cd', ['required', $validationSubjectList]);
-        } else if ($request && $request->filled('course_kind') && $request['course_kind'] == AppConst::CODE_MASTER_42_2) {
+        } else if ($request && $request->filled('course_kind') && $request['course_kind'] == AppConst::CODE_MASTER_42_4) {
             // コース種別が自習の場合、教科をチェック（必須なし）
             $rules += Schedule::fieldRules('subject_cd', [$validationSubjectList]);
         }
@@ -1501,6 +1396,13 @@ class RoomCalendarController extends Controller
                 // 更新の場合のみ、スケジュールIDをセット（除外用）
                 $scheduleId = $request['schedule_id'];
             }
+            if ($request['kind'] == self::SCHE_KIND_CPY) {
+                // コピー登録の場合、空きブース検索ありとする
+                $checkOnly = false;
+            } else {
+                // 新規登録・更新の場合、空きブース検索なしとする
+                $checkOnly = true;
+            }
             // ブース重複チェック（空きブース検索なし）
             $booth = $this->fncScheSearchBooth(
                 $request['campus_cd'],
@@ -1509,7 +1411,7 @@ class RoomCalendarController extends Controller
                 $request['period_no'],
                 $request['how_to_kind'],
                 $scheduleId,
-                true
+                $checkOnly
             );
             if (!$booth) {
                 // ブース空きなしエラー
@@ -1568,6 +1470,13 @@ class RoomCalendarController extends Controller
                 // 更新の場合のみ、スケジュールIDをセット（除外用）
                 $scheduleId = $request['schedule_id'];
             }
+            if ($request['kind'] == self::SCHE_KIND_CPY) {
+                // コピー登録の場合、空きブース検索ありとする
+                $checkOnly = false;
+            } else {
+                // 新規登録・更新の場合、空きブース検索なしとする
+                $checkOnly = true;
+            }
             // ブースの重複チェック
             $booth = $this->fncScheSearchBoothForConference(
                 $request['campus_cd'],
@@ -1576,7 +1485,7 @@ class RoomCalendarController extends Controller
                 $request['start_time'],
                 $request['end_time'],
                 $scheduleId,
-                true
+                $checkOnly
             );
             if (!$booth) {
                 // ブース空きなしエラー
@@ -1594,10 +1503,12 @@ class RoomCalendarController extends Controller
                 // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
                 return;
             }
+            // 対象日の時間割区分を取得
+            $timetableKind = $this->fncScheGetTimeTableKind($request['campus_cd'], $request['target_date']);
             // 時限と開始時刻の相関チェック
-            $chk = $this->fncScheCheckStartTime(
+            $chk = $this->fncScheChkStartTime(
                 $request['campus_cd'],
-                $request['target_date'],
+                $timetableKind,
                 $request['period_no'],
                 $request['start_time']
             );
@@ -1738,7 +1649,7 @@ class RoomCalendarController extends Controller
             // コース種別が面談の場合
             $rules += ['booth_cd' => [$validationDupBoothConference]];
         } else if ($request->filled('course_kind') && $request['course_kind'] != AppConst::CODE_MASTER_42_3) {
-            // コース種別が面談の場合
+            // コース種別が面談以外の場合
             $rules += ['booth_cd' => [$validationDupBooth]];
         }
         // 時限と開始時刻の相関チェック
