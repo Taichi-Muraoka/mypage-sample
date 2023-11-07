@@ -278,17 +278,8 @@ class MasterMngBoothController extends Controller
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
-        // SQLの表示（デバッグ用。削除してからcommit/pushすること）
-        \DB::enableQueryLog();
-
-        // デバッグ用出力（削除してからcommit/pushすること）
-        $this->debug($mstBooth->name);
-
         // 更新
         $mstBooth->fill($form)->save();
-
-        // クエリ出力（デバッグ用。削除してからcommit/pushすること）
-        $this->debug(\DB::getQueryLog());
 
         return;
     }
@@ -314,8 +305,8 @@ class MasterMngBoothController extends Controller
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
-        // 削除
-        $mstBooth->delete();
+        // 物理削除
+        $mstBooth->forceDelete();
 
         return;
     }
@@ -388,11 +379,21 @@ class MasterMngBoothController extends Controller
             }
         };
 
+        // 独自バリデーション: ブースシステム定義コードチェック
+        $validationDefinedKey = function ($attribute, $value, $fail) {
+
+            if ($value == config('appconf.timetable_boothId') || $value == config('appconf.transfer_boothId')) {
+                // 登録済みエラー
+                return $fail(Lang::get('validation.duplicate_data'));
+            }
+
+        };
+
         // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
         // その他を第二引数で指定する
         $rules += MstBooth::fieldRules('booth_id');
         $rules += MstBooth::fieldRules('campus_cd', ['required', $validationRoomList]);
-        $rules += MstBooth::fieldRules('booth_cd', ['required', $validationKey]);
+        $rules += MstBooth::fieldRules('booth_cd', ['required', $validationKey, $validationDefinedKey]);
         $rules += MstBooth::fieldRules('usage_kind', ['required', $validationKindList]);
         $rules += MstBooth::fieldRules('name', ['required']);
         $rules += MstBooth::fieldRules('disp_order', ['required']);
