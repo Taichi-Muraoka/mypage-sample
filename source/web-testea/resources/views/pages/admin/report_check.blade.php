@@ -90,7 +90,8 @@
             <x-bs.td-sp caption="承認ステータス">@{{item.status_name}}</x-bs.td-sp>
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
-                <x-button.list-dtl />
+                {{-- <x-button.list-dtl /> --}}
+                <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
                 {{-- スペース --}}
                 &nbsp;
                 <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval" />
