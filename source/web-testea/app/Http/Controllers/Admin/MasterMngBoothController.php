@@ -379,14 +379,13 @@ class MasterMngBoothController extends Controller
             }
         };
 
-        // 独自バリデーション: ブースシステム定義コードチェック
+        // 独自バリデーション: システム定義ブースコードチェック
         $validationDefinedKey = function ($attribute, $value, $fail) {
 
             if ($value == config('appconf.timetable_boothId') || $value == config('appconf.transfer_boothId')) {
                 // 登録済みエラー
                 return $fail(Lang::get('validation.duplicate_data'));
             }
-
         };
 
         // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
