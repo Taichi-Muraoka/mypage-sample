@@ -859,28 +859,28 @@ class ReportRegistController extends Controller
                     $report_unit->free_category_name3 = $request['category_name3_' . $subCode];
                     $report_unit->unit_cd3 = $request['unit_cd3_' . $subCode];
                     $report_unit->free_unit_name3 = $request['unit_name3_' . $subCode];
-                    // // フリー入力の項目チェック
-                    // if (substr($request['text_cd_' . $subCode], -2) != 99) {
-                    //     $report_unit->free_text_name = null;
-                    // }
-                    // if (substr($request['unit_category_cd1_' . $subCode], -2) != 99) {
-                    //     $report_unit->free_category_name1 = null;
-                    // }
-                    // if (substr($request['unit_category_cd2_' . $subCode], -2) != 99) {
-                    //     $report_unit->free_category_name2 = null;
-                    // }
-                    // if (substr($request['unit_category_cd3_' . $subCode], -2) != 99) {
-                    //     $report_unit->free_category_name3 = null;
-                    // }
-                    // if (substr($request['unit_cd1_' . $subCode], -2) != 99) {
-                    //     $report_unit->free_unit_name1 = null;
-                    // }
-                    // if (substr($request['unit_cd2_' . $subCode], -2) != 99) {
-                    //     $report_unit->free_unit_name2 = null;
-                    // }
-                    // if (substr($request['unit_cd3_' . $subCode], -2) != 99) {
-                    //     $report_unit->free_unit_name3 = null;
-                    // }
+                    // フリー入力の項目チェック
+                    if (substr($request['text_cd_' . $subCode], -2) != 99) {
+                        $report_unit->free_text_name = null;
+                    }
+                    if (substr($request['unit_category_cd1_' . $subCode], -2) != 99) {
+                        $report_unit->free_category_name1 = null;
+                    }
+                    if (substr($request['unit_category_cd2_' . $subCode], -2) != 99) {
+                        $report_unit->free_category_name2 = null;
+                    }
+                    if (substr($request['unit_category_cd3_' . $subCode], -2) != 99) {
+                        $report_unit->free_category_name3 = null;
+                    }
+                    if (substr($request['unit_cd1_' . $subCode], -2) != 99) {
+                        $report_unit->free_unit_name1 = null;
+                    }
+                    if (substr($request['unit_cd2_' . $subCode], -2) != 99) {
+                        $report_unit->free_unit_name2 = null;
+                    }
+                    if (substr($request['unit_cd3_' . $subCode], -2) != 99) {
+                        $report_unit->free_unit_name3 = null;
+                    }
                     $report_unit->save();
                 }
             }
