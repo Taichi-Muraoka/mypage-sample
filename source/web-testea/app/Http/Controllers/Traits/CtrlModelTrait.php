@@ -356,15 +356,20 @@ trait CtrlModelTrait
      * 管理者向け
      *
      * @param int $courseKind コース種別 省略可
+     * @param int $exceptCourseKind 除外するコース種別 省略可
      * @return array
      */
-    protected function mdlGetCourseList($courseKind = null)
+    protected function mdlGetCourseList($courseKind = null, $exceptCourseKind = null)
     {
         $query = MstCourse::query();
 
         // コース種別が指定された場合絞り込み
         $query->when($courseKind, function ($query) use ($courseKind) {
             return $query->where('course_kind', $courseKind);
+        });
+        // 除外するコース種別が指定された場合絞り込み
+        $query->when($exceptCourseKind, function ($query) use ($exceptCourseKind) {
+            return $query->where('course_kind', '<>', $exceptCourseKind);
         });
 
         // プルダウンリストを取得する

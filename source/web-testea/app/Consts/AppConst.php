@@ -429,6 +429,12 @@ class AppConst
      */
     const CODE_MASTER_16_7 = 7;
 
+    /**
+     * 曜日コード サブコード レギュラー登録のリストに使用
+     */
+    const CODE_MASTER_16_SUB_1 = 1;
+
+
     //-----------
     // 回答状態
     //-----------
