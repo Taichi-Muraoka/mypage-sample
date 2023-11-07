@@ -245,7 +245,7 @@ trait FuncCalendarTrait
                     'start' => $startDate . ' 00:00',
                     'end' => $endDate . ' 23:59',
                     'classNames' => 'cal_closed_room',
-                    'resourceId' => '000'
+                    'resourceId' => config('appconf.timetable_boothId')
                 ],
             ];
             return $holiday;

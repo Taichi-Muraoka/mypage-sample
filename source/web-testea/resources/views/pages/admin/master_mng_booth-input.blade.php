@@ -43,6 +43,10 @@
     {{-- hidden --}}
     <x-input.hidden id="booth_id" :editData=$editData />
 
+    <x-bs.callout type="warning">
+        ブースコード「000」および「999」はシステム内で使用しているコードのため、登録できません。<br>
+    </x-bs.callout>
+
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
