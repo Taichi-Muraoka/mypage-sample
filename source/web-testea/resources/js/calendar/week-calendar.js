@@ -25,11 +25,11 @@ export default class WeekCalendar {
      * 一週間分作成
      */
     createWeek() {
-        // モック用に仮の日付を設定（月曜にする）
-        var curDate = new Date("2000/01/03");
+        // モック用に仮の日付を設定（日曜にする）
+        var curDate = new Date("2000/01/02");
 
         for (var i = 1; i < 7; i++) {
-            curDate.getDate();
+            curDate.setDate(curDate.getDate() + 1);
             const calendar = this.create(i, curDate);
             this._calendar.push(calendar);
         }
