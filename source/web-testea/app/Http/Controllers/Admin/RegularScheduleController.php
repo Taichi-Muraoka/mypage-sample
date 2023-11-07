@@ -1234,9 +1234,9 @@ class RegularScheduleController extends Controller
         DB::transaction(function () use ($request, $regDatas) {
 
             //------------------------
-            // 対象期間スケジュール削除
+            // 対象期間スケジュール削除（一括登録データのみ）
             //------------------------
-            // 対象期間内のスケジュール削除（一括登録データのみ）
+            // 対象期間内のスケジュール情報（授業複）取得
             $schedules = Schedule::select(
                 'schedules.schedule_id',
                 'mst_courses.course_kind',
@@ -1245,23 +1245,32 @@ class RegularScheduleController extends Controller
                 ->sdLeftJoin(MstCourse::class, function ($join) {
                     $join->on('schedules.course_cd', 'mst_courses.course_cd');
                 })
+                // 校舎・対象期間で絞り込み
+                ->where('campus_cd', $request['campus_cd'])
                 ->whereBetween('target_date', [$request['date_from'], $request['date_to']])
-                // データ作成区分で絞り込み
+                // コース種別で絞り込み（授業複）
+                ->where('course_kind', AppConst::CODE_MASTER_42_2)
+                // データ作成区分で絞り込み（一括登録）
                 ->where('create_kind', AppConst::CODE_MASTER_32_0)
                 // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
                 ->where($this->guardRoomAdminTableWithRoomCd())
                 ->get();
 
+            // 受講生徒情報削除
             foreach ($schedules as $schedule) {
-                if ($schedule['course_kind'] == AppConst::CODE_MASTER_42_2) {
-                    // 受講生徒情報削除（コース種別が授業複の場合のみ）
-                    ClassMember::where('schedule_id', $schedule['schedule_id'])
-                        ->forceDelete();
-                }
-                // スケジュール情報削除
-                Schedule::where('schedule_id', $schedule['schedule_id'])
+                ClassMember::where('schedule_id', $schedule['schedule_id'])
                     ->forceDelete();
             }
+
+            // 対象期間内のスケジュール情報削除
+            Schedule::where('campus_cd', $request['campus_cd'])
+                // 校舎・対象期間で絞り込み
+                ->whereBetween('target_date', [$request['date_from'], $request['date_to']])
+                // データ作成区分で絞り込み（一括登録）
+                ->where('create_kind', AppConst::CODE_MASTER_32_0)
+                // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+                ->where($this->guardRoomAdminTableWithRoomCd())
+                ->forceDelete();
 
             //------------------------
             // スケジュール登録
