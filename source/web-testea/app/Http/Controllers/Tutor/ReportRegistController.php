@@ -80,13 +80,17 @@ class ReportRegistController extends Controller
         // campus_cdを取得
         $campus_cd = $request->input('id');
 
+        // ログイン者の情報を取得する
+        $account = Auth::user();
+        $account_id = $account->account_id;
+
         // 生徒リスト取得
         if ($campus_cd == -1 || !filled($campus_cd)) {
             // -1 または 空白の場合、自分の受け持ちの生徒だけに絞り込み
             // 生徒リストを取得
-            $students = $this->mdlGetStudentList();
+            $students = $this->mdlGetStudentListForT(null, $account_id);
         } else {
-            $students = $this->mdlGetStudentList($campus_cd);
+            $students = $this->mdlGetStudentListForT($campus_cd, $account_id);
         }
 
         return [

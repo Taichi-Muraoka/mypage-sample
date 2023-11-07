@@ -253,7 +253,7 @@ trait FuncReportTrait
                 })
                 // 単元名取得
                 ->sdLeftJoin(MstUnit::class, function ($join) {
-                    $join->on('report_units.unit_category_cd1', '=', 'mst_units.unit_category_cd');
+                    $join->on('report_units.unit_cd1', '=', 'mst_units.unit_cd');
                 })
                 ->first();
         }
@@ -273,7 +273,7 @@ trait FuncReportTrait
                 })
                 // 単元名取得
                 ->sdLeftJoin(MstUnit::class, function ($join) {
-                    $join->on('report_units.unit_category_cd2', '=', 'mst_units.unit_category_cd');
+                    $join->on('report_units.unit_cd2', '=', 'mst_units.unit_cd');
                 })
                 ->first();
         }
@@ -293,7 +293,7 @@ trait FuncReportTrait
                 })
                 // 単元名取得
                 ->sdLeftJoin(MstUnit::class, function ($join) {
-                    $join->on('report_units.unit_category_cd3', '=', 'mst_units.unit_category_cd');
+                    $join->on('report_units.unit_cd3', '=', 'mst_units.unit_cd');
                 })
                 ->first();
         }
