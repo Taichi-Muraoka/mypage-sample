@@ -10,8 +10,9 @@
 <x-bs.card>
     {{-- カードヘッダ右 --}}
     <x-slot name="tools">
-		<x-button.edit href="{{ route('member_mng-leave-edit', $student->sid) }}" caption="生徒退会" btn="btn-danger" icon="" :small=true />
-		<x-button.edit href="{{ route('member_mng-edit', $student->sid) }}" caption="生徒情報編集" icon="" :small=true />
+        <x-button.edit href="{{ route('member_mng-leave-edit', $student->student_id) }}" caption="生徒退会" icon="" :small=true
+            btn="btn-danger" disabled={{$disabled}} />
+        <x-button.edit href="{{ route('member_mng-edit', $student->student_id) }}" caption="生徒情報編集" icon="" :small=true />
     </x-slot>
 
     <x-slot name="card_title">
@@ -21,7 +22,7 @@
     <x-bs.table :hover=false :vHeader=true class="mb-4 fix">
         <tr>
             <th width="35%">生徒ID</th>
-            <td>{{$student->sid}}</td>
+            <td>{{$student->student_id}}</td>
         </tr>
         <tr>
             <th>生徒名</th>
@@ -29,85 +30,98 @@
         </tr>
         <tr>
             <th>生徒名かな</th>
-            <td>てすとせいと</td>
+            <td>{{$student->name_kana}}</td>
         </tr>
         <tr>
             <th>生徒電話番号</th>
-            <td>08011112222</td>
+            <td>{{$student->tel_stu}}</td>
         </tr>
         <tr>
             <th>保護者電話番号</th>
-            <td>08033334444</td>
+            <td>{{$student->tel_par}}</td>
         </tr>
         <tr>
             <th>生徒メールアドレス</th>
-            <td><a href="mailto:{{$student->email}}">{{$student->email}}</a></td>
+            <td><a href="mailto:{{$student->email_stu}}">{{$student->email_stu}}</a></td>
         </tr>
         <tr>
             <th>保護者メールアドレス</th>
-            <td><a href="mailto:parent0001@ap.jeez.jp">parent0001@ap.jeez.jp</a></td>
+            <td><a href="mailto:{{$student->email_par}}">{{$student->email_par}}</a></td>
         </tr>
         <tr>
             <th>生年月日</th>
-            <td>2010/12/12</td>
+            <td>{{$student->birth_date->format('Y/m/d')}}</td>
         </tr>
         <tr>
             <th>学年</th>
-            <td>{{$student->cls_name}}</td>
+            <td>{{$student->grade_name}}</td>
         </tr>
         <tr>
             <th>所属校舎</th>
-            <td>久我山 日吉</td>
+            <td>{{$campus_names}}</td>
         </tr>
         <tr>
             <th>所属学校（小）</th>
-            <td>千駄谷小学校</td>
+            <td>{{$student->school_e_name}}</td>
         </tr>
         <tr>
             <th>所属学校（中）</th>
-            <td>渋谷第一中学校</td>
+            <td>{{$student->school_j_name}}</td>
         </tr>
         <tr>
             <th>所属学校（高）</th>
-            <td></td>
+            <td>{{$student->school_h_name}}</td>
         </tr>
         <tr>
             <th>会員ステータス</th>
-            <td>在籍</td>
+            <td>{{$student->status_name}}</td>
         </tr>
         <tr>
             <th>入会日</th>
-            <td>2020/04/01</td>
+            {{-- nullだとformatでエラーが出るためif文を追加した --}}
+            <td>
+                @if(isset($student->enter_date))
+                {{$student->enter_date->format('Y/m/d')}}
+                @endif
+            </td>
         </tr>
         <tr>
             <th>退会日</th>
-            <td></td>
+            <td>
+                @if(isset($student->leave_date))
+                {{$student->leave_date->format('Y/m/d')}}
+                @endif
+            </td>
         </tr>
         <tr>
             <th>通塾期間</th>
-            <td></td>
+            <td>
+                @if(isset($student->enter_date))
+                {{floor($student->enter_term / 12)}}年{{floor($student->enter_term % 12)}}ヶ月
+                @endif
+            </td>
         </tr>
         <tr>
             <th>外部サービス顧客ID</th>
-            <td>11</td>
+            <td>{{$student->lead_id}}</td>
         </tr>
         <tr>
             <th>ストレージURL</th>
             <td>
-                <a href="https://drive.google.com/drive/folders/1GiSWPRMHYohxQ04OujILYQvjBtciXLiC?usp=drive_link">https://drive.google.com/drive/folders/1GiSWPRMHYohxQ04OujILYQvjBtciXLiC?usp=drive_link</a>
+                <a href="{{$student->storage_link}}">{{$student->storage_link}}</a>
             </td>
         </tr>
         <tr>
             <th>メモ</th>
-            <td></td>
+            <td>{{$student->memo}}</td>
         </tr>
     </x-bs.table>
 </x-bs.card>
 
 <x-bs.card>
     <x-slot name="tools">
-        <x-button.new href="{{ route('record-new', $student->sid) }}" caption="記録登録" :small=true />
-        <x-button.edit href="{{ route('record', $student->sid) }}" caption="記録管理" icon="" :small=true />
+        <x-button.new href="{{ route('record-new', $student->student_id) }}" caption="記録登録" :small=true />
+        <x-button.edit href="{{ route('record', $student->student_id) }}" caption="記録管理" icon="" :small=true />
     </x-slot>
 
     <x-slot name="card_title">
@@ -127,34 +141,35 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/01/10 17:00</td>
-            <td>面談記録</td>
-            <td>久我山</td>
-            <td>山田　太郎</td>
+        {{-- 最新5件のみ表示 --}}
+        @for ($i = 0; $i <5; $i++) {{-- 5件未満の場合はその時点で処理を抜ける --}} @if(empty($records[$i])) @break @endif <tr>
+            <td>{{$records[$i]->received_date->format('Y/m/d')}} {{$records[$i]->received_time->format('H:i')}}</td>
+            <td>{{$records[$i]->kind_name}}</td>
+            <td>{{$records[$i]->campus_name}}</td>
+            <td>{{$records[$i]->admin_name}}</td>
+            @php
+            $ids = ['id' => $records[$i]->record_id, 'sid' => $records[$i]->student_id,];
+            @endphp
             <td>
-                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
+                <x-button.list-dtl dataTarget="#modal-dtl-record" :dataAttr="$ids" />
             </td>
-        <tr>
-            <td>2023/01/09 19:30</td>
-            <td>電話記録</td>
-            <td>久我山</td>
-            <td>鈴木　花子</td>
-            <td>
-                <x-button.list-dtl  dataTarget="#modal-dtl-record" />
-            </td>
-        </tr>
+            </tr>
+            @endfor
     </x-bs.table>
 
-    <div class="text-right">他3件</div>
+    {{-- 6件以上ある場合は残数表示する --}}
+    @if(5 < count($records)) <div class="text-right">他 @php echo count($records)-5 @endphp 件</div>
+        @endif
 
 </x-bs.card>
 
 <x-bs.card>
     <x-slot name="tools">
         <x-button.new href="{{ route('transfer_check-new') }}" :small=true caption="振替授業登録" />
-        <x-button.edit href="{{ route('member_mng-calendar', $student->sid) }}" caption="カレンダー" icon="" :small=true />
-        <x-button.edit href="{{ route('member_mng-invoice', $student->sid) }}" caption="請求管理" icon="" :small=true />
+        <x-button.edit href="{{ route('member_mng-calendar', $student->student_id) }}" caption="カレンダー" icon=""
+            :small=true />
+        <x-button.edit href="{{ route('member_mng-invoice', $student->student_id) }}" caption="請求管理" icon=""
+            :small=true />
     </x-slot>
 
     <x-slot name="card_title">
@@ -177,14 +192,15 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>火</td>
-            <td>6</td>
-            <td>久我山</td>
-            <td>個別指導コース</td>
-            <td>CWテスト講師１０１</td>
-            <td>英語</td>
-        </tr>
+        @for ($i = 0; $i < count($regular_classes); $i++) <tr>
+            <td>{{$regular_classes[$i]->day_name}}</td>
+            <td>{{$regular_classes[$i]->period_no}}</td>
+            <td>{{$regular_classes[$i]->campus_name}}</td>
+            <td>{{$regular_classes[$i]->course_name}}</td>
+            <td>{{$regular_classes[$i]->tutor_name}}</td>
+            <td>{{$regular_classes[$i]->subject_name}}</td>
+            </tr>
+            @endfor
     </x-bs.table>
 
     {{-- 余白 --}}
@@ -196,31 +212,36 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th>授業日</th>
-            <th>時限</th>
-            <th>校舎</th>
-            <th>コース名</th>
-            <th>講師名</th>
-            <th>科目</th>
-            <th>授業区分</th>
-            <th>出欠ステータス</th>
+            <th class="t-minimum">授業日</th>
+            <th class="t-minimum">時限</th>
+            <th width="10%">校舎</th>
+            <th width="15%">コース名</th>
+            <th width="15%">講師名</th>
+            <th width="15%">科目</th>
+            <th width="10%">授業区分</th>
+            <th width="15%">出欠ステータス</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/01/30</td>
-            <td>6</td>
-            <td>久我山</td>
-            <td>個別指導コース</td>
-            <td>CWテスト講師１０１</td>
-            <td>英語</td>
-            <td>通常</td>
-            <td>振替中（未振替）</td>
+        @for ($i = 0; $i < count($not_yet_transfer_classes); $i++) <tr>
+            <td>{{$not_yet_transfer_classes[$i]->target_date->format('Y/m/d')}}</td>
+            <td>{{$not_yet_transfer_classes[$i]->period_no}}</td>
+            <td>{{$not_yet_transfer_classes[$i]->campus_name}}</td>
+            <td>{{$not_yet_transfer_classes[$i]->course_name}}</td>
+            <td>{{$not_yet_transfer_classes[$i]->tutor_name}}</td>
+            <td>{{$not_yet_transfer_classes[$i]->subject_name}}</td>
+            <td>{{$not_yet_transfer_classes[$i]->lesson_kind_name}}</td>
+            <td>{{$not_yet_transfer_classes[$i]->absent_status_name}}</td>
+            @php
+            $ids = ['id' => $not_yet_transfer_classes[$i]->schedule_id, 'sid' =>
+            $not_yet_transfer_classes[$i]->student_id,];
+            @endphp
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-student_class" />
+                <x-button.list-dtl dataTarget="#modal-dtl-room_calendar" :dataAttr="$ids" />
             </td>
-        </tr>
+            </tr>
+            @endfor
     </x-bs.table>
 
     {{-- 余白 --}}
@@ -232,51 +253,52 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th>授業日</th>
-            <th>時限</th>
-            <th>校舎</th>
-            <th>コース名</th>
-            <th>講師名</th>
-            <th>科目</th>
-            <th>授業区分</th>
-            <th>出欠ステータス</th>
+            <th class="t-minimum">授業日</th>
+            <th class="t-minimum">時限</th>
+            <th width="10%">校舎</th>
+            <th width="15%">コース名</th>
+            <th width="15%">講師名</th>
+            <th width="15%">科目</th>
+            <th width="10%">授業区分</th>
+            <th width="15%">出欠ステータス</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/03/10</td>
-            <td>6</td>
-            <td>久我山</td>
-            <td>個別指導コース</td>
-            <td>CWテスト教師１０１</td>
-            <td>英語</td>
-            <td>追加</td>
-            <td>実施前・出席</td>
+        @for ($i = 0; $i < count($irregular_classes); $i++) <tr>
+            <td>{{$irregular_classes[$i]->target_date->format('Y/m/d')}}</td>
+            <td>{{$irregular_classes[$i]->period_no}}</td>
+            <td>{{$irregular_classes[$i]->campus_name}}</td>
+            <td>{{$irregular_classes[$i]->course_name}}</td>
+            <td>{{$irregular_classes[$i]->tutor_name}}</td>
+            <td>{{$irregular_classes[$i]->subject_name}}</td>
+            <td>{{$irregular_classes[$i]->lesson_kind_name}}</td>
+            {{-- 受講生徒情報にデータがあればその出欠ステータスを表示 1対多 --}}
+            @if(isset($irregular_classes[$i]->class_student_id))
+            <td>{{$irregular_classes[$i]->class_absent_status_name}}</td>
+            @else
+            <td>{{$irregular_classes[$i]->absent_status_name}}</td>
+            @endif
+            @php
+            // 1対多授業は受講生徒情報の生徒IDをセット、個別授業はスケジュール情報の生徒IDをセットする（モーダル選択時の閲覧ガード用）
+            if(isset($irregular_classes[$i]->class_student_id)){
+            $ids = ['id' => $irregular_classes[$i]->schedule_id, 'sid' => $irregular_classes[$i]->class_student_id];
+            }else{
+            $ids = ['id' => $irregular_classes[$i]->schedule_id, 'sid' => $irregular_classes[$i]->student_id];
+            }
+            @endphp
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-student_class" />
+                <x-button.list-dtl dataTarget="#modal-dtl-room_calendar" :dataAttr="$ids" />
             </td>
-        </tr>
-        <tr>
-            <td>2023/03/17</td>
-            <td>6</td>
-            <td>久我山</td>
-            <td>個別指導コース</td>
-            <td>CWテスト教師１０１</td>
-            <td>英語</td>
-            <td>振替</td>
-            <td>実施前・出席</td>
-            <td>
-                <x-button.list-dtl  dataTarget="#modal-dtl-student_class" />
-            </td>
-        </tr>
+            </tr>
+            @endfor
     </x-bs.table>
 </x-bs.card>
 
 <x-bs.card>
     <x-slot name="tools">
-        <x-button.new href="{{ route('desired_mng-new', $student->sid) }}" caption="受験校登録" :small=true />
-        <x-button.edit href="{{ route('desired_mng', $student->sid) }}" caption="受験校管理" icon="" :small=true />
+        <x-button.new href="{{ route('desired_mng-new', $student->student_id) }}" caption="受験校登録" :small=true />
+        <x-button.edit href="{{ route('desired_mng', $student->student_id) }}" caption="受験校管理" icon="" :small=true />
     </x-slot>
 
     <x-slot name="card_title">
@@ -288,8 +310,8 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="10%">受験年度</th>
-            <th width="10%">志望順</th>
+            <th class="t-minimum">受験年度</th>
+            <th class="t-minimum">志望順</th>
             <th>受験校</th>
             <th>学部・学科名</th>
             <th>受験日程名</th>
@@ -299,46 +321,33 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2022</td>
-            <td>1</td>
-            <td>青山高等学校</td>
-            <td>普通科</td>
-            <td>A日程</td>
-            <td>2023/03/03</td>
-            <td>合格</td>
+        @for ($i = 0; $i <5; $i++) @if(empty($entrance_exams[$i])) @break @endif <tr>
+            <td>{{$entrance_exams[$i]->exam_year}}</td>
+            <td>{{$entrance_exams[$i]->priority_no}}</td>
+            <td>{{$entrance_exams[$i]->school_name}}</td>
+            <td>{{$entrance_exams[$i]->department_name}}</td>
+            <td>{{$entrance_exams[$i]->exam_name}}</td>
+            <td>{{$entrance_exams[$i]->exam_date->format('Y/m/d')}}</td>
+            <td>{{$entrance_exams[$i]->result_name}}</td>
             @php
-            $ids = ['roomcd' => 110, 'seq' => 1, 'sid' => 1];
+            $ids = ['id' => $entrance_exams[$i]->student_exam_id, 'sid' => $entrance_exams[$i]->student_id,];
             @endphp
             <td>
                 <x-button.list-dtl dataTarget="#modal-dtl-desired" :dataAttr="$ids" />
             </td>
-        </tr>
-        <tr>
-            <td>2022</td>
-            <td>2</td>
-            <td>成城第二高等学校</td>
-            <td>特進科</td>
-            <td>B日程</td>
-            <td>2023/02/01</td>
-            <td>合格</td>
-            @php
-            $ids = ['roomcd' => 110, 'seq' => 1, 'sid' => 1];
-            @endphp
-            <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-desired" :dataAttr="$ids" />
-            </td>
-        </tr>
+            </tr>
+            @endfor
     </x-bs.table>
 
-    <div class="text-right">他3件</div>
+    @if(5 < count($entrance_exams)) <div class="text-right">現年度 他 @php echo count($entrance_exams)-5 @endphp 件</div>
+        @endif
 
 </x-bs.card>
 
 <x-bs.card>
     <x-slot name="tools">
-        <x-button.new href="{{ route('grades_mng-new', $student->sid) }}" caption="成績登録" :small=true />
-        <x-button.edit href="{{ route('grades_mng', $student->sid) }}" caption="成績管理" icon="" :small=true />
+        <x-button.new href="{{ route('grades_mng-new', $student->student_id) }}" caption="成績登録" :small=true />
+        <x-button.edit href="{{ route('grades_mng', $student->student_id) }}" caption="成績管理" icon="" :small=true />
     </x-slot>
 
     <x-slot name="card_title">
@@ -357,32 +366,29 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/03/18</td>
-            <td>模擬試験</td>
-            <td>全国統一模試</td>
+        @for ($i = 0; $i <5; $i++) @if(empty($scores[$i])) @break @endif <tr>
+            <td>{{$scores[$i]->regist_date->format('Y/m/d')}}</td>
+            <td>{{$scores[$i]->exam_type_name}}</td>
+            <td>{{$scores[$i]->practice_exam_name}} {{$scores[$i]->regular_exam_name}} {{$scores[$i]->term_name}}</td>
+            @php
+            $ids = ['id' => $scores[$i]->score_id, 'sid' => $scores[$i]->student_id,];
+            @endphp
             <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-grades_mng" :dataAttr="['id' => '1']" />
+                <x-button.list-dtl dataTarget="#modal-dtl-grades_mng" :dataAttr="$ids" />
             </td>
-        </tr>
-        <tr>
-            <td>2023/02/28</td>
-            <td>定期考査</td>
-            <td>学年末考査</td>
-            <td>
-                <x-button.list-dtl dataTarget="#modal-dtl-grades_mng" :dataAttr="['id' => '2']" />
-            </td>
-        </tr>
+            </tr>
+            @endfor
     </x-bs.table>
 
-    <div class="text-right">他3件</div>
+    @if(5 < count($scores)) <div class="text-right">他 @php echo count($scores)-5 @endphp 件</div>
+        @endif
 
 </x-bs.card>
 
 <x-bs.card>
     <x-slot name="tools">
-        <x-button.new href="{{ route('badge-new', $student->sid) }}" caption="バッジ付与登録" :small=true />
-        <x-button.edit href="{{ route('badge', $student->sid) }}" caption="バッジ付与管理" icon="" :small=true />
+        <x-button.new href="{{ route('badge-new', $student->student_id) }}" caption="バッジ付与登録" :small=true />
+        <x-button.edit href="{{ route('badge', $student->student_id) }}" caption="バッジ付与管理" icon="" :small=true />
     </x-slot>
 
     <x-slot name="card_title">
@@ -394,7 +400,7 @@
     <x-bs.table :hover=false :vHeader=true class="mb-4">
         <tr>
             <th>バッジ数合計</th>
-            <td>19</td>
+            <td>@php echo count($badges) @endphp</td>
         </tr>
     </x-bs.table>
 
@@ -410,45 +416,29 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/05/10</td>
-            <td>久我山</td>
-            <td>鈴木　花子</td>
-            <td>生徒紹介（佐藤次郎さん）</td>
-        </tr>
-        <tr>
-            <td>2023/04/01</td>
-            <td>久我山</td>
-            <td>鈴木　花子</td>
-            <td>契約期間が３年を超えた</td>
-        </tr>
-        <tr>
-            <td>2022/03/20</td>
-            <td>久我山</td>
-            <td>鈴木　花子</td>
-            <td>生徒紹介（仙台太郎さん）</td>
-        </tr>
-        <tr>
-            <td>2022/02/20</td>
-            <td>久我山</td>
-            <td>鈴木　花子</td>
-            <td>成績UP</td>
-        </tr>
+        @for ($i = 0; $i <5; $i++) @if(empty($badges[$i])) @break @endif <tr>
+            <td>{{$badges[$i]->authorization_date->format('Y/m/d')}}</td>
+            <td>{{$badges[$i]->campus_name}}</td>
+            <td>{{$badges[$i]->admin_name}}</td>
+            <td>{{$badges[$i]->reason}}</td>
+            </tr>
+            @endfor
     </x-bs.table>
 
-    <div class="text-right">他3件</div>
+    @if(5 < count($badges)) <div class="text-right">他 @php echo count($badges)-5 @endphp 件</div>
+        @endif
 
-    {{-- フッター --}}
-    <x-slot name="footer">
-        <div class="d-flex justify-content-between">
-            <x-button.back />
-        </div>
-    </x-slot>
+        {{-- フッター --}}
+        <x-slot name="footer">
+            <div class="d-flex justify-content-between">
+                <x-button.back />
+            </div>
+        </x-slot>
 </x-bs.card>
 
 {{-- モーダル --}}
 {{-- 受講情報 --}}
-@include('pages.admin.modal.student_class-modal', ['modal_id' => 'modal-dtl-student_class'])
+@include('pages.admin.modal.room_calendar-modal', ['modal_id' => 'modal-dtl-room_calendar'])
 {{-- 生徒成績 --}}
 @include('pages.admin.modal.grades_mng-modal', ['modal_id' => 'modal-dtl-grades_mng'])
 {{-- 電話・面談記録 --}}

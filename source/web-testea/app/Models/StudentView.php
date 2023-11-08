@@ -80,6 +80,7 @@ class StudentView extends Model
         'school_cd_e' => 'string',
         'school_cd_j' => 'string',
         'school_cd_h' => 'string',
+        'birth_date' => 'date',
         'enter_date' => 'date',
         'leave_date' => 'date',
         'recess_start_date' => 'date',

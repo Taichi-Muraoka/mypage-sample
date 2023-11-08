@@ -9,7 +9,7 @@
 --}}
 
 @props(['vueHref' => '', 'href' => '', 'caption' => '', 'btn' => '', 
-  'small' => false, 'icon' => 'fas fa-edit', 'vShow' => ''])
+  'small' => false, 'icon' => 'fas fa-edit', 'vShow' => '', 'disabled' => false])
 
 @if (!empty($vueHref))
 
@@ -27,7 +27,7 @@
 @else
 
 {{-- 普通のhref --}}
-<a href="@if (empty($href)){{ '#' }}@else{{ $href }}@endif" class="btn @if (empty($btn)){{ 'btn-primary' }}@else{{ $btn }}@endif ml-3 @if ($small) btn-sm @endif"
+<a href="@if (empty($href)){{ '#' }}@else{{ $href }}@endif" class="btn @if (empty($btn)){{ 'btn-primary' }}@else{{ $btn }}@endif ml-3 @if ($small) btn-sm @endif @if ($disabled) disabled @endif"
     {{-- v-show --}}
     @if ($vShow)
     v-show="{{ $vShow }}"

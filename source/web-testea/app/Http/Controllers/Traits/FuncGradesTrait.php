@@ -8,8 +8,8 @@ use App\Models\Score;
 use App\Models\ScoreDetail;
 use App\Models\ExtSchedule;
 use App\Models\ExtTrialMaster;
-use App\Models\CodeMaster;
 use App\Models\ExtGenericMaster;
+use App\Models\MstGradeSubject;
 use Illuminate\Support\Facades\Lang;
 
 /**
@@ -104,10 +104,10 @@ trait FuncGradesTrait
     /**
      * 生徒成績詳細を取得
      *
-     * @param integer $gradesId 成績ID
+     * @param integer $scoreId 成績ID
      * @return array
      */
-    private function getGradesDetail($gradesId)
+    private function getScoreDetail($scoreId)
     {
         // クエリを作成（生徒成績詳細）
         $query = ScoreDetail::query();
@@ -115,19 +115,20 @@ trait FuncGradesTrait
         // データを取得（生徒成績詳細）
         return $query
             // IDを指定
-            ->where('score_details.score_id', $gradesId)
+            ->where('score_details.score_id', $scoreId)
             // データを取得
             ->select(
-                'curriculum_name',
-                'score',
-                'average',
-                'mst_codes.name as updown'
+                'score_details.g_subject_cd',
+                // 成績科目の名称
+                'mst_grade_subjects.name as g_subject_name',
+                'score_details.score',
+                'score_details.full_score',
+                'score_details.average',
+                'score_details.deviation_score'
             )
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('score_details.previoustime', '=', 'mst_codes.code')
-                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_11);
-            })
-            ->orderBy('grades_seq')
+            // 成績科目名の取得
+            ->sdLeftJoin(MstGradeSubject::class, 'mst_grade_subjects.g_subject_cd', '=', 'score_details.g_subject_cd')
+            ->orderBy('score_details.score_datail_id')
             ->get();
     }
 
