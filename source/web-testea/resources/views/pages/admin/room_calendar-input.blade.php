@@ -40,7 +40,7 @@
 
     <x-input.date-picker caption="日付" id="target_date" :editData=$editData />
 
-        {{-- hidden 退避用--}}
+    {{-- hidden 退避用--}}
     <x-input.hidden id="period_no_bef" :editData=$editData />
 
     <x-input.select vShow="form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}" id="period_no" caption="時限" :select2=true
@@ -144,8 +144,6 @@
         </div>
     </x-slot>
 
-
 </x-bs.card>
-
 
 @stop

@@ -312,8 +312,14 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // 教室選択プルダウンを選択された際に生徒プルダウンの情報を返却する
     Route::post('/report_regist/get_data_select_search', [ReportRegistController::class, 'getDataSelectSearch'])->name('report_regist-get_data_select_search');
 
-    // カレンダーを選択された際に教室・教師の情報を返却する
+    // 授業リストを選択された際に授業情報・教材リストを返却する
     Route::post('/report_regist/get_data_select', [ReportRegistController::class, 'getDataSelect'])->name('report_regist-get_data_select');
+
+    // 教材リストを選択された際に単元分類リストを返却する
+    Route::post('/report_regist/get_data_select_text', [ReportRegistController::class, 'getDataSelectText'])->name('report_regist-get_data_select_text');
+
+    // 単元分類リストを選択された際に単元リストを返却する
+    Route::post('/report_regist/get_data_select_category', [ReportRegistController::class, 'getDataSelectCategory'])->name('report_regist-get_data_select_category');
 
     // 授業報告書登録
     Route::get('/report_regist/new', [ReportRegistController::class, 'new'])->name('report_regist-new');
@@ -602,20 +608,29 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // レギュラーカレンダー
     //---------------------
 
-    // defaultWeekカレンダー（モック）
+    // defaultWeekカレンダー
     Route::get('/regular_schedule', [RegularScheduleController::class, 'calendar'])->name('regular_schedule');
 
-    // defaultWeekカレンダー - 詳細取得用（モック）
+    // defaultWeekカレンダー - 詳細取得用
     Route::post('/regular_schedule/get_calendar', [RegularScheduleController::class, 'getCalendar'])->name('regular_schedule-get_calendar');
 
+    // defaultWeekカレンダー - ブース情報取得用
+    Route::post('/regular_schedule/get_booth', [RegularScheduleController::class, 'getBooth'])->name('regular_schedule-get_booth');
+
+    // コースプルダウンを選択された際にコース情報を返却する
+    Route::post('/regular_schedule/get_data_select_course', [RegularScheduleController::class, 'getDataSelectCourse'])->name('regular_schedule-get_data_select_course');
+
+    // 時限プルダウンを選択された際に時間割の情報を返却する
+    Route::post('/regular_schedule/get_data_select_timetable', [RegularScheduleController::class, 'getDataSelectTimetable'])->name('regular_schedule-get_data_select_timetable');
+
     // defaultWeekカレンダー登録画面
-    Route::get('/regular_schedule/new/{campusCd}/{datetimeStr}/{boothCd}', [RegularScheduleController::class, 'new'])->name('regular_schedule-new');
+    Route::get('/regular_schedule/new/{campusCd}/{daytimeStr}/{boothCd}', [RegularScheduleController::class, 'new'])->name('regular_schedule-new');
 
     // defaultWeekカレンダー編集画面
-    Route::get('/regular_schedule/edit/{scheduleId}', [RegularScheduleController::class, 'edit'])->name('regular_schedule-edit');
+    Route::get('/regular_schedule/edit/{regularClassId}', [RegularScheduleController::class, 'edit'])->name('regular_schedule-edit');
 
     // defaultWeekカレンダーコピー登録画面
-    Route::get('/regular_schedule/copy/{scheduleId}', [RegularScheduleController::class, 'copy'])->name('regular_schedule-copy');
+    Route::get('/regular_schedule/copy/{regularClassId}', [RegularScheduleController::class, 'copy'])->name('regular_schedule-copy');
 
     // バリデーション(登録用)
     Route::post('/regular_schedule/vd_input', [RegularScheduleController::class, 'validationForInput'])->name('regular_schedule-vd_input');
@@ -626,11 +641,14 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 編集処理
     Route::post('/regular_schedule/update', [RegularScheduleController::class, 'update'])->name('regular_schedule-update');
 
-    // バリデーション(登録用)
-    Route::post('/regular_schedule/vd_input', [RegularScheduleController::class, 'validationForInput'])->name('regular_schedule-vd_input');
-
     // 削除処理
     Route::post('/regular_schedule/delete', [RegularScheduleController::class, 'delete'])->name('regular_schedule-delete');
+
+    // バリデーション(一括登録用)
+    Route::post('/regular_schedule/vd_input_bulk', [RegularScheduleController::class, 'validationForInputBulk'])->name('regular_schedule-vd_input_bulk');
+
+    // 一括登録処理
+    Route::post('/regular_schedule/create_bulk', [RegularScheduleController::class, 'createBulk'])->name('regular_schedule-create_bulk');
 
     //---------------------
     // 授業報告書

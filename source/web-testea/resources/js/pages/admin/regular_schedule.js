@@ -21,6 +21,7 @@ export default class AppClass extends PageBase {
 
         // Vue: 入力フォーム
         this.getVueInputForm({
+            urlSuffix: "bulk",
             vueData: {
                 // カレンダー
                 calendar: null,

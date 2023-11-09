@@ -11,9 +11,12 @@ use App\Consts\AppConst;
 use App\Libs\AuthEx;
 use App\Models\Schedule;
 use App\Models\ClassMember;
+use App\Models\RegularClass;
+use App\Models\RegularClassMember;
 use App\Models\Student;
 use App\Models\StudentCampus;
 use App\Models\TutorCampus;
+use App\Models\TutorFreePeriod;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -68,7 +71,7 @@ trait FuncScheduleTrait
     }
 
     /**
-     * 年間予定から日付の取得（スケジュール生成用）
+     * 年間予定から日付の取得（スケジュール生成用・開始日から同一曜日）
      *
      * @param string $campusCd 校舎コード
      * @param string $startDate 取得範囲開始日付
@@ -92,6 +95,26 @@ trait FuncScheduleTrait
             ->where('lesson_date', $startDate)
             ->firstOrFail();
 
+        // 年間予定情報から指定曜日の日付を取得
+        $arrLessenDate = $this->fncScheGetScheduleDateByDayCd($campusCd, $targetDate->day_cd, $startDate, $kaisu, $endDate);
+
+        return $arrLessenDate;
+    }
+
+    /**
+     * 年間予定から日付の取得（スケジュール生成用・曜日指定）
+     *
+     * @param string $campusCd 校舎コード
+     * @param string $dayCd 曜日コード
+     * @param string $startDate 取得範囲開始日付
+     * @param string $kaisu 取得件数
+     * @param string $endDate 取得範囲終了日付
+     * @return array
+     */
+    private function fncScheGetScheduleDateByDayCd($campusCd, $dayCd, $startDate, $kaisu, $endDate = null)
+    {
+        $account = Auth::user();
+
         // 年間予定情報から同一曜日の日付を指定件数分取得
         $query = YearlySchedule::query();
 
@@ -111,7 +134,7 @@ trait FuncScheduleTrait
         $lessonDates = $query
             ->select('lesson_date')
             ->where('campus_cd', $campusCd)
-            ->where('day_cd', $targetDate->day_cd)
+            ->where('day_cd', $dayCd)
             // $startDateを含む
             ->where('lesson_date', ">=", $startDate)
             // 休日は除外する
@@ -122,7 +145,7 @@ trait FuncScheduleTrait
         // 配列に格納
         $arrLessenDate = [];
         foreach ($lessonDates as $lessonDate) {
-            array_push($arrLessenDate, $lessonDate->lesson_date);
+            array_push($arrLessenDate, $lessonDate->lesson_date->format('Y-m-d'));
         }
 
         return $arrLessenDate;
@@ -242,9 +265,10 @@ trait FuncScheduleTrait
      * @param string $endTime 終了時刻
      * @param string $studentId 生徒ID
      * @param string $scheduleId スケジュールID
+     * @param bool $exceptRegular レギュラー授業除外（一括登録用・省略可）
      * @return array
      */
-    private function fncScheChkDuplidateSid($targetDate, $startTime, $endTime, $studentId, $scheduleId = null)
+    private function fncScheChkDuplidateSid($targetDate, $startTime, $endTime, $studentId, $scheduleId = null, $exceptRegular = false)
     {
         // スケジュール情報から対象生徒のスケジュールが登録されているか検索
         $query = Schedule::query();
@@ -252,6 +276,10 @@ trait FuncScheduleTrait
         // 変更時は更新中のキー以外を検索
         if ($scheduleId) {
             $query->where('schedules.schedule_id', '!=', $scheduleId);
+        }
+        // レギュラー授業除外時はデータ作成区分「一括」以外を検索
+        if ($exceptRegular) {
+            $query->where('create_kind', '!=', AppConst::CODE_MASTER_32_0);
         }
 
         $exists = $query
@@ -285,23 +313,76 @@ trait FuncScheduleTrait
     }
 
     /**
-     * 講師のスケジュール重複チェック
+     * 生徒のスケジュール重複チェック（レギュラー授業）
+     *
+     * @param string $dayCd 曜日コード
+     * @param string $startTime 開始時刻
+     * @param string $endTime 終了時刻
+     * @param string $studentId 生徒ID
+     * @param int $regularClassId レギュラー授業ID
+     * @return array
+     */
+    private function fncScheChkDuplidateSidRegular($dayCd, $startTime, $endTime, $studentId, $regularClassId = null)
+    {
+        // スケジュール情報から対象生徒のスケジュールが登録されているか検索
+        $query = RegularClass::query();
+
+        // 変更時は更新中のキー以外を検索
+        if ($regularClassId) {
+            $query->where('regular_classes.regular_class_id', '!=', $regularClassId);
+        }
+
+        $exists = $query
+            // 受講生徒情報とJOIN
+            ->sdLeftJoin(RegularClassMember::class, function ($join) {
+                $join->on('regular_classes.regular_class_id', '=', 'regular_class_members.regular_class_id');
+            })
+            // 生徒所属情報とJOIN
+            ->sdJoin(StudentCampus::class, function ($join) use ($studentId) {
+                $join->on('regular_classes.campus_cd', '=', 'student_campuses.campus_cd')
+                    ->where('student_campuses.student_id', $studentId);
+            })
+            // 曜日・開始時刻・終了時刻・生徒IDで絞り込み
+            ->where('day_cd', $dayCd)
+            ->where('start_time', '<', $endTime)
+            ->where('end_time', '>', $startTime)
+            ->where(function ($orQuery) use ($studentId) {
+                $orQuery
+                    ->where('regular_classes.student_id', $studentId)
+                    ->orWhere('regular_class_members.student_id', $studentId);
+            })
+            ->exists();
+
+        if ($exists) {
+            // 重複ありの場合
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 講師のスケジュール重複チェック（スケジュール情報）
      *
      * @param string $targetDate 対象日付
      * @param string $startTime 開始時刻
      * @param string $endTime 終了時刻
      * @param int $tutorId 講師ID
      * @param int $scheduleId スケジュールID
+     * @param bool $exceptRegular レギュラー授業除外（一括登録用・省略可）
      * @return bool
      */
-    private function fncScheChkDuplidateTid($targetDate, $startTime, $endTime, $tutorId, $scheduleId = null)
+    private function fncScheChkDuplidateTid($targetDate, $startTime, $endTime, $tutorId, $scheduleId = null, $exceptRegular = false)
     {
-        // スケジュール情報から対象生徒のスケジュールが登録されているか検索
+        // スケジュール情報から対象講師のスケジュールが登録されているか検索
         $query = Schedule::query();
 
         // 変更時は更新中のキー以外を検索
         if ($scheduleId) {
             $query->where('schedule_id', '!=', $scheduleId);
+        }
+        // レギュラー授業除外時はデータ作成区分「一括」以外を検索
+        if ($exceptRegular) {
+            $query->where('create_kind', '!=', AppConst::CODE_MASTER_32_0);
         }
 
         $exists = $query
@@ -327,7 +408,47 @@ trait FuncScheduleTrait
     }
 
     /**
-     * ブースのチェック・空きブース取得
+     * 講師のスケジュール重複チェック（レギュラー授業）
+     *
+     * @param string $dayCd 曜日コード
+     * @param string $startTime 開始時刻
+     * @param string $endTime 終了時刻
+     * @param int $tutorId 講師ID
+     * @param int $regularClassId レギュラー授業ID
+     * @return bool
+     */
+    private function fncScheChkDuplidateTidRegular($dayCd, $startTime, $endTime, $tutorId, $regularClassId = null)
+    {
+        // スケジュール情報から対象生徒のスケジュールが登録されているか検索
+        $query = RegularClass::query();
+
+        // 変更時は更新中のキー以外を検索
+        if ($regularClassId) {
+            $query->where('regular_classes.regular_class_id', '!=', $regularClassId);
+        }
+
+        $exists = $query
+            // 講師所属情報とJOIN
+            ->sdJoin(TutorCampus::class, function ($join) use ($tutorId) {
+                $join->on('regular_classes.campus_cd', '=', 'tutor_campuses.campus_cd')
+                    ->where('tutor_campuses.tutor_id', $tutorId);
+            })
+            // 曜日・開始時刻・終了時刻・講師IDで絞り込み
+            ->where('regular_classes.day_cd', $dayCd)
+            ->where('regular_classes.tutor_id', $tutorId)
+            ->where('regular_classes.start_time', '<', $endTime)
+            ->where('regular_classes.end_time', '>', $startTime)
+            ->exists();
+
+        if ($exists) {
+            // 重複ありの場合
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * ブースのチェック・空きブース取得（面談以外）
      *
      * @param string $campusCd 校舎コード
      * @param string $boothCd ブースコード
@@ -336,9 +457,327 @@ trait FuncScheduleTrait
      * @param int $howToKind 通塾種別
      * @param int $scheduleId スケジュールID
      * @param bool $checkOnly 重複チェックのみ
-     * @return string
+     * @return string ブースコード（空き無し時にはnull）
      */
     private function fncScheSearchBooth($campusCd, $boothCd, $targetDate, $periodNo, $howToKind, $scheduleId, $checkOnly = false)
+    {
+        // ブースマスタから対象ブースの用途種別を取得
+        $usage_kind = $this->fncScheGetBoothUsage($campusCd, $boothCd);
+        if (
+            $usage_kind == AppConst::CODE_MASTER_41_4
+            || $usage_kind == AppConst::CODE_MASTER_41_5
+        ) {
+            // 用途種別が両者オンライン・家庭教師の場合はブースコードをそのまま返す
+            return $boothCd;
+        }
+
+        // スケジュール情報から対象ブースが使用されているか検索
+        $account = Auth::user();
+        $query = Schedule::query();
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('campus_cd', $account->campus_cd);
+        }
+
+        // 変更時は更新中のキー以外を検索
+        if ($scheduleId) {
+            $query->where('schedule_id', '!=', $scheduleId);
+        }
+
+        $exists = $query
+            // 校舎・日付・時限・ブースコードで検索
+            ->where('campus_cd', $campusCd)
+            ->where('target_date', $targetDate)
+            ->where('period_no', $periodNo)
+            ->where('booth_cd', $boothCd)
+            ->exists();
+
+        if (!$exists) {
+            // 重複なしの場合、ブースコードをそのまま返す
+            return $boothCd;
+        }
+
+        // ブースチェックのみの場合、空きブース取得処理なしで復帰
+        if ($checkOnly) {
+            // 重複ありの場合、nullを返す
+            return null;
+        }
+
+        //---------------------------
+        // 空きブース検索
+        //---------------------------
+        // ブースマスタから対象校舎のブースを取得
+        $arrMstBooths = $this->fncScheGetBoothFromMst($campusCd, $howToKind);
+
+        // スケジュール情報より、使用ブースを取得
+        $arrUsedBooths = $this->fncScheGetUseBoothFromSchedule($campusCd, $targetDate, $periodNo);
+
+        // マスタのブース - 使用ブース で差分を取得（空きブース）
+        $arrFreeBooths = array_diff($arrMstBooths, $arrUsedBooths);
+        if (count($arrFreeBooths) > 0) {
+            // 空きブースありの場合
+            // ソート順先頭のブースを返す
+            $arrFreeBooths = array_values($arrFreeBooths);
+            $freeBooth = $arrFreeBooths[0];
+        } else {
+            // 空きブースなしの場合、nullを返す
+            $freeBooth = null;
+        }
+
+        return $freeBooth;
+    }
+
+    /**
+     * ブースのチェック・空きブース取得（面談用）
+     *
+     * @param string $campusCd 校舎コード
+     * @param string $boothCd ブースコード
+     * @param string $targetDate 対象日付
+     * @param string $startTime 開始時刻
+     * @param string $endTime 終了時刻
+     * @param int $scheduleId スケジュールID
+     * @param bool $checkOnly 重複チェックのみ
+     * @return string ブースコード（空き無し時にはnull）
+     */
+    private function fncScheSearchBoothForConference($campusCd, $boothCd, $targetDate, $startTime, $endTime, $scheduleId, $checkOnly = false)
+    {
+        // スケジュール情報から対象ブースが使用されているか検索
+        $query = Schedule::query();
+
+        // 変更時は更新中のキー以外を検索
+        if ($scheduleId) {
+            $query->where('schedule_id', '!=', $scheduleId);
+        }
+
+        $account = Auth::user();
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('campus_cd', $account->campus_cd);
+        }
+        $exists = $query
+            // 校舎・日付・開始時刻・終了時刻・ブースコードで検索
+            ->where('campus_cd', $campusCd)
+            ->where('target_date', $targetDate)
+            ->where('start_time', '<', $endTime)
+            ->where('end_time', '>', $startTime)
+            ->where('booth_cd', $boothCd)
+            ->exists();
+
+        if (!$exists) {
+            // 重複なしの場合、ブースコードをそのまま返す
+            return $boothCd;
+        }
+
+        // ブースチェックのみの場合、空きブース取得処理なしで復帰
+        if ($checkOnly) {
+            // 重複ありの場合、nullを返す
+            return null;
+        }
+
+        //---------------------------
+        // ブース重複ありの場合
+        //---------------------------
+        // ブースマスタから対象校舎のブースを取得
+        $query = MstBooth::query();
+
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('campus_cd', $account->campus_cd);
+        }
+        $mstBooths = $query
+            ->select('booth_cd')
+            // 校舎で絞り込み
+            ->where('campus_cd', $campusCd)
+            // 用途種別で絞り込み（面談用）
+            ->where('usage_kind', AppConst::CODE_MASTER_41_3)
+            ->orderBy('disp_order')
+            ->get();
+
+        // 配列に格納
+        $arrMstBooths = [];
+        foreach ($mstBooths as $mstBooth) {
+            array_push($arrMstBooths, $mstBooth->booth_cd);
+        }
+
+        // スケジュール情報より、使用ブースを取得
+        $query = Schedule::query();
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('campus_cd', $account->campus_cd);
+        }
+        $usedBooths = $query
+            ->select('booth_cd')
+            // 校舎・日付・開始時刻・終了時刻で検索
+            ->where('campus_cd', $campusCd)
+            ->where('target_date', $targetDate)
+            ->where('start_time', '<=', $endTime)
+            ->where('end_time', '>=', $startTime)
+            ->get();
+
+        // 配列に格納
+        $arrUsedBooths = [];
+        foreach ($usedBooths as $usedBooth) {
+            array_push($arrUsedBooths, $usedBooth->booth_cd);
+        }
+
+        // マスタのブース - 使用ブース で差分を取得（空きブース）
+        $arrFreeBooths = array_diff($arrMstBooths, $arrUsedBooths);
+        if (count($arrFreeBooths) > 0) {
+            $arrFreeBooths = array_values($arrFreeBooths);
+            // 空きブースありの場合
+            // ソート順先頭のブースを返す
+            $freeBooth = $arrFreeBooths[0];
+        } else {
+            // 空きなしの場合、nullを返す
+            $freeBooth = null;
+        }
+
+        return $freeBooth;
+    }
+
+    /**
+     * ブースのチェック・空きブース取得（レギュラー授業）
+     *
+     * @param string $campusCd 校舎コード
+     * @param string $boothCd ブースコード
+     * @param string $dayCd 曜日コード
+     * @param int $periodNo 時限
+     * @param int $howToKind 通塾種別
+     * @param int $regularClassId レギュラー授業ID
+     * @param bool $checkOnly 重複チェックのみ
+     * @return string ブースコード（空き無し時にはnull）
+     */
+    private function fncScheSearchBoothRegular($campusCd, $boothCd, $dayCd, $periodNo, $howToKind, $regularClassId, $checkOnly = false)
+    {
+        // ブースマスタから対象ブースの用途種別を取得
+        $usage_kind = $this->fncScheGetBoothUsage($campusCd, $boothCd);
+        if (
+            $usage_kind == AppConst::CODE_MASTER_41_4
+            || $usage_kind == AppConst::CODE_MASTER_41_5
+        ) {
+            // 用途種別が両者オンライン・家庭教師の場合はブースコードをそのまま返す
+            return $boothCd;
+        }
+
+        // レギュラー授業情報から対象ブースが使用されているか検索
+        $exists = $this->fncScheChkBoothFromRegular($campusCd, $dayCd, $periodNo, $boothCd, $regularClassId);
+        if (!$exists) {
+            // 重複なしの場合、ブースコードをそのまま返す
+            return $boothCd;
+        }
+
+        // ブースチェックのみの場合、空きブース取得処理なしで復帰
+        if ($checkOnly) {
+            // 重複ありの場合、nullを返す
+            return null;
+        }
+
+        //---------------------------
+        // 空きブース検索
+        //---------------------------
+        // ブースマスタから対象校舎のブースを取得
+        $arrMstBooths = $this->fncScheGetBoothFromMst($campusCd, $howToKind);
+
+        // レギュラー授業情報より、使用ブースを取得
+        $arrUsedBooths = $this->fncScheGetUseBoothFromRegular($campusCd, $dayCd, $periodNo, null);
+
+        // マスタのブース - 使用ブース で差分を取得（空きブース）
+        $arrFreeBooths = array_diff($arrMstBooths, $arrUsedBooths);
+        if (count($arrFreeBooths) > 0) {
+            // 空きブースありの場合
+            // ソート順先頭のブースを返す
+            $arrFreeBooths = array_values($arrFreeBooths);
+            $freeBooth = $arrFreeBooths[0];
+        } else {
+            // 空きブースなしの場合、nullを返す
+            $freeBooth = null;
+        }
+
+        return $freeBooth;
+    }
+
+    /**
+     * ブースのチェック・空きブース取得（一括登録用）
+     *
+     * @param string $campusCd 校舎コード
+     * @param string $boothCd ブースコード
+     * @param string $targetDate 対象日付
+     * @param string $dayCd 曜日コード
+     * @param int $periodNo 時限
+     * @param int $howToKind 通塾種別
+     * @param int $regularClassId レギュラー授業ID
+     * @return string ブースコード（空き無し時にはnull）
+     */
+    private function fncScheSearchBoothBulk($campusCd, $boothCd, $targetDate, $dayCd, $periodNo, $howToKind, $regularClassId)
+    {
+        // ブースマスタから対象ブースの用途種別を取得
+        $usage_kind = $this->fncScheGetBoothUsage($campusCd, $boothCd);
+        if (
+            $usage_kind == AppConst::CODE_MASTER_41_4
+            || $usage_kind == AppConst::CODE_MASTER_41_5
+        ) {
+            // 用途種別が両者オンライン・家庭教師の場合はブースコードをそのまま返す
+            return $boothCd;
+        }
+        // スケジュール情報から対象ブースが使用されているか検索
+        $account = Auth::user();
+        $query = Schedule::query();
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('campus_cd', $account->campus_cd);
+        }
+
+        $exists = $query
+            // 校舎・日付・時限・ブースコードで検索
+            ->where('campus_cd', $campusCd)
+            ->where('target_date', $targetDate)
+            ->where('period_no', $periodNo)
+            ->where('booth_cd', $boothCd)
+            // 一括作成データを除外
+            ->where('create_kind', '!=', AppConst::CODE_MASTER_32_0)
+            ->exists();
+        if (!$exists) {
+            // 重複なしの場合、ブースコードをそのまま返す
+            return $boothCd;
+        }
+
+        //---------------------------
+        // 空きブース検索
+        //---------------------------
+        // ブースマスタから対象校舎のブースを取得
+        $arrMstBooths = $this->fncScheGetBoothFromMst($campusCd, $howToKind);
+
+        // スケジュール情報より、使用ブースを取得 ※レギュラー授業を除外
+        $arrUsedBoothsSchedule = $this->fncScheGetUseBoothFromSchedule($campusCd, $targetDate, $periodNo, true);
+
+        // レギュラー授業情報より、使用ブースを取得 ※自身のレギュラーを除外
+        $arrUsedBoothsRegular = $this->fncScheGetUseBoothFromRegular($campusCd, $dayCd, $periodNo, $regularClassId);
+        // 使用ブースをマージ
+        $arrUsedBooths = array_unique(array_merge($arrUsedBoothsSchedule, $arrUsedBoothsRegular));
+
+        // マスタのブース - 使用ブース で差分を取得（空きブース）
+        $arrFreeBooths = array_diff($arrMstBooths, $arrUsedBooths);
+        if (count($arrFreeBooths) > 0) {
+            // 空きブースありの場合
+            // ソート順先頭のブースを返す
+            $arrFreeBooths = array_values($arrFreeBooths);
+            $freeBooth = $arrFreeBooths[0];
+        } else {
+            // 空きブースなしの場合、nullを返す
+            $freeBooth = null;
+        }
+
+        return $freeBooth;
+    }
+
+    /**
+     * ブースの用途種別取得
+     *
+     * @param string $campusCd 校舎コード
+     * @param string $boothCd ブースコード
+     * @return string
+     */
+    private function fncScheGetBoothUsage($campusCd, $boothCd)
     {
         // ブースマスタから用途種別を取得
         $query = MstBooth::query();
@@ -355,27 +794,34 @@ trait FuncScheduleTrait
             ->where('booth_cd', $boothCd)
             ->firstOrFail();
 
-        if (
-            $mstBooth->usage_kind == AppConst::CODE_MASTER_41_4
-            || $mstBooth->usage_kind == AppConst::CODE_MASTER_41_5
-        ) {
-            // 用途種別が両者オンライン・家庭教師の場合はそのまま設定
-            return $boothCd;
-        }
+        return $mstBooth->usage_kind;
+    }
 
-        // スケジュール情報から対象ブースが使用されているか検索
+    /**
+     * スケジュール情報 ブース空きチェック
+     *
+     * @param string $campusCd 校舎コード
+     * @param string $targetDate 対象日付
+     * @param int $periodNo 時限
+     * @param int $boothCd ブースコード
+     * @param int $scheduleId スケジュールID
+     * @return bool
+     */
+    private function fncScheChkBoothFromSchedule($campusCd, $targetDate, $periodNo, $boothCd, $scheduleId)
+    {
+        // スケジュール情報より、ブース空きチェック
+        $account = Auth::user();
         $query = Schedule::query();
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('campus_cd', $account->campus_cd);
+        }
 
         // 変更時は更新中のキー以外を検索
         if ($scheduleId) {
             $query->where('schedule_id', '!=', $scheduleId);
         }
 
-        $account = Auth::user();
-        if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、所属校舎で絞る（ガード）
-            $query->where('campus_cd', $account->campus_cd);
-        }
         $exists = $query
             // 校舎・日付・時限・ブースコードで検索
             ->where('campus_cd', $campusCd)
@@ -384,40 +830,56 @@ trait FuncScheduleTrait
             ->where('booth_cd', $boothCd)
             ->exists();
 
-        if (!$exists) {
-            // 重複なしの場合
-            return $boothCd;
+        return $exists;
+    }
+
+    /**
+     * レギュラー授業情報 ブース空きチェック
+     *
+     * @param string $campusCd 校舎コード
+     * @param string $dayCd 曜日コード
+     * @param int $periodNo 時限
+     * @param int $boothCd ブースコード
+     * @param int $regularClassId レギュラー授業ID
+     * @return bool
+     */
+    private function fncScheChkBoothFromRegular($campusCd, $dayCd, $periodNo, $boothCd, $regularClassId)
+    {
+        // スケジュール情報より、ブース空きチェック
+        $account = Auth::user();
+        $query = RegularClass::query();
+
+        // 変更時は更新中のキー以外を検索
+        if ($regularClassId) {
+            $query->where('regular_class_id', '!=', $regularClassId);
         }
 
-        //---------------------------
-        // ブース重複ありの場合
-        //---------------------------
-        // ブースチェックのみの場合、空きブース取得処理なし
-        if ($checkOnly) {
-            // 重複ありの場合、nullを返す
-            return null;
-        }
-
-        // スケジュール情報より、使用ブースを取得
-        $query = Schedule::query();
+        $account = Auth::user();
         if (AuthEx::isRoomAdmin()) {
             // 教室管理者の場合、所属校舎で絞る（ガード）
             $query->where('campus_cd', $account->campus_cd);
         }
-        $usedBooths = $query
-            ->select('booth_cd')
-            // 校舎・日付・時限で検索
+        $exists = $query
+            // 校舎・曜日・時限・ブースコードで検索
             ->where('campus_cd', $campusCd)
-            ->where('target_date', $targetDate)
+            ->where('day_cd', $dayCd)
             ->where('period_no', $periodNo)
-            ->get();
+            ->where('booth_cd', $boothCd)
+            ->exists();
 
-        // 配列に格納
-        $arrUsedBooths = [];
-        foreach ($usedBooths as $usedBooth) {
-            array_push($arrUsedBooths, $usedBooth->booth_cd);
-        }
+        return $exists;
+    }
 
+    /**
+     * 通塾種別によるブース情報取得（ブースマスタより）
+     *
+     * @param string $campusCd 校舎コード
+     * @param int $howToKind 通塾種別
+     * @return array
+     */
+    private function fncScheGetBoothFromMst($campusCd, $howToKind)
+    {
+        $account = Auth::user();
         // ブースマスタから対象校舎のブースを取得
         $query = MstBooth::query();
 
@@ -445,85 +907,39 @@ trait FuncScheduleTrait
             array_push($arrMstBooths, $mstBooth->booth_cd);
         }
 
-        // マスタのブース - 使用ブース で差分を取得（空きブース）
-        $arrFreeBooths = array_diff($arrMstBooths, $arrUsedBooths);
-        if (count($arrFreeBooths) > 0) {
-            // 空きブースありの場合
-            // ソート順先頭のブースを返す
-            $arrFreeBooths = array_values($arrFreeBooths);
-            $freeBooth = $arrFreeBooths[0];
-        } else {
-            // 空きブースなしの場合、nullを返す
-            $freeBooth = null;
-        }
-
-        return $freeBooth;
+        return $arrMstBooths;
     }
 
     /**
-     * ブースのチェック・空きブース取得（面談用）
+     * スケジュール情報より使用ブース情報取得
      *
      * @param string $campusCd 校舎コード
-     * @param string $boothCd ブースコード
      * @param string $targetDate 対象日付
-     * @param string $startTime 開始時刻
-     * @param string $endTime 終了時刻
-     * @param int $scheduleId スケジュールID
-     * @param bool $checkOnly 重複チェックのみ
-     * @return string
+     * @param int $periodNo 時限
+     * @param bool $exceptRegular レギュラー授業除外（一括登録用・省略可）
+     * @return array
      */
-    private function fncScheSearchBoothForConference($campusCd, $boothCd, $targetDate, $startTime, $endTime, $scheduleId, $checkOnly = false)
+    private function fncScheGetUseBoothFromSchedule($campusCd, $targetDate, $periodNo, $exceptRegular = false)
     {
-        // スケジュール情報から対象ブースが使用されているか検索
-        $query = Schedule::query();
-
-        // 変更時は更新中のキー以外を検索
-        if ($scheduleId) {
-            $query->where('schedule_id', '!=', $scheduleId);
-        }
-
-        $account = Auth::user();
-        if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、所属校舎で絞る（ガード）
-            $query->where('campus_cd', $account->campus_cd);
-        }
-        $exists = $query
-            // 校舎・日付・開始時刻・終了時刻・ブースコードで検索
-            ->where('campus_cd', $campusCd)
-            ->where('target_date', $targetDate)
-            ->where('start_time', '<', $endTime)
-            ->where('end_time', '>', $startTime)
-            ->where('booth_cd', $boothCd)
-            ->exists();
-
-        if (!$exists) {
-            // 重複なしの場合
-            return $boothCd;
-        }
-
-        //---------------------------
-        // ブース重複ありの場合
-        //---------------------------
-
-        // ブースチェックのみの場合、空きブース取得処理なし
-        if ($checkOnly) {
-            // 重複ありの場合、nullを返す
-            return null;
-        }
-
         // スケジュール情報より、使用ブースを取得
+        $account = Auth::user();
         $query = Schedule::query();
         if (AuthEx::isRoomAdmin()) {
             // 教室管理者の場合、所属校舎で絞る（ガード）
             $query->where('campus_cd', $account->campus_cd);
         }
+
+        // レギュラー授業除外時はデータ作成区分「一括」以外を検索
+        if ($exceptRegular) {
+            $query->where('create_kind', '!=', AppConst::CODE_MASTER_32_0);
+        }
+
         $usedBooths = $query
             ->select('booth_cd')
-            // 校舎・日付・開始時刻・終了時刻で検索
+            // 校舎・日付・時限で検索
             ->where('campus_cd', $campusCd)
             ->where('target_date', $targetDate)
-            ->where('start_time', '<=', $endTime)
-            ->where('end_time', '>=', $startTime)
+            ->where('period_no', $periodNo)
             ->get();
 
         // 配列に格納
@@ -532,57 +948,61 @@ trait FuncScheduleTrait
             array_push($arrUsedBooths, $usedBooth->booth_cd);
         }
 
-        // ブースマスタから対象校舎のブースを取得
-        $query = MstBooth::query();
+        return $arrUsedBooths;
+    }
 
+    /**
+     * レギュラー授業情報より使用ブース情報取得
+     *
+     * @param string $campusCd 校舎コード
+     * @param string $dayCd 曜日コード
+     * @param int $periodNo 時限
+     * @param int $regularClassId レギュラー授業ID
+     * @return array
+     */
+    private function fncScheGetUseBoothFromRegular($campusCd, $dayCd, $periodNo, $regularClassId)
+    {
+        // スケジュール情報より、使用ブースを取得
+        $account = Auth::user();
+        $query = RegularClass::query();
         if (AuthEx::isRoomAdmin()) {
             // 教室管理者の場合、所属校舎で絞る（ガード）
             $query->where('campus_cd', $account->campus_cd);
         }
-        $mstBooths = $query
+
+        // 対象のキー以外を検索
+        if ($regularClassId) {
+            $query->where('regular_class_id', '!=', $regularClassId);
+        }
+
+        $usedBooths = $query
             ->select('booth_cd')
-            // 校舎で絞り込み
+            // 校舎・曜日・時限で検索
             ->where('campus_cd', $campusCd)
-            // 用途種別で絞り込み（面談用）
-            ->where('usage_kind', AppConst::CODE_MASTER_41_3)
-            ->orderBy('disp_order')
+            ->where('day_cd', $dayCd)
+            ->where('period_no', $periodNo)
             ->get();
 
         // 配列に格納
-        $arrMstBooths = [];
-        foreach ($mstBooths as $mstBooth) {
-            array_push($arrMstBooths, $mstBooth->booth_cd);
+        $arrUsedBooths = [];
+        foreach ($usedBooths as $usedBooth) {
+            array_push($arrUsedBooths, $usedBooth->booth_cd);
         }
 
-        // マスタのブース - 使用ブース で差分を取得（空きブース）
-        $arrFreeBooths = array_diff($arrMstBooths, $arrUsedBooths);
-        if (count($arrFreeBooths) > 0) {
-            $arrFreeBooths = array_values($arrFreeBooths);
-            // 空きブースありの場合
-            // ソート順先頭のブースを返す
-            $freeBooth = $arrFreeBooths[0];
-        } else {
-            // 空きなしの場合、nullを返す
-            $freeBooth = null;
-        }
-
-        return $freeBooth;
+        return $arrUsedBooths;
     }
 
     /**
      * 時限・開始時刻の相関チェック
      *
      * @param string $campusCd 校舎コード
-     * @param string $targetDate 対象日付
+     * @param string $timetableKind 時間割区分
      * @param string $period 時限
      * @param string $startTime 開始時刻
      * @return bool
      */
-    private function fncScheCheckStartTime($campusCd, $targetDate, $period, $startTime)
+    private function fncScheChkStartTime($campusCd, $timetableKind, $period, $startTime)
     {
-        // 対象日の時間割区分を取得
-        $timetableKind = $this->fncScheGetTimeTableKind($campusCd, $targetDate);
-
         // 対象時限の時間割情報を取得
         $curTimeTable = $this->fncScheGetTimetableByPeriod($campusCd, $timetableKind, $period);
 
@@ -622,5 +1042,209 @@ trait FuncScheduleTrait
             // チェックNG
             return false;
         }
+    }
+
+    /**
+     * 指定期間が通常期間内かチェック
+     *
+     * @param string $campusCd 校舎コード
+     * @param string $startDate 開始日付
+     * @param string $endDate 終了日付
+     * @return bool
+     */
+    private function fncScheChkScheduleTerm($campusCd, $startDate, $endDate)
+    {
+        // 通常期間が含まれるか
+        $exists = YearlySchedule::where('campus_cd', $campusCd)
+            ->whereBetween('lesson_date', [$startDate, $endDate])
+            // 通常期間
+            ->where('date_kind', AppConst::CODE_MASTER_38_0)
+            ->exists();
+
+        if (!$exists) {
+            // 通常期間データなしの場合、falseを返す
+            return false;
+        }
+
+        // 特別期間が含まれるか
+        $exists = YearlySchedule::where('campus_cd', $campusCd)
+            ->where('campus_cd', $campusCd)
+            ->whereBetween('lesson_date', [$startDate, $endDate])
+            // 特別期間（春期・夏期・冬期）
+            ->whereIn('date_kind', [AppConst::CODE_MASTER_38_1, AppConst::CODE_MASTER_38_2, AppConst::CODE_MASTER_38_3])
+            ->exists();
+
+        if ($exists) {
+            // 特別期間データありの場合、falseを返す
+            return false;
+        }
+
+        return true;
+    }
+
+    //------------------------------
+    // データ登録系
+    //------------------------------
+    /**
+     * スケジュール情報登録
+     * ※トランザクション管理は呼び元で行うこと
+     *
+     * @param array $data スケジュール情報
+     * @param date $targetDate 対象日付
+     * @param string $booth ブース
+     * @param int $createKind データ作成区分
+     * @return void
+     */
+    private function fncScheCreateSchedule($data, $targetDate, $booth, $createKind)
+    {
+        $account = Auth::user();
+
+        // 時間（分）の算出
+        $start = Carbon::createFromTimeString($data['start_time']);
+        $end = Carbon::createFromTimeString($data['end_time']);
+        $minites = $start->diffInMinutes($end);
+
+        // スケジュール情報
+        // schedulesテーブルへのinsert
+        $schedule = new Schedule;
+        $schedule->campus_cd = $data['campus_cd'];
+        $schedule->target_date = $targetDate;
+        if ($data['course_kind'] != AppConst::CODE_MASTER_42_3) {
+            // 時限・教科は面談以外の場合のみ設定
+            $schedule->period_no = $data['period_no'];
+            $schedule->subject_cd = $data['subject_cd'];
+        }
+        $schedule->start_time = $data['start_time'];
+        $schedule->end_time = $data['end_time'];
+        $schedule->minites = $minites;
+        $schedule->booth_cd = $booth;
+        $schedule->course_cd = $data['course_cd'];
+        if ($data['course_kind'] != AppConst::CODE_MASTER_42_2) {
+            // １対多以外の場合 生徒IDを設定
+            $schedule->student_id = $data['student_id'];
+        }
+        if ($data['course_kind'] == AppConst::CODE_MASTER_42_1 || $data['course_kind'] == AppConst::CODE_MASTER_42_2) {
+            // 授業の場合 講師IDを設定
+            $schedule->tutor_id = $data['tutor_id'];
+        }
+        $schedule->how_to_kind = $data['how_to_kind'];
+        $schedule->create_kind = $createKind;
+        if ($createKind == AppConst::CODE_MASTER_32_1) {
+            // 個別登録の場合のみ設定
+            if ($data['course_kind'] == AppConst::CODE_MASTER_42_1 || $data['course_kind'] == AppConst::CODE_MASTER_42_2) {
+                // 授業の場合 授業区分を設定
+                $schedule->lesson_kind = $data['lesson_kind'];
+            }
+            $schedule->tentative_status = $data['tentative_status'];
+            $schedule->memo = $data['memo'];
+        } else {
+            $schedule->lesson_kind = AppConst::CODE_MASTER_31_1;
+        }
+        if ($createKind == AppConst::CODE_MASTER_32_0) {
+            // 一括登録の場合のみ設定
+            $schedule->regular_class_id = $data['regular_class_id'];
+        }
+        $schedule->adm_id = $account->account_id;
+        // 登録
+        $schedule->save();
+
+        // 受講生徒情報
+        if ($data['course_kind'] == AppConst::CODE_MASTER_42_2) {
+            // schedulesテーブル登録時のスケジュールIDをセット
+            $scheduleId = $schedule->schedule_id;
+
+            // class_member_idはカンマ区切り文字列で入ってくる
+            // 分割して１件ずつ登録
+            foreach (explode(",", $data['class_member_id']) as $member) {
+                // class_membersテーブルへのinsert
+                $classmember = new ClassMember;
+                $classmember->schedule_id = $scheduleId;
+                $classmember->student_id = $member;
+                $classmember->absent_status = AppConst::CODE_MASTER_35_0;
+                // 登録
+                $classmember->save();
+            }
+        }
+        return;
+    }
+
+    /**
+     * レギュラー授業情報登録
+     * 講師空き時間情報登録も合わせて行う
+     * ※トランザクション管理は呼び元で行うこと
+     *
+     * @param array $data レギュラー授業登録情報
+     * @param string $booth ブース
+     * @return void
+     */
+    private function fncScheCreateRegular($data, $booth)
+    {
+        // 時間（分）の算出
+        $start = Carbon::createFromTimeString($data['start_time']);
+        $end = Carbon::createFromTimeString($data['end_time']);
+        $minites = $start->diffInMinutes($end);
+
+        // レギュラー授業情報登録
+        // regular_classesテーブルへのinsert
+        $regularClass = new RegularClass();
+        $regularClass->campus_cd = $data['campus_cd'];
+        $regularClass->day_cd = $data['day_cd'];
+        $regularClass->period_no = $data['period_no'];
+        $regularClass->subject_cd = $data['subject_cd'];
+        $regularClass->start_time = $data['start_time'];
+        $regularClass->end_time = $data['end_time'];
+        $regularClass->minites = $minites;
+        $regularClass->booth_cd = $booth;
+        $regularClass->course_cd = $data['course_cd'];
+        if ($data['course_kind'] != AppConst::CODE_MASTER_42_2) {
+            // １対多以外の場合 生徒IDを設定
+            $regularClass->student_id = $data['student_id'];
+        }
+        if ($data['course_kind'] == AppConst::CODE_MASTER_42_1 || $data['course_kind'] == AppConst::CODE_MASTER_42_2) {
+            // 授業の場合 講師IDを設定
+            $regularClass->tutor_id = $data['tutor_id'];
+        }
+        $regularClass->how_to_kind = $data['how_to_kind'];
+        // 登録
+        $regularClass->save();
+
+        // レギュラー受講生徒情報登録（コース種別が授業複の場合のみ）
+        if ($data['course_kind'] == AppConst::CODE_MASTER_42_2) {
+            // regular_classesテーブル登録時のレギュラー授業IDをセット
+            $regularClassId = $regularClass->regular_class_id;
+
+            // class_member_idはカンマ区切り文字列で入ってくる
+            // 分割して１件ずつ登録
+            foreach (explode(",", $data['class_member_id']) as $member) {
+                // レギュラー受講生徒情報テーブルへのinsert
+                $regularClassMember = new RegularClassMember;
+                $regularClassMember->regular_class_id = $regularClassId;
+                $regularClassMember->student_id = $member;
+                // 登録
+                $regularClassMember->save();
+            }
+        }
+
+        // 講師空き時間情報登録（コース種別が授業の場合のみ）
+        if ($data['course_kind'] == AppConst::CODE_MASTER_42_1 || $data['course_kind'] == AppConst::CODE_MASTER_42_2) {
+            // 講師空き時間情報検索
+            $exists = TutorFreePeriod::where('tutor_id', $data['tutor_id'])
+                // 講師ID・曜日コード・時限で絞り込み
+                ->where('day_cd', $data['day_cd'])
+                ->where('period_no', $data['period_no'])
+                ->exists();
+
+            if (!$exists) {
+                // データなしの場合、登録
+                // 講師空き時間情報テーブルへのinsert
+                $tutorPeriod = new TutorFreePeriod;
+                $tutorPeriod->tutor_id = $data['tutor_id'];
+                $tutorPeriod->day_cd = $data['day_cd'];
+                $tutorPeriod->period_no = $data['period_no'];
+                // 登録
+                $tutorPeriod->save();
+            }
+        }
+        return;
     }
 }

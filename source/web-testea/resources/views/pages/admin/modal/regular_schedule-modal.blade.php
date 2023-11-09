@@ -4,54 +4,58 @@
 
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true>
-    <tr v-show="item.mdType != {{ App\Consts\AppConst::EXT_GENERIC_MASTER_109_4 }}">
+    <tr>
         <th width="35%">校舎</th>
-        <td>@{{item.mdClassName}}</td>
+        <td>@{{item.room_name}}</td>
     </tr>
-    <tr>
+    <tr v-show="item.booth_name">
         <th width="35%">ブース</th>
-        <td>Aテーブル</td>
+        <td>@{{item.booth_name}}</td>
     </tr>
-    <tr>
+    <tr v-show="item.course_name">
         <th width="35%">コース名</th>
-        <td>個別指導コース</td>
+        <td>@{{item.course_name}}</td>
     </tr>
     <tr>
         <th>曜日</th>
-        <td>月曜</td>
+        <td>@{{item.day_name}}曜</td>
     </tr>
-    {{-- v-showは、スケジュール種別によって非表示の場合があるため --}}
     <tr>
         <th>時限</th>
-        <td>5時限</td>
+        <td>@{{item.period_no}}限</td>
     </tr>
-    <tr v-show="item.mdStartTime">
+    <tr v-show="item.start_time">
         <th>開始時刻</th>
-        <td>@{{$filters.formatHm(item.mdStartTime)}}</td>
+        <td>@{{item.start_time}}</td>
     </tr>
-    <tr v-show="item.mdEndTime">
+    <tr v-show="item.end_time">
         <th>終了時刻</th>
-        <td>@{{$filters.formatHm(item.mdEndTime)}}</td>
+        <td>@{{item.end_time}}</td>
     </tr>
-    <tr>
+    <tr v-show="item.tutor_name">
         <th>講師名</th>
-        <td>CWテスト教師１０１</td>
+        <td>@{{item.tutor_name}}</td>
     </tr>
-    <tr v-Show="item.lesson_type != 1">
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.student_name && item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_2 }}">
         <th>生徒名</th>
-        <td>CWテスト生徒１</td>
+        <td>@{{item.student_name}}</td>
     </tr>
-    <tr v-Show="item.lesson_type == 1">
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.class_student_names && item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }}">
         <th>受講生徒名</th>
-        <td>CWテスト生徒１<br>CWテスト生徒２<br>CWテスト生徒３</td>
+        {{-- nl2br: 改行 --}}
+        <td class="nl2br">@{{item.class_student_names}}</td>
     </tr>
-    <tr v-show="item.mdSubject">
-        <th>科目</th>
-        <td>@{{item.mdSubject}}</td>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }} && item.subject_name">
+        <th>教科</th>
+        <td>@{{item.subject_name}}</td>
     </tr>
-    <tr>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.how_to_kind_name && (item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }} || item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }})">
         <th>通塾</th>
-        <td>生徒オンライン－教師通塾</td>
+        <td>@{{item.how_to_kind_name}}</td>
     </tr>
 </x-bs.table>
 
@@ -59,9 +63,10 @@
 
 @section('modal-button')
 
+@if (request()->routeIs('regular_schedule'))
 {{-- 更新ボタンを表示 --}}
-<x-button.edit vueHref="'{{ route('regular_schedule-edit', ['','']) }}/' + item.lesson_type + '/' + item.id" icon="" caption="スケジュール編集" />
+<x-button.edit vueHref="'{{ route('regular_schedule-edit', '') }}/' + item.regular_class_id" icon="" caption="スケジュール編集" />
 {{-- コピー登録ボタンを表示 --}}
-<x-button.edit vueHref="'{{ route('regular_schedule-copy', ['','']) }}/' + item.lesson_type + '/' + item.id" icon="" caption="コピー登録" />
-
+<x-button.edit vueHref="'{{ route('regular_schedule-copy', '') }}/' + item.regular_class_id" icon="" caption="コピー登録" />
+@endif
 @overwrite

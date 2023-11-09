@@ -26,7 +26,7 @@ export default class WeekCalendar {
      */
     createWeek() {
         // モック用に仮の日付を設定（日曜にする）
-        var curDate = new Date("2023/03/19");
+        var curDate = new Date("2000/01/02");
 
         for (var i = 1; i < 7; i++) {
             curDate.setDate(curDate.getDate() + 1);
@@ -47,10 +47,16 @@ export default class WeekCalendar {
         var calendar = new Calendar(calendarEl, {
             initialView: "resourceTimeGridDay",
             initialDate: curDate,
+            customButtons: {
+                topLinkButton: {
+                    text: "上部に戻る",
+                    click: this._topLinkButtonClick,
+                },
+            },
             headerToolbar: {
                 left: "",
                 center: "title",
-                right: "",
+                right: "topLinkButton",
             },
             // タイトルの書式
             titleFormat: function (date) {
@@ -66,25 +72,17 @@ export default class WeekCalendar {
                 ][weekNum];
                 return week;
             },
-            //themeSystem: "bootstrap",
             locale: "ja",
-            //height: 700,
-            height: 1700,
+            //height: 1700,
+            contentHeight: "auto",
+            stickyFooterScrollbar: true,
+            stickyHeaderDates: true,
             dayMinWidth: 150,
             selectable: false,
             selectMirror: false,
             navLinks: true,
-            // 左側のリソースの一覧
-            resources: [
-                { id: "000", title: "時間割" },
-                { id: "001", title: "Aテーブル" },
-                { id: "002", title: "Bテーブル" },
-                { id: "003", title: "Cテーブル" },
-                { id: "004", title: "Dテーブル" },
-                { id: "005", title: "E教室" },
-                //{ id: "800", title: "面談ブース"},
-                //{ id: "999", title: "後日振替"},
-            ],
+            // リソース（ブース）の読み込み処理
+            resources: this._resourceFunc,
             // データの読み込み処理
             events: function (info, successCallback, failureCallback) {
                 self._eventFunc(idx, info, successCallback, failureCallback);
@@ -124,12 +122,52 @@ export default class WeekCalendar {
      * 再描画
      */
     refetchEvents() {
-        // TODO: 必要であれば配列で描画
-        //this._calendar[i].refetchEvents();
+        // 全曜日分を配列で描画
+        for (var i = 0; i < 6; i++) {
+            this._calendar[i].refetchResources();
+            this._calendar[i].refetchEvents();
+        }
     }
 
     /**
-     * 表示イベント
+     * リソース表示
+     *
+     * @param info
+     * @param successCallback
+     * @param failureCallback
+     */
+    _resourceFunc = (info, successCallback, failureCallback) => {
+        // カレンダーのカードタグのID
+        var cardId = "#card-calendar";
+
+        $.when()
+            .then(() => {
+                // カードのローディング開始
+                FormCom.loadingForCardOn(cardId);
+                // カードカレンダーの中のHidden値を取得。会員管理のように子画面にカレンダーがある場合
+                var formData = FormCom.getFormArrayData(cardId);
+
+                // カレンダーの条件を送信
+                var sendData = Object.assign(formData, {
+                });
+                //console.log(sendData);
+
+                // 詳細データを取得
+                var url = UrlCom.getFuncUrl() + "/get_booth";
+                return axios.post(url, sendData);
+            })
+            .then((response) => {
+                // コールバックで更新(eventプロパティにセットする)
+                successCallback(response.data);
+
+                // カードのローディング終了
+                FormCom.loadingForCardOff(cardId);
+            })
+            .fail(AjaxCom.fail);
+    };
+
+    /**
+     * イベント表示
      *
      * @param idx
      * @param info
@@ -144,7 +182,6 @@ export default class WeekCalendar {
             .then(() => {
                 // カードのローディング開始
                 FormCom.loadingForCardOn(cardId);
-                //console.log("loadingForCardOn");
                 // カードカレンダーの中のHidden値を取得。会員管理のように子画面にカレンダーがある場合
                 var formData = FormCom.getFormArrayData(cardId);
 
@@ -160,8 +197,6 @@ export default class WeekCalendar {
                 return axios.post(url, sendData);
             })
             .then((response) => {
-                //console.log(response.data);
-
                 // コールバックで更新(eventプロパティにセットする)
                 successCallback(response.data);
 
@@ -200,20 +235,29 @@ export default class WeekCalendar {
      * @param info
      */
     _selectFunc = (info) => {
-        //console.log(info);
+        // カレンダーのカードタグのID
+        var cardId = "#card-calendar";
+        var formData = FormCom.getFormArrayData(cardId);
+        if (info.resource._resource.id !== "000") {
+            // 詳細データを取得
+            var url =
+                UrlCom.getFuncUrl() +
+                "/new" +
+                "/" +
+                formData.campus_cd +
+                "/" +
+                moment(info.start).format("d") +
+                moment(info.start).format("HHmm") +
+                "/" +
+                info.resource._resource.id;
+            location.href = url;
+        }
+    };
 
-        // 詳細データを取得
-        var url =
-            UrlCom.getFuncUrl() +
-            "/new?" +
-            "roomcd=" +
-            "110" +
-            "&day=" +
-            moment(info.start).format("d") +
-            "&start_time=" +
-            moment(info.start).format("HHmm") +
-            "&end_time=" +
-            moment(info.end).format("HHmm");
-        location.href = url;
+    /**
+     * ボタンクリックイベント
+     */
+    _topLinkButtonClick = (e) => {
+        location.href = "#top";
     };
 }
