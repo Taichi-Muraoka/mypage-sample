@@ -213,14 +213,11 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     // 日程連絡一覧
     Route::get('/season_student', [SeasonStudentController::class, 'index'])->name('season_student');
 
-    // バリデーション(検索用)
-    Route::post('/season_student/vd_search', [SeasonStudentController::class, 'validationForSearch'])->name('season_student-vd_search');
-
     // 検索結果取得
     Route::post('/season_student/search', [SeasonStudentController::class, 'search'])->name('season_student-search');
 
     // 提出スケジュール詳細
-    Route::get('/season_student/detail/{sid}', [SeasonStudentController::class, 'detail'])->name('season_student-detail');
+    Route::get('/season_student/detail/{seasonStudentId}', [SeasonStudentController::class, 'detail'])->name('season_student-detail');
 
     // 日程登録画面
     Route::get('/season_student/edit/{seasonStudentId}', [SeasonStudentController::class, 'edit'])->name('season_student-edit');

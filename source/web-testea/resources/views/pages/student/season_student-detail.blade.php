@@ -2,10 +2,10 @@
 
 @section('title', '特別期間講習 連絡内容詳細')
 
-@section('content')
-
 {{-- 子ページ --}}
 @section('child_page', true)
+
+@section('content')
 
 {{-- フォームなし --}}
 <x-bs.card>
@@ -13,42 +13,48 @@
     {{-- 詳細を表示 --}}
     <x-bs.table :hover=false :vHeader=true class="mb-4">
       <tr>
-          <th class="t-minimum" width="25%">特別期間名</th>
-          <td>2023年春期</td>
+        <th width="25%">特別期間</th>
+        <td>{{$seasonStudent->year}}年{{$seasonStudent->season_name}}</td>
       </tr>
         <tr>
           <th>受講校舎</th>
-          <td>久我山</td>
-      </tr>
+          <td>{{$seasonStudent->campus_name}}</td>
+        </tr>
       <tr>
           <th>生徒コメント</th>
-          <td>今回は数学・英語の受講を希望します</td>
+        {{-- nl2br: 改行 --}}
+          <td class="nl2br">{{$seasonStudent->comment}}</td>
       </tr>
+    </x-bs.table>
+    {{-- hidden 退避用--}}
+    <x-input.hidden id="campus_cd" :editData=$seasonStudent />
+    <x-input.hidden id="season_student_id" :editData=$seasonStudent />
+    <x-input.hidden id="season_cd" :editData=$seasonStudent />
+
+    {{-- 余白 --}}
+    <div class="mb-3"></div>
+
+    <x-bs.form-title>受講希望教科・受講回数</x-bs.form-title>
+
+    {{-- テーブル --}}
+    <x-bs.table class="mb-3">
+        <x-slot name="thead">
+            <th width="30%">教科</th>
+            <th>受講回数</th>
+        </x-slot>
+
+        {{-- テーブル行 --}}
+        @foreach ($subjectTimesList as $subjectTimes) <tr>
+          <x-bs.td-sp caption="教科">{{$subjectTimes->subject_name}}</x-bs.td-sp>
+          <x-bs.td-sp caption="受講回数">{{$subjectTimes->times}}</x-bs.td-sp>
+        </tr>
+        @endforeach
     </x-bs.table>
 
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-  <x-bs.form-title>受講希望科目・受講回数</x-bs.form-title>
-
-  {{-- テーブル --}}
-    <x-bs.table class="mb-3">
-        <x-slot name="thead">
-            <th width="30%">受講希望科目</th>
-            <th>受講回数</th>
-        </x-slot>
-
-        {{-- テーブル行 --}}
-        <tr>
-            <td>数学</td>
-            <td>2</td>
-      </tr>
-        <tr>
-            <td>英語</td>
-            <td>2</td>
-        </tr>
-    </x-bs.table>
-
+  <x-bs.form-title>受講</x-bs.form-title>
   <x-bs.table :hover=false class="table-checked">
 
     {{-- テーブルタイトル行 --}}
@@ -56,29 +62,29 @@
       <th class="t-minimum t-week-time"></th>
 
       {{-- 時限を表示 --}}
-      @for ($i = 0; $i < count($periodIdList); $i++)
-        <th class="t-week">{{$periodIdList[$i]}}時限目</th>
-      @endfor
+      @foreach ($periodList as $periodKey => $periodVal)
+        <th class="t-week">{{$periodKey}}時限目</th>
+      @endforeach
     </x-slot>
 
     {{-- 二重ループで組み立てる --}}
-    @for ($j = 0; $j < count($dayList); $j++) <tr>
+    @foreach ($dateList as $date) <tr>
       {{-- 日付を表示 --}}
-      <td class="tt">{{$dayList[$j]}}</td>
+      <td class="tt">{{$date['dateLabel']}}</td>
 
-      @for ($i = 0; $i < count($periodIdList); $i++)
+      @foreach ($periodList as $periodKey => $periodVal)
       <td>
         {{-- チェックボックス。裏でクリックされた時間帯を保持している --}}
-        <x-input.checkbox id="{{$dayIdList[$j]}}_{{$periodIdList[$i]}}" class="chk-wt2" name="chkWs" :icheck=false
-          value="{{$dayIdList[$j]}}_{{$periodIdList[$i]}}" :editData=$editData />
+        <x-input.checkbox id="{{$date['dateId']}}_{{$periodKey}}" class="chk-wt2" name="chkWs" :icheck=false
+          value="{{$date['dateId']}}_{{$periodKey}}" :editData=$editData />
 
         {{-- 表のDiv --}}
-        <div class="chk-t" data-wt="{{$dayIdList[$j]}}_{{$periodIdList[$i]}}"></div>
+        <div class="chk-t" data-wt="{{$date['dateId']}}_{{$periodKey}}"></div>
       </td>
-      @endfor
+      @endforeach
 
       </tr>
-    @endfor
+    @endforeach
 
   </x-bs.table>
 
