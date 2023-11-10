@@ -54,7 +54,7 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-  <x-bs.form-title>受講</x-bs.form-title>
+  <x-bs.form-title>受講不可コマ連絡情報</x-bs.form-title>
   <x-bs.table :hover=false class="table-checked">
 
     {{-- テーブルタイトル行 --}}
