@@ -174,7 +174,7 @@ trait FuncScheduleTrait
             ->select(
                 'yearly_schedules.lesson_date',
                 'mst_codes.name as dayname'
-                )
+            )
             // コードマスターとJOIN（曜日）
             ->sdLeftJoin(CodeMaster::class, function ($join) {
                 $join->on('yearly_schedules.day_cd', '=', 'mst_codes.code')
