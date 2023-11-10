@@ -90,14 +90,21 @@
             <x-bs.td-sp caption="承認ステータス">@{{item.status_name}}</x-bs.td-sp>
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
-                {{-- <x-button.list-dtl /> --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
                 {{-- スペース --}}
                 &nbsp;
-                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval" />
+                {{-- <form action="{{ route('report_check-approval') }}" method="POST">
+                    @csrf
+                    <button type="submit" caption="承認" btn="btn-primary" class="btn btn-primary btn-sm"> --}}
+                    <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval" :vueDataAttr="['id' => '2']" />
+                    {{-- hidden --}}
+                    {{-- <x-input.hidden id="id" />
+                </form> --}}
                 {{-- スペース --}}
                 &nbsp;
-                <x-button.list-edit href="{{ route('report_check-edit', '1') }}" />
+                <x-button.list-edit vueHref="'{{ route('report_check-edit', '') }}/' + item.id"
+                    {{-- 承認のときは非活性 --}}
+                    vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }}"/>
             </td>
         </tr>
 

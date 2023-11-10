@@ -356,13 +356,16 @@ trait FuncReportTrait
             }, 'mst_unit_categories3')
             // 単元名取得
             ->sdLeftJoin(MstUnit::class, function ($join) {
-                $join->on('report_units.unit_cd1', '=', 'mst_units1.unit_cd');
+                $join->on('report_units.unit_cd1', '=', 'mst_units1.unit_cd')
+                    ->on('report_units.unit_category_cd1', '=', 'mst_units1.unit_category_cd');
             }, 'mst_units1')
             ->sdLeftJoin(MstUnit::class, function ($join) {
-                $join->on('report_units.unit_cd2', '=', 'mst_units2.unit_cd');
+                $join->on('report_units.unit_cd2', '=', 'mst_units2.unit_cd')
+                    ->on('report_units.unit_category_cd2', '=', 'mst_units2.unit_category_cd');
             }, 'mst_units2')
             ->sdLeftJoin(MstUnit::class, function ($join) {
-                $join->on('report_units.unit_cd3', '=', 'mst_units3.unit_cd');
+                $join->on('report_units.unit_cd3', '=', 'mst_units3.unit_cd')
+                    ->on('report_units.unit_category_cd3', '=', 'mst_units3.unit_category_cd');
             }, 'mst_units3')
             ->first();
 

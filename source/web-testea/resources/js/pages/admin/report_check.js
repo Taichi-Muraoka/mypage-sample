@@ -20,8 +20,14 @@ export default class AppClass extends PageBase {
         // Vue: モーダル
         this.getVueModal();
 
+        // 編集完了後は一覧へ戻る
+        var afterEdit = () => {
+            UrlCom.redirect(UrlCom.getFuncUrl());
+        };
+
         // Vue: 検索フォーム
         this.getVueSearchForm({
+            afterEdit: afterEdit,
             // 画面読み込み時
             vueMounted: function ($vue, option) {
                 // 初期表示時に、生徒プルダウンを初期化する。
