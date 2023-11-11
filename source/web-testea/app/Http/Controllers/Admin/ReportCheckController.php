@@ -63,7 +63,7 @@ class ReportCheckController extends Controller
         $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4, $subCodes);
 
         return view('pages.admin.report_check', [
-            'rules' => $this->rulesForSearch(),
+            'rules' => $this->rulesForSearch(null),
             'rooms' => $rooms,
             'grades' => $grades,
             'tutors' => $tutors,
@@ -107,7 +107,7 @@ class ReportCheckController extends Controller
     public function validationForSearch(Request $request)
     {
         // リクエストデータチェック
-        $validator = Validator::make($request->all(), $this->rulesForSearch());
+        $validator = Validator::make($request->all(), $this->rulesForSearch($request));
         return $validator->errors();
     }
 
@@ -120,7 +120,7 @@ class ReportCheckController extends Controller
     public function search(Request $request)
     {
         // バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForSearch())->validate();
+        Validator::make($request->all(), $this->rulesForSearch($request))->validate();
 
         // formを取得
         $form = $request->all();
@@ -268,6 +268,7 @@ class ReportCheckController extends Controller
             'period_no' => $report->period_no,
             'course_name' => $report->course_name,
             'course_kind' => $report->course_kind,
+            'tutor_name' => $report->tutor_name,
             'student_name' => $report->student_name,
             'class_member_name' => $class_member_names,
             'subject_name' => $report->subject_name,
@@ -309,7 +310,7 @@ class ReportCheckController extends Controller
      *
      * @return mixed ルール
      */
-    private function rulesForSearch()
+    private function rulesForSearch(?Request $request)
     {
         $rules = array();
 
@@ -370,14 +371,59 @@ class ReportCheckController extends Controller
                 return $fail(Lang::get('validation.invalid_input'));
             }
         };
+        
+        $ruleLessonDate = Report::getFieldRule('lesson_date');
+        // FromとToの大小チェックバリデーションを追加(Fromが存在する場合のみ)
+        $validateFromTo = [];
+        $keyFrom = 'lesson_date_from';
+        if (isset($request[$keyFrom]) && filled($request[$keyFrom])) {
+            $validateFromTo = ['after_or_equal:' . $keyFrom];
+        }
 
         $rules += Report::fieldRules('campus_cd', [$validationRoomList]);
         $rules += Report::fieldRules('student_id', [$validationStudentList]);
         $rules += Report::fieldRules('tutor_id', [$validationTeacherList]);
         $rules += ['grade_cd' => [$validationClassesList]];
         $rules += Report::fieldRules('approval_status', [$validationStatus]);
+        $rules += ['lesson_date_from' => $ruleLessonDate];
+        $rules += ['lesson_date_to' => array_merge($validateFromTo, $ruleLessonDate)];
         
         return $rules;
+    }
+
+    /**
+     * モーダル処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function execModal(Request $request)
+    {
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request, 'id');
+
+        // モーダルによって処理を行う
+        $modal = $request->input('target');
+
+        switch ($modal) {
+            case "#modal-dtl-approval":
+                // IDのバリデーション
+                $this->validateIdsFromRequest($request, 'id');
+
+                $report = Report::query()
+                    ->where('report_id', $request->input('id'))
+                    // 該当データがない場合はエラーを返す
+                    ->firstOrFail();        
+                    
+                $report->approval_status = AppConst::CODE_MASTER_2_3;
+
+                $report->save();
+
+                return;
+            default:
+                // 該当しない場合
+                $this->illegalResponseErr();
+        }
     }
 
     //==========================
@@ -504,19 +550,6 @@ class ReportCheckController extends Controller
         $report->fill($form)->save();
 
         return;
-    }
-
-    /**
-     * 承認処理
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return void
-     */
-    public function approval(Request $request)
-    {
-        $this->debug($request);
-
-        return redirect('/report_check/');
     }
 
     /**

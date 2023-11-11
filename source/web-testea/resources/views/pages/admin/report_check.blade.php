@@ -93,13 +93,9 @@
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
                 {{-- スペース --}}
                 &nbsp;
-                {{-- <form action="{{ route('report_check-approval') }}" method="POST">
-                    @csrf
-                    <button type="submit" caption="承認" btn="btn-primary" class="btn btn-primary btn-sm"> --}}
-                    <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval" :vueDataAttr="['id' => '2']" />
-                    {{-- hidden --}}
-                    {{-- <x-input.hidden id="id" />
-                </form> --}}
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval"
+                    :vueDataAttr="['id' => 'item.id']"
+                    vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }}"/>
                 {{-- スペース --}}
                 &nbsp;
                 <x-button.list-edit vueHref="'{{ route('report_check-edit', '') }}/' + item.id"
@@ -114,5 +110,6 @@
 
 {{-- モーダル --}}
 @include('pages.admin.modal.report_check-modal')
+@include('pages.admin.modal.report_check_approval-modal', ['modal_send_confirm' => true, 'modal_id' => 'modal-dtl-approval'])
 
 @stop

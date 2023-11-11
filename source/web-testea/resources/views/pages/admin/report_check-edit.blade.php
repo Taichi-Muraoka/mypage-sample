@@ -18,7 +18,7 @@
             <td>{{$report['regist_date']->format('Y/m/d')}}</td>
         </tr>
         <tr>
-            <th width="35%">授業日・時限</th>
+            <th width="20%">授業日・時限</th>
             <td>{{$report['lesson_date']->format('Y/m/d')}} {{$report['period_no']}}限</td>
         </tr>
         <tr>
@@ -163,10 +163,6 @@
 
     {{-- hidden --}}
     <x-input.hidden id="report_id" :editData=$editData />
-
-    <x-bs.callout title="登録の際の注意事項" type="warning">
-        承認ステータスを「承認」として更新ボタンを押下すると、 生徒に授業報告書が開示されます。
-    </x-bs.callout>
 
     {{-- フッター --}}
     <x-slot name="footer">

@@ -678,8 +678,8 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 編集処理
     Route::post('/report_check/update', [ReportCheckController::class, 'update'])->name('report_check-update');
 
-    // 承認処理
-    Route::post('/report_check/approval', [ReportCheckController::class, 'approval'])->name('report_check-approval');
+    // モーダル処理
+    Route::post('/report_check/exec_modal', [ReportCheckController::class, 'execModal'])->name('report_check-exec_modal');
 
     // バリデーション(登録用)
     Route::post('/report_check/vd_input', [ReportCheckController::class, 'validationForInput'])->name('report_check-vd_input');

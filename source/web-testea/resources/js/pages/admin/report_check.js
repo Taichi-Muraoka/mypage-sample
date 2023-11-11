@@ -20,15 +20,24 @@ export default class AppClass extends PageBase {
         // Vue: モーダル
         this.getVueModal();
 
-        // 編集完了後は一覧へ戻る
-        var afterEdit = () => {
+        // 完了後は一覧へ戻る
+        var afterExec = () => {
             UrlCom.redirect(UrlCom.getFuncUrl());
         };
 
+        // Vue: モーダル(承認)
+        this.getVueModal({
+            // IDを分けた
+            id: "#modal-dtl-approval",
+
+            // 完了処理後
+            afterExec: afterExec
+        });
+
         // Vue: 検索フォーム
         this.getVueSearchForm({
-            afterEdit: afterEdit,
             // 画面読み込み時
+            // afterExec: afterExec,
             vueMounted: function ($vue, option) {
                 // 初期表示時に、生徒プルダウンを初期化する。
                 // -1の場合、自分の受け持ちの生徒だけに絞り込み
