@@ -60,7 +60,8 @@ export default class AppClass extends PageBase {
                                 (data) => {
                                     // データをセット
                                     this.selectGetItemTemplate = data;
-                                    this.form.reason = data.reason;
+                                    // nullやundefinedの場合に空文字に置き換え
+                                    this.form.reason = data.reason ?? '';
                                 }
                             );
                         })

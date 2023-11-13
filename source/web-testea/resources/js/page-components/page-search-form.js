@@ -94,8 +94,9 @@ export default class PageSearchForm extends PageComponentBase {
 
                 // ライブラリの初期化
                 // self.initLibs(this, option);
-                // 検索モーダルでも使用するSelect2だけ、この画面内で初期化する
+                // 検索モーダル・フォームでも使用するSelect2,DatePickerを、この画面内で初期化する
                 self.initSelect2(this, option);
+                self.initDatePicker(this, option);
 
                 // afterSearch用
                 const _self = this;
