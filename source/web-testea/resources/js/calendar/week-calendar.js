@@ -45,6 +45,8 @@ export default class WeekCalendar {
         const self = this;
 
         var calendar = new Calendar(calendarEl, {
+            // license key for premium features
+            schedulerLicenseKey: '0477382314-fcs-1699842877',
             initialView: "resourceTimeGridDay",
             initialDate: curDate,
             customButtons: {
