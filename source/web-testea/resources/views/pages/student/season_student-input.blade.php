@@ -74,7 +74,7 @@
     <x-bs.form-title>受講希望教科・受講回数</x-bs.form-title>
 
     {{-- テーブル --}}
-    <x-bs.table :bordered=false :hover=false :smartPhone=true class="mb-small">
+    <x-bs.table :bordered=false :hover=false>
       <x-slot name="thead">
         <td>教科</td>
         <td>受講回数</td>
@@ -86,7 +86,7 @@
             :select2Search=true :blank=true :rules=$rules />
         </x-bs.td-sp>
 
-        <x-bs.td-sp caption="回数">
+        <x-bs.td-sp caption="受講回数">
           <x-input.text id="times_{{ $i }}" :rules=$rules />
         </x-bs.td-sp>
       </tr>
