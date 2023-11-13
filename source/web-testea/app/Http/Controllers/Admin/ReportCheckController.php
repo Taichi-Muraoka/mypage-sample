@@ -365,7 +365,7 @@ class ReportCheckController extends Controller
         $validationStatus =  function ($attribute, $value, $fail) {
 
             // リストを取得し存在チェック
-            $states = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_2);
+            $states = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4);
             if (!isset($states[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
@@ -415,7 +415,7 @@ class ReportCheckController extends Controller
                     // 該当データがない場合はエラーを返す
                     ->firstOrFail();        
                     
-                $report->approval_status = AppConst::CODE_MASTER_2_1;
+                $report->approval_status = AppConst::CODE_MASTER_4_2;
 
                 $report->save();
 
@@ -617,7 +617,7 @@ class ReportCheckController extends Controller
         $validationStatus =  function ($attribute, $value, $fail) {
 
             // リストを取得し存在チェック
-            $states = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_2);
+            $states = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4);
             if (!isset($states[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
