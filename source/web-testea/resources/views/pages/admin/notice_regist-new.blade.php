@@ -15,12 +15,11 @@
     <x-input.select id="template_id" caption="定型文選択" :select2=true onChange="selectChangeGetTemplate"
         :mastrData=$templates :editData=$editData />
 
-    {{-- モック画面用（固定） --}}
     <div v-cloak>
         <x-bs.table vShow="form.template_id" :hover=false :vHeader=true>
             <tr>
                 <th>お知らせ種別</th>
-                <td>その他</td>
+                <td v-cloak>@{{ selectGetItemTemplate.notice_type_name }}</td>
             </tr>
         </x-bs.table>
     </div>
@@ -29,28 +28,7 @@
 
     <x-input.textarea id="text" caption="内容" :rules=$rules />
 
-    <x-input.select caption="模試・イベント情報" id="tmid" :select2=true :editData=$editData
-        v-show="selectGetItemTemplate.notice_type == {{ App\Consts\AppConst::CODE_MASTER_14_1 }}">
-        {{-- vueで動的にプルダウンを作成 --}}
-        <option v-for="item in selectGetItemTemplate.selectItemsTm" :value="item.tmid">
-            @{{ item.value }}
-        </option>
-    </x-input.select>
-
-    <x-input.select caption="模試・イベント情報" id="event_id" :select2=true :editData=$editData
-        v-show="selectGetItemTemplate.notice_type == {{ App\Consts\AppConst::CODE_MASTER_14_2 }}">
-        {{-- vueで動的にプルダウンを作成 --}}
-        <option v-for="item in selectGetItemTemplate.selectItemsEvent" :value="item.event_id">
-            @{{ item.value }}
-        </option>
-    </x-input.select>
-
-    <x-input.select id="destination_type" caption="宛先種別" :select2=true onChange="selectChangeGetMulti">
-        <option value='{{ App\Consts\AppConst::CODE_MASTER_15_1 }}'>グループ一斉</option>
-        <option value='{{ App\Consts\AppConst::CODE_MASTER_15_2 }}'>個別（生徒）</option>
-        <option value='{{ App\Consts\AppConst::CODE_MASTER_15_3 }}'>個別（講師）</option>
-        <option value="4">個別（保護者メール）</option>
-    </x-input.select>
+    <x-input.select id="destination_type" caption="宛先種別" :select2=true onChange="selectChangeGetMulti" :mastrData=$destination_types/>
 
     {{-- グループ一斉 --}}
     <x-bs.card vShow="form.destination_type == {{ App\Consts\AppConst::CODE_MASTER_15_1 }}">

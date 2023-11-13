@@ -11,42 +11,22 @@
         <x-bs.col2>
             @can('roomAdmin')
             {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-            <x-input.select id="roomcd" caption="校舎（送信元）" :select2=true :mastrData=$rooms :editData=$editData
+            <x-input.select id="campus_cd" caption="校舎（送信元）" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false :blank=false />
             @else
-            <x-input.select id="roomcd" caption="校舎（送信元）" :select2=true :mastrData=$rooms :editData=$editData
+            <x-input.select id="campus_cd" caption="校舎（送信元）" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false />
             @endcan
         </x-bs.col2>
         <x-bs.col2>
-            {{-- 本番用 --}}
-            {{-- <x-input.select id="destination_type" caption="宛先種別" :select2=true :mastrData=$destination_types :editData=$editData /> --}}
-
-            {{-- モック用 --}}
-            <x-input.select id="destination_type" caption="宛先種別" :select2=true :mastrData=$destination_types :editData=$editData
-                :select2Search=false >
-                <option value="4">個別（保護者メール）</option>
-            </x-input.select>
+            <x-input.select id="destination_type" caption="宛先種別" :select2=true :mastrData=$destination_types :editData=$editData />
         </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>
         <x-bs.col2>
-            {{-- 本番用 --}}
-            {{-- <x-input.select id="notice_type" caption="お知らせ種別" :select2=true :editData=$editData :mastrData=$typeList
-                :select2Search=false /> --}}
-
-            {{-- モック用 --}}
-            <x-input.select id="notice_type" caption="お知らせ種別" :select2=true :editData=$editData 
-                :select2Search=false >
-                <option value="4">その他</option>
-                <option value="5">面談</option>
-                <option value="6">特別期間講習</option>
-                <option value="7">成績登録</option>
-                <option value="8">請求</option>
-                <option value="9">給与</option>
-                <option value="10">追加請求</option>
-            </x-input.select>
+            <x-input.select id="notice_type" caption="お知らせ種別" :select2=true :editData=$editData :mastrData=$notice_type_list
+                :select2Search=false />
         </x-bs.col2>
         <x-bs.col2>
             <x-input.text caption="タイトル" id="title" :rules=$rules />
@@ -77,7 +57,7 @@
         </x-slot>
 
         {{-- モック用 --}}
-        <tr>
+        {{-- <tr>
             <td>2023/06/16</td>
             <td>面談のご案内</td>
             <td>面談</td>
@@ -86,18 +66,19 @@
             <td>
                 <x-button.list-dtl href="{{ route('notice_regist-detail', 1) }}" caption="お知らせ情報"/>
             </td>
-        </tr>
+        </tr> --}}
 
         {{-- 本番用 --}}
-        {{-- <tr v-for="item in paginator.data" v-cloak>
+        <tr v-for="item in paginator.data" v-cloak>
             <td>@{{$filters.formatYmd(item.date)}}</td>
             <td>@{{item.title}}</td>
+            <td>@{{item.notice_type_name}}</td>
             <td>@{{item.type_name}}</td>
             <td>@{{item.room_name}}</td>
             <td>
                 <x-button.list-dtl vueHref="'{{ route('notice_regist-detail', '') }}/' + item.id" caption="お知らせ情報" />
             </td>
-        </tr> --}}
+        </tr>
 
     </x-bs.table>
 
