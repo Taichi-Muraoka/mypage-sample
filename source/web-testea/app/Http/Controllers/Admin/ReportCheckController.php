@@ -332,7 +332,7 @@ class ReportCheckController extends Controller
         $validationClassesList =  function ($attribute, $value, $fail) {
 
             // 学年リストを取得
-            $classes = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_44_4);
+            $classes = $this->mdlGetGradeList();
             if (!isset($classes[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
