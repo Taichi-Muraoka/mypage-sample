@@ -727,9 +727,12 @@ label:not(.form-check-label):not(.custom-file-label) {
 
     .card-body .table.smart-phone tbody > tr > td:last-of-type {
         border: 1px solid #dee2e6;
-        text-align: center;
         border: none;
         padding: 6px 12px;
+    }
+
+    .card-body .table.smart-phone.table-button tbody > tr > td:last-of-type {
+        text-align: center;
     }
 
     .card-body .table.smart-phone tbody > tr > td.not-center:last-of-type {
