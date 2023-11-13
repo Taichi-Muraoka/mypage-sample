@@ -415,7 +415,7 @@ class ReportCheckController extends Controller
                     // 該当データがない場合はエラーを返す
                     ->firstOrFail();        
                     
-                $report->approval_status = AppConst::CODE_MASTER_2_3;
+                $report->approval_status = AppConst::CODE_MASTER_2_1;
 
                 $report->save();
 
