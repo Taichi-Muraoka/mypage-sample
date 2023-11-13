@@ -660,6 +660,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/report_check/search', [ReportCheckController::class, 'search'])->name('report_check-search');
 
+    // 教室選択プルダウンを選択された際に生徒プルダウンの情報を返却する
+    Route::post('/report_check/get_data_select_search', [ReportCheckController::class, 'getDataSelectSearch'])->name('report_check-get_data_select_search');
+
     // 詳細取得用
     Route::post('/report_check/get_data', [ReportCheckController::class, 'getData'])->name('report_check-get_data');
 
@@ -671,6 +674,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 編集処理
     Route::post('/report_check/update', [ReportCheckController::class, 'update'])->name('report_check-update');
+
+    // モーダル処理
+    Route::post('/report_check/exec_modal', [ReportCheckController::class, 'execModal'])->name('report_check-exec_modal');
 
     // バリデーション(登録用)
     Route::post('/report_check/vd_input', [ReportCheckController::class, 'validationForInput'])->name('report_check-vd_input');

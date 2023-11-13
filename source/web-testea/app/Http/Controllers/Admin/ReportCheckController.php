@@ -5,14 +5,15 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Report;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtRirekisho;
+use App\Models\ReportUnit;
+use App\Models\Student;
+use App\Models\Tutor;
+use App\Models\Schedule;
+use App\Models\ClassMember;
+use App\Models\MstCourse;
 use App\Models\CodeMaster;
-use App\Models\ExtSchedule;
 use App\Consts\AppConst;
-use App\Libs\AuthEx;
 use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncReportTrait;
 
@@ -45,18 +46,56 @@ class ReportCheckController extends Controller
      */
     public function index()
     {
-        // 教室リストを取得
+        // 校舎リストを取得
         $rooms = $this->mdlGetRoomList(false);
 
         // 学年リストを取得
-        $classes = $this->mdlMenuFromExtGenericMaster(AppConst::EXT_GENERIC_MASTER_112);
+        $grades = $this->mdlGetGradeList();
+
+        // 講師リストを取得
+        $tutors = $this->mdlGetTutorList();
+
+        // コースリストを取得
+        $courses = $this->mdlGetCourseList();
+
+        // 報告書承認リストを取得（サブコード指定で絞り込み）
+        $subCodes = [1];
+        $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4, $subCodes);
 
         return view('pages.admin.report_check', [
-            'rules' => $this->rulesForSearch(),
+            'rules' => $this->rulesForSearch(null),
             'rooms' => $rooms,
-            'classes' => $classes,
+            'grades' => $grades,
+            'tutors' => $tutors,
+            'courses' => $courses,
+            'statusList' => $statusList,
             'editData' => null
         ]);
+    }
+
+    /**
+     * 生徒情報取得（校舎リスト選択時）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 生徒情報
+     */
+    public function getDataSelectSearch(Request $request)
+    {
+        // campus_cdを取得
+        $campus_cd = $request->input('id');
+
+        // 生徒リスト取得
+        if ($campus_cd == -1 || !filled($campus_cd)) {
+            // -1 または 空白の場合、自分の受け持ちの生徒だけに絞り込み
+            // 生徒リストを取得
+            $students = $this->mdlGetStudentList();
+        } else {
+            $students = $this->mdlGetStudentList($campus_cd);
+        }
+
+        return [
+            'selectItems' => $this->objToArray($students),
+        ];
     }
 
     /**
@@ -68,7 +107,7 @@ class ReportCheckController extends Controller
     public function validationForSearch(Request $request)
     {
         // リクエストデータチェック
-        $validator = Validator::make($request->all(), $this->rulesForSearch());
+        $validator = Validator::make($request->all(), $this->rulesForSearch($request));
         return $validator->errors();
     }
 
@@ -81,7 +120,7 @@ class ReportCheckController extends Controller
     public function search(Request $request)
     {
         // バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForSearch())->validate();
+        Validator::make($request->all(), $this->rulesForSearch($request))->validate();
 
         // formを取得
         $form = $request->all();
@@ -89,53 +128,81 @@ class ReportCheckController extends Controller
         // クエリを作成
         $query = Report::query();
 
-        // 教室の検索
-        if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-            $query->where($this->guardRoomAdminTableWithRoomCd());
-        } else {
-            // 管理者の場合検索フォームから取得
-            $query->SearchRoom($form);
+        // 校舎コード選択による絞り込み条件
+        // -1 は未選択状態のため、-1以外の場合に校舎コードの絞り込みを行う
+        if (isset($form['campus_cd']) && filled($form['campus_cd']) && $form['campus_cd'] != -1) {
+            // 検索フォームから取得（スコープ）
+            $query->SearchCampusCd($form);
         }
 
-        // 学年の検索(生徒基本情報参照)
-        (new ExtStudentKihon)->scopeSearchCls($query, $form);
+        // 学年コード選択により絞り込み条件
+        if (isset($form['grade_cd']) && filled($form['grade_cd'])) {
+            // 検索フォームから取得（スコープ）
+            $query->SearchGradeCd($form);
+        }
 
-        // 生徒名の検索(生徒基本情報参照)
-        $key['name'] = $form['sname'];
-        (new ExtStudentKihon)->scopeSearchName($query, $key);
+        // コースコード選択により絞り込み条件
+        if (isset($form['course_cd']) && filled($form['course_cd'])) {
+            // 検索フォームから取得（スコープ）
+            $query->SearchCourseCd($form);
+        }
 
-        // 教師名の検索(教師履歴書情報参照)
-        $key['name'] = $form['tname'];
-        (new ExtRirekisho)->scopeSearchName($query, $key);
+        // 承認ステータス選択により絞り込み条件
+        if (isset($form['approval_status']) && filled($form['approval_status'])) {
+            // 検索フォームから取得（スコープ）
+            $query->SearchApprovalStatus($form);
+        }
 
-        // 教室名取得のサブクエリ
+        // 生徒IDの検索（スコープで指定する）
+        $query->SearchSid($form);
+
+        // 講師IDの検索（スコープで指定する）
+        $query->SearchTid($form);
+
+        // 認定日の絞り込み条件
+        $query->SearchLessonDateFrom($form);
+        $query->SearchLessonDateTo($form);
+
+        // 校舎名取得のサブクエリ
         $room_names = $this->mdlGetRoomQuery();
 
         // データを取得
         $reports = $query
             ->select(
-                'report_id as id',
-                'regist_time',
-                'lesson_date',
-                'start_time',
+                'reports.report_id as id',
+                'reports.lesson_date',
+                'reports.period_no',
+                'reports.tutor_id',
+                'reports.approval_status',
+                'reports.regist_date',
                 'room_names.room_name as room_name',
-                'ext_student_kihon.name as sname',
-                'ext_rirekisho.name as tname',
-                'r_minutes',
-                'report.created_at'
+                'mst_courses.name as course_name',
+                'mst_codes.name as status_name',
+                'tutors.name as tutor_name',
+                'students.name as student_name'
             )
-            // 教室名の取得
+            // スケジュール情報のJOIN
+            ->sdJoin(Schedule::class, 'reports.schedule_id', '=', 'schedules.schedule_id')
+            // 受講生徒情報のJOIN
+            ->sdLeftJoin(ClassMember::class, 'schedules.schedule_id', '=', 'class_members.schedule_id')
+            // 校舎名の取得
             ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('report.roomcd', '=', 'room_names.code');
+                $join->on('schedules.campus_cd', '=', 'room_names.code');
             })
+            // 講師名の取得
+            ->sdLeftJoin(Tutor::class, 'reports.tutor_id', '=', 'tutors.tutor_id')
             // 生徒名の取得
-            ->sdLeftJoin(ExtStudentKihon::class, 'report.sid', '=', 'ext_student_kihon.sid')
-            // 教師名の取得
-            ->sdLeftJoin(ExtRirekisho::class, 'report.tid', '=', 'ext_rirekisho.tid')
-            // 登録日の降順
-            ->orderBy('report.regist_time', 'desc')
-            ->orderBy('report.created_at', 'desc');
+            ->sdLeftJoin(Student::class, 'reports.student_id', '=', 'students.student_id')
+            // コース名の取得
+            ->sdLeftJoin(MstCourse::class, 'reports.course_cd', '=', 'mst_courses.course_cd')
+            // 報告書承認ステータス名の取得
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('reports.approval_status', 'mst_codes.code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_4);
+            })
+            ->distinct()
+            ->orderby('lesson_date', 'desc')
+            ->orderby('period_no', 'desc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $reports);
@@ -149,68 +216,93 @@ class ReportCheckController extends Controller
      */
     public function getData(Request $request)
     {
-        // // IDのバリデーション
-        // $this->validateIdsFromRequest($request, 'id');
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request, 'id');
 
-        // // IDを取得
-        // $id = $request->input('id');
+        // IDを取得
+        $id = $request->input('id');
 
-        // // クエリを作成
-        // $query = Report::query();
+        // データを取得
+        $report = $this->getReport($id);
 
-        // // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        // $query->where($this->guardRoomAdminTableWithRoomCd());
+        // 集団授業の場合受講生徒名取得
+        if ($report->course_kind == AppConst::CODE_MASTER_42_2) {
+            $class_member_names = $this->getClassMember($report->schedule_id);
+        } else {
+            $class_member_names = [];
+        }
 
-        // // 教室名取得のサブクエリ
-        // $room_names = $this->mdlGetRoomQuery();
+        foreach (AppConst::REPORT_SUBCODES as $subCode) {
+            if (ReportUnit::where('report_units.sub_cd', '=', $subCode)->exists()) {
+                // 可変変数名をセット
+                $lesson_text = 'lesson_text' . $subCode;
 
-        // // データを取得
-        // $report = $query
-        //     // IDを指定
-        //     ->where('report.report_id', $id)
-        //     ->select(
-        //         'regist_time',
-        //         'ext_rirekisho.name as tname',
-        //         'mst_codes.name as lesson_type_name',
-        //         'lesson_date',
-        //         'start_time',
-        //         'room_names.room_name as room_name',
-        //         'ext_student_kihon.name as sname',
-        //         'r_minutes',
-        //         'content',
-        //         'homework',
-        //         'teacher_comment',
-        //         'parents_comment'
-        //     )
-        //     // 教室名の取得
-        //     ->leftJoinSub($room_names, 'room_names', function ($join) {
-        //         $join->on('report.roomcd', '=', 'room_names.code');
-        //     })
-        //     // 生徒名の取得
-        //     ->sdLeftJoin(ExtStudentKihon::class, 'report.sid', '=', 'ext_student_kihon.sid')
-        //     // 教師名の取得
-        //     ->sdLeftJoin(ExtRirekisho::class, 'report.tid', '=', 'ext_rirekisho.tid')
-        //     // 授業種別名の取得
-        //     ->sdLeftJoin(CodeMaster::class, function ($join) {
-        //         $join->on('report.lesson_type', '=', 'mst_codes.code')
-        //             ->where('mst_codes.data_type', AppConst::CODE_MASTER_8);
-        //     })
-        //     ->firstOrFail();
+                // 教材名
+                $$lesson_text = $this->getReportText($report->report_id, $subCode);
 
-        // return [
-        //     'regist_time' => $report->regist_time,
-        //     'tname' => $report->tname,
-        //     'lesson_type_name' => $report->lesson_type_name,
-        //     'lesson_date' => $report->lesson_date,
-        //     'start_time' => $report->start_time,
-        //     'room_name' => $report->room_name,
-        //     'sname' => $report->sname,
-        //     'r_minutes' => $report->r_minutes,
-        //     'content' => $report->content,
-        //     'homework' => $report->homework,
-        //     'teacher_comment' => $report->teacher_comment,
-        //     'parents_comment' => $report->parents_comment
-        // ];
+                // 単元分類・単元
+                for ($i = 1; $i <= 3; $i++) {
+                    // 可変変数名をセット
+                    $lesson_category = 'lesson_category' . $subCode . '_' . $i;
+                    $$lesson_category = $this->getReportCategory($report->report_id, $subCode, $i);
+                }
+            }
+            // 存在しない場合nullにする
+            else {
+                $lesson_text = 'lesson_text' . $subCode;
+
+                // 教材名
+                $$lesson_text = null;
+                // 単元分類・単元
+                for ($i = 1; $i <= 3; $i++) {
+                    $lesson_category = 'lesson_category' . $subCode . '_' . $i;
+                    $$lesson_category = null;
+                }
+            }
+        }
+
+        return [
+            'campus_name' => $report->campus_name,
+            'regist_date' => $report->regist_date,
+            'lesson_date' => $report->lesson_date,
+            'period_no' => $report->period_no,
+            'course_name' => $report->course_name,
+            'course_kind' => $report->course_kind,
+            'tutor_name' => $report->tutor_name,
+            'student_name' => $report->student_name,
+            'class_member_name' => $class_member_names,
+            'subject_name' => $report->subject_name,
+            'monthly_goal' => $report->monthly_goal,
+            'test_contents' => $report->test_contents,
+            'test_score' => $report->test_score,
+            'test_full_score' => $report->test_full_score,
+            'achievement' => intval($report->achievement),
+            'goodbad_point' => $report->goodbad_point,
+            'solution' => $report->solution,
+            'others_comment' => $report->others_comment,
+            'status' => $report->status,
+            'admin_comment' => $report->admin_comment,
+            // 授業教材１
+            'lesson_text1' => $lesson_textL1,
+            'lesson_category1_1' => $lesson_categoryL1_1,
+            'lesson_category1_2' => $lesson_categoryL1_2,
+            'lesson_category1_3' => $lesson_categoryL1_3,
+            // 授業教材２
+            'lesson_text2' => $lesson_textL2,
+            'lesson_category2_1' => $lesson_categoryL2_1,
+            'lesson_category2_2' => $lesson_categoryL2_2,
+            'lesson_category2_3' => $lesson_categoryL2_3,
+            // 宿題教材１
+            'homework_text1' => $lesson_textH1,
+            'homework_category1_1' => $lesson_categoryH1_1,
+            'homework_category1_2' => $lesson_categoryH1_2,
+            'homework_category1_3' => $lesson_categoryH1_3,
+            // 宿題教材２
+            'homework_text2' => $lesson_textH2,
+            'homework_category2_1' => $lesson_categoryH2_1,
+            'homework_category2_2' => $lesson_categoryH2_2,
+            'homework_category2_3' => $lesson_categoryH2_3,
+        ];
     }
 
     /**
@@ -218,17 +310,19 @@ class ReportCheckController extends Controller
      *
      * @return mixed ルール
      */
-    private function rulesForSearch()
+    private function rulesForSearch(?Request $request)
     {
-
         $rules = array();
 
-        // 独自バリデーション: リストのチェック 教室
+        // 独自バリデーション: リストのチェック 校舎
         $validationRoomList =  function ($attribute, $value, $fail) {
 
-            // 教室リストを取得
+            // 校舎リストを取得
             $rooms = $this->mdlGetRoomList(false);
             if (!isset($rooms[$value])) {
+                // 初期表示の時はエラーを発生させないようにする
+                if ($value == -1) return;
+
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
@@ -238,20 +332,98 @@ class ReportCheckController extends Controller
         $validationClassesList =  function ($attribute, $value, $fail) {
 
             // 学年リストを取得
-            $classes = $this->mdlMenuFromExtGenericMaster(AppConst::EXT_GENERIC_MASTER_112);
+            $classes = $this->mdlGetGradeList();
             if (!isset($classes[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
         };
 
-        $rules += Report::fieldRules('roomcd', [$validationRoomList]);
-        $rules += ExtStudentKihon::fieldRules('cls_cd', [$validationClassesList]);
-        $ruleSname = ExtStudentKihon::getFieldRule('name');
-        $rules += ['sname' => $ruleSname];
-        $ruleTname = ExtRirekisho::getFieldRule('name');
-        $rules += ['tname' => $ruleTname];
+        // 独自バリデーション: リストのチェック 生徒ID
+        $validationStudentList =  function ($attribute, $value, $fail) {
+
+            // リストを取得し存在チェック
+            $students = $this->mdlGetStudentList();
+            if (!isset($students[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 教師名
+        $validationTeacherList =  function ($attribute, $value, $fail) {
+
+            // 講師リストを取得
+            $tutors = $this->mdlGetTutorList();
+            if (!isset($tutors[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 承認ステータス
+        $validationStatus =  function ($attribute, $value, $fail) {
+
+            // リストを取得し存在チェック
+            $states = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4);
+            if (!isset($states[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+        
+        $ruleLessonDate = Report::getFieldRule('lesson_date');
+        // FromとToの大小チェックバリデーションを追加(Fromが存在する場合のみ)
+        $validateFromTo = [];
+        $keyFrom = 'lesson_date_from';
+        if (isset($request[$keyFrom]) && filled($request[$keyFrom])) {
+            $validateFromTo = ['after_or_equal:' . $keyFrom];
+        }
+
+        $rules += Report::fieldRules('campus_cd', [$validationRoomList]);
+        $rules += Report::fieldRules('student_id', [$validationStudentList]);
+        $rules += Report::fieldRules('tutor_id', [$validationTeacherList]);
+        $rules += ['grade_cd' => [$validationClassesList]];
+        $rules += Report::fieldRules('approval_status', [$validationStatus]);
+        $rules += ['lesson_date_from' => $ruleLessonDate];
+        $rules += ['lesson_date_to' => array_merge($validateFromTo, $ruleLessonDate)];
+        
         return $rules;
+    }
+
+    /**
+     * モーダル処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function execModal(Request $request)
+    {
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request, 'id');
+
+        // モーダルによって処理を行う
+        $modal = $request->input('target');
+
+        switch ($modal) {
+            case "#modal-dtl-approval":
+                // IDのバリデーション
+                $this->validateIdsFromRequest($request, 'id');
+
+                $report = Report::query()
+                    ->where('report_id', $request->input('id'))
+                    // 該当データがない場合はエラーを返す
+                    ->firstOrFail();        
+                    
+                $report->approval_status = AppConst::CODE_MASTER_4_2;
+
+                $report->save();
+
+                return;
+            default:
+                // 該当しない場合
+                $this->illegalResponseErr();
+        }
     }
 
     //==========================
@@ -266,64 +438,83 @@ class ReportCheckController extends Controller
      */
     public function edit($reportId)
     {
+        // IDのバリデーション
+        $this->validateIds($reportId);
 
-        // // IDのバリデーション
-        // $this->validateIds($reportId);
+        // データを取得
+        $report = $this->getReport($reportId);
 
-        // // クエリを作成
-        // $query = Report::query();
+        // 集団授業の場合受講生徒名取得
+        if ($report->course_kind == AppConst::CODE_MASTER_42_2) {
+            $class_member_names = $this->getClassMember($report->schedule_id);
+        } else {
+            $class_member_names = [];
+        }
 
-        // // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        // $query->where($this->guardRoomAdminTableWithRoomCd());
+        $editdata = [
+            'id' => $report->schedule_id,
+            'report_id' => $report->report_id,
+            'approval_status' => $report->approval_status,
+            'admin_comment' => $report->admin_comment
+        ];
 
-        // // データを取得
-        // $report = $query
-        //     // IDを指定
-        //     ->where('report.report_id', $reportId)
-        //     ->select(
-        //         'report_id',
-        //         'regist_time',
-        //         'lesson_type',
-        //         'id',
-        //         'id as _id', // hiddenに退避
-        //         'lesson_date',
-        //         'start_time',
-        //         'report.sid',
-        //         'report.tid',
-        //         'ext_rirekisho.name as tname',
-        //         'r_minutes',
-        //         'content',
-        //         'homework',
-        //         'teacher_comment',
-        //         'parents_comment'
-        //     )
-        //     // 教師名の取得
-        //     ->sdLeftJoin(ExtRirekisho::class, 'report.tid', '=', 'ext_rirekisho.tid')
-        //     ->firstOrFail();
+        // 教材単元情報を取得（サブコード毎に取得する）
+        foreach (AppConst::REPORT_SUBCODES as $subCode) {
+            $exists = ReportUnit::where('report_units.report_id', '=', $report->report_id)
+                ->where('report_units.sub_cd', '=', $subCode)
+                ->exists();
+            if ($exists) {
+                // データがある場合のみeditdataにセット
+                $report_unit = $this->getReportUnit($report->report_id, $subCode);
+                $editdata += [
+                    'text_name_' . $subCode => $report_unit->text_name1,
+                    'free_text_name_' . $subCode => $report_unit->free_text_name,
+                    'text_page_' . $subCode => $report_unit->text_page1,
+                    'category_name1_' . $subCode => $report_unit->unit_category_name1,
+                    'category_name2_' . $subCode => $report_unit->unit_category_name2,
+                    'category_name3_' . $subCode => $report_unit->unit_category_name3,
+                    'free_category_name1_' . $subCode => $report_unit->free_category_name1,
+                    'free_category_name2_' . $subCode => $report_unit->free_category_name2,
+                    'free_category_name3_' . $subCode => $report_unit->free_category_name3,
+                    'unit_name1_' . $subCode => $report_unit->unit_name1,
+                    'unit_name2_' . $subCode => $report_unit->unit_name2,
+                    'unit_name3_' . $subCode => $report_unit->unit_name3,
+                    'free_unit_name1_' . $subCode => $report_unit->free_unit_name1,
+                    'free_unit_name2_' . $subCode => $report_unit->free_unit_name2,
+                    'free_unit_name3_' . $subCode => $report_unit->free_unit_name3,
+                ];
+            }
+            else {
+                $editdata += [
+                    'text_name_' . $subCode => null,
+                    'free_text_name_' . $subCode => null,
+                    'text_page_' . $subCode => null,
+                    'category_name1_' . $subCode => null,
+                    'category_name2_' . $subCode => null,
+                    'category_name3_' . $subCode => null,
+                    'free_category_name1_' . $subCode => null,
+                    'free_category_name2_' . $subCode => null,
+                    'free_category_name3_' . $subCode => null,
+                    'unit_name1_' . $subCode => null,
+                    'unit_name2_' . $subCode => null,
+                    'unit_name3_' . $subCode => null,
+                    'free_unit_name1_' . $subCode => null,
+                    'free_unit_name2_' . $subCode => null,
+                    'free_unit_name3_' . $subCode => null
+                ];
+            }
+        }
 
-        // if ($report->lesson_type == AppConst::CODE_MASTER_8_1) {
-        //     // 個別教室の場合、生徒IDをセットする
-        //     $report['sidKobetsu'] = $report->sid;
-        //     $report->sid = null;
-        // }
-
-        // // 教師の担当している生徒の一覧を取得(個別教室)
-        // // このプルダウン自体は登録には使わず、個別教室のスケジュールのプルダウンを作成するために使用される
-        // // 家庭教師以外
-        // $studentsKobetsu = $this->mdlGetStudentListForT(null, $report->tid, AppConst::EXT_GENERIC_MASTER_101_900);
-
-        // // 家庭教師の受け持ち生徒名プルダウンメニューを作成
-        // $students = $this->mdlGetStudentListForT(AppConst::EXT_GENERIC_MASTER_101_900, $report->tid);
-
-        // // 授業時間数のプルダウンメニューを作成
-        // $minutes = $this->getMenuOfMinutes();
+        // 報告書承認リストを取得（サブコード指定で絞り込み）
+        $subCodes = [1];
+        $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4, $subCodes);
 
         return view('pages.admin.report_check-edit', [
-            'editData' => null,
+            'editData' => $editdata,
             'rules' => $this->rulesForInput(null),
-            'student_kobetsu_list' => null,
-            'student_list' => null,
-            'minutes_list' => null
+            'report' => $report,
+            'class_member_names' => $class_member_names,
+            'statusList' => $statusList
         ]);
     }
 
@@ -338,80 +529,24 @@ class ReportCheckController extends Controller
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        // 登録者の教師ID取得
-        $tid = $request->input('tid');
-
         // 対象データを取得(PKでユニークに取る)
         $query = Report::query();
 
-        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        // 校舎管理者の場合、自分の校舎コードのみにガードを掛ける
         $query->where($this->guardRoomAdminTableWithRoomCd());
 
         $report = $query
             ->where('report_id', $request->input('report_id'))
-            // 登録者の教師IDでも絞り込み
-            ->where('tid', $tid)
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
-        if ($request->input('lesson_type') == AppConst::CODE_MASTER_8_1) {
-            //---------------
-            // 個別教室登録
-            //---------------
-            $id = $request->input('id');
-
-            // スケジュールidから授業日・授業開始時間・教室・生徒を取得する。
-            $query = ExtSchedule::query();
-
-            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-            $query->where($this->guardRoomAdminTableWithRoomCd());
-
-            $lesson = $query
-                ->select(
-                    'roomcd',
-                    'lesson_date',
-                    'start_time',
-                    'sid'
-                )
-                ->where('id', '=', $id)
-                // 登録者の教師IDでも絞り込み
-                ->where('tid', '=', $tid)
-                ->firstOrFail();
-
-            $roomcd = $lesson->roomcd;
-            $lesson_date = $lesson->lesson_date;
-            $start_time = $lesson->start_time;
-            $sid = $lesson->sid;
-        } elseif ($request->input('lesson_type') == AppConst::CODE_MASTER_8_2) {
-            //---------------
-            // 家庭教師登録
-            //---------------
-            $id = null;
-            $roomcd = AppConst::EXT_GENERIC_MASTER_101_900;
-            $lesson_date = $request->input('lesson_date');
-            $start_time = $request->input('start_time');
-            $sid = $request->input('sid');
-        } else {
-            $this->illegalResponseErr();
-        }
-
         // フォームから受け取った値を格納
         $form = $request->only(
-            'regist_time',
-            'lesson_type',
-            'r_minutes',
-            'content',
-            'homework',
-            'teacher_comment',
-            'parents_comment'
+            'approval_status',
+            'admin_comment'
         );
 
-        // 保存
-        $report->id = $id;
-        $report->roomcd = $roomcd;
-        $report->lesson_date = $lesson_date;
-        $report->start_time = $start_time;
-        $report->sid = $sid;
+        // 更新
         $report->fill($form)->save();
 
         return;
@@ -427,97 +562,32 @@ class ReportCheckController extends Controller
     {
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'report_id');
-        $report_id = $request->input('report_id');
-        $tid = $request->input('tid');
 
         // 対象データを取得(PKでユニークに取る)
-        $query = Report::query();
-
-        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        $query->where($this->guardRoomAdminTableWithRoomCd());
-
-        $report = $query
-            ->where('report_id', $report_id)
-            // 登録者の教師IDでも絞り込み
-            ->where('tid', $tid)
+        $report = Report::query()
+            ->where('report_id', $request->input('report_id'))
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
         // Reportテーブルのdelete
         $report->delete();
 
+        // 授業教材情報を削除
+        foreach (AppConst::REPORT_SUBCODES as $subCode) {
+            if (ReportUnit::where('report_units.sub_cd', '=', $subCode)
+                ->where('report_units.report_id', '=', $report->report_id)
+                ->exists()
+            ) {
+                $lesson_unit = ReportUnit::query()
+                    ->where('report_units.report_id', '=', $report->report_id)
+                    ->where('report_units.sub_cd', '=', $subCode)
+                    ->firstOrFail();
+                // ReportUnitテーブルのdelete
+                $lesson_unit->delete();
+            }
+        }
+
         return;
-    }
-
-    /**
-     * 教室・生徒情報取得
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return array 教師、生徒情報
-     */
-    public function getDataSelect(Request $request)
-    {
-
-        // IDのバリデーション
-        // スケジュールIDは生徒IDの後に受け取れるのでsidのみ必須チェックする
-        $this->validateIdsFromRequest($request, 'reportId', 'sid');
-
-        // IDを取得
-        $reportId =  $request->input('reportId');
-        $schedule_id = $request->input('id');
-        $sid = $request->input('sid');
-
-        // reportIdを取得してtidを取得する
-        $tid = $this->getTidFormReport($reportId);
-
-        //------------------------
-        // [ガード] リスト自体を取得して、
-        // 値が正しいかチェックする
-        //------------------------
-
-        // 教師の担当している生徒の一覧を取得(家庭教師は除く)
-        $students = $this->mdlGetStudentListForT(null, $tid, AppConst::EXT_GENERIC_MASTER_101_900);
-
-        // 生徒一覧にsidがあるかチェック
-        $this->guardListValue($students, $sid);
-
-        //---------------------------
-        // スケジュールプルダウンの作成
-        //---------------------------
-
-        // 教師に紐づくスケジュールを取得
-        // 教室管理者の場合、自分の教室コードのスケジュールのみにガードを掛ける
-        if (AuthEx::isRoomAdmin()) {
-            $account = Auth::user();
-            $myRoomCd = $account->roomcd;
-        } else {
-            $myRoomCd = null;
-        }
-
-        // 個別教室のスケジュールプルダウンメニューを作成
-        $scheduleMaster = $this->getScheduleListReport($tid, $myRoomCd, $sid);
-
-        //---------------------------
-        // 教室を返却する
-        //---------------------------
-        $room_name = null;
-        if (filled($schedule_id)) {
-            // idが指定されている場合のみ
-
-            // [ガード] スケジュールIDがプルダウンの中にあるかチェック
-            $this->guardListValue($scheduleMaster, $schedule_id);
-
-            // スケジュールの取得(ガードはこの中でも掛ける)
-            $lesson = $this->mdlGetScheduleDtl($schedule_id);
-
-            // 変数にセット
-            $room_name = $lesson->room_name;
-        }
-
-        return [
-            'selectItems' => $this->objToArray($scheduleMaster),
-            'class_name' => $room_name
-        ];
     }
 
     /**
@@ -539,236 +609,24 @@ class ReportCheckController extends Controller
      * @param \Illuminate\Http\Request $request リクエスト
      * @return array ルール
      */
-    private function rulesForInput(?Request $request)
+    private function rulesForInput()
     {
-
-        // 独自バリデーション: 重複チェック(個別教室登録用)
-        $validationDuplicateRegular = function ($attribute, $value, $fail) use ($request) {
-
-            if (!isset($request['id'])) {
-                // requiredでチェックするのでreturn
-                return;
-            }
-            if ($request['lesson_type'] != AppConst::CODE_MASTER_8_1) {
-                // 種別で判断
-                return;
-            }
-
-            // 対象データを取得(PKでユニークに取る)
-            // スケジュールID
-            $exists = Report::where('id', $request['id'])
-                // 授業種別
-                ->where('lesson_type', AppConst::CODE_MASTER_8_1)
-                // 更新中のキー以外を検索
-                ->where('report_id', '!=', $request['report_id'])
-                ->exists();
-
-            if ($exists) {
-                // 登録済みエラー
-                return $fail(Lang::get('validation.duplicate_data'));
-            }
-        };
-
-        // 独自バリデーション: 重複チェック(家庭教師登録用)
-        $validationDuplicateHomeTeacher = function ($attribute, $value, $fail) use ($request) {
-
-            if (!isset($request['lesson_date'])) {
-                // requiredでチェックするのでreturn
-                return;
-            }
-            if ($request['lesson_type'] != AppConst::CODE_MASTER_8_2) {
-                // 種別で判断
-                return;
-            }
-
-            // 授業日・開始時刻が現在日付時刻以前の授業のみ登録可とする
-            $lesson_datetime = $request['lesson_date'] . " " . $request['start_time'];
-            $today = date("Y/m/d H:i");
-
-            if (strtotime($lesson_datetime) > strtotime($today)) {
-                // 日時チェックエラー
-                return $fail(Lang::get('validation.before_today'));
-            }
-
-            // 対象データを取得(PKでユニークに取る)
-            $exists = Report::where('tid', $request['tid'])
-                ->where('lesson_date', $request['lesson_date'])
-                ->where('start_time', $request['start_time'])
-                // 授業種別
-                ->where('lesson_type', AppConst::CODE_MASTER_8_2)
-                // 更新中のキー以外を検索
-                ->where('report_id', '!=', $request['report_id'])
-                ->exists();
-
-            if ($exists) {
-                // 登録済みエラー
-                return $fail(Lang::get('validation.duplicate_data'));
-            }
-        };
-
-        // 独自バリデーション: 授業種別（ラジオ）
-        $validationRadioLessonType = function ($attribute, $value, $fail) use ($request) {
-
-            // ラジオの値のチェック
-            if (
-                $request['lesson_type'] != AppConst::CODE_MASTER_8_1 &&
-                $request['lesson_type'] != AppConst::CODE_MASTER_8_2
-            ) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-            // 教室管理者の場合、ラジオの値の変更は不可とする
-            if (AuthEx::isRoomAdmin()) {
-                $account = Auth::user();
-                if (
-                    $account->roomcd == AppConst::EXT_GENERIC_MASTER_101_900 &&
-                    $request->input('lesson_type') == AppConst::CODE_MASTER_8_1
-                ) {
-                    // 不正な値エラー
-                    return $fail(Lang::get('validation.invalid_input'));
-                } else if (
-                    $account->roomcd != AppConst::EXT_GENERIC_MASTER_101_900 &&
-                    $request->input('lesson_type') == AppConst::CODE_MASTER_8_2
-                ) {
-                    // 不正な値エラー
-                    return $fail(Lang::get('validation.invalid_input'));
-                }
-            }
-        };
-
-        // 独自バリデーション: リストのチェック 授業時間
-        $validationMinutesList =  function ($attribute, $value, $fail) {
-
-            // 授業時間数のプルダウンメニューを作成
-            $minutes = $this->getMenuOfMinutes();
-            if (!isset($minutes[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-        };
-
-        // 独自バリデーション: リストのチェック 個別教室のスケジュール
-        $validationScheduleMasterList =  function ($attribute, $value, $fail) use ($request) {
-
-            if (!isset($request)) return;
-
-            // reportIdを取得してtidを取得する
-            $tid = $this->getTidFormReport($request['report_id']);
-
-            // 教師に紐づくスケジュールを取得
-            // 教室管理者の場合、自分の教室コードのスケジュールのみにガードを掛ける
-            if (AuthEx::isRoomAdmin()) {
-                $account = Auth::user();
-                $myRoomCd = $account->roomcd;
-            } else {
-                $myRoomCd = null;
-            }
-
-            // 個別教室のスケジュールプルダウンメニューを作成
-            $scheduleMaster = $this->getScheduleListReport($tid, $myRoomCd);
-
-            if (!isset($scheduleMaster[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-        };
-
-        // 独自バリデーション: リストのチェック 家庭教師の受け持ち生徒名
-        $validationStudentsList =  function ($attribute, $value, $fail) use ($request) {
-
-            if (!isset($request)) return;
-
-            // reportIdを取得してtidを取得する
-            $tid = $this->getTidFormReport($request['report_id']);
-
-            // 家庭教師の受け持ち生徒名プルダウンメニューを作成
-            $students = $this->mdlGetStudentListForT(AppConst::EXT_GENERIC_MASTER_101_900, $tid);
-            if (!isset($students[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-        };
-
-        // 独自バリデーション: リストのチェック 生徒ID(個別教室)
-        $validationSidList =  function ($attribute, $value, $fail) use ($request) {
-
-            // reportIdを取得してtidを取得する
-            $tid = $this->getTidFormReport($request['report_id']);
-
-            // 教師の担当している生徒の一覧を取得
-            $students = $this->mdlGetStudentListForT(null, $tid, AppConst::EXT_GENERIC_MASTER_101_900);
-
-            if (!isset($students[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-        };
-
         $rules = array();
 
-        // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
-        // その他を第二引数で指定する
+        // 独自バリデーション: リストのチェック 承認ステータス
+        $validationStatus =  function ($attribute, $value, $fail) {
 
-        // 個別教室の生徒ID
-        $ruleSid = ExtSchedule::getFieldRule('sid');
-        $rules += ['sidKobetsu' =>  array_merge(
-            $ruleSid,
-            ['required_if:lesson_type,' . AppConst::CODE_MASTER_8_1, $validationSidList]
-        )];
+            // リストを取得し存在チェック
+            $states = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4);
+            if (!isset($states[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
 
-        // 項目のバリデーションルールをベースにする
-        $ruleId = Report::getFieldRule('id');
-        $ruleLessonDate = Report::getFieldRule('lesson_date');
-        $rules += Report::fieldRules('lesson_type', ['required', $validationRadioLessonType]);
-        $rules += Report::fieldRules('regist_time', ['required']);
-        $rules += Report::fieldRules('start_time', ['required_if:lesson_type,' . AppConst::CODE_MASTER_8_2]);
-        $rules += Report::fieldRules('sid', ['required_if:lesson_type,' . AppConst::CODE_MASTER_8_2, $validationStudentsList]);
-
-        // 授業種別が個別教室の場合、スケジュールIDの必須チェックと重複チェック
-        $rules += ['id' =>  array_merge(
-            $ruleId,
-            ['required_if:lesson_type,' . AppConst::CODE_MASTER_8_1, $validationDuplicateRegular, $validationScheduleMasterList]
-        )];
-
-        // 授業種別が家庭教師の場合、必須チェックと重複チェック
-        $rules += ['lesson_date' =>  array_merge(
-            $ruleLessonDate,
-            ['required_if:lesson_type,' . AppConst::CODE_MASTER_8_2, $validationDuplicateHomeTeacher]
-        )];
-
-        // MEMO: 不正アクセス対策として、report_idもルールに追加する
-        $rules += Report::fieldRules('report_id', ['required']);
-        $rules += Report::fieldRules('r_minutes', ['required', $validationMinutesList]);
-        $rules += Report::fieldRules('content', ['required']);
-        $rules += Report::fieldRules('homework');
-        $rules += Report::fieldRules('teacher_comment', ['required']);
-        $rules += Report::fieldRules('parents_comment');
+        $rules += Report::fieldRules('approval_status', [$validationStatus]);
+        $rules += Report::fieldRules('admin_comment');
 
         return $rules;
-    }
-
-    /**
-     * レポートIDから教師IDを取得
-     * 
-     * @param int $transferApplyId 振替ID
-     */
-    private function getTidFormReport($reportId)
-    {
-        // クエリを作成
-        $query = Report::query();
-
-        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        $query->where($this->guardRoomAdminTableWithRoomCd());
-
-        // データを取得
-        $report = $query
-            // IDを指定
-            ->where('report.report_id', $reportId)
-            ->select(
-                'report.tid',
-            )
-            ->firstOrFail();
-
-        return $report->tid;
     }
 }
