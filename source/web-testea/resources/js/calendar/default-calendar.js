@@ -32,6 +32,8 @@ export default class DefaultCalendar {
         var calendarEl = document.getElementById(calendarId);
 
         this._calendar = new Calendar(calendarEl, {
+            // license key for premium features
+            schedulerLicenseKey: '0477382314-fcs-1699842877',
             // v5対応
             initialView: "dayGridMonth",
             headerToolbar: {

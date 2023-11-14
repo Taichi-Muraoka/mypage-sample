@@ -37,6 +37,8 @@ export default class RoomCalendar {
         var calendarEl = document.getElementById(calendarId);
 
         this._calendar = new Calendar(calendarEl, {
+            // license key for premium features
+            schedulerLicenseKey: '0477382314-fcs-1699842877',
             initialView: "resourceTimeGridDay",
             datesSet: this._dateChangeFunc,
             initialDate: initDate,

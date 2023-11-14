@@ -2,7 +2,11 @@
 
 @section('modal-body')
 
-{{-- テーブル --}}
+<p>
+    以下の授業報告書を承認します。<br>
+    よろしいですか？
+</p>
+
 <x-bs.table :hover=false :vHeader=true>
     <tr>
         <th>登録日</th>
@@ -127,6 +131,5 @@
         <td class="nl2br" v-cloak>@{{item.admin_comment}}</td>
     </tr>
 </x-bs.table>
-
 
 @overwrite

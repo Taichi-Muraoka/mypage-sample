@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Traits;
 use App\Models\Report;
 use App\Models\ReportUnit;
 use App\Models\Student;
+use App\Models\Tutor;
 use App\Models\Schedule;
 use App\Models\ClassMember;
 use App\Models\MstCourse;
@@ -137,6 +138,9 @@ trait FuncReportTrait
                 'reports.student_id',
                 // 生徒情報の名前
                 'students.name as student_name',
+                'reports.tutor_id',
+                // 講師情報の名前
+                'tutors.name as tutor_name',
                 'reports.monthly_goal',
                 'reports.test_contents',
                 'reports.test_score',
@@ -161,6 +165,8 @@ trait FuncReportTrait
             })
             // 生徒名を取得
             ->sdLeftJoin(Student::class, 'reports.student_id', '=', 'students.student_id')
+            // 講師名を取得
+            ->sdLeftJoin(Tutor::class, 'reports.tutor_id', '=', 'tutors.tutor_id')
             // スケジュール情報とJOIN
             ->sdLeftJoin(Schedule::class, 'reports.schedule_id', '=', 'schedules.schedule_id')
             // コース名の取得
@@ -356,13 +362,16 @@ trait FuncReportTrait
             }, 'mst_unit_categories3')
             // 単元名取得
             ->sdLeftJoin(MstUnit::class, function ($join) {
-                $join->on('report_units.unit_cd1', '=', 'mst_units1.unit_cd');
+                $join->on('report_units.unit_cd1', '=', 'mst_units1.unit_cd')
+                    ->on('report_units.unit_category_cd1', '=', 'mst_units1.unit_category_cd');
             }, 'mst_units1')
             ->sdLeftJoin(MstUnit::class, function ($join) {
-                $join->on('report_units.unit_cd2', '=', 'mst_units2.unit_cd');
+                $join->on('report_units.unit_cd2', '=', 'mst_units2.unit_cd')
+                    ->on('report_units.unit_category_cd2', '=', 'mst_units2.unit_category_cd');
             }, 'mst_units2')
             ->sdLeftJoin(MstUnit::class, function ($join) {
-                $join->on('report_units.unit_cd3', '=', 'mst_units3.unit_cd');
+                $join->on('report_units.unit_cd3', '=', 'mst_units3.unit_cd')
+                    ->on('report_units.unit_category_cd3', '=', 'mst_units3.unit_category_cd');
             }, 'mst_units3')
             ->first();
 

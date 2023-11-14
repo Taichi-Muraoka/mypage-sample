@@ -21,56 +21,22 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <x-bs.td-sp caption="特別期間名">2023年夏期</x-bs.td-sp>
-            <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
-            <x-bs.td-sp caption="受付開始日">2023/06/20</x-bs.td-sp>
-            <x-bs.td-sp caption="ステータス">未登録</x-bs.td-sp>
-            <x-bs.td-sp caption="連絡日"></x-bs.td-sp>
+        <tr v-for="item in paginator.data" v-cloak>
+            <x-bs.td-sp caption="特別期間名">@{{item.year}}年@{{item.season_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="校舎">@{{item.campus_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="受付開始日">@{{$filters.formatYmd(item.s_start_date)}}</x-bs.td-sp>
+            <x-bs.td-sp caption="ステータス">@{{item.status_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="連絡日">@{{$filters.formatYmd(item.apply_date)}}</x-bs.td-sp>
             <td>
-                {{-- 未登録の場合 --}}
-                <div v-show="1==1"><x-button.list-edit vueHref="'{{ route('season_student-edit', '') }}/' + 1" caption="登録" /></div>
+                {{-- 未登録の場合（登録期間内の場合のみ押下可） --}}
+                <div v-show="item.regist_status=={{ App\Consts\AppConst::CODE_MASTER_5_0 }}">
+                    <x-button.list-edit caption="登録" vueHref="'{{ route('season_student-edit', '') }}/' + item.season_student_id"
+                        vueDisabled="item.datediff < 0 || item.datediff == null" />
+                </div>
                 {{-- 登録済の場合 --}}
-                <div v-show="1==0"><x-button.list-dtl vueHref="'{{ route('season_student-detail', '') }}/' + 1" caption="詳細"/></div>
-            </td>
-        </tr>
-        <tr>
-            <x-bs.td-sp caption="特別期間名">2023年夏期</x-bs.td-sp>
-            <x-bs.td-sp caption="校舎">西永福</x-bs.td-sp>
-            <x-bs.td-sp caption="受付開始日">2023/07/01</x-bs.td-sp>
-            <x-bs.td-sp caption="ステータス">未登録</x-bs.td-sp>
-            <x-bs.td-sp caption="連絡日"></x-bs.td-sp>
-            <td>
-                {{-- 未登録の場合 --}}
-                <div v-show="1==1"><x-button.list-edit vueHref="'{{ route('season_student-edit', '') }}/' + 1" caption="登録"/></div>
-                {{-- 登録済の場合 --}}
-                <div v-show="1==0"><x-button.list-dtl vueHref="'{{ route('season_student-detail', '') }}/' + 1" caption="詳細"/></div>
-            </td>
-        </tr>
-        <tr>
-            <x-bs.td-sp caption="特別期間名">2023年春期</x-bs.td-sp>
-            <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
-            <x-bs.td-sp caption="受付開始日">2023/03/01</x-bs.td-sp>
-            <x-bs.td-sp caption="ステータス">登録済</x-bs.td-sp>
-            <x-bs.td-sp caption="連絡日">2023/03/05</x-bs.td-sp>
-            <td>
-                {{-- 未登録の場合 --}}
-                <div v-show="1==0"><x-button.list-edit vueHref="'{{ route('season_student-edit', '') }}/' + 1" caption="登録" /></div>
-                {{-- 登録済の場合 --}}
-                <div v-show="1==1"><x-button.list-dtl vueHref="'{{ route('season_student-detail', '') }}/' + 1" caption="詳細"/></div>
-            </td>
-        </tr>
-        <tr>
-            <x-bs.td-sp caption="特別期間名">2022年冬期</x-bs.td-sp>
-            <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
-            <x-bs.td-sp caption="受付開始日">2022/12/01</x-bs.td-sp>
-            <x-bs.td-sp caption="ステータス">登録済</x-bs.td-sp>
-            <x-bs.td-sp caption="連絡日">2022/12/05</x-bs.td-sp>
-            <td>
-                {{-- 未登録の場合 --}}
-                <div v-show="1==0"><x-button.list-edit vueHref="'{{ route('season_student-edit', '') }}/' + 1" caption="登録" /></div>
-                {{-- 登録済の場合 --}}
-                <div v-show="1==1"><x-button.list-dtl vueHref="'{{ route('season_student-detail', '') }}/' + 1" caption="詳細"/></div>
+                <div v-show="item.regist_status=={{ App\Consts\AppConst::CODE_MASTER_5_1 }}">
+                    <x-button.list-dtl caption="詳細" vueHref="'{{ route('season_student-detail', '') }}/' + item.season_student_id"/>
+                </div>
             </td>
         </tr>
 
