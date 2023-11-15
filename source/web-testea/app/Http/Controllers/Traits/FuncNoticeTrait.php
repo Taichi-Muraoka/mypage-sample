@@ -333,5 +333,4 @@ trait FuncNoticeTrait
                 $this->illegalResponseErr();
         }
     }
-
 }
