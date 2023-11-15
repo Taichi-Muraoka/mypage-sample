@@ -368,13 +368,11 @@ class SeasonTutorController extends Controller
 
             // リクエストを配列に変換する
             $datePeriods = $this->fncSasnSplitValue($value);
-            $this->debug($datePeriods);
-            $this->debug($dateIdList);
             // リクエストの中身のチェック
             foreach ($datePeriods as $datePeriod) {
 
                 // 日付のチェック。配列に存在するか
-                if (!in_array($datePeriod['dateId'], $dateIdList)) {
+                if (!in_array($datePeriod['dateId'], array_column($dateIdList, 'dateId'))) {
                     // 存在しない場合はエラー
                     return $fail(Lang::get('validation.invalid_input'));
                 }
@@ -426,7 +424,6 @@ class SeasonTutorController extends Controller
                 strtotime($today) > strtotime($seasonMng['t_end_date'])
             ) {
                 // 登録期間外エラー
-                $this->debug("out_of_range_regist_term");
                 return false;
             }
             return true;
@@ -452,7 +449,6 @@ class SeasonTutorController extends Controller
 
             if ($exists) {
                 // 登録済みの場合
-                $this->debug("duplicate_data");
                 return false;
             }
             return true;

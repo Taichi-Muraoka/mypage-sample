@@ -7,6 +7,7 @@ use App\Models\CodeMaster;
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
 use App\Models\TutorCampus;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * 特別期間講習 - 機能共通処理

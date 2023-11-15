@@ -188,17 +188,7 @@ class SeasonStudentController extends Controller
         $periodList = $this->mdlGetPeriodListByKind($seasonStudent['campus_cd'], AppConst::CODE_MASTER_37_1);
 
         // 特別期間日付リストを取得（校舎・特別期間コード指定）
-        $lessonDates = $this->fncScheGetDateSeason($seasonStudent['campus_cd'], $seasonStudent['season_cd']);
-        // 配列に格納
-        $dateList = [];
-        foreach ($lessonDates as $lessonDate) {
-            array_push($dateList, [
-                // 日付（区切り文字無し）をIDとして扱う
-                'dateId' => $lessonDate->lesson_date->format('Ymd'),
-                // ラベル用「月/日(曜日)」の形式に編集
-                'dateLabel' => $lessonDate->lesson_date->format('m/d') . "(" . $lessonDate->dayname . ")",
-            ]);
-        }
+        $dateList = $this->fncSasnGetSeasonDate($seasonStudent['campus_cd'], $seasonStudent['season_cd']);
 
         // 生徒連絡コマ情報を取得する
         // クエリを作成（生徒連絡コマ情報）
@@ -461,7 +451,7 @@ class SeasonStudentController extends Controller
             foreach ($datePeriods as $datePeriod) {
 
                 // 日付のチェック。配列に存在するか
-                if (!in_array($datePeriod['dateId'], $dateIdList)) {
+                if (!in_array($datePeriod['dateId'], array_column($dateIdList, 'dateId'))) {
                     // 存在しない場合はエラー
                     return $fail(Lang::get('validation.invalid_input'));
                 }
