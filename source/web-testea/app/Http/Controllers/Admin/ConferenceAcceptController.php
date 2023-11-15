@@ -659,8 +659,8 @@ class ConferenceAcceptController extends Controller
             $notice->text = Lang::get(
                 'message.notice.conference_accept.text',
                 [
-                    'conferenceDate' => $conference->conference_date,
-                    'startTime' => $conference->start_time,
+                    'conferenceDate' => $conference->conference_date->format('Y/m/d'),
+                    'startTime' => $conference->start_time->format('H:i'),
                     'roomName' => $campus_name
                 ]
             );
