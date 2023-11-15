@@ -170,6 +170,9 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     // 詳細取得用
     Route::post('/grades/get_data', [GradesController::class, 'getData'])->name('grades-get_data');
 
+    // 試験種別が選択された際に成績表示欄数を返却する
+    Route::post('/grades/get_data_select', [GradesController::class, 'getDataSelect'])->name('grades-get_data_select');
+
     // 生徒成績登録
     Route::get('/grades/new', [GradesController::class, 'new'])->name('grades-new');
 
