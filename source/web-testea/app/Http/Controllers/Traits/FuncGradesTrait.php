@@ -556,8 +556,11 @@ trait FuncGradesTrait
             }
             // 教科未選択で平均点などを入力している時は教科選択を必須とする
             $rule[] = 'required_with:score_' . $i . ',full_score_' . $i . ',average_' . $i . ',deviation_score_' . $i . ',rating_' . $i;
-            // ルールセット
+
+            // 共通のルールセット
             $rules += ['g_subject_cd_' . $i => array_merge($ruleSubjectCd, $rule, [$validationSubjectList], [$validationDupSubject])];
+            $rules += ['average_' . $i => $ruleAvarage];
+            $rules += ['deviation_score_' . $i => $ruleDeviationScore];
         }
 
         return $rules;
