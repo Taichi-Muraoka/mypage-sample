@@ -9,45 +9,6 @@
 
 {{-- formを指定 --}}
 <x-bs.card :form=true>
-
-    {{-- モック用 --}}
-    {{-- <x-bs.table :hover=false :vHeader=true class="mb-4 fix">
-        <tr>
-            <th width="35%">通知日</th>
-            <td>2023/06/16</td>
-        </tr>
-        <tr>
-            <th>タイトル</th>
-            <td>面談のご案内</td>
-        </tr>
-        <tr>
-            <th>送信元校舎</th>
-            <td>本部</td>
-        </tr>
-        <tr>
-            <th>送信者</th>
-            <td>本部管理者</td>
-        </tr>
-        <tr>
-            <th>内容</th>
-            <td class="nl2br">以下の日程で面談を実施します。
-                7月1日～7月7日<br>都合の良い日をマイページからご連絡ください。</td>
-        </tr>
-        <tr>
-            <th>お知らせ種別</th>
-            <td>面談</td>
-        </tr>
-        <tr>
-            <th>宛先種別</th>
-            <td>グルーブ一斉</td>
-        </tr>
-        <tr>
-            <th>宛先</th>
-            <td>中1<br>中2<br>中3</td>
-        </tr>
-    </x-bs.table> --}}
-
-    {{-- 本番用 --}}
     <x-bs.table :hover=false :vHeader=true class="mb-4 fix">
         <tr>
             <th width="35%">通知日</th>
@@ -67,7 +28,7 @@
         </tr>
         <tr>
             <th>内容</th>
-            <td class="nl2br">{{$notice->text}}</td>
+            <td>{!! nl2br($notice->text) !!}</td>
         </tr>
         <tr>
             <th>お知らせ種別</th>

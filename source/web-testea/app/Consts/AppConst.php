@@ -1768,7 +1768,7 @@ class AppConst
     /**
      * お知らせグループID 講師
      */
-    const NOTICE_GROUP_ID_15 = 15;
+    const NOTICE_GROUP_ID_16 = 16;
 
     //==========================
     // カレンダー

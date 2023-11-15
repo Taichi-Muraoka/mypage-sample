@@ -499,7 +499,7 @@ class NoticeRegistController extends Controller
                         ];
 
                         // グループが講師の場合はnull
-                        if ($notice_groups[$i] == AppConst::NOTICE_GROUP_ID_15) {
+                        if ($notice_groups[$i] == AppConst::NOTICE_GROUP_ID_16) {
                             $destination['campus_cd'] = null;
                         }
 
@@ -534,7 +534,7 @@ class NoticeRegistController extends Controller
                             $destination['notice_group_id'] = $notice_groups[$j];
 
                             // グループに講師が含まれる場合、フラグのみ立てておく
-                            if ($destination['notice_group_id'] == AppConst::NOTICE_GROUP_ID_15) {
+                            if ($destination['notice_group_id'] == AppConst::NOTICE_GROUP_ID_16) {
                                 $tutor_flg = true;
                                 continue;
                             }
@@ -549,7 +549,7 @@ class NoticeRegistController extends Controller
                             'student_id' => null,
                             'tutor_id' => null,
                             'destination_seq' => $seq,
-                            'notice_group_id' => AppConst::NOTICE_GROUP_ID_15
+                            'notice_group_id' => AppConst::NOTICE_GROUP_ID_16
                         ];
                         array_push($destinations, $destination);
                     }
@@ -891,7 +891,7 @@ class NoticeRegistController extends Controller
                         $campus_cd_group_required = 'required';
                         // 宛先が講師のみの場合は、校舎は必須としない
                         $notice_groups = $request->input('notice_groups');
-                        if ($notice_groups === (string) AppConst::NOTICE_GROUP_ID_15) {
+                        if ($notice_groups === (string) AppConst::NOTICE_GROUP_ID_16) {
                             $campus_cd_group_required = null;
                         }
                     }
@@ -922,7 +922,7 @@ class NoticeRegistController extends Controller
         $rules += Notice::fieldRules('title', ['required']);
         $rules += Notice::fieldRules('text', ['required']);
         $rules += NoticeDestination::fieldRules('destination_type', ['required', $validationDestinationTypesList]);
-        $rules += ['campus_cd_group' => ['integer', $campus_cd_group_required, $validationRoomList]];
+        $rules += ['campus_cd_group' => [$campus_cd_group_required, $validationRoomList]];
         $rules += ['campus_cd_student' => [$campus_cd_student_required, $validationRoomList]];
 
         return $rules;
