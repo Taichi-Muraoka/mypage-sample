@@ -189,8 +189,8 @@ class NoticeController extends Controller
                     ->where('notices.notice_id', '=', $notice_id)
                     ->firstOrFail();
 
-                    return $notice;
-        
+                return $notice;
+
             default:
                 //---------------
                 // 該当しない場合
