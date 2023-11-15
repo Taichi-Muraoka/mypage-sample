@@ -7,22 +7,22 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Mail\NoticeRegistToStudent;
+use App\Mail\NoticeRegistToTutor;
+use App\Mail\NoticeRegistToParent;
 use App\Libs\AuthEx;
 use App\Consts\AppConst;
 use App\Models\CodeMaster;
+use App\Models\AdminUser;
+use App\Models\Student;
+use App\Models\Tutor;
 use App\Models\Notice;
 use App\Models\NoticeDestination;
-use App\Models\AdminUser;
 use App\Models\NoticeGroup;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtRirekisho;
-use App\Models\ExtTrialMaster;
-use App\Models\Event;
 use App\Models\NoticeTemplate;
-use App\Models\ExtGenericMaster;
-use App\Models\Account;
-use Carbon\Carbon;
+use App\Models\Record;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Traits\FuncNoticeTrait;
 
 /**
@@ -55,16 +55,20 @@ class NoticeRegistController extends Controller
     public function index()
     {
 
-        // 教室リストを取得
-        $rooms = $this->mdlGetRoomList();
+        // 校舎リストを取得
+        $rooms = $this->mdlGetRoomList(true);
 
         // 宛先種別プルダウンを作成
         $destination_types = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_15);
 
+        // お知らせ種別プルダウンを作成
+        $notice_type_list = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_14);
+
         return view('pages.admin.notice_regist', [
-            'rules' => $this->rulesForSearch(),
+            'rules' => $this->rulesForSearch(null),
             'rooms' => $rooms,
             'destination_types' => $destination_types,
+            'notice_type_list' => $notice_type_list,
             'editData' => null
         ]);
     }
@@ -78,7 +82,7 @@ class NoticeRegistController extends Controller
     public function validationForSearch(Request $request)
     {
         // リクエストデータチェック
-        $validator = Validator::make($request->all(), $this->rulesForSearch());
+        $validator = Validator::make($request->all(), $this->rulesForSearch($request));
         return $validator->errors();
     }
 
@@ -91,7 +95,7 @@ class NoticeRegistController extends Controller
     public function search(Request $request)
     {
         // バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForSearch())->validate();
+        Validator::make($request->all(), $this->rulesForSearch($request))->validate();
 
         // formを取得
         $form = $request->all();
@@ -99,49 +103,59 @@ class NoticeRegistController extends Controller
         // クエリを作成(主テーブルはお知らせとした)
         $query = Notice::query();
 
-        // 教室の検索
+        // 校舎の検索
         if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+            // 校舎管理者の場合、自分の校舎コードのみにガードを掛ける
             $query->where($this->guardRoomAdminTableWithRoomCd());
         } else {
             // 管理者の場合検索フォームから取得
-            $query->SearchRoomcd($form);
+            $query->SearchCampusCd($form);
         }
 
         // 宛先種別(お知らせ宛先参照)
         (new NoticeDestination)->scopeSearchType($query, $form);
 
+        // お知らせ種別絞り込み
+        $query->SearchNoticeType($form);
+
         // タイトル(お知らせ)
         $query->SearchTitle($form);
 
-        // 教室名取得のサブクエリ
+        // 校舎名取得のサブクエリ
         $room_names = $this->mdlGetRoomQuery();
 
         // クエリ作成
         $notices = $query
             ->distinct()
             ->select(
-                'notice.notice_id AS id',
-                'notice.regist_time AS date',
-                'notice.title',
-                'mst_codes.name AS type_name',
-                'room_name'
+                'notices.notice_id as id',
+                'notices.regist_time as date',
+                'notices.title',
+                'mst_codes1.name as type_name',
+                'room_name',
+                'notice_destinations.destination_type as destination_type',
+                'mst_codes2.name as notice_type_name',
             )
             // お知らせ宛先
             ->sdLeftJoin(NoticeDestination::class, function ($join) {
                 // 1件取得
-                $join->on('notice_destination.notice_id', '=', 'notice.notice_id');
+                $join->on('notice_destinations.notice_id', '=', 'notices.notice_id');
             })
             // 宛先種別
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('mst_codes.code', '=', 'notice_destination.destination_type')
-                    ->where('mst_codes.data_type', '=', AppConst::CODE_MASTER_15);
-            })
-            // 教室名取得
+                $join->on('mst_codes1.code', '=', 'notice_destinations.destination_type')
+                    ->where('mst_codes1.data_type', '=', AppConst::CODE_MASTER_15);
+            }, 'mst_codes1')
+            // お知らせ種別
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('mst_codes2.code', '=', 'notices.notice_type')
+                    ->where('mst_codes2.data_type', '=', AppConst::CODE_MASTER_14);
+            }, 'mst_codes2')
+            // 校舎名取得
             ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('notice.roomcd', '=', 'room_names.code');
+                $join->on('notices.campus_cd', '=', 'room_names.code');
             })
-            ->orderBy('notice.regist_time', 'desc');
+            ->orderBy('notices.regist_time', 'desc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $notices);
@@ -155,129 +169,94 @@ class NoticeRegistController extends Controller
      */
     public function detail($noticeId)
     {
+        // IDのバリデーション
+        $this->validateIds($noticeId);
+
+        // 校舎管理者の場合、見れていいidかチェックする
+        if (AuthEx::isRoomAdmin()) {
+            $notice = Notice::where('notice_id', $noticeId)
+                // 校舎管理者の場合、自分の校舎コードのみにガードを掛ける
+                ->where($this->guardRoomAdminTableWithRoomCd())
+                ->firstOrFail();
+        }
+
+        // 校舎名取得のサブクエリ
+        $room_names = $this->mdlGetRoomQuery();
+
+        // クエリを作成
+        $query = Notice::query();
+        $notice = $query
+            ->select(
+                'notices.notice_id as id',
+                'notices.regist_time as regist_time',
+                'notices.title',
+                'notices.text',
+                'mst_codes1.name as type_name',
+                'room_name',
+                'notice_destinations.destination_type as destination_type',
+                'mst_codes2.name as notice_type_name',
+                'admin_users.name as sender'
+            )
+            // お知らせ宛先
+            ->sdLeftJoin(NoticeDestination::class, function ($join) {
+                // 1件取得
+                $join->on('notice_destinations.notice_id', '=', 'notices.notice_id');
+            })
+            // 宛先種別
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('mst_codes1.code', '=', 'notice_destinations.destination_type')
+                    ->where('mst_codes1.data_type', '=', AppConst::CODE_MASTER_15);
+            }, 'mst_codes1')
+            // お知らせ種別
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('mst_codes2.code', '=', 'notices.notice_type')
+                    ->where('mst_codes2.data_type', '=', AppConst::CODE_MASTER_14);
+            }, 'mst_codes2')
+            // 校舎名取得
+            ->leftJoinSub($room_names, 'room_names', function ($join) {
+                $join->on('notices.campus_cd', '=', 'room_names.code');
+            })
+            // 送信者
+            ->sdLeftJoin(AdminUser::class, function ($join) {
+                $join->on('admin_users.adm_id', '=', 'notices.adm_id');
+            })
+            // IDで絞り込み
+            ->where('notices.notice_id', '=', $noticeId)
+            ->firstOrFail();
+
+        // 宛先名の取得
+        $query = NoticeDestination::query();
+        $destination_names = $query
+            ->distinct()
+            ->select(
+                'students.name as student_name',
+                'tutors.name as teacher_name',
+                'notice_destinations.notice_group_id',
+                'group_name'
+            )
+            // 生徒名の取得
+            ->sdLeftJoin(Student::class, function ($join) {
+                $join->on('students.student_id', '=', 'notice_destinations.student_id');
+            })
+            // 講師名の取得
+            ->sdLeftJoin(Tutor::class, function ($join) {
+                $join->on('tutors.tutor_id', '=', 'notice_destinations.tutor_id');
+            })
+            // お知らせグループ
+            ->sdLeftJoin(NoticeGroup::class, function ($join) {
+                $join->on('notice_groups.notice_group_id', '=', 'notice_destinations.notice_group_id');
+            })
+            ->where('notice_destinations.notice_id', '=', $noticeId)
+            ->orderBy('notice_destinations.notice_group_id', 'asc')
+            ->get();
+
         return view('pages.admin.notice_regist-detail', [
+            'notice' => $notice,
+            'destination_names' => $destination_names,
             'editData' => [
-                'noticeId' => null
+                'noticeId' => $notice->id
             ]
         ]);
-
-    //==========================
-    // 本番用
-    //==========================
-        // // IDのバリデーション
-        // $this->validateIds($noticeId);
-
-        // // 教室管理者の場合、見れていいidかチェックする
-        // if (AuthEx::isRoomAdmin()) {
-        //     $notice = Notice::where('notice_id', $noticeId)
-        //         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        //         ->where($this->guardRoomAdminTableWithRoomCd())
-        //         ->firstOrFail();
-        // }
-
-        // // 教室名取得のサブクエリ
-        // $room_names = $this->mdlGetRoomQuery();
-
-        // // クエリを作成
-        // $query = Notice::query();
-        // $notice = $query
-        //     ->select(
-        //         'notice.notice_id AS id',
-        //         'notice.regist_time',
-        //         'notice.title',
-        //         'notice.text',
-        //         'notice.notice_type',
-        //         'mst_codes.name AS type_name',
-        //         'room_name',
-        //         'office.name AS sender',
-        //         'ext_trial_master.name AS trial_name',
-        //         'ext_trial_master.trial_date',
-        //         'event.name AS event_name',
-        //         'event.event_date'
-        //     )
-        //     // お知らせ宛先
-        //     ->sdLeftJoin(NoticeDestination::class, function ($join) {
-        //         // 1件取得
-        //         $join->on('notice_destination.notice_id', '=', 'notice.notice_id')
-        //             ->limit(1);
-        //     })
-        //     // 宛先種別
-        //     ->sdLeftJoin(CodeMaster::class, function ($join) {
-        //         $join->on('mst_codes.code', '=', 'notice_destination.destination_type')
-        //             ->where('mst_codes.data_type', '=', AppConst::CODE_MASTER_15);
-        //     })
-        //     // 事務局マスタ(送信者名)
-        //     ->sdLeftJoin(AdminUser::class, 'office.adm_id', '=', 'notice.adm_id')
-        //     // 教室名
-        //     ->leftJoinSub($room_names, 'room_names', function ($join) {
-        //         $join->on('notice.roomcd', '=', 'room_names.code');
-        //     })
-        //     // 模試名の取得
-        //     ->sdLeftJoin(ExtTrialMaster::class, 'ext_trial_master.tmid', '=', 'notice.tmid_event_id')
-        //     // イベント名の取得
-        //     ->sdLeftJoin(Event::class, 'event.event_id', '=', 'notice.tmid_event_id')
-        //     // IDで絞り込み
-        //     ->where('notice.notice_id', '=', $noticeId)
-        //     ->firstOrFail();
-
-        // // 該当データである場合は、模試・イベントいずれかのみ残す
-        // if ($notice['notice_type'] == AppConst::CODE_MASTER_14_1) {
-        //     //---------
-        //     // 模試
-        //     //---------
-        //     $notice['tm_event_name'] = $notice['trial_name'];
-        //     // 日時の取得(JOIN先の方はCarbonで取れないので以下初期化)
-        //     $tmpDate = new Carbon($notice['trial_date']);
-        //     $notice['tm_event_date'] = $tmpDate->format('Y/m/d');
-        // } elseif ($notice['notice_type'] == AppConst::CODE_MASTER_14_2) {
-        //     //---------
-        //     // イベント
-        //     //---------
-        //     $notice['tm_event_name'] = $notice['event_name'];
-        //     // 日時の取得(JOIN先の方はCarbonで取れないので以下初期化)
-        //     $tmpDate = new Carbon($notice['event_date']);
-        //     $notice['tm_event_date'] = $tmpDate->format('Y/m/d');
-        // } else {
-        //     $notice['tm_event_name'] = '';
-        // }
-        // unset($notice['trial_name']);
-        // unset($notice['trial_date']);
-        // unset($notice['event_name']);
-        // unset($notice['event_date']);
-
-        // // 宛先名の取得
-        // $query = NoticeDestination::query();
-        // $destination_names = $query
-        //     ->distinct()
-        //     ->select(
-        //         'ext_student_kihon.name AS student_name',
-        //         'ext_rirekisho.name AS teacher_name',
-        //         'notice_destination.notice_group_id',
-        //         'group_name'
-        //     )
-        //     // 生徒名の取得
-        //     ->sdLeftJoin(ExtStudentKihon::class, function ($join) {
-        //         $join->on('ext_student_kihon.sid', '=', 'notice_destination.sid');
-        //     })
-        //     // 教師名の取得
-        //     ->sdLeftJoin(ExtRirekisho::class, function ($join) {
-        //         $join->on('ext_rirekisho.tid', '=', 'notice_destination.tid');
-        //     })
-        //     // お知らせグループ
-        //     ->sdLeftJoin(NoticeGroup::class, function ($join) {
-        //         $join->on('notice_group.notice_group_id', '=', 'notice_destination.notice_group_id');
-        //     })
-        //     ->where('notice_destination.notice_id', '=', $noticeId)
-        //     ->orderBy('notice_destination.notice_group_id', 'asc')
-        //     ->get();
-
-        // return view('pages.admin.notice_regist-detail', [
-        //     'notice' => $notice,
-        //     'destination_names' => $destination_names,
-        //     'editData' => [
-        //         'noticeId' => $notice->id
-        //     ]
-        // ]);
     }
 
     /**
@@ -285,23 +264,23 @@ class NoticeRegistController extends Controller
      *
      * @return array ルール
      */
-    private function rulesForSearch()
+    private function rulesForSearch(?Request $request)
     {
 
         $rules = array();
 
-        // 独自バリデーション: リストのチェック 教室
-        $validationRoomList =  function ($attribute, $value, $fail) {
-
-            // 教室リストを取得
-            $rooms = $this->mdlGetRoomList();
+        // 独自バリデーション: リストのチェック 校舎
+        $validationCampusList =  function ($attribute, $value, $fail) use($request) {
+            
+            // 校舎リストを取得
+            $rooms = $this->mdlGetRoomList(true);
             if (!isset($rooms[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
         };
 
-        // 独自バリデーション: リストのチェック ステータス
+        // 独自バリデーション: リストのチェック 宛先種別
         $validationDestinationTypesList =  function ($attribute, $value, $fail) {
 
             // 宛先種別プルダウンを作成
@@ -312,8 +291,20 @@ class NoticeRegistController extends Controller
             }
         };
 
-        $rules += Notice::fieldRules('roomcd', [$validationRoomList]);
+        // 独自バリデーション: リストのチェック お知らせ種別
+        $validationNoticeTypesList =  function ($attribute, $value, $fail) {
+
+            // 宛先種別プルダウンを作成
+            $notice_types = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_14);
+            if (!isset($notice_types[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        $rules += Notice::fieldRules('campus_cd', [$validationCampusList]);
         $rules += NoticeDestination::fieldRules('destination_type', [$validationDestinationTypesList]);
+        $rules += Notice::fieldRules('notice_type', [$validationNoticeTypesList]);
         $rules += Notice::fieldRules('title');
 
         return $rules;
@@ -337,11 +328,15 @@ class NoticeRegistController extends Controller
         // 宛先グループチェックボックス
         $noticeGroup = $this->getMenuOfNoticeGroup();
 
+        // 宛先種別プルダウンを作成
+        $destination_types = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_15);
+
         return view('pages.admin.notice_regist-new', [
             'rules' => $this->rulesForInput(null),
             'templates' => $templates,
             'editData' => null,
             'noticeGroup' => $noticeGroup,
+            'destination_types' => $destination_types
         ]);
     }
 
@@ -366,37 +361,22 @@ class NoticeRegistController extends Controller
             ->select(
                 'title',
                 'text',
-                'notice_type'
+                'notice_type',
+                'mst_codes.name as notice_type_name',
             )
             ->where('template_id', '=', $id)
+            // お知らせ種別
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('mst_codes.code', '=', 'notice_templates.notice_type')
+                    ->where('mst_codes.data_type', '=', AppConst::CODE_MASTER_14);
+            })
             ->firstOrFail();
-
-        // 現在日取得
-        $today = date("Y/m/d");
-
-        // 模試・イベントのプルダウンを取得
-        $trials = [];
-        $events = [];
-        if ($template['notice_type'] == AppConst::CODE_MASTER_14_1) {
-            //------------------
-            // 模試
-            //------------------
-
-            $trials = $this->getMenuOfTrial($today);
-        } elseif ($template['notice_type'] == AppConst::CODE_MASTER_14_2) {
-            //------------------
-            // イベント
-            //------------------
-
-            $events = $this->getMenuOfEvent($today);
-        }
 
         return [
             'title' => $template->title,
             'text' => $template->text,
             'notice_type' => $template->notice_type,
-            'selectItemsTm' => $trials,
-            'selectItemsEvent' => $events
+            'notice_type_name' => $template->notice_type_name,
         ];
     }
 
@@ -404,7 +384,7 @@ class NoticeRegistController extends Controller
      * 宛先種別プルダウンを選択
      *
      * @param \Illuminate\Http\Request $request リクエスト
-     * @return mixed 教師、生徒、教室情報取得
+     * @return mixed 講師、生徒、校舎情報取得
      */
     public function getDataSelect(Request $request)
     {
@@ -422,7 +402,8 @@ class NoticeRegistController extends Controller
             $destination_type = $request->input('destinationType');
             if (!($destination_type == AppConst::CODE_MASTER_15_1 ||
                 $destination_type == AppConst::CODE_MASTER_15_2 ||
-                $destination_type == AppConst::CODE_MASTER_15_3)) {
+                $destination_type == AppConst::CODE_MASTER_15_3 ||
+                $destination_type == AppConst::CODE_MASTER_15_4)) {
                 return [
                     'rooms' => [],
                     'students' => [],
@@ -431,22 +412,22 @@ class NoticeRegistController extends Controller
             }
         }
 
-        // 教室のプルダウンリストを取得
+        // 校舎のプルダウンリストを取得
         $rooms = $this->mdlGetRoomList(false);
 
-        if ($destination_type == AppConst::CODE_MASTER_15_2) {
+        if ($destination_type == AppConst::CODE_MASTER_15_2 || $destination_type == AppConst::CODE_MASTER_15_4) {
 
-            if ($request->filled('roomcdStudent')) {
+            if ($request->filled('campus_cd_student')) {
 
-                $roomcd = $request->input('roomcdStudent');
+                $campus_cd = $request->input('campus_cd_student');
 
-                // 教室が選択されている場合
-                $students = $this->mdlGetStudentListWithSid($roomcd);
+                // 校舎が選択されている場合
+                $students = $this->mdlGetStudentList($campus_cd);
             }
         } elseif ($destination_type == AppConst::CODE_MASTER_15_3) {
 
-            // 教師リスト取得
-            $teachers = $this->getMenuOfTeacher();
+            // 講師リスト取得
+            $teachers = $this->mdlGetTutorList();
         }
 
         return [
@@ -467,8 +448,6 @@ class NoticeRegistController extends Controller
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        $tmid_event_id = null;
-
         // ログイン者のidを取得する。
         $account = Auth::user();
         $adm_id = $account->account_id;
@@ -485,25 +464,16 @@ class NoticeRegistController extends Controller
             'text'
         );
 
-        // お知らせ種別により保存する値を分岐
-        switch ($notice_type) {
-            case AppConst::CODE_MASTER_14_1:
-
-                $tmid_event_id = $request->input('tmid');
-
-                break;
-            case AppConst::CODE_MASTER_14_2:
-
-                $tmid_event_id = $request->input('event_id');
-
-                break;
-            default:
-                break;
+        $campus_cd = $request->input('campus_cd_group');
+        if (AuthEx::isRoomAdmin()) {
+            // 校舎管理者の場合、強制的に校舎コードを指定する
+            $campus_cd = Auth::user()->campus_cd;
         }
 
         // 宛先種別により保存内容を分岐
         $destination_type = $request->input('destination_type');
         $destinations = [];
+        $records = [];
 
         switch ($destination_type) {
                 // グループ一斉
@@ -514,73 +484,57 @@ class NoticeRegistController extends Controller
                 // 配列を昇順に並び替える
                 sort($notice_groups);
 
-                // 教室コード指定の指定がある場合
-                if ($request->filled('roomcd_group') || AuthEx::isRoomAdmin()) {
-
-                    $roomcd = $request->input('roomcd_group');
-                    if (AuthEx::isRoomAdmin()) {
-                        // 教室管理者の場合、強制的に教室コードを指定する
-                        $roomcd = Auth::user()->roomcd;
-                    }
+                // 校舎コード指定の指定がある場合
+                if ($request->filled('campus_cd_group') || AuthEx::isRoomAdmin()) {
 
                     $seq = 1;
                     for ($i = 0; $i < count($notice_groups); $i++) {
                         $destination = [
                             'destination_seq' => $seq,
                             'destination_type' => AppConst::CODE_MASTER_15_1,
-                            'sid' => null,
-                            'tid' => null,
+                            'student_id' => null,
+                            'tutor_id' => null,
                             'notice_group_id' => $notice_groups[$i],
-                            'roomcd' => $roomcd
+                            'campus_cd' => $campus_cd
                         ];
 
-                        // グループが教師の場合はnull
-                        if ($notice_groups[$i] == AppConst::NOTICE_GROUP_ID_15) {
-                            $destination['roomcd'] = null;
+                        // グループが講師の場合はnull
+                        if ($notice_groups[$i] == AppConst::NOTICE_GROUP_ID_16) {
+                            $destination['campus_cd'] = null;
                         }
 
                         array_push($destinations, $destination);
                         $seq++;
                     }
-                    // 教室コード指定の指定がない場合（全教室対象）
+                    // 校舎コード指定の指定がない場合（全校舎対象）
                 } else {
 
-                    // 全ての教室コードを取得する。ただし除外対象の教室コードを除く
-                    $codemasters = CodeMaster::select('gen_item1', 'gen_item2')
-                        ->where('data_type', AppConst::CODE_MASTER_6)
-                        ->firstOrFail();
+                    // // 全ての校舎コードを取得する。ただし除外対象の校舎コードを除く
+                    $rooms = $this->mdlGetRoomList(true);
 
-                    $query = ExtGenericMaster::query();
-                    $rooms = $query->select('code')
-                        ->where('codecls', $codemasters->gen_item1)
-                        ->where('code', '<=', $codemasters->gen_item2)
-                        ->whereNotIn('code', config('appconf.excluded_roomcd'))
-                        ->orderBy('disp_order', 'asc')
-                        ->get();
-
-                    // 教室コードの配列
+                    // 校舎コードの配列
                     $room_codes = [];
                     foreach ($rooms as $room) {
                         array_push($room_codes, $room->code);
                     }
 
-                    // 全て教室コード×全てのグループで配列を作る
+                    // 全て校舎コード×全てのグループで配列を作る
                     $seq = 1;
                     $tutor_flg = false;
                     for ($i = 0; $i < count($room_codes); $i++) {
                         $destination = [
                             'destination_type' => AppConst::CODE_MASTER_15_1,
-                            'roomcd' => $room_codes[$i],
-                            'sid' => null,
-                            'tid' => null
+                            'campus_cd' => $room_codes[$i],
+                            'student_id' => null,
+                            'tutor_id' => null
                         ];
 
                         for ($j = 0; $j < count($notice_groups); $j++) {
                             $destination['destination_seq'] = $seq;
                             $destination['notice_group_id'] = $notice_groups[$j];
 
-                            // グループに教師が含まれる場合、フラグのみ立てておく
-                            if ($destination['notice_group_id'] == AppConst::NOTICE_GROUP_ID_15) {
+                            // グループに講師が含まれる場合、フラグのみ立てておく
+                            if ($destination['notice_group_id'] == AppConst::NOTICE_GROUP_ID_16) {
                                 $tutor_flg = true;
                                 continue;
                             }
@@ -591,11 +545,11 @@ class NoticeRegistController extends Controller
                     if ($tutor_flg) {
                         $destination = [
                             'destination_type' => AppConst::CODE_MASTER_15_1,
-                            'roomcd' => null,
-                            'sid' => null,
-                            'tid' => null,
+                            'campus_cd' => null,
+                            'student_id' => null,
+                            'tutor_id' => null,
                             'destination_seq' => $seq,
-                            'notice_group_id' => AppConst::NOTICE_GROUP_ID_15
+                            'notice_group_id' => AppConst::NOTICE_GROUP_ID_16
                         ];
                         array_push($destinations, $destination);
                     }
@@ -605,40 +559,57 @@ class NoticeRegistController extends Controller
                 // 個別（生徒）
             case AppConst::CODE_MASTER_15_2:
 
-                // sidのチェック
-                if (AuthEx::isRoomAdmin()) {
-                    ExtStudentKihon::where('sid', $request->input('sid'))
-                        // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
-                        ->where($this->guardRoomAdminTableWithSid())
-                        ->firstOrFail();
-                }
-
                 $destinations = [
                     [
                         'destination_seq' => 1,
                         'destination_type' => AppConst::CODE_MASTER_15_2,
-                        'sid' => $request->input('sid'),
-                        'tid' => null,
+                        'student_id' => $request->input('student_id'),
+                        'tutor_id' => null,
                         'notice_group_id' => null,
-                        'roomcd' => null
+                        'campus_cd' => null
                     ]
                 ];
 
                 break;
-                // 個別（教師）
+                // 個別（講師）
             case AppConst::CODE_MASTER_15_3:
 
                 $destinations = [
                     [
                         'destination_seq' => 1,
                         'destination_type' => AppConst::CODE_MASTER_15_3,
-                        'sid' => null,
-                        'tid' => $request->input('tid'),
+                        'student_id' => null,
+                        'tutor_id' => $request->input('tutor_id'),
                         'notice_group_id' => null,
-                        'roomcd' => null
+                        'campus_cd' => null
                     ]
                 ];
 
+                break;
+                // 個別（保護者） 
+            case AppConst::CODE_MASTER_15_4:
+
+                $destinations = [
+                    [
+                        'destination_seq' => 1,
+                        'destination_type' => AppConst::CODE_MASTER_15_4,
+                        'student_id' => $request->input('student_id'),
+                        'tutor_id' => null,
+                        'notice_group_id' => null,
+                        'campus_cd' => null
+                    ]
+                ];
+
+                $records = [
+                        'student_id' => $request->input('student_id'),
+                        'campus_cd' => $account->campus_cd,
+                        'record_kind' => AppConst::CODE_MASTER_46_3,
+                        'received_date' => now()->format('Y-m-d'),
+                        'received_time' => now()->format('H:i:00'),
+                        'regist_time' => now(),
+                        'adm_id' => $adm_id,
+                        'memo' => $request->input('text')
+                ];
                 break;
             default:
                 break;
@@ -647,15 +618,23 @@ class NoticeRegistController extends Controller
         // 保存内容
         $notice = new Notice;
         $notice->notice_type = $notice_type;
-        $notice->tmid_event_id = $tmid_event_id;
         $notice->adm_id = $adm_id;
-        $notice->roomcd = $account->roomcd;
+        $notice->campus_cd = $account->campus_cd;
 
-        DB::transaction(function () use ($form, $notice, $destinations) {
+        DB::transaction(function () use ($form, $notice, $destinations, $records, $destination_type) {
 
-            $notice->fill($form)->save();
+            // お知らせ情報保存
+            $res = $notice->fill($form)->save();
             $notice_id = $notice->notice_id;
 
+            // お知らせ対象が保護者の場合連絡記録に保存
+            if ($destination_type == AppConst::CODE_MASTER_15_4 && $records != null) {
+                $record = new Record;
+                $record->fill($records)->save();
+                $record->save();
+            }
+
+            // お知らせ宛先情報保存
             for ($i = 0; $i < count($destinations); $i++) {
                 $destinations[$i]['notice_id'] = $notice_id;
             }
@@ -665,11 +644,83 @@ class NoticeRegistController extends Controller
                 $notice_destination->notice_id = $data['notice_id'];
                 $notice_destination->destination_seq = $data['destination_seq'];
                 $notice_destination->destination_type = $data['destination_type'];
-                $notice_destination->sid = $data['sid'];
-                $notice_destination->tid = $data['tid'];
+                $notice_destination->student_id = $data['student_id'];
+                $notice_destination->tutor_id = $data['tutor_id'];
                 $notice_destination->notice_group_id = $data['notice_group_id'];
-                $notice_destination->roomcd = $data['roomcd'];
-                $notice_destination->save();
+                $notice_destination->campus_cd = $data['campus_cd'];
+                $res = $notice_destination->save();
+            }
+
+            // save成功時のみ送信
+            if ($res) {
+                switch ($destination_type) {
+                    // グループ一斉
+                    case AppConst::CODE_MASTER_15_1:
+                        // グループ一斉はメール送信なし
+                        break;
+                    // 個別（生徒）
+                    case AppConst::CODE_MASTER_15_2:
+                        // 生徒情報からログイン種別とメールアドレスを取得
+                        $student = Student::select(
+                                'login_kind',
+                                'email_stu',
+                                'email_par'
+                            )
+                            ->where('student_id', $notice_destination->student_id)
+                            ->firstOrFail();
+                        // ログイン種別が生徒なら生徒のメールアドレスに
+                        // 保護者なら保護者のメールアドレスに送信する
+                        if ($student->login_kind == AppConst::CODE_MASTER_8_1) {
+                            $email = $student->email_stu;
+                        }
+                        else if ($student->login_kind == AppConst::CODE_MASTER_8_2) {
+                            $email = $student->email_par;
+                        }
+                        else {
+                            $email = null;
+                        }
+                        $subject = $notice->title;
+                        $mail_body = [
+                            'text' => $notice->text,
+                        ];
+                        // メール送信
+                        Mail::to($email)->send(new NoticeRegistToStudent($mail_body, $subject));
+                        break;
+                    // 個別（講師）
+                    case AppConst::CODE_MASTER_15_3:
+                        // 講師情報からメールアドレスを取得
+                        $tutor = Tutor::select(
+                                'email'
+                            )
+                            ->where('tutor_id', $notice_destination->tutor_id)
+                            ->firstOrFail();
+                        $email = $tutor->email;
+                        $subject = $notice->title;
+                        $mail_body = [
+                            'text' => $notice->text,
+                        ];
+                        // メール送信
+                        Mail::to($email)->send(new NoticeRegistToTutor($mail_body, $subject));
+                        break;
+                    // 個別（保護者）
+                    case AppConst::CODE_MASTER_15_4:
+                        // 生徒情報から保護者のメールアドレスを取得
+                        $student = Student::select(
+                                'email_par'
+                            )
+                            ->where('student_id', $notice_destination->student_id)
+                            ->firstOrFail();
+                        $email = $student->email_par;
+                        $subject = $notice->title;
+                        $mail_body = [
+                            'text' => $notice->text,
+                        ];
+                        // メール送信
+                        Mail::to($email)->send(new NoticeRegistToParent($mail_body, $subject));
+                        break;
+                    default:
+                        break;
+                }
             }
         });
 
@@ -684,19 +735,10 @@ class NoticeRegistController extends Controller
      */
     public function delete(Request $request)
     {
-
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'noticeId');
 
         $noticeId = $request->input('noticeId');
-
-        // 教室管理者の場合、削除していいidかチェックする
-        if (AuthEx::isRoomAdmin()) {
-            $notice = Notice::where('notice_id', $noticeId)
-                // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-                ->where($this->guardRoomAdminTableWithRoomCd())
-                ->firstOrFail();
-        }
 
         DB::transaction(function () use ($noticeId) {
             // 削除
@@ -731,30 +773,6 @@ class NoticeRegistController extends Controller
 
         $rules = array();
 
-        // 独自バリデーション: リストのチェック 模試名
-        $validationTrialsList =  function ($attribute, $value, $fail) {
-
-            $today = date("Y/m/d");
-            // 模試のプルダウン取得
-            $trials = $this->getMenuOfTrial($today);
-            if (!isset($trials[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-        };
-
-        // 独自バリデーション: リストのチェック イベント
-        $validationEventList =  function ($attribute, $value, $fail) {
-
-            $today = date("Y/m/d");
-            // イベントチェックボックス
-            $events = $this->getMenuOfEvent($today);
-            if (!isset($events[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-        };
-
         // 独自バリデーション: リストのチェック 定型文
         $validationTemplatesList =  function ($attribute, $value, $fail) {
 
@@ -778,11 +796,11 @@ class NoticeRegistController extends Controller
             }
         };
 
-        // 独自バリデーション: リストのチェック 教室
+        // 独自バリデーション: リストのチェック 校舎
         $validationRoomList =  function ($attribute, $value, $fail) {
 
-            // 教室リストを取得
-            $rooms = $this->mdlGetRoomList();
+            // 校舎リストを取得
+            $rooms = $this->mdlGetRoomList(false);
             if (!isset($rooms[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
@@ -792,20 +810,20 @@ class NoticeRegistController extends Controller
         // 独自バリデーション: リストのチェック 生徒
         $validationStudentList =  function ($attribute, $value, $fail) use ($request) {
 
-            if (!isset($request->roomcd_student)) return;
+            if (!isset($request->campus_cd_student)) return;
             // 生徒リスト取得
-            $students = $this->mdlGetStudentListWithSid($request->roomcd_student);
+            $students = $this->mdlGetStudentList($request->campus_cd_student);
             if (!isset($students[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
         };
 
-        // 独自バリデーション: リストのチェック 教師
+        // 独自バリデーション: リストのチェック 講師
         $validationTeacherList =  function ($attribute, $value, $fail) {
 
-            // 教師リスト取得
-            $teachers = $this->getMenuOfTeacher();
+            // 講師リスト取得
+            $teachers = $this->mdlGetTutorList();
             if (!isset($teachers[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
@@ -841,54 +859,61 @@ class NoticeRegistController extends Controller
             }
         };
 
+        // 独自バリデーション： 保護者のメールアドレスの有無
+        $validationEmailPar = function ($attribute, $value, $fail) use ($request) {
+            // 生徒情報取得
+            $student = Student::query()
+                ->where('student_id', '=', $request['student_id'])
+                ->firstOrFail();
+            // 保護者のメールアドレスがなかった場合エラーを返す
+            if ($student->email_par == null) {
+                return $fail('保護者のメールアドレスが登録されていません');
+            }
+            else {
+                return;
+            }
+        };
+
         // 必須要素の分岐用
-        $tm_required = [];
-        $event_required = [];
-        $roomcd_group_required = '';
-        $roomcd_student_required = '';
+        $campus_cd_group_required = '';
+        $campus_cd_student_required = '';
 
         if ($request != null) {
             if ($request->filled('template_id') && $request->filled('destination_type')) {
-                $template_id = $request->input('template_id');
                 $destination_type = $request->input('destination_type');
 
                 // 宛先種別ごとのバリデーションルール
                 if ($destination_type == AppConst::CODE_MASTER_15_1) {
                     // チェックボックスのバリデーション
                     $rules += ['notice_groups' => ['required', $validationNoticeGroupList]];
-                    // 教室管理者の場合
+                    // 校舎管理者の場合
                     if (AuthEx::isRoomAdmin()) {
-                        $roomcd_group_required = 'required';
-                        // 宛先が教師のみの場合は、教室は必須としない
+                        $campus_cd_group_required = 'required';
+                        // 宛先が講師のみの場合は、校舎は必須としない
                         $notice_groups = $request->input('notice_groups');
-                        if ($notice_groups === (string) AppConst::NOTICE_GROUP_ID_15) {
-                            $roomcd_group_required = null;
+                        if ($notice_groups === (string) AppConst::NOTICE_GROUP_ID_16) {
+                            $campus_cd_group_required = null;
                         }
                     }
                 } elseif ($destination_type == AppConst::CODE_MASTER_15_2) {
                     // 生徒No.のバリデーション
-                    $rules += ExtStudentKihon::fieldRules('sid', ['required', $validationStudentList]);
-                    // 教室管理者の場合
+                    $rules += NoticeDestination::fieldRules('student_id', ['required', $validationStudentList]);
+                    // 校舎管理者の場合
                     if (AuthEx::isRoomAdmin()) {
-                        $roomcd_student_required = 'required';
+                        $campus_cd_student_required = 'required';
                     }
                 } elseif ($destination_type == AppConst::CODE_MASTER_15_3) {
-                    // 教師No.のバリデーション
-                    $rules += ExtRirekisho::fieldRules('tid', ['required', $validationTeacherList]);
+                    // 講師No.のバリデーション
+                    $rules += NoticeDestination::fieldRules('tutor_id', ['required', $validationTeacherList]);
+                } elseif ($destination_type == AppConst::CODE_MASTER_15_4) {
+                    // 校舎管理者の場合
+                    if (AuthEx::isRoomAdmin()) {
+                        $campus_cd_student_required = 'required';
+                    }
+                    // 生徒No.のバリデーション
+                    $rules += NoticeDestination::fieldRules('student_id', ['required', $validationStudentList, $validationEmailPar]);
                 } else {
                     $this->illegalResponseErr();
-                }
-
-                // 模試・イベントidのバリデーション
-                $notice_type = NoticeTemplate::select('notice_type')
-                    ->where('template_id', $template_id)
-                    ->firstOrFail()
-                    ->notice_type;
-
-                if ($notice_type == AppConst::CODE_MASTER_14_1) {
-                    $tm_required = ['required', $validationTrialsList];
-                } elseif ($notice_type == AppConst::CODE_MASTER_14_2) {
-                    $event_required = ['required', $validationEventList];
                 }
             }
         }
@@ -897,110 +922,9 @@ class NoticeRegistController extends Controller
         $rules += Notice::fieldRules('title', ['required']);
         $rules += Notice::fieldRules('text', ['required']);
         $rules += NoticeDestination::fieldRules('destination_type', ['required', $validationDestinationTypesList]);
-        $rules += ExtTrialMaster::fieldRules('tmid', $tm_required);
-        $rules += Event::fieldRules('event_id', $event_required);
-        $rules += ['roomcd_group' => ['integer', $roomcd_group_required, $validationRoomList]];
-        $rules += ['roomcd_student' => ['integer', $roomcd_student_required, $validationRoomList]];
+        $rules += ['campus_cd_group' => [$campus_cd_group_required, $validationRoomList]];
+        $rules += ['campus_cd_student' => [$campus_cd_student_required, $validationRoomList]];
 
         return $rules;
-    }
-
-    /**
-     * テンプレートメニューの取得
-     *
-     * @return array 定型文情報取得
-     */
-    private function getMenuOfNoticeTemplate()
-    {
-        return NoticeTemplate::select(
-            'template_id',
-            'template_name AS value',
-        )
-            ->orderBy('order_code', 'asc')
-            ->get()
-            ->keyBy('template_id');
-    }
-
-    /**
-     * 宛先グループメニューの取得
-     *
-     * @return array 宛先グループリスト
-     */
-    private function getMenuOfNoticeGroup()
-    {
-        return NoticeGroup::select(
-            'notice_group_id',
-            'group_name AS value'
-        )
-            ->orderBy('notice_group_id', 'asc')
-            ->get();
-    }
-
-    /**
-     * 模試一覧取得
-     *
-     * @return array 模試一覧
-     */
-    private function getMenuOfTrial($today)
-    {
-        // 本日以降の模試一覧を取得する
-        return ExtTrialMaster::select(
-            'tmid',
-            DB::raw('CONCAT(name,"：", ext_generic_master.name2) AS value')
-        )
-            // 学年名称の取得
-            ->sdLeftJoin(ExtGenericMaster::class, function ($join) {
-                $join->on('ext_generic_master.code', '=', 'ext_trial_master.cls_cd')
-                ->where('ext_generic_master.codecls', '=', AppConst::EXT_GENERIC_MASTER_112);
-            })
-            ->where('ext_trial_master.trial_date', '>', $today)
-            ->orderBy('tmid', 'asc')
-            ->get()
-            ->keyBy('tmid');
-    }
-
-    /**
-     * イベント一覧取得
-     *
-     * @return array イベント一覧
-     */
-    private function getMenuOfEvent($today)
-    {
-        // 本日以降のイベント一覧を取得する
-        return Event::select(
-            'event_id',
-            DB::raw('CONCAT(name,"：", ext_generic_master.name2) AS value')
-        )
-            // 学年名称の取得
-            ->sdLeftJoin(ExtGenericMaster::class, function ($join) {
-                $join->on('ext_generic_master.code', '=', 'event.cls_cd')
-                ->where('ext_generic_master.codecls', '=', AppConst::EXT_GENERIC_MASTER_112);
-            })
-            ->where('event.event_date', '>', $today)
-            ->orderBy('event_id', 'asc')
-            ->get()
-            ->keyBy('event_id');
-    }
-
-    /**
-     * 教師リスト一覧取得
-     *
-     * @return array 教師リスト
-     */
-    private function getMenuOfTeacher()
-    {
-
-        return ExtRirekisho::select(
-            'tid AS id',
-            DB::raw('CONCAT(tid,"：", name) AS value')
-            )
-            // アカウントテーブルとJOIN（削除教師非表示対応）
-            ->sdJoin(Account::class, function ($join) {
-                $join->on('ext_rirekisho.tid', '=', 'accounts.account_id')
-                    ->where('accounts.account_type', AppConst::CODE_MASTER_7_2);
-            })
-            ->orderBy('tid', 'asc')
-            ->get()
-            ->keyBy('id');
     }
 }
