@@ -35,7 +35,7 @@ trait FuncGradesTrait
     /**
      * 生徒成績を取得 一覧用
      *
-     * @param integer $query クエリ
+     * @param \Illuminate\Database\Eloquent\Builder $query クエリ
      * @return array
      */
     private function getScoreList($query)
@@ -82,7 +82,7 @@ trait FuncGradesTrait
      * 生徒成績を取得 モーダル用
      *
      * @param integer $scoreId 成績ID
-     * @return array
+     * @return object
      */
     private function getScore($scoreId)
     {
@@ -182,7 +182,7 @@ trait FuncGradesTrait
      * 成績登録時の学年の取得 新規登録用
      *
      * @param integer $sid 生徒ID
-     * @return array
+     * @return object
      */
     private function getGradeAtRegist($sid)
     {
@@ -210,7 +210,7 @@ trait FuncGradesTrait
      * 成績登録時の学年の取得 編集用
      *
      * @param int $scoreId 成績ID
-     * @return string
+     * @return object
      */
     protected function getGradeAtEdit($scoreId)
     {
