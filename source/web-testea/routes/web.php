@@ -406,17 +406,14 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // 日程連絡一覧
     Route::get('/season_tutor', [SeasonTutorController::class, 'index'])->name('season_tutor');
 
-    // バリデーション(検索用)
-    Route::post('/season_tutor/vd_search', [SeasonTutorController::class, 'validationForSearch'])->name('season_tutor-vd_search');
-
     // 検索結果取得
     Route::post('/season_tutor/search', [SeasonTutorController::class, 'search'])->name('season_tutor-search');
 
     // 提出スケジュール詳細
-    Route::get('/season_tutor/detail/{tid}', [SeasonTutorController::class, 'detail'])->name('season_tutor-detail');
+    Route::get('/season_tutor/detail/{seasonTutorId}', [SeasonTutorController::class, 'detail'])->name('season_tutor-detail');
 
     // 日程登録画面
-    Route::get('/season_tutor/new', [SeasonTutorController::class, 'new'])->name('season_tutor-new');
+    Route::get('/season_tutor/new/{seasonCd}', [SeasonTutorController::class, 'new'])->name('season_tutor-new');
 
     // 新規登録処理
     Route::post('/season_tutor/create', [SeasonTutorController::class, 'create'])->name('season_tutor-create');
@@ -978,6 +975,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 詳細取得用
     Route::post('/member_mng/get_data_grades_mng', [GradesMngController::class, 'getData'])->name('grades_mng-get_data');
+
+    // 試験種別が選択された際に成績表示欄数を返却する
+    Route::post('/member_mng/get_data_select_grades', [GradesMngController::class, 'getDataSelect'])->name('grades_mng-get_data_select');
 
     // 登録画面
     Route::get('/member_mng/grades_mng/{sid}/new', [GradesMngController::class, 'new'])->name('grades_mng-new');

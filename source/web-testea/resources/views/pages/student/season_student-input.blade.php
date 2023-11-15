@@ -15,8 +15,8 @@
     {{-- 詳細を表示 --}}
     <x-bs.table :hover=false :vHeader=true class="mb-4">
       <tr>
-          <th width="25%">特別期間</th>
-          <td>{{$seasonStudent->year}}年{{$seasonStudent->season_name}}</td>
+        <th width="40%">特別期間</th>
+        <td>{{$seasonStudent->year}}年{{$seasonStudent->season_name}}</td>
       </tr>
       <tr>
         <th>受講校舎</th>
@@ -37,11 +37,11 @@
 
     {{-- テーブルタイトル行 --}}
     <x-slot name="thead">
-      <th class="t-minimum t-week-time"></th>
+      <th class="t-minimum t-period-day"></th>
 
       {{-- 時限を表示 --}}
       @foreach ($periodList as $periodKey => $periodVal)
-        <th class="t-week">{{$periodKey}}時限目</th>
+        <th class="t-period">{{$periodKey}}限</th>
       @endforeach
     </x-slot>
 

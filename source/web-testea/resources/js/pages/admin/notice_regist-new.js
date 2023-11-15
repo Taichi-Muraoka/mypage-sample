@@ -82,17 +82,17 @@ export default class AppClass extends PageBase {
                 // 宛先種別
                 selectChangeGetMulti: function (event) {
                     var destinationType = this.form.destination_type;
-                    var roomcdStudent = this.form.roomcd_student;
+                    var campus_cd_student = this.form.campus_cd_student;
 
                     // 生徒プルダウンは動的に変わるので、一旦クリアする
-                    this.form.sid = "";
+                    this.form.student_id = "";
 
                     // チェンジイベントを発生させる
                     self.selectChangeGet(
                         this,
                         {
                             destinationType: destinationType,
-                            roomcdStudent: roomcdStudent,
+                            campus_cd_student: campus_cd_student,
                         },
                         this.option
                     );

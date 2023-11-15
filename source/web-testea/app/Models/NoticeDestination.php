@@ -114,5 +114,14 @@ class NoticeDestination extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
-
+    /**
+     * 検索 宛先種別
+     */
+    public function scopeSearchType($query, $obj)
+    {
+        $key = 'destination_type';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
 }

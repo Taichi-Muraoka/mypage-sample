@@ -152,46 +152,6 @@ trait FuncScheduleTrait
     }
 
     /**
-     * 年間予定から特別期間日付の取得（校舎・特別期間コード指定）
-     *
-     * @param string $campusCd 校舎コード
-     * @param string $seasonCd 特別期間コード
-     * @return object
-     */
-    private function fncScheGetDateSeason($campusCd, $seasonCd)
-    {
-        $account = Auth::user();
-
-        // 年間予定情報から対象の特別期間の日付を取得
-        $query = YearlySchedule::query();
-
-        if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、所属校舎で絞る（ガード）
-            $query->where('yearly_schedules.campus_cd', $account->campus_cd);
-        }
-
-        $lessonDates = $query
-            ->select(
-                'yearly_schedules.lesson_date',
-                'mst_codes.name as dayname'
-            )
-            // コードマスターとJOIN（曜日）
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('yearly_schedules.day_cd', '=', 'mst_codes.code')
-                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_16);
-            })
-            ->where('campus_cd', $campusCd)
-            // 年度＝特別期間コードの上4桁
-            ->where('school_year',  substr($seasonCd, 0, 4))
-            // 期間区分＝特別期間コードの下2桁を数値変換
-            ->where('date_kind', intval(substr($seasonCd, 4, 2)))
-            ->orderBy('lesson_date')
-            ->get();
-
-        return $lessonDates;
-    }
-
-    /**
      * 校舎・日付から時間割区分の取得
      *
      * @param string $campusCd 校舎コード

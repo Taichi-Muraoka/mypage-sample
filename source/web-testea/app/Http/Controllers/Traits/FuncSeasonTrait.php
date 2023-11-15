@@ -1,0 +1,190 @@
+<?php
+
+namespace App\Http\Controllers\Traits;
+
+use App\Models\YearlySchedule;
+use App\Models\CodeMaster;
+use App\Consts\AppConst;
+use App\Libs\AuthEx;
+use App\Models\TutorCampus;
+use Illuminate\Support\Facades\Auth;
+
+/**
+ * 特別期間講習 - 機能共通処理
+ */
+trait FuncSeasonTrait
+{
+
+    //==========================
+    // 関数名を区別するために
+    // fncSasnを先頭につける
+    //==========================
+
+    /**
+     * 年間予定から特別期間日付の取得（校舎・特別期間コード指定）
+     *
+     * @param string $campusCd 校舎コード
+     * @param string $seasonCd 特別期間コード
+     * @return array
+     */
+    private function fncSasnGetSeasonDate($campusCd, $seasonCd)
+    {
+        $account = Auth::user();
+
+        // 年間予定情報から対象の特別期間の日付を取得
+        $query = YearlySchedule::query();
+
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('yearly_schedules.campus_cd', $account->campus_cd);
+        }
+
+        $lessonDates = $query
+            ->select(
+                'yearly_schedules.lesson_date',
+                'mst_codes.name as dayname'
+            )
+            // コードマスターとJOIN（曜日）
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('yearly_schedules.day_cd', '=', 'mst_codes.code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_16);
+            })
+            ->where('campus_cd', $campusCd)
+            // 年度＝特別期間コードの上4桁
+            ->where('school_year',  substr($seasonCd, 0, 4))
+            // 期間区分＝特別期間コードの下2桁を数値変換
+            ->where('date_kind', intval(substr($seasonCd, 4, 2)))
+            ->orderBy('lesson_date')
+            ->get();
+
+        // 配列に格納
+        $dateList = [];
+        foreach ($lessonDates as $lessonDate) {
+            array_push($dateList, [
+                // 日付（区切り文字無し）をIDとして扱う
+                'dateId' => $lessonDate->lesson_date->format('Ymd'),
+                // 「月/日(曜日)」の形式に編集
+                'dateLabel' => $lessonDate->lesson_date->format('m/d') . "(" . $lessonDate->dayname . ")",
+            ]);
+        }
+
+        return $dateList;
+    }
+
+    /**
+     * 年間予定から特別期間日付の取得（講師ID・特別期間コード指定）
+     *
+     * @param int $tutorId 講師ID
+     * @param string $seasonCd 特別期間コード
+     * @return array
+     */
+    private function fncSasnGetSeasonDateForTutor($tutorId, $seasonCd)
+    {
+        // 年間予定情報から対象の特別期間の日付を取得
+        $query = YearlySchedule::query();
+
+        $lessonDates = $query
+            ->select(
+                'yearly_schedules.lesson_date',
+                'mst_codes.name as dayname'
+            )
+            // コードマスターとJOIN（曜日）
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('yearly_schedules.day_cd', '=', 'mst_codes.code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_16);
+            })
+            // 講師所属情報とJOIN
+            ->sdJoin(TutorCampus::class, function ($join) use ($tutorId){
+                $join->on('yearly_schedules.campus_cd', '=', 'tutor_campuses.campus_cd')
+                    ->where('tutor_campuses.tutor_id', $tutorId);
+            })
+            // 年度＝特別期間コードの上4桁
+            ->where('school_year',  substr($seasonCd, 0, 4))
+            // 期間区分＝特別期間コードの下2桁を数値変換
+            ->where('date_kind', intval(substr($seasonCd, 4, 2)))
+            ->orderBy('lesson_date')
+            ->distinct()
+            ->get();
+
+        // 配列に格納
+        $dateList = [];
+        foreach ($lessonDates as $lessonDate) {
+            array_push($dateList, [
+                // 日付（区切り文字無し）をIDとして扱う
+                'dateId' => $lessonDate->lesson_date->format('Ymd'),
+                // 「月/日(曜日)」の形式に編集
+                'dateLabel' => $lessonDate->lesson_date->format('m/d') . "(" . $lessonDate->dayname . ")",
+            ]);
+        }
+
+        return $dateList;
+    }
+
+    /**
+     * チェックボックスの値を分割する
+     * ある程度フォーマットのチェックは行っている
+     *
+     * @param string $value チェックボックスの値
+     * @return array 配列
+     */
+    private function fncSasnSplitValue($value)
+    {
+        // パラメータ：
+        // カンマ区切りで日付_時限 のように飛んでくる。
+        // 20231225_1,20231226_2
+        //
+        // 戻り値：
+        // array (
+        //   0 =>
+        //   array (
+        //     'dateId' => '20231225',
+        //     'lesson_date' => '2023-12-25',
+        //     'period_no' => '1',
+        //   ),
+        //   1 =>
+        //   array (
+        //     'dateId' => '20231226',
+        //     'lesson_date' => '2023-12-26',
+        //     'period_no' => '2',
+        //   ),
+        // )
+
+        $rtn = [];
+
+        // 空の場合は処理なし
+        if (!filled($value)) {
+            return $rtn;
+        }
+
+        // カンマ区切りで分割
+        $commaList = explode(",", $value);
+
+        foreach ($commaList as $commaVal) {
+
+            // アンダーバー区切りで分割
+            $datePeriod = explode("_", $commaVal);
+
+            // 必ず2つになる
+            if (count($datePeriod) != 2) {
+                // 不正なエラー
+                $this->illegalResponseErr();
+            }
+
+            // 20231011 -> 2023-10-11
+            $dateId = $datePeriod[0];
+            if (strlen($dateId) != 8) {
+                // 不正なエラー
+                $this->illegalResponseErr();
+            }
+
+            array_push($rtn, [
+                'dateId' => $datePeriod[0],
+                // ハイフン区切りの日付にする
+                'lesson_date' => substr($dateId, 0, 4) . '-' . substr($dateId, 4, 2) . '-' . substr($dateId, 6, 2),
+                'period_no' => $datePeriod[1],
+            ]);
+        }
+
+        return $rtn;
+    }
+}

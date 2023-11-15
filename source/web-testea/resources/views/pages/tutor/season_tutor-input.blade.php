@@ -2,10 +2,10 @@
 
 @section('title', '特別期間講習 日程連絡')
 
-@section('content')
-
 {{-- 子ページ --}}
 @section('child_page', true)
+
+@section('content')
 
 {{-- フォーム --}}
 <x-bs.card :form=true >
@@ -15,11 +15,14 @@
     {{-- 詳細を表示 --}}
     <x-bs.table :hover=false :vHeader=true class="mb-4">
       <tr>
-          <th width="25%">特別期間</th>
-          <td>2023年春期</td>
+        <th width="40%">特別期間</th>
+        <td>{{$seasonName->year}}年{{$seasonName->season_name}}</td>
       </tr>
     </x-bs.table>
+    <x-input.hidden id="season_cd" :editData=$editData />
 
+  {{-- 登録期間外のエラー時のメッセージ --}}
+  <x-bs.form-group name="t_date_term" />
   {{-- チェックボックスのエラー時のメッセージ --}}
   <x-bs.form-group name="chkWs" />
 
@@ -27,38 +30,38 @@
 
     {{-- テーブルタイトル行 --}}
     <x-slot name="thead">
-      <th class="t-minimum t-week-time"></th>
+      <th class="t-minimum t-period-day"></th>
 
       {{-- 時限を表示 --}}
-      @for ($i = 0; $i < count($periodList); $i++)
-        <th class="t-week">{{$periodList[$i]}}</th>
-      @endfor
+      @foreach ($periodList as $periodKey => $periodVal)
+        <th class="t-period">{{$periodKey}}限</th>
+      @endforeach
     </x-slot>
 
     {{-- 二重ループで組み立てる --}}
-    @for ($j = 0; $j < count($dayList); $j++) <tr>
+    @foreach ($dateList as $date) <tr>
       {{-- 日付を表示 --}}
-      <td class="tt">{{$dayList[$j]}}</td>
+      <td class="tt">{{$date['dateLabel']}}</td>
 
-      @for ($i = 0; $i < count($periodList); $i++)
+      @foreach ($periodList as $periodKey => $periodVal)
       <td>
         {{-- チェックボックス。裏でクリックされた時間帯を保持している --}}
-        <x-input.checkbox id="{{$j}}_{{$periodIdList[$i]}}" class="chk-wt2" name="chkWs" :icheck=false
-          value="{{$j}}_{{$periodIdList[$i]}}" :editData=$editData />
+        <x-input.checkbox id="{{$date['dateId']}}_{{$periodKey}}" class="chk-wt2" name="chkWs" :icheck=false
+          value="{{$date['dateId']}}_{{$periodKey}}" :editData=$editData />
 
         {{-- 表のDiv --}}
-        <div class="chk-t" data-wt="{{$j}}_{{$periodIdList[$i]}}" v-on:click="timeClick"></div>
+        <div class="chk-t" data-wt="{{$date['dateId']}}_{{$periodKey}}" v-on:click="timeClick"></div>
       </td>
-      @endfor
+      @endforeach
 
       </tr>
-    @endfor
+    @endforeach
 
   </x-bs.table>
   
   {{-- 余白 --}}
   <div class="mb-3"></div>
-  <x-input.textarea caption="備考欄" id="memo" />
+  <x-input.textarea caption="備考欄" id="comment" :rules=$rules />
 
   {{-- フッター --}}
   <x-slot name="footer">
