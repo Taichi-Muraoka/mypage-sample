@@ -7,7 +7,7 @@
 {{-- 子ページ --}}
 @section('child_page', true)
 
-{{-- フォーム --}}
+{{-- フォームなし --}}
 <x-bs.card>
 
     {{-- 詳細を表示 --}}
@@ -20,14 +20,13 @@
         <th>講師コメント</th>
         {{-- nl2br: 改行 --}}
         <td class="nl2br">{{$seasonTutor->comment}}</td>
-    </tr>
-  </x-bs.table>
-    <x-input.hidden id="season_tutor_id" :editData=$seasonTutor />
+      </tr>
+    </x-bs.table>
 
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-bs.form-title>受講不可コマ連絡情報</x-bs.form-title>
+    <x-bs.form-title>授業不可コマ連絡情報</x-bs.form-title>
     <x-bs.table :hover=false class="table-checked">
 
     {{-- テーブルタイトル行 --}}

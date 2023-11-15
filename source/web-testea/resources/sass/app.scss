@@ -55,7 +55,7 @@ body {
     color: #fff;
 }
 
-/* 
+/*
   サイドバー アイコンとテキストのマージン
 */
 .sidebar .nav-link > i {
@@ -102,7 +102,7 @@ body {
 /* tdの背景は白にする */
 /* ホバーが効かなくなるのでコメント
 .table td {
-     background-color: white; 
+     background-color: white;
 }
 */
 
@@ -160,7 +160,7 @@ body {
 
 /* カードタグ ------------------------*/
 
-/* 
+/*
   カードの枠に線を表示。
   影も外す
   下にマージンを取る。
@@ -541,7 +541,7 @@ label:not(.form-check-label):not(.custom-file-label) {
     background-color: #5a6268;
     border-color: #545b62;
 }
-      
+
 .fc .fc-topLinkButton-button.disabled, .fc .fc-topLinkButton-button:disabled {
     color: #fff;
     background-color: #6c757d;
@@ -558,7 +558,7 @@ label:not(.form-check-label):not(.custom-file-label) {
 .show > .fc .fc-topLinkButton-buttony.dropdown-toggle:focus {
     box-shadow: 0 0 0 0 rgba(130, 138, 145, 0.5);
 }
-      
+
 /* 空き時間・特別期間講習 コマ枠 ----------*/
 //.card.pa-table-checked {
 //    overflow-x: scroll;
@@ -574,8 +574,9 @@ label:not(.form-check-label):not(.custom-file-label) {
     white-space: nowrap;
 }
 
-.table-checked td {
+.table-checked td:not(.tt) {
     padding: 0;
+    max-width: 50px;
 }
 
 .table-checked td div {
@@ -601,23 +602,24 @@ label:not(.form-check-label):not(.custom-file-label) {
     display: none;
 }
 
+/* 授業不可の枠 */
 .chk-wt2:checked + div {
     background-color: #4c4c4c;
 }
 
 /*  授業登録済みの枠 */
-//.chk-wt2:disabled + div {
-//    background-color: rgb(201, 233, 143);
-//}
+.chk-wt2:disabled + div {
+    background-color: rgb(201, 233, 143);
+}
+
 .table-checked td div .class-info {
     padding: 0.75rem;
-    font-size: 0.875rem;
-    background-color: rgb(201, 233, 143);
+    font-size: 0.725rem;
 }
 
 /*  生徒コマ組み 講師選択の枠 */
 .table-checked td div .sel-button {
-    padding: 0.75rem;
+    //padding: 0.75rem;
     font-size: 0.725rem;
 }
 

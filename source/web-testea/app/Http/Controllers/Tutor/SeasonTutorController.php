@@ -120,7 +120,7 @@ class SeasonTutorController extends Controller
             ->sdLeftJoin(CodeMaster::class, function ($join) {
                 $join->on(DB::raw('RIGHT(season_tutor_requests.season_cd, 2)'), '=', 'mst_codes.gen_item1')
                     ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
-            }, 'mst_codes')
+            })
             // 自分の講師IDで絞り込み
             ->where('tutor_id', $account->account_id)
             ->orderby('season_tutor_requests.apply_date', 'desc')

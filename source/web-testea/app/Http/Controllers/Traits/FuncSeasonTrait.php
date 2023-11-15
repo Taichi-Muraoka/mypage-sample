@@ -7,7 +7,9 @@ use App\Models\CodeMaster;
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
 use App\Models\TutorCampus;
+use App\Models\SeasonMng;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 /**
  * 特別期間講習 - 機能共通処理
@@ -19,6 +21,50 @@ trait FuncSeasonTrait
     // 関数名を区別するために
     // fncSasnを先頭につける
     //==========================
+
+    /**
+     * 特別期間プルダウンメニューのリストを取得
+     * 管理者向け（教室管理者の場合は自分の校舎のみ）
+     * 教室管理者以外は、指定されたcampusCdで検索
+     *
+     * @param string $campusCd 校舎コード 指定なしの場合null
+     * @return array
+     */
+    protected function fncSasnGetGetSeasonList($campusCd = null)
+    {
+        // 現在日を取得
+        $today = date("Y-m-d");
+
+        // クエリを作成（特別期間講習管理）
+        $query = SeasonMng::query();
+
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、校舎コードで絞る
+            $account = Auth::user();
+            $query->where('campus_cd', $account->campus_cd);
+        }
+        // 校舎が指定された場合絞り込み
+        $query->when($campusCd, function ($query) use ($campusCd) {
+            return $query->where('campus_cd', $campusCd);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select(
+            'season_cd as code',
+            DB::raw('CONCAT(LEFT(season_cd, 4), "年", mst_codes.gen_item2) AS value')
+        )
+            // コードマスターとJOIN（期間区分）
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on(DB::raw('RIGHT(season_cd, 2)'), '=', 'mst_codes.gen_item1')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
+            })
+            // 講師受付開始日を過ぎたもの
+            ->where('t_start_date', '<=', $today)
+            ->orderby('season_cd', 'desc')
+            ->distinct()
+            ->get()
+            ->keyBy('code');
+    }
 
     /**
      * 年間予定から特別期間日付の取得（校舎・特別期間コード指定）
@@ -94,7 +140,7 @@ trait FuncSeasonTrait
                     ->where('mst_codes.data_type', AppConst::CODE_MASTER_16);
             })
             // 講師所属情報とJOIN
-            ->sdJoin(TutorCampus::class, function ($join) use ($tutorId){
+            ->sdJoin(TutorCampus::class, function ($join) use ($tutorId) {
                 $join->on('yearly_schedules.campus_cd', '=', 'tutor_campuses.campus_cd')
                     ->where('tutor_campuses.tutor_id', $tutorId);
             })
@@ -114,6 +160,8 @@ trait FuncSeasonTrait
                 'dateId' => $lessonDate->lesson_date->format('Ymd'),
                 // 「月/日(曜日)」の形式に編集
                 'dateLabel' => $lessonDate->lesson_date->format('m/d') . "(" . $lessonDate->dayname . ")",
+                // 日付（ハイフン区切り）
+                'dateYmd' => $lessonDate->lesson_date->format('Y-m-d'),
             ]);
         }
 

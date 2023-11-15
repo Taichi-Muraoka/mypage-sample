@@ -115,5 +115,28 @@ class SeasonTutorRequest extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
+    /**
+     * 検索 講師ID
+     */
+    public function scopeSearchTid($query, $obj)
+    {
+        $key = 'tutor_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 特別期間コード
+     */
+    public function scopeSearchSeasonCd($query, $obj)
+    {
+        $key = 'season_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 
 }
