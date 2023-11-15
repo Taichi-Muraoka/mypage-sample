@@ -976,6 +976,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 詳細取得用
     Route::post('/member_mng/get_data_grades_mng', [GradesMngController::class, 'getData'])->name('grades_mng-get_data');
 
+    // 試験種別が選択された際に成績表示欄数を返却する
+    Route::post('/member_mng/get_data_select_grades', [GradesMngController::class, 'getDataSelect'])->name('grades_mng-get_data_select');
+
     // 登録画面
     Route::get('/member_mng/grades_mng/{sid}/new', [GradesMngController::class, 'new'])->name('grades_mng-new');
 
