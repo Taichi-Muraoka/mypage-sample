@@ -107,10 +107,10 @@ class ScoreDetail extends Model
             'score_datail_id' => ['integer'],
             'score_id' => ['integer'],
             'g_subject_cd' => ['string', 'max:3', 'digits:3'],
-            'score' => ['integer'],
-            'full_score' => ['integer'],
-            'average' => ['integer'],
-            'deviation_score' => ['integer']
+            'score' => ['integer', 'max:9999'],
+            'full_score' => ['integer', 'max:9999'],
+            'average' => ['integer', 'max:9999'],
+            'deviation_score' => ['integer', 'max:9999']
         ];
         return $_fieldRules;
     }
