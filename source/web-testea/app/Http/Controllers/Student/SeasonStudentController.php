@@ -15,7 +15,7 @@ use App\Models\CodeMaster;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
-use App\Http\Controllers\Traits\FuncScheduleTrait;
+use App\Http\Controllers\Traits\FuncSeasonTrait;
 
 /**
  * 特別期間講習日程連絡（生徒） - コントローラ
@@ -23,8 +23,8 @@ use App\Http\Controllers\Traits\FuncScheduleTrait;
 class SeasonStudentController extends Controller
 {
 
-    // 機能共通処理：スケジュール関連
-    use FuncScheduleTrait;
+    // 機能共通処理：特別期間講習
+    use FuncSeasonTrait;
 
     /**
      * 教科受講回数欄の行数
@@ -146,7 +146,7 @@ class SeasonStudentController extends Controller
                 'season_student_requests.season_cd',
                 'season_student_requests.campus_cd',
                 DB::raw('LEFT(season_student_requests.season_cd, 4) as year'),
-                'mst_codes_38.gen_item2 as season_name',
+                'mst_codes.gen_item2 as season_name',
                 'room_names.room_name as campus_name',
                 'season_student_requests.comment'
             )
@@ -156,9 +156,9 @@ class SeasonStudentController extends Controller
             })
             // コードマスターとJOIN（期間区分）
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on(DB::raw('RIGHT(season_student_requests.season_cd, 2)'), '=', 'mst_codes_38.gen_item1')
-                    ->where('mst_codes_38.data_type', AppConst::CODE_MASTER_38);
-            }, 'mst_codes_38')
+                $join->on(DB::raw('RIGHT(season_student_requests.season_cd, 2)'), '=', 'mst_codes.gen_item1')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
+            })
             // IDを指定
             ->where('season_student_id', $seasonStudentId)
             // 登録済データのみ表示可
@@ -201,7 +201,7 @@ class SeasonStudentController extends Controller
         }
 
         // 生徒連絡コマ情報を取得する
-        // クエリを作成（受講回数情報）
+        // クエリを作成（生徒連絡コマ情報）
         $query = SeasonStudentPeriod::query();
         // データを取得
         $studentPeriods = $query
@@ -263,24 +263,18 @@ class SeasonStudentController extends Controller
                 'season_student_requests.season_cd',
                 'season_student_requests.campus_cd',
                 DB::raw('LEFT(season_student_requests.season_cd, 4) as year'),
-                'mst_codes_38.gen_item2 as season_name',
-                'room_names.room_name as campus_name',
-                'season_mng.s_end_date'
+                'mst_codes.gen_item2 as season_name',
+                'room_names.room_name as campus_name'
             )
-            // 特別期間管理情報とJOIN
-            ->sdLeftJoin(SeasonMng::class, function ($join) {
-                $join->on('season_student_requests.season_cd', '=', 'season_mng.season_cd')
-                    ->on('season_student_requests.campus_cd', '=', 'season_mng.campus_cd');
-            })
             // 校舎名の取得
             ->leftJoinSub($room, 'room_names', function ($join) {
                 $join->on('season_student_requests.campus_cd', '=', 'room_names.code');
             })
             // コードマスターとJOIN（期間区分）
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on(DB::raw('RIGHT(season_student_requests.season_cd, 2)'), '=', 'mst_codes_38.gen_item1')
-                    ->where('mst_codes_38.data_type', AppConst::CODE_MASTER_38);
-            }, 'mst_codes_38')
+                $join->on(DB::raw('RIGHT(season_student_requests.season_cd, 2)'), '=', 'mst_codes.gen_item1')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
+            })
             // IDを指定
             ->where('season_student_id', $seasonStudentId)
             // 未登録時のみ表示可
@@ -296,17 +290,7 @@ class SeasonStudentController extends Controller
         $periodList = $this->mdlGetPeriodListByKind($seasonStudent['campus_cd'], AppConst::CODE_MASTER_37_1);
 
         // 特別期間日付リストを取得（校舎・特別期間コード指定）
-        $lessonDates = $this->fncScheGetDateSeason($seasonStudent['campus_cd'], $seasonStudent['season_cd']);
-        // 配列に格納
-        $dateList = [];
-        foreach ($lessonDates as $lessonDate) {
-            array_push($dateList, [
-                // 日付（区切り文字無し）をIDとして扱う
-                'dateId' => $lessonDate->lesson_date->format('Ymd'),
-                // 「月/日(曜日)」の形式に編集
-                'dateLabel' => $lessonDate->lesson_date->format('m/d') . "(" . $lessonDate->dayname . ")",
-            ]);
-        }
+        $dateList = $this->fncSasnGetSeasonDate($seasonStudent['campus_cd'], $seasonStudent['season_cd']);
 
         return view('pages.student.season_student-input', [
             'rules' => $this->rulesForInput(null),
@@ -353,7 +337,7 @@ class SeasonStudentController extends Controller
         );
 
         // リクエストを配列に変換する
-        $datePeriods = $this->splitValue($form['chkWs']);
+        $datePeriods = $this->fncSasnSplitValue($form['chkWs']);
 
         // 複数の更新のためトランザクション
         DB::transaction(function () use ($form, $datePeriods) {
@@ -466,17 +450,13 @@ class SeasonStudentController extends Controller
             }
 
             // 特別期間日付リストを取得（校舎・特別期間コード指定）
-            $lessonDates = $this->fncScheGetDateSeason($request['campus_cd'], $request['season_cd']);
-            $dateIdList = [];
-            foreach ($lessonDates as $lessonDate) {
-                // 日付（区切り文字無し）をIDとして扱う
-                array_push($dateIdList, $lessonDate->lesson_date->format('Ymd'));
-            }
+            $dateIdList = $this->fncSasnGetSeasonDate($request['campus_cd'], $request['season_cd']);
+
             // 時限リストを取得（校舎・時間割区分から）
             $periodList = $this->mdlGetPeriodListByKind($request['campus_cd'], AppConst::CODE_MASTER_37_1);
 
             // リクエストを配列に変換する
-            $datePeriods = $this->splitValue($value);
+            $datePeriods = $this->fncSasnSplitValue($value);
             // リクエストの中身のチェック
             foreach ($datePeriods as $datePeriod) {
 
@@ -620,73 +600,5 @@ class SeasonStudentController extends Controller
         }
 
         return $rules;
-    }
-
-    /**
-     * チェックボックスの値を分割する
-     * ある程度フォーマットのチェックは行っている
-     *
-     * @param string $value チェックボックスの値
-     * @return array 配列
-     */
-    private function splitValue($value)
-    {
-        // パラメータ：
-        // カンマ区切りで日付_時限 のように飛んでくる。
-        // 20231225_1,20231226_2
-        //
-        // 戻り値：
-        // array (
-        //   0 =>
-        //   array (
-        //     'dateId' => '20231225',
-        //     'lesson_date' => '2023-12-25',
-        //     'period_no' => '1',
-        //   ),
-        //   1 =>
-        //   array (
-        //     'dateId' => '20231226',
-        //     'lesson_date' => '2023-12-26',
-        //     'period_no' => '2',
-        //   ),
-        // )
-
-        $rtn = [];
-
-        // 空の場合は処理なし
-        if (!filled($value)) {
-            return $rtn;
-        }
-
-        // カンマ区切りで分割
-        $commaList = explode(",", $value);
-
-        foreach ($commaList as $commaVal) {
-
-            // アンダーバー区切りで分割
-            $datePeriod = explode("_", $commaVal);
-
-            // 必ず2つになる
-            if (count($datePeriod) != 2) {
-                // 不正なエラー
-                $this->illegalResponseErr();
-            }
-
-            // 20231011 -> 2023-10-11
-            $dateId = $datePeriod[0];
-            if (strlen($dateId) != 8) {
-                // 不正なエラー
-                $this->illegalResponseErr();
-            }
-
-            array_push($rtn, [
-                'dateId' => $datePeriod[0],
-                // ハイフン区切りの日付にする
-                'lesson_date' => substr($dateId, 0, 4) . '-' . substr($dateId, 4, 2) . '-' . substr($dateId, 6, 2),
-                'period_no' => $datePeriod[1],
-            ]);
-        }
-
-        return $rtn;
     }
 }
