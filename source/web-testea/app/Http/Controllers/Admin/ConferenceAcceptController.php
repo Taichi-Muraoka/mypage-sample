@@ -456,8 +456,8 @@ class ConferenceAcceptController extends Controller
                 $notice->text = Lang::get(
                     'message.notice.conference_accept.text',
                     [
-                        'conferenceDate' => $schedule->target_date,
-                        'startTime' => $schedule->start_time,
+                        'conferenceDate' => $schedule->target_date->format('Y/m/d'),
+                        'startTime' => $schedule->start_time->format('H:i'),
                         'roomName' => $campus_name
                     ]
                 );
@@ -643,7 +643,7 @@ class ConferenceAcceptController extends Controller
             // 面談連絡情報更新
             $conference->conference_date = $request['target_date'];
             $conference->start_time = $request['start_time'];
-            $conference->end_time = $end_time;
+            $conference->end_time = $this->endTime($request['start_time']);;
             $conference->status = AppConst::CODE_MASTER_5_1;
             $conference->conference_schedule_id = $schedule->schedule_id;
             $conference->save();
