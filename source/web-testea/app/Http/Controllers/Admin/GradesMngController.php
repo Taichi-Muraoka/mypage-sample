@@ -70,8 +70,17 @@ class GradesMngController extends Controller
         // 生徒IDを取得
         $sid = $request->input('student_id');
 
+        // クエリを作成
+        $query = Score::query();
+
+        // 教室管理者の場合、自分の校舎コードの生徒のみにガードを掛ける
+        $query->where($this->guardRoomAdminTableWithSid());
+
+        // 画面表示中生徒のデータに絞り込み
+        $query->where('scores.student_id', $sid);
+
         // データを取得
-        $scores = $this->getScoreList($sid);
+        $scores = $this->getScoreList($query);
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $scores);

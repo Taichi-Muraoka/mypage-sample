@@ -35,21 +35,11 @@ trait FuncGradesTrait
     /**
      * 生徒成績を取得 一覧用
      *
-     * @param integer $sid 生徒ID
+     * @param integer $query クエリ
      * @return array
      */
-    private function getScoreList($sid)
+    private function getScoreList($query)
     {
-        // クエリを作成
-        $query = Score::query();
-
-        if (AuthEx::isAdmin()) {
-            // 教室管理者の場合、自分の校舎コードの生徒のみにガードを掛ける
-            $query->where($this->guardRoomAdminTableWithSid());
-            // 画面表示中生徒のデータに絞り込み
-            $query->where('scores.student_id', $sid);
-        }
-
         return $query
             ->select(
                 'scores.score_id as id',
@@ -102,6 +92,14 @@ trait FuncGradesTrait
         if (AuthEx::isAdmin()) {
             // 教室管理者の場合、自分の校舎コードの生徒のみにガードを掛ける
             $query->where($this->guardRoomAdminTableWithSid());
+        }
+        if (AuthEx::isStudent()) {
+            // 生徒の場合、自分の生徒IDのみにガードを掛ける
+            $query->where($this->guardStudentTableWithSid());
+        }
+        if (AuthEx::isTutor()) {
+            // 講師の場合、自分の担当生徒のみにガードを掛ける
+            $query->where($this->guardTutorTableWithSid());
         }
 
         return $query
