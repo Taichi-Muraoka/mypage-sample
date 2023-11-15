@@ -649,7 +649,7 @@ class ReportRegistController extends Controller
             $report->lesson_date = $lesson->target_date;
             $report->period_no = $lesson->period_no;
             $report->student_id = $lesson->student_id;
-            $report->approval_status = AppConst::CODE_MASTER_2_0;
+            $report->approval_status = AppConst::CODE_MASTER_4_1;
             $report->regist_date = now();
             $report->fill($form)->save();
 
@@ -819,8 +819,8 @@ class ReportRegistController extends Controller
 
             $report->regist_date = now();
             // 承認ステータスが差戻の場合、承認待ちに変更
-            if ($report->approval_status == AppConst::CODE_MASTER_2_2) {
-                $report->approval_status = AppConst::CODE_MASTER_2_0;
+            if ($report->approval_status == AppConst::CODE_MASTER_4_3) {
+                $report->approval_status = AppConst::CODE_MASTER_4_1;
             }
             // 授業報告書情報更新
             $report->fill($form)->save();
