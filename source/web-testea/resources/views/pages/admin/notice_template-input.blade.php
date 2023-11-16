@@ -19,18 +19,7 @@
     <x-input.textarea id="text" caption="本文" :rules=$rules :editData=$editData />
 
     {{-- 本番用 --}}
-    {{-- <x-input.select id="notice_type" caption="お知らせ種別" :select2=true :editData=$editData :mastrData=$typeList /> --}}
-
-    {{-- モック用 --}}
-    <x-input.select id="notice_type" caption="お知らせ種別" :select2=true :editData=$editData >
-        <option value="4">その他</option>
-        <option value="5">面談</option>
-        <option value="6">特別期間講習</option>
-        <option value="7">成績登録</option>
-        <option value="8">請求</option>
-        <option value="9">給与</option>
-        <option value="10">追加請求</option>
-    </x-input.select>
+    <x-input.select id="notice_type" caption="お知らせ種別" :select2=true :editData=$editData :mastrData=$typeList />
 
     {{-- 現在の表示順の最大値＋1をデフォルト値として設定 --}}
     <x-input.text id="order_code" caption="表示順" :rules=$rules :editData=$editData />
