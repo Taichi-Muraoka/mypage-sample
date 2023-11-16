@@ -463,7 +463,7 @@ class ConferenceAcceptController extends Controller
                 );
 
                 // お知らせ種別（面談）
-                $notice->notice_type = AppConst::CODE_MASTER_14_5;
+                $notice->notice_type = AppConst::CODE_MASTER_14_4;
                 // 管理者ID
                 $account = Auth::user();
                 $notice->adm_id = $account->account_id;
@@ -666,7 +666,7 @@ class ConferenceAcceptController extends Controller
             );
 
             // お知らせ種別（面談）
-            $notice->notice_type = AppConst::CODE_MASTER_14_5;
+            $notice->notice_type = AppConst::CODE_MASTER_14_4;
             // 管理者ID
             $account = Auth::user();
             $notice->adm_id = $account->account_id;
