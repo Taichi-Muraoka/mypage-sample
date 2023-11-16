@@ -28,7 +28,7 @@ export default class WeekCalendar {
         // モック用に仮の日付を設定（日曜にする）
         var curDate = new Date("2000/01/02");
 
-        for (var i = 1; i < 7; i++) {
+        for (var i = 1; i <= 7; i++) {
             curDate.setDate(curDate.getDate() + 1);
             const calendar = this.create(i, curDate);
             this._calendar.push(calendar);
@@ -125,7 +125,7 @@ export default class WeekCalendar {
      */
     refetchEvents() {
         // 全曜日分を配列で描画
-        for (var i = 0; i < 6; i++) {
+        for (var i = 0; i < 7; i++) {
             this._calendar[i].refetchResources();
             this._calendar[i].refetchEvents();
         }
