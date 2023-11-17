@@ -139,27 +139,14 @@ class Score extends Model
     }
 
     /**
-     * 検索 生徒(student_id)に紐づく教室
+     * 検索 生徒(student_id)に紐づく校舎
      */
     public function scopeSearchRoom($query, $obj)
     {
         $key = 'campus_cd';
         if (isset($obj[$key]) && filled($obj[$key])) {
-            // sidで教室で絞り込む(共通処理)
+            // campus_cdで生徒を絞り込む
             $this->mdlWhereSidByRoomQuery($query, self::class, $obj[$key]);
         }
     }
-
-    /**
-     * 検索 生徒(student_id)に紐づく教室（講師向け画面からの検索）
-     */
-    public function scopeSearchRoomForT($query, $obj)
-    {
-        $key = 'campus_cd';
-        if (isset($obj[$key]) && filled($obj[$key])) {
-            // student_idで教室で絞り込む(共通処理・講師用)
-            $this->mdlWhereSidByRoomQueryForT($query, self::class, $obj[$key]);
-        }
-    }
-
 }

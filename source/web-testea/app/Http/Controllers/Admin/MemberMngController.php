@@ -23,29 +23,27 @@ use App\Models\Badge;
 use App\Models\StudentView;
 use App\Http\Controllers\Traits\FuncCalendarTrait;
 use App\Http\Controllers\Traits\FuncInvoiceTrait;
-use App\Http\Controllers\Traits\FuncAgreementTrait;
+use App\Http\Controllers\Traits\FuncMemberDetailTrait;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\MypageGuideToStudent;
 use App\Mail\MypageGuideRejoinToStudent;
-use Carbon\Carbon;
 
 /**
  * 会員管理 - コントローラ
  */
 class MemberMngController extends Controller
 {
-
     // 機能共通処理：カレンダー
     use FuncCalendarTrait;
 
     // 機能共通処理：請求書
     use FuncInvoiceTrait;
 
-    // 機能共通処理：契約内容
-    use FuncAgreementTrait;
+    // 機能共通処理：生徒カルテ
+    use FuncMemberDetailTrait;
 
     /**
      * コンストラクタ
@@ -53,8 +51,7 @@ class MemberMngController extends Controller
      * @return void
      */
     public function __construct()
-    {
-    }
+    { }
 
     //==========================
     // 一覧
@@ -324,7 +321,7 @@ class MemberMngController extends Controller
                 $data->grade_name,
                 $data->enter_date->format('Y/m/d'),
                 // 通塾期間は月数を「Y年Mヶ月」にフォーマットする
-                floor($data->enter_term / 12).'年'.floor($data->enter_term % 12).'ヶ月',
+                floor($data->enter_term / 12) . '年' . floor($data->enter_term % 12) . 'ヶ月',
                 $data->badge_count,
                 $data->stu_status_name,
             ];
@@ -364,13 +361,13 @@ class MemberMngController extends Controller
         // IDのバリデーション
         $this->validateIds($sid);
 
-        // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
+        // 教室管理者の場合、自分の校舎コードの生徒のみにガードを掛ける
         $this->guardRoomAdminSid($sid);
 
-        // 生徒の契約内容を取得
-        $agreement = $this->getStudentAgreement($sid);
+        // 生徒カルテ情報を取得 FuncMemberDetailTrait
+        $student = $this->getMemberDetail($sid);
 
-        return view('pages.admin.member_mng-detail', $agreement);
+        return view('pages.admin.member_mng-detail', $student);
     }
 
     /**
@@ -381,54 +378,42 @@ class MemberMngController extends Controller
      */
     public function getDataDetail(Request $request)
     {
-        //==========================
-        // モック用処理
-        //==========================
-        return;
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request);
 
-        //==========================
-        // 本番処理
-        //==========================
-        // // IDのバリデーション
-        // $this->validateIdsFromRequest($request, 'sid', 'seq', 'roomcd');
+        // 生徒ID取得
+        $sid = $request->input('sid');
 
-        // // 生徒ID
-        // $sid = $request->input('sid');
+        // 教室管理者の場合、自分の校舎コードの生徒のみにガードを掛ける
+        $this->guardRoomAdminSid($sid);
 
-        // // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
-        // $this->guardRoomAdminSid($sid);
+        // モーダルによって処理を行う
+        $modal = $request->input('target');
 
-        // $roomcd = $request->input('roomcd');
-        // $seq = $request->input('seq');
+        // 詳細表示するデータID取得
+        $id = $request->input('id');
 
-        // // モーダルによって処理を行う
-        // $modal = $request->input('target');
+        switch ($modal) {
+            case "#modal-dtl-record":
+                // 連絡記録情報を取得する
+                return $this->getModalRecord($id);
 
-        // switch ($modal) {
-        //     case "#modal-dtl-regulation":
+            case "#modal-dtl-room_calendar":
+                // 授業情報を取得する
+                return $this->getModalSchedule($id);
 
-        //         // 規定情報を取得する
-        //         return $this->getStudentRegular($sid, $roomcd, $seq);
+            case "#modal-dtl-desired":
+                // 受験校情報を取得する
+                return $this->getModalEntranceExam($id);
 
-        //     case "#modal-dtl-tutor":
+            case "#modal-dtl-grades_mng":
+                // 成績情報を取得する
+                return $this->getModalScore($id);
 
-        //         // 家庭教師標準情報を取得する
-        //         return $this->getStudentHomeTeacherStd($sid, $roomcd, $seq);
-
-        //     case "#modal-dtl-course":
-
-        //         // 短期個別講習を取得する
-        //         return $this->getStudentExtraIndividual($sid, $roomcd, $seq);
-
-        //         case "#modal-dtl-grades_mng":
-
-        //             // 家庭教師標準情報を取得する
-        //             return $this->getStudentHomeTeacherStd($sid, $roomcd, $seq);
-    
-        //         default:
-        //         // 該当しない場合
-        //         $this->illegalResponseErr();
-        // }
+            default:
+                // 該当しない場合
+                $this->illegalResponseErr();
+        }
     }
 
     //==========================
@@ -810,7 +795,7 @@ class MemberMngController extends Controller
             }
 
             // 会員ステータス「見込客」 で登録の場合はこの時点で処理終了
-            if($student->stu_status == AppConst::CODE_MASTER_28_0){
+            if ($student->stu_status == AppConst::CODE_MASTER_28_0) {
                 return;
             }
 
@@ -820,10 +805,10 @@ class MemberMngController extends Controller
             //-------------------------
             // 生徒メールか保護者メールか判別
             $email = null;
-            if($student->login_kind == AppConst::CODE_MASTER_8_1){
+            if ($student->login_kind == AppConst::CODE_MASTER_8_1) {
                 $email = $student->email_stu;
             }
-            if($student->login_kind == AppConst::CODE_MASTER_8_2){
+            if ($student->login_kind == AppConst::CODE_MASTER_8_2) {
                 $email = $student->email_par;
             }
 
@@ -1070,10 +1055,10 @@ class MemberMngController extends Controller
             // メールアドレス生徒／保護者分岐
             // 1.アカウント情報作成 2.アカウント情報更新 3.メール送信 に使用
             $email = null;
-            if($request['login_kind'] == AppConst::CODE_MASTER_8_1){
+            if ($request['login_kind'] == AppConst::CODE_MASTER_8_1) {
                 $email = $request['email_stu'];
             }
-            if($request['login_kind'] == AppConst::CODE_MASTER_8_2){
+            if ($request['login_kind'] == AppConst::CODE_MASTER_8_2) {
                 $email = $request['email_par'];
             }
 
@@ -1111,8 +1096,8 @@ class MemberMngController extends Controller
                 $seasonCodes = $this->mdlFormatSeasonCd();
 
                 // 所属校舎の当年度春期～翌年度春期の特別期間講習管理 生徒連絡情報のレコードが有るか確認
-                foreach ($seasonCodes as $seasonCd ) {
-                    foreach ( $campuses as $campus) {
+                foreach ($seasonCodes as $seasonCd) {
+                    foreach ($campuses as $campus) {
                         // 生徒ID、特別期間コード、選択した校舎 で絞り込む
                         $existsSeasonStuReq = SeasonStudentRequest::where('student_id', $request['student_id'])
                             ->where('season_cd', $seasonCd)
@@ -1120,7 +1105,7 @@ class MemberMngController extends Controller
                             ->exists();
 
                         // 無ければ新規登録
-                        if(!$existsSeasonStuReq){
+                        if (!$existsSeasonStuReq) {
                             $seasonStuReq = new SeasonStudentRequest;
                             $seasonStuReq->student_id = $request['student_id'];
                             $seasonStuReq->season_cd = $seasonCd;
@@ -1172,10 +1157,12 @@ class MemberMngController extends Controller
 
             // 「見込客」はアカウント情報を持たないため、この処理からは外す（エラー防止）
             // 「見込客」→「在籍」に変更時も、この処理は行わない（アカウント新規作成を上記で行うため）
-            if ($request['stu_status'] != AppConst::CODE_MASTER_28_0
+            if (
+                $request['stu_status'] != AppConst::CODE_MASTER_28_0
                 && !($student->stu_status == AppConst::CODE_MASTER_28_0 && $request['stu_status'] == AppConst::CODE_MASTER_28_1)
-                ) {
-                if ($student->login_kind != $request['login_kind']
+            ) {
+                if (
+                    $student->login_kind != $request['login_kind']
                     || ($account->email != $request['email_stu'] && $account->email != $request['email_par'])
                     || ($student->stu_status == AppConst::CODE_MASTER_28_5 && $request['stu_status'] == AppConst::CODE_MASTER_28_1)
                 ) {
@@ -1463,7 +1450,7 @@ class MemberMngController extends Controller
                 ->first();
 
             // 編集前のデータが会員ステータス「在籍」「休塾予定」「退会処理中」の場合はチェックしない
-            if (isset($student) && ($student->stu_status == AppConst::CODE_MASTER_28_1 || $student->stu_status == AppConst::CODE_MASTER_28_2 || $student->stu_status == AppConst::CODE_MASTER_28_4) ) {
+            if (isset($student) && ($student->stu_status == AppConst::CODE_MASTER_28_1 || $student->stu_status == AppConst::CODE_MASTER_28_2 || $student->stu_status == AppConst::CODE_MASTER_28_4)) {
                 return;
             }
 

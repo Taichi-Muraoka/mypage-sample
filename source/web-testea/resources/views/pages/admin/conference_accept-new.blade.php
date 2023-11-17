@@ -32,7 +32,7 @@
 
     <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules :editData=$editData />
 
-    <x-input.select caption="生徒（入会前面談時は未選択）" id="student_id" emptyValue="-1" :select2=true :editData=$editData>
+    <x-input.select caption="生徒（入会前面談時は未選択）" id="student_id" :select2=true :editData=$editData>
         {{-- vueで動的にプルダウンを作成 --}}
         <option v-for="item in selectGetItem.selectItems" :value="item.id">
             @{{ item.value }}

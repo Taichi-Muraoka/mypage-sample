@@ -34,6 +34,7 @@
             <x-button.submit-href caption="木" icon="" btn="secondary" class="mr-2" href="#calendar4" />
             <x-button.submit-href caption="金" icon="" btn="secondary" class="mr-2" href="#calendar5" />
             <x-button.submit-href caption="土" icon="" btn="secondary" class="mr-2" href="#calendar6" />
+            <x-button.submit-href caption="日" icon="" btn="secondary" class="mr-2" href="#calendar7" />
         </div>
 
     </x-bs.card>
@@ -44,6 +45,7 @@
     <div id="calendar4"></div>
     <div id="calendar5"></div>
     <div id="calendar6"></div>
+    <div id="calendar7"></div>
 
 </x-bs.card>
 
