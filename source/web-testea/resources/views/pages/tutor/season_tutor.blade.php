@@ -9,7 +9,7 @@
 
     {{-- カードヘッダ右 --}}
     <x-slot name="tools">
-        <x-button.new href="{{ route('season_tutor-new') }}" :small=true caption="日程登録" />
+        <x-button.new href="{{ route('season_tutor-new', $seasonCd) }}" caption="日程登録" btn="btn-primary" :disabled=$newBtnDisabled/>
     </x-slot>
 
     {{-- テーブル --}}
@@ -23,28 +23,13 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <x-bs.td-sp caption="連絡日">2023/03/05</x-bs.td-sp>
-            <x-bs.td-sp caption="特別期間名">2023年春期</x-bs.td-sp>
+        <tr v-for="item in paginator.data" v-cloak>
+            <x-bs.td-sp caption="連絡日">@{{$filters.formatYmd(item.apply_date)}}</x-bs.td-sp>
+            <x-bs.td-sp caption="特別期間名">@{{item.year}}年@{{item.season_name}}</x-bs.td-sp>
             <td>
-                <x-button.list-dtl vueHref="'{{ route('season_tutor-detail', '') }}/' + 1" caption="詳細" />
+                <x-button.list-dtl vueHref="'{{ route('season_tutor-detail', '') }}/' + item.season_tutor_id" caption="詳細" />
             </td>
         </tr>
-        <tr>
-            <x-bs.td-sp caption="連絡日">2022/12/05</x-bs.td-sp>
-            <x-bs.td-sp caption="特別期間名">2022年冬期</x-bs.td-sp>
-            <td>
-                <x-button.list-dtl vueHref="'{{ route('season_tutor-detail', '') }}/' + 1" caption="詳細" />
-            </td>
-        </tr>
-        <tr>
-            <x-bs.td-sp caption="連絡日">2022/07/05</x-bs.td-sp>
-            <x-bs.td-sp caption="特別期間名">2022年夏期</x-bs.td-sp>
-            <td>
-                <x-button.list-dtl vueHref="'{{ route('season_tutor-detail', '') }}/' + 1" caption="詳細" />
-            </td>
-        </tr>
-
     </x-bs.table>
 
 </x-bs.card-list>

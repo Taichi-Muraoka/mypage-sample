@@ -10,7 +10,7 @@ use App\Models\TutorCampus;
 
 /**
  * ガード共通処理
- * 
+ *
  * 他人のIDを見れないかなど、リクエストを権限によってガードを掛けるための共通処理
  * 生徒・講師・教室管理者の場合にそれぞれガードをかける
  */
@@ -26,7 +26,7 @@ trait GuardTrait
 
     /**
      * プルダウンリストの値が正しいかチェックする
-     * 
+     *
      * @param $list プルダウンリスト
      * @param $value 値
      */
@@ -103,7 +103,7 @@ trait GuardTrait
      * テーブルそのものに校舎コードカラムを持っており、
      * 教室管理者の校舎コードでガードを掛ける
      * whereにそのまま指定する
-     * 
+     *
      * @param $model 絞り込む対象のテーブルモデルを指定。nullの場合は主テーブルを取得するが、教室コードが主テーブルではない場合
      */
     protected function guardRoomAdminTableWithRoomCd($model = null)
@@ -141,6 +141,25 @@ trait GuardTrait
                 $account = Auth::user();
                 // 主テーブルのsidに対して絞り込む
                 $this->mdlWhereSidByRoomQuery($query, get_class($query->getModel()), $account->campus_cd);
+            }
+        };
+    }
+
+    /**
+     * テーブルそのものに講師IDカラムを持っており、
+     * 教室管理者の担当校舎の講師のみにガードを掛ける
+     * whereにそのまま指定する
+     */
+    protected function guardRoomAdminTableWithTid()
+    {
+        // クロージャで呼んでもらうため、関数で返却
+        return function ($query) {
+
+            if (AuthEx::isRoomAdmin()) {
+                // 指定された教室コードのsidのみを絞り込む
+                $account = Auth::user();
+                // 主テーブルのsidに対して絞り込む
+                $this->mdlWhereTidByRoomQuery($query, get_class($query->getModel()), $account->campus_cd);
             }
         };
     }

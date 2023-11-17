@@ -42,9 +42,9 @@
 
                 <tr v-for="scoreDetail in item.scoreDetails" v-cloak>
                     <x-bs.td-sp>@{{scoreDetail.g_subject_name}}</x-bs.td-sp>
-                    <x-bs.td-sp>@{{scoreDetail.score}}点</x-bs.td-sp>
-                    <x-bs.td-sp>@{{scoreDetail.full_score}}点</x-bs.td-sp>
-                    <x-bs.td-sp>@{{scoreDetail.average}}点</x-bs.td-sp>
+                    <x-bs.td-sp>@{{scoreDetail.score}}<span v-show='scoreDetail.score != null'>点</span></x-bs.td-sp>
+                    <x-bs.td-sp>@{{scoreDetail.full_score}}<span v-show='scoreDetail.full_score != null'>点</span></x-bs.td-sp>
+                    <x-bs.td-sp>@{{scoreDetail.average}}<span v-show='scoreDetail.average != null'>点</span></x-bs.td-sp>
                     <x-bs.td-sp>@{{scoreDetail.deviation_score}}</x-bs.td-sp>
                 </tr>
             </x-bs.table>
@@ -97,8 +97,8 @@
 
                 <tr v-for="scoreDetail in item.scoreDetails" v-cloak>
                     <x-bs.td-sp>@{{scoreDetail.g_subject_name}}</x-bs.td-sp>
-                    <x-bs.td-sp>@{{scoreDetail.score}}点</x-bs.td-sp>
-                    <x-bs.td-sp>@{{scoreDetail.average}}点</x-bs.td-sp>
+                    <x-bs.td-sp>@{{scoreDetail.score}}<span v-show='scoreDetail.score != null'>点</span></x-bs.td-sp>
+                    <x-bs.td-sp>@{{scoreDetail.average}}<span v-show='scoreDetail.average != null'>点</span></x-bs.td-sp>
                 </tr>
             </x-bs.table>
         </td>

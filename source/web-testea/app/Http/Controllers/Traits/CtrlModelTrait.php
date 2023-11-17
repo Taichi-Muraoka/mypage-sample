@@ -195,7 +195,7 @@ trait CtrlModelTrait
      * 講師向け
      *
      * @param string $campusCd 校舎コード 指定なしの場合null
-     * @param int $tutorId 講師ID 
+     * @param int $tutorId 講師ID
      * @param string $excludeCampusCd 除外する校舎コード(削除予定)
      * @return array
      */
@@ -466,6 +466,34 @@ trait CtrlModelTrait
     }
 
     /**
+     * 時限プルダウンメニューのリストを取得（講師ID・時間割区分指定）
+     *
+     * @param string $tutorId 講師ID
+     * @param int $timetableKind 時間割区分
+     * @return array
+     */
+    protected function mdlGetPeriodListForTutor($tutorId, $timetableKind)
+    {
+        $query = MstTimetable::query();
+
+        // プルダウンリストを取得する
+        return $query->select(
+            'period_no as code',
+            DB::raw('CONCAT(period_no, "限") AS value')
+        )
+            // 講師所属情報とJOIN
+            ->sdJoin(TutorCampus::class, function ($join) use ($tutorId) {
+                $join->on('mst_timetables.campus_cd', '=', 'tutor_campuses.campus_cd')
+                    ->where('tutor_campuses.tutor_id', $tutorId);
+            })
+            ->where('timetable_kind', $timetableKind)
+            ->orderby('period_no')
+            ->distinct()
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
      * 授業科目プルダウンメニューのリストを取得
      *
      * @param int $courseKind コース種別 省略可
@@ -538,7 +566,7 @@ trait CtrlModelTrait
      * 権限によって制御をかける
      * getDataSelectで使用される想定
      * 校舎名と生徒名を返却する。機能のみではなかったのでここに定義
-     * 
+     *
      * @param int $schedule_id スケジュールID
      */
     protected function mdlGetScheduleDtl($schedule_id)
@@ -583,7 +611,7 @@ trait CtrlModelTrait
      * 講師向け
      * selectのIN句に指定する想定
      *
-     * @param int $tutorId 講師ID 
+     * @param int $tutorId 講師ID
      * @return array
      */
     protected function mdlGetStudentArrayForT($tutorId = null)
@@ -729,9 +757,9 @@ trait CtrlModelTrait
     {
         $lists = $collection->map(function ($item, $key) use ($digit) {
             return [
-                    'code' => $item['code'],
-                    'value' => str_pad($item['code'], $digit, '0', STR_PAD_LEFT) . ' (' . $item['value'] . ')'
-                ];
+                'code' => $item['code'],
+                'value' => str_pad($item['code'], $digit, '0', STR_PAD_LEFT) . ' (' . $item['value'] . ')'
+            ];
         });
 
         return $lists;
@@ -751,8 +779,8 @@ trait CtrlModelTrait
 
         // 年は、システムマスタの「現年度」から取得する。
         $currentYear = MstSystem::select('value_num')
-        ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
-        ->first();
+            ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
+            ->first();
 
         // 期間区分を取得する（サブコード1のみ：春期1,夏期2,冬期3）
         $termList = CodeMaster::select('code')
@@ -763,15 +791,15 @@ trait CtrlModelTrait
         // 現年度分 特別期間コード生成 期間区分コードを2桁で0埋め
         $seasonCodes = [];
         foreach ($termList as $term) {
-            $seasonCodes[] = $currentYear->value_num.str_pad($term->code, 2, '0', STR_PAD_LEFT);
+            $seasonCodes[] = $currentYear->value_num . str_pad($term->code, 2, '0', STR_PAD_LEFT);
         }
 
         // 翌年度分 特別期間コード生成 春期のみ
-        $seasonCodes[] = $currentYear->value_num +1 .str_pad($termList[0]->code, 2, '0', STR_PAD_LEFT);
+        $seasonCodes[] = $currentYear->value_num + 1 . str_pad($termList[0]->code, 2, '0', STR_PAD_LEFT);
 
         return $seasonCodes;
     }
-    
+
     //------------------------------
     // 名称取得（共通で使用されるもの）
     //------------------------------

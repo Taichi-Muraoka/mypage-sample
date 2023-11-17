@@ -170,6 +170,9 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     // 詳細取得用
     Route::post('/grades/get_data', [GradesController::class, 'getData'])->name('grades-get_data');
 
+    // 試験種別が選択された際に成績表示欄数を返却する
+    Route::post('/grades/get_data_select', [GradesController::class, 'getDataSelect'])->name('grades-get_data_select');
+
     // 生徒成績登録
     Route::get('/grades/new', [GradesController::class, 'new'])->name('grades-new');
 
@@ -213,14 +216,11 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     // 日程連絡一覧
     Route::get('/season_student', [SeasonStudentController::class, 'index'])->name('season_student');
 
-    // バリデーション(検索用)
-    Route::post('/season_student/vd_search', [SeasonStudentController::class, 'validationForSearch'])->name('season_student-vd_search');
-
     // 検索結果取得
     Route::post('/season_student/search', [SeasonStudentController::class, 'search'])->name('season_student-search');
 
     // 提出スケジュール詳細
-    Route::get('/season_student/detail/{sid}', [SeasonStudentController::class, 'detail'])->name('season_student-detail');
+    Route::get('/season_student/detail/{seasonStudentId}', [SeasonStudentController::class, 'detail'])->name('season_student-detail');
 
     // 日程登録画面
     Route::get('/season_student/edit/{seasonStudentId}', [SeasonStudentController::class, 'edit'])->name('season_student-edit');
@@ -409,17 +409,14 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // 日程連絡一覧
     Route::get('/season_tutor', [SeasonTutorController::class, 'index'])->name('season_tutor');
 
-    // バリデーション(検索用)
-    Route::post('/season_tutor/vd_search', [SeasonTutorController::class, 'validationForSearch'])->name('season_tutor-vd_search');
-
     // 検索結果取得
     Route::post('/season_tutor/search', [SeasonTutorController::class, 'search'])->name('season_tutor-search');
 
     // 提出スケジュール詳細
-    Route::get('/season_tutor/detail/{tid}', [SeasonTutorController::class, 'detail'])->name('season_tutor-detail');
+    Route::get('/season_tutor/detail/{seasonTutorId}', [SeasonTutorController::class, 'detail'])->name('season_tutor-detail');
 
     // 日程登録画面
-    Route::get('/season_tutor/new', [SeasonTutorController::class, 'new'])->name('season_tutor-new');
+    Route::get('/season_tutor/new/{seasonCd}', [SeasonTutorController::class, 'new'])->name('season_tutor-new');
 
     // 新規登録処理
     Route::post('/season_tutor/create', [SeasonTutorController::class, 'create'])->name('season_tutor-create');
@@ -663,6 +660,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/report_check/search', [ReportCheckController::class, 'search'])->name('report_check-search');
 
+    // 教室選択プルダウンを選択された際に生徒プルダウンの情報を返却する
+    Route::post('/report_check/get_data_select_search', [ReportCheckController::class, 'getDataSelectSearch'])->name('report_check-get_data_select_search');
+
     // 詳細取得用
     Route::post('/report_check/get_data', [ReportCheckController::class, 'getData'])->name('report_check-get_data');
 
@@ -674,6 +674,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 編集処理
     Route::post('/report_check/update', [ReportCheckController::class, 'update'])->name('report_check-update');
+
+    // モーダル処理
+    Route::post('/report_check/exec_modal', [ReportCheckController::class, 'execModal'])->name('report_check-exec_modal');
 
     // バリデーション(登録用)
     Route::post('/report_check/vd_input', [ReportCheckController::class, 'validationForInput'])->name('report_check-vd_input');
@@ -975,6 +978,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 詳細取得用
     Route::post('/member_mng/get_data_grades_mng', [GradesMngController::class, 'getData'])->name('grades_mng-get_data');
+
+    // 試験種別が選択された際に成績表示欄数を返却する
+    Route::post('/member_mng/get_data_select_grades', [GradesMngController::class, 'getDataSelect'])->name('grades_mng-get_data_select');
 
     // 登録画面
     Route::get('/member_mng/grades_mng/{sid}/new', [GradesMngController::class, 'new'])->name('grades_mng-new');

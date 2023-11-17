@@ -17,10 +17,6 @@ export default class AppClass extends PageBase {
     start() {
         const self = this;
 
-        // 編集完了後は一覧へ戻る
-        //var afterEdit = () => {
-        //    UrlCom.redirect(UrlCom.getFuncUrl());
-        //};
         var afterEdit = () => {
             // 本画面は三階層目なので二階層目に戻る(親画面)
             self.redirectToParent2();
@@ -30,15 +26,47 @@ export default class AppClass extends PageBase {
             self.redirectToParent();
         };
 
-        // Vue: 入力フォーム
-        //this.getVueInputForm({
-        //    afterEdit: afterEdit,
-        //});
         this.getVueInputForm({
             afterEdit: afterEdit,
             afterNew: afterNew,
             // 別画面でも更新・削除を使用するのでURLを変更
             urlSuffix: "grades_mng",
+
+            vueData: {
+                // プロパティを用意
+                selectGetItem: {},
+            },
+            vueMethods: {
+                // 変更イベント
+                selectChangeGetCount: function (event) {
+                    AjaxCom.getPromise()
+                        .then(() => {
+                            // 初期化
+                            this.selectGetItem = {};
+                            this.form.display_count = null;
+
+                            // チェンジイベントを発生させる
+                            self.selectChangeGetCallBack(
+                                this,
+                                {
+                                    exam_type: this.form.exam_type,
+                                    school_kind: this.form.school_kind,
+                                },
+                                // URLを分けた
+                                {
+                                    urlSuffix: "grades",
+                                },
+                                // 受信後のコールバック
+                                (data) => {
+                                    // データをセット
+                                    this.selectGetItem = data;
+                                    this.form.display_count = data.count;
+                                }
+                            );
+                        })
+                        .catch(AjaxCom.fail);
+                },
+            }
         });
     }
 }

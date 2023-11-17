@@ -15,19 +15,21 @@
     {{-- 詳細を表示 --}}
     <x-bs.table :hover=false :vHeader=true class="mb-4">
       <tr>
-          <th width="25%">特別期間</th>
-          <td>2023年春期</td>
+        <th width="40%">特別期間</th>
+        <td>{{$seasonStudent->year}}年{{$seasonStudent->season_name}}</td>
       </tr>
       <tr>
         <th>受講校舎</th>
-        <td>久我山</td>
-      </tr>
-      <tr>
-          <th>受講回数（目安）</th>
-          <td>4回</td>
+        <td>{{$seasonStudent->campus_name}}</td>
       </tr>
     </x-bs.table>
+    {{-- hidden 退避用--}}
+    <x-input.hidden id="campus_cd" :editData=$seasonStudent />
+    <x-input.hidden id="season_student_id" :editData=$seasonStudent />
+    <x-input.hidden id="season_cd" :editData=$seasonStudent />
 
+  {{-- 登録期間外のエラー時のメッセージ --}}
+  <x-bs.form-group name="s_date_term" />
   {{-- チェックボックスのエラー時のメッセージ --}}
   <x-bs.form-group name="chkWs" />
 
@@ -35,32 +37,32 @@
 
     {{-- テーブルタイトル行 --}}
     <x-slot name="thead">
-      <th class="t-minimum t-week-time"></th>
+      <th class="t-minimum t-period-day"></th>
 
       {{-- 時限を表示 --}}
-      @for ($i = 0; $i < count($periodList); $i++)
-        <th class="t-week">{{$periodList[$i]}}</th>
-      @endfor
+      @foreach ($periodList as $periodKey => $periodVal)
+        <th class="t-period">{{$periodKey}}限</th>
+      @endforeach
     </x-slot>
 
     {{-- 二重ループで組み立てる --}}
-    @for ($j = 0; $j < count($dayList); $j++) <tr>
+    @foreach ($dateList as $date) <tr>
       {{-- 日付を表示 --}}
-      <td class="tt">{{$dayList[$j]}}</td>
+      <td class="tt">{{$date['dateLabel']}}</td>
 
-      @for ($i = 0; $i < count($periodList); $i++)
+      @foreach ($periodList as $periodKey => $periodVal)
       <td>
         {{-- チェックボックス。裏でクリックされた時間帯を保持している --}}
-        <x-input.checkbox id="{{$j}}_{{$periodIdList[$i]}}" class="chk-wt2" name="chkWs" :icheck=false
-          value="{{$j}}_{{$periodIdList[$i]}}" :editData=$editData />
+        <x-input.checkbox id="{{$date['dateId']}}_{{$periodKey}}" class="chk-wt2" name="chkWs" :icheck=false
+          value="{{$date['dateId']}}_{{$periodKey}}" :editData=$editData />
 
         {{-- 表のDiv --}}
-        <div class="chk-t" data-wt="{{$j}}_{{$periodIdList[$i]}}" v-on:click="timeClick"></div>
+        <div class="chk-t" data-wt="{{$date['dateId']}}_{{$periodKey}}" v-on:click="timeClick"></div>
       </td>
-      @endfor
+      @endforeach
 
       </tr>
-    @endfor
+    @endforeach
 
   </x-bs.table>
 
@@ -69,39 +71,34 @@
 
     <x-bs.form-group name="kaisuArea" />
 
-    <x-bs.form-title>受講希望科目・受講回数</x-bs.form-title>
+    <x-bs.form-title>受講希望教科・受講回数</x-bs.form-title>
 
     {{-- テーブル --}}
-    <x-bs.table :bordered=false :hover=false :smartPhone=true class="mb-small">
+    <x-bs.table :bordered=false :hover=false>
       <x-slot name="thead">
-        <td>科目</td>
+        <td>教科</td>
         <td>受講回数</td>
       </x-slot>
       @for ($i = 1; $i <= 5; $i++)
       <tr v-cloak>
-        <x-bs.td-sp caption="科目">
-          <x-input.select id="curriculumcd_{{ $i }}" :select2=true >
-            <option value="1">国語</option>
-            <option value="2">数学</option>
-            <option value="3">理科</option>
-            <option value="4">社会</option>
-            <option value="5">英語</option>
-          </x-input.select>
+        <x-bs.td-sp caption="教科">
+          <x-input.select id="subject_cd_{{ $i }}" :select2=true :mastrData=$subjects :editData="$editData"
+            :select2Search=true :blank=true :rules=$rules />
         </x-bs.td-sp>
 
-        <x-bs.td-sp caption="回数">
-          <x-input.text id="kaisu_{{ $i }}" />
+        <x-bs.td-sp caption="受講回数">
+          <x-input.text id="times_{{ $i }}" :rules=$rules />
         </x-bs.td-sp>
       </tr>
       @endfor
 
     </x-bs.table>
 
-    <x-input.textarea caption="備考欄" id="memo" />
+    <x-input.textarea caption="備考欄" id="comment" :rules=$rules />
 
     <x-bs.callout type="warning">
       ※ご希望の日時ではなく、ご都合の悪い日程・時限を入力してください。<br>
-      　ピンポイントでの日時のご指定をいただくと、授業の設定ができない場合がございます。<br>
+      &emsp;ピンポイントでの日時のご指定をいただくと、授業の設定ができない場合がございます。<br>
       ※早めのご登録をお願いいたします。登録いただいた方から順次スケジュールを作成いたします。
     </x-bs.callout>
 
@@ -110,7 +107,7 @@
         <div class="d-flex justify-content-between">
             <x-button.back />
 
-      <x-button.submit-new />
+      <x-button.submit-edit caption="送信" />
     </div>
   </x-slot>
 
