@@ -33,55 +33,24 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="15%">登録日</th>
-            <th width="15%">生徒名</th>
+            <th class="t-minimum">登録日</th>
+            <th width="20%">生徒名</th>
             <th width="15%">種別</th>
             <th>学期・試験名</th>
             <th></th>
         </x-slot>
 
-        {{-- モック用処理 --}}
         {{-- テーブル行 --}}
-        <tr>
-            <x-bs.td-sp caption="登録日">2023/07/21</x-bs.td-sp>
-            <x-bs.td-sp caption="生徒名">CWテスト生徒１</x-bs.td-sp>
-            <x-bs.td-sp caption="種別">通信票評定</x-bs.td-sp>
-            <x-bs.td-sp caption="学期・試験名">１学期（前期）</x-bs.td-sp>
+        <tr v-for="item in paginator.data" v-cloak>
+            <x-bs.td-sp caption="登録日">@{{$filters.formatYmd(item.regist_date)}}</x-bs.td-sp>
+            <x-bs.td-sp caption="生徒名">@{{item.student_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="種別">@{{item.exam_type_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="学期・試験名">@{{item.practice_exam_name}} @{{item.regular_exam_name}} @{{item.term_name}}</x-bs.td-sp>
             <td>
-                <x-button.list-dtl :vueDataAttr="['id' => '3']" />
-            </td>
-        </tr>
-        <tr>
-            <x-bs.td-sp caption="登録日">2023/04/10</x-bs.td-sp>
-            <x-bs.td-sp caption="生徒名">CWテスト生徒１</x-bs.td-sp>
-            <x-bs.td-sp caption="種別">定期考査</x-bs.td-sp>
-            <x-bs.td-sp caption="学期・試験名">１学期（前期）中間考査</x-bs.td-sp>
-            <td>
-                <x-button.list-dtl :vueDataAttr="['id' => '2']" />
-            </td>
-        </tr>
-        <tr>
-            <x-bs.td-sp caption="登録日">2023/03/18</x-bs.td-sp>
-            <x-bs.td-sp caption="生徒名">CWテスト生徒１</x-bs.td-sp>
-            <x-bs.td-sp caption="種別">模試</x-bs.td-sp>
-            <x-bs.td-sp caption="学期・試験名">全国統一模試</x-bs.td-sp>
-            <td>
-                <x-button.list-dtl :vueDataAttr="['id' => '1']" />
-            </td>
-        </tr>
-
-        {{-- 本番用処理 --}}
-        {{-- テーブル行 --}}
-        {{-- <tr v-for="item in paginator.data" v-cloak>
-            <x-bs.td-sp caption="登録日">@{{$filters.formatYmd(item.regist_time)}}</x-bs.td-sp>
-            <x-bs.td-sp caption="生徒名">@{{item.sname}}</x-bs.td-sp>
-            <x-bs.td-sp caption="種別">@{{item.type_name}}</x-bs.td-sp>
-            <x-bs.td-sp caption="学期・試験名">@{{item.teiki_name}}@{{item.moshi_name}}</x-bs.td-sp>
-            <td> --}}
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
-                {{-- <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
+                <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
             </td>
-        </tr> --}}
+        </tr>
 
     </x-bs.table>
 
