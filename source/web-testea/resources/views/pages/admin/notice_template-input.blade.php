@@ -19,7 +19,8 @@
     <x-input.textarea id="text" caption="本文" :rules=$rules :editData=$editData />
 
     {{-- 本番用 --}}
-    <x-input.select id="notice_type" caption="お知らせ種別" :select2=true :editData=$editData :mastrData=$typeList />
+    <x-input.select id="notice_type" caption="お知らせ種別" :select2=true :editData=$editData :mastrData=$typeList 
+        :select2Search=false/>
 
     {{-- 現在の表示順の最大値＋1をデフォルト値として設定 --}}
     <x-input.text id="order_code" caption="表示順" :rules=$rules :editData=$editData />

@@ -106,7 +106,7 @@ class NoticeTemplate extends Model
             'title' => ['string', 'max:50'],
             'text' => ['string', 'max:1000'],
             'notice_type' => ['integer'],
-            'order_code' => ['integer'],
+            'order_code' => ['integer', 'max:9999'],
         ];
         return $_fieldRules;
     }
