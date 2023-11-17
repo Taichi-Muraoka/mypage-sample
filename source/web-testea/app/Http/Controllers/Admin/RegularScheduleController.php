@@ -138,7 +138,6 @@ class RegularScheduleController extends Controller
 
         $roomcd = $request->input('roomcd');
 
-
         return $this->getRegularCalendar($request, $roomcd, false);
     }
 
@@ -183,7 +182,7 @@ class RegularScheduleController extends Controller
         $courses = $this->mdlGetCourseList(null, AppConst::CODE_MASTER_42_3);
 
         // 曜日リストを取得
-        $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16, [AppConst::CODE_MASTER_16_SUB_1]);
+        $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
 
         // 時限リストを取得（校舎・時間割区分から）
         $periods = $this->mdlGetPeriodListByKind($campusCd, AppConst::CODE_MASTER_37_0);
@@ -348,7 +347,7 @@ class RegularScheduleController extends Controller
         $validationDayList =  function ($attribute, $value, $fail) use ($param) {
 
             // 曜日コードリストを取得
-            $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16, [AppConst::CODE_MASTER_16_SUB_1]);
+            $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
             if (!isset($dayList[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
@@ -450,7 +449,7 @@ class RegularScheduleController extends Controller
         $booths = $this->mdlGetBoothList($campusCd);
 
         // 曜日リストを取得
-        $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16, [AppConst::CODE_MASTER_16_SUB_1]);
+        $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
 
         // 時限リストを取得（校舎・時間割区分から）
         $periods = $this->mdlGetPeriodListByKind($campusCd, AppConst::CODE_MASTER_37_0);
@@ -562,7 +561,7 @@ class RegularScheduleController extends Controller
         $booths = $this->mdlGetBoothList($campusCd);
 
         // 曜日リストを取得
-        $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16, [AppConst::CODE_MASTER_16_SUB_1]);
+        $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
 
         // 時限リストを取得（校舎・時間割区分から）
         $periods = $this->mdlGetPeriodListByKind($campusCd, AppConst::CODE_MASTER_37_0);
@@ -846,7 +845,7 @@ class RegularScheduleController extends Controller
         $validationDayList =  function ($attribute, $value, $fail) {
 
             // 曜日コードリストを取得
-            $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16, [AppConst::CODE_MASTER_16_SUB_1]);
+            $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
             if (!isset($dayList[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
@@ -1381,7 +1380,7 @@ class RegularScheduleController extends Controller
         $regDatas = [];
 
         // 曜日リストを取得
-        $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16, [AppConst::CODE_MASTER_16_SUB_1]);
+        $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
         // 曜日毎にループ
         foreach ($dayList as $dayCd => $data) {
             // レギュラースケジュール情報の取得

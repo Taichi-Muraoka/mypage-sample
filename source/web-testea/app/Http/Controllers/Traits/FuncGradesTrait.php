@@ -36,7 +36,6 @@ trait FuncGradesTrait
      * 生徒成績を取得 一覧用
      *
      * @param \Illuminate\Database\Eloquent\Builder $query クエリ
-     * @return array
      */
     private function getScoreList($query)
     {

@@ -59,6 +59,24 @@ export default class RoomCalendar {
                 week: "週",
                 day: "日",
             },
+            // タイトルの書式
+            titleFormat: function (date) {
+                const year = date.date.year
+                const month = date.date.month + 1;
+                const day = date.date.day;
+                const weekNum = date.date.marker.getDay();
+                const week = [
+                    "(日)",
+                    "(月)",
+                    "(火)",
+                    "(水)",
+                    "(木)",
+                    "(金)",
+                    "(土)"
+                ][weekNum];
+                const title = year + "年" + month + "月" + day + "日 " + week
+                return title;
+            },
             locale: "ja",
             //height: 700,
             //height: 1700,
