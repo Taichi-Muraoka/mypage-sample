@@ -52,7 +52,7 @@
         </x-input.select>
     </x-bs.card>
 
-    {{-- 個別（生徒） --}}
+    {{-- 個別（生徒）、個別（保護者メール） --}}
     <x-bs.card vShow="form.destination_type == {{ AppConst::CODE_MASTER_15_2 }} || form.destination_type == {{ AppConst::CODE_MASTER_15_4 }}">
 
         <x-input.select id="campus_cd_student" caption="校舎" :select2=true onChange="selectChangeGetMulti" :select2Search=false>
