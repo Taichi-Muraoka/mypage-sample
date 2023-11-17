@@ -410,6 +410,7 @@
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
             <th width="15%">認定日</th>
+            <th width="15%">バッジ種別</th>
             <th width="15%">校舎</th>
             <th width="15%">担当者名</th>
             <th>認定理由</th>
@@ -418,6 +419,7 @@
         {{-- テーブル行 --}}
         @for ($i = 0; $i <5; $i++) @if(empty($badges[$i])) @break @endif <tr>
             <td>{{$badges[$i]->authorization_date->format('Y/m/d')}}</td>
+            <td>{{$badges[$i]->kind_name}}</td>
             <td>{{$badges[$i]->campus_name}}</td>
             <td>{{$badges[$i]->admin_name}}</td>
             <td>{{$badges[$i]->reason}}</td>

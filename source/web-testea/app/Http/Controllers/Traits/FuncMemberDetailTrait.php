@@ -539,6 +539,9 @@ trait FuncMemberDetailTrait
                 'badges.campus_cd',
                 // 校舎の名称
                 'campus_names.room_name as campus_name',
+                'badges.badge_type',
+                // コードマスタの名称（バッジ種別）
+                'mst_codes.name as kind_name',
                 'badges.reason',
                 'badges.authorization_date',
                 'badges.adm_id',
@@ -553,6 +556,11 @@ trait FuncMemberDetailTrait
             })
             // 管理者名を取得
             ->sdLeftJoin(AdminUser::class, 'badges.adm_id', '=', 'admin_users.adm_id')
+            // コードマスターとJOIN
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('badges.badge_type', '=', 'mst_codes.code')
+                    ->where('data_type', AppConst::CODE_MASTER_55);
+            })
             ->orderBy('badges.authorization_date', 'desc')
             ->orderBy('badges.badge_type', 'asc')
             ->orderBy('badges.campus_cd', 'asc')
