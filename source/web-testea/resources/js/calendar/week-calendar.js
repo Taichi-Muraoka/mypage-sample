@@ -242,13 +242,14 @@ export default class WeekCalendar {
         var formData = FormCom.getFormArrayData(cardId);
         if (info.resource._resource.id !== "000") {
             // 詳細データを取得
+            var daycd = moment(info.start).format("d") == 0 ? 7 : moment(info.start).format("d");
             var url =
                 UrlCom.getFuncUrl() +
                 "/new" +
                 "/" +
                 formData.campus_cd +
                 "/" +
-                moment(info.start).format("d") +
+                daycd +
                 moment(info.start).format("HHmm") +
                 "/" +
                 info.resource._resource.id;
