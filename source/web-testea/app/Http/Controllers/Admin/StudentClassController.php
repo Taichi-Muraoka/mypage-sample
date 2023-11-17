@@ -41,9 +41,29 @@ class StudentClassController extends Controller
      */
     public function index()
     {
+        // 校舎リストを取得
+        $rooms = $this->mdlGetRoomList(false);
+
+        // コースリストを取得
+        $courses = $this->mdlGetCourseList();
+
+        // 授業区分リストを取得
+        $lesson_kind = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_31);
+
+        // 出欠ステータス
+        $absent_status = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_35);
+
+        // 教科リストを取得
+        $subjects = $this->mdlGetSubjectList();
+
         return view('pages.admin.student_class', [
             'rules' => $this->rulesForSearch(),
-            'editData' => null
+            'editData' => null,
+            'rooms' => $rooms,
+            'courses' => $courses,
+            'lesson_kind' => $lesson_kind,
+            'absent_status' => $absent_status,
+            'subjects' => $subjects,
         ]);
     }
 

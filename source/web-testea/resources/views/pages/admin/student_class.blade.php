@@ -9,14 +9,14 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="roomcd" caption="校舎" :select2=true >
-                <option value="1">久我山</option>
-                <option value="2">西永福</option>
-                <option value="3">下高井戸</option>
-                <option value="4">駒込</option>
-                <option value="5">日吉</option>
-                <option value="6">自由が丘</option>
-            </x-input.select>
+            @can('roomAdmin')
+            {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
+           <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+                :select2Search=false :blank=false/>
+            @else
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData onChange="selectChangeGetRoom"
+                :select2Search=false emptyValue="-1"/>
+            @endcan
         </x-bs.col2>
         <x-bs.col2>
             <x-input.text id="student" caption="生徒名" />
@@ -24,17 +24,8 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="course_cd" caption="コース名" :select2=true>
-                <option value="10100">個別指導コース</option>
-                <option value="10200">1対2コース</option>
-                <option value="10300">1対3コース</option>
-                <option value="10400">家庭教師</option>
-                <option value="10500">演習</option>
-                <option value="10600">ハイプラン</option>
-                <option value="20100">集団指導</option>
-                <option value="90100">その他・自習</option>
-                <option value="90200">面談</option>
-            </x-input.select>
+            <x-input.select id="course_cd" caption="コース" :select2=true :mastrData=$courses :editData=$editData
+                :select2Search=false :blank=true />
         </x-bs.col2>
         <x-bs.col2>
             <x-input.text id="teacher" caption="講師名" />
@@ -42,38 +33,23 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="lesson_kind" caption="授業区分" :select2=true>
-                <option value="1">通常授業</option>
-                <option value="2">特別期間講習</option>
-                <option value="3">追加授業</option>
-                <option value="4">初回授業</option>
-                <option value="5">体験授業１回目</option>
-                <option value="6">体験授業２回目</option>
-                <option value="7">体験授業３回目</option>
-            </x-input.select>
+            <x-input.select id="lesson_kind" caption="授業区分" :select2=true :mastrData=$lesson_kind :editData=$editData
+                :select2Search=false :blank=true/>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="absent_status" caption="出欠ステータス" :select2=true>
-                <option value="1">実施前・出席</option>
-                <option value="2">当日欠席（講師出勤あり）</option>
-                <option value="3">当日欠席（講師出勤なし）</option>
-                <option value="4">未振替</option>
-                <option value="5">振替中</option>
-            </x-input.select>
+            <x-input.select id="absent_status" caption="出欠ステータス" :select2=true :mastrData=$absent_status :editData=$editData
+                :select2Search=false :blank=true/>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select caption="教科" id="subject_cd" :select2=true :select2Search=false>
-                <option value="1">国語</option>
-                <option value="2">数学</option>
-                <option value="3">理科</option>
-                <option value="4">社会</option>
-                <option value="5">英語</option>
-            </x-input.select>
+            <x-input.select caption="教科" id="subject_cd" :select2=true :mastrData=$subjects :editData=$editData
+                :select2Search=false :blank=true/>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="授業報告書ステータス" id="report" :select2=true :select2Search=false>
+            {{-- <x-input.select caption="授業報告書ステータス" id="report_status" :select2=true :mastrData=$report_status :editData=$editData
+                :select2Search=false :blank=true/> --}}
+            <x-input.select caption="授業報告書ステータス" id="report_status" :select2=true :select2Search=false :blank=true>
                 <option value="1">―（登録不要）</option>
                 <option value="2">✕（要登録・差戻し）</option>
                 <option value="3">△（承認待ち）</option>
@@ -83,10 +59,10 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="日付 From" id="holiday_date_from" />
+            <x-input.date-picker caption="日付 From" id="target_date_from" />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="日付 To" id="holiday_date_to" />
+            <x-input.date-picker caption="日付 To" id="target_date_to" />
         </x-bs.col2>
     </x-bs.row>
 
