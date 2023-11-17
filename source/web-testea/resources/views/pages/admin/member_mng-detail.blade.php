@@ -371,7 +371,7 @@
             <td>{{$scores[$i]->exam_type_name}}</td>
             <td>{{$scores[$i]->practice_exam_name}} {{$scores[$i]->regular_exam_name}} {{$scores[$i]->term_name}}</td>
             @php
-            $ids = ['id' => $scores[$i]->score_id, 'sid' => $scores[$i]->student_id,];
+            $ids = ['id' => $scores[$i]->id, 'sid' => $scores[$i]->student_id,];
             @endphp
             <td>
                 <x-button.list-dtl dataTarget="#modal-dtl-grades_mng" :dataAttr="$ids" />

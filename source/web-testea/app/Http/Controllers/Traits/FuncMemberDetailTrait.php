@@ -131,7 +131,7 @@ trait FuncMemberDetailTrait
         // 受験校情報の取得
         $entrance_exams = $this->getEntranceExam($sid);
         // 成績情報の取得
-        $scores = $this->getScore($sid);
+        $scores = $this->getGrade($sid);
         // バッジ付与情報の取得
         $badges = $this->getBadge($sid);
 
@@ -506,46 +506,17 @@ trait FuncMemberDetailTrait
      *
      * @param integer $sid 生徒ID
      */
-    private function getScore($sid)
+    private function getGrade($sid)
     {
         // クエリ作成
         $query = Score::query();
 
-        $scores = $query
-            ->select(
-                'scores.score_id',
-                'scores.student_id',
-                'scores.exam_type',
-                // コードマスタの名称（種別）
-                'mst_codes_43.name as exam_type_name',
-                'scores.regular_exam_cd',
-                // コードマスタの名称（定期考査コード）
-                'mst_codes_45.name as regular_exam_name',
-                'scores.practice_exam_name',
-                'scores.term_cd',
-                // コードマスタの名称（学期コード）
-                'mst_codes_44.name as term_name',
-                'scores.regist_date',
-            )
-            // 画面表示中生徒のデータに絞り込み
-            ->where('scores.student_id', $sid)
-            // 種別の名称取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('scores.exam_type', '=', 'mst_codes_43.code')
-                    ->where('mst_codes_43.data_type', AppConst::CODE_MASTER_43);
-            }, 'mst_codes_43')
-            // 定期考査コードの名称取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('scores.regular_exam_cd', '=', 'mst_codes_45.code')
-                    ->where('mst_codes_45.data_type', AppConst::CODE_MASTER_45);
-            }, 'mst_codes_45')
-            // 学期コードの名称取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('scores.term_cd', '=', 'mst_codes_44.code')
-                    ->where('mst_codes_44.data_type', AppConst::CODE_MASTER_44);
-            }, 'mst_codes_44')
-            ->orderBy('scores.regist_date', 'desc')
-            ->get();
+        // 画面表示中生徒のデータに絞り込み
+        $query->where('scores.student_id', $sid);
+
+        // データを取得 FuncGradesTrait
+        $scores = $this->getScoreList($query);
+        $scores = $scores->get();
 
         return $scores;
     }
@@ -562,9 +533,6 @@ trait FuncMemberDetailTrait
 
         // クエリ作成
         $query = Badge::query();
-
-        // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
-        $query->where($this->guardRoomAdminTableWithRoomCd());
 
         $badges = $query
             ->select(
@@ -888,49 +856,8 @@ trait FuncMemberDetailTrait
      */
     private function getModalScore($id)
     {
-        // クエリ作成
-        $query = Score::query();
-
-        $scores = $query
-            ->select(
-                'scores.score_id',
-                'scores.student_id',
-                // 生徒情報の名前
-                'students.name as student_name',
-                'scores.exam_type',
-                // コードマスタの名称（種別）
-                'mst_codes_43.name as exam_type_name',
-                'scores.regular_exam_cd',
-                // コードマスタの名称（定期考査コード）
-                'mst_codes_45.name as regular_exam_name',
-                'scores.practice_exam_name',
-                'scores.term_cd',
-                // コードマスタの名称（学期コード）
-                'mst_codes_44.name as term_name',
-                'scores.exam_date',
-                'scores.student_comment',
-                'scores.regist_date',
-            )
-            // 詳細ボタン押下時に指定したIDで絞り込み
-            ->where('scores.score_id', $id)
-            // 生徒名を取得
-            ->sdLeftJoin(Student::class, 'scores.student_id', '=', 'students.student_id')
-            // 種別の名称取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('scores.exam_type', '=', 'mst_codes_43.code')
-                    ->where('mst_codes_43.data_type', AppConst::CODE_MASTER_43);
-            }, 'mst_codes_43')
-            // 定期考査コードの名称取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('scores.regular_exam_cd', '=', 'mst_codes_45.code')
-                    ->where('mst_codes_45.data_type', AppConst::CODE_MASTER_45);
-            }, 'mst_codes_45')
-            // 学期コードの名称取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('scores.term_cd', '=', 'mst_codes_44.code')
-                    ->where('mst_codes_44.data_type', AppConst::CODE_MASTER_44);
-            }, 'mst_codes_44')
-            ->first();
+        // 生徒成績を取得 FuncGradesTrait
+        $scores = $this->getScore($id);
 
         // 生徒成績詳細を取得
         $scoreDetails = $this->getScoreDetail($id);
