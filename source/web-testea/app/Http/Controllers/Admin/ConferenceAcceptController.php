@@ -463,7 +463,7 @@ class ConferenceAcceptController extends Controller
                 );
 
                 // お知らせ種別（面談）
-                $notice->notice_type = AppConst::CODE_MASTER_14_5;
+                $notice->notice_type = AppConst::CODE_MASTER_14_4;
                 // 管理者ID
                 $account = Auth::user();
                 $notice->adm_id = $account->account_id;
@@ -666,7 +666,7 @@ class ConferenceAcceptController extends Controller
             );
 
             // お知らせ種別（面談）
-            $notice->notice_type = AppConst::CODE_MASTER_14_5;
+            $notice->notice_type = AppConst::CODE_MASTER_14_4;
             // 管理者ID
             $account = Auth::user();
             $notice->adm_id = $account->account_id;
@@ -784,10 +784,6 @@ class ConferenceAcceptController extends Controller
             $end_time = $this->endTime($request['start_time']);
             $scheduleId = null;
             
-            if ($request->filled('schedule_id')) {
-                // 更新の場合のみ、スケジュールIDをセット（除外用）
-                $scheduleId = $request['schedule_id'];
-            }
             // ブースの重複チェック
             $booth = $this->fncScheSearchBoothForConference(
                 $request['campus_cd'],
@@ -801,6 +797,27 @@ class ConferenceAcceptController extends Controller
             if (!$booth) {
                 // ブース空きなしエラー
                 return $fail(Lang::get('validation.duplicate_booth'));
+            }
+        };
+
+        // 独自バリデーション: 生徒スケジュール重複チェック
+        $validationDupStudent =  function ($attribute, $value, $fail) use ($request) {
+
+            // 終了時刻計算
+            $end_time = $this->endTime($request['start_time']);
+            $scheduleId = null;
+            
+            // 生徒スケジュール重複チェック
+            $chk = $this->fncScheChkDuplidateSid(
+                $request['target_date'],
+                $request['start_time'],
+                $end_time,
+                $request['student_id'],
+                $scheduleId
+            );
+            if (!$chk) {
+                // 生徒スケジュール重複エラー
+                return $fail(Lang::get('validation.duplicate_student'));
             }
         };
 
@@ -820,7 +837,7 @@ class ConferenceAcceptController extends Controller
         $rules += Conference::fieldRules('student_id', [$validationStudentList]);
         $rules += Schedule::fieldRules('booth_cd', ['required', $validationBoothList, $validationDupBoothConference]);
         $rules += Schedule::fieldRules('target_date', ['required']);
-        $rules += Schedule::fieldRules('start_time', ['required', $validationConferenceDateTime]);
+        $rules += Schedule::fieldRules('start_time', ['required', $validationConferenceDateTime, $validationDupStudent]);
         $rules += Schedule::fieldRules('memo');
 
         return $rules;
