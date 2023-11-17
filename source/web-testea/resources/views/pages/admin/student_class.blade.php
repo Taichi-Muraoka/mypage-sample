@@ -14,12 +14,12 @@
            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false :blank=false/>
             @else
-            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData onChange="selectChangeGetRoom"
-                :select2Search=false emptyValue="-1"/>
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData 
+                :select2Search=false/>
             @endcan
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="student" caption="生徒名" />
+            <x-input.text id="student_name" caption="生徒名" />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
@@ -28,7 +28,7 @@
                 :select2Search=false :blank=true />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="teacher" caption="講師名" />
+            <x-input.text id="tutor_name" caption="講師名" />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
@@ -91,103 +91,27 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/09/28</td>
-            <td>木</td>
-            <td>6限</td>
-            <td>個別</td>
-            <td>久</td>
-            <td>CWテスト生徒５</td>
-            <td>CWテスト教師１０１</td>
-            <td>英</td>
-            <td>追加</td>
-            <td>前・出席</td>
-            <td>〇</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmd(item.target_date)}}</td>
+            <td>@{{$filters.formatWeek(item.target_date)}}</td>
             <td>
-                <x-button.list-dtl />
+                <span v-if="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
+                    @{{item.start_time}}
+                </span>
+                <span v-if="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
+                    @{{(item.period_no)}}限
+                </span>
             </td>
-        </tr>
-        <tr>
-            <td>2023/09/28</td>
-            <td>木</td>
-            <td>5限</td>
-            <td>個別</td>
-            <td>久</td>
-            <td>CWテスト生徒１</td>
-            <td>CWテスト教師１０２</td>
-            <td>数</td>
-            <td>通常・振替</td>
-            <td>前・出席</td>
-            <td>✕</td>
-            <td>
-                <x-button.list-dtl />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/09/24</td>
-            <td>日</td>
-            <td>6現</td>
-            <td>個別</td>
-            <td>久</td>
-            <td>CWテスト生徒１</td>
-            <td>CWテスト教師１０１</td>
-            <td>理</td>
-            <td>体験１</td>
-            <td>当欠(出勤)</td>
-            <td>〇</td>
-            <td>
-                <x-button.list-dtl />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/09/24</td>
-            <td>日</td>
-            <td>5限</td>
-            <td>個別</td>
-            <td>久</td>
-            <td>CWテスト生徒３</td>
-            <td>CWテスト教師１０１</td>
-            <td>社</td>
-            <td>通常</td>
-            <td>未振替</td>
-            <td>－</td>
-            <td>
-                <x-button.list-dtl />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/09/24</td>
-            <td>日</td>
-            <td>4限</td>
-            <td>個別</td>
-            <td>久</td>
-            <td>CWテスト生徒４</td>
-            <td>CWテスト教師１０２</td>
-            <td>国英数</td>
-            <td>追加</td>
-            <td>前・出席</td>
-            <td>〇</td>
-            <td>
-                <x-button.list-dtl />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/02/24</td>
-            <td>日</td>
-            <td>15:00</td>
-            <td>面談</td>
-            <td>久</td>
-            <td>CWテスト生徒2</td>
-            <td>久我山教室長</td>
+            <td>@{{(item.course_name)}}</td>
+            <td>@{{(item.room_name)}}</td>
+            <td>@{{(item.student_name)}}</td>
+            <td>@{{(item.tutor_name)}}</td>
+            <td>@{{(item.subject_name)}}</td>
+            <td>@{{(item.lesson_kind_name)}}</td>
+            <td>@{{(item.absent_status_name)}}</td>
             <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-                <x-button.list-dtl />
-            </td>
+            <td><x-button.list-dtl :vueDataAttr="['id' => 'item.id']" /></td>
         </tr>
-
     </x-bs.table>
 
 </x-bs.card-list>
