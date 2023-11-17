@@ -53,7 +53,7 @@
     </x-bs.card>
 
     {{-- 個別（生徒） --}}
-    <x-bs.card vShow="form.destination_type == {{ AppConst::CODE_MASTER_15_2 }}">
+    <x-bs.card vShow="form.destination_type == {{ AppConst::CODE_MASTER_15_2 }} || form.destination_type == {{ AppConst::CODE_MASTER_15_4 }}">
 
         <x-input.select id="campus_cd_student" caption="校舎" :select2=true onChange="selectChangeGetMulti" :select2Search=false>
             <option v-for="item in selectGetItem.rooms" :value="item.code">
@@ -78,21 +78,6 @@
             </option>
         </x-input.select>
 
-    </x-bs.card>
-
-    {{-- 個別（保護者メール） --}}
-    <x-bs.card vShow="form.destination_type == {{ AppConst::CODE_MASTER_15_4 }}">
-        <x-input.select id="campus_cd_student" caption="校舎" :select2=true onChange="selectChangeGetMulti" :select2Search=false>
-            <option v-for="item in selectGetItem.rooms" :value="item.code">
-                @{{ item.value }}
-            </option>
-        </x-input.select>
-
-        <x-input.select id="student_id" caption="宛先生徒名" :select2=true>
-            <option v-for="item in selectGetItem.students" :value="item.id">
-                @{{ item.value }}
-            </option>
-        </x-input.select>
     </x-bs.card>
 
     {{-- フッター --}}
