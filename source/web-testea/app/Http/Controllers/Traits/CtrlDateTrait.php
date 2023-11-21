@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Traits;
 
+use App\Consts\AppConst;
+
 /**
  * 日付 - コントローラ共通処理
  */
@@ -57,5 +59,56 @@ trait CtrlDateTrait
         }
 
         return $dateStr;
+    }
+
+    /**
+     * 日付から曜日コードを返す
+     * 
+     * @param string 日付の文字列
+     * @return int   曜日コード
+     */
+    protected function dtGetDayOfWeekCd(String $dt)
+    {
+        $dayno = date('w', strtotime($dt));
+        if ($dayno == 0) {
+            // 日曜日 = 0 を 曜日コードの値に変換する
+            $dayno = AppConst::CODE_MASTER_16_7;
+        }
+        return $dayno;
+    }
+
+    /**
+     * 対象日付が指定範囲内かどうかをチェック
+     * 
+     * @param $target_date
+     * @param $from_date
+     * @param $to_date
+     * @return bool true:範囲内、false:範囲外
+     */
+    protected function dtCheckDateFromTo($target_date, $from_date, $to_date)
+    {
+        $targetDate = strtotime($target_date);
+
+        if ($targetDate >= strtotime($from_date) &&
+            $targetDate <= strtotime($to_date)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 日付を/区切りの形式にフォーマットする
+     * 
+     * @param $target_date
+     * @return string   YYYY/MM/DD形式
+     */
+    protected function dtFormatYmd($target_date)
+    {
+        if ($target_date == null || $target_date == ''){
+            return '';
+        }else{
+            return date('Y/m/d', strtotime($target_date));
+        }
     }
 }

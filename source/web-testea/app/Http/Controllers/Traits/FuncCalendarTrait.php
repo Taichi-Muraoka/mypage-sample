@@ -652,6 +652,48 @@ trait FuncCalendarTrait
     }
 
     /**
+     * 校舎・日付・時限から時間割時刻の取得
+     *
+     * @param string $campusCd   校舎コード
+     * @param date   $targetDate 対象日
+     * @param int    $periodNo  時限
+     * @return object   開始時刻、終了時刻
+     */
+    private function getTimetablePeriodTimeByDatePeriod($campusCd, $targetDate, $periodNo)
+    {
+        $query = MstTimetable::query();
+
+        $account = Auth::user();
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎で絞る（ガード）
+            $query->where('mst_timetables.campus_cd', $account->campus_cd);
+        }
+
+        $timeTables = $query
+            ->select(
+                'start_time',
+                'end_time',
+            )
+            // 年間予定情報とJOIN
+            ->sdJoin(YearlySchedule::class, function ($join) use ($targetDate) {
+                $join->on('mst_timetables.campus_cd', 'yearly_schedules.campus_cd')
+                ->where('yearly_schedules.lesson_date', $targetDate);
+            })
+            // 期間区分
+            ->sdJoin(CodeMaster::class, function ($join) {
+                $join->on('yearly_schedules.date_kind', '=', 'mst_codes.code')
+                ->on('mst_timetables.timetable_kind', '=', 'mst_codes.sub_code')
+                ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
+            })
+            // 指定校舎で絞り込み
+            ->where('mst_timetables.campus_cd', $campusCd)
+            ->where('mst_timetables.period_no', $periodNo)
+            ->firstOrFail();
+
+        return $timeTables;
+    }
+
+    /**
      * 校舎・時間割区分から時間割情報の取得
      *
      * @param string $campusCd 校舎コード
