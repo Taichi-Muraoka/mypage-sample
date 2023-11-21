@@ -19,7 +19,8 @@
             @endcan
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="destination_type" caption="宛先種別" :select2=true :mastrData=$destination_types :editData=$editData />
+            <x-input.select id="destination_type" caption="宛先種別" :select2=true :mastrData=$destination_types :editData=$editData 
+                :select2Search=false />
         </x-bs.col2>
     </x-bs.row>
 
@@ -56,19 +57,6 @@
             <th></th>
         </x-slot>
 
-        {{-- モック用 --}}
-        {{-- <tr>
-            <td>2023/06/16</td>
-            <td>面談のご案内</td>
-            <td>面談</td>
-            <td>グルーブ一斉</td>
-            <td>本部</td>
-            <td>
-                <x-button.list-dtl href="{{ route('notice_regist-detail', 1) }}" caption="お知らせ情報"/>
-            </td>
-        </tr> --}}
-
-        {{-- 本番用 --}}
         <tr v-for="item in paginator.data" v-cloak>
             <td>@{{$filters.formatYmd(item.date)}}</td>
             <td>@{{item.title}}</td>
