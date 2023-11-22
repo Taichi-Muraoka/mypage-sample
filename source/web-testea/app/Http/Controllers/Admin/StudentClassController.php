@@ -156,8 +156,8 @@ class StudentClassController extends Controller
                         // 授業日が当日以前かつ出欠ステータスが「実施前・出席」かつ授業報告書登録なし
                         ->orWhere(function ($orQuery) use ($today) {
                             $orQuery->where('schedules.target_date', '<', $today)
-                            ->where('schedules.absent_status', AppConst::CODE_MASTER_35_0)
-                            ->whereNull('schedules.report_id');
+                                ->where('schedules.absent_status', AppConst::CODE_MASTER_35_0)
+                                ->whereNull('schedules.report_id');
                         });
                     break;
 
@@ -165,14 +165,14 @@ class StudentClassController extends Controller
                     // 授業報告書登録あり かつ 承認状態＝承認待ち
                     $query->whereNotNull('schedules.report_id')
                         ->sdLeftJoin(Report::class, 'schedules.report_id', 'reports.report_id')
-                            ->where('reports.approval_status', '=', AppConst::CODE_MASTER_4_1);
+                        ->where('reports.approval_status', '=', AppConst::CODE_MASTER_4_1);
                     break;
 
                 case AppConst::REPORT_STATUS_4:
                     // 授業報告書登録あり かつ 承認状態＝承認の場合
                     $query->whereNotNull('schedules.report_id')
                         ->sdLeftJoin(Report::class, 'schedules.report_id', 'reports.report_id')
-                            ->where('reports.approval_status', '=', AppConst::CODE_MASTER_4_2);
+                        ->where('reports.approval_status', '=', AppConst::CODE_MASTER_4_2);
                     break;
 
                 default:
@@ -184,23 +184,23 @@ class StudentClassController extends Controller
         $room_names = $this->mdlGetRoomQuery();
 
         $schedules = $query->select(
-                'schedules.schedule_id as id',
-                'room_names.room_name as room_name',
-                'schedules.target_date',
-                'schedules.period_no',
-                'schedules.start_time',
-                'schedules.course_cd',
-                'schedules.absent_status',
-                'schedules.report_id as report_id',
-                'mst_courses.name as course_name',
-                'mst_courses.course_kind as course_kind',
-                'students.name as student_name',
-                'tutors.name as tutor_name',
-                'mst_subjects.name as subject_name',
-                'mst_codes_31.name as lesson_kind_name',
-                'mst_codes_35.name as absent_status_name',
-                'reports_.approval_status as approval_status'
-            )
+            'schedules.schedule_id as id',
+            'room_names.room_name as room_name',
+            'schedules.target_date',
+            'schedules.period_no',
+            'schedules.start_time',
+            'schedules.course_cd',
+            'schedules.absent_status',
+            'schedules.report_id as report_id',
+            'mst_courses.name as course_name',
+            'mst_courses.course_kind as course_kind',
+            'students.name as student_name',
+            'tutors.name as tutor_name',
+            'mst_subjects.name as subject_name',
+            'mst_codes_31.name as lesson_kind_name',
+            'mst_codes_35.name as absent_status_name',
+            'reports_.approval_status as approval_status'
+        )
             ->sdLeftJoin(Report::class, function ($join) {
                 $join->on('schedules.report_id', 'reports_.report_id');
             }, 'reports_')
@@ -238,8 +238,7 @@ class StudentClassController extends Controller
                 // 面談は登録不要ステータスを設定
                 if ($item['course_kind'] == AppConst::CODE_MASTER_42_3) {
                     $item['report_status'] = '―';
-                }
-                else if ($item['report_id'] != null) {
+                } else if ($item['report_id'] != null) {
                     if ($item['approval_status'] == AppConst::CODE_MASTER_4_1) {
                         $item['report_status'] = '△';
                     }
@@ -249,11 +248,12 @@ class StudentClassController extends Controller
                     if ($item['approval_status'] == AppConst::CODE_MASTER_4_3) {
                         $item['report_status'] = '✕';
                     }
-                }
-                else {
-                    if ($item['target_date'] >= now() || 
-                        $item['absent_status'] == AppConst::CODE_MASTER_35_1 || $item['absent_status'] == AppConst::CODE_MASTER_35_2) {
-                            $item['report_status'] = '―';
+                } else {
+                    if (
+                        $item['target_date'] >= now() ||
+                        $item['absent_status'] == AppConst::CODE_MASTER_35_1 || $item['absent_status'] == AppConst::CODE_MASTER_35_2
+                    ) {
+                        $item['report_status'] = '―';
                     }
                     if ($item['target_date'] < now() && $item['absent_status'] == AppConst::CODE_MASTER_35_0) {
                         $item['report_status'] = '✕';
@@ -468,14 +468,14 @@ class StudentClassController extends Controller
 
         // 集団授業の生徒名取得
         $class_members = ClassMember::query()
-                ->where('class_members.schedule_id', '=', $schedules->id)
-                ->where('class_members.absent_status', '=', AppConst::CODE_MASTER_35_0)
-                ->select('class_members.student_id')
-                ->get();
-            
+            ->where('class_members.schedule_id', '=', $schedules->id)
+            ->where('class_members.absent_status', '=', AppConst::CODE_MASTER_35_0)
+            ->select('class_members.student_id')
+            ->get();
+
         // 受講人数カウント
         $number_people = count($class_members);
-            
+
         // 受講生徒名を配列に格納
         $class_member_names = [];
         for ($i = 0; $i < $number_people; $i++) {
@@ -487,8 +487,7 @@ class StudentClassController extends Controller
         // 面談は登録不要ステータスを設定
         if ($schedules->course_kind == AppConst::CODE_MASTER_42_3) {
             $report_status = '―';
-        }
-        else if ($schedules->report_id != null) {
+        } else if ($schedules->report_id != null) {
             if ($schedules->approval_status == AppConst::CODE_MASTER_4_1) {
                 $report_status = '△';
             }
@@ -498,11 +497,12 @@ class StudentClassController extends Controller
             if ($schedules->approval_status == AppConst::CODE_MASTER_4_3) {
                 $report_status = '✕';
             }
-        }
-        else {
-            if ($schedules->target_date >= now() || 
-                $schedules->absent_status == AppConst::CODE_MASTER_35_1 || 
-                $schedules->absent_status == AppConst::CODE_MASTER_35_2) {
+        } else {
+            if (
+                $schedules->target_date >= now() ||
+                $schedules->absent_status == AppConst::CODE_MASTER_35_1 ||
+                $schedules->absent_status == AppConst::CODE_MASTER_35_2
+            ) {
                 $report_status = '―';
             }
             if ($schedules->target_date < now() && $schedules->absent_status == AppConst::CODE_MASTER_35_0) {
