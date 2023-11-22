@@ -1925,4 +1925,20 @@ class AppConst
      * 授業報告書 その他教材・単元の下2桁
      */
     const REPORT_OTHER_TEXT_UNIT_CODE = 99;
+
+    /**
+     * 授業報告書 ステータス
+     */
+
+    // ―（登録不要）
+    const REPORT_STATUS_1 = '1';
+
+    // ×（要登録・差戻し）
+    const REPORT_STATUS_2 = '2';
+
+    // △（承認待ち）
+    const REPORT_STATUS_3 = '3';
+
+    // 〇（登録済み）
+    const REPORT_STATUS_4 = '4';
 }

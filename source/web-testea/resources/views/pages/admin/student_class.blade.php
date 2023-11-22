@@ -47,14 +47,8 @@
                 :select2Search=false :blank=true/>
         </x-bs.col2>
         <x-bs.col2>
-            {{-- <x-input.select caption="授業報告書ステータス" id="report_status" :select2=true :mastrData=$report_status :editData=$editData
-                :select2Search=false :blank=true/> --}}
-            <x-input.select caption="授業報告書ステータス" id="report_status" :select2=true :select2Search=false :blank=true>
-                <option value="1">―（登録不要）</option>
-                <option value="2">✕（要登録・差戻し）</option>
-                <option value="3">△（承認待ち）</option>
-                <option value="4">〇（登録済み）</option>
-            </x-input.select>
+            <x-input.select caption="授業報告書ステータス" id="report_status" :select2=true :mastrData=$report_status_list :editData=$editData
+                :select2Search=false :blank=true/>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
@@ -69,7 +63,7 @@
 </x-bs.card>
 
 {{-- 結果リスト --}}
-<x-bs.card-list :mock=true>
+<x-bs.card-list>
 
     {{-- テーブル --}}
     <x-bs.table :button=true>
@@ -108,8 +102,10 @@
             <td>@{{(item.tutor_name)}}</td>
             <td>@{{(item.subject_name)}}</td>
             <td>@{{(item.lesson_kind_name)}}</td>
-            <td>@{{(item.absent_status_name)}}</td>
-            <td></td>
+            <td>
+                <span v-show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }}">@{{(item.absent_status_name)}}</span>
+            </td>
+            <td>@{{item.report_status}}</td>
             <td><x-button.list-dtl :vueDataAttr="['id' => 'item.id']" /></td>
         </tr>
     </x-bs.table>

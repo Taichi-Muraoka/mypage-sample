@@ -6,71 +6,83 @@
 <x-bs.table :hover=false :vHeader=true>
     <tr>
         <th width="35%">校舎</th>
-        <td>久我山</td>
+        <td>@{{item.room_name}}</td>
     </tr>
     <tr>
         <th width="35%">ブース</th>
-        <td>Aテーブル</td>
+        <td>@{{item.booth_name}}</td>
     </tr>
     <tr>
         <th width="35%">コース</th>
-        <td>個別指導コース</td>
+        <td>@{{item.course_name}}</td>
     </tr>
     <tr>
         <th>授業区分</th>
-        <td>追加</td>
+        <td>@{{item.lesson_kind_name}}</td>
     </tr>
     <tr>
         <th>日付</th>
-        <td>2023/02/28</td>
+        <td>@{{$filters.formatYmd(item.target_date)}}</td>
     </tr>
     <tr>
         <th>時限</th>
-        <td>5時限</td>
+        <td>
+            <span v-if="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
+                @{{(item.period_no)}}限
+            </span>
+        </td>
     </tr>
     <tr>
         <th>開始時刻</th>
-        <td>16:00</td>
+        <td>@{{$filters.formatHm(item.start_time)}}</td>
     </tr>
     <tr>
         <th>終了時刻</th>
-        <td>17:30</td>
+        <td>@{{$filters.formatHm(item.end_time)}}</td>
     </tr>
     <tr>
         <th>講師名/担当者名</th>
-        <td>CWテスト教師１０１</td>
+        <td>@{{item.tutor_name}}</td>
     </tr>
-    <tr>
+    {{-- 個別指導の場合 --}}
+    <tr v-show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }}">
         <th>生徒名</th>
-        <td>CWテスト生徒５</td>
+        <td v-cloak>@{{item.student_name}}</td>
+    </tr>
+    {{-- 集団授業の場合 --}}
+    <tr v-show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }}">
+        <th>受講生徒名</th>
+        <td><span v-for="member in item.class_member_names" v-cloak>@{{member}}<br></span></td>
     </tr>
     <tr>
         <th>科目</th>
-        <td>英語</td>
+        <td>@{{item.subject_name}}</td>
     </tr>
     <tr>
         <th>通塾</th>
-        <td>生徒通塾 - 教師通塾</td>
+        <td>@{{item.how_to_kind_name}}</td>
     </tr>
     <tr>
         <th>授業代講</th>
-        <td>なし</td>
+        <td>@{{item.substitute_kind_name}}</td>
     </tr>
     <tr>
         <th>出欠ステータス</th>
-        <td>未実施・出席</td>
+        <td>
+            <span v-show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }}">@{{item.absent_status_name}}</span>
+        </td>
     </tr>
     <tr>
         <th>授業報告書ステータス</th>
-        <td>〇</td>
+        <td>@{{item.report_status}}</td>
     </tr>
-    <tr>
+    <tr v-show="item.transfer_class_id != null">
         <th>振替元授業日・時限</th>
-        <td>2023/02/28 4限</td>
+        <td>@{{$filters.formatYmd(item.transfer_target_date)}} @{{item.transfer_priod_no}}限</td>
     </tr>
     <tr>
         <th>メモ</th>
-        <td>メモメモメモメモ</td>
+        <td>@{{item.memo}}</td>
     </tr>
 </x-bs.table>
 
