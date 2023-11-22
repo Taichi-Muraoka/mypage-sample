@@ -201,7 +201,7 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     // 申請(直接ID付きで選択された状態にする)
     Route::get('/conference/{scheduleId}', [ConferenceController::class, 'direct'])->name('conference-direct');
 
-    // 授業日時プルダウンを選択された際に教室・教師の情報を返却する →不要？
+    // 授業日時プルダウンを選択された際に教室・講師の情報を返却する →不要？
 
     // 新規登録処理
     Route::post('/conference/create', [ConferenceController::class, 'create'])->name('conference-create');
@@ -241,7 +241,7 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     // 申請(直接ID付きで選択された状態にする)
     Route::get('/absent/{scheduleId}', [AbsentController::class, 'direct'])->name('absent-direct');
 
-    // 授業日時プルダウンを選択された際に教室・教師の情報を返却する
+    // 授業日時プルダウンを選択された際に教室・講師の情報を返却する
     Route::post('/absent/get_data_select', [AbsentController::class, 'getDataSelect'])->name('absent-get_data_select');
 
     // 新規登録処理
@@ -279,7 +279,7 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
 });
 
 //===============================================
-// 教師向け(共通)
+// 講師向け(共通)
 //===============================================
 
 use App\Http\Controllers\Tutor\ReportRegistController;
@@ -669,7 +669,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 授業報告編集
     Route::get('/report_check/edit/{reportId}', [ReportCheckController::class, 'edit'])->name('report_check-edit');
 
-    // カレンダーを選択された際に教室・教師の情報を返却する
+    // カレンダーを選択された際に教室・講師の情報を返却する
     Route::post('/report_check/get_data_select', [ReportCheckController::class, 'getDataSelect'])->name('report_check-get_data_select');
 
     // 編集処理
@@ -725,7 +725,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 振替連絡編集
     Route::get('/transfer_check/edit/{transferApplyId}', [TransferCheckController::class, 'edit'])->name('transfer_check-edit');
 
-    // // カレンダーを選択された際に教室・教師の情報を返却する
+    // // カレンダーを選択された際に教室・講師の情報を返却する
     // Route::post('/transfer_check/get_data_select', [TransferCheckController::class, 'getDataSelect'])->name('transfer_check-get_data_select');
 
     // 編集処理
@@ -772,7 +772,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 欠席申請編集
     Route::get('/absent_accept/edit/{absentApplyId}', [AbsentAcceptController::class, 'edit'])->name('absent_accept-edit');
 
-    // 授業日時プルダウンを選択された際に教室・教師の情報を返却する
+    // 授業日時プルダウンを選択された際に教室・講師の情報を返却する
     Route::post('/absent_accept/get_data_select', [AbsentAcceptController::class, 'getDataSelect'])->name('absent_accept-get_data_select');
 
     // 編集処理
@@ -1094,7 +1094,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 講師管理 登録・編集・詳細・所属・カレンダー・空き時間・給与表示
     //---------------------
 
-    // 教師一覧
+    // 講師一覧
     Route::get('/tutor_mng', [TutorMngController::class, 'index'])->name('tutor_mng');
 
     // バリデーション(検索用)
@@ -1103,11 +1103,8 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/tutor_mng/search', [TutorMngController::class, 'search'])->name('tutor_mng-search');
 
-    // 教師情報詳細
+    // 講師情報詳細
     Route::get('/tutor_mng/detail/{tid}', [TutorMngController::class, 'detail'])->name('tutor_mng-detail');
-
-    // 教師情報詳細 - 削除処理
-    Route::post('/tutor_mng/delete_detail', [TutorMngController::class, 'deleteDetail'])->name('tutor_mng-delete_detail');
 
     // 給料明細一覧
     Route::get('/tutor_mng/salary/{tid}', [TutorMngController::class, 'salary'])->name('tutor_mng-salary');
@@ -1121,28 +1118,28 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // PDF出力
     Route::get('/tutor_mng/salary/{tid}/pdf/{date}', [TutorMngController::class, 'pdf'])->name('tutor_mng-pdf_salary');
 
-    // 教師空き時間
+    // 講師空き時間
     Route::get('/tutor_mng/weekly_shift/{tid}', [TutorMngController::class, 'weeklyShift'])->name('tutor_mng-weekly_shift');
 
-    // 教師カレンダー
+    // 講師カレンダー
     Route::get('/tutor_mng/calendar/{tid}', [TutorMngController::class, 'calendar'])->name('tutor_mng-calendar');
 
     // 詳細取得用
     Route::post('/tutor_mng/get_calendar', [TutorMngController::class, 'getCalendar'])->name('tutor_mng-get_calendar');
 
-    // 教師 新規登録
+    // 講師 新規登録
     Route::get('/tutor_mng/new', [TutorMngController::class, 'new'])->name('tutor_mng-new');
 
-    // 教師 新規登録処理
+    // 講師 新規登録処理
     Route::post('/tutor_mng/create', [TutorMngController::class, 'create'])->name('tutor_mng-create');
 
-    // 教師 編集
+    // 講師 編集
     Route::get('/tutor_mng/edit/{tid}', [TutorMngController::class, 'edit'])->name('tutor_mng-edit');
 
-    // 教師 編集処理
+    // 講師 編集処理
     Route::post('/tutor_mng/update', [TutorMngController::class, 'update'])->name('tutor_mng-update');
 
-    // バリデーション(登録用)（教師登録）
+    // バリデーション(登録用)（講師登録）
     Route::post('/tutor_mng/vd_input', [TutorMngController::class, 'validationForInput'])->name('tutor_mng-vd_input');
 
     // バリデーション(学校-検索用)
@@ -1155,25 +1152,28 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::get('/tutor_mng/leave/edit/{tid}', [TutorMngController::class, 'leaveEdit'])->name('tutor_mng-leave-edit');
 
     // 退職処理
-    Route::post('/tutor_mng/leave/update', [TutorMngController::class, 'leaveUpdate'])->name('tutor_mng-leave-update');
+    Route::post('/tutor_mng/update_leave', [TutorMngController::class, 'leaveUpdate'])->name('tutor_mng-leave-update');
+
+    // バリデーション（退職登録用）
+    Route::post('/tutor_mng/vd_input_leave', [TutorMngController::class, 'leaveValidationForInput'])->name('tutor_mng-leave-vd_input');
 
     // 所属登録
-    Route::get('/tutor_mng/campus/new', [TutorMngController::class, 'campusNew'])->name('tutor_mng-campus-new');
+    Route::get('/tutor_mng/campus/new/{tid}', [TutorMngController::class, 'campusNew'])->name('tutor_mng-campus-new');
 
     // 所属登録処理
-    Route::post('/tutor_mng/campus/create', [TutorMngController::class, 'campusCreate'])->name('tutor_mng-campus-create');
+    Route::post('/tutor_mng/create_campus', [TutorMngController::class, 'campusCreate'])->name('tutor_mng-campus-create');
 
     // 所属編集
-    Route::get('/tutor_mng/campus/edit/{tid}', [TutorMngController::class, 'campusEdit'])->name('tutor_mng-campus-edit');
+    Route::get('/tutor_mng/campus/edit/{tutorCampusId}', [TutorMngController::class, 'campusEdit'])->name('tutor_mng-campus-edit');
 
     // 所属編集処理
-    Route::post('/tutor_mng/campus/update', [TutorMngController::class, 'campusUpdate'])->name('tutor_mng-campus-update');
+    Route::post('/tutor_mng/update_campus', [TutorMngController::class, 'campusUpdate'])->name('tutor_mng-campus-update');
 
     // バリデーション(登録用)（所属登録）
-    Route::post('/tutor_mng/campus/vd_input', [TutorMngController::class, 'campusValidationForInput'])->name('tutor_mng-campus-vd_input');
+    Route::post('/tutor_mng/vd_input_campus', [TutorMngController::class, 'campusValidationForInput'])->name('tutor_mng-campus-vd_input');
 
     // 所属削除処理
-    Route::post('/tutor_mng/campus/delete', [TutorMngController::class, 'campusDelete'])->name('tutor_mng-campus-delete');
+    Route::post('/tutor_mng/delete_campus', [TutorMngController::class, 'campusDelete'])->name('tutor_mng-campus-delete');
 
     //---------------------
     // 講師授業集計

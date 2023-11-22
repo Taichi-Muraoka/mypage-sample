@@ -8,15 +8,13 @@
 @section('content')
 
 {{-- カード --}}
-<x-bs.card :form="true">
-
-    {{-- hidden 削除用--}}
-    <x-input.hidden id="tid" :editData=$editData />
+<x-bs.card>
 
     {{-- カードヘッダ右 --}}
     <x-slot name="tools">
-		<x-button.edit href="{{ route('tutor_mng-leave-edit', '101') }}" caption="退職処理" btn="btn-danger" icon="" :small=true />
-        <x-button.edit href="{{ route('tutor_mng-edit', '101') }}" caption="更新" icon="" :small=true />
+        <x-button.edit href="{{ route('tutor_mng-leave-edit', $tutor->tutor_id) }}" caption="退職処理" icon="" :small=true
+            btn="btn-danger" disabled={{$disabledLeaveBtn}} />
+        <x-button.edit href="{{ route('tutor_mng-edit', $tutor->tutor_id) }}" caption="更新" icon="" :small=true />
     </x-slot>
 
     <x-slot name="card_title">
@@ -26,86 +24,100 @@
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="35%">講師ID</th>
-            <td>101</td>
+            <td>{{$tutor->tutor_id}}</td>
         </tr>
         <tr>
             <th>講師名</th>
-            <td>CWテスト講師１０１</td>
+            <td>{{$tutor->name}}</td>
         </tr>
         <tr>
             <th>講師名かな</th>
-            <td>てすとこうし</td>
+            <td>{{$tutor->name_kana}}</td>
         </tr>
         <tr>
             <th>電話番号</th>
-            <td>070-1111-2222</td>
+            <td>{{$tutor->tel}}</td>
         </tr>
         <tr>
             <th>メールアドレス</th>
-            <td><a href="mailto:teacher0101@mp-sample.rulez.jp">teacher0101@mp-sample.rulez.jp</a></td>
+            <td><a href="mailto:{{$tutor->email}}">{{$tutor->email}}</a></td>
         </tr>
         <tr>
             <th>住所</th>
-            <td>千代田区九段南1‑2‑1</td>
+            <td>{{$tutor->address}}</td>
         </tr>
         <tr>
             <th>生年月日</th>
-            <td>2003/04/10</td>
+            <td>{{$tutor->birth_date->format('Y/m/d')}}</td>
         </tr>
         <tr>
             <th>性別</th>
-            <td>男性</td>
+            <td>{{$tutor->gender_name}}</td>
         </tr>
         <tr>
             <th>学年</th>
-            <td>大学１年</td>
+            <td>{{$tutor->grade_name}}</td>
         </tr>
         <tr>
             <th>所属大学</th>
-            <td>青山学院大学</td>
+            <td>{{$tutor->school_u_name}}</td>
         </tr>
         <tr>
             <th>出身高校</th>
-            <td>青山高等学校</td>
+            <td>{{$tutor->school_h_name}}</td>
         </tr>
         <tr>
             <th>出身中学</th>
-            <td>青山中学校</td>
+            <td>{{$tutor->school_j_name}}</td>
         </tr>
         <tr>
             <th>授業時給（ベース給）</th>
-            <td>1300</td>
+            <td>{{$tutor->hourly_base_wage}}</td>
         </tr>
         <tr>
             <th>講師ステータス</th>
-            <td>在籍</td>
+            <td>{{$tutor->status_name}}</td>
         </tr>
         <tr>
             <th>勤務開始日</th>
-            <td>2022/04/01</td>
+            {{-- nullだとformatでエラーが出るためif文を追加した --}}
+            <td>
+                @if(isset($tutor->enter_date))
+                {{$tutor->enter_date->format('Y/m/d')}}
+                @endif
+            </td>
         </tr>
         <tr>
             <th>退職日</th>
-            <td></td>
+            <td>
+                @if(isset($tutor->leave_date))
+                {{$tutor->leave_date->format('Y/m/d')}}
+                @endif
+            </td>
         </tr>
         <tr>
             <th>勤務年数</th>
-            <td>1年3ヶ月</td>
+            <td>
+                @if(isset($tutor->enter_term))
+                {{floor($tutor->enter_term / 12)}}年{{floor($tutor->enter_term % 12)}}ヶ月
+                @endif
+            </td>
         </tr>
         <tr>
-            <th>担当科目</th>
-            <td>数学</td>
+            <th>担当教科</th>
+            <td>{{$subject_names}}</td>
         </tr>
         <tr>
             <th>メモ</th>
-            <td></td>
+            <td class="nl2br">{{$tutor->memo}}</td>
         </tr>
     </x-bs.table>
 </x-bs.card>
 
 <x-bs.card>
     <x-slot name="tools">
-		<x-button.new href="{{ route('tutor_mng-campus-new', '101') }}" caption="新規登録" icon="" :small=true />
+        <x-button.new href="{{ route('tutor_mng-campus-new', $tutor->tutor_id) }}" caption="新規登録" icon="" :small=true
+            disabled={{$disabledNewBtn}} />
     </x-slot>
 
     <x-slot name="card_title">
@@ -123,13 +135,16 @@
         </x-slot>
 
         {{-- テーブル行 --}}
+        @for ($i = 0; $i < count($campuses); $i++)
         <tr>
-            <td>久我山</td>
-            <td>800</td>
+            <td>{{$campuses[$i]->campus_name}}</td>
+            <td>{{$campuses[$i]->travel_cost}}</td>
             <td>
-                <x-button.list-edit href="{{ route('tutor_mng-campus-edit', 1) }}"/>
+                <x-button.list-edit href="{{ route('tutor_mng-campus-edit', $campuses[$i]->tutor_campus_id) }}"
+                    disabled="{{$campuses[$i]->disabled_btn}}" />
             </td>
         </tr>
+        @endfor
     </x-bs.table>
 
     {{-- フッター --}}
