@@ -1340,19 +1340,19 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/season_mng_student/search', [SeasonMngStudentController::class, 'search'])->name('season_mng_student-search');
 
     // 生徒日程詳細
-    Route::get('/season_mng_student/detail/{sid}', [SeasonMngStudentController::class, 'detail'])->name('season_mng_student-detail');
+    Route::get('/season_mng_student/detail/{seasonStudentId}', [SeasonMngStudentController::class, 'detail'])->name('season_mng_student-detail');
 
-    // 編集処理
+    // 生徒日程詳細 編集処理（ステータス更新）
     Route::post('/season_mng_student/update', [SeasonMngStudentController::class, 'update'])->name('season_mng_student-update');
 
-    // 生徒日程編集 - バリデーション(登録用)
+    // 生徒日程詳細 - バリデーション(ステータス更新用)
     Route::post('/season_mng_student/vd_input', [SeasonMngStudentController::class, 'validationForInput'])->name('season_mng_student-vd_input');
 
     // 生徒科目別コマ組み
-    Route::get('/season_mng_student/detail/{sid}/plan/{subjectId}', [SeasonMngStudentController::class, 'plan'])->name('season_mng_student-plan');
+    Route::get('/season_mng_student/detail/{seasonStudentId}/plan/{subjectCd}', [SeasonMngStudentController::class, 'plan'])->name('season_mng_student-plan');
 
-    // 生徒科目別コマ組み編集処理
-    Route::post('/season_mng_student/update_plan', [SeasonMngStudentController::class, 'updatePlan'])->name('season_mng_student-update_plan');
+    // 生徒科目別コマ組み登録処理
+    Route::post('/season_mng_student/create_plan', [SeasonMngStudentController::class, 'createPlan'])->name('season_mng_student-create_plan');
 
     // 生徒科目別コマ組み編集 - バリデーション(登録用)
     Route::post('/season_mng_student/vd_input_plan', [SeasonMngStudentController::class, 'validationForInputPlan'])->name('season_mng_student-vd_input_plan');
@@ -1370,7 +1370,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/season_mng_tutor/search', [SeasonMngTutorController::class, 'search'])->name('season_mng_tutor-search');
 
     // 講師日程詳細
-    Route::get('/season_mng_tutor/detail/{tid}', [SeasonMngTutorController::class, 'detail'])->name('season_mng_tutor-detail');
+    Route::get('/season_mng_tutor/detail/{seasonTutorId}', [SeasonMngTutorController::class, 'detail'])->name('season_mng_tutor-detail');
 
     //---------------------
     // 成績情報出力

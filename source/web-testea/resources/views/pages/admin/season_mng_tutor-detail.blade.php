@@ -34,7 +34,7 @@
 
     {{-- テーブルタイトル行 --}}
     <x-slot name="thead">
-      <th class="t-minimum t-week-time"></th>
+        <th class="t-minimum t-period-day"></th>
 
       {{-- 時限を表示 --}}
       @foreach ($periodList as $periodKey => $periodVal)
