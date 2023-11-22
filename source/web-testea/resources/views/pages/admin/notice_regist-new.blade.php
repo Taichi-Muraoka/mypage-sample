@@ -28,7 +28,8 @@
 
     <x-input.textarea id="text" caption="内容" :rules=$rules />
 
-    <x-input.select id="destination_type" caption="宛先種別" :select2=true onChange="selectChangeGetMulti" :mastrData=$destination_types/>
+    <x-input.select id="destination_type" caption="宛先種別" :select2=true onChange="selectChangeGetMulti" :mastrData=$destination_types
+        :select2Search=false/>
 
     {{-- グループ一斉 --}}
     <x-bs.card vShow="form.destination_type == {{ AppConst::CODE_MASTER_15_1 }}">
@@ -44,17 +45,17 @@
             @endfor
         </x-bs.form-group>
 
-        <x-input.select id="campus_cd_group" caption="校舎絞り込み（生徒のみ）" :select2=true>
+        <x-input.select id="campus_cd_group" caption="校舎絞り込み（生徒のみ）" :select2=true :select2Search=false>
             <option v-for="item in selectGetItem.rooms" :value="item.code">
                 @{{ item.value }}
             </option>
         </x-input.select>
     </x-bs.card>
 
-    {{-- 個別（生徒） --}}
-    <x-bs.card vShow="form.destination_type == {{ AppConst::CODE_MASTER_15_2 }}">
+    {{-- 個別（生徒）、個別（保護者メール） --}}
+    <x-bs.card vShow="form.destination_type == {{ AppConst::CODE_MASTER_15_2 }} || form.destination_type == {{ AppConst::CODE_MASTER_15_4 }}">
 
-        <x-input.select id="campus_cd_student" caption="校舎" :select2=true onChange="selectChangeGetMulti">
+        <x-input.select id="campus_cd_student" caption="校舎" :select2=true onChange="selectChangeGetMulti" :select2Search=false>
             <option v-for="item in selectGetItem.rooms" :value="item.code">
                 @{{ item.value }}
             </option>
@@ -77,21 +78,6 @@
             </option>
         </x-input.select>
 
-    </x-bs.card>
-
-    {{-- 個別（保護者メール） --}}
-    <x-bs.card vShow="form.destination_type == {{ AppConst::CODE_MASTER_15_4 }}">
-        <x-input.select id="campus_cd_student" caption="校舎" :select2=true onChange="selectChangeGetMulti">
-            <option v-for="item in selectGetItem.rooms" :value="item.code">
-                @{{ item.value }}
-            </option>
-        </x-input.select>
-
-        <x-input.select id="student_id" caption="宛先生徒名" :select2=true>
-            <option v-for="item in selectGetItem.students" :value="item.id">
-                @{{ item.value }}
-            </option>
-        </x-input.select>
     </x-bs.card>
 
     {{-- フッター --}}

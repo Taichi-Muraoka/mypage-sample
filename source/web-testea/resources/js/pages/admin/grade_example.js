@@ -19,6 +19,9 @@ export default class AppClass extends PageBase {
         this.getVueModal();
 
         // Vue: 検索フォーム
-        this.getVueSearchForm();
+        this.getVueSearchForm({
+            // 検索フォーム内にDatePickerを使用する場合
+            useSearchDatePicker: true
+        });
     }
 }

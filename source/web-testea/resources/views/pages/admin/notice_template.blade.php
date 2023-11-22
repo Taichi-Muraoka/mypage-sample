@@ -24,29 +24,18 @@
             <th></th>
         </x-slot>
 
-        {{-- モック用 --}}
-        <tr>
-            <td>1</td>
-            <td>面談案内</td>
-            <td>面談のご案内</td>
-            <td>面談</td>
-            <td>
-                <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('notice_template-edit', 1) }}" />
-            </td>
-        </tr>
-
-        {{-- 本番用 --}}
-        {{-- <tr v-for="item in paginator.data" v-cloak>
+        <tr v-for="item in paginator.data" v-cloak>
             <td>@{{item.order_code}}</td>
             <td>@{{item.template_name}}</td>
             <td>@{{item.title}}</td>
             <td>@{{item.type_name}}</td>
             <td>
                 <x-button.list-dtl :vueDataAttr="['template_id' => 'item.template_id']" />
+                {{-- スペース --}}
+                &nbsp;
                 <x-button.list-edit vueHref="'{{ route('notice_template-edit', '') }}/' + item.template_id" />
             </td>
-        </tr> --}}
+        </tr>
     </x-bs.table>
 
 </x-bs.card-list>

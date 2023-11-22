@@ -15,33 +15,29 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
-
-        // Vue: モーダル(規定情報)
+        // Vue: モーダル(連絡記録)
         this.getVueModal({
-            id: "#modal-dtl-regulation",
-            // 別画面でもモーダルを使用するのでURLを変更
+            id: "#modal-dtl-record",
+            // get_data_detailとなるようURLを変更
             urlSuffix: "detail",
         });
 
+        // Vue: モーダル(授業情報)
         this.getVueModal({
-            id: "#modal-dtl-grades_mng",
-            // 別画面でもモーダルを使用するのでURLを変更
-            urlSuffix: "grades_mng"
+            id: "#modal-dtl-room_calendar",
+            urlSuffix: "detail",
         });
 
-        // Vue: モーダル(家庭教師標準情報)
-        //this.getVueModal({
-        //    id: "#modal-dtl-tutor",
-        //    // 別画面でもモーダルを使用するのでURLを変更
-        //    urlSuffix: "detail",
-        //});
+        // Vue: モーダル(受験校情報)
+        this.getVueModal({
+            id: "#modal-dtl-desired",
+            urlSuffix: "detail",
+        });
 
-        // Vue: モーダル(短期個別講習)
-        //this.getVueModal({
-        //    id: "#modal-dtl-course",
-        //    // 別画面でもモーダルを使用するのでURLを変更
-        //    urlSuffix: "detail",
-        //});
-
+        // Vue: モーダル(成績情報)
+        this.getVueModal({
+            id: "#modal-dtl-grades_mng",
+            urlSuffix: "detail",
+        });
     }
 }

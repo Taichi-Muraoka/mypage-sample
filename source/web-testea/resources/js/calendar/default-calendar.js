@@ -47,7 +47,27 @@ export default class DefaultCalendar {
                 week: "週",
                 day: "日",
             },
-            allDayText: "終日",
+            // view毎のカスタマイズ
+            views: {
+                dayGridMonth: {
+                    // 月カレンダーの日付表示変更（数字のみとする）
+                    dayCellContent: function(arg){
+                        return arg.date.getDate();
+                    }
+                },
+                timeGridWeek: {
+                    // 週カレンダーの日ヘッダ表示変更（曜日のみとする）
+                    dayHeaderFormat: function (date) {
+                        const day = date.date.day;
+                        const weekNum = date.date.marker.getDay();
+                        const week = ['日', '月', '火', '水', '木', '金', '土'][weekNum];
+                        return week;
+                    }
+                }
+            },
+            // 終日スロットは非表示
+            allDaySlot: false,
+            //allDayText: "終日",
             //themeSystem: "bootstrap",
             locale: "ja",
             //height: 700,
@@ -82,9 +102,6 @@ export default class DefaultCalendar {
             slotMinTime: "08:00:00",
             slotMaxTime: "23:00:00",
             eventTextColor: "white",
-            dayCellContent: function(arg){
-                return arg.date.getDate();
-            }
         });
 
         this._calendar.render();

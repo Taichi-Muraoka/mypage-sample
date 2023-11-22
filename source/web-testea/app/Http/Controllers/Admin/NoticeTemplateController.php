@@ -55,16 +55,16 @@ class NoticeTemplateController extends Controller
         // お知らせ定型文取得
         $templateList = $query->select(
             'template_id',
-            'notice_template.order_code',
+            'notice_templates.order_code',
             'template_name',
             'title',
             'mst_codes.name as type_name'
         )
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('notice_template.notice_type', '=', 'mst_codes.code')
+                $join->on('notice_templates.notice_type', '=', 'mst_codes.code')
                     ->where('data_type', AppConst::CODE_MASTER_14);
             })
-            ->orderBy('notice_template.order_code')
+            ->orderBy('notice_templates.order_code')
             ->orderBy('template_id');
 
         // ページネータで返却
@@ -79,28 +79,28 @@ class NoticeTemplateController extends Controller
      */
     public function getData(Request $request)
     {
-        // // IDのバリデーション
-        // $this->validateIdsFromRequest($request, 'template_id');
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request, 'template_id');
 
-        // // クエリ作成
-        // $query = NoticeTemplate::query();
+        // クエリ作成
+        $query = NoticeTemplate::query();
 
-        // // お知らせ定型文取得
-        // $templateList = $query->select(
-        //     'template_name',
-        //     'title',
-        //     'text',
-        //     'mst_codes.name as type_name',
-        //     'notice_template.order_code'
-        // )
-        //     ->where('template_id', $request->template_id)
-        //     ->sdLeftJoin(CodeMaster::class, function ($join) {
-        //         $join->on('notice_template.notice_type', '=', 'mst_codes.code')
-        //             ->where('data_type', AppConst::CODE_MASTER_14);
-        //     })
-        //     ->firstOrFail();
+        // お知らせ定型文取得
+        $templateList = $query->select(
+            'template_name',
+            'title',
+            'text',
+            'mst_codes.name as type_name',
+            'notice_templates.order_code'
+        )
+            ->where('template_id', $request->template_id)
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('notice_templates.notice_type', '=', 'mst_codes.code')
+                    ->where('data_type', AppConst::CODE_MASTER_14);
+            })
+            ->firstOrFail();
 
-        // return $templateList;
+        return $templateList;
     }
 
     //==========================
@@ -164,44 +164,32 @@ class NoticeTemplateController extends Controller
      */
     public function edit($templateId)
     {
-        // モック用
-        $editData = [
-            'order_code' => NoticeTemplate::max('order_code') + 1
-        ];
+        // IDのバリデーション
+        $this->validateIds($templateId);
+
+        // お知らせ種別のプルダウン取得
+        $typeList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_14);
+
+        // クエリ作成
+        $query = NoticeTemplate::query();
+
+        // お知らせ定型文取得
+        $noticeTemplate = $query->select(
+            'template_id',
+            'template_name',
+            'title',
+            'text',
+            'notice_type',
+            'order_code',
+        )
+            ->where('template_id', $templateId)
+            ->firstOrFail();
 
         return view('pages.admin.notice_template-input', [
-            'editData' => $editData,
-            'rules' => $this->rulesForInput(null),
-            'typeList' => null
+            'editData' => $noticeTemplate,
+            'rules' => $this->rulesForInput(),
+            'typeList' => $typeList
         ]);
-
-        // 本番用
-        // // IDのバリデーション
-        // $this->validateIds($templateId);
-
-        // // お知らせ種別のプルダウン取得
-        // $typeList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_14);
-
-        // // クエリ作成
-        // $query = NoticeTemplate::query();
-
-        // // お知らせ定型文取得
-        // $noticeTemplate = $query->select(
-        //     'template_id',
-        //     'template_name',
-        //     'title',
-        //     'text',
-        //     'notice_type',
-        //     'order_code',
-        // )
-        //     ->where('template_id', $templateId)
-        //     ->firstOrFail();
-
-        // return view('pages.admin.notice_template-input', [
-        //     'editData' => $noticeTemplate,
-        //     'rules' => $this->rulesForInput(),
-        //     'typeList' => $typeList
-        // ]);
     }
 
     /**
