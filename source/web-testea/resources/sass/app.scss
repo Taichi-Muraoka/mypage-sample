@@ -593,8 +593,9 @@ label:not(.form-check-label):not(.custom-file-label) {
     background-color: rgb(201, 233, 143);
 }
 
-.chk-wt.except + div {
-    background-color: #4c4c4c;
+/* レギュラー授業登録済みの枠 */
+.chk-wt:disabled + div {
+    background-color: #4c4c4c !important;
 }
 
 /* 特別期間講習 授業コマ枠 */
@@ -604,11 +605,21 @@ label:not(.form-check-label):not(.custom-file-label) {
 
 /* 授業不可の枠 */
 .chk-wt2:checked + div {
-    background-color: #4c4c4c;
+    background-color: #4c4c4c !important;
 }
 
-/*  授業登録済みの枠 */
-.chk-wt2:disabled + div {
+/* 特別期間講習 授業コマ枠 コマ組み画面 */
+.chk-season-plan {
+    display: none;
+}
+
+/* 授業不可の枠 */
+.chk-season-plan:disabled + div {
+    background-color: #4c4c4c !important;
+}
+
+/* 授業登録済みの枠 */
+.chk-season-plan:checked + div {
     background-color: rgb(201, 233, 143);
 }
 
@@ -623,7 +634,7 @@ label:not(.form-check-label):not(.custom-file-label) {
     font-size: 0.725rem;
 }
 
-/*テーブルごとの個別調整*/
+/* テーブルごとの個別調整 ----------*/
 .table > thead > tr > th.t-minimum {
     width: 1px;
     white-space: nowrap;

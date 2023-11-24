@@ -382,6 +382,8 @@ class SeasonMngStudentController extends Controller
             })
             // 対象の生徒ID
             ->where('schedules.student_id', $seasonStudent->student_id)
+            // 校舎コードで絞り込み
+            ->where('schedules.campus_cd', $seasonStudent->campus_cd)
             // 授業種別＝特別期間講習
             ->where('schedules.lesson_kind', AppConst::CODE_MASTER_31_2)
             // 対象の特別期間の日付範囲
@@ -627,10 +629,11 @@ class SeasonMngStudentController extends Controller
 
         // チェックボックスをセットするための値を生成（連絡コマ情報）
         // 例：['20231225_1', '20231226_2']
-        $chkWsData = [];
+        // 授業不可コマ情報を$exceptData にセット（グレー網掛け部）
+        $exceptData = [];
         foreach ($studentPeriods as $datePeriod) {
             // 配列に追加
-            array_push($chkWsData, $datePeriod->lesson_date->format('Ymd') . '_' . $datePeriod->period_no);
+            array_push($exceptData, $datePeriod->lesson_date->format('Ymd') . '_' . $datePeriod->period_no);
         }
 
         // 期間中の授業情報取得
@@ -671,12 +674,13 @@ class SeasonMngStudentController extends Controller
 
         // チェックボックスをセットするための値を生成（スケジュール情報）
         // 例：['20231225_1', '20231226_2']
-        $exceptData = [];
+        // 登録済みスケジュール情報を$chkWsData にセット（グリーン網掛け部）
+        $chkWsData = [];
         $lessonInfo = [];
         foreach ($schedules as $schedule) {
             // 配列に追加
             $datePeriodKey = $schedule->target_date->format('Ymd') . '_' . $schedule->period_no;
-            array_push($exceptData, $datePeriodKey);
+            array_push($chkWsData, $datePeriodKey);
             // $lessonInfo に表示する授業情報をセット
             array_push($lessonInfo, [
                 // '20231225_1'の形式

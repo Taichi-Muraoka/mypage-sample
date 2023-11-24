@@ -50,18 +50,21 @@
         @foreach ($periodList as $periodKey => $periodVal)
         <td>
         {{-- チェックボックス。裏でクリックされた時間帯を保持している --}}
-        <x-input.checkbox id="{{$date['dateId']}}_{{$periodKey}}" class="chk-wt2" name="chkWs" :icheck=false
+        <x-input.checkbox id="{{$date['dateId']}}_{{$periodKey}}" class="chk-season-plan" name="chkWs" :icheck=false
           value="{{$date['dateId']}}_{{$periodKey}}" :editData=$editData  :exceptData=$exceptData/>
 
           {{-- 表のDiv --}}
           <div class="chk-t" data-wt="{{$date['dateId']}}_{{$periodKey}}">
-            @for ($i = 0; $i < count($lessonInfo); $i++)
-                @if ($lessonInfo[$i]['key'] == $date['dateId'] . "_" . $periodKey)
-                <div class="class-info">
-                    <span>{{$lessonInfo[$i]['student']}}</span>
-                </div>
-                @endif
-            @endfor
+            @if (!in_array($date['dateId'] . "_" . $periodKey, $exceptData))
+                {{-- $exceptData に指定されたセルは受講不可（グレー網掛け）のため、授業情報表示対象外 --}}
+                @for ($i = 0; $i < count($lessonInfo); $i++)
+                    @if ($lessonInfo[$i]['key'] == $date['dateId'] . "_" . $periodKey)
+                    <div class="class-info">
+                        <span>{{$lessonInfo[$i]['student']}}</span>
+                    </div>
+                    @endif
+                @endfor
+            @endif
           </div>
         </td>
         @endforeach
