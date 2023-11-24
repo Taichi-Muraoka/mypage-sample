@@ -210,6 +210,9 @@ return [
     // 期間の不整合時のエラー
     'out_of_range_regist_term' => '登録期間外です。',
 
+    // 選択件数のエラー
+    'invalid_count_of_select' => '選択件数が正しくありません。',
+
     // 削除時に入力値変更不可のエラー
     'delete_cannot_change' => '削除時は変更しないでください。',
 

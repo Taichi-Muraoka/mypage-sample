@@ -111,6 +111,8 @@ trait FuncSeasonTrait
                 'dateId' => $lessonDate->lesson_date->format('Ymd'),
                 // 「月/日(曜日)」の形式に編集
                 'dateLabel' => $lessonDate->lesson_date->format('m/d') . "(" . $lessonDate->dayname . ")",
+                // 日付（ハイフン区切り）
+                'dateYmd' => $lessonDate->lesson_date->format('Y-m-d'),
             ]);
         }
 
@@ -209,30 +211,59 @@ trait FuncSeasonTrait
 
         foreach ($commaList as $commaVal) {
 
-            // アンダーバー区切りで分割
-            $datePeriod = explode("_", $commaVal);
+            $datePeriod = $this->fncSasnSplitDatePeriodKey($commaVal);
 
-            // 必ず2つになる
-            if (count($datePeriod) != 2) {
-                // 不正なエラー
-                $this->illegalResponseErr();
-            }
-
-            // 20231011 -> 2023-10-11
-            $dateId = $datePeriod[0];
-            if (strlen($dateId) != 8) {
-                // 不正なエラー
-                $this->illegalResponseErr();
-            }
-
-            array_push($rtn, [
-                'dateId' => $datePeriod[0],
-                // ハイフン区切りの日付にする
-                'lesson_date' => substr($dateId, 0, 4) . '-' . substr($dateId, 4, 2) . '-' . substr($dateId, 6, 2),
-                'period_no' => $datePeriod[1],
-            ]);
+            array_push($rtn, $datePeriod);
         }
 
         return $rtn;
+    }
+
+    /**
+     * 日付時限キー（日付_時限）を分割・整形する
+     * ある程度フォーマットのチェックは行っている
+     *
+     * @param string $value 日付時限キー
+     * @return object
+     */
+    private function fncSasnSplitDatePeriodKey($value)
+    {
+        // パラメータ：日付_時限
+        // 20231225_1
+        //
+        // 戻り値：
+        //   array (
+        //     'dateId' => '20231225',
+        //     'lesson_date' => '2023-12-25',
+        //     'period_no' => '1',
+        //   )
+
+        // 空の場合は処理なし
+        if (!filled($value)) {
+            return null;
+        }
+
+        // アンダーバー区切りで分割
+        $datePeriod = explode("_", $value);
+
+        // 必ず2つになる
+        if (count($datePeriod) != 2) {
+            // 不正なエラー
+            $this->illegalResponseErr();
+        }
+
+        // 20231011 -> 2023-10-11
+        $dateId = $datePeriod[0];
+        if (strlen($dateId) != 8) {
+            // 不正なエラー
+            $this->illegalResponseErr();
+        }
+
+        $rtnObj['dateId'] = $datePeriod[0];
+        // ハイフン区切りの日付にする
+        $rtnObj['lesson_date'] = substr($dateId, 0, 4) . '-' . substr($dateId, 4, 2) . '-' . substr($dateId, 6, 2);
+        $rtnObj['period_no'] = $datePeriod[1];
+
+        return $rtnObj;
     }
 }
