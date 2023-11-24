@@ -212,7 +212,7 @@ class AbsentController extends Controller
 
         $rules = array();
 
-        $rules += AbsentApplication::fieldRules('schedule_id', ['required',$validationDuplicate, $validationScheduleList]);
+        $rules += AbsentApplication::fieldRules('schedule_id', ['required', $validationDuplicate, $validationScheduleList]);
         $rules += AbsentApplication::fieldRules('absent_reason', ['required']);
 
         return $rules;
