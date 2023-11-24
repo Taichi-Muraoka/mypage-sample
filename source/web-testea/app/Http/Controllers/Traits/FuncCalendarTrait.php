@@ -121,11 +121,12 @@ trait FuncCalendarTrait
             unset($schedule['summary_kind']);
             unset($schedule['absent_tutor_id']);
             unset($schedule['absent_status']);
-            unset($schedule['tentative_status']);
 
             if (!AuthEx::isAdmin()) {
                 // 管理者以外（生徒想定）の場合に表示しない項目をunset
                 unset($schedule['absent_tutor_name']);
+                unset($schedule['tentative_status']);
+                unset($schedule['tentative_name']);
                 unset($schedule['admin_name']);
                 unset($schedule['memo']);
             }
@@ -208,11 +209,12 @@ trait FuncCalendarTrait
             unset($schedule['summary_kind']);
             unset($schedule['absent_tutor_id']);
             unset($schedule['absent_status']);
-            unset($schedule['tentative_status']);
 
             if (!AuthEx::isAdmin()) {
                 // 管理者以外（講師想定）の場合に表示しない項目をunset
                 unset($schedule['absent_tutor_name']);
+                unset($schedule['tentative_status']);
+                unset($schedule['tentative_name']);
                 unset($schedule['admin_name']);
                 unset($schedule['memo']);
             }
@@ -336,6 +338,10 @@ trait FuncCalendarTrait
                 } else {
                     $schedule['title'] = $schedule['title'] . '<br>stu：' . $schedule['student_name'];
                 }
+            }
+            // タイトル_仮登録フラグ（仮登録の場合のみ）
+            if ($schedule['tentative_status'] == AppConst::CODE_MASTER_36_1) {
+                $schedule['title'] = $schedule['title'] . '<br><span class="class_special">' . $schedule['tentative_name'] . '</span>';
             }
             // モーダル表示用
             $schedule['hurikae_name'] = "";
@@ -706,15 +712,23 @@ trait FuncCalendarTrait
         if ($studentId) {
             // 生徒ID指定の場合、生徒IDで絞り込み
             // スケジュール情報に存在するかチェックする。existsを使用した
-            $query->where('schedules.student_id', $studentId)
-                ->orWhereExists(function ($query) use ($studentId) {
-                    $query->from('class_members')->whereColumn('class_members.schedule_id', 'schedules.schedule_id')
-                        ->where('class_members.student_id', $studentId);
-                });
+            $query->where(function ($orQuery) use ($studentId) {
+                $orQuery->where('schedules.student_id', $studentId)
+                    ->orWhereExists(function ($query) use ($studentId) {
+                        $query->from('class_members')->whereColumn('class_members.schedule_id', 'schedules.schedule_id')
+                            ->where('class_members.student_id', $studentId);
+                    });
+            });
         }
         if ($tutorId) {
             // 講師ID指定の場合、講師IDで絞り込み
             $query->where('schedules.tutor_id', $tutorId);
+        }
+
+        if (AuthEx::isStudent() || AuthEx::isTutor()) {
+            // アカウントが生徒・講師の場合、仮登録のデータを除外
+            $this->debug("not admin!!");
+            $query->where('schedules.tentative_status', "!=", AppConst::CODE_MASTER_36_1);
         }
 
         // 教室名取得のサブクエリ
@@ -758,6 +772,7 @@ trait FuncCalendarTrait
                 'schedules.absent_status',
                 'mst_codes_35.name as absent_name',
                 'schedules.tentative_status',
+                'mst_codes_36.name as tentative_name',
                 'transfer_schedules.target_date as transfer_date',
                 'transfer_schedules.period_no as transfer_period_no',
                 'admin_users.name as admin_name',
@@ -816,6 +831,11 @@ trait FuncCalendarTrait
                 $join->on('schedules.absent_status', '=', 'mst_codes_35.code')
                     ->where('mst_codes_35.data_type', AppConst::CODE_MASTER_35);
             }, 'mst_codes_35')
+            // 仮登録フラグ名の取得
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('schedules.tentative_status', '=', 'mst_codes_36.code')
+                    ->where('mst_codes_36.data_type', AppConst::CODE_MASTER_36);
+            }, 'mst_codes_36')
             // 管理者名の取得
             ->sdLeftJoin(AdminUser::class, function ($join) {
                 $join->on('schedules.adm_id', 'admin_users.adm_id');
