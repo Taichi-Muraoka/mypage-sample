@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Traits;
 
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
+use App\Libs\CommonDateFormat;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CodeMaster;
 use App\Models\MstCampus;
@@ -537,7 +538,7 @@ trait CtrlModelTrait
      * 抽出したスケジュールより日時のプルダウンメニューのリストを取得
      *
      * @param array $lessons schedulesよりget
-     * @return array プルダウンメニュー用日時 Y/m/d n限
+     * @return array プルダウンメニュー用日時 Y/m/d(曜日) n限
      */
     protected function mdlGetScheduleMasterList($lessons)
     {
@@ -549,7 +550,7 @@ trait CtrlModelTrait
                 //$lesson['target_datetime'] = $lesson['target_date']->format('Y/m/d') . " " . $lesson['period'] . "限";
                 $schedule = [
                     'id' => $lesson['schedule_id'],
-                    'value' => $lesson['target_date']->format('Y/m/d') . " " . $lesson['period_no'] . "限"
+                    'value' => CommonDateFormat::formatYmdDay($lesson['target_date']) . " " . $lesson['period_no'] . "限"
                 ];
                 $schedule = (object) $schedule;
                 array_push($scheduleMasterKeys, $lesson['schedule_id']);
