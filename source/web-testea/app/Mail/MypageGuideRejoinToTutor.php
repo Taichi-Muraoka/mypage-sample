@@ -39,8 +39,7 @@ class MypageGuideRejoinToTutor extends Mailable
      */
     public function build()
     {
-        // $subject = "【" . config('app.name') . "】" . Lang::get('message.mail.mypage_guide_to_tutor.subject');
-        $subject = "【個別指導塾テスティー】" . Lang::get('message.mail.mypage_guide_rejoin_to_tutor.subject');
+        $subject = Lang::get('message.mail.mypage_guide_rejoin_to_tutor.subject');
 
         return $this
             // タイトル

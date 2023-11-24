@@ -39,8 +39,7 @@ class MypageGuideRejoinToStudent extends Mailable
      */
     public function build()
     {
-        // $subject = "【" . config('app.name') . "】" . Lang::get('message.mail.mypage_guide_to_student.subject');
-        $subject = "【個別指導塾テスティー】" . Lang::get('message.mail.mypage_guide_rejoin_to_student.subject');
+        $subject = Lang::get('message.mail.mypage_guide_rejoin_to_student.subject');
 
         return $this
             // タイトル

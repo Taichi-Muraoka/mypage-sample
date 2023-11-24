@@ -40,7 +40,7 @@ class AbsentApplyToTeacher extends Mailable
      */
     public function build()
     {
-        $subject = "【" . config('app.name') . "】" . Lang::get('message.mail.absent_apply_to_teacher.subject');
+        $subject = Lang::get('message.mail.absent_apply_to_teacher.subject');
 
         return $this
             // タイトル
