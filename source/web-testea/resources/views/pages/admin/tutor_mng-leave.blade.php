@@ -5,7 +5,7 @@
 {{-- 子ページ --}}
 @section('child_page', true)
 
-@section('parent_page', route('tutor_mng-detail', 1))
+@section('parent_page', route('tutor_mng-detail', $editData['tutor_id']))
 
 @section('parent_page_title', '講師情報')
 
@@ -18,11 +18,11 @@
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="15%">講師ID</th>
-            <td>101</td>
+            <td>{{$editData['tutor_id']}}</td>
         </tr>
         <tr>
             <th width="15%">講師名</th>
-            <td>CWテスト教師１０１</td>
+            <td>{{$tname}}</td>
         </tr>
     </x-bs.table>
 
@@ -36,20 +36,17 @@
     </x-bs.callout>
 
     {{-- hidden --}}
-    <x-input.hidden id="tid" :editData=$editData />
+    <x-input.hidden id="tutor_id" :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
             {{-- 講師情報に戻る --}}
-            <x-button.back url="{{route('tutor_mng-detail', 1)}}" />
+            <x-button.back url="{{route('tutor_mng-detail', $editData['tutor_id'])}}" />
 
             <div class="d-flex justify-content-end">
-                {{-- 削除機能なし --}}
-                {{-- <x-button.submit-delete /> --}}
                 <x-button.submit-edit caption="登録" />
             </div>
-
         </div>
     </x-slot>
 

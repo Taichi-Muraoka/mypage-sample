@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 講師退職登録
+ * 講師所属校舎登録・編集
  */
 export default class AppClass extends PageBase {
     /**
@@ -18,15 +18,26 @@ export default class AppClass extends PageBase {
         const self = this;
 
         // 完了後は講師詳細画面（二階層目）に戻る
+        var afterNew = () => {
+            self.redirectToParent();
+        };
+
         var afterEdit = () => {
             self.redirectToParent();
+        };
+
+        // 削除後は一覧画面に戻る
+        var afterDelete = () => {
+            UrlCom.redirect(UrlCom.getFuncUrl());
         };
 
         // Vue: 入力フォーム
         this.getVueInputForm({
             afterEdit: afterEdit,
-            // vd_input_leaveとなるようにURL指定
-            urlSuffix: "leave",
+            afterNew: afterNew,
+            afterDelete: afterDelete,
+            // vd_input_campusとなるようにURL指定
+            urlSuffix: "campus",
         });
     }
 }
