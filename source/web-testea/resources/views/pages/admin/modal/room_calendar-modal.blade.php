@@ -21,6 +21,11 @@
         <th>授業区分</th>
         <td>@{{item.lesson_kind_name}} @{{item.hurikae_name}}</td>
     </tr>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.lesson_kind == {{ App\Consts\AppConst::CODE_MASTER_31_2 }}">
+        <th>仮登録フラグ</th>
+        <td>@{{item.tentative_name}}</td>
+    </tr>
     <tr v-show="item.holiday_name">
         <th>期間区分</th>
         <td>@{{item.holiday_name}}</td>
