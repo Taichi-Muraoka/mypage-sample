@@ -717,7 +717,7 @@ trait FuncCalendarTrait
                     ->orWhereExists(function ($query) use ($studentId) {
                         $query->from('class_members')->whereColumn('class_members.schedule_id', 'schedules.schedule_id')
                             ->where('class_members.student_id', $studentId);
-                });
+                    });
             });
         }
         if ($tutorId) {
