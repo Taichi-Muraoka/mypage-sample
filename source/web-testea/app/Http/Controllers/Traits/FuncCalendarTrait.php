@@ -341,7 +341,7 @@ trait FuncCalendarTrait
             }
             // タイトル_仮登録フラグ（仮登録の場合のみ）
             if ($schedule['tentative_status'] == AppConst::CODE_MASTER_36_1) {
-                $schedule['title'] = $schedule['title'] . "<br>" . $schedule['tentative_name'];
+                $schedule['title'] = $schedule['title'] . '<br><span class="class_special">' . $schedule['tentative_name'] . '</span>';
             }
             // モーダル表示用
             $schedule['hurikae_name'] = "";
