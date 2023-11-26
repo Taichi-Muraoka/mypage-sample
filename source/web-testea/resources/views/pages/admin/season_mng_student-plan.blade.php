@@ -1,100 +1,116 @@
 @extends('adminlte::page')
 
-@section('title', '特別期間講習 生徒科目別コマ組み')
+@section('title', '特別期間講習 生徒教科別コマ組み')
 
 {{-- 子ページ --}}
 @section('child_page', true)
 
 {{-- 三階層目の場合：親ページを指定(URLとタイトル) --}}
-@section('parent_page', route('season_mng_student-detail', 1))
+@section('parent_page', route('season_mng_student-detail', $seasonStudent->season_student_id))
 
 @section('parent_page_title', '生徒日程詳細')
 
 @section('content')
 
+{{-- フォーム --}}
 <x-bs.card :form=true>
     <x-slot name="card_title">
-        CWテスト生徒１
+        {{$seasonStudent->student_name}}
     </x-slot>
 
     {{-- テーブル --}}
     <x-bs.table :hover=false :vHeader=true>
-      <tr>
-          <th width="35%">特別期間名</th>
-          <td>2023年春期</td>
-      </tr>
-      <tr>
-          <th>校舎</th>
-          <td>久我山</td>
-      </tr>
-      <tr>
-        <th>科目</th>
-        <td>数学</td>
-      </tr>
-      <tr>
-        <th>科目別受講回数</th>
-        <td>2</td>
-      </tr>
+        <tr>
+            <th width="35%">特別期間名</th>
+            <td>{{$seasonStudent->year}}年{{$seasonStudent->season_name}}</td>
+        </tr>
+        <tr>
+            <th>校舎</th>
+            <td>{{$seasonStudent->campus_name}}</td>
+        </tr>
+        <tr>
+            <th>教科</th>
+            <td>{{$seasonStudent->subject_name}}</td>
+        </tr>
+        <tr>
+            <th>教科別希望受講回数</th>
+            <td>{{$seasonStudent->times}}</td>
+        </tr>
     </x-bs.table>
+    {{-- hidden 退避用--}}
+    <x-input.hidden id="campus_cd" :editData=$seasonStudent />
+    <x-input.hidden id="student_id" :editData=$seasonStudent />
+    <x-input.hidden id="season_student_id" :editData=$seasonStudent />
+    <x-input.hidden id="season_cd" :editData=$seasonStudent />
+    <x-input.hidden id="subject_cd" :editData=$seasonStudent />
 
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
     <p>下記表にて講習を入れたいコマに担当講師を割り当て、登録してください。</p>
-  
+
+    {{-- 講師選択のバリデーションエラー時のメッセージ --}}
+    <x-bs.form-group name="validate_selTutor" />
+    {{-- スケジュール登録のバリデーションエラー時のメッセージ --}}
+    <x-bs.form-group name="validate_schedule" />
+
     <x-bs.table :hover=false class="table-checked">
 
     {{-- テーブルタイトル行 --}}
     <x-slot name="thead">
-      <th class="t-minimum t-week-time"></th>
+        <th class="t-minimum t-period-day"></th>
 
       {{-- 時限を表示 --}}
-      @for ($i = 0; $i < count($periodList); $i++)
-        <th class="t-week">{{$periodList[$i]}}</th>
-      @endfor
+      @foreach ($periodList as $periodKey => $periodVal)
+        <th class="t-period">{{$periodKey}}限</th>
+      @endforeach
     </x-slot>
 
     {{-- 二重ループで組み立てる --}}
-    @for ($j = 0; $j < count($dayList); $j++) <tr>
-      {{-- 日付を表示 --}}
-      <td class="tt">{{$dayList[$j]}}</td>
+    @foreach ($dateList as $date) <tr>
+        {{-- 日付を表示 --}}
+        <td class="tt">{{$date['dateLabel']}}</td>
 
-      @for ($i = 0; $i < count($periodList); $i++)
-      <td>
+        @foreach ($periodList as $periodKey => $periodVal)
+        <td>
         {{-- チェックボックス。裏でクリックされた時間帯を保持している --}}
-        <x-input.checkbox id="{{$j}}_{{$periodIdList[$i]}}" class="chk-wt2" name="chkWs" :icheck=false
-          :disabled=false value="{{$j}}_{{$periodIdList[$i]}}" :editData=$editData />
-        {{-- 表のDiv --}}
-        <div class="chk-t" data-wt="{{$j}}_{{$periodIdList[$i]}}">
-            @if (!in_array($j . "_" . $periodIdList[$i], $editData["chkWs"]))
-              @if ($i == 0 && $j== 0 )
-              <div class="class-info">
-                <span>CW講師１０１<br>英語</span>
-              </div>
-              @elseif ($i == 1 && $j== 2 )
-              <div class="class-info">
-                <span>CW講師１０１<br>英語</span>
-              </div>
-              @else
-              <div class="sel-button">
+        <x-input.checkbox id="{{$date['dateId']}}_{{$periodKey}}" class="chk-season-plan" name="chkWs" :icheck=false
+          value="{{$date['dateId']}}_{{$periodKey}}" :editData=$editData  :exceptData=$exceptData/>
 
-                {{-- TODO: dataAttrは日付・時限を特定する値をセットする。以下はサンプル --}}
-                <x-button.list-dtl caption="講師" :dataAttr="['chk_plan_id' => $j . '_' . $periodIdList[$i]]"/>
+          {{-- 表のDiv --}}
+          <div class="chk-t" data-wt="{{$date['dateId']}}_{{$periodKey}}">
+            @if (!in_array($date['dateId'] . "_" . $periodKey, $exceptData))
+                {{-- $exceptData に指定されたセルは受講不可（グレー網掛け）のため、講師ボタン・授業情報表示対象外 --}}
+                @if (in_array($date['dateId'] . "_" . $periodKey, array_column($lessonInfo, 'key')))
+                    {{-- $lessonInfo に設定されたセルは授業登録済み（緑網掛け）のため、授業情報表示 --}}
+                    @for ($i = 0; $i < count($lessonInfo); $i++)
+                        @if ($lessonInfo[$i]['key'] == $date['dateId'] . "_" . $periodKey)
+                        <div class="class-info">
+                            <span>{{$lessonInfo[$i]['tutor']}}<br>
+                                {{$lessonInfo[$i]['subject']}}</span>
+                        </div>
+                        @endif
+                    @endfor
+                @else
+                    {{-- 上記以外のセルはコマ組み可のセルのため、講師ボタンを表示 --}}
+                    <div class="sel-button">
 
-                {{-- 講師名表示用 波括弧の入れ子ができず暫定対応 --}}
-                <span v-cloak>&#123;&#123; form.hd_text_{{$j}}_{{$periodIdList[$i]}} &#125;&#125;</span>
-                <x-input.hidden :id="'hd_text_' . $j . '_' . $periodIdList[$i]" :editData=$editData />
-                <x-input.hidden :id="'hd_' . $j . '_' . $periodIdList[$i]" :editData=$editData />
+                    {{-- dataAttrに日付_時限のIDをセットする --}}
+                    <x-button.list-dtl caption="講師" :dataAttr="['date_period_key' => $date['dateId'] . '_' . $periodKey]"/>
 
-              </div>
-              @endif
+                    {{-- 講師名表示用 波括弧の入れ子ができず文字コードで設定 --}}
+                    <span v-cloak>&#123;&#123; form.sel_tname_{{$date['dateId']}}_{{$periodKey}} &#125;&#125;</span>
+                    <x-input.hidden :id="'sel_tname_' . $date['dateId'] . '_' . $periodKey" :editData=$editData />
+                    <x-input.hidden :id="'sel_tid_' .$date['dateId'] . '_' . $periodKey" :editData=$editData />
+
+                    </div>
+                @endif
             @endif
-        </div>
-      </td>
-      @endfor
-
-      </tr>
-    @endfor
+          </div>
+        </td>
+        @endforeach
+    </tr>
+    @endforeach
 
     </x-bs.table>
 
@@ -102,7 +118,7 @@
     <div class="mb-3"></div>
 
     <x-bs.callout type="warning">
-        当画面で登録された講習スケジュールは、科目固定・両者通塾・指導ブース自動割り当てとなります。<br>
+        当画面で登録された講習スケジュールは、教科固定・両者通塾・ブース自動割り当てとなります。<br>
         教室カレンダーから確認・編集を行うことができます。<br>
     </x-bs.callout>
 
@@ -110,8 +126,8 @@
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
             {{-- 二階層目に戻る --}}
-            <x-button.back url="{{route('season_mng_student-detail', 1)}}" />
-            <x-button.submit-edit caption="送信" />
+            <x-button.back url="{{route('season_mng_student-detail', $seasonStudent->season_student_id)}}" />
+            <x-button.submit-new caption="送信" />
           </div>
     </x-slot>
 

@@ -40,7 +40,7 @@ class PasswordReset extends Mailable
      */
     public function build()
     {
-        $subject = "【" . config('app.name') . "】" . Lang::get('message.mail.password_reset.subject');
+        $subject = Lang::get('message.mail.password_reset.subject');
 
         return $this
             // タイトル

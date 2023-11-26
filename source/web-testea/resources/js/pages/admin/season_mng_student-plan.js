@@ -37,12 +37,12 @@ export default class AppClass extends PageBase {
             // formDatasはformの値が格納されている
 
             // Hidden名
-            const chkPlanId = modalButtonData.chk_plan_id;
+            const datePeriodKey = modalButtonData.date_period_key;
 
             // 講師名
-            vueForm.form["hd_text_" + chkPlanId] = formDatas["tname"];
-            // ID
-            vueForm.form["hd_" + chkPlanId] = formDatas["tid"];
+            vueForm.form["sel_tname_" + datePeriodKey] = formDatas["tname"];
+            // 講師ID
+            vueForm.form["sel_tid_" + datePeriodKey] = formDatas["tutor_id"];
         };
 
         // Vue: 講師選択モーダル
@@ -50,22 +50,27 @@ export default class AppClass extends PageBase {
             afterOk: afterOk,
             onShowModal: function ($vue, modalButtonData) {
                 // クリア
-                $vue.vueInputForm.form.tid = "";
+                $vue.vueInputForm.form.tutor_id = "";
                 $vue.vueInputForm.form.tname = "";
-
-                // Hidden名
-                const chkPlanId = modalButtonData.chk_plan_id;
+                // ボタン押下のセルのID
+                const datePeriodKey = modalButtonData.date_period_key;
+                // 校舎コード
+                const campusCd = vueForm.form["campus_cd"];
+                // 科目コード
+                const subjectCd = vueForm.form["subject_cd"];
 
                 // 選択済み値
-                const selectedValue = vueForm.form["hd_" + chkPlanId];
+                const selectedValue = vueForm.form["sel_tid_" + datePeriodKey];
 
-                // プルダウンを取得
+                // 講師プルダウンを取得
                 $vue.vueInputForm.selectGetItem = {};
                 self.selectChangeGetCallBack(
                     $vue.vueInputForm,
                     {
-                        // TODO: サンプル(日付・時限単位で設定)。どういう持ち方にするかは要検討
-                        chk_plan_id: chkPlanId,
+                        // 講師リスト取得に必要な項目をセット
+                        date_period_key: datePeriodKey,
+                        campus_cd: campusCd,
+                        subject_cd: subjectCd,
                     },
                     {
                         urlSuffix: "tutor",
@@ -78,8 +83,8 @@ export default class AppClass extends PageBase {
                             $vue.vueInputForm.selectGetItem
                         )) {
                             if (selectedValue == value.id) {
-                                // プルダウンに存在。IDと講師名を初期化
-                                $vue.vueInputForm.form.tid = value.id;
+                                // 選択済み値がプルダウンに存在する場合、選択値をセット
+                                $vue.vueInputForm.form.tutor_id = value.id;
                                 $vue.vueInputForm.form.tname = value.value;
                                 break;
                             }

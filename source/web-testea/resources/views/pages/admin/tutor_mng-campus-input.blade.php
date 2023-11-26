@@ -5,7 +5,7 @@
 {{-- 子ページ --}}
 @section('child_page', true)
 
-@section('parent_page', route('tutor_mng-detail', 1))
+@section('parent_page', route('tutor_mng-detail', $editData['tutor_id']))
 
 @section('parent_page_title', '講師情報')
 
@@ -24,25 +24,19 @@
     @endif
 
     {{-- 共通項目 --}}
-    <x-input.select id="roomcd" caption="校舎" :select2=true >
-        <option value="1">久我山</option>
-        <option value="2">西永福</option>
-        <option value="3">下高井戸</option>
-        <option value="4">駒込</option>
-        <option value="5">日吉</option>
-        <option value="6">自由が丘</option>
-    </x-input.select>
-
-    <x-input.text caption="交通費(往復)" id="tel" :rules=$rules />
+    <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+        :select2Search=false :blank=false />
+    <x-input.text caption="交通費(往復)" id="travel_cost" :rules=$rules :editData=$editData />
 
     {{-- hidden --}}
     <x-input.hidden id="tutor_id" :editData=$editData />
+    <x-input.hidden id="tutor_campus_id" :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
             {{-- 講師情報に戻る --}}
-            <x-button.back url="{{route('tutor_mng-detail', 1)}}" />
+            <x-button.back url="{{route('tutor_mng-detail', $editData['tutor_id'])}}" />
 
             @if (request()->routeIs('tutor_mng-campus-edit'))
             {{-- 編集時 --}}

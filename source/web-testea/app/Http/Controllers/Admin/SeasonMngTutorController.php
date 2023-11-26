@@ -225,10 +225,11 @@ class SeasonMngTutorController extends Controller
 
         // チェックボックスをセットするための値を生成
         // 例：['20231225_1', '20231226_2']
-        $editData = [];
+        // 授業不可コマ情報を$exceptData にセット（グレー網掛け部）
+        $exceptData = [];
         foreach ($tutorPeriods as $datePeriod) {
             // 配列に追加
-            array_push($editData, $datePeriod->lesson_date->format('Ymd') . '_' . $datePeriod->period_no);
+            array_push($exceptData, $datePeriod->lesson_date->format('Ymd') . '_' . $datePeriod->period_no);
         }
 
         // 期間中の授業情報取得
@@ -264,12 +265,12 @@ class SeasonMngTutorController extends Controller
 
         // チェックボックスをセットするための値を生成
         // 例：['20231225_1', '20231226_2']
-        $exceptData = [];
+        $chkWsData = [];
         $lessonInfo = [];
         foreach ($schedules as $schedule) {
             // 配列に追加
             $classKey = $schedule->target_date->format('Ymd') . '_' . $schedule->period_no;
-            array_push($exceptData, $classKey);
+            array_push($chkWsData, $classKey);
             array_push($lessonInfo, [
                 // '20231225_1'の形式
                 'key' => $classKey,
@@ -287,7 +288,7 @@ class SeasonMngTutorController extends Controller
             'periodList' => $periodList,
             'dateList' => $dateList,
             'editData' => [
-                'chkWs' => $editData
+                'chkWs' => $chkWsData
             ],
             'exceptData' => $exceptData,
             'lessonInfo' => $lessonInfo,
