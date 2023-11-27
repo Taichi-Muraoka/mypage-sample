@@ -71,6 +71,14 @@ export default class PageComponentBase {
                     return moment(date).format("YYYY/MM/DD");
                 }
             },
+            // スケジュール年月日(曜日あり)
+            formatYmdDay(date) {
+                if (ValueCom.isEmpty(date)) {
+                    return "";
+                } else {
+                    return moment(date).format("YYYY/MM/DD(dd)");
+                }
+            },
             // 年月日 日時
             formatYmdHm(date) {
                 if (ValueCom.isEmpty(date)) {
