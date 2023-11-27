@@ -203,7 +203,6 @@ class YearScheduleImportController extends Controller
      */
     private function readData($path)
     {
-
         // CSVのヘッダ項目
         $csvHeaders = [
             'lesson_date',
@@ -227,10 +226,10 @@ class YearScheduleImportController extends Controller
                 $headers = $line;
 
                 // [バリデーション] ヘッダが想定通りかチェック
-                if ($headers !== $csvHeaders) {
-                    throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                        . "(" . config('appconf.upload_file_csv_name_T01') . "：ヘッダ行不正)");
-                }
+                // if ($headers !== $csvHeaders) {
+                //     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
+                //         . "(" . config('appconf.upload_file_csv_name_T01') . "：ヘッダ行不正)");
+                // }
                 continue;
             }
 
@@ -247,48 +246,23 @@ class YearScheduleImportController extends Controller
             $values = array_combine($headers, $line);
 
             // [バリデーション] データ行の値のチェック
-            // $validator = Validator::make(
-            //     // 対象
-            //     $values,
-            //     // バリデーションルール
-            //     ExtSchedule::fieldRules('id', ['required'])
-            //         + ExtSchedule::fieldRules('campus_cd', ['required'])
-            //         + ExtSchedule::fieldRules('sid', ['required'])
-            //         + ExtSchedule::fieldRules('lesson_type', ['required'])
-            //         + ExtSchedule::fieldRules('symbol', ['required'])
-            //         + ExtSchedule::fieldRules('curriculumcd')
-            //         + ExtSchedule::fieldRules('rglr_minutes')
-            //         + ExtSchedule::fieldRules('gmid')
-            //         + ExtSchedule::fieldRules('period_no')
-            //         + ExtSchedule::fieldRules('tmid')
-            //         + ExtSchedule::fieldRules('tid')
-            //         + ExtSchedule::fieldRules('lesson_date', ['required'], '_csv')
-            //         + ExtSchedule::fieldRules('start_time', [], '_csv')
-            //         + ExtSchedule::fieldRules('r_minutes')
-            //         + ExtSchedule::fieldRules('end_time', [], '_csv')
-            //         + ExtSchedule::fieldRules('pre_tid')
-            //         + ExtSchedule::fieldRules('pre_lesson_date', [], '_csv')
-            //         + ExtSchedule::fieldRules('pre_start_time', [], '_csv')
-            //         + ExtSchedule::fieldRules('pre_r_minutes')
-            //         + ExtSchedule::fieldRules('pre_end_time', [], '_csv')
-            //         + ExtSchedule::fieldRules('chg_status_cd')
-            //         + ExtSchedule::fieldRules('diff_time')
-            //         + ExtSchedule::fieldRules('substitute_flg')
-            //         + ExtSchedule::fieldRules('atd_status_cd')
-            //         + ExtSchedule::fieldRules('status_info')
-            //         + ExtSchedule::fieldRules('create_kind_cd', ['required'])
-            //         + ExtSchedule::fieldRules('transefer_kind_cd', ['required'])
-            //         + ExtSchedule::fieldRules('trn_lesson_date', [], '_csv')
-            //         + ExtSchedule::fieldRules('trn_start_time', [], '_csv')
-            //         + ExtSchedule::fieldRules('trn_r_minutes')
-            //         + ExtSchedule::fieldRules('trn_end_time', [], '_csv')
-            //         + ExtSchedule::fieldRules('updtime', ['required'], '_csv')
-            // );
+            $validator = Validator::make(
+                // 対象
+                $values,
+                // バリデーションルール
+                YearlySchedule::fieldRules('school_year', ['required'])
+                    + YearlySchedule::fieldRules('campus_cd', ['required'])
+                    + YearlySchedule::fieldRules('lesson_date', ['required'])
+                    + YearlySchedule::fieldRules('day_cd', ['required'])
+                    + YearlySchedule::fieldRules('date_kind', ['required'])
+                    + YearlySchedule::fieldRules('school_month', ['required'])
+                    + YearlySchedule::fieldRules('week_count', ['required'])
+            );
 
-            // if ($validator->fails()) {
-            //     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-            //         . "(" . config('appconf.upload_file_csv_name_T01') . "：データ項目不正)");
-            // }
+            if ($validator->fails()) {
+                throw new ReadDataValidateException(Lang::get('validation.invalid_file')
+                    . "(" . config('appconf.upload_file_csv_name_T01') . "：データ項目不正)");
+            }
 
             // MEMO: スケジュール情報は期間が絞られている前提とし授業日のチェックを行わない
 
