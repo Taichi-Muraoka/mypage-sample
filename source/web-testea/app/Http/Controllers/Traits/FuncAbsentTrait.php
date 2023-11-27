@@ -2,120 +2,106 @@
 
 namespace App\Http\Controllers\Traits;
 
-use App\Models\ExtSchedule;
-use App\Models\TutorRelate;
-use App\Models\ExtRirekisho;
 use App\Consts\AppConst;
-use App\Libs\AuthEx;
-use Illuminate\Support\Facades\Log;
+use App\Models\MstCourse;
+use App\Models\Schedule;
+use App\Models\ClassMember;
+use App\Models\Tutor;
+use App\Models\MstCampus;
+use App\Models\MstSubject;
 
 /**
  * 欠席申請 - 機能共通処理
  */
 trait FuncAbsentTrait
 {
-
     /**
      * 生徒のスケジュールを取得する
      *
      * @param integer $sid 生徒ID
-     * @param string $roomcd 教室コード（指定しない場合はnull）
      */
-    private function getStudentSchedule($sid, $roomcd)
+    private function getStudentSchedule($sid)
     {
-
-        // 翌日を取得（明日以降のスケジュール取得を分かりやすくするため）
-        $tomorrow = date("Y/m/d", strtotime('+1 day'));
-
-        // レギュラー＋個別講習の抽出条件
-        $lesson_types = [AppConst::EXT_GENERIC_MASTER_109_0, AppConst::EXT_GENERIC_MASTER_109_1];
-
-        // 生徒No.に紐づくスケジュール（レギュラー＋個別講習）を取得する。
-        $query = ExtSchedule::query();
-        $lessonsQuery = $query
-            ->select(
-                'id',
-                'lesson_date',
-                'start_time'
-            )
-            ->where('ext_schedule.sid', '=', $sid)
-            ->whereIn('ext_schedule.lesson_type', $lesson_types)
-            ->where(function ($orQuery) {
-                // 出欠・振替コードが2（振替）以外 ※NULLのものを含む
-                $orQuery->whereNotIn('ext_schedule.atd_status_cd', [AppConst::ATD_STATUS_CD_2])
-                    ->orWhereNull('ext_schedule.atd_status_cd');
-            })
-            // 教室が指定された場合のみ絞り込み
-            ->when($roomcd, function ($query) use ($roomcd) {
-                return $query->where('.roomcd', $roomcd);
-            })
-            ->orderBy('ext_schedule.lesson_date', 'asc')
-            ->orderBy('ext_schedule.start_time', 'asc');
-
-        // 生徒のみ翌日以降のスケジュール表示
-        if (AuthEx::isAdmin()) {
-            $lessons = $lessonsQuery->get();
+        // 画面表示時の時間を基準に、欠席連絡可能な授業を判定する
+        $nowTime = date('H:i');
+        $fromDate = null;
+        $toDate = null;
+        if ($nowTime < '22:00') {
+            // 現在時刻が22時までは、翌日～翌日より1ヶ月先
+            $fromDate = date('Y/m/d', strtotime('+1 day'));
+            $toDate = date('Y/m/d', strtotime('+1 day +1 month'));
         } else {
-            $lessons = $lessonsQuery
-                ->where('ext_schedule.lesson_date', '>=', $tomorrow)
-                ->get();
+            // 現在時刻が22時以降は、翌々日～翌々日より1ヶ月先
+            $fromDate = date('Y/m/d', strtotime('+2 day'));
+            $toDate = date('Y/m/d', strtotime('+2 day +1 month'));
         }
+
+        // 生徒IDに紐づくスケジュール（1対多授業）を取得する。
+        $query = Schedule::query();
+        $lessons = $query
+            ->select(
+                'schedules.schedule_id',
+                'schedules.campus_cd',
+                'schedules.target_date',
+                'schedules.period_no',
+                'schedules.tutor_id',
+            )
+            // コースマスタとJOIN
+            ->sdLeftJoin(MstCourse::class, 'schedules.course_cd', '=', 'mst_courses.course_cd')
+            // 受講生徒情報とJOIN
+            ->sdLeftJoin(ClassMember::class, 'schedules.schedule_id', '=', 'class_members.schedule_id')
+            // 抽出条件：
+            // コースマスタ->コース種別 = 授業複
+            // 受講生徒情報->受講生徒ID = ログイン中の生徒ID
+            // 受講生徒情報->出欠ステータス = 実施前・出席
+            ->where('mst_courses.course_kind', AppConst::CODE_MASTER_42_2)
+            ->where('class_members.student_id', '=', $sid)
+            ->where('class_members.absent_status', '=', AppConst::CODE_MASTER_35_0)
+            ->whereBetween('schedules.target_date', [$fromDate, $toDate])
+            ->orderBy('schedules.target_date', 'asc')
+            ->orderBy('schedules.period_no', 'asc')
+            ->get();
+
         return $lessons;
     }
 
     /**
-     * 生徒が所属する教室の教師名を取得する
-     * プルダウン用
-     *
-     * @param integer $sid 生徒ID
-     */
-    private function getTeacherList($sid)
-    {
-        // 教師名のプルダウンメニューを作成
-        $query = TutorRelate::query();
-        $home_teachers = $query
-            ->distinct()
-            ->select(
-                'ext_rirekisho.tid',
-                'ext_rirekisho.name AS value'
-            )
-            ->sdLeftJoin(ExtRirekisho::class, function ($join) {
-                $join->on('ext_rirekisho.tid', '=', 'tutor_relate.tid');
-            })
-            ->where('tutor_relate.sid', '=', $sid)
-            ->where('tutor_relate.roomcd', '=', AppConst::EXT_GENERIC_MASTER_101_900)
-            ->orderBy('ext_rirekisho.tid', 'asc')
-            ->get()
-            ->keyBy('tid');
-
-        return $home_teachers;
-    }
-
-    /**
      * スケジュール詳細を取得
-     * 教師名と教室名を返却する
+     * テーブルに表示する情報、メール送信に必要な情報を返却する
      *
      * @param integer $scheduleId スケジュールID
      */
     private function getScheduleDetail($scheduleId)
     {
-        // 教室名取得のサブクエリ
-        $room_names = $this->mdlGetRoomQuery();
-
-        // $requestからidを取得し、検索結果を返却する。idはスケジュールID
-        $query = ExtSchedule::query();
+        $query = Schedule::query();
         $lesson = $query
             ->select(
-                'room_name',
-                'name'
+                'schedules.target_date',
+                'schedules.period_no',
+                'mst_campuses.name as campus_name',
+                'mst_campuses.email_campus',
+                'mst_campuses.tel_campus',
+                'mst_courses.name as course_name',
+                'mst_subjects.name as subject_name',
+                'tutors.name as tutor_name'
             )
-            ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('ext_schedule.roomcd', '=', 'room_names.code');
+            // 校舎マスタとJOIN
+            ->sdLeftJoin(MstCampus::class, function ($join) {
+                $join->on('schedules.campus_cd', '=', 'mst_campuses.campus_cd');
             })
-            ->sdLeftJoin(ExtRirekisho::class, function ($join) {
-                $join->on('ext_rirekisho.tid', '=', 'ext_schedule.tid');
+            // コースマスタとJOIN
+            ->sdLeftJoin(MstCourse::class, function ($join) {
+                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd');
             })
-            ->where('ext_schedule.id', '=', $scheduleId)
+            // 教科マスタとJOIN
+            ->sdLeftJoin(MstSubject::class, function ($join) {
+                $join->on('schedules.subject_cd', '=', 'mst_subjects.subject_cd');
+            })
+            // 講師情報とJOIN
+            ->sdLeftJoin(Tutor::class, function ($join) {
+                $join->on('schedules.tutor_id', '=', 'tutors.tutor_id');
+            })
+            ->where('schedules.schedule_id', '=', $scheduleId)
             ->firstOrFail();
 
         return $lesson;
