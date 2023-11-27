@@ -207,6 +207,9 @@ export default class PageInputForm extends PageComponentBase {
                     },
                     // 削除ボタン
                     submitDelete: function () {
+                        if (option["afterDelete"]) {
+                            option["afterEdit"] = option["afterDelete"];
+                        }
                         // 削除処理
                         self._sendDelete(this, option);
                     },

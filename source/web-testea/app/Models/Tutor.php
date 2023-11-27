@@ -74,7 +74,9 @@ class Tutor extends Model
         'grade_year' => 'string',
         'school_cd_j' => 'string',
         'school_cd_h' => 'string',
-        'school_cd_u' => 'string'
+        'school_cd_u' => 'string',
+        'enter_date' => 'date',
+        'leave_date' => 'date',
     ];
 
     /**
@@ -119,10 +121,10 @@ class Tutor extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'tutor_id' => ['integer'],
+            'tutor_id' => ['integer', 'max:9999999999'],
             'name' => ['string', 'max:50'],
             'name_kana' => ['string', 'max:50'],
-            'tel' => ['string', 'max:20', 'vdAlphaNum'],
+            'tel' => ['string', 'max:20', 'vdTelephone'],
             'email' => ['string', 'email:rfc,filter', 'max:100'],
             'address' => ['string', 'max:100'],
             'birth_date' => ['date_format:Y-m-d'],
@@ -133,7 +135,7 @@ class Tutor extends Model
             'school_cd_h' => ['string', 'max:13', 'digits:13'],
             'school_cd_u' => ['string', 'max:13', 'digits:13'],
             'hourly_base_wage' => ['integer', 'min:0', 'max:9999'],
-            'gender_cd' => ['integer'],
+            'tutor_status' => ['integer'],
             'enter_date' => ['date_format:Y-m-d'],
             'leave_date' => ['date_format:Y-m-d'],
             'memo' => ['string', 'max:1000']

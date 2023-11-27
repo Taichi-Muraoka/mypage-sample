@@ -1,4 +1,4 @@
-{{------------------------------------------ 
+{{------------------------------------------
     input - file
   --------------------------------------------}}
 
@@ -15,7 +15,7 @@
   class: クラス
   icheck: icheckを使うかどうか
 --}}
-@props(['caption' => '', 'id' => '', 'name' => '', 'value' => '', 'checked' => false, 
+@props(['caption' => '', 'id' => '', 'name' => '', 'value' => '', 'checked' => false,
 'disabled' => false, 'editData' => [],'vShow' => '', 'exceptData' => [],'class' => '', 'icheck' => true])
 
 {{-- v-show --}}
@@ -28,10 +28,10 @@
 @endif
 
   <input type="checkbox" id="{{ $id }}" name="{{ $name }}" value="{{ $value }}"
-  v-model="form.{{ $name }}" 
+  v-model="form.{{ $name }}"
 
   {{-- クラス --}}
-  class="@if (!empty($class)){{ $class }}@endif @if (isset($exceptData) && in_array($value, $exceptData)) except @endif"
+  class="@if (!empty($class)){{ $class }}@endif"
 
   {{-- disabled --}}
   @if ($disabled)
@@ -43,7 +43,7 @@
   disabled
   @endif
 
-  {{-- チェック状態 --}} 
+  {{-- チェック状態 --}}
   @if ($checked && (!isset($editData) || !isset($editData[$name])))
   {{-- デフォルト。editDataがない場合 --}}
   checked

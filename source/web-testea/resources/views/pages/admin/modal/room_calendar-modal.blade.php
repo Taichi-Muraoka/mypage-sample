@@ -21,13 +21,18 @@
         <th>授業区分</th>
         <td>@{{item.lesson_kind_name}} @{{item.hurikae_name}}</td>
     </tr>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.lesson_kind == {{ App\Consts\AppConst::CODE_MASTER_31_2 }}">
+        <th>仮登録フラグ</th>
+        <td>@{{item.tentative_name}}</td>
+    </tr>
     <tr v-show="item.holiday_name">
         <th>期間区分</th>
         <td>@{{item.holiday_name}}</td>
     </tr>
     <tr>
         <th>日付</th>
-        <td>@{{$filters.formatYmd(item.target_date)}}</td>
+        <td>@{{$filters.formatYmdDay(item.target_date)}}</td>
     </tr>
     {{-- v-showは、コース種別によって非表示の場合があるため --}}
     <tr v-show="item.period_no && item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
@@ -84,7 +89,7 @@
     {{-- v-showは、データ作成区分によって非表示の場合があるため --}}
     <tr v-show="item.transfer_date && (item.create_kind == {{ App\Consts\AppConst::CODE_MASTER_32_2 }})">
         <th>振替元授業日・時限</th>
-        <td>@{{$filters.formatYmd(item.transfer_date)}} @{{item.transfer_period_no}}限</td>
+        <td>@{{$filters.formatYmdDay(item.transfer_date)}} @{{item.transfer_period_no}}限</td>
     </tr>
     <tr v-show="item.admin_name">
         <th>登録・担当者名</th>
