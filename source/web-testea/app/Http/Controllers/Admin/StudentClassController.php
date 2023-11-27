@@ -54,8 +54,15 @@ class StudentClassController extends Controller
         // 授業区分リストを取得
         $lesson_kind = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_31);
 
-        // 出欠ステータス
-        $absent_status = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_35);
+        // 出欠ステータスリストを取得
+        $absent_status = CodeMaster::query()
+            ->select('code', 'name as value')
+            ->where('data_type', AppConst::CODE_MASTER_35)
+            // 振替済みを除外
+            ->where('code', '!=', AppConst::CODE_MASTER_35_5)
+            ->orderby('order_code')
+            ->get()
+            ->keyBy('code');
 
         // 教科リストを取得
         $subjects = $this->mdlGetSubjectList();
@@ -120,7 +127,8 @@ class StudentClassController extends Controller
         // 出欠ステータス選択により絞り込み条件
         if (isset($form['absent_status']) && filled($form['absent_status'])) {
             // 検索フォームから取得（スコープ）
-            $query->SearchAbsentStatus($form);
+            $query->SearchAbsentStatus($form)
+                ->where('course_kind', '!=', AppConst::CODE_MASTER_42_3);
         }
 
         // 生徒名検索
@@ -137,7 +145,7 @@ class StudentClassController extends Controller
         // 授業報告書ステータス選択により絞り込み
         if (isset($form['report_status']) && filled($form['report_status'])) {
             switch ($form['report_status']) {
-
+                // ―（登録不要）
                 case AppConst::REPORT_STATUS_1:
                     // 授業日が当日以降(未実施)または当日欠席の授業
                     $today = now();
@@ -145,29 +153,36 @@ class StudentClassController extends Controller
                         ->orWhere('schedules.absent_status', AppConst::CODE_MASTER_35_1)
                         ->orWhere('schedules.absent_status', AppConst::CODE_MASTER_35_2);
                     break;
-
+                // ×（要登録・差戻し）
                 case AppConst::REPORT_STATUS_2:
                     $today = now();
                     $query
-                        // 授業報告書登録あり かつ 承認状態＝差戻し
-                        ->whereNotNull('schedules.report_id')
                         ->sdLeftJoin(Report::class, 'schedules.report_id', 'reports.report_id')
-                        ->where('reports.approval_status', '=', AppConst::CODE_MASTER_4_3)
-                        // 授業日が当日以前かつ出欠ステータスが「実施前・出席」かつ授業報告書登録なし
-                        ->orWhere(function ($orQuery) use ($today) {
-                            $orQuery->where('schedules.target_date', '<', $today)
-                                ->where('schedules.absent_status', AppConst::CODE_MASTER_35_0)
-                                ->whereNull('schedules.report_id');
+                        ->where(function ($orQuery) use ($today) {
+                            $orQuery
+                                // 授業報告書登録あり かつ 承認状態＝差戻し
+                                ->where(function ($orQuery) {
+                                    $orQuery
+                                        ->whereNotNull('schedules.report_id')
+                                        ->where('reports.approval_status', '=', AppConst::CODE_MASTER_4_3);
+                                })
+                                // 授業日が当日以前かつ出欠ステータスが「実施前・出席」かつ授業報告書登録なし
+                                ->orWhere(function ($orQuery) use ($today) {
+                                    $orQuery
+                                        ->where('schedules.target_date', '<', $today)
+                                        ->where('schedules.absent_status', AppConst::CODE_MASTER_35_0)
+                                        ->whereNull('schedules.report_id');
+                                });
                         });
                     break;
-
+                // △（承認待ち）
                 case AppConst::REPORT_STATUS_3:
                     // 授業報告書登録あり かつ 承認状態＝承認待ち
                     $query->whereNotNull('schedules.report_id')
                         ->sdLeftJoin(Report::class, 'schedules.report_id', 'reports.report_id')
                         ->where('reports.approval_status', '=', AppConst::CODE_MASTER_4_1);
                     break;
-
+                // 〇（登録済み）
                 case AppConst::REPORT_STATUS_4:
                     // 授業報告書登録あり かつ 承認状態＝承認の場合
                     $query->whereNotNull('schedules.report_id')
@@ -201,6 +216,8 @@ class StudentClassController extends Controller
             'mst_codes_35.name as absent_status_name',
             'reports_.approval_status as approval_status'
         )
+            // 出欠ステータスが振替済みのものは除外
+            ->where('schedules.absent_status', '!=', AppConst::CODE_MASTER_35_5)
             ->sdLeftJoin(Report::class, function ($join) {
                 $join->on('schedules.report_id', 'reports_.report_id');
             }, 'reports_')
