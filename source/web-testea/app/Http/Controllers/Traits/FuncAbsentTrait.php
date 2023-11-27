@@ -81,12 +81,17 @@ trait FuncAbsentTrait
                 'mst_campuses.name as campus_name',
                 'mst_campuses.email_campus',
                 'mst_campuses.tel_campus',
+                'mst_courses.name as course_name',
                 'mst_subjects.name as subject_name',
                 'tutors.name as tutor_name'
             )
             // 校舎マスタとJOIN
             ->sdLeftJoin(MstCampus::class, function ($join) {
                 $join->on('schedules.campus_cd', '=', 'mst_campuses.campus_cd');
+            })
+            // コースマスタとJOIN
+            ->sdLeftJoin(MstCourse::class, function ($join) {
+                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd');
             })
             // 教科マスタとJOIN
             ->sdLeftJoin(MstSubject::class, function ($join) {

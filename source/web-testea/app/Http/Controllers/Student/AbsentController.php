@@ -88,11 +88,12 @@ class AbsentController extends Controller
         // 値のチェック
         $this->guardListValue($scheduleList, $schedule_id);
 
-        // スケジュールから、講師名・教科・校舎・校舎電話番号を取得
+        // スケジュールから、講師名・教科・コース名・校舎・校舎電話番号を取得
         $lesson = $this->getScheduleDetail($schedule_id);
 
         return [
             'campus_name' => $lesson->campus_name,
+            'course_name' => $lesson->course_name,
             'tutor_name' => $lesson->tutor_name,
             'subject_name' => $lesson->subject_name,
             'tel_campus' => $lesson->tel_campus

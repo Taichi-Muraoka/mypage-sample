@@ -23,6 +23,10 @@
                 <td><span v-cloak>@{{selectGetItem.campus_name}}</span></td>
             </tr>
             <tr>
+                <th>コース</th>
+                <td><span v-cloak>@{{selectGetItem.course_name}}</span></td>
+            </tr>
+            <tr>
                 <th>講師</th>
                 <td><span v-cloak>@{{selectGetItem.tutor_name}}<span v-if="selectGetItem.teacher_name">先生</span></span>
                 </td>
