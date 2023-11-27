@@ -12,11 +12,11 @@
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="30%">年度</th>
-            <td>2023年度</td>
+            <td>{{$school_year}}年度</td>
         </tr>
         <tr>
             <th width="30%">校舎</th>
-            <td>{{$school}}</td>
+            <td>{{$room_name}}</td>
         </tr>
     </x-bs.table>
 

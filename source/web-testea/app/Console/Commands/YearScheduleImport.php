@@ -66,31 +66,9 @@ class YearScheduleImport extends Command
 
             Log::info("Batch yearScheduleImport Start, PATH: {$path}, ACCOUNT_ID: {$account_id}");
 
-            $now = Carbon::now();
-
-            // バッチ管理テーブルにレコード作成
-            $batchMng = new BatchMng;
-            $batchMng->batch_type = AppConst::BATCH_TYPE_2;
-            $batchMng->start_time = $now;
-            $batchMng->batch_state = AppConst::CODE_MASTER_22_99;
-            $batchMng->adm_id = $account_id;
-            $batchMng->save();
-
-            $batch_id = $batchMng->batch_id;
-
             try {
-                // Zipを解凍し、ファイルパス一覧を取得
-                $opPathList = $this->unzip($path);
-                // 今回は1件しか無いので、1件目を取得
-                if (count($opPathList) != 1) {
-                    throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                        . "(csvファイル数不正)");
-                }
-
-                $csvPath = $opPathList[0];
-
                 // CSVデータの読み込み
-                $datas = $this->readData($csvPath);
+                $datas = $this->readData($path);
 
                 $ids = $datas["ids"];
                 $datas = $datas["datas"];
@@ -99,16 +77,14 @@ class YearScheduleImport extends Command
                     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
                         . "(データ件数不正)");
                 }
-
-                // Zip解凍ファイルのクリーンアップ
-                $this->unzipCleanUp($opPathList);
+                
             } catch (ReadDataValidateException  $e) {
                 // 通常は事前にバリデーションするのでここはありえないのでエラーとする
                 throw $e;
             }
 
             // トランザクション(例外時は自動的にロールバック)
-            DB::transaction(function () use ($datas, $ids, $batch_id) {
+            DB::transaction(function () use ($datas, $ids) {
 
                 $insertCount = 0;
 
@@ -167,28 +143,11 @@ class YearScheduleImport extends Command
                     $insertCount++;
                 }
 
-                // バッチ管理テーブルのレコードを更新：正常終了
-                $end = Carbon::now();
-                BatchMng::where('batch_id', '=', $batch_id)
-                    ->update([
-                        'end_time' => $end,
-                        'batch_state' => AppConst::CODE_MASTER_22_0,
-                        'updated_at' => $end
-                    ]);
-
                 $insertCount = (string) $insertCount;
 
                 Log::info("Insert {$insertCount} Records. yearScheduleImport Succeeded.");
             });
         } catch (\Exception  $e) {
-            // バッチ管理テーブルのレコードを更新：異常終了
-            $end = Carbon::now();
-            BatchMng::where('batch_id', '=', $batch_id)
-                ->update([
-                    'end_time' => $end,
-                    'batch_state' => AppConst::CODE_MASTER_22_1,
-                    'updated_at' => $end
-                ]);
             // この時点では補足できないエラーとして、詳細は返さずエラーとする
             Log::error($e);
         }
@@ -209,40 +168,14 @@ class YearScheduleImport extends Command
 
         // CSVのヘッダ項目
         $csvHeaders = [
-            "id",
-            "roomcd",
-            "sid",
-            "lesson_type",
-            "symbol",
-            "curriculumcd",
-            "rglr_minutes",
-            "gmid",
-            "period_no",
-            "tmid",
-            "tid",
-            "lesson_date",
-            "start_time",
-            "r_minutes",
-            "end_time",
-            "pre_tid",
-            "pre_lesson_date",
-            "pre_start_time",
-            "pre_r_minutes",
-            "pre_end_time",
-            "chg_status_cd",
-            "diff_time",
-            "substitute_flg",
-            "atd_status_cd",
-            "status_info",
-            "create_kind_cd",
-            "transefer_kind_cd",
-            "trn_lesson_date",
-            "trn_start_time",
-            "trn_r_minutes",
-            "trn_end_time",
-            "updtime",
-            "upduser"
+            'lesson_date',
+            'day_cd',
+            'date_kind_name',
+            'date_kind',
+            'school_month',
+            'week_count'
         ];
+
         // CSVのデータをリストで保持
         $datas = [
             "datas" => [],
