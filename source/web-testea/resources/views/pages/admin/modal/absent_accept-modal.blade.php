@@ -2,71 +2,35 @@
 
 @section('modal-body')
 
-
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true>
-    {{-- モック用処理 --}}
     <tr>
         <th width="35%">申請日</th>
-        <td>2023/05/10</td>
+        <td>@{{$filters.formatYmd(item.apply_date)}}</td>
     </tr>
     <tr>
         <th>生徒名</th>
-        <td>CWテスト生徒１</td>
-    </tr>
-    <tr>
-        <th>コース名</th>
-        <td>集団授業</td>
-    </tr>
-    <tr>
-        <th>校舎</th>
-        <td>久我山</td>
+        <td>@{{item.student_name}}</td>
     </tr>
     <tr>
         <th>授業日・時限</th>
-        <td>2023/05/22 4限</td>
+        <td>@{{$filters.formatYmdDay(item.target_date)}} @{{item.period_no}}限</td>
     </tr>
     <tr>
-        <th>講師名</th>
-        <td>CWテスト教師１０１</td>
-    </tr>
-    <tr>
-        <th>教科</th>
-        <td>数学</td>
-    </tr>
-    <tr>
-        <th>欠席理由</th>
-        <td class="nl2br">学校行事のため</td>
-    </tr>
-    <tr>
-        <th>ステータス</th>
-        <td>未対応</td>
-    </tr>
-
-    {{-- 本番用処理 --}}
-    {{-- <tr>
-        <th width="35%">申請日</th>
-        <td>@{{$filters.formatYmd(item.apply_time)}}</td>
-    </tr>
-    <tr>
-        <th>生徒名</th>
-        <td>@{{item.sname}}</td>
+        <th>校舎</th>
+        <td>@{{item.campus_name}}</td>
     </tr>
     <tr>
         <th>コース名</th>
-        <td>個別指導コース</td>
-    </tr>
-    <tr v-show="item.lesson_type == {{ App\Consts\AppConst::CODE_MASTER_8_1 }}">
-        <th>校舎</th>
-        <td>@{{item.room_name}}</td>
-    </tr>
-    <tr>
-        <th>授業日時</th>
-        <td>@{{$filters.formatYmd(item.lesson_date)}} @{{$filters.formatHm(item.start_time)}}</td>
+        <td>@{{item.course_name}}</td>
     </tr>
     <tr>
         <th>講師名</th>
-        <td>@{{item.tname}}</td>
+        <td>@{{item.tutor_name}}</td>
+    </tr>
+    <tr>
+        <th>教科</th>
+        <td>@{{item.subject_name}}</td>
     </tr>
     <tr>
         <th>欠席理由</th>
@@ -74,9 +38,8 @@
     </tr>
     <tr>
         <th>ステータス</th>
-        <td>@{{item.status}}</td>
-    </tr> --}}
-
+        <td>@{{item.status_name}}</td>
+    </tr>
 </x-bs.table>
 
 @overwrite
