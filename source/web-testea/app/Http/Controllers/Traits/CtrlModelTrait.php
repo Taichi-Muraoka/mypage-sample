@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Traits;
 
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
+use App\Libs\CommonDateFormat;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CodeMaster;
 use App\Models\MstCampus;
@@ -24,6 +25,7 @@ use App\Models\Schedule;
 use App\Models\ClassMember;
 use App\Models\Account;
 use App\Models\MstGrade;
+use App\Models\MstTutorGrade;
 use App\Models\YearlySchedule;
 use App\Models\MstSystem;
 use Illuminate\Support\Facades\DB;
@@ -536,7 +538,7 @@ trait CtrlModelTrait
      * 抽出したスケジュールより日時のプルダウンメニューのリストを取得
      *
      * @param array $lessons schedulesよりget
-     * @return array プルダウンメニュー用日時 Y/m/d n限
+     * @return array プルダウンメニュー用日時 Y/m/d(曜日) n限
      */
     protected function mdlGetScheduleMasterList($lessons)
     {
@@ -548,7 +550,7 @@ trait CtrlModelTrait
                 //$lesson['target_datetime'] = $lesson['target_date']->format('Y/m/d') . " " . $lesson['period'] . "限";
                 $schedule = [
                     'id' => $lesson['schedule_id'],
-                    'value' => $lesson['target_date']->format('Y/m/d') . " " . $lesson['period_no'] . "限"
+                    'value' => CommonDateFormat::formatYmdDay($lesson['target_date']) . " " . $lesson['period_no'] . "限"
                 ];
                 $schedule = (object) $schedule;
                 array_push($scheduleMasterKeys, $lesson['schedule_id']);
@@ -648,6 +650,29 @@ trait CtrlModelTrait
     protected function mdlGetGradeList($schoolKind = null)
     {
         $query = MstGrade::query();
+
+        // 学校区分が指定された場合絞り込み
+        $query->when($schoolKind, function ($query) use ($schoolKind) {
+            return $query->where('school_kind', $schoolKind);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('grade_cd as code', 'name as value')
+            ->orderby('grade_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 講師学年プルダウンメニューのリストを取得
+     * 管理者向け
+     *
+     * @param int $ schoolKind 学校区分 省略可
+     * @return array
+     */
+    protected function mdlGetTutorGradeList($schoolKind = null)
+    {
+        $query = MstTutorGrade::query();
 
         // 学校区分が指定された場合絞り込み
         $query->when($schoolKind, function ($query) use ($schoolKind) {

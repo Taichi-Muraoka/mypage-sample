@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Lang;
 
 /**
- * 教師への欠席申請メール
+ * 講師への欠席申請メール
  */
 class AbsentApplyToTeacher extends Mailable
 {
@@ -24,7 +24,7 @@ class AbsentApplyToTeacher extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param array 'name' 生徒名 'datetime' 授業日 開始時間 'room_name' 教室名
+     * @param array 'studentName' 生徒名 'targetDate' 授業日 'periodNo' 時限 'campusName' 校舎名
      * @return void
      */
     public function __construct($mail_body)
@@ -40,7 +40,7 @@ class AbsentApplyToTeacher extends Mailable
      */
     public function build()
     {
-        $subject = "【" . config('app.name') . "】" . Lang::get('message.mail.absent_apply_to_teacher.subject');
+        $subject = Lang::get('message.mail.absent_apply_to_teacher.subject');
 
         return $this
             // タイトル

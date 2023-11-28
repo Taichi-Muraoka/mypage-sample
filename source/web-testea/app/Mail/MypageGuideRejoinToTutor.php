@@ -8,9 +8,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Lang;
 
 /**
- * 新規入会生徒へのマイページログイン案内メール
+ * 再入会講師へのマイページログイン案内メール
  */
-class MypageGuideToStudent extends Mailable
+class MypageGuideRejoinToTutor extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -39,12 +39,12 @@ class MypageGuideToStudent extends Mailable
      */
     public function build()
     {
-        $subject = Lang::get('message.mail.mypage_guide_to_student.subject');
+        $subject = Lang::get('message.mail.mypage_guide_rejoin_to_tutor.subject');
 
         return $this
             // タイトル
             ->subject($subject)
             // テンプレート
-            ->text('emails.mypage_guide_to_student');
+            ->text('emails.mypage_guide_rejoin_to_tutor');
     }
 }

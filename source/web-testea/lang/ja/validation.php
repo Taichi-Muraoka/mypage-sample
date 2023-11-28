@@ -210,6 +210,9 @@ return [
     // 期間の不整合時のエラー
     'out_of_range_regist_term' => '登録期間外です。',
 
+    // 選択件数のエラー
+    'invalid_count_of_select' => '選択件数が正しくありません。',
+
     // 削除時に入力値変更不可のエラー
     'delete_cannot_change' => '削除時は変更しないでください。',
 
@@ -222,6 +225,9 @@ return [
     // 会員編集 会員ステータス「退会処理中」「退会済」に変更時のエラー
     'status_cannot_change_leave' => '退会処理は退会登録画面から行なってください。',
 
+    // 講師編集 講師ステータス「退職処理中」「退職済」に変更時のエラー
+    'status_cannot_change_retirement' => '退職処理は退職登録画面から行なってください。',
+
     // 振替調整希望日・時限 重複
     'preferred_datetime_distinct' => '異なる希望日・時限を指定してください。',
 
@@ -233,6 +239,9 @@ return [
 
     // 振替調整希望日 フリー入力 振替対象期間範囲エラー
     'preferred_date_out_of_range' => '振替可能な期間の範囲外です。範囲内の日付を指定してください。',
+
+    // 振替調整希望日 フリー入力 休業日エラー
+    'preferred_date_closed' => '休業日です。他の日付を指定してください。',
 
     // 振替調整承認 承認時 希望日未選択エラー
     'preferred_approval_not_select' => '承認する場合、振替希望日を選択してください。',

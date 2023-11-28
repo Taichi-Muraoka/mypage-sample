@@ -1,4 +1,5 @@
 @extends('adminlte::page')
+@inject('formatter','App\Libs\CommonDateFormat')
 
 @section('title', '授業欠席登録')
 
@@ -33,7 +34,7 @@
         </tr>
         <tr>
             <th>授業日・時限</th>
-            <td>{{$schedule->target_date->format('Y/m/d')}} {{$schedule->period_no}}限</td>
+            <td>{{$formatter::formatYmdDay($schedule->target_date)}} {{$schedule->period_no}}限</td>
         </tr>
         <tr>
             <th>講師名</th>

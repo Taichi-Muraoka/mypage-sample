@@ -8,9 +8,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Lang;
 
 /**
- * 新規入会生徒へのマイページログイン案内メール
+ * 生徒への欠席申請受付メール
  */
-class MypageGuideToStudent extends Mailable
+class AbsentApplyToStudent extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -24,12 +24,13 @@ class MypageGuideToStudent extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param array
+     * @param array 'targetDate' 授業日 'periodNo' 時限 'campusName' 校舎名
      * @return void
      */
-    public function __construct()
+    public function __construct($mail_body)
     {
-
+        // 本文に使用する変数を保持
+        $this->mail = $mail_body;
     }
 
     /**
@@ -39,12 +40,12 @@ class MypageGuideToStudent extends Mailable
      */
     public function build()
     {
-        $subject = Lang::get('message.mail.mypage_guide_to_student.subject');
+        $subject = Lang::get('message.mail.absent_apply_to_student.subject');
 
         return $this
             // タイトル
             ->subject($subject)
             // テンプレート
-            ->text('emails.mypage_guide_to_student');
+            ->text('emails.absent_apply_to_student');
     }
 }

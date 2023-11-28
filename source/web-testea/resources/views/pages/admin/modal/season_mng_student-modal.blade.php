@@ -7,7 +7,7 @@
 <p>以下のリストより、担当講師を選択してください。</p>
 
 {{-- 講師リスト --}}
-<x-input.select id="tid" :select2=true onChange="selectChange" :editData=$editData>
+<x-input.select id="tutor_id" :select2=true blankText="未選択" onChange="selectChange" :editData=$editData>
   <option v-for="item in selectGetItem" :value="item.id">
     @{{ item.value }}
   </option>

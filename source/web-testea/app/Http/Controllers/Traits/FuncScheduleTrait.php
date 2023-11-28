@@ -54,6 +54,25 @@ trait FuncScheduleTrait
     }
 
     /**
+     * コース情報の取得（コース種別・給与算出種別から）
+     *
+     * @param string $courseCd コースコード
+     * @return object
+     */
+    private function fncScheGetCourseInfoByKind($courseKind, $summaryKind)
+    {
+        // コース情報を取得
+        $query = MstCourse::query();
+        $course = $query
+            ->select('course_cd')
+            ->where('course_kind', $courseKind)
+            ->where('summary_kind', $summaryKind)
+            ->firstOrFail();
+
+        return $course;
+    }
+
+    /**
      * 生徒情報の取得
      *
      * @param string $courseCd コースコード
