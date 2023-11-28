@@ -31,7 +31,7 @@
     </tr>
     <tr>
         <th>受験日</th>
-        <td>@{{$filters.formatYmd(item.exam_date)}}</td>
+        <td>@{{$filters.formatYmdDay(item.exam_date)}}</td>
     </tr>
     <tr>
         <th>合否</th>
