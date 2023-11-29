@@ -173,39 +173,6 @@ class DesiredMngController extends Controller
     //==========================
 
     /**
-     * 受験年度リスト作成
-     */
-    public function getExamYearList()
-    {
-        // システムマスタ「現年度」を取得
-        $currentYear = MstSystem::select('value_num')
-            ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
-            ->first();
-
-        // 現年度～2年後までのリストを作る 例2023～2025
-        $examYearList = [];
-        for ($i = 0; $i <= 2; $i++) {
-            $examYearList += array($currentYear->value_num + $i => ["value" => $currentYear->value_num + $i]);
-        }
-
-        return $examYearList;
-    }
-
-    /**
-     * 志望順リスト作成
-     */
-    public function getPriorityList()
-    {
-        // 1～10までのリストを作る
-        $priorityList = [];
-        for ($i = 1; $i <= 10; $i++) {
-            $priorityList += array($i => ["value" => $i]);
-        }
-
-        return $priorityList;
-    }
-
-    /**
      * 登録画面
      *
      * @param int $sid 生徒ID
@@ -223,9 +190,9 @@ class DesiredMngController extends Controller
         $name = $this->mdlGetStudentName($sid);
 
         // 受験年度リストを取得 上部メソッドに記載
-        $examYearList = $this->getExamYearList();
+        $examYearList = $this->mdlGetExamYearList();
         // 志望順リストを取得 上部メソッドに記載
-        $priorityList = $this->getPriorityList();
+        $priorityList = $this->mdlGetPriorityList();
         // 合否リストを取得
         $resultList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_52);
 
@@ -335,9 +302,9 @@ class DesiredMngController extends Controller
         $name = $this->mdlGetStudentName($exam->student_id);
 
         // 受験年度リストを取得 上部メソッドに記載
-        $examYearList = $this->getExamYearList();
+        $examYearList = $this->mdlGetExamYearList();
         // 志望順リストを取得 上部メソッドに記載
-        $priorityList = $this->getPriorityList();
+        $priorityList = $this->mdlGetPriorityList();
         // 合否リストを取得
         $resultList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_52);
 
@@ -447,7 +414,7 @@ class DesiredMngController extends Controller
         // 独自バリデーション: リストのチェック 受験年度
         $validationExamYearList =  function ($attribute, $value, $fail) {
             // リストを取得し存在チェック
-            $list = $this->getExamYearList();
+            $list = $this->mdlGetExamYearList();
             if (!isset($list[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
@@ -457,7 +424,7 @@ class DesiredMngController extends Controller
         // 独自バリデーション: リストのチェック 志望順
         $validationPriorityList =  function ($attribute, $value, $fail) {
             // リストを取得し存在チェック
-            $list = $this->getPriorityList();
+            $list = $this->mdlGetPriorityList();
             if (!isset($list[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
