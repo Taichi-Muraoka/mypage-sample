@@ -31,6 +31,217 @@ trait FuncTransferTrait
     //------------------------------
 
     /**
+     * 振替依頼対象スケジュール情報を取得
+     * 
+     * @param   $fromDate 対象開始日
+     * @param   $toDate   対象終了日
+     * @param   $sid      生徒ID
+     * @param   $tid      講師ID
+     * @return  object スケジュール情報
+     */
+    private function fncTranGetTransferSchedule($fromDate, $toDate, $sid = null, $tid = null)
+    {
+
+        $query = Schedule::query();
+        $lessons = $query
+            ->select(
+                'schedule_id',
+                'target_date',
+                'period_no'
+            )
+            // コース種別 = 授業単 のみ対象とする
+            ->sdJoin(MstCourse::class, function ($join) {
+                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd')
+                ->where('mst_courses.course_kind', '=', AppConst::CODE_MASTER_42_1);;
+            })
+            // キーの指定
+            // 生徒IDが指定された場合のみ絞り込み
+            ->when($sid, function ($query) use ($sid) {
+                return $query->where('schedules.student_id', $sid);
+            })
+            // 講師IDが指定された場合のみ絞り込み
+            ->when($tid, function ($query) use ($tid) {
+                return $query->where('schedules.tutor_id', $tid);
+            })
+
+            // 出欠・振替コードが0:実施前・出席、3:未振替
+            ->whereIn('schedules.absent_status', [AppConst::CODE_MASTER_35_0, AppConst::CODE_MASTER_35_3])
+            // 対象の授業日範囲
+            ->whereBetween('schedules.target_date', [$fromDate, $toDate])
+            ->orderby('schedules.target_date')
+            ->orderby('schedules.period_no')
+            ->get();
+
+        return $lessons;
+    }
+
+    /**
+     * 選択対象スケジュール情報を取得
+     * 
+     * @param   $scheduleId スケジュールID
+     * @param   $sid        生徒ID
+     * @param   $tid        講師ID
+     * @return  object スケジュール情報(選択時表示用)
+     */
+    private function fncTranGetTargetScheduleInfo($scheduleId, $sid, $tid = null)
+    {
+        // 校舎名取得のサブクエリ
+        $campus_names = $this->mdlGetRoomQuery();
+
+        $query = Schedule::query();
+        $lesson = $query
+            // キーの指定
+            ->where('schedules.schedule_id', '=', $scheduleId)
+            ->select(
+                'schedules.schedule_id',
+                'schedules.target_date',
+                'schedules.campus_cd',
+                'schedules.minites',
+                // 校舎名
+                'campus_names.room_name as campus_name',
+                'schedules.student_id',
+                // 生徒情報の名前
+                'students.name as student_name',
+                'schedules.tutor_id',
+                // 教師情報の名前
+                'tutors.name as tutor_name',
+                'schedules.course_cd',
+                // コース名
+                'mst_courses.name as course_name',
+                'schedules.subject_cd',
+                // 科目名
+                'mst_subjects.name as subject_name'
+            )
+            // 校舎名の取得
+            ->leftJoinSub($campus_names, 'campus_names',
+                function ($join) {
+                    $join->on('schedules.campus_cd', '=', 'campus_names.code');
+                }
+            )
+            // 生徒名を取得
+            ->sdLeftJoin(Student::class, 'schedules.student_id', '=', 'students.student_id')
+            // 講師名を取得
+            ->sdLeftJoin(Tutor::class, 'schedules.tutor_id', '=', 'tutors.tutor_id')
+            // コース名の取得
+            ->sdLeftJoin(MstCourse::class, function ($join) {
+                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd');
+            })
+            // 科目名の取得
+            ->sdLeftJoin(MstSubject::class, function ($join) {
+                $join->on('mst_subjects.subject_cd', '=', 'schedules.subject_cd');
+            })
+            // 生徒IDが指定された場合のみ絞り込み
+            ->when($sid, function ($query) use ($sid) {
+                return $query->where('schedules.student_id', $sid);
+            })
+            // 講師IDが指定された場合のみ絞り込み
+            ->when($tid, function ($query) use ($tid) {
+                return $query->where('schedules.tutor_id', $tid);
+            })
+            ->firstOrFail();
+
+        return $lesson;
+    }
+
+    /**
+     * 一覧表示用 振替依頼情報を取得SQLを作成
+     * 
+     * @param   $sid        生徒ID
+     * @param   $tid        講師ID
+     * @param   $campusCd   校舎コード
+     * @param   $status     振替依頼承認ステータス
+     * @return  object 振替依頼情報
+     */
+    private function fncTranGetATransferApplicationList($sid = null, $tid = null, $campusCd = null, $status = null)
+    {
+        // 校舎名取得のサブクエリ
+        $campus_names = $this->mdlGetRoomQuery();
+
+        $query = TransferApplication::query();
+        // データを取得
+        $transfers = $query
+        ->select(
+            'transfer_applications.transfer_apply_id',
+            'transfer_applications.apply_date',
+            'transfer_applications.apply_kind',
+            'transfer_applications.approval_status',
+            'transfer_applications.monthly_count',
+            // 授業情報
+            'schedules.target_date',
+            'schedules.period_no',
+            // 生徒の名称
+            'students.name as student_name',
+            // 講師の名称
+            'tutors.name as tutor_name',
+            // 校舎名
+            'campus_names.room_name as campus_name',
+            // コースの名称
+            'mst_courses.name as course_name',
+            // コードマスタ（申請者種別）の名称
+            'mst_codes_53.name as apply_kind_name',
+            // コードマスタ（振替承認ステータス）の名称・汎用項目１
+            'mst_codes_3.gen_item1 as approval_status_name_for_student', // 振替承認ステータス(生徒向け)
+            'mst_codes_3.name as approval_status_name'                   // 振替承認ステータス(講師・運用管理向け)
+        )
+            // 授業情報の取得
+            ->sdLeftJoin(Schedule::class, function ($join) {
+                $join->on('transfer_applications.schedule_id', '=', 'schedules.schedule_id');
+            })
+            // 生徒名を取得
+            ->sdLeftJoin(Student::class, 'transfer_applications.student_id', '=', 'students.student_id')
+            // 講師名称の取得
+            ->sdLeftJoin(Tutor::class, function ($join) {
+                $join->on('transfer_applications.tutor_id', '=', 'tutors.tutor_id');
+            })
+            // 校舎名の取得
+            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
+                $join->on('schedules.campus_cd', '=', 'campus_names.code');
+            })
+            // コース名称の取得
+            ->sdLeftJoin(MstCourse::class, function ($join) {
+                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd')
+                ->where('course_kind', '=', AppConst::CODE_MASTER_42_1);;
+            })
+            // コードマスタ（申請者種別）名称の取得
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('transfer_applications.apply_kind', '=', 'mst_codes_53.code')
+                    ->where('mst_codes_53.data_type', '=', AppConst::CODE_MASTER_53);
+            }, 'mst_codes_53')
+            // コードマスタ（振替承認ステータス）名称の取得
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('transfer_applications.approval_status', '=', 'mst_codes_3.code')
+                    ->where('mst_codes_3.data_type', '=', AppConst::CODE_MASTER_3);
+            }, 'mst_codes_3')
+
+            // キーの指定
+            // 生徒IDが指定された場合のみ絞り込み
+            ->when($sid, function ($query) use ($sid) {
+                return $query->where('transfer_applications.student_id', $sid);
+            })
+            // 講師IDが指定された場合のみ絞り込み
+            ->when($tid,
+                function ($query) use ($tid) {
+                    return $query->where('transfer_applications.tutor_id', $tid);
+                }
+            )
+            // 校舎コードが指定された場合のみ絞り込み
+            ->when($campusCd, function ($query) use ($campusCd) {
+                return $query->where('schedule.campus_cd', $campusCd);
+            })
+            // 振替承認ステータスが指定された場合のみ絞り込み
+            ->when($status, function ($query) use ($status) {
+                return $query->where('transfer_applications.approval_status', $status);
+            })
+            ->where('transfer_applications.approval_status', '!=', AppConst::CODE_MASTER_3_0)
+
+            ->orderby('apply_date', 'desc')
+            ->orderby('target_date', 'asc')
+            ->orderby('period_no', 'asc');
+
+        return $transfers;
+    }
+
+    /**
      * 振替依頼情報を取得
      * 
      * @param   $id    振替依頼情報ID
@@ -159,7 +370,7 @@ trait FuncTransferTrait
                 return $query->where('transfer_applications.tutor_id', $tid);
             })
 
-            ->first();
+            ->firstOrFail();
 
         return $tranApp;
     }
@@ -184,6 +395,62 @@ trait FuncTransferTrait
         return $tutorFreeList;
     }
 
+    /**
+     * 講師の空き授業時間を指定期間の範囲で取得
+     * 対象講師、生徒の登録済みスケジュールもチェックする
+     * 
+     * @param $tutorId  講師ID
+     * @param $fromDate 開始日
+     * @param $toDate   終了日
+     * @param $campusCd 校舎コード
+     * @param $studentId 生徒ID
+     * @param $minites  授業時間
+     * @return object   日付,時限の配列
+     */
+    private function fncTranGetTutorFreeSchedule($tutorId, $fromDate, $toDate, $campusCd, $studentId, $minites)
+    {
+        // 対象期間の年間予定を取得
+        $lessonDate = $this->fncTranGetScheduleFromTo($campusCd, $fromDate, $toDate);
+
+        // 講師空き時間情報の取得
+        $tutorFreeList = $this->fncTranGetTutorFreePeriods($tutorId);
+
+        // 対象期間で講師空き時間から授業可能日・時限を生成
+        $enableDateTime = array();
+        foreach ($lessonDate as $lDate) {
+            // 対象日の曜日を取得
+            $youbi = $this->dtGetDayOfWeekCd($lDate);
+            // 対象日・対象校舎の時限・開始～終了時刻を取得
+            $timeTables = $this->getTimetableByDate($campusCd, $lDate);
+            $periodList = $timeTables->keyBy('period_no');
+
+            foreach ($tutorFreeList as $tutorFree) {
+                // 空き時間と曜日が一致していたらスケジュールを作る
+                if ($tutorFree->day_cd == $youbi) {
+                    // 空き時間の時限が、対象日にあるかどうか
+                    if (isset($periodList[$tutorFree->period_no])){
+                        // 終了時刻計算
+                        $endTime = $this->fncTranEndTime($periodList[$tutorFree->period_no]['start_time'], $minites);
+
+                        // 講師のスケジュール重複チェック
+                        if ($this->fncScheChkDuplidateTid($lDate, $periodList[$tutorFree->period_no]['start_time'], $endTime, $tutorId)) {
+                            // 生徒のスケジュール重複チェック
+                            if ($this->fncScheChkDuplidateSid($lDate, $periodList[$tutorFree->period_no]['start_time'], $endTime, $studentId)) {
+                                // 重複していない場合は空きスケジュールの候補に追加
+                                $enableDateTime[] = [
+                                    'target_date' => $lDate,
+                                    'period_no' => $tutorFree->period_no
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $enableDateTime;
+    }
+    
     /**
      * 抽出したスケジュールより日・時限のプルダウンのリストを取得
      *
@@ -211,6 +478,21 @@ trait FuncTransferTrait
         $res = array_combine($scheduleMasterKeys, $scheduleMasterValue);
 
         return $res;
+    }
+
+    /**
+     * 対象のスケジュール情報から、振替候補日のリストを取得
+     * 
+     * @param $schedule     スケジュール情報
+     * @param $targetPeriod 候補日対象範囲
+     * @return object 
+     */
+    private function fncTranGetTransferCandidateDates($schedule, $targetPeriod)
+    {
+        // 講師空き時間の取得
+        $tutorFreePeriod = $this->fncTranGetTutorFreeSchedule($schedule->tutor_id, $targetPeriod['from_date'], $targetPeriod['to_date'], $schedule->campus_cd, $schedule->student_id, $schedule->minites);
+        // プルダウン用リストに変換
+        return $this->fncTranGetScheduleMasterList($tutorFreePeriod);
     }
 
     /**
@@ -341,7 +623,8 @@ trait FuncTransferTrait
                 'schedules.booth_cd',
                 'schedules.student_id',
                 'schedules.tutor_id',
-                'schedules.how_to_kind'
+                'schedules.how_to_kind',
+                'schedules.minites'
             )
             // 振替依頼情報の取得
             ->sdJoin(TransferApplication::class, function ($join) use ($tranAppId) {

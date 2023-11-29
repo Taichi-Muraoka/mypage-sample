@@ -44,9 +44,9 @@
         <p class="input-title">振替希望日一覧</p>
 
         {{-- テーブル --}}
-        <x-bs.table :hover=true :vHeader=true :smartPhone=true>
+        <x-bs.table :hover=true :smartPhone=true>
             <x-slot name="thead">
-                <th>選択</th>
+                <th class="t-minimum">選択</th>
                 <th>希望順</th>
                 <th>振替希望日</th>
                 <th>時限</th>
@@ -96,7 +96,8 @@
 
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
-                <x-button.submit-approval caption="送信" />
+                <x-button.submit-approval caption="送信" 
+                vueDisabled="(form.approval_status=={{ App\Consts\AppConst::CODE_MASTER_3_1 }})"/>
             </div>
         </div>
     </x-slot>
