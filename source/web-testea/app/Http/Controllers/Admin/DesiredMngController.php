@@ -189,9 +189,9 @@ class DesiredMngController extends Controller
         // 生徒名を取得する
         $name = $this->mdlGetStudentName($sid);
 
-        // 受験年度リストを取得 上部メソッドに記載
+        // 受験年度リストを取得
         $examYearList = $this->mdlGetExamYearList();
-        // 志望順リストを取得 上部メソッドに記載
+        // 志望順リストを取得
         $priorityList = $this->mdlGetPriorityList();
         // 合否リストを取得
         $resultList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_52);
@@ -301,9 +301,9 @@ class DesiredMngController extends Controller
         // 生徒名を取得する
         $name = $this->mdlGetStudentName($exam->student_id);
 
-        // 受験年度リストを取得 上部メソッドに記載
+        // 受験年度リストを取得
         $examYearList = $this->mdlGetExamYearList();
-        // 志望順リストを取得 上部メソッドに記載
+        // 志望順リストを取得
         $priorityList = $this->mdlGetPriorityList();
         // 合否リストを取得
         $resultList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_52);
