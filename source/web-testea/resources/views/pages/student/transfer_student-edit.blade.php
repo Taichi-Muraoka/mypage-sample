@@ -96,8 +96,7 @@
 
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
-                <x-button.submit-approval caption="送信" 
-                vueDisabled="(form.approval_status=={{ App\Consts\AppConst::CODE_MASTER_3_1 }})"/>
+                <x-button.submit-approval caption="送信" />
             </div>
         </div>
     </x-slot>
