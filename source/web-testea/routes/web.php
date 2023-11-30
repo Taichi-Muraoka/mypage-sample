@@ -136,6 +136,9 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     // 振替希望日プルダウンを選択された際に授業情報を返却する
     Route::post('/transfer_student/get_data_select_schedule', [TransferStudentController::class, 'getDataSelectSchedule'])->name('transfer_student-get_data_select_schedule');
 
+    // 振替希望日フリー入力した際に時限情報を返却する
+    Route::post('/transfer_student/get_data_select_calender', [TransferStudentController::class, 'getDataSelectCalender'])->name('transfer_student-get_data_select_calender');
+
     // 新規登録処理
     Route::post('/transfer_student/create', [TransferStudentController::class, 'create'])->name('transfer_student-create');
 

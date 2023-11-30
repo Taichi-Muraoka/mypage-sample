@@ -76,7 +76,7 @@
         <x-input.select vShow="form.preferred{{$i}}_type == 2" id="preferred_date{{$i}}_period" caption="時限"
             :select2=true :editData=$editData :select2Search=false :blank=true>
             {{-- vueで動的にプルダウンを作成 --}}
-            <option v-for="item in selectGetItemPeriod" :value="item.code">
+            <option v-for="item in selectGetItemPeriod{{$i}}" :value="item.code">
                 @{{ item.value }}
             </option>
         </x-input.select>

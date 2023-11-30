@@ -76,63 +76,12 @@ class TransferStudentController extends Controller
      */
     public function search(Request $request)
     {
-        // ログイン者のNo.を取得する。
+        // ログイン者の情報を取得する
         $account = Auth::user();
         $account_id = $account->account_id;
 
-        $query = TransferApplication::query();
-        // データを取得
-        $transfers = $query
-            ->select(
-                'transfer_applications.transfer_apply_id',
-                'transfer_applications.apply_date',
-                'transfer_applications.apply_kind',
-                'transfer_applications.approval_status',
-                // 授業情報
-                'schedules.target_date',
-                'schedules.period_no',
-                // 講師の名称
-                'tutors.name as tutor_name',
-                // コースの名称
-                'mst_courses.name as course_name',
-                // コードマスタ（申請者種別）の名称
-                'mst_codes_53.name as apply_kind_name',
-                // コードマスタ（振替承認ステータス）の名称（汎用項目１）
-                'mst_codes_3.gen_item1 as approval_status_name'
-            )
-            // 授業情報の取得
-            ->sdLeftJoin(Schedule::class, function ($join) {
-                $join->on('transfer_applications.schedule_id', '=', 'schedules.schedule_id');
-            })
-            // 講師名称の取得
-            ->sdLeftJoin(Tutor::class, function ($join) {
-                $join->on('transfer_applications.tutor_id', '=', 'tutors.tutor_id');
-            })
-            // コース名称の取得
-            ->sdLeftJoin(MstCourse::class, function ($join) {
-                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd')
-                    ->where('course_kind', '=', AppConst::CODE_MASTER_42_1);;
-            })
-            // コードマスタ（申請者種別）名称の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('transfer_applications.apply_kind', '=', 'mst_codes_53.code')
-                    ->where('mst_codes_53.data_type', '=', AppConst::CODE_MASTER_53);
-            }, 'mst_codes_53')
-            // コードマスタ（振替承認ステータス）名称の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('transfer_applications.approval_status', '=', 'mst_codes_3.code')
-                    ->where('mst_codes_3.data_type', '=', AppConst::CODE_MASTER_3);
-            }, 'mst_codes_3')
-
-            // ->where('transfer_applications.student_id', '=', $account_id)
-            // キーの指定
-            // 自分のアカウントIDでガードを掛ける（sid）
-            ->where($this->guardStudentTableWithSid())
-            ->where('transfer_applications.approval_status', '!=', AppConst::CODE_MASTER_3_0)
-
-            ->orderby('apply_date', 'desc')
-            ->orderby('target_date', 'asc')
-            ->orderby('period_no', 'asc');
+        // 一覧用SQLを取得
+        $transfers = $this->fncTranGetATransferApplicationList($account_id, null, null, null);
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $transfers);
@@ -177,34 +126,12 @@ class TransferStudentController extends Controller
         $account = Auth::user();
         $account_id = $account->account_id;
 
-        $query = Schedule::query();
-
         // 振替対象日の範囲
         $targetPeriod = $this->fncTranTargetDateFromTo();
 
         // 授業情報を取得
-        $lessons = $query
-            ->select(
-                'schedule_id',
-                'target_date',
-                'period_no'
-            )
-            // コース種別 = 授業単 のみ対象とする
-            ->sdJoin(MstCourse::class, function ($join) {
-                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd')
-                    ->where('mst_courses.course_kind', '=', AppConst::CODE_MASTER_42_1);;
-            })
-            // キーの指定
-            // 自分のアカウントIDでガードを掛ける（sid）
-            ->where($this->guardStudentTableWithSid())
-            // 出欠・振替コードが0:実施前・出席、3:未振替
-            ->whereIn('schedules.absent_status', [AppConst::CODE_MASTER_35_0, AppConst::CODE_MASTER_35_3])
-            // 対象の授業日範囲
-            ->whereBetween('schedules.target_date', [$targetPeriod['from_date'], $targetPeriod['to_date']])
-            ->orderby('schedules.target_date')
-            ->orderby('schedules.period_no')
-            ->get();
-
+        $lessons = $this->fncTranGetTransferSchedule($targetPeriod['from_date'], $targetPeriod['to_date'], $account_id, null);
+        // プルダウン用にリスト作成
         $lesson_list = $this->mdlGetScheduleMasterList($lessons);
 
         // 登録画面用テンプレートを使用
@@ -228,52 +155,15 @@ class TransferStudentController extends Controller
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'id');
 
+        // ログイン者の情報を取得する
+        $account = Auth::user();
+        $account_id = $account->account_id;
+
         // IDを取得
         $schedule_id = $request->input('id');
 
-        // 校舎名取得のサブクエリ
-        $campus_names = $this->mdlGetRoomQuery();
-
-        $query = Schedule::query();
-
-        $lesson = $query
-            // キーの指定
-            ->where('schedules.schedule_id', '=', $schedule_id)
-            // 自分のアカウントIDでガードを掛ける（sid）
-            ->where($this->guardStudentTableWithSid())
-            ->select(
-                'schedules.schedule_id',
-                'schedules.target_date',
-                'schedules.campus_cd',
-                'schedules.minites',
-                // 校舎名
-                'campus_names.room_name as campus_name',
-                'schedules.student_id',
-                'schedules.tutor_id',
-                // 教師情報の名前
-                'tutors.name as tutor_name',
-                'schedules.course_cd',
-                // コース名
-                'mst_courses.name as course_name',
-                'schedules.subject_cd',
-                // 科目名
-                'mst_subjects.name as subject_name',
-            )
-            // 校舎名の取得
-            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
-                $join->on('schedules.campus_cd', '=', 'campus_names.code');
-            })
-            // 講師名を取得
-            ->sdLeftJoin(Tutor::class, 'schedules.tutor_id', '=', 'tutors.tutor_id')
-            // コース名の取得
-            ->sdLeftJoin(MstCourse::class, function ($join) {
-                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd');
-            })
-            // 科目名の取得
-            ->sdLeftJoin(MstSubject::class, function ($join) {
-                $join->on('mst_subjects.subject_cd', '=', 'schedules.subject_cd');
-            })
-            ->firstOrFail();
+        // 授業情報を取得
+        $lesson = $this->fncTranGetTargetScheduleInfo($schedule_id, $account_id, null);
 
         // 時限リストを取得
         $periods = $this->mdlGetPeriodListByDate($lesson->campus_cd, $lesson->target_date);
@@ -282,7 +172,7 @@ class TransferStudentController extends Controller
         $targetPeriod = $this->fncTranCandidateDateFromTo($lesson->target_date);
 
         // 振替候補日を取得
-        $candidates = $this->getTransferCandidateDates($lesson, $targetPeriod);
+        $candidates = $this->fncTranGetTransferCandidateDates($lesson, $targetPeriod);
 
         return [
             'campus_cd' => $lesson->campus_cd,
@@ -304,71 +194,23 @@ class TransferStudentController extends Controller
     }
 
     /**
-     * 対象のスケジュール情報から、振替候補日のリストを取得
-     * 
-     * @param $schedule     スケジュール情報
-     * @param $targetPeriod 候補日対象範囲
-     * @return object 
+     * 時限情報取得（校舎コード、日付より）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 時限コード、時限名
      */
-    private function getTransferCandidateDates($schedule, $targetPeriod)
+    public function getDataSelectCalender(Request $request)
     {
-        // 講師空き時間の取得
-        $tutorFreePeriod = $this->getTutorFreeSchedule($schedule->tutor_id, $targetPeriod['from_date'], $targetPeriod['to_date'], $schedule->campus_cd, $schedule->student_id, $schedule->minites);
-        // プルダウン用リストに変換
-        return $this->fncTranGetScheduleMasterList($tutorFreePeriod);
-    }
+        // 校舎コードを取得
+        $campusCd = $request->input('campus_cd');
+        // 対象日付を取得
+        $targetDate = $request->input('target_date');
 
-    /**
-     * 講師の空き授業時間を指定期間の範囲で取得
-     * 対象講師、生徒の登録済みスケジュールもチェックする
-     * 
-     * @param $tutorId  講師ID
-     * @param $fromDate 開始日
-     * @param $toDate   終了日
-     * @param $campusCd 校舎コード
-     * @param $studentId 生徒ID
-     * @param $minites  授業時間
-     * @return object   日付,時限の配列
-     */
-    private function getTutorFreeSchedule($tutorId, $fromDate, $toDate, $campusCd, $studentId, $minites)
-    {
-        // 対象期間の年間予定を取得
-        $lessonDate = $this->fncTranGetScheduleFromTo($campusCd, $fromDate, $toDate);
-
-        // 講師空き時間情報の取得
-        $tutorFreeList = $this->fncTranGetTutorFreePeriods($tutorId);
-
-        // 対象期間で講師空き時間から授業可能日・時限を生成
-        $enableDateTime = array();
-        foreach ($lessonDate as $lDate) {
-            // 対象日の曜日を取得
-            $youbi = $this->dtGetDayOfWeekCd($lDate);
-            // 対象日・対象校舎の時限・開始～終了時刻を取得
-            $timeTables = $this->getTimetableByDate($campusCd, $lDate);
-            $periodList = $timeTables->keyBy('period_no');
-
-            foreach ($tutorFreeList as $tutorFree) {
-                // 空き時間と曜日が一致していたらスケジュールを作る
-                if ($tutorFree->day_cd == $youbi) {
-                    // 終了時刻計算
-                    $endTime = $this->fncTranEndTime($periodList[$tutorFree->period_no]['start_time'], $minites);
-
-                    // 講師のスケジュール重複チェック
-                    if ($this->fncScheChkDuplidateTid($lDate, $periodList[$tutorFree->period_no]['start_time'], $endTime, $tutorId)) {
-                        // 生徒のスケジュール重複チェック
-                        if ($this->fncScheChkDuplidateSid($lDate, $periodList[$tutorFree->period_no]['start_time'], $endTime, $studentId)) {
-                            // 重複していない場合は空きスケジュールの候補に追加
-                            $enableDateTime[] = [
-                                'target_date' => $lDate,
-                                'period_no' => $tutorFree->period_no
-                            ];
-                        }
-                    }
-                }
-            }
-        }
-
-        return $enableDateTime;
+        // 対象日・対象校舎の時限リストを取得
+        $periods = $this->mdlGetPeriodListByDate($campusCd, $targetDate);
+        return [
+            'periods' => $this->objToArray($periods)
+        ];
     }
 
     /**
@@ -381,6 +223,8 @@ class TransferStudentController extends Controller
     {
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
+        // 関連チェック
+        Validator::make($request->all(), $this->rulesForInputRelated($request));
 
         // ログイン者の情報を取得する
         $account = Auth::user();
@@ -536,29 +380,29 @@ class TransferStudentController extends Controller
                     $studentId
                 )) {
                     $freeCheck[$i] = '生徒スケジュールあり';
-                }
-
-                // 講師スケジュール重複チェック
-                if (!$this->fncScheChkDuplidateTid(
-                    $tran_date[$i],
-                    $periodData['start_time'],
-                    $periodData['end_time'],
-                    $tutorId
-                )) {
-                    $freeCheck[$i] = '講師スケジュールあり';
-                }
-
-                // ブース空きチェック
-                if ($this->fncScheSearchBooth(
-                    $campusCd,
-                    $boothCd,
-                    $tran_date[$i],
-                    $tran_period[$i],
-                    $howToKind,
-                    null,
-                    false
-                ) == null) {
-                    $freeCheck[$i] = '空きブースなし';
+                } else {
+                    // 講師スケジュール重複チェック
+                    if (!$this->fncScheChkDuplidateTid(
+                        $tran_date[$i],
+                        $periodData['start_time'],
+                        $periodData['end_time'],
+                        $tutorId
+                    )) {
+                        $freeCheck[$i] = '講師スケジュールあり';
+                    } else {
+                        // ブース空きチェック
+                        if ($this->fncScheSearchBooth(
+                            $campusCd,
+                            $boothCd,
+                            $tran_date[$i],
+                            $tran_period[$i],
+                            $howToKind,
+                            null,
+                            false
+                        ) == null) {
+                            $freeCheck[$i] = '空きブースなし';
+                        }
+                    }
                 }
             }
         }
@@ -901,6 +745,13 @@ class TransferStudentController extends Controller
                     // 希望日範囲外エラー
                     return $fail(Lang::get('validation.preferred_date_out_of_range'));
                 }
+                // 休業日チェック
+                // 期間区分の取得（年間授業予定）
+                $dateKind = $this->getYearlyDateKind($request['campus_cd'], $request['preferred_date1_calender']);
+                if ($dateKind == AppConst::CODE_MASTER_38_9) {
+                    // 休業日の場合、エラー
+                    return $fail(Lang::get('validation.preferred_date_closed'));
+                }
             };
             $validationPreferred1_input =  function ($attribute, $value, $fail) use ($request, $scheduleDate, $schedulePeriod) {
                 if ((!$request->filled('preferred_date1_calender') || $request['preferred_date1_calender'] == '') ||
@@ -909,6 +760,7 @@ class TransferStudentController extends Controller
                     // 未入力の場合は必須チェックでエラー
                     return;
                 }
+
                 // 振替対象の選択授業日・時限とチェック
                 if (
                     strtotime($request['preferred_date1_calender']) == strtotime($scheduleDate) &&
@@ -968,6 +820,14 @@ class TransferStudentController extends Controller
             ) {
                 // 時限入力あり・カレンダー入力なし エラー
                 return $fail(Lang::get('validation.preferred_input_reqired'));
+            }
+
+            // 休業日チェック
+            // 期間区分の取得（年間授業予定）
+            $dateKind = $this->getYearlyDateKind($request['campus_cd'], $request['preferred_date2_calender']);
+            if ($dateKind == AppConst::CODE_MASTER_38_9) {
+                // 休業日の場合、エラー
+                return $fail(Lang::get('validation.preferred_date_closed'));
             }
 
             // カレンダー入力ありの場合
@@ -1098,6 +958,14 @@ class TransferStudentController extends Controller
             ) {
                 // 時限入力あり・カレンダー入力なし エラー
                 return $fail(Lang::get('validation.preferred_input_reqired'));
+            }
+
+            // 休業日チェック
+            // 期間区分の取得（年間授業予定）
+            $dateKind = $this->getYearlyDateKind($request['campus_cd'], $request['preferred_date3_calender']);
+            if ($dateKind == AppConst::CODE_MASTER_38_9) {
+                // 休業日の場合、エラー
+                return $fail(Lang::get('validation.preferred_date_closed'));
             }
 
             // カレンダー入力ありの場合
@@ -1274,10 +1142,15 @@ class TransferStudentController extends Controller
                 }
             }
 
-            // 希望日選択ありだが承認待ちの場合、エラー
-            if ($request->filled('approval_status') && $request['approval_status'] == AppConst::CODE_MASTER_3_1) {
-                // 振替希望日選択チェック
-                if ($request->filled('transfer_date_id') && $request['transfer_date_id'] != '') {
+            // 振替希望日選択チェック
+            if ($request->filled('transfer_date_id') && $request['transfer_date_id'] != '') {
+                // 希望日選択ありだが承認待ち・差戻し(日程不都合)・〃(代講希望)の場合、エラー
+                if (
+                    $request->filled('approval_status') &&
+                    ($request['approval_status'] == AppConst::CODE_MASTER_3_1 ||
+                        $request['approval_status'] == AppConst::CODE_MASTER_3_3 ||
+                        $request['approval_status'] == AppConst::CODE_MASTER_3_4)
+                ) {
                     // 希望日選択ありエラー
                     return $fail(Lang::get('validation.preferred_status_not_apply'));
                 }

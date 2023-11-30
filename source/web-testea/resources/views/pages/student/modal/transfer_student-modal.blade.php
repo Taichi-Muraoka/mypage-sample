@@ -60,7 +60,7 @@
     </tr>
     <tr v-show="item.comment != null">
         <th>コメント</th>
-        <td v-cloak>@{{item.comment}}</td>
+        <td class="nl2br" v-cloak>@{{item.comment}}</td>
     </tr>
     <tr>
         <th>振替代講区分</th>

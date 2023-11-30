@@ -86,19 +86,19 @@ return [
         'absent_apply_accept_student' => [
             'title' => "欠席申請受付",
             'text' => "以下の欠席申請を受け付けました。\n" .
-                "授業日時：:lessonDate :startTime\n" .
-                "教室：:roomName\n",
+                "授業日・時限：:targetDate :periodNo時限目\n" .
+                "校舎：:campusName\n",
         ],
 
         //--------------
         // 欠席申請
-        // 欠席申請受付（教師）
+        // 欠席申請受付（講師）
         //--------------
-        'absent_apply_accept_teacher' => [
+        'absent_apply_accept_tutor' => [
             'title' => "生徒欠席連絡",
-            'text' => ":snameさんより、授業欠席の連絡がありました。\n" .
-                "授業日時：:lessonDate :startTime\n" .
-                "教室：:roomName\n",
+            'text' => ":studentNameさんより、授業欠席の連絡がありました。\n" .
+                "授業日・時限：:targetDate :periodNo時限目\n" .
+                "校舎：:campusName\n",
         ],
 
         //--------------
@@ -153,14 +153,21 @@ return [
         ],
 
         //-------------------
-        // 欠席申請
+        // 欠席申請(管理者)
         //-------------------
         'absent_apply_to_office' => [
             'subject' => "【" . config('app.name') . "】" . "欠席申請"
         ],
 
         //-------------------
-        // 欠席申請(教師)
+        // 欠席申請受付(生徒)
+        //-------------------
+        'absent_apply_to_student' => [
+            'subject' => "【" . config('app.name') . "】" . "欠席申請受付"
+        ],
+
+        //-------------------
+        // 欠席申請受付(講師)
         //-------------------
         'absent_apply_to_teacher' => [
             'subject' => "【" . config('app.name') . "】" . "生徒欠席連絡"
@@ -203,49 +210,49 @@ return [
         // 振替調整依頼(生徒・講師から)
         //-------------------
         'transfer_adjustment_request' => [
-            'subject' => "授業振替調整依頼"
+            'subject' => "【" . config('app.name') . "】" . "授業振替調整依頼"
         ],
 
         //-------------------
         // 振替調整依頼 回数超過(講師から)
         //-------------------
         'transfer_adjustment_request_over' => [
-            'subject' => "授業振替調整依頼（講師振替依頼回数超過）"
+            'subject' => "【" . config('app.name') . "】" . "授業振替調整依頼（講師振替依頼回数超過）"
         ],
 
         //-------------------
         // 振替調整 講師差戻し
         //-------------------
         'transfer_remand_tutor_to_admin' => [
-            'subject' => "振替授業調整差戻（講師）"
+            'subject' => "【" . config('app.name') . "】" . "振替授業調整差戻（講師）"
         ],
 
         //-------------------
         // 振替調整 生徒差戻し
         //-------------------
         'transfer_remand_student_to_admin' => [
-            'subject' => "振替授業調整差戻（生徒）"
+            'subject' => "【" . config('app.name') . "】" . "振替授業調整差戻（生徒）"
         ],
 
         //-------------------
         // 振替調整 授業登録(講師承認・生徒承認・管理者登録)
         //-------------------
         'transfer_apply_regist_schedule' => [
-            'subject' => "振替授業登録のお知らせ"
+            'subject' => "【" . config('app.name') . "】" . "振替授業登録のお知らせ"
         ],
 
         //-------------------
         // 振替調整 代講授業登録(生徒へ)
         //-------------------
         'substitute_regist_to_student' => [
-            'subject' => "代講授業登録のお知らせ"
+            'subject' => "【" . config('app.name') . "】" . "代講授業登録のお知らせ"
         ],
 
         //-------------------
         // 振替調整 代講授業登録(講師へ)
         //-------------------
         'substitute_regist_to_tutor' => [
-            'subject' => "代講授業登録のお知らせ"
+            'subject' => "【" . config('app.name') . "】" . "代講授業登録のお知らせ"
         ],
 
     ],

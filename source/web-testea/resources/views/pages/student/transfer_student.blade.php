@@ -34,7 +34,7 @@
             {{-- <x-bs.td-sp caption="授業日・時限">@{{item.target_date}} @{{item.period_no}}限</x-bs.td-sp> --}}
             <x-bs.td-sp caption="コース">@{{item.course_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="講師名">@{{item.tutor_name}}</x-bs.td-sp>
-            <x-bs.td-sp caption="ステータス">@{{item.approval_status_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="ステータス">@{{item.approval_status_name_for_student}}</x-bs.td-sp>
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.transfer_apply_id']" />

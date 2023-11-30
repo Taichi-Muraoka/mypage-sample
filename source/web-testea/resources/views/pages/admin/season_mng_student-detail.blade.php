@@ -1,4 +1,5 @@
 @extends('adminlte::page')
+@inject('formatter','App\Libs\CommonDateFormat')
 
 @section('title', '特別期間講習 生徒日程詳細')
 
@@ -83,7 +84,7 @@
 
     {{-- テーブル行 --}}
         @foreach ($schedules as $schedule) <tr>
-            <td>{{$schedule->target_date->format('Y/m/d')}}</td>
+            <td>{{$formatter::formatYmdDay($schedule->target_date)}}</td>
             <td>{{$schedule->period_no}}</td>
             <td>{{$schedule->tutor_name}}</td>
             <td>{{$schedule->subject_name}}</td>

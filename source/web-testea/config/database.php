@@ -60,6 +60,8 @@ return [
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                // 暫定対応（db-Viewの置き換え対応が完了したら外す
+                PDO::ATTR_EMULATE_PREPARES => true,
             ]) : [],
         ],
 
