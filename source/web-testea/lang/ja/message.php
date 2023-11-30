@@ -117,7 +117,7 @@ return [
             'title' => "面談スケジュール登録のお知らせ",
             'text' => "面談スケジュールの登録を行いました。\n" .
                 "詳細はカレンダーよりご確認ください。\n" .
-                "面談日時：:conferenceDate :startTime\n" . 
+                "面談日時：:conferenceDate :startTime\n" .
                 "校舎：:roomName\n",
         ],
     ],
@@ -190,6 +190,13 @@ return [
         //-------------------
         'mypage_guide_rejoin_to_tutor' => [
             'subject' => "【" . config('app.name') . "】" . "マイページログイン案内"
+        ],
+
+        //-------------------
+        // 追加授業依頼(管理者)
+        //-------------------
+        'extra_class_apply_to_office' => [
+            'subject' => "【" . config('app.name') . "】" . "追加授業依頼"
         ],
     ],
 
