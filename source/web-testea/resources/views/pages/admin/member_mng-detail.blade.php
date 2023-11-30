@@ -1,4 +1,5 @@
 @extends('adminlte::page')
+@inject('formatter','App\Libs\CommonDateFormat')
 
 @section('title', '生徒カルテ')
 
@@ -10,9 +11,10 @@
 <x-bs.card>
     {{-- カードヘッダ右 --}}
     <x-slot name="tools">
-        <x-button.edit href="{{ route('member_mng-leave-edit', $student->student_id) }}" caption="生徒退会" icon="" :small=true
-            btn="btn-danger" disabled={{$disabled}} />
-        <x-button.edit href="{{ route('member_mng-edit', $student->student_id) }}" caption="生徒情報編集" icon="" :small=true />
+        <x-button.edit href="{{ route('member_mng-leave-edit', $student->student_id) }}" caption="生徒退会" icon=""
+            :small=true btn="btn-danger" disabled={{$disabled}} />
+        <x-button.edit href="{{ route('member_mng-edit', $student->student_id) }}" caption="生徒情報編集" icon=""
+            :small=true />
     </x-slot>
 
     <x-slot name="card_title">
@@ -225,7 +227,7 @@
 
         {{-- テーブル行 --}}
         @for ($i = 0; $i < count($not_yet_transfer_classes); $i++) <tr>
-            <td>{{$not_yet_transfer_classes[$i]->target_date->format('Y/m/d')}}</td>
+            <td>{{$formatter::formatYmdDay($not_yet_transfer_classes[$i]->target_date)}}</td>
             <td>{{$not_yet_transfer_classes[$i]->period_no}}</td>
             <td>{{$not_yet_transfer_classes[$i]->campus_name}}</td>
             <td>{{$not_yet_transfer_classes[$i]->course_name}}</td>
@@ -266,7 +268,7 @@
 
         {{-- テーブル行 --}}
         @for ($i = 0; $i < count($irregular_classes); $i++) <tr>
-            <td>{{$irregular_classes[$i]->target_date->format('Y/m/d')}}</td>
+            <td>{{$formatter::formatYmdDay($irregular_classes[$i]->target_date)}}</td>
             <td>{{$irregular_classes[$i]->period_no}}</td>
             <td>{{$irregular_classes[$i]->campus_name}}</td>
             <td>{{$irregular_classes[$i]->course_name}}</td>
@@ -327,7 +329,7 @@
             <td>{{$entrance_exams[$i]->school_name}}</td>
             <td>{{$entrance_exams[$i]->department_name}}</td>
             <td>{{$entrance_exams[$i]->exam_name}}</td>
-            <td>{{$entrance_exams[$i]->exam_date->format('Y/m/d')}}</td>
+            <td>{{$formatter::formatYmdDay($entrance_exams[$i]->exam_date)}}</td>
             <td>{{$entrance_exams[$i]->result_name}}</td>
             @php
             $ids = ['id' => $entrance_exams[$i]->student_exam_id, 'sid' => $entrance_exams[$i]->student_id,];

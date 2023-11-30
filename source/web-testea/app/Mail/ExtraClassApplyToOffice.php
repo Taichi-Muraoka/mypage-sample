@@ -8,9 +8,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Lang;
 
 /**
- * 講師への欠席申請メール
+ * 校舎への追加授業依頼メール
  */
-class AbsentApplyToTeacher extends Mailable
+class ExtraClassApplyToOffice extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -24,7 +24,7 @@ class AbsentApplyToTeacher extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param array 'studentName' 生徒名 'targetDate' 授業日 'periodNo' 時限 'campusName' 校舎名
+     * @param array 'student_name' 生徒名 'request' 依頼内容
      * @return void
      */
     public function __construct($mail_body)
@@ -40,12 +40,12 @@ class AbsentApplyToTeacher extends Mailable
      */
     public function build()
     {
-        $subject = Lang::get('message.mail.absent_apply_to_teacher.subject');
+        $subject = Lang::get('message.mail.extra_class_apply_to_office.subject');
 
         return $this
             // タイトル
             ->subject($subject)
             // テンプレート
-            ->text('emails.absent_apply_to_teacher');
+            ->text('emails.extra_class_apply_to_office');
     }
 }

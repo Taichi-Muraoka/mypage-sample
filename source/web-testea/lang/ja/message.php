@@ -86,19 +86,19 @@ return [
         'absent_apply_accept_student' => [
             'title' => "欠席申請受付",
             'text' => "以下の欠席申請を受け付けました。\n" .
-                "授業日時：:lessonDate :startTime\n" .
-                "教室：:roomName\n",
+                "授業日・時限：:targetDate :periodNo時限目\n" .
+                "校舎：:campusName\n",
         ],
 
         //--------------
         // 欠席申請
-        // 欠席申請受付（教師）
+        // 欠席申請受付（講師）
         //--------------
-        'absent_apply_accept_teacher' => [
+        'absent_apply_accept_tutor' => [
             'title' => "生徒欠席連絡",
-            'text' => ":snameさんより、授業欠席の連絡がありました。\n" .
-                "授業日時：:lessonDate :startTime\n" .
-                "教室：:roomName\n",
+            'text' => ":studentNameさんより、授業欠席の連絡がありました。\n" .
+                "授業日・時限：:targetDate :periodNo時限目\n" .
+                "校舎：:campusName\n",
         ],
 
         //--------------
@@ -117,7 +117,7 @@ return [
             'title' => "面談スケジュール登録のお知らせ",
             'text' => "面談スケジュールの登録を行いました。\n" .
                 "詳細はカレンダーよりご確認ください。\n" .
-                "面談日時：:conferenceDate :startTime\n" . 
+                "面談日時：:conferenceDate :startTime\n" .
                 "校舎：:roomName\n",
         ],
     ],
@@ -139,14 +139,21 @@ return [
         ],
 
         //-------------------
-        // 欠席申請
+        // 欠席申請(管理者)
         //-------------------
         'absent_apply_to_office' => [
             'subject' => "【" . config('app.name') . "】" . "欠席申請"
         ],
 
         //-------------------
-        // 欠席申請(教師)
+        // 欠席申請受付(生徒)
+        //-------------------
+        'absent_apply_to_student' => [
+            'subject' => "【" . config('app.name') . "】" . "欠席申請受付"
+        ],
+
+        //-------------------
+        // 欠席申請受付(講師)
         //-------------------
         'absent_apply_to_teacher' => [
             'subject' => "【" . config('app.name') . "】" . "生徒欠席連絡"
@@ -183,6 +190,13 @@ return [
         //-------------------
         'mypage_guide_rejoin_to_tutor' => [
             'subject' => "【" . config('app.name') . "】" . "マイページログイン案内"
+        ],
+
+        //-------------------
+        // 追加授業依頼(管理者)
+        //-------------------
+        'extra_class_apply_to_office' => [
+            'subject' => "【" . config('app.name') . "】" . "追加授業依頼"
         ],
     ],
 

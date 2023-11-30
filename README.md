@@ -1,6 +1,80 @@
 # testea-mypage
 テスティー様向けマイページ（塾管理システム）開発のリポジトリ  
 
+- [testea-mypage](#testea-mypage)
+  - [テスト環境](#テスト環境)
+  - [Mailtrap](#mailtrap)
+  - [メールアカウント](#メールアカウント)
+  - [ブランチ](#ブランチ)
+  - [バージョン](#バージョン)
+  - [ソース・課題管理](#ソース課題管理)
+    - [GitHub](#github)
+  - [README.mdや各種mdファイルについて](#readmemdや各種mdファイルについて)
+
+
+## テスト環境
+
+社内向け用に、さくらのレンタルサーバを契約。  
+試験に使用したり、お客様にモックをお見せするのに使用する。
+
+|URL|備考|
+| ---- | ---- |
+|https://testea-dev.rulez.jp/|モック用とした。mock_20230915ブランチを参照|
+|https://testea-dev2.rulez.jp/|開発用とした。developブランチを参照|  
+
+
+開発用サイトのログイン情報  
+2023/11/28現在では、開発用初期投入データが入っている状態。  
+SharePointの テスティ― > テーブル設計　> 開発用初期投入データ_0919.xlsx  
+の[accounts]シートを参照のこと。
+
+
+## Mailtrap
+
+テスト時に以下のMailtrapのアカウントを共有で使用する。  
+https://mailtrap.io/
+
+|メールアドレス|PW|備考|
+| ---- | ---- | ---- |
+|mypage_admin@testea-dev.rulez.jp|testMailT||
+
+
+## メールアカウント
+
+開発では使用しないが、一応、メールアカウントを用意。  
+mailtrap用のアカウント取得に使用した。  
+→基本は使用しない。
+
+|メールアドレス|PW|備考|
+| ---- | ---- | ---- |
+|mypage_admin@testea-dev.rulez.jp|test9999|マイページの管理者用アドレス|
+
+Webメールで見る場合は以下  
+以下にアクセス  
+https://secure.sakura.ad.jp/rscontrol/?webmail=1
+
+
+## ブランチ
+
+|ブランチ|説明|
+| ---- | ---- |
+|master|リリース済みブランチ|
+|develop|開発用ブランチ|
+|mock_20230915|モック用ブランチ|
+
+
+## バージョン
+
+2023.11.28時点  
+
+||ローカル|さくら|
+| ---- | ---- | ---- |
+|PHP|8.1.xx|8.1.24|
+|DB|MariaDB 10.4.xx|MySQL 5.7|
+|Laravel|10.24.0|10.33.0|  
+
+※上記はdevelop環境。mock環境のバージョンは古いので注意！  
+
 
 ## ソース・課題管理
 
@@ -27,3 +101,14 @@ https://github.com/cw-develop/testea-mypage
 1行目：#1 変更内容の要約  （課題番号、タイトル、概要）
 2行目以降：変更した理由（内容、詳細）
 ```
+
+
+## README.mdや各種mdファイルについて
+
+VSCodeと以下の拡張機能で作成
+
+- Markdown All in One
+- Markdown TOC  
+(GitHubはTOCに対応していないためこの拡張機能でTOCを手動作成)
+
+
