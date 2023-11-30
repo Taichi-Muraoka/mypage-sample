@@ -22,7 +22,11 @@
         <tr v-for="item in paginator.data" v-cloak>
             <td>@{{item.school_year}}</td>
             <td>@{{item.room_name}}</td>
-            <td>@{{item.import_state}}</td>
+            <td>
+                <span v-if="item.import_state == {{ App\Consts\AppConst::CODE_MASTER_20_0 }}"
+                    class="text-danger">@{{item.import_state_name}}</span>
+                <span v-else>@{{item.import_state_name}}</span>
+            </td>
             <td>
                 <x-button.list-send vueHref="'{{ route('year_schedule_import-import', '')}}/' + item.id" caption="取込" />
             </td>

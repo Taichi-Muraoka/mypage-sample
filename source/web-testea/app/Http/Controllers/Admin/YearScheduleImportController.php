@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
-use App\Models\BatchMng;
-use App\Models\AdminUser;
+use Illuminate\Support\Facades\Log;
 use App\Models\CodeMaster;
 use App\Models\YearlySchedule;
 use App\Models\YearlySchedulesImport;
@@ -55,8 +55,9 @@ class YearScheduleImportController extends Controller
                 'yearly_schedules_import_id as id',
                 'school_year',
                 'import_date',
+                'import_state',
                 'room_names.room_name as room_name',
-                'mst_codes.name as import_state',
+                'mst_codes.name as import_state_name',
             )
             // 校舎名の取得
             ->leftJoinSub($room_names, 'room_names', function ($join) {
@@ -105,6 +106,7 @@ class YearScheduleImportController extends Controller
             ->select(
                 'yearly_schedules_import_id as id',
                 'school_year',
+                'campus_cd',
                 'import_date',
                 'room_names.room_name as room_name',
             )
@@ -114,10 +116,18 @@ class YearScheduleImportController extends Controller
             })
             ->firstOrFail();
 
+        $editData = [
+            'yearly_schedules_import_id' => $yeary_schedules_import->id,
+            'campus_cd' => $yeary_schedules_import->campus_cd,
+            'school_year' => $yeary_schedules_import->school_year,
+        ];
+
         return view('pages.admin.year_schedule_import-import', [
             'rules' => $this->rulesForInput(),
             'school_year' => $yeary_schedules_import->school_year,
-            'room_name' => $yeary_schedules_import->room_name
+            'campus_cd' => $yeary_schedules_import->campus_cd,
+            'editData' => $editData,
+            'room_name' => $yeary_schedules_import->room_name,
         ]);
     }
 
@@ -141,22 +151,91 @@ class YearScheduleImportController extends Controller
 
         // アップロードファイルの保存
         $path = $this->fileUploadSave($request, $uploadDir, 'upload_file');
-        $base_path = base_path();
 
         // 実行者のアカウントIDを取得
         $account_id = Auth::user()->account_id;
 
-        // 非同期実行する
-        if (strpos(PHP_OS, 'WIN') !== false) {
-            // Windows
-            $command = 'start /b /d ' . base_path() . ' php artisan command:YearScheduleImport ' . $path . ' ' . $account_id;
-            $fp = popen($command, 'r');
-            pclose($fp);
-        } else {
-            // Linux
-            $command = "cd {$base_path} && php artisan command:YearScheduleImport {$path} {$account_id} > /dev/null &";
-            exec($command);
+        try {
+            // CSVファイルのパスと実行者のアカウントIDを受け取る
+            $school_year = $request['school_year'];
+            $campus_cd = $request['campus_cd'];
+            $yearly_schedules_import_id = $request['yearly_schedules_import_id'];
+            $datas = [];
+
+            Log::info("Batch yearScheduleImport Start, PATH: {$path}, ACCOUNT_ID: {$account_id}");
+
+            try {
+                // CSVデータの読み込み
+                $datas = $this->readData($path);
+
+                $datas = $datas["datas"];
+
+                if (empty($datas)) {
+                    throw new ReadDataValidateException(Lang::get('validation.invalid_file')
+                        . "(データ件数不正)");
+                }
+            } catch (ReadDataValidateException  $e) {
+                // 通常は事前にバリデーションするのでここはありえないのでエラーとする
+                throw $e;
+            }
+
+            // トランザクション(例外時は自動的にロールバック)
+            DB::transaction(function () use ($datas, $school_year, $campus_cd, $yearly_schedules_import_id) {
+
+                // 元々のデータを削除
+                YearlySchedule::query()
+                    ->where('school_year', $school_year)
+                    ->where('campus_cd', $campus_cd)
+                    ->forceDelete();
+
+                $insertCount = 0;
+
+                $week = [
+                    '月' => AppConst::CODE_MASTER_16_1,
+                    '火' => AppConst::CODE_MASTER_16_2,
+                    '水' => AppConst::CODE_MASTER_16_3,
+                    '木' => AppConst::CODE_MASTER_16_4,
+                    '金' => AppConst::CODE_MASTER_16_5,
+                    '土' => AppConst::CODE_MASTER_16_6,
+                    '日' => AppConst::CODE_MASTER_16_7,
+                ];
+
+                // スケジュール情報テーブルの登録（Insert）
+                foreach ($datas as $data) {
+
+                    $yearlySchedule = new YearlySchedule;
+                    $yearlySchedule['school_year'] = $school_year;
+                    $yearlySchedule['campus_cd'] = $campus_cd;
+                    $yearlySchedule['lesson_date'] = $data['年月日'];
+                    $yearlySchedule['day_cd'] = $week[$data['曜日']];
+                    $yearlySchedule['date_kind'] = $data['期間区分コード'];
+                    $yearlySchedule['school_month'] = $data['月度'];
+                    $yearlySchedule['week_count'] = $data['週数'];
+
+                    $yearlySchedule->save();
+                    $insertCount++;
+                }
+
+                $insertCount = (string) $insertCount;
+
+                $query = YearlySchedulesImport::query();
+                $yearlyScheduleImport = $query
+                    ->where('yearly_schedules_import_id', $yearly_schedules_import_id)
+                    ->firstOrFail();
+
+                // 年間予定取込
+                $yearlyScheduleImport->import_state = AppConst::CODE_MASTER_20_1;
+                $yearlyScheduleImport->import_date = now();
+                $yearlyScheduleImport->save();
+
+                Log::info("Insert {$insertCount} Records. yearScheduleImport Succeeded.");
+            });
+        } catch (\Exception  $e) {
+            // この時点では補足できないエラーとして、詳細は返さずエラーとする
+            Log::error($e);
         }
+        // 念のため明示的に捨てる
+        $datas = null;
 
         return;
     }
@@ -203,16 +282,14 @@ class YearScheduleImportController extends Controller
      */
     private function readData($path)
     {
-        // CSVのヘッダ項目
         $csvHeaders = [
-            'lesson_date',
-            'day_cd',
-            'date_kind_name',
-            'date_kind',
-            'school_month',
-            'week_count'
+            '年月日',
+            '曜日',
+            '期間区分',
+            '期間区分コード',
+            '月度',
+            '週数'
         ];
-        
         $headers = [];
 
         // CSV読み込み
@@ -226,10 +303,10 @@ class YearScheduleImportController extends Controller
                 $headers = $line;
 
                 // [バリデーション] ヘッダが想定通りかチェック
-                // if ($headers !== $csvHeaders) {
-                //     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                //         . "(" . config('appconf.upload_file_csv_name_T01') . "：ヘッダ行不正)");
-                // }
+                if ($headers !== $csvHeaders) {
+                    throw new ReadDataValidateException(Lang::get('validation.invalid_file')
+                         . "：ヘッダ行不正)");
+                }
                 continue;
             }
 
@@ -239,39 +316,46 @@ class YearScheduleImportController extends Controller
             // [バリデーション] データ行の列の数のチェック
             if (count($line) !== count($csvHeaders)) {
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                    . "(" . config('appconf.upload_file_csv_name_T01') . "：データ列数不正)");
+                     . "：データ列数不正)");
             }
 
             // headerをもとに、値をセットしたオブジェクトを生成
             $values = array_combine($headers, $line);
 
             // [バリデーション] データ行の値のチェック
-            $validator = Validator::make(
-                // 対象
-                $values,
-                // バリデーションルール
-                YearlySchedule::fieldRules('school_year', ['required'])
-                    + YearlySchedule::fieldRules('campus_cd', ['required'])
-                    + YearlySchedule::fieldRules('lesson_date', ['required'])
-                    + YearlySchedule::fieldRules('day_cd', ['required'])
-                    + YearlySchedule::fieldRules('date_kind', ['required'])
-                    + YearlySchedule::fieldRules('school_month', ['required'])
-                    + YearlySchedule::fieldRules('week_count', ['required'])
-            );
+            $rules = [];
+            $rules += ['年月日' => [YearlySchedule::fieldRules('lesson_date'), 'required']];
+            $rules += ['曜日' => ['required', 'max:1', 'regex:/^(月|火|水|木|金|土|日\d*)$/']];
+            $rules += ['期間区分' => ['string', 'max:50']];
+            $rules += ['期間区分コード' => ['required', 'max:1', 'regex:/^([0-3]|[9]\d*)$/']];
+            $rules += ['月度' => ['required', 'max:2', 'regex:/^([0-9]|[1][0-2]\d*)$/']];
+            $rules += ['週数' => ['required', 'max:1', 'regex:/^(0|[0-4]\d*)$/']];
+
+            $validator = Validator::make($values, $rules);
 
             if ($validator->fails()) {
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                    . "(" . config('appconf.upload_file_csv_name_T01') . "：データ項目不正)");
+                     . "：データ項目不正)");
             }
 
-            // MEMO: スケジュール情報は期間が絞られている前提とし授業日のチェックを行わない
-
-            // 10行目までチェックする
-            if ($i === 10) {
-                break;
+            foreach ($values as $key => $val) {
+                // 空白はnullに変換
+                if ($values[$key] === '') {
+                    $values[$key] = null;
+                }
             }
+
+            // リストに保持しておく
+            $datas["datas"][] = $values;
+            $datas["ids"]['lesson_date'] = $values["年月日"];
+            $datas["ids"]['campus_cd'] = 02;
         }
-        return;
+
+        // sidをユニークにする
+        $datas["ids"] = array_unique($datas["ids"]);
+        $datas["ids"] = array_values($datas["ids"]);
+
+        return $datas;
     }
 
     /**
@@ -281,19 +365,7 @@ class YearScheduleImportController extends Controller
      */
     private function rulesForInput()
     {
-
         $rules = array();
-
-        // 独自バリデーション: ファイル名のチェック
-        $validationFileName = function ($attribute, $value, $fail) {
-
-            // ファイル名の先頭をチェック
-            // 想定：年次スケジュール情報_20201124114040.zip
-            $fileName = config('appconf.upload_file_name_year_schedule_import');
-            if (!preg_match('/^' . $fileName . '[0-9]{14}.zip$/', $value)) {
-                return $fail(Lang::get('validation.invalid_file'));
-            }
-        };
 
         //-----------------------------
         // ファイルアップロード

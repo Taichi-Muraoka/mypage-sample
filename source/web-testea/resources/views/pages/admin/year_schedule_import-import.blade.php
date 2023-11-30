@@ -25,6 +25,11 @@
 
     <x-input.file caption="年間業カレンダー情報ファイル" id="upload_file" />
 
+    {{-- hidden --}}
+    <x-input.hidden id="yearly_schedules_import_id" :editData=$editData />
+    <x-input.hidden id="campus_cd" :editData=$editData />
+    <x-input.hidden id="school_year" :editData=$editData />
+
     <x-bs.callout>
         ファイル形式：CSV形式
     </x-bs.callout>
