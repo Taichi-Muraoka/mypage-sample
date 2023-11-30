@@ -1318,7 +1318,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/season_mng/exec_modal', [SeasonMngController::class, 'execModal'])->name('season_mng-exec_modal');
 
     // 受付期間登録画面
-    Route::get('/season_mng/edit/{changeId}', [SeasonMngController::class, 'edit'])->name('season_mng-edit');
+    Route::get('/season_mng/edit/{seasonMngId}', [SeasonMngController::class, 'edit'])->name('season_mng-edit');
 
     // 編集処理
     Route::post('/season_mng/update', [SeasonMngController::class, 'update'])->name('season_mng-update');
