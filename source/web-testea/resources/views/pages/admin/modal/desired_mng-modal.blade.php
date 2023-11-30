@@ -2,7 +2,6 @@
 
 @section('modal-body')
 
-
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true>
     <tr>
