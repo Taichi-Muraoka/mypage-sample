@@ -771,6 +771,43 @@ trait CtrlModelTrait
     }
 
     /**
+     * 受験年度プルダウンメニューのリストを取得
+     *
+     * @return array
+     */
+    protected function mdlGetExamYearList()
+    {
+        // システムマスタ「現年度」を取得
+        $currentYear = MstSystem::select('value_num')
+            ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
+            ->first();
+
+        // 現年度～2年後までのリストを作る 例2023～2025
+        $examYearList = [];
+        for ($i = 0; $i <= 2; $i++) {
+            $examYearList += array($currentYear->value_num + $i => ["value" => $currentYear->value_num + $i]);
+        }
+
+        return $examYearList;
+    }
+
+    /**
+     * 志望順プルダウンメニューのリストを取得
+     *
+     * @return array
+     */
+    protected function mdlGetPriorityList()
+    {
+        // 1～10までのリストを作る
+        $priorityList = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $priorityList += array($i => ["value" => $i]);
+        }
+
+        return $priorityList;
+    }
+
+    /**
      * 登録画面プルダウン用データフォーマット
      * name を 「コード (名称)」 の形式にする
      *
