@@ -10,7 +10,7 @@
     </tr>
     <tr>
         <th width="35%">授業日・時限</th>
-        <td v-cloak>@{{$filters.formatYmd(item.lesson_date)}} @{{item.period_no}}時限</td>
+        <td v-cloak>@{{$filters.formatYmdDay(item.lesson_date)}} @{{item.period_no}}時限</td>
     </tr>
     <tr>
         <th>校舎</th>

@@ -61,7 +61,7 @@
 
         {{-- テーブル行 --}}
         <tr v-for="item in paginator.data" v-cloak>
-            <x-bs.td-sp caption="授業日・時限">@{{$filters.formatYmd(item.lesson_date)}} @{{item.period_no}}限</x-bs.td-sp>
+            <x-bs.td-sp caption="授業日・時限">@{{$filters.formatYmdDay(item.lesson_date)}} @{{item.period_no}}限</x-bs.td-sp>
             <x-bs.td-sp caption="校舎">@{{item.room_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="コース">@{{item.course_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="講師名">@{{item.tutor_name}}</x-bs.td-sp>
@@ -70,8 +70,6 @@
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
-                {{-- スペース --}}
-                &nbsp;
                 <x-button.list-edit vueHref="'{{ route('report_regist-edit', '') }}/' + item.id" 
                 {{-- 承認のときは非活性 --}}
                 vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }}"/>
