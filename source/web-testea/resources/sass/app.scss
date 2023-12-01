@@ -346,6 +346,11 @@ label:not(.form-check-label):not(.custom-file-label) {
     /*font-weight: bold;*/
 }
 
+/* 非アクティブ時のボタンカーソルの統一 ------------------------*/
+.btn.disabled, .btn:disabled {
+    cursor: pointer !important;
+}
+
 /* カレンダー ----------------------------*/
 
 /* 当日の背景色 */

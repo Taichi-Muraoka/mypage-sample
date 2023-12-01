@@ -51,8 +51,12 @@ class SeasonStudentController extends Controller
      */
     public function index()
     {
+        // 現在日を取得
+        $todayYmd = date("Ymd");
 
-        return view('pages.student.season_student');
+        return view('pages.student.season_student', [
+            'todayYmd' => $todayYmd,
+        ]);
     }
 
     /**
@@ -82,11 +86,10 @@ class SeasonStudentController extends Controller
                 'mst_codes_38.gen_item2 as season_name',
                 'room_names.room_name as campus_name',
                 'season_mng.s_start_date',
+                'season_mng.s_end_date',
                 'season_student_requests.regist_status',
                 'mst_codes_5.name as status_name',
-                'season_student_requests.apply_date',
-                // 受付終了日を経過していないか判定するために取得（0以上なら期間内）
-                DB::raw('DATEDIFF(season_mng.s_end_date, curdate()) as datediff'),
+                'season_student_requests.apply_date'
             )
             // 校舎名の取得
             ->leftJoinSub($room_names, 'room_names', function ($join) {

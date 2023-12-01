@@ -91,13 +91,9 @@
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
-                {{-- スペース --}}
-                &nbsp;
                 <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval"
                     :vueDataAttr="['id' => 'item.id']"
                     vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }}"/>
-                {{-- スペース --}}
-                &nbsp;
                 <x-button.list-edit vueHref="'{{ route('report_check-edit', '') }}/' + item.id"
                     {{-- 承認のときは非活性 --}}
                     vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }}"/>
