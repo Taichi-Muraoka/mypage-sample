@@ -177,6 +177,9 @@ class SeasonMngTutorController extends Controller
     public function detail($seasonTutorId)
     {
 
+        // IDのバリデーション
+        $this->validateIds($seasonTutorId);
+
         // クエリを作成（講師連絡情報）
         $query = SeasonTutorRequest::query();
 

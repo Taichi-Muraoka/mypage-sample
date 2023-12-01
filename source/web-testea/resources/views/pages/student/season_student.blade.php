@@ -31,7 +31,7 @@
                 {{-- 未登録の場合（登録期間内の場合のみ押下可） --}}
                 <div v-show="item.regist_status=={{ App\Consts\AppConst::CODE_MASTER_5_0 }}">
                     <x-button.list-edit caption="登録" vueHref="'{{ route('season_student-edit', '') }}/' + item.season_student_id"
-                        vueDisabled="item.datediff < 0 || item.datediff == null" />
+                        vueDisabled="!item.s_end_date || $filters.formatYmdNoH(item.s_end_date) < {{$todayYmd}}" />
                 </div>
                 {{-- 登録済の場合 --}}
                 <div v-show="item.regist_status=={{ App\Consts\AppConst::CODE_MASTER_5_1 }}">

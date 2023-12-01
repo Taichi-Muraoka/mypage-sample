@@ -23,7 +23,7 @@ export default class AppClass extends PageBase {
             // 完了処理後
             afterExec: () => {
                 // 一覧を再表示する
-                searchForm.vueSearchList.refresh();
+                $vueSearchList.refresh();
             }
         });
         // 検索一覧の表示

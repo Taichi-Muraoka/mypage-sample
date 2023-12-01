@@ -480,6 +480,11 @@ trait FuncScheduleTrait
      */
     private function fncScheSearchBooth($campusCd, $boothCd, $targetDate, $periodNo, $howToKind, $scheduleId, $checkOnly = false)
     {
+        if (!$boothCd) {
+            // $boothCdがnullの場合、そのまま返す
+            return $boothCd;
+        }
+
         // ブースマスタから対象ブースの用途種別を取得
         $usage_kind = $this->fncScheGetBoothUsage($campusCd, $boothCd);
         if (

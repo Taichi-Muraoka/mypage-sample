@@ -1178,16 +1178,28 @@ class AppConst
      * 春期特別期間
      */
     const CODE_MASTER_38_1 = 1;
+    /**
+     * 春期特別期間（文字列コード）
+     */
+    const CODE_MASTER_38_GEN1_1 = '01';
 
     /**
      * 夏期特別期間
      */
     const CODE_MASTER_38_2 = 2;
+    /**
+     * 夏期特別期間（文字列コード）
+     */
+    const CODE_MASTER_38_GEN1_2 = '02';
 
     /**
      * 冬期特別期間
      */
     const CODE_MASTER_38_3 = 3;
+    /**
+     * 冬期特別期間（文字列コード）
+     */
+    const CODE_MASTER_38_GEN1_3 = '03';
 
     /**
      * 休日
@@ -1485,19 +1497,14 @@ class AppConst
     const CODE_MASTER_48 = 48;
 
     /**
-     * 受付期間前
+     * 未確定
      */
     const CODE_MASTER_48_0 = 0;
 
     /**
-     * 未確定
-     */
-    const CODE_MASTER_48_1 = 1;
-
-    /**
      * 確定済
      */
-    const CODE_MASTER_48_2 = 2;
+    const CODE_MASTER_48_1 = 1;
 
     //-----------
     // 学校種
@@ -1880,7 +1887,7 @@ class AppConst
      * バッチ種別 データ移行
      */
     const BATCH_TYPE_21 = 21;
-    
+
     //==========================
     // システムマスタ システム変数ID
     //==========================

@@ -24,119 +24,28 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023年夏期</td>
-            <td>久我山</td>
-            <td>2023/07/01</td>
-            <td>2023/07/23</td>
-            <td>2023/07/01</td>
-            <td>2023/08/26</td>
-            <td>受付前</td>
-            <td></td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{item.year}}年@{{item.season_name}}</td>
+            <td>@{{item.campus_name}}</td>
+            <td>@{{$filters.formatYmd(item.t_start_date)}}</td>
+            <td>@{{$filters.formatYmd(item.t_end_date)}}</td>
+            <td>@{{$filters.formatYmd(item.s_start_date)}}</td>
+            <td>@{{$filters.formatYmd(item.s_end_date)}}</td>
+            {{-- 確定状態 講師受付開始日設定済み かつ 受付開始日以降の場合 --}}
+            <td v-show="item.t_start_date && $filters.formatYmdNoH(item.t_start_date) <= {{$todayYmd}}">@{{item.status_name}}</td>
+            {{-- 確定状態 講師受付開始日未設定 または 受付開始日以前の場合 --}}
+            <td v-show="!item.t_start_date || $filters.formatYmdNoH(item.t_start_date) > {{$todayYmd}}">@{{item.status_name_bef}}</td>
+            <td>@{{$filters.formatYmd(item.confirm_date)}}</td>
             <td>
-                <x-button.list-edit caption="受付期間登録" href="{{ route('season_mng-edit',1) }}" />
-                <x-button.list-dtl caption="コマ組み確定" btn="btn-primary" dataTarget="#modal-exec-confirm" />
+                {{-- 受付期間登録ボタン 生徒受付終了日設定済み かつ 受付終了日以降の場合はdisable --}}
+                <x-button.list-edit vueHref="'{{ route('season_mng-edit', '') }}/' + item.season_mng_id"
+                    caption="受付期間登録" vueDisabled="item.s_end_date && $filters.formatYmdNoH(item.s_end_date) < {{$todayYmd}}" />
+                {{-- コマ組み確定ボタン 受付期間外の場合はdisable --}}
+                <x-button.list-dtl caption="コマ組み確定" btn="btn-primary" dataTarget="#modal-exec-confirm"
+                    :vueDataAttr="['season_mng_id' => 'item.season_mng_id']"
+                    vueDisabled="$filters.formatYmdNoH(item.s_start_date) > {{$todayYmd}} || $filters.formatYmdNoH(item.s_end_date) < {{$todayYmd}}" />
             </td>
         </tr>
-        <tr>
-            <td>2023年夏期</td>
-            <td>西永福</td>
-            <td>2023/07/01</td>
-            <td>2023/07/23</td>
-            <td>2023/07/01</td>
-            <td>2023/08/26</td>
-            <td>受付前</td>
-            <td></td>
-            <td>
-                <x-button.list-edit caption="受付期間登録" href="{{ route('season_mng-edit',1) }}" />
-                <x-button.list-dtl caption="コマ組み確定" btn="btn-primary" dataTarget="#modal-exec-confirm" disabled=true />
-            </td>
-        </tr>
-        <tr>
-            <td>2023年夏期</td>
-            <td>駒込</td>
-            <td>2023/07/01</td>
-            <td>2023/07/09</td>
-            <td>2023/07/01</td>
-            <td>2023/08/26</td>
-            <td>受付前</td>
-            <td></td>
-            <td>
-                <x-button.list-edit caption="受付期間登録" href="{{ route('season_mng-edit',1) }}" />
-                <x-button.list-dtl caption="コマ組み確定" btn="btn-primary" dataTarget="#modal-exec-confirm" disabled=true />
-            </td>
-        </tr>
-        <tr>
-            <td>2023年夏期</td>
-            <td>日吉</td>
-            <td>2023/07/01</td>
-            <td>2023/07/23</td>
-            <td>2023/07/01</td>
-            <td>2023/08/31</td>
-            <td>受付前</td>
-            <td></td>
-            <td>
-                <x-button.list-edit caption="受付期間登録" href="{{ route('season_mng-edit',1) }}" />
-                <x-button.list-dtl caption="コマ組み確定" btn="btn-primary" dataTarget="#modal-exec-confirm" disabled=true />
-            </td>
-        </tr>
-        <tr>
-            <td>2023年春期</td>
-            <td>久我山</td>
-            <td>2023/03/01</td>
-            <td>2023/03/25</td>
-            <td>2023/03/01</td>
-            <td>2023/04/10</td>
-            <td>確定済</td>
-            <td>2023/03/20</td>
-            <td>
-                <x-button.list-edit caption="受付期間登録" href="{{ route('season_mng-edit',1) }}" disabled=true />
-                <x-button.list-dtl caption="コマ組み確定" btn="btn-primary" dataTarget="#modal-exec-confirm" disabled=true />
-            </td>
-        </tr>
-        <tr>
-            <td>2023年春期</td>
-            <td>西永福</td>
-            <td>2023/03/01</td>
-            <td>2023/03/25</td>
-            <td>2023/03/01</td>
-            <td>2023/04/10</td>
-            <td>確定済</td>
-            <td>2023/03/19</td>
-            <td>
-                <x-button.list-edit caption="受付期間登録" href="{{ route('season_mng-edit',1) }}" disabled=true />
-                <x-button.list-dtl caption="コマ組み確定" btn="btn-primary" dataTarget="#modal-exec-confirm" disabled=true />
-            </td>
-        </tr>
-        <tr>
-            <td>2023年春期</td>
-            <td>駒込</td>
-            <td>2023/03/01</td>
-            <td>2023/03/25</td>
-            <td>2023/03/01</td>
-            <td>2023/04/10</td>
-            <td>確定済</td>
-            <td>2023/03/20</td>
-            <td>
-                <x-button.list-edit caption="受付期間登録" href="{{ route('season_mng-edit',1) }}" disabled=true />
-                <x-button.list-dtl caption="コマ組み確定" btn="btn-primary" dataTarget="#modal-exec-confirm" disabled=true />
-            </td>
-        </tr>
-        <tr>
-            <td>2023年春期</td>
-            <td>日吉</td>
-            <td>2023/03/01</td>
-            <td>2023/03/25</td>
-            <td>2023/03/01</td>
-            <td>2023/04/10</td>
-            <td>確定済</td>
-            <td>2023/03/21</td>
-            <td>
-                <x-button.list-edit caption="受付期間登録" href="{{ route('season_mng-edit',1) }}" disabled=true />
-                <x-button.list-dtl caption="コマ組み確定" btn="btn-primary" dataTarget="#modal-exec-confirm" disabled=true />
-            </td>
-        </tr>
-
     </x-bs.table>
 
 </x-bs.card-list>
