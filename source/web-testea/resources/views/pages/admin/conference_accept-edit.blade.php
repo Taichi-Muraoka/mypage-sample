@@ -1,4 +1,5 @@
 @extends('adminlte::page')
+@inject('formatter','App\Libs\CommonDateFormat')
 
 @section('title', '面談日程登録')
 
@@ -26,13 +27,13 @@
         </tr>
         <tr>
             <th>第１希望日時</th>
-            <td>{{$conference_date1}} {{$start_time1}}</td>
+            <td>{{$formatter::formatYmdDay($conference_date1)}} {{$start_time1}}</td>
         </tr>
         <tr>
             <th>第２希望日時</th>
             <td>
                 @if ($conference_date2 != null)
-                    {{date('Y/m/d', strtotime($conference_date2))}}
+                    {{$formatter::formatYmdDay($conference_date2)}}
                     {{$start_time2}}
                 @endif
             </td>
@@ -41,7 +42,7 @@
             <th>第３希望日時</th>
             <td>
                 @if ($conference_date3 != null)
-                    {{date('Y/m/d', strtotime($conference_date3))}}
+                    {{$formatter::formatYmdDay($conference_date3)}}
                     {{$start_time3}}
                 @endif
             </td>

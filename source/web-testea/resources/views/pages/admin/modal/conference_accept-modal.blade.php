@@ -19,15 +19,15 @@
     </tr>
     <tr>
         <th>第１希望日時</th>
-        <td>@{{$filters.formatYmd(item.conference_date1)}} @{{$filters.formatHm(item.start_time1)}}</td>
+        <td>@{{$filters.formatYmdDay(item.conference_date1)}} @{{$filters.formatHm(item.start_time1)}}</td>
     </tr>
     <tr>
         <th>第２希望日時</th>
-        <td>@{{$filters.formatYmd(item.conference_date2)}} @{{$filters.formatHm(item.start_time2)}}</td>
+        <td>@{{$filters.formatYmdDay(item.conference_date2)}} @{{$filters.formatHm(item.start_time2)}}</td>
     </tr>
     <tr>
         <th>第３希望日時</th>
-        <td>@{{$filters.formatYmd(item.conference_date3)}} @{{$filters.formatHm(item.start_time3)}}</td>
+        <td>@{{$filters.formatYmdDay(item.conference_date3)}} @{{$filters.formatHm(item.start_time3)}}</td>
     </tr>
     <tr>
         <th>特記事項</th>
@@ -35,7 +35,7 @@
     </tr>
     <tr>
         <th>面談日</th>
-        <td>@{{$filters.formatYmd(item.conference_date)}}</td>
+        <td>@{{$filters.formatYmdDay(item.conference_date)}}</td>
     </tr>
     <tr>
         <th>面談担当者</th>
