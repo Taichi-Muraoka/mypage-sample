@@ -844,20 +844,20 @@ trait CtrlModelTrait
             ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
             ->first();
 
-        // 期間区分を取得する（サブコード1のみ：春期1,夏期2,冬期3）
-        $termList = CodeMaster::select('code')
+        // 期間区分コード（2桁）を取得する（サブコード1のみ：春期01,夏期02,冬期03）
+        $termList = CodeMaster::select('gen_item1')
             ->where('data_type', AppConst::CODE_MASTER_38)
             ->where('sub_code', AppConst::CODE_MASTER_38_SUB_1)
             ->get();
 
-        // 現年度分 特別期間コード生成 期間区分コードを2桁で0埋め
+        // 現年度分 特別期間コード生成
         $seasonCodes = [];
         foreach ($termList as $term) {
-            $seasonCodes[] = $currentYear->value_num . str_pad($term->code, 2, '0', STR_PAD_LEFT);
+            $seasonCodes[] = $currentYear->value_num . $term->gen_item1;
         }
 
         // 翌年度分 特別期間コード生成 春期のみ
-        $seasonCodes[] = $currentYear->value_num + 1 . str_pad($termList[0]->code, 2, '0', STR_PAD_LEFT);
+        $seasonCodes[] = $currentYear->value_num + 1 . $term->gen_item1;
 
         return $seasonCodes;
     }

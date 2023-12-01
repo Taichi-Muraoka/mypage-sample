@@ -38,8 +38,6 @@
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.transfer_apply_id']" />
-                {{-- スペース --}}
-                &nbsp;
                 {{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
                 <x-button.list-edit vueHref="'{{ route('transfer_student-edit', '') }}/' + item.transfer_apply_id"
                     caption="承認" {{-- 申請者種別=講師 かつ 承認待ちのときは活性 --}}
