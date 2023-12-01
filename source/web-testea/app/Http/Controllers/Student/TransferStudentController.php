@@ -10,15 +10,11 @@ use App\Http\Controllers\Traits\FuncTransferTrait;
 use App\Mail\TransferAdjustmentRequest;
 use App\Mail\TransferApplyRegistSchedule;
 use App\Mail\TransferRemandStudentToAdmin;
-use App\Models\CodeMaster;
-use App\Models\MstCourse;
-use App\Models\MstSubject;
 use App\Models\Notice;
 use App\Models\NoticeDestination;
 use App\Models\Schedule;
 use App\Models\TransferApplication;
 use App\Models\TransferApplicationDate;
-use App\Models\Tutor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -683,17 +679,17 @@ class TransferStudentController extends Controller
         // 候補日選択の場合 必須
         $rules += ['preferred_date1_select' => ['required_if:preferred1_type,' . self::PREF_TYPE_SELECT]];
         // フリー入力の場合 必須
-        $rules += ['preferred_date1_calender' => ['required_if:preferred1_type,' . self::PREF_TYPE_INPUT]];
+        $rules += ['preferred_date1_calender' => ['required_if:preferred1_type,' . self::PREF_TYPE_INPUT, 'date_format:Y-m-d']];
         $rules += ['preferred_date1_period' => ['required_if:preferred1_type,' . self::PREF_TYPE_INPUT]];
 
         // 独自バリデーション: 第2希望日
         // フリー入力の場合 どちらかが入力されていたら必須
-        $rules += ['preferred_date2_calender' => ['required_with:preferred_date2_period']];
+        $rules += ['preferred_date2_calender' => ['required_with:preferred_date2_period', 'date_format:Y-m-d']];
         $rules += ['preferred_date2_period' => ['required_with:preferred_date2_calender']];
 
         // 独自バリデーション: 第3希望日
         // フリー入力の場合 どちらかが入力されていたら必須
-        $rules += ['preferred_date3_calender' => ['required_with:preferred_date3_period']];
+        $rules += ['preferred_date3_calender' => ['required_with:preferred_date3_period', 'date_format:Y-m-d']];
         $rules += ['preferred_date3_period' => ['required_with:preferred_date3_calender']];
 
 
@@ -770,10 +766,25 @@ class TransferStudentController extends Controller
                     return $fail(Lang::get('validation.preferred_datetime_same'));
                 }
             };
+            $validationPreferred1_input_period =  function ($attribute, $value, $fail) use ($request) {
+                if ((!$request->filled('preferred_date1_calender') || $request['preferred_date1_calender'] == '') ||
+                    (!$request->filled('preferred_date1_period') || $request['preferred_date1_period'] == '')
+                ) {
+                    // 未入力の場合は必須チェックでエラー
+                    return;
+                }
+
+                // 時限リストを取得
+                $list = $this->mdlGetPeriodListByDate($request['campus_cd'], $request['preferred_date1_calender']);
+                if (!isset($list[$value])) {
+                    // 不正な値エラー
+                    return $fail(Lang::get('validation.invalid_input'));
+                }
+            };
 
             // フリー入力の場合
             $rules += ['preferred_date1_calender' => [$validationPreferred1_input_calender, $validationPreferred1_input]];
-            $rules += ['preferred_date1_period' => [$validationPreferred1_input]];
+            $rules += ['preferred_date1_period' => [$validationPreferred1_input, $validationPreferred1_input_period]];
         }
 
         // 独自バリデーション: 第２希望日のチェック 候補日選択リスト
@@ -855,6 +866,13 @@ class TransferStudentController extends Controller
             ) {
                 // カレンダー入力あり・時限入力なし エラー
                 return $fail(Lang::get('validation.preferred_input_reqired'));
+            }
+
+            // 時限リストを取得
+            $list = $this->mdlGetPeriodListByDate($request['campus_cd'], $request['preferred_date2_calender']);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
             }
         };
         $validationPreferred2_input =  function ($attribute, $value, $fail) use ($request, $scheduleDate, $schedulePeriod) {
@@ -993,6 +1011,13 @@ class TransferStudentController extends Controller
             ) {
                 // カレンダー入力あり・時限入力なし エラー
                 return $fail(Lang::get('validation.preferred_input_reqired'));
+            }
+
+            // 時限リストを取得
+            $list = $this->mdlGetPeriodListByDate($request['campus_cd'], $request['preferred_date3_calender']);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
             }
         };
         $validationPreferred3_input =  function ($attribute, $value, $fail) use ($request, $scheduleDate, $schedulePeriod) {
