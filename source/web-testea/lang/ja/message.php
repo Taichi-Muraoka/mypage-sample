@@ -120,6 +120,20 @@ return [
                 "面談日時：:conferenceDate :startTime\n" .
                 "校舎：:roomName\n",
         ],
+        
+        //-------------------
+        // 振替調整 授業登録(講師承認・生徒承認・管理者登録)
+        //-------------------
+        'transfer_apply_regist_schedule' => [
+            'title' => "振替授業登録のお知らせ",
+            'text' => "下記のとおり、振替授業が登録されました。\n" .
+                "詳細はカレンダーよりご確認ください。\n" .
+                "授業日・時限：:targetDate :targetPeriodNo時限目\n" . 
+                "振替日・時限：:transferDate :transferPeriodNo時限目\n" . 
+                "校舎：:roomName\n" . 
+                "講師：:tutorName\n" . 
+                "生徒：:studentName\n"
+        ],
     ],
 
     /*
@@ -198,6 +212,56 @@ return [
         'extra_class_apply_to_office' => [
             'subject' => "【" . config('app.name') . "】" . "追加授業依頼"
         ],
+
+        //-------------------
+        // 振替調整依頼(生徒・講師から)
+        //-------------------
+        'transfer_adjustment_request' => [
+            'subject' => "【" . config('app.name') . "】" . "授業振替調整依頼"
+        ],
+
+        //-------------------
+        // 振替調整依頼 回数超過(講師から)
+        //-------------------
+        'transfer_adjustment_request_over' => [
+            'subject' => "【" . config('app.name') . "】" . "授業振替調整依頼（講師振替依頼回数超過）"
+        ],
+
+        //-------------------
+        // 振替調整 講師差戻し
+        //-------------------
+        'transfer_remand_tutor_to_admin' => [
+            'subject' => "【" . config('app.name') . "】" . "振替授業調整差戻（講師）"
+        ],
+
+        //-------------------
+        // 振替調整 生徒差戻し
+        //-------------------
+        'transfer_remand_student_to_admin' => [
+            'subject' => "【" . config('app.name') . "】" . "振替授業調整差戻（生徒）"
+        ],
+
+        //-------------------
+        // 振替調整 授業登録(講師承認・生徒承認・管理者登録)
+        //-------------------
+        'transfer_apply_regist_schedule' => [
+            'subject' => "【" . config('app.name') . "】" . "振替授業登録のお知らせ"
+        ],
+
+        //-------------------
+        // 振替調整 代講授業登録(生徒へ)
+        //-------------------
+        'substitute_regist_to_student' => [
+            'subject' => "【" . config('app.name') . "】" . "代講授業登録のお知らせ"
+        ],
+
+        //-------------------
+        // 振替調整 代講授業登録(講師へ)
+        //-------------------
+        'substitute_regist_to_tutor' => [
+            'subject' => "【" . config('app.name') . "】" . "代講授業登録のお知らせ"
+        ],
+
     ],
 
     /*

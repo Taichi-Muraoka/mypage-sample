@@ -27,29 +27,21 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/01/10</td>
-            <td>講師</td>
-            <td>2023/01/30 5限</td>
-            <td>個別指導コース</td>
-            <td>CWテスト教師１０１</td>
-            <td>承認待ち</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <x-bs.td-sp caption="申請日">@{{$filters.formatYmd(item.apply_date)}}</x-bs.td-sp>
+            <x-bs.td-sp caption="申請者種別">@{{item.apply_kind_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="授業日・時限">@{{$filters.formatYmd(item.target_date)}} @{{item.period_no}}限</x-bs.td-sp>
+            {{-- <x-bs.td-sp caption="授業日・時限">@{{item.target_date}} @{{item.period_no}}限</x-bs.td-sp> --}}
+            <x-bs.td-sp caption="コース">@{{item.course_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="講師名">@{{item.tutor_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="ステータス">@{{item.approval_status_name_for_student}}</x-bs.td-sp>
             <td>
-                <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('transfer_student-edit', 1) }}" caption="承認" />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/01/09</td>
-            <td>生徒</td>
-            <td>2023/01/29 5限</td>
-            <td>家庭教師</td>
-            <td>CWテスト教師１０１</td>
-            <td>承認待ち</td>
-            <td>
-                <x-button.list-dtl />
-                {{-- 申請者種別が生徒のため更新ボタン非活性 --}}
-                <x-button.list-edit href="{{ route('transfer_student-edit', 2) }}" caption="承認" disabled=true/>
+                {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
+                <x-button.list-dtl :vueDataAttr="['id' => 'item.transfer_apply_id']" />
+                {{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
+                <x-button.list-edit vueHref="'{{ route('transfer_student-edit', '') }}/' + item.transfer_apply_id"
+                    caption="承認" {{-- 申請者種別=講師 かつ 承認待ちのときは活性 --}}
+                    vueDisabled="!(item.approval_status=={{ App\Consts\AppConst::CODE_MASTER_3_1 }} && item.apply_kind=={{ App\Consts\AppConst::CODE_MASTER_53_2 }})" />
             </td>
         </tr>
     </x-bs.table>

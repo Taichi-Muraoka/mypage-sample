@@ -925,6 +925,41 @@ trait CtrlModelTrait
     }
 
     //------------------------------
+    // メールアドレス取得（共通で使用されるもの）
+    //------------------------------
+
+    /**
+     * アカウント情報からメールアドレスの取得
+     *
+     * @param string $accountId アカウントID
+     * @param string $accountType アカウント種別
+     * @return string メールアドレス
+     */
+    protected function mdlGetAccountMail($accountId, $accountType) {
+        $account = Account::select('email')
+            ->where('account_id', $accountId)
+            ->where('account_type', $accountType)
+            ->firstOrFail();
+
+        return $account->email;
+    }
+
+    /**
+     * 校舎マスタからメールアドレスの取得
+     *
+     * @param string $campusCd 校舎コード
+     * @return string メールアドレス
+     */
+    protected function mdlGetCampusMail($campusCd)
+    {
+        $campus = MstCampus::select('email_campus')
+            ->where('campus_cd', $campusCd)
+            ->firstOrFail();
+
+        return $campus->email_campus;
+    }
+
+    //------------------------------
     // join向けリストの作成
     //------------------------------
 

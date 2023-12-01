@@ -133,6 +133,12 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     // 振替希望日登録
     Route::get('/transfer_student/new', [TransferStudentController::class, 'new'])->name('transfer_student-new');
 
+    // 振替希望日プルダウンを選択された際に授業情報を返却する
+    Route::post('/transfer_student/get_data_select_schedule', [TransferStudentController::class, 'getDataSelectSchedule'])->name('transfer_student-get_data_select_schedule');
+
+    // 振替希望日フリー入力した際に時限情報を返却する
+    Route::post('/transfer_student/get_data_select_calender', [TransferStudentController::class, 'getDataSelectCalender'])->name('transfer_student-get_data_select_calender');
+
     // 新規登録処理
     Route::post('/transfer_student/create', [TransferStudentController::class, 'create'])->name('transfer_student-create');
 
@@ -144,6 +150,9 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
 
     // バリデーション(登録用)
     Route::post('/transfer_student/vd_input', [TransferStudentController::class, 'validationForInput'])->name('transfer_student-vd_input');
+
+    // バリデーション(承認用)
+    Route::post('/transfer_student/vd_approval', [TransferStudentController::class, 'validationForApproval'])->name('transfer_student-vd_approval');
 
     //---------------------
     // 追加授業依頼 モック
