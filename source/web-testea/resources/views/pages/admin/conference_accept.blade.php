@@ -81,8 +81,6 @@
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.conference_id']" />
-                {{-- スペース --}}
-                &nbsp;
                 {{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
                 <x-button.list-edit vueHref="'{{ route('conference_accept-edit', '') }}/' + item.conference_id" caption="日程登録" 
                     {{-- 登録済みの場合は非活性 --}}

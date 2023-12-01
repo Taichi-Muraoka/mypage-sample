@@ -31,8 +31,6 @@
             <td>@{{item.type_name}}</td>
             <td>
                 <x-button.list-dtl :vueDataAttr="['template_id' => 'item.template_id']" />
-                {{-- スペース --}}
-                &nbsp;
                 <x-button.list-edit vueHref="'{{ route('notice_template-edit', '') }}/' + item.template_id" />
             </td>
         </tr>

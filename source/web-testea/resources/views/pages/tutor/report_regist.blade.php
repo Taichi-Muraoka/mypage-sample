@@ -70,8 +70,6 @@
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
-                {{-- スペース --}}
-                &nbsp;
                 <x-button.list-edit vueHref="'{{ route('report_regist-edit', '') }}/' + item.id" 
                 {{-- 承認のときは非活性 --}}
                 vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }}"/>

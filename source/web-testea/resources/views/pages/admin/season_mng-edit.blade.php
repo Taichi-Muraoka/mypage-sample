@@ -12,17 +12,18 @@
 
     {{-- hidden --}}
     <x-input.hidden id="season_mng_id" :editData=$editData />
+    <x-input.hidden id="campus_cd" :editData=$editData />
 
     <p>以下の特別期間講習について、受付期間の登録を行います。</p>
 
     <x-bs.table :hover=false :vHeader=true>
         <tr>
-            <th width="35%">特別期間</th>
-            <td>2023年夏期</td>
-        </tr>
+            <th width="35%">特別期間名</th>
+            <td>{{$editData->year}}年{{$editData->season_name}}</td>
+          </tr>
         <tr>
             <th>校舎</th>
-            <td>久我山</td>
+            <td>{{$editData->campus_name}}</td>
         </tr>
     </x-bs.table>
     {{-- 余白 --}}
