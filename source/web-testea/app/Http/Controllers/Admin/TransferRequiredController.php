@@ -6,16 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
 use App\Models\Tutor;
 use App\Models\Schedule;
 use App\Models\CodeMaster;
 use App\Models\MstCourse;
 use App\Models\MstSubject;
-use Illuminate\Support\Facades\Lang;
-//use App\Http\Controllers\Traits\FuncReportTrait;
-use Carbon\Carbon;
 
 /**
  * 要振替授業管理 - コントローラ
@@ -55,7 +51,7 @@ class TransferRequiredController extends Controller
         $tutorList = $this->mdlGetTutorList();
 
         return view('pages.admin.transfer_required', [
-            'rules' => $this->rulesForSearch(),
+            'rules' => $this->rulesForSearch(null),
             'editData' => null,
             'rooms' => $rooms,
             'studentList' => $studentList,
@@ -72,7 +68,7 @@ class TransferRequiredController extends Controller
     public function search(Request $request)
     {
         // バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForSearch())->validate();
+        Validator::make($request->all(), $this->rulesForSearch($request))->validate();
 
         // formを取得
         $form = $request->all();
@@ -161,7 +157,7 @@ class TransferRequiredController extends Controller
     public function validationForSearch(Request $request)
     {
         // リクエストデータチェック
-        $validator = Validator::make($request->all(), $this->rulesForSearch());
+        $validator = Validator::make($request->all(), $this->rulesForSearch($request));
         return $validator->errors();
     }
 
@@ -170,10 +166,60 @@ class TransferRequiredController extends Controller
      *
      * @return array ルール
      */
-    private function rulesForSearch()
+    private function rulesForSearch(?Request $request)
     {
-
         $rules = array();
+
+        // 独自バリデーション: リストのチェック 校舎
+        $validationCampusList =  function ($attribute, $value, $fail) {
+
+            // 初期表示の時はエラーを発生させないようにする
+            if ($value == -1) return;
+
+            // 校舎リストを取得
+            $rooms = $this->mdlGetRoomList(false);
+            if (!isset($rooms[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 生徒ID
+        $validationStudentList =  function ($attribute, $value, $fail) {
+
+            // リストを取得し存在チェック
+            $students = $this->mdlGetStudentList();
+            if (!isset($students[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 生徒ID
+        $validationTutorList =  function ($attribute, $value, $fail) {
+
+            // リストを取得し存在チェック
+            $students = $this->mdlGetTutorList();
+            if (!isset($students[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // FromとToの大小チェックバリデーションを追加(Fromが存在する場合のみ)
+        $ruleTargetDate = Schedule::getFieldRule('target_date');
+        // FromとToの大小チェックバリデーションを追加(Fromが存在する場合のみ)
+        $validateFromTo = [];
+        $keyFrom = 'target_date_from';
+        if (isset($request[$keyFrom]) && filled($request[$keyFrom])) {
+            $validateFromTo = ['after_or_equal:' . $keyFrom];
+        }
+
+        $rules += Schedule::fieldRules('campus_cd', [$validationCampusList]);
+        $rules += Schedule::fieldRules('student_id', [$validationStudentList]);
+        $rules += Schedule::fieldRules('tutor_id', [$validationTutorList]);
+        $rules += ['target_date_from' => $ruleTargetDate];
+        $rules += ['target_date_to' => array_merge($validateFromTo, $ruleTargetDate)];
 
         return $rules;
     }

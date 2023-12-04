@@ -20,10 +20,10 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$studentList :editData=$editData :select2Search=false/>
+            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$studentList :editData=$editData/>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="tutor_id" caption="講師名" :select2=true :mastrData=$tutorList :editData=$editData :select2Search=false/>
+            <x-input.select id="tutor_id" caption="講師名" :select2=true :mastrData=$tutorList :editData=$editData/>
         </x-bs.col2>
     </x-bs.row>
 
