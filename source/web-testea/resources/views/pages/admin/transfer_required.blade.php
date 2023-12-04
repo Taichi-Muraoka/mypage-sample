@@ -9,29 +9,21 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="kinds" caption="校舎" :select2=true>
-                <option value="1">久我山</option>
-                <option value="2">西永福</option>
-                <option value="3">下高井戸</option>
-                <option value="4">駒込</option>
-                <option value="5">日吉</option>
-                <option value="6">自由が丘</option>
-            </x-input.select>
+            @can('roomAdmin')
+            {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData :select2Search=false :blank=false/>
+            @else
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData :select2Search=false/>
+            @endcan
         </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select caption="生徒名" id="student_name" :select2=true :editData=$editData>
-                <option value="1">CWテスト生徒１</option>
-                <option value="2">CWテスト生徒２</option>
-            </x-input.select>
+            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$studentList :editData=$editData :select2Search=false/>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="講師名" id="teacher_name" :select2=true :editData=$editData>
-                <option value="1">CWテスト講師１</option>
-                <option value="2">CWテスト講師２</option>
-            </x-input.select>
+            <x-input.select id="tutor_id" caption="講師名" :select2=true :mastrData=$tutorList :editData=$editData :select2Search=false/>
         </x-bs.col2>
     </x-bs.row>
 

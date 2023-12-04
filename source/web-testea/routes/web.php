@@ -756,9 +756,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/transfer_required/search', [TransferRequiredController::class, 'search'])->name('transfer_required-search');
 
-    // 詳細取得用
-    Route::post('/transfer_required/get_data', [TransferRequiredController::class, 'getData'])->name('transfer_required-get_data');
-
     //----------------------
     // 欠席申請受付
     //----------------------

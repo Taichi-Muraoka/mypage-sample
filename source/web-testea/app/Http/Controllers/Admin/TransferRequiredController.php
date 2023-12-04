@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtSchedule;
+use App\Models\Student;
+use App\Models\Schedule;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
 //use App\Http\Controllers\Traits\FuncReportTrait;
@@ -41,9 +41,21 @@ class TransferRequiredController extends Controller
      */
     public function index()
     {
+        // 校舎プルダウン
+        $rooms = $this->mdlGetRoomList(false);
+
+        // 生徒リストを取得
+        $studentList = $this->mdlGetStudentList();
+
+        // 講師リストを取得
+        $tutorList = $this->mdlGetTutorList();
+
         return view('pages.admin.transfer_required', [
             'rules' => $this->rulesForSearch(),
-            'editData' => null
+            'editData' => null,
+            'rooms' => $rooms,
+            'studentList' => $studentList,
+            'tutorList' => $tutorList
         ]);
     }
 
@@ -85,41 +97,5 @@ class TransferRequiredController extends Controller
         $rules = array();
 
         return $rules;
-    }
-
-    /**
-     * 詳細取得
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return array 詳細データ
-     */
-    public function getData(Request $request)
-    {
-        return [
-        ];
-    }
-
-    //==========================
-    // クラス内共通処理
-    //==========================
-
-    /**
-     * 生徒名の取得
-     *
-     * @param int $sid 生徒Id
-     * @return object
-     */
-    private function getStudentName($sid)
-    {
-        // 生徒名を取得する
-        $query = ExtStudentKihon::query();
-        $student = $query
-            ->select(
-                'name'
-            )
-            ->where('ext_student_kihon.sid', '=', $sid)
-            ->firstOrFail();
-
-        return $student;
     }
 }
