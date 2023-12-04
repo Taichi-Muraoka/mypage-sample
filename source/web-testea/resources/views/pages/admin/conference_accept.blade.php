@@ -74,7 +74,7 @@
             <td>@{{$filters.formatYmd(item.apply_date)}}</td>
             <td>@{{item.student_name}}</td>
             <td>@{{item.campus_name}}</td>
-            <td>@{{$filters.formatYmd(item.conference_date)}}</td>
+            <td>@{{$filters.formatYmdDay(item.conference_date)}}</td>
             <td>@{{item.start_time}}</td>
             <td>@{{item.adm_name}}</td>
             <td>@{{item.status_name}}</td>
