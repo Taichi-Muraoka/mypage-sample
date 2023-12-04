@@ -721,6 +721,8 @@ class RoomCalendarController extends Controller
     {
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
+        // 登録前バリデーション（関連チェック）。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForInputRelated($request))->validate();
 
         if ($request['kind'] == self::SCHE_KIND_NEW) {
             // 新規登録処理
@@ -891,6 +893,8 @@ class RoomCalendarController extends Controller
     {
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
+        // 登録前バリデーション（関連チェック）。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForInputRelated($request))->validate();
 
         // トランザクション(例外時は自動的にロールバック)
         DB::transaction(function () use ($request) {
