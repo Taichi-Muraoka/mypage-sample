@@ -29,10 +29,10 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="授業日 From" id="date_from" />
+            <x-input.date-picker caption="授業日 From" id="target_date_from" />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="授業日 To" id="date_to" />
+            <x-input.date-picker caption="授業日 To" id="target_date_to" />
         </x-bs.col2>
     </x-bs.row>
 </x-bs.card>
@@ -56,36 +56,20 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>久我山</td>
-            <td>2023/01/30 4限</td>
-            <td>個別指導コース</td>
-            <td>CWテスト生徒１</td>
-            <td>CWテスト教師１０１</td>
-            <td>英語</td>
-            <td>振替中</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{item.room_name}}</td>
+            <td>@{{$filters.formatYmdDay(item.target_date)}} @{{item.period_no}}限</td>
+            <td>@{{item.course_name}}</td>
+            <td>@{{item.student_name}}</td>
+            <td>@{{item.tutor_name}}</td>
+            <td>@{{item.subject_name}}</td>
+            <td>@{{item.status_name}}</td>
             <td>
                 <x-button.list-edit href="{{ route('transfer_check-new') }}" icon="" caption="振替情報登録" />
             </td>
         </tr>
-        <tr>
-            <td>久我山</td>
-            <td>2023/01/31 6限</td>
-            <td>個別指導コース</td>
-            <td>CWテスト生徒２</td>
-            <td>CWテスト教師１０２</td>
-            <td>数学</td>
-            <td>未振替</td>
-            <td>
-                <x-button.list-edit href="{{ route('transfer_check-new') }}" icon="" caption="振替情報登録" />
-            </td>
-        </tr>
-
     </x-bs.table>
 
 </x-bs.card-list>
-
-{{-- 詳細 --}}
-{{-- @include('pages.admin.modal.transfer_required-modal') --}}
 
 @stop
