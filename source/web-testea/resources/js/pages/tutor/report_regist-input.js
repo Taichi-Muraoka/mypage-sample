@@ -54,49 +54,41 @@ export default class AppClass extends PageBase {
             },
             // 画面読み込み時
             vueMounted: function($vue, option) {
-                // 初期表示時に、授業情報リスト変更イベント実行
-                $vue.selectChangeGet();
-                // 初期表示時に、教材リスト・単元分類リスト取得処理実行
-                for (var subCode of subCodes) {
-                    $vue.selectChangeGetCatInit(subCode);
-                }
+                // 初期表示時に、授業情報リスト設定処理
+                $vue.selectChangeGetInit();
             },
             // Vueにメソッド追加
             vueMethods: {
+                // 授業情報変更時の項目クリア処理
+                lessonListReset: function () {
+                    this.form.monthly_goal = "";
+                    for (var subCode of subCodes) {
+                        // 教材項目の初期化
+                        this.selectGetItem = {};
+                        this.form['text_cd_' + subCode] = "";
+                        this.form['bef_text_cd_' + subCode] = "";
+                        this.form['text_page_' + subCode] = "";
+                        this.form['text_name_' + subCode] = "";
+                        this['selectGetItemCat' +  '_' + subCode] = {};
+                        for (var j = 1; j <= 3; j++) {
+                            // 単元分類項目の初期化
+                            this.form['unit_category_cd' + j +  '_' + subCode] = "";
+                            this.form['bef_unit_category_cd' + j + '_' + subCode] = "";
+                            this.form['category_name' + j + '_' + subCode] = "";
+                            // 単元項目の初期化
+                            this['selectGetItemUni' + j +  '_' + subCode] = {};
+                            this.form['unit_cd' + j +  '_' + subCode] = "";
+                            this.form['bef_unit_cd' + j + '_' + subCode] = "";
+                            this.form['unit_name' + j + '_' + subCode] = "";
+                        }
+                    }
+                },
                 // 授業情報リスト変更
                 selectChangeGet: function (event) {
-                    this.selectGetItem = {};
-                    // 未選択となった場合は項目リセット
-                    if (ValueCom.isEmpty(this.form['id'])) {
-                        this.form.monthly_goal = "";
-                        for (var subCode of subCodes) {
-                            // 教材プルダウンの初期化
-                            this.form['bef_text_cd_' + subCode] = "";
-                            this.form['text_page_' + subCode] = "";
-                            this.form['text_name_' + subCode] = "";
-                            for (var j = 1; j <= 3; j++) {
-                                // 単元分類プルダウン・単元プルダウンもクリア
-                                this.form['bef_unit_category_cd' + j + '_' + subCode] = "";
-                                this.form['category_name' + j + '_' + subCode] = "";
-                                this.form['bef_unit_cd' + j + '_' + subCode] = "";
-                                this.form['unit_name' + j + '_' + subCode] = "";
-                            }
-                        }
-                    }
-                    for (var subCode of subCodes) {
-                        // 教材プルダウンの初期化
-                        this.form['text_cd_' + subCode] = "";
-                        this['selectGetItemCat' +  '_' + subCode] = {};
-                        for (var j = 1;  j <= 3;  j++) {
-                            // 単元分類プルダウン・単元プルダウンもクリア
-                            this.form['unit_category_cd' + j +  '_' + subCode] = "";
-                            this.form['unit_cd' + j +  '_' + subCode] = "";
-                            this['selectGetItemUni' + j +  '_' + subCode] = {};
-                        }
-                    }
+                    // 授業情報変更時の項目クリア処理
+                    this.lessonListReset();
                     // チェンジイベントを発生させる
                     var selected = this.form.id;
-                    // チェンジイベントを発生させる
                     self.selectChangeGetCallBack(
                         this,
                         selected,
@@ -105,30 +97,6 @@ export default class AppClass extends PageBase {
                         (data) => {
                             // データをセット
                             this.selectGetItem = data;
-                            
-                            // 初期化
-                            if (data.last_data['flag'] != 0) {
-                                this.form.monthly_goal = "";
-                                for (var subCode of subCodes) {
-                                    // 教材プルダウンの初期化
-                                    this.form['text_cd_' + subCode] = "";
-                                    this.form['bef_text_cd_' + subCode] = "";
-                                    this.form['text_page_' + subCode] = "";
-                                    this.form['text_name_' + subCode] = "";
-                                    this['selectGetItemCat' + '_' + subCode] = {};
-                                    for (var j = 1; j <= 3; j++) {
-                                        // 単元分類プルダウン・単元プルダウンもクリア
-                                        this.form['unit_category_cd' + j + '_' + subCode] = "";
-                                        this.form['bef_unit_category_cd' + j + '_' + subCode] = "";
-                                        this.form['category_name' + j + '_' + subCode] = "";
-                                        this.form['unit_cd' + j + '_' + subCode] = "";
-                                        this.form['bef_unit_cd' + j + '_' + subCode] = "";
-                                        this.form['unit_name' + j + '_' + subCode] = "";
-                                        this['selectGetItemUni' + j + '_' + subCode] = {};
-                                    }
-                                }
-                            }
-
                             // 教材リストが取得できた場合のみ、hiddenの教材コードをセット
                             if (data.selectItems.length != 0) {
                                 for (var subCode of subCodes) {
@@ -136,9 +104,10 @@ export default class AppClass extends PageBase {
                                 }
                             }
 
-                            // 前回授業が存在する場合
+                            // 前回授業が存在する場合、前回登録情報を設定
                             if (data.last_data.length != 1 && data.last_data['lesson_report_id'] == null)
                             {
+                                // 今月の目標を設定
                                 if (data.last_data['monthly_goal'] != null) {
                                     this.form.monthly_goal = data.last_data['monthly_goal'];
                                 }
@@ -146,6 +115,7 @@ export default class AppClass extends PageBase {
                                     if (subCode == 'H1') {
                                         break;
                                     }
+                                    // 教材情報を設定
                                     if (data.last_data['text_cd_' + subCode] != null) {
                                         this.form['bef_text_cd_' + subCode] = data.last_data['text_cd_' + subCode];
                                         this.form['text_cd_' + subCode] = this.form['bef_text_cd_' + subCode];
@@ -157,6 +127,7 @@ export default class AppClass extends PageBase {
                                         this.form['text_name_' + subCode] = data.last_data['text_name_' + subCode];
                                     }
                                     for (var j = 1; j <= 3; j++) {
+                                        // 単元分類情報を設定
                                         if (data.last_data['unit_category_cd' + j + '_' + subCode] != null) {
                                             this.form['bef_unit_category_cd' + j + '_' + subCode] = data.last_data['unit_category_cd' + j + '_' + subCode];
                                             this.form['unit_category_cd' + j + '_' + subCode] = this.form['bef_unit_category_cd' + j + '_' + subCode];
@@ -164,6 +135,7 @@ export default class AppClass extends PageBase {
                                         if (data.last_data['category_name' + j + '_' + subCode] != null) {
                                             this.form['category_name' + j + '_' + subCode] = data.last_data['category_name' + j + '_' + subCode];
                                         }
+                                        // 単元情報を設定
                                         if (data.last_data['unit_cd' + j + '_' + subCode] != null) {
                                             this.form['bef_unit_cd' + j + '_' + subCode] = data.last_data['unit_cd' + j + '_' + subCode];
                                             this.form['unit_cd' + j + '_' + subCode] = this.form['bef_unit_cd' + j + '_' + subCode];
@@ -172,14 +144,43 @@ export default class AppClass extends PageBase {
                                             this.form['unit_name' + j + '_' + subCode] = data.last_data['unit_name' + j + '_' + subCode];
                                         }
                                     }
-                                    // 教材選択によるチェンジイベント
+                                    // 単元分類リスト取得処理実行
                                     this.selectChangeGetCatInit(subCode);
                                 }
                             }
                         }
                     );
                 },
-                // 教材リスト変更
+                // 画面初期表示時の授業情報リスト設定
+                selectChangeGetInit: function () {
+                    // 新規画面（未選択）の場合何もしない
+                    if (ValueCom.isEmpty(this.form['id'])) {
+                        return;
+                    }
+                    this.selectGetItem = {};
+                    // チェンジイベントを発生させる
+                    var selected = this.form.id;
+                    // チェンジイベントを発生させる
+                    self.selectChangeGetCallBack(
+                        this,
+                        selected,
+                        this.option,
+                        // 受信後のコールバック
+                        (data) => {
+                            // データをセット
+                            this.selectGetItem = data;
+                            // 教材リストが取得できた場合のみ、hiddenの教材コードをセット
+                            if (data.selectItems.length != 0) {
+                                for (var subCode of subCodes) {
+                                    this.form['text_cd_' + subCode] = this.form['bef_text_cd_' + subCode];
+                                    // 単元分類リスト取得処理実行
+                                    this.selectChangeGetCatInit(subCode);
+                                }
+                            }
+                        }
+                    );
+                },
+                // 教材リスト変更時の単元分類リスト設定
                 selectChangeGetCat: function (event) {
                     if (!event || !event.target.id.startsWith('text_cd_')) {
                         return;
@@ -218,30 +219,27 @@ export default class AppClass extends PageBase {
                 // 単元分類リスト設定（画面初期表示時）
                 selectChangeGetCatInit: function (subCode) {
                     var targetCd = this.form['bef_text_cd_' + subCode];
-                    for (var j = 1;  j <= 3;  j++) {
-                        // 単元分類プルダウンを初期化
-                        this.form['unit_category_cd'  + j +  '_' + subCode] = "";
+                    // 未選択の場合は何もせず復帰
+                    if (ValueCom.isEmpty(targetCd)) {
+                        return;
                     }
                     this['selectGetItemCat' + subCode] = {};
                     // 取得情報格納用dataを設定
                     var itemDataName = "selectGetItemCat" + subCode;
 
-                    // 未選択となった場合は復帰
-                    if (ValueCom.isEmpty(targetCd)) {
-                        return;
-                    }
                     // チェンジイベントを発生させる
                     var selected = {
                         text_cd: targetCd
                     };
-                    // チェンジイベントを発生させる
-                    self.selectChangeGetCallBack(
+                    // チェンジイベント（取得情報格納用data指定）
+                    self.selectChangeGetCallBack2(
                         this,
                         selected,
                         // URLを分けた
                         {
                             urlSuffix: "text"
                         },
+                        itemDataName,
                         // 受信後のコールバック
                         (data) => {
                             // データをセット
@@ -256,7 +254,7 @@ export default class AppClass extends PageBase {
                         }
                     );
                 },
-                // 単元分類リスト変更
+                // 単元分類リスト変更時の単元リスト設定
                 selectChangeGetUni: function (event) {
 
                     if (!event || !event.target.id.startsWith('unit_category_cd')) {
@@ -269,7 +267,6 @@ export default class AppClass extends PageBase {
                     this['selectGetItemUni' + selectkey] = {};
                     // 取得情報格納用dataを設定
                     var itemDataName = "selectGetItemUni" + selectkey;
-                    //this['selectGetItemCatL' + selectkey] = {};
 
                     // 未選択となった場合は復帰
                     if (ValueCom.isEmpty(this.form[event.target.id])) {
@@ -279,7 +276,7 @@ export default class AppClass extends PageBase {
                     var selected = {
                         unit_category_cd: this.form[event.target.id]
                     };
-                    // 取得情報格納用data指定とする
+                    // チェンジイベント（取得情報格納用data指定）
                     self.selectChangeGet2(
                         this,
                         selected,
@@ -290,34 +287,33 @@ export default class AppClass extends PageBase {
                         itemDataName
                     );
                 },
-                // 単元分類リスト変更（画面初期表示時）
+                // 単元リスト設定（画面初期表示時）
                 selectChangeGetUniInit: function (subCode, j) {
 
                     var targetCd = this.form['unit_category_cd'  + j +  '_' + subCode];
-
-                    // 単元プルダウンを初期化
-                    this.form['unit_cd' + j + '_' + subCode] = "";
-                    this['selectGetItemUni' + j + '_' + subCode] = {};
-                    // 取得情報格納用dataを設定
-                    var itemDataName = "selectGetItemUni" + j + '_' + subCode;
-                    //this['selectGetItemCatL' + j] = {};
-
-                    // 未選択となった場合は復帰
+                    // 未選択の場合は何もせず復帰
                     if (ValueCom.isEmpty(targetCd)) {
                         return;
                     }
+
+                    // 単元プルダウンを初期化
+                    this['selectGetItemUni' + j + '_' + subCode] = {};
+                    // 取得情報格納用dataを設定
+                    var itemDataName = "selectGetItemUni" + j + '_' + subCode;
+
                     // チェンジイベントを発生させる
                     var selected = {
                         unit_category_cd: targetCd
                     };
-                    // チェンジイベントを発生させる
-                    self.selectChangeGetCallBack(
+                    // チェンジイベント（取得情報格納用data指定）
+                    self.selectChangeGetCallBack2(
                         this,
                         selected,
                         // URLを分けた
                         {
                             urlSuffix: "category"
                         },
+                        itemDataName,
                         // 受信後のコールバック
                         (data) => {
                             // データをセット
