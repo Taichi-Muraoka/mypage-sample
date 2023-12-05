@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Lang;
 use App\Consts\AppConst;
 use App\Models\Student;
 use App\Models\Tutor;
@@ -195,12 +196,12 @@ class TransferRequiredController extends Controller
             }
         };
 
-        // 独自バリデーション: リストのチェック 生徒ID
+        // 独自バリデーション: リストのチェック 講師ID
         $validationTutorList =  function ($attribute, $value, $fail) {
 
             // リストを取得し存在チェック
-            $students = $this->mdlGetTutorList();
-            if (!isset($students[$value])) {
+            $tutors = $this->mdlGetTutorList();
+            if (!isset($tutors[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
