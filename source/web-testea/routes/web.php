@@ -809,17 +809,20 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 詳細取得用
     Route::post('/extra_lesson_mng/get_data', [ExtraLessonMngController::class, 'getData'])->name('extra_lesson_mng-get_data');
 
-    // モーダル処理
-    Route::post('/extra_lesson_mng/exec_modal', [ExtraLessonMngController::class, 'execModal'])->name('extra_lesson_mng-exec_modal');
+    // 校舎ダウンを選択された際に時限リスト・講師リストを返却する
+    Route::post('/extra_lesson_mng/get_data_select_list', [ExtraLessonMngController::class, 'getDataSelectList'])->name('extra_lesson_mng-get_data_select_list');
+
+    // 時限プルダウンを選択された際に時間割の情報を返却する
+    Route::post('/extra_lesson_mng/get_data_select_timetable', [ExtraLessonMngController::class, 'getDataSelectTimetable'])->name('extra_lesson_mng-get_data_select_timetable');
 
     // 新規登録
-    Route::get('/extra_lesson_mng/new', [ExtraLessonMngController::class, 'new'])->name('extra_lesson_mng-new');
+    Route::get('/extra_lesson_mng/new/{sid}/{campusCd}', [ExtraLessonMngController::class, 'new'])->name('extra_lesson_mng-new');
 
     // 新規登録処理
     Route::post('/extra_lesson_mng/create', [ExtraLessonMngController::class, 'create'])->name('extra_lesson_mng-create');
 
     // 編集画面
-    Route::get('/extra_lesson_mng/edit/{changeId}', [ExtraLessonMngController::class, 'edit'])->name('extra_lesson_mng-edit');
+    Route::get('/extra_lesson_mng/edit/{extraId}', [ExtraLessonMngController::class, 'edit'])->name('extra_lesson_mng-edit');
 
     // 編集処理
     Route::post('/extra_lesson_mng/update', [ExtraLessonMngController::class, 'update'])->name('extra_lesson_mng-update');

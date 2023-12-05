@@ -20,16 +20,5 @@ export default class AppClass extends PageBase {
 
         // Vue: 検索フォーム
         this.getVueSearchForm();
-
-        // Vue: モーダル(受付)
-//        this.getVueModal({
-//            id: "#modal-dtl-acceptance",
-//
-//            // 完了処理後
-//            afterExec: () => {
-//                // 一覧を再表示する
-//                searchForm.vueSearchList.refresh();
-//            }
-//        });
     }
 }
