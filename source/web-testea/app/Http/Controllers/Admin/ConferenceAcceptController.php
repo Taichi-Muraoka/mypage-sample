@@ -87,7 +87,7 @@ class ConferenceAcceptController extends Controller
         } else {
             $students = $this->mdlGetStudentList($campus_cd);
         }
-        
+
         return [
             'selectItems' => $this->objToArray($students),
         ];
@@ -160,7 +160,7 @@ class ConferenceAcceptController extends Controller
                 'conferences.start_time',
                 'conferences.conference_schedule_id',
                 'schedules.adm_id as adm_id',
-                'admin_users.name as adm_name'  
+                'admin_users.name as adm_name'
             )
             // 校舎名の取得
             ->leftJoinSub($campus_names, 'campus_names', function ($join) {
@@ -305,7 +305,7 @@ class ConferenceAcceptController extends Controller
                 // 管理者メモ
                 'schedules.memo as memo',
                 // 面談担当者
-                'admin_users.name as adm_name' 
+                'admin_users.name as adm_name'
             )
             // 校舎名の取得
             ->leftJoinSub($campus_names, 'campus_names', function ($join) {
@@ -373,7 +373,7 @@ class ConferenceAcceptController extends Controller
         } else {
             $booths = $this->mdlGetBoothList($campus_cd, AppConst::CODE_MASTER_41_3);
         }
-        
+
         return [
             'selectItems' => $this->objToArray($students),
             'selectLists' => $this->objToArray($booths)
@@ -496,12 +496,12 @@ class ConferenceAcceptController extends Controller
 
                     $mail_body = [
                         'conference_date' => $schedule->target_date->format('Y/m/d') .
-                        ' ' . $schedule->start_time->format('H:i'),
+                            ' ' . $schedule->start_time->format('H:i'),
                         'room_name' => $campus_name
                     ];
 
                     $email = $studentAccount->email;
-                        Mail::to($email)->send(new ConferenceAcceptToStudent($mail_body));
+                    Mail::to($email)->send(new ConferenceAcceptToStudent($mail_body));
                 }
             }
         });
@@ -639,7 +639,7 @@ class ConferenceAcceptController extends Controller
                 ->where($this->guardRoomAdminTableWithRoomCd())
                 // 該当データがない場合はエラーを返す
                 ->firstOrFail();
-            
+
             // 面談連絡情報更新
             $conference->conference_date = $request['target_date'];
             $conference->start_time = $request['start_time'];
@@ -694,7 +694,7 @@ class ConferenceAcceptController extends Controller
             if ($res) {
                 $mail_body = [
                     'conference_date' => $conference->conference_date->format('Y/m/d') .
-                    ' ' . $conference->start_time->format('H:i'),
+                        ' ' . $conference->start_time->format('H:i'),
                     'room_name' => $campus_name
                 ];
 
@@ -783,7 +783,7 @@ class ConferenceAcceptController extends Controller
             // 終了時刻計算
             $end_time = $this->endTime($request['start_time']);
             $scheduleId = null;
-            
+
             // ブースの重複チェック
             $booth = $this->fncScheSearchBoothForConference(
                 $request['campus_cd'],
@@ -806,7 +806,7 @@ class ConferenceAcceptController extends Controller
             // 終了時刻計算
             $end_time = $this->endTime($request['start_time']);
             $scheduleId = null;
-            
+
             // 生徒スケジュール重複チェック
             $chk = $this->fncScheChkDuplidateSid(
                 $request['target_date'],
