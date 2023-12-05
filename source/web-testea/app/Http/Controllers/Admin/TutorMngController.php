@@ -88,36 +88,6 @@ class TutorMngController extends Controller
     }
 
     /**
-     * クラス内関数
-     * 所属校舎が未登録の講師を取得する
-     * whereにそのまま指定する
-     */
-    protected function unregisteredTutorCampus()
-    {
-        // クロージャで呼んでもらうため、関数で返却
-        return function ($query) {
-            $model = get_class($query->getModel());
-
-            // 講師所属情報が存在しない者を取得する
-            $query->whereNotExists(function ($query) use ($model) {
-
-                // 対象テーブル(モデルから取得)
-                $modelObj = new $model();
-                // テーブル名取得
-                $table = $modelObj->getTable();
-                // 講師所属情報テーブル
-                $tutorCampus = (new TutorCampus)->getTable();
-
-                $query->from($tutorCampus)
-                    // 対象テーブルと講師所属情報の講師IDを連結
-                    ->whereRaw($table . '.tutor_id = ' . $tutorCampus . '.tutor_id')
-                    // delete_dt条件の追加
-                    ->whereNull($tutorCampus . '.deleted_at');
-            });
-        };
-    }
-
-    /**
      * 検索結果取得
      *
      * @param \Illuminate\Http\Request $request リクエスト
@@ -136,9 +106,8 @@ class TutorMngController extends Controller
 
         // 校舎の検索
         if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、自分の校舎の講師 または 所属校舎未登録の講師のみにガードを掛ける
-            $query->where($this->guardRoomAdminTableWithTid())
-                ->orWhere($this->unregisteredTutorCampus());
+            // 教室管理者の場合、自分の校舎の講師のみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithTid());
         } else {
             // 管理者の場合検索フォームから取得
             $query->SearchRoom($form);
@@ -283,12 +252,8 @@ class TutorMngController extends Controller
         // IDのバリデーション
         $this->validateIds($tid);
 
-        // 所属校舎情報に該当講師の講師IDが存在するかチェック
-        $exists = TutorCampus::where('tutor_id', $tid)->exists();
-        if ($exists) {
-            // 存在する場合、教室管理者であれば、自校舎の講師のみにガードを掛ける
-            $this->guardRoomAdminTid($tid);
-        }
+        // 教室管理者の場合、自校舎の講師のみにガードを掛ける
+        $this->guardRoomAdminTid($tid);
 
         // 講師情報を取得 FuncTutorDetailTrait
         $tutor = $this->getTutorDetail($tid);
@@ -545,6 +510,11 @@ class TutorMngController extends Controller
      */
     public function new()
     {
+        // 教室管理者の場合、新規登録画面は表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 学年設定年度の初期表示用データセット（システムマスタ「現年度」）
         $currentYear = MstSystem::select('value_num')
             ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
@@ -587,6 +557,11 @@ class TutorMngController extends Controller
      */
     public function create(Request $request)
     {
+        // 教室管理者の場合、新規登録は行なわない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
@@ -1182,11 +1157,13 @@ class TutorMngController extends Controller
      */
     public function campusNew($tid)
     {
+        // 教室管理者の場合、新規登録画面は表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // IDのバリデーション
         $this->validateIds($tid);
-
-        // 教室管理者の場合、自校舎の講師のみにガードを掛ける
-        $this->guardRoomAdminTid($tid);
 
         // 既に3つ所属校舎がある場合は登録画面を表示しない
         $tutorCampus = TutorCampus::where('tutor_id', $tid)
@@ -1216,6 +1193,11 @@ class TutorMngController extends Controller
      */
     public function campusCreate(Request $request)
     {
+        // 教室管理者の場合、新規登録は行なわない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->campusRulesForInput($request))->validate();
 
