@@ -120,7 +120,7 @@ return [
                 "面談日時：:conferenceDate :startTime\n" .
                 "校舎：:roomName\n",
         ],
-        
+
         //-------------------
         // 振替調整 授業登録(講師承認・生徒承認・管理者登録)
         //-------------------
@@ -128,11 +128,35 @@ return [
             'title' => "振替授業登録のお知らせ",
             'text' => "下記のとおり、振替授業が登録されました。\n" .
                 "詳細はカレンダーよりご確認ください。\n" .
-                "授業日・時限：:targetDate :targetPeriodNo時限目\n" . 
-                "振替日・時限：:transferDate :transferPeriodNo時限目\n" . 
-                "校舎：:roomName\n" . 
-                "講師：:tutorName\n" . 
+                "授業日・時限：:targetDate :targetPeriodNo時限目\n" .
+                "振替日・時限：:transferDate :transferPeriodNo時限目\n" .
+                "校舎：:roomName\n" .
+                "講師：:tutorName\n" .
                 "生徒：:studentName\n"
+        ],
+
+        //--------------
+        // 追加授業登録（生徒）
+        //--------------
+        'extra_lesson_accept_student' => [
+            'title' => "追加授業登録のお知らせ",
+            'text' => "追加授業の登録を行いました。\n" .
+                "詳細はカレンダーよりご確認ください。\n" .
+                "授業日・時限：:targetDate :periodNo時限目\n" .
+                "校舎：:campusName\n" .
+                "講師：:tutorName\n",
+        ],
+
+        //--------------
+        // 追加授業登録（講師）
+        //--------------
+        'extra_lesson_accept_tutor' => [
+            'title' => "追加授業登録のお知らせ",
+            'text' => "追加授業の登録を行いました。\n" .
+                "詳細はカレンダーよりご確認ください。\n" .
+                "授業日・時限：:targetDate :periodNo時限目\n" .
+                "校舎：:campusName\n" .
+                "生徒：:studentName\n",
         ],
     ],
 
@@ -260,6 +284,20 @@ return [
         //-------------------
         'substitute_regist_to_tutor' => [
             'subject' => "【" . config('app.name') . "】" . "代講授業登録のお知らせ"
+        ],
+
+        //-------------------
+        // 追加授業登録(生徒)
+        //-------------------
+        'extra_lesson_accept_to_student' => [
+            'subject' => "【" . config('app.name') . "】" . "追加授業登録のお知らせ"
+        ],
+
+        //-------------------
+        // 追加授業登録(講師)
+        //-------------------
+        'extra_lesson_accept_to_tutor' => [
+            'subject' => "【" . config('app.name') . "】" . "追加授業登録のお知らせ"
         ],
 
     ],

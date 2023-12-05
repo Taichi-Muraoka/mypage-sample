@@ -9,80 +9,56 @@
 
     <x-bs.row>
         <x-bs.col2>
-            {{-- @can('roomAdmin') --}}
+            @can('roomAdmin')
             {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-            {{-- <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
-                :select2Search=false :blank=false />
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :select2Search=false
+                :blank=false />
             @else
-            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
-            @endcan --}}
-            <x-input.select id="roomcd" caption="校舎" :select2=true >
-                <option value="1">久我山</option>
-                <option value="2">西永福</option>
-                <option value="3">下高井戸</option>
-                <option value="4">駒込</option>
-                <option value="5">日吉</option>
-                <option value="6">自由が丘</option>
-            </x-input.select>
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :select2Search=false />
+            @endcan
         </x-bs.col2>
         <x-bs.col2>
-            {{-- <x-input.select id="changes_state" caption="ステータス" :select2=true :mastrData=$statusList /> --}}
-            <x-input.select caption="ステータス" id="state" :select2=true :editData=$editData>
-                <option value="1">未対応</option>
-                <option value="2">対応済</option>
-            </x-input.select>
+            <x-input.select id="status" caption="ステータス" :select2=true :mastrData=$statusList :select2Search=false
+                :blank=true />
         </x-bs.col2>
     </x-bs.row>
-
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select caption="生徒名" id="student" :select2=true :editData="$editData">
-                <option value="1">CWテスト生徒１</option>
-                <option value="2">CWテスト生徒２</option>
-                <option value="3">CWテスト生徒３</option>
-            </x-input.select>
+            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$studentList :select2Search=true
+                :blank=true />
         </x-bs.col2>
     </x-bs.row>
-
 </x-bs.card>
 
 {{-- 結果リスト --}}
 <x-bs.card-list>
-
     {{-- テーブル --}}
     <x-bs.table :button=true>
-
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th>依頼日</th>
+            <th class="t-minimum">依頼日</th>
             <th>校舎</th>
             <th>生徒名</th>
-            <th>ステータス</th>
+            <th class="t-minimum">ステータス</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/02/20</td>
-            <td>久我山</td>
-            <td>CWテスト生徒１</td>
-            <td>未対応</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmd(item.apply_date)}}</td>
+            <td>@{{item.campus_name}}</td>
+            <td>@{{item.student_name}}</td>
+            <td>@{{item.status_name}}</td>
             <td>
-                <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('extra_lesson_mng-new') }}" caption="授業追加"/>
-                <x-button.list-edit href="{{ route('extra_lesson_mng-edit',1) }}" />
+                <x-button.list-dtl :vueDataAttr="['extra_apply_id' => 'item.extra_apply_id']" />
+                <x-button.list-edit vueHref="'{{ route('extra_lesson_mng-new', ['', '']) }}/' + item.student_id + '/' + item.campus_cd" caption="授業追加" />
+                <x-button.list-edit vueHref="'{{ route('extra_lesson_mng-edit', '') }}/' + item.extra_apply_id" />
             </td>
         </tr>
-
-
     </x-bs.table>
-
 </x-bs.card-list>
 
 {{-- 詳細 --}}
 @include('pages.admin.modal.extra_lesson_mng-modal')
-{{-- モーダル(送信確認モーダル) 受付 --}}
-{{--@include('pages.admin.modal.extra_lesson_mng_acceptance-modal', ['modal_send_confirm' => true, 'modal_id' =>
-'modal-dtl-acceptance']) --}}
 
 @stop
