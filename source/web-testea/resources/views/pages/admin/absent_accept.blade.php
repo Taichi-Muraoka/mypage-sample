@@ -62,8 +62,6 @@
             <td>@{{item.status_name}}</td>
             <td>
                 <x-button.list-dtl :vueDataAttr="['absent_apply_id' => 'item.absent_apply_id']" />
-                {{-- ボタンスペース --}}
-                &nbsp;
                 <x-button.list-dtl caption="受付" btn="btn-primary" dataTarget="#modal-dtl-acceptance"
                     :vueDataAttr="['absent_apply_id' => 'item.absent_apply_id']"
                     vueDisabled="item.status == {{ App\Consts\AppConst::CODE_MASTER_1_1 }}" />

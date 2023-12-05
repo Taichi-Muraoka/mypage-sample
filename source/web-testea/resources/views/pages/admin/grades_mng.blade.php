@@ -43,8 +43,6 @@
                 <td>
                     {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                     <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
-                    {{-- ボタンスペース --}}
-                    &nbsp;
                     <x-button.list-edit vueHref="'{{ route('grades_mng-edit', '') }}/' + item.id" />
                 </td>
             </tr>
