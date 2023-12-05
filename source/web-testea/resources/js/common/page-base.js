@@ -110,7 +110,8 @@ export default class PageBase {
     }
 
     /**
-     * プルダウンの変更イベントで詳細を取得
+     * プルダウンの変更イベントで詳細を取得（レスポンス結果格納エリア指定）
+     * $vue.selectGetItemは使用しない
      */
     selectChangeGet2($vue, selected, option, dataName) {
         PageEvent.selectChangeGet2($vue, selected, option, dataName);
@@ -123,5 +124,13 @@ export default class PageBase {
      */
     selectChangeGetCallBack($vue, selected, option, callback) {
         PageEvent.selectChangeGetCallBack($vue, selected, option, callback);
+    }
+
+    /**
+     * プルダウンの変更イベントで詳細を取得（レスポンス結果格納エリア指定）
+     * コールバック用とした。$vue.selectGetItemは使用しない
+     */
+    selectChangeGetCallBack2($vue, selected, option, dataName, callback) {
+        PageEvent.selectChangeGetCallBack2($vue, selected, option, dataName, callback);
     }
 }

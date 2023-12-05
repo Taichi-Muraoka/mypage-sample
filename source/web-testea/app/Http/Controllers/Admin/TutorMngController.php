@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\FuncCalendarTrait;
 use App\Http\Controllers\Traits\FuncSalaryTrait;
 use App\Http\Controllers\Traits\FuncTutorDetailTrait;
 use App\Http\Controllers\Traits\FuncSchoolSearchTrait;
+use App\Http\Controllers\Traits\FuncWeeklyShiftTrait;
 use App\Consts\AppConst;
 use App\Models\MstTutorGrade;
 use App\Models\MstSchool;
@@ -14,7 +15,6 @@ use App\Models\MstCampus;
 use App\Models\MstSubject;
 use App\Models\MstSystem;
 use App\Models\Account;
-use App\Models\WeeklyShift; //空き時間の実装時に使用
 use App\Models\Salary;
 use App\Models\CodeMaster;
 use App\Models\Tutor;
@@ -44,6 +44,9 @@ class TutorMngController extends Controller
 
     // 機能共通処理：給与
     use FuncSalaryTrait;
+
+    // 機能共通処理：空き時間
+    use FuncWeeklyShiftTrait;
 
     // 機能共通処理：学校検索モーダル
     use FuncSchoolSearchTrait;
@@ -305,11 +308,11 @@ class TutorMngController extends Controller
      */
     public function salary($tid)
     {
-
-        // MEMO: 教室管理者でも全て見れるのでガードは不要
-
         // IDのバリデーション
         $this->validateIds($tid);
+
+        // 教室管理者の場合、自校舎の講師のみにガードを掛ける
+        $this->guardRoomAdminTid($tid);
 
         // 講師名を取得する
         $teacher = $this->getTeacherName($tid);
@@ -331,10 +334,11 @@ class TutorMngController extends Controller
      */
     public function searchSalary(Request $request)
     {
-        // MEMO: 教室管理者でも全て見れるのでガードは不要
-
         // IDのバリデーション（講師No.）
         $this->validateIdsFromRequest($request, 'tid');
+
+        // 教室管理者の場合、自校舎の講師のみにガードを掛ける
+        $this->guardRoomAdminTid($request->input('tid'));
 
         // 給与明細を取得する
         $query = Salary::query();
@@ -368,10 +372,11 @@ class TutorMngController extends Controller
      */
     public function detailSalary($tid, $date)
     {
-        // MEMO: 教室管理者でも全て見れるのでガードは不要
-
         // IDのバリデーション
         $this->validateIds($tid, $date);
+
+        // 教室管理者の場合、自校舎の講師のみにガードを掛ける
+        $this->guardRoomAdminTid($tid);
 
         // データの取得
         $dtlData = $this->getSalaryDetail($tid, $date);
@@ -404,6 +409,9 @@ class TutorMngController extends Controller
         // IDのバリデーション
         $this->validateIds($tid, $date);
 
+        // 教室管理者の場合、自校舎の講師のみにガードを掛ける
+        $this->guardRoomAdminTid($tid);
+
         // データの取得
         $dtlData = $this->getSalaryDetail($tid, $date);
 
@@ -426,110 +434,38 @@ class TutorMngController extends Controller
      */
     public function weeklyShift($tid)
     {
-        //==========================
-        // 既存処理
-        //==========================
-        // // MEMO: 教室管理者でも全て見れるのでガードは不要
+        // IDのバリデーション
+        $this->validateIds($tid);
 
-        // // IDのバリデーション
-        // $this->validateIds($tid);
+        // 教室管理者の場合、自校舎の講師のみにガードを掛ける
+        $this->guardRoomAdminTid($tid);
 
-        // // 曜日の配列を取得 コードマスタより取得
-        // $weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
-
-        // // 時間帯 コードマスタにないのでappconfに定義した。
-        // $timeList = config('appconf.weekly_shift_time');
-
-        // // コロンを除いた値をIDとして扱う
-        // // 管理画面では送信しないが、講師画面と統一した
-        // $timeIdList = [];
-        // foreach ($timeList as $time) {
-        //     $timeId = str_replace(":", "", $time);
-        //     array_push($timeIdList, $timeId);
-        // }
-
-        // // 講師の空き時間を取得する
-        // $weeklyShift = WeeklyShift::where('tid', $tid)
-        //     ->get();
-
-        // // チェックボックスをセットするための値を生成
-        // // 例：['1_1030', '2_1030']
-        // $editData = [];
-        // foreach ($weeklyShift as $ws) {
-        //     // 配列に追加
-        //     array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
-        // }
-
-        // // 講師名を取得する
-        // $teacher = $this->getTeacherName($tid);
-
-        // return view('pages.admin.tutor_mng-weekly_shift', [
-        //     'weekdayList' => $weekdayList,
-        //     'timeList' => $timeList,
-        //     'timeIdList' => $timeIdList,
-        //     'editData' => [
-        //         'chkWs' => $editData
-        //     ],
-        //     'extRirekisho' => $teacher,
-        // ]);
-
-        //==========================
-        // モック用処理
-        //==========================
         // 曜日の配列を取得 コードマスタより取得
         $weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
 
-        // 時間帯
-        $timeList = array(
-            '1時限目', '2時限目', '3時限目', '4時限目', '5時限目', '6時限目', '7時限目',
-        );
+        // 時限リストを取得（講師ID・時間割区分から）
+        $periodList = $this->mdlGetPeriodListForTutor($tid, AppConst::CODE_MASTER_37_0);
 
-        // コロンを除いた値をIDとして扱う
-        // 管理画面では送信しないが、講師画面と統一した
-        $timeIdList = [];
-        foreach ($timeList as $time) {
-            $timeId = str_replace("時限目", "", $time);
-            array_push($timeIdList, $timeId);
-        }
-
-        // 講師の空き時間を取得する
-        //$weeklyShift = WeeklyShift::where('tid', $tid)
-        //    ->get();
-
-        // チェックボックスをセットするための値を生成
-        // 例：['1_1030', '2_1030']
-        $editData = [];
-        //foreach ($weeklyShift as $ws) {
-        //    // 配列に追加
-        //    array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
-        //}
-        array_push($editData, '4_5');
-        array_push($editData, '4_6');
-        array_push($editData, '4_7');
-
-        // レギュラー授業情報を取得し、チェックボックスをセットするための値を生成
+        // 講師の空き時間を取得する（緑色表示用）
         // 曜日コード_時限No 例：['1_1', '2_1']
-        $regularData = [];
-        array_push($regularData, '1_5');
-        array_push($regularData, '2_5');
-        array_push($regularData, '2_6');
-        array_push($regularData, '6_4');
-        array_push($regularData, '6_5');
-        array_push($regularData, '6_6');
-        array_push($regularData, '6_7');
+        $chkData = $this->fncWksfGetFreePeriod($tid);
+
+        // レギュラー授業情報を取得する（黒色表示用）
+        // 曜日コード_時限No 例：['1_1', '2_1']
+        $regularData = $this->fncWksfGetRegularClass($tid);
+
 
         // 講師名を取得する
-        $teacher = $this->getTeacherName($tid);
+        $tutor_name = $this->mdlGetTeacherName($tid);
 
         return view('pages.admin.tutor_mng-weekly_shift', [
             'weekdayList' => $weekdayList,
-            'timeList' => $timeList,
-            'timeIdList' => $timeIdList,
+            'periodList' => $periodList,
             'editData' => [
-                'chkWs' => $editData
+                'chkWs' => $chkData
             ],
             'exceptData' => $regularData,
-            'extRirekisho' => $teacher,
+            'tutor_name' => $tutor_name,
         ]);
     }
 
@@ -744,6 +680,9 @@ class TutorMngController extends Controller
     {
         // IDのバリデーション
         $this->validateIds($tid);
+
+        // 教室管理者の場合、自校舎の講師のみにガードを掛ける
+        $this->guardRoomAdminTid($tid);
 
         // 講師情報を取得する
         $query = Tutor::query();
@@ -1245,6 +1184,9 @@ class TutorMngController extends Controller
     {
         // IDのバリデーション
         $this->validateIds($tid);
+
+        // 教室管理者の場合、自校舎の講師のみにガードを掛ける
+        $this->guardRoomAdminTid($tid);
 
         // 既に3つ所属校舎がある場合は登録画面を表示しない
         $tutorCampus = TutorCampus::where('tutor_id', $tid)
