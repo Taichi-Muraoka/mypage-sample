@@ -7,6 +7,7 @@
     modal_send_confirm: 送信確認用のダイアログ。fadeは無効にし、タイトル行は非表示にする
     modal-size: モーダルのサイズ
     modal_form: モーダルでフォームを表示
+    caption_OK: OKボタン表示名
 --}}
 
 {{-- モーダルを複数使用する場合はmodalIdを指定する --}}
@@ -67,7 +68,7 @@
                 <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
                 @else
                 {{-- 送信確認用のダイアログの場合 --}}
-                <button type="button" class="btn btn-primary" v-on:click="modalOk">OK</button>
+                <button type="button" class="btn btn-primary" v-on:click="modalOk">@if (empty($caption_OK)) OK @else{{ $caption_OK }}@endif</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">キャンセル</button>
                 @endif
             </div>

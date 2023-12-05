@@ -106,6 +106,6 @@
 
 {{-- モーダル --}}
 @include('pages.admin.modal.report_check-modal')
-@include('pages.admin.modal.report_check_approval-modal', ['modal_send_confirm' => true, 'modal_id' => 'modal-dtl-approval'])
+@include('pages.admin.modal.report_check_approval-modal', ['modal_send_confirm' => true, 'modal_id' => 'modal-dtl-approval', 'caption_OK' => '承認'])
 
 @stop
