@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student;
 
 use App\Consts\AppConst;
+use App\Libs\CommonDateFormat;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\FuncCalendarTrait;
 use App\Http\Controllers\Traits\FuncScheduleTrait;
@@ -77,7 +78,7 @@ class TransferStudentController extends Controller
         $account_id = $account->account_id;
 
         // 一覧用SQLを取得
-        $transfers = $this->fncTranGetATransferApplicationList($account_id, null, null, null);
+        $transfers = $this->fncTranGetATransferApplicationList($account_id, null, null, null, true);
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $transfers);
@@ -161,9 +162,6 @@ class TransferStudentController extends Controller
         // 授業情報を取得
         $lesson = $this->fncTranGetTargetScheduleInfo($schedule_id, $account_id, null);
 
-        // 時限リストを取得
-        $periods = $this->mdlGetPeriodListByDate($lesson->campus_cd, $lesson->target_date);
-
         // 振替候補日の範囲
         $targetPeriod = $this->fncTranCandidateDateFromTo($lesson->target_date);
 
@@ -184,7 +182,6 @@ class TransferStudentController extends Controller
             'subject_name' => $lesson->subject_name,
             'preferred_from' => $targetPeriod['from_date'],
             'preferred_to' => $targetPeriod['to_date'],
-            'periods' => $this->objToArray($periods),
             'candidates' => $this->objToArray($candidates)
         ];
     }
@@ -314,7 +311,7 @@ class TransferStudentController extends Controller
 
                 $mail_body = [
                     'from_name' => $student_name,
-                    'schedule_date_time' => $schedule->target_date->format('Y/m/d') .
+                    'schedule_date_time' => CommonDateFormat::formatYmdDay($schedule->target_date) .
                         ' ' . $schedule->period_no . '時限目',
                     'campus_name' => $campus_name,
                     'tutor_name' => $tutor_name,
@@ -365,38 +362,42 @@ class TransferStudentController extends Controller
                 // 対象日・対象校舎の時限・開始～終了時刻を取得
                 $timeTables = $this->getTimetableByDate($campusCd, $tran_date[$i]);
                 $periodList = $timeTables->keyBy('period_no');
-
-                $periodData = $periodList[$tran_period[$i]];
-
-                // 生徒スケジュール重複チェック
-                if (!$this->fncScheChkDuplidateSid(
-                    $tran_date[$i],
-                    $periodData['start_time'],
-                    $periodData['end_time'],
-                    $studentId
-                )) {
-                    $freeCheck[$i] = '生徒スケジュールあり';
+                if (!isset($periodList[$tran_period[$i]])) {
+                    // 時限リストに該当の時限のデータがない
+                    $freeCheck[$i] = Lang::get('validation.invalid_period');
                 } else {
-                    // 講師スケジュール重複チェック
-                    if (!$this->fncScheChkDuplidateTid(
+                    $periodData = $periodList[$tran_period[$i]];
+
+                    // 生徒スケジュール重複チェック
+                    if (!$this->fncScheChkDuplidateSid(
                         $tran_date[$i],
                         $periodData['start_time'],
                         $periodData['end_time'],
-                        $tutorId
+                        $studentId
                     )) {
-                        $freeCheck[$i] = '講師スケジュールあり';
+                        $freeCheck[$i] = Lang::get('validation.duplicate_student');
                     } else {
-                        // ブース空きチェック
-                        if ($this->fncScheSearchBooth(
-                            $campusCd,
-                            $boothCd,
+                        // 講師スケジュール重複チェック
+                        if (!$this->fncScheChkDuplidateTid(
                             $tran_date[$i],
-                            $tran_period[$i],
-                            $howToKind,
-                            null,
-                            false
-                        ) == null) {
-                            $freeCheck[$i] = '空きブースなし';
+                            $periodData['start_time'],
+                            $periodData['end_time'],
+                            $tutorId
+                        )) {
+                            $freeCheck[$i] = Lang::get('validation.duplicate_tutor');
+                        } else {
+                            // ブース空きチェック
+                            if ($this->fncScheSearchBooth(
+                                $campusCd,
+                                $boothCd,
+                                $tran_date[$i],
+                                $tran_period[$i],
+                                $howToKind,
+                                null,
+                                false
+                            ) == null) {
+                                $freeCheck[$i] = Lang::get('validation.duplicate_booth');
+                            }
                         }
                     }
                 }
@@ -405,7 +406,7 @@ class TransferStudentController extends Controller
 
         $editdata = [
             'transfer_apply_id' => $tranApp->transfer_apply_id,
-            'target_date' => $this->dtFormatYmd($tranApp->lesson_target_date),
+            'target_date' => CommonDateFormat::formatYmdDay($tranApp->lesson_target_date),
             'period_no' => $tranApp->lesson_period_no,
             'campus_name' => $tranApp->campus_name,
             'course_name' => $tranApp->course_name,
@@ -421,7 +422,7 @@ class TransferStudentController extends Controller
         ];
         for ($i = 1; $i <= 3; $i++) {
             $editdata += [
-                'transfer_date_' . $i => $tran_date[$i],
+                'transfer_date_' . $i => CommonDateFormat::formatYmdDay($tran_date[$i]),
                 'period_no_' . $i => $tran_period[$i],
                 'free_check_' . $i => $freeCheck[$i]
             ];
@@ -547,9 +548,9 @@ class TransferStudentController extends Controller
                 $notice->text = Lang::get(
                     'message.notice.transfer_apply_regist_schedule.text',
                     [
-                        'targetDate' => $befSchedule->target_date->format('Y/m/d'),
+                        'targetDate' => CommonDateFormat::formatYmdDay($befSchedule->target_date),
                         'targetPeriodNo' => $befSchedule->period_no,
-                        'transferDate' => $transAppDate->transfer_date->format('Y/m/d'),
+                        'transferDate' => CommonDateFormat::formatYmdDay($transAppDate->transfer_date),
                         'transferPeriodNo' => $transAppDate->period_no,
                         'roomName' => $campus_name,
                         'tutorName' => $tutor_name,
@@ -589,9 +590,9 @@ class TransferStudentController extends Controller
 
                     $mail_body = [
                         'from_name' => $student_name,
-                        'schedule_date_time' => $befSchedule->target_date->format('Y/m/d') .
+                        'schedule_date_time' => CommonDateFormat::formatYmdDay($befSchedule->target_date) .
                             ' ' . $befSchedule->period_no . '時限目',
-                        'transfer_date_time' => $transAppDate->transfer_date->format('Y/m/d') .
+                        'transfer_date_time' => CommonDateFormat::formatYmdDay($transAppDate->transfer_date) .
                             ' ' . $transAppDate->period_no . '時限目',
                         'campus_name' => $campus_name,
                         'tutor_name' => $tutor_name,
@@ -630,7 +631,7 @@ class TransferStudentController extends Controller
 
                         $mail_body = [
                             'from_name' => $student_name,
-                            'schedule_date_time' => $befSchedule->target_date->format('Y/m/d') .
+                            'schedule_date_time' => CommonDateFormat::formatYmdDay($befSchedule->target_date) .
                                 ' ' . $befSchedule->period_no . '時限目',
                             'campus_name' => $campus_name,
                             'tutor_name' => $tutor_name,

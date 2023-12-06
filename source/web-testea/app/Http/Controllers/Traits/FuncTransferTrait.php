@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Traits;
 
+use App\Libs\CommonDateFormat;
 use App\Models\TutorFreePeriod;
 use App\Models\YearlySchedule;
 use App\Consts\AppConst;
@@ -323,7 +324,7 @@ trait FuncTransferTrait
             ->sdLeftJoin(MstSubject::class, 'lesson_schedules.subject_cd', '=', 'mst_subjects.subject_cd')
             // コードマスターとJOIN 申請者種別
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('transfer_applications.approval_status', '=', 'mst_codes_53.code')
+                $join->on('transfer_applications.apply_kind', '=', 'mst_codes_53.code')
                     ->where('mst_codes_53.data_type', AppConst::CODE_MASTER_53);
             }, 'mst_codes_53')
             // コードマスターとJOIN 振替依頼承認ステータス
@@ -469,7 +470,7 @@ trait FuncTransferTrait
             foreach ($lessons as $lesson) {
                 $schedule = [
                     'id' => date('Y-m-d', strtotime($lesson['target_date'])) . '_' . $lesson['period_no'],
-                    'value' => date('Y/m/d', strtotime($lesson['target_date'])) . ' ' . $lesson['period_no'] . '限'
+                    'value' => CommonDateFormat::formatYmdDay($lesson['target_date']) . ' ' . $lesson['period_no'] . '限'
                 ];
                 $schedule = (object) $schedule;
                 array_push($scheduleMasterKeys, $schedule->id);
