@@ -55,6 +55,8 @@ export default class PageComponentBase {
         // フィルター
         app.config.globalProperties.$filters = this._getFilters();
 
+        app.config.compilerOptions.whitespace = 'preserve';
+
         return app.mount(id);
     }
 

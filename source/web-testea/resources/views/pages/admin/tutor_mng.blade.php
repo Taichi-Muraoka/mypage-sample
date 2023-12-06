@@ -76,12 +76,8 @@
             <td>@{{$filters.formatTotalMonth(item.enter_term)}}</td>
             <td>
                 <x-button.list-edit vueHref="'{{ route('tutor_mng-detail', '') }}/' + item.tutor_id" caption="講師情報" />
-                {{-- ボタンスペース --}}
-                &nbsp;
                 <x-button.list-edit vueHref="'{{ route('tutor_mng-calendar', '') }}/' + item.tutor_id" caption="カレンダー" />
-                &nbsp;
                 <x-button.list-dtl vueHref="'{{ route('tutor_mng-weekly_shift', '') }}/' + item.tutor_id" caption="空き時間" />
-                &nbsp;
                 <x-button.list-dtl vueHref="'{{ route('tutor_mng-salary', '') }}/' + item.tutor_id" caption="給与明細" />
             </td>
         </tr>

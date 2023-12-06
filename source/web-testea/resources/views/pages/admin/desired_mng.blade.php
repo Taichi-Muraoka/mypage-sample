@@ -44,8 +44,6 @@
                 <td>@{{item.result_name}}</td>
                 <td>
                     <x-button.list-dtl :vueDataAttr="['id' => 'item.student_exam_id']" />
-                    {{-- ボタンスペース --}}
-                    &nbsp;
                     <x-button.list-edit vueHref="'{{ route('desired_mng-edit', '') }}/' + item.student_exam_id"
                         vueDisabled="item.disabled_btn" />
                 </td>

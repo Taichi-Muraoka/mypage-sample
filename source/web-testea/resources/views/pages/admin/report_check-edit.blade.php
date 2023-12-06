@@ -1,4 +1,5 @@
 @extends('adminlte::page')
+@inject('formatter','App\Libs\CommonDateFormat')
 
 @section('title', '授業報告書編集')
 
@@ -19,7 +20,7 @@
         </tr>
         <tr>
             <th width="20%">授業日・時限</th>
-            <td>{{$report['lesson_date']->format('Y/m/d')}} {{$report['period_no']}}限</td>
+            <td>{{$formatter::formatYmdDay($report['lesson_date'])}} {{$report['period_no']}}限</td>
         </tr>
         <tr>
             <th>校舎</th>

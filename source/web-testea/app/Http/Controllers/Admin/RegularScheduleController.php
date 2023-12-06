@@ -608,6 +608,8 @@ class RegularScheduleController extends Controller
     {
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
+        // 登録前バリデーション（関連チェック）。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForInputRelated($request))->validate();
 
         $form = $request->only(
             'campus_cd',
@@ -665,6 +667,8 @@ class RegularScheduleController extends Controller
     {
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
+        // 登録前バリデーション（関連チェック）。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForInputRelated($request))->validate();
 
         // トランザクション(例外時は自動的にロールバック)
         DB::transaction(function () use ($request) {

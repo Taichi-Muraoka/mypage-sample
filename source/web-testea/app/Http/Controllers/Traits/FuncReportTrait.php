@@ -109,7 +109,7 @@ trait FuncReportTrait
      * 授業報告書教材情報の取得
      *
      * @param integer $id report_id
-     * @return array
+     * @return object
      */
     private function getReport($id)
     {
@@ -181,7 +181,7 @@ trait FuncReportTrait
                     ->where('data_type', AppConst::CODE_MASTER_2);
             })
             ->first();
-        
+
         return $report;
     }
     /**
@@ -193,13 +193,13 @@ trait FuncReportTrait
     private function getClassMember($schedule_id)
     {
         $class_members = ClassMember::query()
-                ->where('class_members.schedule_id', '=', $schedule_id)
-                ->select('class_members.student_id')
-                ->get();
-            
+            ->where('class_members.schedule_id', '=', $schedule_id)
+            ->select('class_members.student_id')
+            ->get();
+
         // 受講人数カウント
         $number_people = count($class_members);
-            
+
         // 受講生徒名を配列に格納
         $class_member_names = [];
         for ($i = 0; $i < $number_people; $i++) {
@@ -215,14 +215,14 @@ trait FuncReportTrait
      * @param integer $sub_code AppConst 授業報告書サブコード
      * @return array
      */
-    private function getReportText($report_id,$sub_code)
+    private function getReportText($report_id, $sub_code)
     {
         $report_text = ReportUnit::query()
             ->where('report_units.report_id', '=', $report_id)
             ->where('report_units.sub_cd', '=', $sub_code)
             ->select(
-                'mst_texts.name as text_name1',// 教材名
-                'report_units.free_text_name as free_text_name1',// 教材名フリー
+                'mst_texts.name as text_name1', // 教材名
+                'report_units.free_text_name as free_text_name1', // 教材名フリー
                 'report_units.text_page as text_page1',
             )
             // 教材名の取得
@@ -243,15 +243,15 @@ trait FuncReportTrait
      */
     private function getReportCategory($report_id, $sub_code, $no)
     {
-        if($no == 1) {
+        if ($no == 1) {
             $report_category = ReportUnit::query()
                 ->where('report_units.report_id', '=', $report_id)
                 ->where('report_units.sub_cd', '=', $sub_code)
                 ->select(
-                    'mst_unit_categories.name as unit_category_name',// 単元分類名
-                    'report_units.free_category_name1 as free_category_name',// 単元分類名フリー
-                    'mst_units.name as unit_name',// 単元名
-                    'report_units.free_unit_name1 as free_unit_name',// 単元名フリー
+                    'mst_unit_categories.name as unit_category_name', // 単元分類名
+                    'report_units.free_category_name1 as free_category_name', // 単元分類名フリー
+                    'mst_units.name as unit_name', // 単元名
+                    'report_units.free_unit_name1 as free_unit_name', // 単元名フリー
                 )
                 // 単元分類名の取得
                 ->sdLeftJoin(MstUnitCategory::class, function ($join) {
@@ -264,15 +264,15 @@ trait FuncReportTrait
                 })
                 ->first();
         }
-        if($no == 2) {
+        if ($no == 2) {
             $report_category = ReportUnit::query()
                 ->where('report_units.report_id', '=', $report_id)
                 ->where('report_units.sub_cd', '=', $sub_code)
                 ->select(
-                    'mst_unit_categories.name as unit_category_name',// 単元分類名
-                    'report_units.free_category_name2 as free_category_name',// 単元分類名フリー
-                    'mst_units.name as unit_name',// 単元名
-                    'report_units.free_unit_name2 as free_unit_name',// 単元名フリー
+                    'mst_unit_categories.name as unit_category_name', // 単元分類名
+                    'report_units.free_category_name2 as free_category_name', // 単元分類名フリー
+                    'mst_units.name as unit_name', // 単元名
+                    'report_units.free_unit_name2 as free_unit_name', // 単元名フリー
                 )
                 // 単元分類名の取得
                 ->sdLeftJoin(MstUnitCategory::class, function ($join) {
@@ -285,15 +285,15 @@ trait FuncReportTrait
                 })
                 ->first();
         }
-        if($no == 3) {
+        if ($no == 3) {
             $report_category = ReportUnit::query()
                 ->where('report_units.report_id', '=', $report_id)
                 ->where('report_units.sub_cd', '=', $sub_code)
                 ->select(
-                    'mst_unit_categories.name as unit_category_name',// 単元分類名
-                    'report_units.free_category_name3 as free_category_name',// 単元分類名フリー
-                    'mst_units.name as unit_name',// 単元名
-                    'report_units.free_unit_name3 as free_unit_name',// 単元名フリー
+                    'mst_unit_categories.name as unit_category_name', // 単元分類名
+                    'report_units.free_category_name3 as free_category_name', // 単元分類名フリー
+                    'mst_units.name as unit_name', // 単元名
+                    'report_units.free_unit_name3 as free_unit_name', // 単元名フリー
                 )
                 // 単元分類名の取得
                 ->sdLeftJoin(MstUnitCategory::class, function ($join) {
@@ -313,7 +313,7 @@ trait FuncReportTrait
      *
      * @param integer $report_id 授業報告書ID
      * @param integer $sub_code AppConst 授業報告書サブコード
-     * @return array
+     * @return object
      */
     private function getReportUnit($report_id, $sub_code)
     {
@@ -324,27 +324,27 @@ trait FuncReportTrait
                 'report_units.report_id',
                 'report_units.sub_cd',
                 'report_units.text_cd',
-                'mst_texts1.name as text_name1',// 教材名
-                'report_units.free_text_name as free_text_name',// 教材名フリー
+                'mst_texts1.name as text_name1', // 教材名
+                'report_units.free_text_name as free_text_name', // 教材名フリー
                 'report_units.text_page as text_page1',
                 'report_units.unit_category_cd1',
-                'mst_unit_categories1.name as unit_category_name1',// 単元分類名
-                'report_units.free_category_name1 as free_category_name1',// 単元分類名フリー
+                'mst_unit_categories1.name as unit_category_name1', // 単元分類名
+                'report_units.free_category_name1 as free_category_name1', // 単元分類名フリー
                 'report_units.unit_cd1',
-                'mst_units1.name as unit_name1',// 単元名
-                'report_units.free_unit_name1 as free_unit_name1',// 単元名フリー
+                'mst_units1.name as unit_name1', // 単元名
+                'report_units.free_unit_name1 as free_unit_name1', // 単元名フリー
                 'report_units.unit_category_cd2',
-                'mst_unit_categories2.name as unit_category_name2',// 単元分類名
-                'report_units.free_category_name2 as free_category_name2',// 単元分類名フリー
+                'mst_unit_categories2.name as unit_category_name2', // 単元分類名
+                'report_units.free_category_name2 as free_category_name2', // 単元分類名フリー
                 'report_units.unit_cd2',
-                'mst_units2.name as unit_name2',// 単元名
-                'report_units.free_unit_name2 as free_unit_name2',// 単元名フリー
+                'mst_units2.name as unit_name2', // 単元名
+                'report_units.free_unit_name2 as free_unit_name2', // 単元名フリー
                 'report_units.unit_category_cd3',
-                'mst_unit_categories3.name as unit_category_name3',// 単元分類名
-                'report_units.free_category_name3 as free_category_name3',// 単元分類名フリー
+                'mst_unit_categories3.name as unit_category_name3', // 単元分類名
+                'report_units.free_category_name3 as free_category_name3', // 単元分類名フリー
                 'report_units.unit_cd3',
-                'mst_units3.name as unit_name3',// 単元名
-                'report_units.free_unit_name3 as free_unit_name3',// 単元名フリー
+                'mst_units3.name as unit_name3', // 単元名
+                'report_units.free_unit_name3 as free_unit_name3', // 単元名フリー
             )
             // 教材名の取得
             ->sdLeftJoin(MstText::class, function ($join) {

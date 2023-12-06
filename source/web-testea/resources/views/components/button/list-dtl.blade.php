@@ -20,7 +20,7 @@
 @if (empty($href) && empty($vueHref))
 
 <button type="button" 
-  class="btn btn-sm ml-1 @if (empty($btn)){{ 'btn-secondary' }}@else{{ $btn }}@endif @if ($disabled) {{ 'disabled' }} @endif @if (!empty($class)){{ $class }}@endif" 
+  class="btn btn-sm @if (empty($btn)){{ 'btn-secondary' }}@else{{ $btn }}@endif @if ($disabled) {{ 'disabled' }} @endif @if (!empty($class)){{ $class }}@endif" 
   data-toggle="modal"
 
   {{-- 開くモーダルを指定。動的に指定する場合は、vueDataAttr=['target' => 'xxx'] のように指定するのでそれ以外の場合 --}} 
@@ -52,7 +52,7 @@
 
 {{-- vue用のbindを使用 --}}
 <a :href="{{ $vueHref }}" 
-  class="btn @if (empty($btn)){{ 'btn-secondary' }}@else{{ $btn }}@endif btn-sm ml-1 @if (!empty($class)){{ $class }}@endif @if ($disabled) {{ 'disabled' }} @endif" role="button">
+  class="btn @if (empty($btn)){{ 'btn-secondary' }}@else{{ $btn }}@endif btn-sm @if (!empty($class)){{ $class }}@endif @if ($disabled) {{ 'disabled' }} @endif" role="button">
   @if (empty($caption)){{ '詳細' }}@else{{ $caption }}@endif
 </a>
 
@@ -60,7 +60,7 @@
 
 {{-- 単純なリンクの遷移 --}}
 <a href="@if (empty($href)){{ '#' }}@else{{ $href }}@endif" 
-  class="btn @if (empty($btn)){{ 'btn-secondary' }}@else{{ $btn }}@endif btn-sm ml-1 @if (!empty($class)){{ $class }}@endif @if ($disabled) {{ 'disabled' }} @endif" role="button">
+  class="btn @if (empty($btn)){{ 'btn-secondary' }}@else{{ $btn }}@endif btn-sm @if (!empty($class)){{ $class }}@endif @if ($disabled) {{ 'disabled' }} @endif" role="button">
   @if (empty($caption)){{ '詳細' }}@else{{ $caption }}@endif
 </a>
 
