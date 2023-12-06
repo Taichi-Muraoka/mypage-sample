@@ -496,6 +496,37 @@ trait CtrlModelTrait
     }
 
     /**
+     * 時限プルダウンメニューのリストを取得（管理者用）
+     *
+     * @param int $timetableKind 時間割区分（省略可）
+     * @return array
+     */
+    protected function mdlGetPeriodListForAdmin($timetableKind = null)
+    {
+        $query = MstTimetable::query();
+
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithRoomCd());
+        }
+
+        // 時間割区分が指定された場合絞り込み
+        $query->when($timetableKind, function ($query) use ($timetableKind) {
+            return $query->where('timetable_kind', $timetableKind);
+        });
+
+            // プルダウンリストを取得する
+        return $query->select(
+            'period_no as code',
+            DB::raw('CONCAT(period_no, "限") AS value')
+        )
+            ->orderby('period_no')
+            ->distinct()
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
      * 授業科目プルダウンメニューのリストを取得
      *
      * @param int $courseKind コース種別 省略可

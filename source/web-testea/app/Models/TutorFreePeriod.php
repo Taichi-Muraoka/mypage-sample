@@ -30,7 +30,7 @@ class TutorFreePeriod extends Model
      * @var array
      */
 
-    protected $primaryKey = 'free_priod_id';
+    protected $primaryKey = 'free_period_id';
 
     /**
      * IDが自動増分されるか
@@ -99,7 +99,7 @@ class TutorFreePeriod extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'free_priod_id' => ['integer'],
+            'free_period_id' => ['integer'],
             'tutor_id' => ['integer'],
             'day_cd' => ['integer'],
             'period_no' => ['integer']
@@ -110,5 +110,40 @@ class TutorFreePeriod extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
+    /**
+     * 検索 講師ID
+     */
+    public function scopeSearchTutorId($query, $obj)
+    {
+        $key = 'tutor_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 曜日コード
+     */
+    public function scopeSearchDayCd($query, $obj)
+    {
+        $key = 'day_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 時限
+     */
+    public function scopeSearchPeriodNo($query, $obj)
+    {
+        $key = 'period_no';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 
 }
