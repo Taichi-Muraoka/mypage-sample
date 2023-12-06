@@ -9,6 +9,8 @@ use App\Models\ClassMember;
 use App\Models\Tutor;
 use App\Models\MstCampus;
 use App\Models\MstSubject;
+use App\Models\Student;
+use App\Models\CodeMaster;
 
 /**
  * 欠席申請 - 機能共通処理
@@ -105,5 +107,69 @@ trait FuncAbsentTrait
             ->firstOrFail();
 
         return $lesson;
+    }
+
+    /**
+     * 欠席申請情報を取得
+     * 一覧・詳細モーダル・受付モーダル共通
+     * 管理者用
+     */
+    private function getAbsentApplyDetail($query)
+    {
+        $absentApply = $query
+            ->select(
+                'absent_applications.absent_apply_id',
+                'absent_applications.student_id',
+                'absent_applications.absent_reason',
+                'absent_applications.status',
+                'absent_applications.apply_date',
+                'schedules.schedule_id',
+                'schedules.target_date',
+                'schedules.period_no',
+                // 校舎名
+                'mst_campuses.name as campus_name',
+                // コース名
+                'mst_courses.name as course_name',
+                // 教科名
+                'mst_subjects.name as subject_name',
+                // 生徒名
+                'students.name as student_name',
+                // 講師名
+                'tutors.tutor_id',
+                'tutors.name as tutor_name',
+                // コードマスタの名称（ステータス）
+                'mst_codes.name as status_name'
+            )
+            // スケジュール情報とJOIN
+            ->sdLeftJoin(Schedule::class, function ($join) {
+                $join->on('absent_applications.schedule_id', '=', 'schedules.schedule_id');
+            })
+            // 校舎マスタとJOIN
+            ->sdLeftJoin(MstCampus::class, function ($join) {
+                $join->on('schedules.campus_cd', '=', 'mst_campuses.campus_cd');
+            })
+            // コースマスタとJOIN
+            ->sdLeftJoin(MstCourse::class, function ($join) {
+                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd');
+            })
+            // 教科マスタとJOIN
+            ->sdLeftJoin(MstSubject::class, function ($join) {
+                $join->on('schedules.subject_cd', '=', 'mst_subjects.subject_cd');
+            })
+            // 生徒情報とJOIN
+            ->sdLeftJoin(Student::class, function ($join) {
+                $join->on('absent_applications.student_id', '=', 'students.student_id');
+            })
+            // 講師情報とJOIN
+            ->sdLeftJoin(Tutor::class, function ($join) {
+                $join->on('schedules.tutor_id', '=', 'tutors.tutor_id');
+            })
+            // コードマスタとJOIN ステータス
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('absent_applications.status', '=', 'mst_codes.code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_1);
+            });
+
+        return $absentApply;
     }
 }

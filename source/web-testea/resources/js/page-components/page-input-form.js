@@ -218,6 +218,11 @@ export default class PageInputForm extends PageComponentBase {
                         // 削除処理
                         self._sendValidationDelete(this, option);
                     },
+                    // 承認送信ボタン
+                    submitApproval: function () {
+                        // 承認処理
+                        self._sendApproval(this, option);
+                    },
                     // プルダウンの変更イベントで詳細を取得
                     selectChangeGet: function (event) {
                         // プルダウン変更
@@ -657,6 +662,114 @@ export default class PageInputForm extends PageComponentBase {
 
                 // 完了メッセージ
                 return appDialogCom.success("削除");
+            })
+            .then(
+                // 後処理を実行する
+                option["afterEdit"]
+            )
+            .catch(AjaxCom.fail);
+    }
+
+    /**
+     * 承認
+     *
+     * @param vueインスタンス
+     */
+    _sendApproval($vue, option) {
+        // 送信フォームのデータを取得する
+        var sendData = this._getSendFormData($vue);
+
+        const self = this;
+        AjaxCom.getPromise()
+            .then(() => {
+                // バリデート(例：http://localhost:8000/sample/edit/1 と同じ階層を想定)
+                var url =
+                    UrlCom.getFuncUrl() + "/vd_approval" + option["urlSuffix"];
+                // モック時は送信しない
+                if (!option["isMock"]) {
+                    // ファイルアップロード時は大きいファイルが想定されるのでローディングを表示
+                    // 空き時間登録のチェックボックスが多くやや時間がかかるので強制的に表示する場合も想定
+                    if (sendData.upload || option["progressShow"]) {
+                        // ダイアログ
+                        appDialogCom.progressShow();
+                    }
+
+                    // バリデーション
+                    return axios.post(url, sendData.data, sendData.header);
+                }
+            })
+            .then((response) => {
+                // モック時はチェックしない
+                if (!option["isMock"]) {
+                    // ファイルアップロード時は大きいファイルが想定されるのでローディングを表示
+                    if (sendData.upload || option["progressShow"]) {
+                        // ダイアログ
+                        appDialogCom.progressHide();
+                    }
+
+                    // バリデーション結果をチェック
+                    if (!self.validateCheck($vue, response)) {
+                        // 処理を抜ける
+                        return AjaxCom.exit();
+                    }
+                }
+
+                // 確認ダイアログ
+                if (
+                    Object.keys(response.data).length == 1 &&
+                    response.data["confirm_modal_data"]
+                ) {
+                    // 確認モーダルダイアログ
+
+                    // モーダルに表示したいデータをセットする
+                    $vue.vueModal.item = response.data["confirm_modal_data"];
+
+                    // モーダルを表示する
+                    $vue.vueModal.show();
+
+                    // 確認
+                    return $vue.vueModal.confirm();
+                } else {
+                    // 通常の確認ダイアログ
+                    return appDialogCom.confirmSend(option["confirmStrEdit"]);
+                }
+            })
+            .then((flg) => {
+                if (!flg) {
+                    // いいえを押した場合
+                    return AjaxCom.exit();
+                }
+
+                // ダイアログ
+                appDialogCom.progressShow();
+
+                // 編集
+                var url = UrlCom.getFuncUrl() + "/update" + option["urlSuffix"];
+
+                // モック時は送信しない
+                if (!option["isMock"]) {
+                    // 送信
+                    return axios.post(url, sendData.data, sendData.header);
+                } else {
+                    // ダミーウェイト
+                    return DummyCom.wait();
+                }
+            })
+            .then((response) => {
+                // ダイアログ
+                appDialogCom.progressHide();
+
+                // エラー応答の場合は、アラートを表示する
+                if (
+                    Object.keys(response.data).length == 1 &&
+                    response.data["error"]
+                ) {
+                    appDialogCom.alert(response.data["error"]);
+                    return AjaxCom.exit();
+                }
+
+                // 完了メッセージ
+                return appDialogCom.success(option["confirmStrEdit"]);
             })
             .then(
                 // 後処理を実行する

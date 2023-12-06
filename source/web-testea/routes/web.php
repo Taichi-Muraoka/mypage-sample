@@ -133,6 +133,12 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     // 振替希望日登録
     Route::get('/transfer_student/new', [TransferStudentController::class, 'new'])->name('transfer_student-new');
 
+    // 振替希望日プルダウンを選択された際に授業情報を返却する
+    Route::post('/transfer_student/get_data_select_schedule', [TransferStudentController::class, 'getDataSelectSchedule'])->name('transfer_student-get_data_select_schedule');
+
+    // 振替希望日フリー入力した際に時限情報を返却する
+    Route::post('/transfer_student/get_data_select_calender', [TransferStudentController::class, 'getDataSelectCalender'])->name('transfer_student-get_data_select_calender');
+
     // 新規登録処理
     Route::post('/transfer_student/create', [TransferStudentController::class, 'create'])->name('transfer_student-create');
 
@@ -144,6 +150,9 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
 
     // バリデーション(登録用)
     Route::post('/transfer_student/vd_input', [TransferStudentController::class, 'validationForInput'])->name('transfer_student-vd_input');
+
+    // バリデーション(承認用)
+    Route::post('/transfer_student/vd_approval', [TransferStudentController::class, 'validationForApproval'])->name('transfer_student-vd_approval');
 
     //---------------------
     // 追加授業依頼 モック
@@ -747,9 +756,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/transfer_required/search', [TransferRequiredController::class, 'search'])->name('transfer_required-search');
 
-    // 詳細取得用
-    Route::post('/transfer_required/get_data', [TransferRequiredController::class, 'getData'])->name('transfer_required-get_data');
-
     //----------------------
     // 欠席申請受付
     //----------------------
@@ -800,17 +806,20 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 詳細取得用
     Route::post('/extra_lesson_mng/get_data', [ExtraLessonMngController::class, 'getData'])->name('extra_lesson_mng-get_data');
 
-    // モーダル処理
-    Route::post('/extra_lesson_mng/exec_modal', [ExtraLessonMngController::class, 'execModal'])->name('extra_lesson_mng-exec_modal');
+    // 校舎ダウンを選択された際に時限リスト・講師リストを返却する
+    Route::post('/extra_lesson_mng/get_data_select_list', [ExtraLessonMngController::class, 'getDataSelectList'])->name('extra_lesson_mng-get_data_select_list');
+
+    // 時限プルダウンを選択された際に時間割の情報を返却する
+    Route::post('/extra_lesson_mng/get_data_select_timetable', [ExtraLessonMngController::class, 'getDataSelectTimetable'])->name('extra_lesson_mng-get_data_select_timetable');
 
     // 新規登録
-    Route::get('/extra_lesson_mng/new', [ExtraLessonMngController::class, 'new'])->name('extra_lesson_mng-new');
+    Route::get('/extra_lesson_mng/new/{sid}/{campusCd}', [ExtraLessonMngController::class, 'new'])->name('extra_lesson_mng-new');
 
     // 新規登録処理
     Route::post('/extra_lesson_mng/create', [ExtraLessonMngController::class, 'create'])->name('extra_lesson_mng-create');
 
     // 編集画面
-    Route::get('/extra_lesson_mng/edit/{changeId}', [ExtraLessonMngController::class, 'edit'])->name('extra_lesson_mng-edit');
+    Route::get('/extra_lesson_mng/edit/{extraId}', [ExtraLessonMngController::class, 'edit'])->name('extra_lesson_mng-edit');
 
     // 編集処理
     Route::post('/extra_lesson_mng/update', [ExtraLessonMngController::class, 'update'])->name('extra_lesson_mng-update');
@@ -1318,7 +1327,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/season_mng/exec_modal', [SeasonMngController::class, 'execModal'])->name('season_mng-exec_modal');
 
     // 受付期間登録画面
-    Route::get('/season_mng/edit/{changeId}', [SeasonMngController::class, 'edit'])->name('season_mng-edit');
+    Route::get('/season_mng/edit/{seasonMngId}', [SeasonMngController::class, 'edit'])->name('season_mng-edit');
 
     // 編集処理
     Route::post('/season_mng/update', [SeasonMngController::class, 'update'])->name('season_mng-update');

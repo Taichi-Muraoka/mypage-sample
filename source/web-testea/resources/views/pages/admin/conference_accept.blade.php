@@ -74,15 +74,13 @@
             <td>@{{$filters.formatYmd(item.apply_date)}}</td>
             <td>@{{item.student_name}}</td>
             <td>@{{item.campus_name}}</td>
-            <td>@{{$filters.formatYmd(item.conference_date)}}</td>
+            <td>@{{$filters.formatYmdDay(item.conference_date)}}</td>
             <td>@{{item.start_time}}</td>
             <td>@{{item.adm_name}}</td>
             <td>@{{item.status_name}}</td>
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.conference_id']" />
-                {{-- スペース --}}
-                &nbsp;
                 {{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
                 <x-button.list-edit vueHref="'{{ route('conference_accept-edit', '') }}/' + item.conference_id" caption="日程登録" 
                     {{-- 登録済みの場合は非活性 --}}

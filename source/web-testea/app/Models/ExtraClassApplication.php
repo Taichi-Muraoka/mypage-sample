@@ -48,7 +48,6 @@ class ExtraClassApplication extends Model
         'student_id',
         'campus_cd',
         'status',
-        'schedule_id',
         'request',
         'apply_date',
         'admin_comment'
@@ -110,7 +109,6 @@ class ExtraClassApplication extends Model
             'student_id' => ['integer'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
             'status' => ['integer'],
-            'schedule_id' => ['integer'],
             'request' => ['string', 'max:1000'],
             'apply_date' => ['date_format:Y-m-d'],
             'admin_comment' => ['string', 'max:1000']
@@ -121,5 +119,39 @@ class ExtraClassApplication extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
+    /**
+     * 検索 校舎コード
+     */
+    public function scopeSearchCampusCd($query, $obj)
+    {
+        $key = 'campus_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 
+    /**
+     * 検索 ステータス
+     */
+    public function scopeSearchStatus($query, $obj)
+    {
+        $key = 'status';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 生徒ID
+     */
+    public function scopeSearchStudentId($query, $obj)
+    {
+        $key = 'student_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 }

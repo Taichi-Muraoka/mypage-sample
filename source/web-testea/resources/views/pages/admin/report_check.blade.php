@@ -83,7 +83,7 @@
         <tr v-for="item in paginator.data" v-cloak>
             <x-bs.td-sp caption="登録日">@{{$filters.formatYmd(item.regist_date)}}</x-bs.td-sp>
             <x-bs.td-sp caption="講師名">@{{item.tutor_name}}</x-bs.td-sp>
-            <x-bs.td-sp caption="授業日・時限">@{{$filters.formatYmd(item.lesson_date)}} @{{item.period_no}}限</x-bs.td-sp>
+            <x-bs.td-sp caption="授業日・時限">@{{$filters.formatYmdDay(item.lesson_date)}} @{{item.period_no}}限</x-bs.td-sp>
             <x-bs.td-sp caption="校舎">@{{item.room_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="コース">@{{item.course_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="生徒名">@{{item.student_name}}</x-bs.td-sp>
@@ -91,13 +91,9 @@
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
-                {{-- スペース --}}
-                &nbsp;
                 <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval"
                     :vueDataAttr="['id' => 'item.id']"
                     vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }}"/>
-                {{-- スペース --}}
-                &nbsp;
                 <x-button.list-edit vueHref="'{{ route('report_check-edit', '') }}/' + item.id"
                     {{-- 承認のときは非活性 --}}
                     vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }}"/>
@@ -110,6 +106,6 @@
 
 {{-- モーダル --}}
 @include('pages.admin.modal.report_check-modal')
-@include('pages.admin.modal.report_check_approval-modal', ['modal_send_confirm' => true, 'modal_id' => 'modal-dtl-approval'])
+@include('pages.admin.modal.report_check_approval-modal', ['modal_send_confirm' => true, 'modal_id' => 'modal-dtl-approval', 'caption_OK' => '承認'])
 
 @stop

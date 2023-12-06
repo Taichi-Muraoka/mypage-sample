@@ -266,4 +266,42 @@ trait FuncSeasonTrait
 
         return $rtnObj;
     }
+
+    /**
+     * 特別期間講習管理 一覧画面表示対象の特別期間コード取得
+     * システム日付の月により設定
+     *
+     * @return string
+     */
+    private function fncSasnGetDispSeasonCd()
+    {
+        // 現在月を取得
+        $month = date("n");
+
+        switch ($month) {
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                // 2～5月の場合、当年の春期特別期間コードとする
+                return date("Y") . AppConst::CODE_MASTER_38_GEN1_1;
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+                // 6～10月の場合、当年の夏期特別期間コードとする
+                return date("Y") . AppConst::CODE_MASTER_38_GEN1_2;
+            case 11:
+            case 12:
+                // 11～12月の場合、当年の冬期特別期間コードとする
+                return date("Y") . AppConst::CODE_MASTER_38_GEN1_3;
+            case 1:
+                // 1月の場合、年が変わるため前年の冬期特別期間コードとする
+                return date('Y', strtotime('-1 year')) . AppConst::CODE_MASTER_38_GEN1_3;
+            default:
+                // 不正なエラー
+                $this->illegalResponseErr();
+        }
+    }
 }

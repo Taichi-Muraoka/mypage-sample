@@ -970,7 +970,26 @@ class SeasonMngStudentController extends Controller
         }, ARRAY_FILTER_USE_BOTH);
 
         // ブースマスタから対象校舎のブースを取得（両者通塾用）
+        $howToKind = AppConst::CODE_MASTER_33_0;
+        $boothFirst = null;
         $arrMstBooths = $this->fncScheGetBoothFromMst($campusCd, AppConst::CODE_MASTER_33_0);
+        if ($arrMstBooths) {
+            $boothFirst = $arrMstBooths[0];
+        } else {
+            // 両者通塾用のブースがない場合、家庭教師用のブースを取得（家庭教師教室対応）
+            $arrMstBooths = $this->fncScheGetBoothFromMst($campusCd, AppConst::CODE_MASTER_33_4);
+            if ($arrMstBooths) {
+                $howToKind = AppConst::CODE_MASTER_33_4;
+                $boothFirst = $arrMstBooths[0];
+            } else {
+                // 両者通塾用・家庭教師用のブースがない場合、両者オンライン用のブースを取得（オンライン教室対応）
+                $arrMstBooths = $this->fncScheGetBoothFromMst($campusCd, AppConst::CODE_MASTER_33_2);
+                if ($arrMstBooths) {
+                    $howToKind = AppConst::CODE_MASTER_33_2;
+                    $boothFirst = $arrMstBooths[0];
+                }
+            }
+        }
 
         // 個別指導コース情報の取得（コース種別・給与算出種別から）
         $course = $this->fncScheGetCourseInfoByKind(AppConst::CODE_MASTER_42_1, AppConst::CODE_MASTER_25_1);
@@ -998,7 +1017,7 @@ class SeasonMngStudentController extends Controller
             if (!$chk) {
                 // 講師スケジュール重複
                 throw new ReadDataValidateException(Lang::get('validation.duplicate_tutor')
-                    . "(" . $targetDate .  " " . $periodNo . "限 " . ")");
+                    . "(" . $targetDate .  " " . $periodNo . "限" . ")");
             }
 
             // 生徒のスケジュール重複チェック
@@ -1007,23 +1026,23 @@ class SeasonMngStudentController extends Controller
             if (!$chk) {
                 // 生徒スケジュール重複
                 throw new ReadDataValidateException(Lang::get('validation.duplicate_student')
-                    . "(" . $targetDate .  " " . $periodNo . "限 " . ")");
+                    . "(" . $targetDate .  " " . $periodNo . "限" . ")");
             }
 
             // ブースのチェック・空きブース取得
             $booth = $this->fncScheSearchBooth(
                 $campusCd,
-                $arrMstBooths[0],
+                $boothFirst,
                 $targetDate,
                 $periodNo,
-                AppConst::CODE_MASTER_33_0,
+                $howToKind,
                 null,
                 false
             );
             if (!$booth) {
                 // 空きブース無し
                 throw new ReadDataValidateException(Lang::get('validation.duplicate_booth')
-                    . "(" . $targetDate .  " " . $periodNo . "限 " . ")");
+                    . "(" . $targetDate .  " " . $periodNo . "限" . ")");
             }
 
             // スケジュール情報セット
@@ -1040,7 +1059,7 @@ class SeasonMngStudentController extends Controller
                 'tutor_id' => $tutorId,
                 'student_id' => $studentId,
                 'lesson_kind' => AppConst::CODE_MASTER_31_2,
-                'how_to_kind' => AppConst::CODE_MASTER_33_0,
+                'how_to_kind' => $howToKind,
                 'tentative_status' => AppConst::CODE_MASTER_36_1,
                 'memo' => null,
             ];

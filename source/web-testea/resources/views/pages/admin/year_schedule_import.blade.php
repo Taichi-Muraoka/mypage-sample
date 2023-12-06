@@ -19,31 +19,18 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023</td>
-            <td>久我山</td>
-            <td>取込済</td>
-            <td><x-button.list-send vueHref="'{{ route('year_schedule_import-import', '')}}/' + '久我山'" caption="取込" /></td>
-        </tr>
-        <tr>
-            <td>2023</td>
-            <td>西永服</td>
-            <td class="text-danger">取込未</td>
-            <td><x-button.list-send vueHref="'{{ route('year_schedule_import-import', '')}}/' + '西永福'" caption="取込" /></td>
-        </tr>
-        <tr>
-            <td>2023</td>
-            <td>本郷</td>
-            <td class="text-danger">取込未</td>
-            <td><x-button.list-send vueHref="'{{ route('year_schedule_import-import', '')}}/' + '本郷'" caption="取込" /></td>
-        </tr>
-        {{-- <tr v-for="item in paginator.data" v-cloak>
-            <td>@{{$filters.formatYmdHms(item.start_time)}}</td>
-            <td>@{{$filters.formatYmdHms(item.end_time)}}</td>
-            <td><span v-if="item.batch_state == {{ App\Consts\AppConst::CODE_MASTER_22_1 }}" class="text-danger">@{{item.batch_state_name}}</span><span v-else>@{{item.batch_state_name}}</span></td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{item.school_year}}</td>
             <td>@{{item.room_name}}</td>
-            <td>@{{item.executor}}</td>
-        </tr> --}}
+            <td>
+                <span v-if="item.import_state == {{ App\Consts\AppConst::CODE_MASTER_20_0 }}"
+                    class="text-danger">@{{item.import_state_name}}</span>
+                <span v-else>@{{item.import_state_name}}</span>
+            </td>
+            <td>
+                <x-button.list-send vueHref="'{{ route('year_schedule_import-import', '')}}/' + item.id" caption="取込" />
+            </td>
+        </tr>
 
     </x-bs.table>
 

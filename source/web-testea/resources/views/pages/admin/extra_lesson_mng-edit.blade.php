@@ -15,32 +15,28 @@
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="35%">校舎</th>
-            <td>久我山</td>
+            <td>{{$editData['campus_name']}}</td>
         </tr>
         <tr>
             <th>生徒名</th>
-            <td>CWテスト生徒１</td>
+            <td>{{$editData['student_name']}}</td>
         </tr>
         <tr>
             <th>希望内容</th>
-            <td>定期テスト対策で来週１コマ追加したい （英語）<br>
-                2023/3/1の5限か6限希望</td>
+            <td class="nl2br">{{$editData['request']}}</td>
         </tr>
     </x-bs.table>
 
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    {{-- <x-input.select id="changes_state" caption="ステータス" :select2=true :select2Search=false :editData=$editData
-        :mastrData=$statusList /> --}}
-    <x-input.select caption="ステータス" id="state" :select2=true :editData=$editData>
-        <option value="1">未対応</option>
-        <option value="2">対応済</option>
-    </x-input.select>
+    <x-input.select caption="ステータス" id="status" :select2=true :mastrData=$statusList :editData="$editData"
+        :select2Search=false :blank=false />
 
-    <x-input.textarea caption="管理者コメント" id="comment" :editData=$editData :rules=$rules />
+    <x-input.textarea caption="管理者コメント" id="admin_comment" :editData=$editData :rules=$rules />
 
-    <x-input.hidden id="change_id" :editData=$editData />
+    {{-- hidden --}}
+    <x-input.hidden id="extra_apply_id" :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">

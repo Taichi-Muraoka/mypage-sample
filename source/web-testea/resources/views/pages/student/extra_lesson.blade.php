@@ -9,13 +9,9 @@
 
     <p>追加授業の依頼を行います。</p>
 
-    <x-input.select id="school" caption="校舎" :select2=true :select2Search=false :blank=false>
-        <option value="1">久我山</option>
-        <option value="2">西永福</option>
-        <option value="3">本郷</option>
-    </x-input.select>
+    <x-input.select caption="校舎" id="campus_cd" :select2=true :mastrData=$rooms :select2Search=false :blank=false />
 
-    <x-input.textarea caption="追加授業の希望内容（希望の授業日時や教科等）" id="changes_text" :rules=$rules />
+    <x-input.textarea caption="追加授業の希望内容（希望の授業日時や教科等）" id="request" :rules=$rules />
 
     <x-bs.callout type="warning">
         教室長が授業スケジュールを調整し、ご連絡します。<br>

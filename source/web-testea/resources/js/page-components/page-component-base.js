@@ -55,6 +55,8 @@ export default class PageComponentBase {
         // フィルター
         app.config.globalProperties.$filters = this._getFilters();
 
+        app.config.compilerOptions.whitespace = 'preserve';
+
         return app.mount(id);
     }
 
@@ -77,6 +79,14 @@ export default class PageComponentBase {
                     return "";
                 } else {
                     return moment(date).format("YYYY/MM/DD(dd)");
+                }
+            },
+            // 年月日（ハイフンなし）
+            formatYmdNoH(date) {
+                if (ValueCom.isEmpty(date)) {
+                    return "";
+                } else {
+                    return moment(date).format("YYYYMMDD");
                 }
             },
             // 年月日 日時

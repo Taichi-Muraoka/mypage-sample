@@ -346,6 +346,11 @@ label:not(.form-check-label):not(.custom-file-label) {
     /*font-weight: bold;*/
 }
 
+/* 非アクティブ時のボタンカーソルの統一 ------------------------*/
+.btn.disabled, .btn:disabled {
+    cursor: pointer !important;
+}
+
 /* カレンダー ----------------------------*/
 
 /* 当日の背景色 */
@@ -560,9 +565,6 @@ label:not(.form-check-label):not(.custom-file-label) {
 }
 
 /* 空き時間・特別期間講習 コマ枠 ----------*/
-//.card.pa-table-checked {
-//    overflow-x: scroll;
-//}
 
 .table-checked th {
     text-align: center;
@@ -585,6 +587,7 @@ label:not(.form-check-label):not(.custom-file-label) {
     width: 100%;
 }
 
+/* 講師空き時間 空きコマ枠 */
 .chk-wt {
     display: none;
 }
@@ -593,7 +596,7 @@ label:not(.form-check-label):not(.custom-file-label) {
     background-color: rgb(201, 233, 143);
 }
 
-/* レギュラー授業登録済みの枠 */
+/* 講師空き時間 レギュラー授業の枠 */
 .chk-wt:disabled + div {
     background-color: #4c4c4c !important;
 }
@@ -603,22 +606,22 @@ label:not(.form-check-label):not(.custom-file-label) {
     display: none;
 }
 
-/* 授業不可の枠 */
+/* 特別期間講習 授業不可の枠 */
 .chk-wt2:checked + div {
     background-color: #4c4c4c !important;
 }
 
-/* 特別期間講習 授業コマ枠 コマ組み画面 */
+/* 特別期間講習 コマ組み画面 */
 .chk-season-plan {
     display: none;
 }
 
-/* 授業不可の枠 */
+/* 特別期間講習 コマ組み画面 授業不可の枠 */
 .chk-season-plan:disabled + div {
     background-color: #4c4c4c !important;
 }
 
-/* 授業登録済みの枠 */
+/* 特別期間講習 コマ組み画面 授業登録済みの枠 */
 .chk-season-plan:checked + div {
     background-color: rgb(201, 233, 143);
 }
