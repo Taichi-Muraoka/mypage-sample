@@ -5,48 +5,48 @@
 {{-- テーブル --}}
 <x-bs.table :hover=false :vHeader=true>
     <tr>
-        <th width="35%">校舎</th>
-        <td>久我山</td>
+        <th>校舎</th>
+        <td>@{{item.campus_name}}</td>
     </tr>
     <tr>
-        <th width="35%">講師名</th>
-        <td>CWテスト教師１０１</td>
+        <th>講師名</th>
+        <td>@{{item.tutor_name}}</td>
     </tr>
     <tr>
-        <th width="35%">講師電話番号</th>
-        <td>070-1111-2222</td>
+        <th>講師電話番号</th>
+        <td>@{{item.tel}}</td>
     </tr>
     <tr>
-        <th width="35%">講師メールアドレス</th>
-        <td><a href="mailto:teacher0101@mp-sample.rulez.jp">teacher0101@mp-sample.rulez.jp</a></td>
+        <th>講師メールアドレス</th>
+        <td><a v-bind:href="'mailto:' + item.email">@{{item.email}}</a></td>
     </tr>
     <tr>
-        <th width="35%">性別</th>
-        <td>男性</td>
+        <th>性別</th>
+        <td>@{{item.gender_name}}</td>
     </tr>
     <tr>
-        <th width="35%">在籍大学</th>
-        <td>青山学院大学</td>
+        <th>在籍大学</th>
+        <td>@{{item.school_u_name}}</td>
     </tr>
     <tr>
-        <th width="35%">出身高校</th>
-        <td>青山学院高等部</td>
+        <th>出身高校</th>
+        <td>@{{item.school_h_name}}</td>
     </tr>
     <tr>
-        <th width="35%">出身中学</th>
-        <td>成城学園中等部</td>
+        <th>出身中学</th>
+        <td>@{{item.school_j_name}}</td>
     </tr>
     <tr>
-        <th width="35%">曜日</th>
-        <td>月曜</td>
+        <th>曜日</th>
+        <td>@{{item.day_name}}曜</td>
     </tr>
     <tr>
-        <th width="35%">時限</th>
-        <td>3限</td>
+        <th>時限</th>
+        <td>@{{item.period_no}}限</td>
     </tr>
     <tr>
         <th>担当科目</th>
-        <td>国語,数学,英語</td>
+        <td>@{{item.subject_name}}</td>
     </tr>
 </x-bs.table>
 
