@@ -8,12 +8,12 @@ use App\Consts\AppConst;
 use App\Models\CodeMaster;
 use App\Models\MstCourse;
 use App\Models\MstSubject;
+use App\Models\MstSystem;
 use App\Models\Schedule;
 use App\Models\Student;
 use App\Models\Tutor;
 use App\Models\TransferApplication;
 use App\Models\TransferApplicationDate;
-use Illuminate\Support\Facades\DB;
 
 /**
  * 振替申請 - 機能共通処理
@@ -52,7 +52,7 @@ trait FuncTransferTrait
             // コース種別 = 授業単 のみ対象とする
             ->sdJoin(MstCourse::class, function ($join) {
                 $join->on('schedules.course_cd', '=', 'mst_courses.course_cd')
-                ->where('mst_courses.course_kind', '=', AppConst::CODE_MASTER_42_1);;
+                    ->where('mst_courses.course_kind', '=', AppConst::CODE_MASTER_42_1);;
             })
             // キーの指定
             // 生徒IDが指定された場合のみ絞り込み
@@ -68,6 +68,8 @@ trait FuncTransferTrait
             ->whereIn('schedules.absent_status', [AppConst::CODE_MASTER_35_0, AppConst::CODE_MASTER_35_3])
             // 対象の授業日範囲
             ->whereBetween('schedules.target_date', [$fromDate, $toDate])
+            // 仮登録状態 = 0:本登録
+            ->whereIn('schedules.tentative_status', [AppConst::CODE_MASTER_36_0, AppConst::CODE_MASTER_35_3])
             ->orderby('schedules.target_date')
             ->orderby('schedules.period_no')
             ->get();
@@ -113,11 +115,9 @@ trait FuncTransferTrait
                 'mst_subjects.name as subject_name'
             )
             // 校舎名の取得
-            ->leftJoinSub($campus_names, 'campus_names',
-                function ($join) {
-                    $join->on('schedules.campus_cd', '=', 'campus_names.code');
-                }
-            )
+            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
+                $join->on('schedules.campus_cd', '=', 'campus_names.code');
+            })
             // 生徒名を取得
             ->sdLeftJoin(Student::class, 'schedules.student_id', '=', 'students.student_id')
             // 講師名を取得
@@ -150,9 +150,10 @@ trait FuncTransferTrait
      * @param   $tid        講師ID
      * @param   $campusCd   校舎コード
      * @param   $status     振替依頼承認ステータス
+     * @param   $forS       生徒向け(ステータス条件あり)
      * @return  object 振替依頼情報
      */
-    private function fncTranGetATransferApplicationList($sid = null, $tid = null, $campusCd = null, $status = null)
+    private function fncTranGetATransferApplicationList($sid = null, $tid = null, $campusCd = null, $status = null, $forS = true)
     {
         // 校舎名取得のサブクエリ
         $campus_names = $this->mdlGetRoomQuery();
@@ -160,29 +161,29 @@ trait FuncTransferTrait
         $query = TransferApplication::query();
         // データを取得
         $transfers = $query
-        ->select(
-            'transfer_applications.transfer_apply_id',
-            'transfer_applications.apply_date',
-            'transfer_applications.apply_kind',
-            'transfer_applications.approval_status',
-            'transfer_applications.monthly_count',
-            // 授業情報
-            'schedules.target_date',
-            'schedules.period_no',
-            // 生徒の名称
-            'students.name as student_name',
-            // 講師の名称
-            'tutors.name as tutor_name',
-            // 校舎名
-            'campus_names.room_name as campus_name',
-            // コースの名称
-            'mst_courses.name as course_name',
-            // コードマスタ（申請者種別）の名称
-            'mst_codes_53.name as apply_kind_name',
-            // コードマスタ（振替承認ステータス）の名称・汎用項目１
-            'mst_codes_3.gen_item1 as approval_status_name_for_student', // 振替承認ステータス(生徒向け)
-            'mst_codes_3.name as approval_status_name'                   // 振替承認ステータス(講師・運用管理向け)
-        )
+            ->select(
+                'transfer_applications.transfer_apply_id',
+                'transfer_applications.apply_date',
+                'transfer_applications.apply_kind',
+                'transfer_applications.approval_status',
+                'transfer_applications.monthly_count',
+                // 授業情報
+                'schedules.target_date',
+                'schedules.period_no',
+                // 生徒の名称
+                'students.name as student_name',
+                // 講師の名称
+                'tutors.name as tutor_name',
+                // 校舎名
+                'campus_names.room_name as campus_name',
+                // コースの名称
+                'mst_courses.name as course_name',
+                // コードマスタ（申請者種別）の名称
+                'mst_codes_53.name as apply_kind_name',
+                // コードマスタ（振替承認ステータス）の名称・汎用項目１
+                'mst_codes_3.gen_item1 as approval_status_name_for_student', // 振替承認ステータス(生徒向け)
+                'mst_codes_3.name as approval_status_name'                   // 振替承認ステータス(講師・運用管理向け)
+            )
             // 授業情報の取得
             ->sdLeftJoin(Schedule::class, function ($join) {
                 $join->on('transfer_applications.schedule_id', '=', 'schedules.schedule_id');
@@ -200,7 +201,7 @@ trait FuncTransferTrait
             // コース名称の取得
             ->sdLeftJoin(MstCourse::class, function ($join) {
                 $join->on('schedules.course_cd', '=', 'mst_courses.course_cd')
-                ->where('course_kind', '=', AppConst::CODE_MASTER_42_1);;
+                    ->where('course_kind', '=', AppConst::CODE_MASTER_42_1);;
             })
             // コードマスタ（申請者種別）名称の取得
             ->sdLeftJoin(CodeMaster::class, function ($join) {
@@ -219,20 +220,21 @@ trait FuncTransferTrait
                 return $query->where('transfer_applications.student_id', $sid);
             })
             // 講師IDが指定された場合のみ絞り込み
-            ->when($tid,
-                function ($query) use ($tid) {
+            ->when($tid, function ($query) use ($tid) {
                     return $query->where('transfer_applications.tutor_id', $tid);
-                }
-            )
+            })
             // 校舎コードが指定された場合のみ絞り込み
             ->when($campusCd, function ($query) use ($campusCd) {
-                return $query->where('schedule.campus_cd', $campusCd);
+                return $query->where('schedules.campus_cd', $campusCd);
             })
             // 振替承認ステータスが指定された場合のみ絞り込み
             ->when($status, function ($query) use ($status) {
                 return $query->where('transfer_applications.approval_status', $status);
             })
-            ->where('transfer_applications.approval_status', '!=', AppConst::CODE_MASTER_3_0)
+            // 生徒向けフラグ=trueの場合のみ絞り込み
+            ->when($forS, function ($query) {
+                return $query->where('transfer_applications.approval_status', '!=', AppConst::CODE_MASTER_3_0);
+            })
 
             ->orderby('apply_date', 'desc')
             ->orderby('target_date', 'asc')
@@ -428,7 +430,7 @@ trait FuncTransferTrait
                 // 空き時間と曜日が一致していたらスケジュールを作る
                 if ($tutorFree->day_cd == $youbi) {
                     // 空き時間の時限が、対象日にあるかどうか
-                    if (isset($periodList[$tutorFree->period_no])){
+                    if (isset($periodList[$tutorFree->period_no])) {
                         // 終了時刻計算
                         $endTime = $this->fncTranEndTime($periodList[$tutorFree->period_no]['start_time'], $minites);
 
@@ -450,7 +452,7 @@ trait FuncTransferTrait
 
         return $enableDateTime;
     }
-    
+
     /**
      * 抽出したスケジュールより日・時限のプルダウンのリストを取得
      *
@@ -655,6 +657,19 @@ trait FuncTransferTrait
         return $transferDate;
     }
 
+    /**
+     * 振替調整スキップ回数を取得する
+     */
+    private function fncTranGetTransferSkip()
+    {
+        // システムマスタ「振替調整スキップ回数」
+        $skipCount = MstSystem::select('value_num')
+            ->where('key_id', AppConst::SYSTEM_KEY_ID_3)
+            ->first();
+
+        return $skipCount->value_num;
+    }
+
     //------------------------------
     // 日付・時刻計算
     //------------------------------
@@ -670,13 +685,13 @@ trait FuncTransferTrait
         $fromDate = null;
         $toDate = null;
         if ($nowTime < '22:00') {
-            // 現在時刻が22時までは、翌日～翌日より1ヶ月先
+            // 現在時刻が22時までは、翌日～翌日より1ヶ月(30日)先
             $fromDate = date('Y/m/d', strtotime('+1 day'));
-            $toDate = date('Y/m/d', strtotime('+1 day +1 month'));
+            $toDate = date('Y/m/d', strtotime('+31 day'));
         } else {
-            // 現在時刻が22時以降は、翌々日～翌々日より1ヶ月先
+            // 現在時刻が22時以降は、翌々日～翌々日より1ヶ月(30日)先
             $fromDate = date('Y/m/d', strtotime('+2 day'));
-            $toDate = date('Y/m/d', strtotime('+2 day +1 month'));
+            $toDate = date('Y/m/d', strtotime('+32 day'));
         }
 
         return [
