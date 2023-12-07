@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('surcharges', function (Blueprint $table) {
             /* カラム */
-            $table->unsignedInteger('surcharge_id')->comment('追加請求ID');
+            $table->increments('surcharge_id')->comment('追加請求ID');
             $table->unsignedInteger('tutor_id')->comment('講師ID');
             $table->string('campus_cd', 2)->comment('校舎コード');
             $table->date('apply_date')->comment('申請日');
@@ -27,13 +27,10 @@ return new class extends Migration
             $table->text('comment')->nullable()->comment('内容');
             $table->unsignedSmallInteger('approval_status')->default(1)->comment('承認状態（1:承認待ち、2:承認、3:差戻し）');
             $table->date('payment_date')->nullable()->comment('支払年月');
-            $table->unsignedSmallInteger('payment_status')->default(0)->comment('支払状況（0:未処理、1:支払済）');
+            $table->unsignedSmallInteger('payment_status')->nullable()->default(0)->comment('支払状況（0:未処理、1:支払済）');
             $table->text('admin_comment')->nullable()->comment('管理者コメント');
             $table->timestamps();
             $table->softDeletes();
-
-            /* インデックス */
-            $table->primary('surcharge_id');
 
             /* テーブル名コメント */
             $table->comment('追加請求情報');
