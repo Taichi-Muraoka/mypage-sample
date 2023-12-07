@@ -128,8 +128,11 @@ class StudentClassController extends Controller
                 $orQuery->where('schedules.absent_status', $form['absent_status'])
                     // または受講生徒情報から絞り込み（１対多授業）
                     ->orWhereExists(function ($query) use ($form) {
-                        $query->from('class_members')->whereColumn('class_members.schedule_id', 'schedules.schedule_id')
-                            ->where('class_members.absent_status', $form['absent_status']);
+                        $query->from('class_members')
+                            ->whereColumn('class_members.schedule_id', 'schedules.schedule_id')
+                            ->where('class_members.absent_status', $form['absent_status'])
+                            // delete_dt条件の追加
+                            ->whereNull('class_members.deleted_at');
                     });
             })
                 // コース種別が面談・自習のものを除外
@@ -137,8 +140,23 @@ class StudentClassController extends Controller
         }
 
         // 生徒名検索
-        $formStudent = ['name' => $request->student_name];
-        (new Student)->scopeSearchName($query, $formStudent);
+        if (isset($form['student_name']) && filled($form['student_name'])) {
+            // スケジュール情報・受講生徒情報に存在するかチェックする。existsを使用した
+            $query->where(function ($orQuery) use ($form) {
+                // スケジュール情報から絞り込み（１対１授業）
+                $orQuery->where('students.name', 'LIKE', '%' . $form['student_name'] . '%')
+                    // または受講生徒情報から絞り込み（１対多授業）
+                    ->orWhereExists(function ($query) use ($form) {
+                        $query->from('class_members')
+                            ->join('students', 'students.student_id', '=', 'class_members.student_id')
+                            ->whereColumn('class_members.schedule_id', 'schedules.schedule_id')
+                            ->where('students.name', 'LIKE', '%' . $form['student_name'] . '%')
+                            // delete_dt条件の追加
+                            ->whereNull('class_members.deleted_at');
+                    });
+            });
+        }
+
         // 講師名検索
         $formTutor = ['name' => $request->tutor_name];
         (new Tutor)->scopeSearchName($query, $formTutor);
@@ -271,7 +289,7 @@ class StudentClassController extends Controller
             // 報告書ステータスリスト取得
             $statusList = $this->mdlMenuFromCodeMasterGenItem(AppConst::CODE_MASTER_4, "gen_item1");
             foreach ($items as $item) {
-                // 画面表示用告書ステータス（文字列）取得
+                // 画面表示用報告書ステータス（文字列）取得
                 $item['report_status'] = $this->fncStclGetReportStatus($item, $statusList, $item['approval_status']);
             }
             return $items;
@@ -453,7 +471,7 @@ class StudentClassController extends Controller
         // 報告書ステータスリスト取得
         $statusList = $this->mdlMenuFromCodeMasterGenItem(AppConst::CODE_MASTER_4, "gen_item2");
 
-        // 画面表示用告書ステータス（文字列）取得
+        // 画面表示用報告書ステータス（文字列）取得
         $approval_status = null;
         if ($report) {
             $approval_status = $report->approval_status;

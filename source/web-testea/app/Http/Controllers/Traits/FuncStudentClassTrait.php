@@ -20,7 +20,7 @@ trait FuncStudentClassTrait
      * @param object $schedule スケジュール情報
      * @param int $statusList 報告書ステータスリスト
      * @param int $approvalStatus 報告書承認ステータス
-     * @return array
+     * @return string 画面表示用報告書ステータス（文字列）
      */
     private function fncStclGetReportStatus($schedule, $statusList, $approvalStatus)
     {
