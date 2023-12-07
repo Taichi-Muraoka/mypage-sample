@@ -117,22 +117,22 @@ class AppConst
     const CODE_MASTER_4 = 4;
 
     /**
-     * 承認ステータス 対象外
+     * 報告書承認ステータス 対象外
      */
     const CODE_MASTER_4_0 = 0;
 
     /**
-     * 承認ステータス 承認待ち
+     * 報告書承認ステータス 承認待ち
      */
     const CODE_MASTER_4_1 = 1;
 
     /**
-     * 承認ステータス 承認
+     * 報告書承認ステータス 承認
      */
     const CODE_MASTER_4_2 = 2;
 
     /**
-     * 承認ステータス 差戻し
+     * 報告書承認ステータス 差戻し
      */
     const CODE_MASTER_4_3 = 3;
 
@@ -1121,6 +1121,11 @@ class AppConst
      * 出欠ステータス サブコード １対多のみ
      */
     const CODE_MASTER_35_SUB_2 = 2;
+
+    /**
+     * 出欠ステータス サブコード １対１・画面非表示対象（振替済・リセット）
+     */
+    const CODE_MASTER_35_SUB_3 = 3;
 
     //-----------
     // 仮登録フラグ

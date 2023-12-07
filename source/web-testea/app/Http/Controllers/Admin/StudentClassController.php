@@ -9,13 +9,13 @@ use App\Consts\AppConst;
 use App\Models\Schedule;
 use App\Models\Student;
 use App\Models\Tutor;
-use App\Models\ClassMember;
 use App\Models\MstCourse;
 use App\Models\MstSubject;
 use App\Models\CodeMaster;
-use App\Models\MstBooth;
 use App\Models\Report;
 use Illuminate\Support\Facades\Lang;
+use App\Http\Controllers\Traits\FuncCalendarTrait;
+use App\Http\Controllers\Traits\FuncStudentClassTrait;
 
 /**
  * 授業情報検索 - コントローラ
@@ -23,7 +23,10 @@ use Illuminate\Support\Facades\Lang;
 class StudentClassController extends Controller
 {
 
-    // 機能共通処理：
+    // 機能共通処理：カレンダー
+    use FuncCalendarTrait;
+    // 機能共通処理：授業情報検索
+    use FuncStudentClassTrait;
 
     /**
      * コンストラクタ
@@ -55,20 +58,13 @@ class StudentClassController extends Controller
         $lesson_kind = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_31);
 
         // 出欠ステータスリストを取得
-        $absent_status = CodeMaster::query()
-            ->select('code', 'name as value')
-            ->where('data_type', AppConst::CODE_MASTER_35)
-            // 振替済みを除外
-            ->where('code', '!=', AppConst::CODE_MASTER_35_5)
-            ->orderby('order_code')
-            ->get()
-            ->keyBy('code');
+        $absent_status = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_35, [AppConst::CODE_MASTER_35_SUB_0, AppConst::CODE_MASTER_35_SUB_1, AppConst::CODE_MASTER_35_SUB_2]);
 
         // 教科リストを取得
         $subjects = $this->mdlGetSubjectList();
 
-        // 授業報告書ステータスを取得 コードマスタにないのでappconfに定義しています。
-        $report_status_list = config('appconf.report_status');
+        // 授業報告書ステータスを取得
+        $report_status_list = $this->mdlMenuFromCodeMasterGenItem(AppConst::CODE_MASTER_4, "gen_item2");
 
         return view('pages.admin.student_class', [
             'rules' => $this->rulesForSearch(null),
@@ -126,9 +122,18 @@ class StudentClassController extends Controller
 
         // 出欠ステータス選択により絞り込み条件
         if (isset($form['absent_status']) && filled($form['absent_status'])) {
-            // 検索フォームから取得（スコープ）
-            $query->SearchAbsentStatus($form)
-                ->where('course_kind', '!=', AppConst::CODE_MASTER_42_3);
+            // スケジュール情報・受講生徒情報に存在するかチェックする。existsを使用した
+            $query->where(function ($orQuery) use ($form) {
+                // スケジュール情報から絞り込み（１対１授業）
+                $orQuery->where('schedules.absent_status', $form['absent_status'])
+                    // または受講生徒情報から絞り込み（１対多授業）
+                    ->orWhereExists(function ($query) use ($form) {
+                        $query->from('class_members')->whereColumn('class_members.schedule_id', 'schedules.schedule_id')
+                            ->where('class_members.absent_status', $form['absent_status']);
+                    });
+            })
+                // コース種別が面談・自習のものを除外
+                ->whereNotIn('mst_courses.course_kind', [AppConst::CODE_MASTER_42_3, AppConst::CODE_MASTER_42_4]);
         }
 
         // 生徒名検索
@@ -144,49 +149,56 @@ class StudentClassController extends Controller
 
         // 授業報告書ステータス選択により絞り込み
         if (isset($form['report_status']) && filled($form['report_status'])) {
+            // 現在日を取得
+            $today = date("Y-m-d");
+
             switch ($form['report_status']) {
-                // ―（登録不要）
-                case AppConst::REPORT_STATUS_1:
-                    // 授業日が当日以降(未実施)または当日欠席の授業
-                    $today = now();
-                    $query->where('schedules.target_date', '>=', $today)
-                        ->orWhere('schedules.absent_status', AppConst::CODE_MASTER_35_1)
-                        ->orWhere('schedules.absent_status', AppConst::CODE_MASTER_35_2);
+                    // ―（登録不要）
+                case AppConst::CODE_MASTER_4_0:
+                    // 授業日が当日以降(未実施)または当日欠席の授業 またはコース種別＝面談または自習
+                    $query->where(function ($orQuery) use ($today) {
+                        $orQuery
+                            ->where('schedules.target_date', '>=', $today)
+                            ->orWhere('schedules.absent_status', AppConst::CODE_MASTER_35_1)
+                            ->orWhere('schedules.absent_status', AppConst::CODE_MASTER_35_2)
+                            ->orWhereIn('mst_courses.course_kind', [AppConst::CODE_MASTER_42_3, AppConst::CODE_MASTER_42_4]);
+                    });
                     break;
-                // ×（要登録・差戻し）
-                case AppConst::REPORT_STATUS_2:
-                    $today = now();
-                    $query
-                        ->sdLeftJoin(Report::class, 'schedules.report_id', 'reports.report_id')
-                        ->where(function ($orQuery) use ($today) {
-                            $orQuery
-                                // 授業報告書登録あり かつ 承認状態＝差戻し
-                                ->where(function ($orQuery) {
-                                    $orQuery
-                                        ->whereNotNull('schedules.report_id')
-                                        ->where('reports.approval_status', '=', AppConst::CODE_MASTER_4_3);
-                                })
-                                // 授業日が当日以前かつ出欠ステータスが「実施前・出席」かつ授業報告書登録なし
-                                ->orWhere(function ($orQuery) use ($today) {
-                                    $orQuery
-                                        ->where('schedules.target_date', '<', $today)
-                                        ->where('schedules.absent_status', AppConst::CODE_MASTER_35_0)
-                                        ->whereNull('schedules.report_id');
-                                });
-                        });
+
+                    // ×（要登録・差戻し）
+                case AppConst::CODE_MASTER_4_3:
+                    // コース種別が面談・自習のものは除外する
+                    $query->whereNotIn('mst_courses.course_kind', [AppConst::CODE_MASTER_42_3, AppConst::CODE_MASTER_42_4]);
+                    $query->where(function ($orQuery) use ($today) {
+                        $orQuery
+                            // 授業日が当日以前かつ出欠ステータスが「実施前・出席」かつ授業報告書登録なし
+                            ->where(function ($subQuery) use ($today) {
+                                $subQuery
+                                    ->where('schedules.target_date', '<', $today)
+                                    ->where('schedules.absent_status', AppConst::CODE_MASTER_35_0)
+                                    ->whereNull('schedules.report_id');
+                            })
+                            // 授業報告書登録あり かつ 承認状態＝差戻し
+                            ->orWhere(function ($subQuery) use ($today) {
+                                $subQuery->whereNotNull('schedules.report_id')
+                                    ->where('reports.approval_status', '=', AppConst::CODE_MASTER_4_3);
+                            });
+                    });
                     break;
-                // △（承認待ち）
-                case AppConst::REPORT_STATUS_3:
-                    // 授業報告書登録あり かつ 承認状態＝承認待ち
+
+                    // △（承認待ち）
+                case AppConst::CODE_MASTER_4_1:
+                    // 授業報告書登録あり かつ 報告書承認状態＝承認待ち
+                    // (reportsテーブルはベースのクエリでjoinされている前提)
                     $query->whereNotNull('schedules.report_id')
-                        ->sdLeftJoin(Report::class, 'schedules.report_id', 'reports.report_id')
                         ->where('reports.approval_status', '=', AppConst::CODE_MASTER_4_1);
                     break;
-                // 〇（登録済み）
-                case AppConst::REPORT_STATUS_4:
-                    // 授業報告書登録あり かつ 承認状態＝承認の場合
+
+                    // 〇（承認済み）
+                case AppConst::CODE_MASTER_4_2:
+                    // 授業報告書登録あり かつ 報告書承認状態＝承認の場合
+                    // (reportsテーブルはベースのクエリでjoinされている前提)
                     $query->whereNotNull('schedules.report_id')
-                        ->sdLeftJoin(Report::class, 'schedules.report_id', 'reports.report_id')
                         ->where('reports.approval_status', '=', AppConst::CODE_MASTER_4_2);
                     break;
 
@@ -200,27 +212,28 @@ class StudentClassController extends Controller
 
         $schedules = $query->select(
             'schedules.schedule_id as id',
-            'room_names.room_name as room_name',
+            'room_names.room_name_symbol as room_name',
             'schedules.target_date',
             'schedules.period_no',
             'schedules.start_time',
             'schedules.course_cd',
             'schedules.absent_status',
             'schedules.report_id as report_id',
-            'mst_courses.name as course_name',
+            'mst_courses.short_name as course_name',
             'mst_courses.course_kind as course_kind',
             'students.name as student_name',
             'tutors.name as tutor_name',
-            'mst_subjects.name as subject_name',
-            'mst_codes_31.name as lesson_kind_name',
-            'mst_codes_35.name as absent_status_name',
-            'reports_.approval_status as approval_status'
+            'mst_subjects.short_name as subject_name',
+            'mst_codes_31.gen_item1 as lesson_kind_name',
+            'mst_codes_35.gen_item1 as absent_status_name',
+            'schedules.create_kind',
+            'mst_codes_32.name as create_kind_name',
+            'reports.approval_status as approval_status'
         )
-            // 出欠ステータスが振替済みのものは除外
-            ->where('schedules.absent_status', '!=', AppConst::CODE_MASTER_35_5)
+            // 授業報告書情報をJOIN
             ->sdLeftJoin(Report::class, function ($join) {
-                $join->on('schedules.report_id', 'reports_.report_id');
-            }, 'reports_')
+                $join->on('schedules.report_id', 'reports.report_id');
+            })
             // 校舎名の取得
             ->leftJoinSub($room_names, 'room_names', function ($join) {
                 $join->on('schedules.campus_cd', '=', 'room_names.code');
@@ -238,44 +251,28 @@ class StudentClassController extends Controller
                 $join->on('schedules.lesson_kind', 'mst_codes_31.code')
                     ->where('mst_codes_31.data_type', AppConst::CODE_MASTER_31);
             }, 'mst_codes_31')
+            // データ作成区分名の取得
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('schedules.create_kind', '=', 'mst_codes_32.code')
+                    ->where('mst_codes_32.data_type', AppConst::CODE_MASTER_32);
+            }, 'mst_codes_32')
             // 出欠ステータス名の取得
             ->sdLeftJoin(CodeMaster::class, function ($join) {
                 $join->on('schedules.absent_status', 'mst_codes_35.code')
                     ->where('mst_codes_35.data_type', AppConst::CODE_MASTER_35);
             }, 'mst_codes_35')
-            ->distinct()
+            // 振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->orderBy('schedules.target_date', 'desc')
-            ->orderBy('schedules.period_no', 'desc');
+            ->orderBy('schedules.start_time', 'desc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $schedules, function ($items) {
-            // 報告書ステータス設定
+            // 報告書ステータスリスト取得
+            $statusList = $this->mdlMenuFromCodeMasterGenItem(AppConst::CODE_MASTER_4, "gen_item1");
             foreach ($items as $item) {
-                $item['report_status'] = null;
-                // 面談は登録不要ステータスを設定
-                if ($item['course_kind'] == AppConst::CODE_MASTER_42_3) {
-                    $item['report_status'] = '―';
-                } else if ($item['report_id'] != null) {
-                    if ($item['approval_status'] == AppConst::CODE_MASTER_4_1) {
-                        $item['report_status'] = '△';
-                    }
-                    if ($item['approval_status'] == AppConst::CODE_MASTER_4_2) {
-                        $item['report_status'] = '〇';
-                    }
-                    if ($item['approval_status'] == AppConst::CODE_MASTER_4_3) {
-                        $item['report_status'] = '✕';
-                    }
-                } else {
-                    if (
-                        $item['target_date'] >= now() ||
-                        $item['absent_status'] == AppConst::CODE_MASTER_35_1 || $item['absent_status'] == AppConst::CODE_MASTER_35_2
-                    ) {
-                        $item['report_status'] = '―';
-                    }
-                    if ($item['target_date'] < now() && $item['absent_status'] == AppConst::CODE_MASTER_35_0) {
-                        $item['report_status'] = '✕';
-                    }
-                }
+                // 画面表示用告書ステータス（文字列）取得
+                $item['report_status'] = $this->fncStclGetReportStatus($item, $statusList, $item['approval_status']);
             }
             return $items;
         });
@@ -363,7 +360,7 @@ class StudentClassController extends Controller
         $validationReportStatusList =  function ($attribute, $value, $fail) {
 
             // 授業報告書ステータスリストを取得
-            $report_status_list = config('appconf.report_status');
+            $report_status_list = $this->mdlMenuFromCodeMasterGenItem(AppConst::CODE_MASTER_4, "gen_item2");
             if (!isset($report_status_list[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
@@ -383,9 +380,11 @@ class StudentClassController extends Controller
         $rules += Schedule::fieldRules('lesson_kind', [$validationLessonKindList]);
         $rules += Schedule::fieldRules('absent_status', [$validationAbsentStatusList]);
         $rules += Schedule::fieldRules('subject_cd', [$validationSubjectList]);
-        $rules += ['student_name' => ['string', 'max:50']];
-        $rules += ['tutor_name' => ['string', 'max:50']];
-        $rules += ['tutor_name' => $validationReportStatusList];
+        $ruleStudentName = Student::getFieldRule('name');
+        $rules += ['student_name' => $ruleStudentName];
+        $ruleTutorName = Tutor::getFieldRule('name');
+        $rules += ['tutor_name' => $ruleTutorName];
+        $rules += ['report_status' => $validationReportStatusList];
         $rules += ['target_date_from' => $ruleLessonDate];
         $rules += ['target_date_to' => array_merge($validateFromTo, $ruleLessonDate)];
 
@@ -406,149 +405,61 @@ class StudentClassController extends Controller
         // IDを取得
         $id = $request->input('id');
 
-        // クエリ作成
+        // スケジュール情報取得
         $query = Schedule::query();
 
-        // 校舎名取得のサブクエリ
-        $room_names = $this->mdlGetRoomQuery();
+        // スケジュール情報表示用のquery作成（select句・join句）
+        $this->getScheduleQuery($query);
 
-        $schedules = $query->where('schedules.schedule_id', $id)
-            ->select(
-                'schedules.schedule_id as id',
-                'room_names.room_name as room_name',
-                'schedules.target_date',
-                'schedules.period_no',
-                'schedules.start_time',
-                'schedules.end_time',
-                'schedules.course_cd',
-                'schedules.absent_status',
-                'schedules.transfer_class_id',
-                'schedules.report_id',
-                'schedules.memo',
-                'mst_booths.name as booth_name',
-                'mst_courses.name as course_name',
-                'mst_courses.course_kind as course_kind',
-                'students.name as student_name',
-                'tutors.name as tutor_name',
-                'mst_subjects.name as subject_name',
-                'mst_codes_31.name as lesson_kind_name',
-                'mst_codes_33.name as how_to_kind_name',
-                'mst_codes_34.name as substitute_kind_name',
-                'mst_codes_35.name as absent_status_name',
-                'reports_.approval_status as approval_status',
-                'schedules_.target_date as transfer_target_date',
-                'schedules_.period_no as transfer_priod_no'
-            )
-            // 授業報告書情報
-            ->sdLeftJoin(Report::class, function ($join) {
-                $join->on('schedules.report_id', 'reports_.report_id');
-            }, 'reports_')
-            // 振替元スケジュール情報取得
-            ->sdLeftJoin(Schedule::class, function ($join) {
-                $join->on('schedules.transfer_class_id', 'schedules_.schedule_id');
-            }, 'schedules_')
-            // 校舎名の取得
-            ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('schedules.campus_cd', '=', 'room_names.code');
-            })
-            // ブース名の取得
-            ->sdLeftJoin(MstBooth::class, 'schedules.booth_cd', '=', 'mst_booths.booth_cd')
-            // コース名の取得
-            ->sdLeftJoin(MstCourse::class, 'schedules.course_cd', '=', 'mst_courses.course_cd')
-            // 生徒名の取得
-            ->sdLeftJoin(Student::class, 'schedules.student_id', '=', 'students.student_id')
-            // 講師名の取得
-            ->sdLeftJoin(Tutor::class, 'schedules.tutor_id', '=', 'tutors.tutor_id')
-            // コース名の取得
-            ->sdLeftJoin(MstSubject::class, 'schedules.subject_cd', '=', 'mst_subjects.subject_cd')
-            // 授業区分名の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('schedules.lesson_kind', 'mst_codes_31.code')
-                    ->where('mst_codes_31.data_type', AppConst::CODE_MASTER_31);
-            }, 'mst_codes_31')
-            // 通塾種別名の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('schedules.how_to_kind', '=', 'mst_codes_33.code')
-                    ->where('mst_codes_33.data_type', AppConst::CODE_MASTER_33);
-            }, 'mst_codes_33')
-            // 代講種別名の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('schedules.substitute_kind', '=', 'mst_codes_34.code')
-                    ->where('mst_codes_34.data_type', AppConst::CODE_MASTER_34);
-            }, 'mst_codes_34')
-            // 出欠ステータス名の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('schedules.absent_status', 'mst_codes_35.code')
-                    ->where('mst_codes_35.data_type', AppConst::CODE_MASTER_35);
-            }, 'mst_codes_35')
+        // 個別の絞り込み条件を付加する
+        $schedule = $query->where('schedules.schedule_id', $id)
+            // スケジュールID指定
+            // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+            ->where($this->guardRoomAdminTableWithRoomCd())
             ->firstOrFail();
 
-        // 集団授業の生徒名取得
-        $class_members = ClassMember::query()
-            ->where('class_members.schedule_id', '=', $schedules->id)
-            ->where('class_members.absent_status', '=', AppConst::CODE_MASTER_35_0)
-            ->select('class_members.student_id')
-            ->get();
-
-        // 受講人数カウント
-        $number_people = count($class_members);
-
-        // 受講生徒名を配列に格納
-        $class_member_names = [];
-        for ($i = 0; $i < $number_people; $i++) {
-            $class_member_names[$i] = $this->mdlGetStudentName($class_members[$i]['student_id']);
+        // 振替の場合、授業区分に付加する文字列を設定
+        $schedule['hurikae_name'] = "";
+        if ($schedule['create_kind'] == AppConst::CODE_MASTER_32_2) {
+            $schedule['hurikae_name'] = $schedule['create_kind_name'];
         }
 
-        // 授業報告書ステータス
-        $report_status = null;
-        // 面談は登録不要ステータスを設定
-        if ($schedules->course_kind == AppConst::CODE_MASTER_42_3) {
-            $report_status = '―';
-        } else if ($schedules->report_id != null) {
-            if ($schedules->approval_status == AppConst::CODE_MASTER_4_1) {
-                $report_status = '△';
-            }
-            if ($schedules->approval_status == AppConst::CODE_MASTER_4_2) {
-                $report_status = '〇';
-            }
-            if ($schedules->approval_status == AppConst::CODE_MASTER_4_3) {
-                $report_status = '✕';
-            }
-        } else {
-            if (
-                $schedules->target_date >= now() ||
-                $schedules->absent_status == AppConst::CODE_MASTER_35_1 ||
-                $schedules->absent_status == AppConst::CODE_MASTER_35_2
-            ) {
-                $report_status = '―';
-            }
-            if ($schedules->target_date < now() && $schedules->absent_status == AppConst::CODE_MASTER_35_0) {
-                $report_status = '✕';
-            }
+        // １対多授業の場合、受講生徒名を取得
+        if ($schedule['course_kind'] == AppConst::CODE_MASTER_42_2) {
+            $schedule['class_student_names'] = $this->getClassMembers($schedule['schedule_id']);
         }
 
-        return [
-            'room_name' => $schedules->room_name,
-            'booth_name' => $schedules->booth_name,
-            'course_name' => $schedules->course_name,
-            'course_kind' => $schedules->course_kind,
-            'lesson_kind_name' => $schedules->lesson_kind_name,
-            'target_date' => $schedules->target_date,
-            'period_no' => $schedules->period_no,
-            'start_time' => $schedules->start_time,
-            'end_time' => $schedules->end_time,
-            'tutor_name' => $schedules->tutor_name,
-            'student_name' => $schedules->student_name,
-            'class_member_names' => $class_member_names,
-            'subject_name' => $schedules->subject_name,
-            'how_to_kind_name' => $schedules->how_to_kind_name,
-            'substitute_kind_name' => $schedules->substitute_kind_name,
-            'absent_status_name' => $schedules->absent_status_name,
-            'memo' => $schedules->memo,
-            'transfer_class_id' => $schedules->transfer_class_id,
-            'transfer_target_date' => $schedules->transfer_target_date,
-            'transfer_priod_no' => $schedules->transfer_priod_no,
-            'report_status' => $report_status
-        ];
+        // 不要な要素の削除
+        unset($schedule['campus_cd']);
+        unset($schedule['room_symbol']);
+        unset($schedule['booth_cd']);
+        unset($schedule['course_cd']);
+        unset($schedule['student_id']);
+        unset($schedule['tutor_id']);
+        unset($schedule['subject_cd']);
+        unset($schedule['summary_kind']);
+        unset($schedule['absent_tutor_id']);
+        unset($schedule['absent_status']);
+        unset($schedule['tentative_status']);
+
+        // 授業報告書ステータスの取得
+        $report = Report::select(
+            'approval_status'
+        )
+            // スケジュールIDを指定
+            ->where('schedule_id', $id)
+            ->first();
+
+        // 報告書ステータスリスト取得
+        $statusList = $this->mdlMenuFromCodeMasterGenItem(AppConst::CODE_MASTER_4, "gen_item2");
+
+        // 画面表示用告書ステータス（文字列）取得
+        $approval_status = null;
+        if ($report) {
+            $approval_status = $report->approval_status;
+        }
+        $schedule['report_status'] = $this->fncStclGetReportStatus($schedule, $statusList, $approval_status);
+
+        return $schedule;
     }
 }

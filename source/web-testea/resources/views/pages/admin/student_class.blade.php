@@ -11,52 +11,53 @@
         <x-bs.col2>
             @can('roomAdmin')
             {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-           <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
-                :select2Search=false :blank=false/>
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+                :rules=$rules :select2Search=false :blank=false />
             @else
-            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData 
-                :select2Search=false/>
+            {{-- 全体管理者の場合、検索を非表示・未選択を表示する --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+                :rules=$rules :select2Search=false :blank=true />
             @endcan
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="student_name" caption="生徒名" />
+            <x-input.text id="student_name" caption="生徒名" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
             <x-input.select id="course_cd" caption="コース" :select2=true :mastrData=$courses :editData=$editData
-                :select2Search=false :blank=true />
+                :rules=$rules :select2Search=false :blank=true />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="tutor_name" caption="講師名" />
+            <x-input.text id="tutor_name" caption="講師名" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
             <x-input.select id="lesson_kind" caption="授業区分" :select2=true :mastrData=$lesson_kind :editData=$editData
-                :select2Search=false :blank=true/>
+                :rules=$rules :select2Search=false :blank=true/>
         </x-bs.col2>
         <x-bs.col2>
             <x-input.select id="absent_status" caption="出欠ステータス" :select2=true :mastrData=$absent_status :editData=$editData
-                :select2Search=false :blank=true/>
+                :rules=$rules :select2Search=false :blank=true/>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
             <x-input.select caption="教科" id="subject_cd" :select2=true :mastrData=$subjects :editData=$editData
-                :select2Search=false :blank=true/>
+                :rules=$rules :select2Search=false :blank=true/>
         </x-bs.col2>
         <x-bs.col2>
             <x-input.select caption="授業報告書ステータス" id="report_status" :select2=true :mastrData=$report_status_list :editData=$editData
-                :select2Search=false :blank=true/>
+                :rules=$rules :select2Search=false :blank=true/>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="日付 From" id="target_date_from" />
+            <x-input.date-picker caption="日付 From" id="target_date_from" :rules=$rules />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="日付 To" id="target_date_to" />
+            <x-input.date-picker caption="日付 To" id="target_date_to" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
 
@@ -101,7 +102,10 @@
             <td>@{{(item.student_name)}}</td>
             <td>@{{(item.tutor_name)}}</td>
             <td>@{{(item.subject_name)}}</td>
-            <td>@{{(item.lesson_kind_name)}}</td>
+            <td>
+                @{{(item.lesson_kind_name)}}
+                <span v-show="item.create_kind == {{ App\Consts\AppConst::CODE_MASTER_32_2 }}">(@{{(item.create_kind_name)}})</span>
+            </td>
             <td>
                 <span v-show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }}">@{{(item.absent_status_name)}}</span>
             </td>
