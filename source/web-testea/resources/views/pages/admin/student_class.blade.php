@@ -100,7 +100,14 @@
             <td>@{{(item.course_name)}}</td>
             <td>@{{(item.room_name)}}</td>
             <td>@{{(item.student_name)}}</td>
-            <td>@{{(item.tutor_name)}}</td>
+            <td>
+                <span v-if="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
+                    @{{item.admin_name}}
+                </span>
+                <span v-if="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
+                    @{{(item.tutor_name)}}
+                </span>
+            </td>
             <td>@{{(item.subject_name)}}</td>
             <td>
                 @{{(item.lesson_kind_name)}}

@@ -13,6 +13,7 @@ use App\Models\MstCourse;
 use App\Models\MstSubject;
 use App\Models\CodeMaster;
 use App\Models\Report;
+use App\Models\AdminUser;
 use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncCalendarTrait;
 use App\Http\Controllers\Traits\FuncStudentClassTrait;
@@ -246,6 +247,7 @@ class StudentClassController extends Controller
             'mst_codes_35.gen_item1 as absent_status_name',
             'schedules.create_kind',
             'mst_codes_32.name as create_kind_name',
+            'admin_users.name as admin_name',
             'reports.approval_status as approval_status'
         )
             // 授業報告書情報をJOIN
@@ -279,6 +281,10 @@ class StudentClassController extends Controller
                 $join->on('schedules.absent_status', 'mst_codes_35.code')
                     ->where('mst_codes_35.data_type', AppConst::CODE_MASTER_35);
             }, 'mst_codes_35')
+            // 管理者名の取得
+            ->sdLeftJoin(AdminUser::class, function ($join) {
+                $join->on('schedules.adm_id', 'admin_users.adm_id');
+            })
             // 振替済・リセット済スケジュールを除外
             ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->orderBy('schedules.target_date', 'desc')
