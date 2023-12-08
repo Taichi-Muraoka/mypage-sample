@@ -453,19 +453,6 @@ class StudentClassController extends Controller
             $schedule['class_student_names'] = $this->getClassMembers($schedule['schedule_id']);
         }
 
-        // 不要な要素の削除
-        unset($schedule['campus_cd']);
-        unset($schedule['room_symbol']);
-        unset($schedule['booth_cd']);
-        unset($schedule['course_cd']);
-        unset($schedule['student_id']);
-        unset($schedule['tutor_id']);
-        unset($schedule['subject_cd']);
-        unset($schedule['summary_kind']);
-        unset($schedule['absent_tutor_id']);
-        unset($schedule['absent_status']);
-        unset($schedule['tentative_status']);
-
         // 授業報告書ステータスの取得
         $report = Report::select(
             'approval_status'
@@ -483,6 +470,19 @@ class StudentClassController extends Controller
             $approval_status = $report->approval_status;
         }
         $schedule['report_status'] = $this->fncStclGetReportStatus($schedule, $statusList, $approval_status);
+
+        // 不要な要素の削除
+        unset($schedule['campus_cd']);
+        unset($schedule['room_symbol']);
+        unset($schedule['booth_cd']);
+        unset($schedule['course_cd']);
+        unset($schedule['student_id']);
+        unset($schedule['tutor_id']);
+        unset($schedule['subject_cd']);
+        unset($schedule['summary_kind']);
+        unset($schedule['absent_tutor_id']);
+        unset($schedule['absent_status']);
+        unset($schedule['tentative_status']);
 
         return $schedule;
     }
