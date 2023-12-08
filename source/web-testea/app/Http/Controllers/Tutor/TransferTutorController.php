@@ -579,8 +579,12 @@ class TransferTutorController extends Controller
             'comment' => $tranApp->comment
         ];
         for ($i = 1; $i <= 3; $i++) {
+            $fmtDate = '';
+            if ($tran_date[$i] != '') {
+                $fmtDate = CommonDateFormat::formatYmdDay($tran_date[$i]);
+            }
             $editdata += [
-                'transfer_date_' . $i => CommonDateFormat::formatYmdDay($tran_date[$i]),
+                'transfer_date_' . $i => $fmtDate,
                 'period_no_' . $i => $tran_period[$i],
                 'free_check_' . $i => $freeCheck[$i]
             ];
