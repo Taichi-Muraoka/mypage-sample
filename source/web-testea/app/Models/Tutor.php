@@ -147,4 +147,15 @@ class Tutor extends Model
     // 検索条件
     //-------------------------------
 
+    /**
+     * 検索 name
+     */
+    public function scopeSearchName($query, $obj)
+    {
+        $key = 'name';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // nameが他とかぶるので、テーブル名を指定した
+            $query->where($this->getTable() . '.' . $key, 'LIKE',  '%' . $obj[$key] . '%');
+        }
+    }
 }

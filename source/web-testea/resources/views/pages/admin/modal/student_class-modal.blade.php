@@ -6,71 +6,104 @@
 <x-bs.table :hover=false :vHeader=true>
     <tr>
         <th width="35%">校舎</th>
-        <td>久我山</td>
+        <td>@{{item.room_name}}</td>
     </tr>
-    <tr>
+    <tr v-show="item.booth_name">
         <th width="35%">ブース</th>
-        <td>Aテーブル</td>
+        <td>@{{item.booth_name}}</td>
     </tr>
-    <tr>
-        <th width="35%">コース</th>
-        <td>個別指導コース</td>
+    <tr v-show="item.course_name">
+        <th width="35%">コース名</th>
+        <td>@{{item.course_name}}</td>
     </tr>
-    <tr>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }} || item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }}">
         <th>授業区分</th>
-        <td>追加</td>
+        <td>@{{item.lesson_kind_name}} @{{item.hurikae_name}}</td>
+    </tr>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.lesson_kind == {{ App\Consts\AppConst::CODE_MASTER_31_2 }}">
+        <th>仮登録フラグ</th>
+        <td>@{{item.tentative_name}}</td>
+    </tr>
+    <tr v-show="item.holiday_name">
+        <th>期間区分</th>
+        <td>@{{item.holiday_name}}</td>
     </tr>
     <tr>
         <th>日付</th>
-        <td>2023/02/28</td>
+        <td>@{{$filters.formatYmdDay(item.target_date)}}</td>
     </tr>
-    <tr>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.period_no && item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
         <th>時限</th>
-        <td>5時限</td>
+        <td>@{{item.period_no}}限</td>
     </tr>
-    <tr>
+    <tr v-show="item.start_time">
         <th>開始時刻</th>
-        <td>16:00</td>
+        <td>@{{item.start_time}}</td>
     </tr>
-    <tr>
+    <tr v-show="item.end_time">
         <th>終了時刻</th>
-        <td>17:30</td>
+        <td>@{{item.end_time}}</td>
     </tr>
-    <tr>
-        <th>講師名/担当者名</th>
-        <td>CWテスト教師１０１</td>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.tutor_name && (item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }} || item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }})">
+        <th>講師名</th>
+        <td>@{{item.tutor_name}}</td>
     </tr>
-    <tr>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.student_name && item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_2 }}">
         <th>生徒名</th>
-        <td>CWテスト生徒５</td>
+        <td>@{{item.student_name}}</td>
     </tr>
-    <tr>
-        <th>科目</th>
-        <td>英語</td>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.class_student_names && item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }}">
+        <th>受講生徒名</th>
+        {{-- nl2br: 改行 --}}
+        <td class="nl2br">@{{item.class_student_names}}</td>
     </tr>
-    <tr>
+    <tr v-show="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }} && item.subject_name">
+        <th>教科</th>
+        <td>@{{item.subject_name}}</td>
+    </tr>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.how_to_kind_name && (item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }} || item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }})">
         <th>通塾</th>
-        <td>生徒通塾 - 教師通塾</td>
+        <td>@{{item.how_to_kind_name}}</td>
     </tr>
-    <tr>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.substitute_kind_name && (item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }} || item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }})">
         <th>授業代講</th>
-        <td>なし</td>
+        <td>@{{item.substitute_kind_name}}</td>
     </tr>
-    <tr>
+    <tr v-show="item.absent_tutor_name">
+        <th>欠席講師名</th>
+        <td>@{{item.absent_tutor_name}}</td>
+    </tr>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.absent_name && (item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }})">
         <th>出欠ステータス</th>
-        <td>未実施・出席</td>
+        <td>@{{item.absent_name}}</td>
     </tr>
-    <tr>
+    {{-- v-showは、コース種別によって非表示の場合があるため --}}
+    <tr v-show="item.report_status && (item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }} || item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_2 }})">
         <th>授業報告書ステータス</th>
-        <td>〇</td>
+        <td>@{{item.report_status}}</td>
     </tr>
-    <tr>
+    {{-- v-showは、データ作成区分によって非表示の場合があるため --}}
+    <tr v-show="item.transfer_date && (item.create_kind == {{ App\Consts\AppConst::CODE_MASTER_32_2 }})">
         <th>振替元授業日・時限</th>
-        <td>2023/02/28 4限</td>
+        <td>@{{$filters.formatYmdDay(item.transfer_date)}} @{{item.transfer_period_no}}限</td>
     </tr>
-    <tr>
-        <th>メモ</th>
-        <td>メモメモメモメモ</td>
+    <tr v-show="item.admin_name">
+        <th>登録・担当者名</th>
+        <td>@{{item.admin_name}}</td>
+    </tr>
+    <tr v-show="!item.holiday_name">
+        <th>管理者用メモ</th>
+        {{-- nl2br: 改行 --}}
+        <td class="nl2br">@{{item.memo}}</td>
     </tr>
 </x-bs.table>
 

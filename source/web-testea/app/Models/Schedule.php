@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Consts\AppConst;
+use App\Models\Report;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -173,6 +175,18 @@ class Schedule extends Model
     }
 
     /**
+     * 検索 コースコード
+     */
+    public function scopeSearchCourseCd($query, $obj)
+    {
+        $key = 'course_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
      * 検索 生徒ID
      */
     public function scopeSearchStudentId($query, $obj)
@@ -190,6 +204,42 @@ class Schedule extends Model
     public function scopeSearchTutorId($query, $obj)
     {
         $key = 'tutor_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 教科コード
+     */
+    public function scopeSearchSubjectCd($query, $obj)
+    {
+        $key = 'subject_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 授業区分
+     */
+    public function scopeSearchLessonKind($query, $obj)
+    {
+        $key = 'lesson_kind';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 出欠ステータス
+     */
+    public function scopeSearchAbsentStatus($query, $obj)
+    {
+        $key = 'absent_status';
         $col = $this->getTable() . '.' . $key;
         if (isset($obj[$key]) && filled($obj[$key])) {
             $query->where($col, $obj[$key]);

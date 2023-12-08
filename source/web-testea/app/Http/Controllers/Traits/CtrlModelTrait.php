@@ -47,23 +47,6 @@ trait CtrlModelTrait
     //------------------------------
 
     /**
-     * 汎用マスタからプルダウンメニューのリストを取得
-     * codeclsを指定する
-     *
-     * @param string $codecls
-     * @return array
-     */
-    //protected function mdlMenuFromExtGenericMaster($codecls)
-    //{
-    //    return  ExtGenericMaster::select('code', 'name1 as value')
-    //        ->where('codecls', $codecls)
-    //        ->orderby('disp_order')
-    //        ->orderby('code')
-    //        ->get()
-    //        ->keyBy('code');
-    //}
-
-    /**
      * コードマスタからプルダウンメニューのリストを取得
      * data_typeを指定する
      *
@@ -83,6 +66,33 @@ trait CtrlModelTrait
 
         // プルダウンリストを取得する
         return $query->select('code', 'name as value')
+            ->where('data_type', $dataType)
+            ->orderby('order_code')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * コードマスタからプルダウンメニューのリストを取得
+     * data_typeと、名称として取得するカラム名を指定する
+     *
+     * @param integer $dataType
+     * @param string $colName
+     * @param array $subCode サブコード（配列で指定）省略可
+     * @return array
+     */
+    protected function mdlMenuFromCodeMasterGenItem($dataType, $colName, $subCodes = null)
+    {
+
+        $query = CodeMaster::query();
+
+        // サブコードが指定された場合絞り込み
+        $query->when($subCodes, function ($query) use ($subCodes) {
+            return $query->whereIn('sub_code', $subCodes);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('code', $colName . ' as value')
             ->where('data_type', $dataType)
             ->orderby('order_code')
             ->get()
@@ -198,10 +208,8 @@ trait CtrlModelTrait
      *
      * @param string $campusCd 校舎コード 指定なしの場合null
      * @param int $tutorId 講師ID
-     * @param string $excludeCampusCd 除外する校舎コード(削除予定)
      * @return array
      */
-    //protected function mdlGetStudentListForT($campusCd, $tid, $excludeCampusCd = null)
     protected function mdlGetStudentListForT($campusCd, $tutorId)
     {
         $query = Student::query();
@@ -515,7 +523,7 @@ trait CtrlModelTrait
             return $query->where('timetable_kind', $timetableKind);
         });
 
-            // プルダウンリストを取得する
+        // プルダウンリストを取得する
         return $query->select(
             'period_no as code',
             DB::raw('CONCAT(period_no, "限") AS value')
@@ -966,7 +974,8 @@ trait CtrlModelTrait
      * @param string $accountType アカウント種別
      * @return string メールアドレス
      */
-    protected function mdlGetAccountMail($accountId, $accountType) {
+    protected function mdlGetAccountMail($accountId, $accountType)
+    {
         $account = Account::select('email')
             ->where('account_id', $accountId)
             ->where('account_type', $accountType)
