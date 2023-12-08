@@ -86,6 +86,9 @@ trait FuncSurchargeTrait
      */
     private function getSurchargeDetail($surchargeId)
     {
+        // 本部ありで校舎名を取得する用のクエリ 後述使用
+        $campus_names = $this->mdlGetRoomQuery();
+
         // クエリを作成
         $query = Surcharge::query();
 
@@ -111,8 +114,8 @@ trait FuncSurchargeTrait
             'surcharges.payment_date',
             'surcharges.payment_status',
             'surcharges.admin_comment',
-            // 校舎マスタの名称
-            'mst_campuses.name as campus_name',
+            // 校舎の名称（本部あり）
+            'campus_names.room_name as campus_name',
             // コードマスタのサブコード（請求種別）
             'mst_codes_26.sub_code',
             // コードマスタの名称（請求種別）
@@ -122,8 +125,10 @@ trait FuncSurchargeTrait
             // コードマスタの名称（支払状況）
             'mst_codes_27.name as payment_status_name',
         )
-            // 校舎マスタとJOIN
-            ->sdLeftJoin(MstCampus::class, 'mst_campuses.campus_cd', '=', 'surcharges.campus_cd')
+            // 校舎名の取得JOIN
+            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
+                $join->on('surcharges.campus_cd', '=', 'campus_names.code');
+            })
             // コードマスターとJOIN 請求種別
             ->sdLeftJoin(CodeMaster::class, function ($join) {
                 $join->on('surcharges.surcharge_kind', '=', 'mst_codes_26.code')
