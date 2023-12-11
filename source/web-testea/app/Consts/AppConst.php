@@ -461,7 +461,7 @@ class AppConst
     /**
      * 請求情報ファイル項目定義
      */
-//    const CODE_MASTER_18 = 18;
+    //    const CODE_MASTER_18 = 18;
 
 
     //-----------
@@ -820,6 +820,21 @@ class AppConst
      * その他
      */
     const CODE_MASTER_26_32 = 32;
+
+    /**
+     * 請求種別 サブコード 請求区分:時給
+     */
+    const CODE_MASTER_26_SUB_8 = 8;
+
+    /**
+     * 請求種別 サブコード 請求区分:金額（源泉徴収対象）
+     */
+    const CODE_MASTER_26_SUB_9 = 9;
+
+    /**
+     * 請求種別 サブコード 請求区分:金額（源泉徴収対象外）
+     */
+    const CODE_MASTER_26_SUB_10 = 10;
 
     //-----------
     // 支払状況
@@ -1911,6 +1926,11 @@ class AppConst
      * システム変数ID 振替調整スキップ回数
      */
     const SYSTEM_KEY_ID_3 = 102;
+
+    /**
+     * システム変数ID 事務作業給
+     */
+    const SYSTEM_KEY_ID_2 = 101;
 
     //-----------
     // 授業報告書サブコード
