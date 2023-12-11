@@ -191,7 +191,7 @@ trait FuncSurchargeTrait
         $surcharge->comment = $request['comment'];
         $surcharge->approval_status = AppConst::CODE_MASTER_2_0;
         $surcharge->payment_date = null;
-        $surcharge->payment_status = null;
+        $surcharge->payment_status = AppConst::CODE_MASTER_27_0;
         $surcharge->admin_comment = null;
 
         // 請求種別によって保存項目分岐
