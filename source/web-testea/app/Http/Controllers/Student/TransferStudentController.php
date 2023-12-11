@@ -37,12 +37,6 @@ class TransferStudentController extends Controller
     use FuncTransferTrait;
 
     /**
-     * 候補日入力選択
-     */
-    const PREF_TYPE_SELECT = 1;
-    const PREF_TYPE_INPUT = 2;
-
-    /**
      * コンストラクタ
      *
      * @return void
@@ -253,7 +247,7 @@ class TransferStudentController extends Controller
                 $app_date = null;
                 $app_period = null;
 
-                if ($request['preferred' . $i . '_type'] == self::PREF_TYPE_SELECT) {
+                if ($request['preferred' . $i . '_type'] == AppConst::TRANSFER_PREF_TYPE_SELECT) {
                     // 候補日選択リスト
                     if ($request->filled('preferred_date' . $i . '_select') && $request['preferred_date' . $i . '_select'] != '') {
                         $selectData = $this->splitPreferredKeyId($request['preferred_date' . $i . '_select']);
@@ -341,96 +335,7 @@ class TransferStudentController extends Controller
         $account_id = $account->account_id;
 
         // データを取得
-        $tranApp = $this->fncTranGetTransferApplicationData($transferId, $account_id, null);
-
-        // 希望日のスケジュール重複チェック
-        $campusCd = $tranApp->campus_cd;
-        $studentId = $tranApp->student_id;
-        $tutorId = $tranApp->tutor_id;
-        $boothCd = $tranApp->booth_cd;
-        $howToKind = $tranApp->how_to_kind;
-        $tran_date[1] = $this->dtFormatYmd($tranApp->transfer_date_1);
-        $tran_date[2] = $this->dtFormatYmd($tranApp->transfer_date_2);
-        $tran_date[3] = $this->dtFormatYmd($tranApp->transfer_date_3);
-        $tran_period[1] = $tranApp->period_no_1;
-        $tran_period[2] = $tranApp->period_no_2;
-        $tran_period[3] = $tranApp->period_no_3;
-        $freeCheck = [];
-        for ($i = 1; $i <= 3; $i++) {
-            $freeCheck[$i] = null;
-            if ($tran_period[$i] != null && $tran_period[$i] != '') {
-                // 対象日・対象校舎の時限・開始～終了時刻を取得
-                $timeTables = $this->getTimetableByDate($campusCd, $tran_date[$i]);
-                $periodList = $timeTables->keyBy('period_no');
-                if (!isset($periodList[$tran_period[$i]])) {
-                    // 時限リストに該当の時限のデータがない
-                    $freeCheck[$i] = Lang::get('validation.invalid_period');
-                } else {
-                    $periodData = $periodList[$tran_period[$i]];
-
-                    // 生徒スケジュール重複チェック
-                    if (!$this->fncScheChkDuplidateSid(
-                        $tran_date[$i],
-                        $periodData['start_time'],
-                        $periodData['end_time'],
-                        $studentId
-                    )) {
-                        $freeCheck[$i] = Lang::get('validation.duplicate_student');
-                    } else {
-                        // 講師スケジュール重複チェック
-                        if (!$this->fncScheChkDuplidateTid(
-                            $tran_date[$i],
-                            $periodData['start_time'],
-                            $periodData['end_time'],
-                            $tutorId
-                        )) {
-                            $freeCheck[$i] = Lang::get('validation.duplicate_tutor');
-                        } else {
-                            // ブース空きチェック
-                            if ($this->fncScheSearchBooth(
-                                $campusCd,
-                                $boothCd,
-                                $tran_date[$i],
-                                $tran_period[$i],
-                                $howToKind,
-                                null,
-                                false
-                            ) == null) {
-                                $freeCheck[$i] = Lang::get('validation.duplicate_booth');
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        $editdata = [
-            'transfer_apply_id' => $tranApp->transfer_apply_id,
-            'target_date' => CommonDateFormat::formatYmdDay($tranApp->lesson_target_date),
-            'period_no' => $tranApp->lesson_period_no,
-            'campus_name' => $tranApp->campus_name,
-            'course_name' => $tranApp->course_name,
-            'tutor_name' => $tranApp->lesson_tutor_name,
-            'subject_name' => $tranApp->subject_name,
-            'transfer_reason' => $tranApp->transfer_reason,
-            'transfer_date_id_1' => $tranApp->transfer_date_id_1,
-            'transfer_date_id_2' => $tranApp->transfer_date_id_2,
-            'transfer_date_id_3' => $tranApp->transfer_date_id_3,
-            'subject_name' => $tranApp->subject_name,
-            'approval_status' => $tranApp->approval_status,
-            'comment' => $tranApp->comment
-        ];
-        for ($i = 1; $i <= 3; $i++) {
-            $fmtDate = '';
-            if ($tran_date[$i] != '') {
-                $fmtDate = CommonDateFormat::formatYmdDay($tran_date[$i]);
-            }
-            $editdata += [
-                'transfer_date_' . $i => $fmtDate,
-                'period_no_' . $i => $tran_period[$i],
-                'free_check_' . $i => $freeCheck[$i]
-            ];
-        }
+        $editdata = $this->fncTranGetEditTransferData($transferId, $account_id, null);
 
         // 承認ステータスリスト用データ
         $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_3, [AppConst::CODE_MASTER_3_SUB_1]);
@@ -682,10 +587,10 @@ class TransferStudentController extends Controller
 
         // 独自バリデーション: 第1希望日
         // 候補日選択の場合 必須
-        $rules += ['preferred_date1_select' => ['required_if:preferred1_type,' . self::PREF_TYPE_SELECT]];
+        $rules += ['preferred_date1_select' => ['required_if:preferred1_type,' . AppConst::TRANSFER_PREF_TYPE_SELECT]];
         // フリー入力の場合 必須
-        $rules += ['preferred_date1_calender' => ['required_if:preferred1_type,' . self::PREF_TYPE_INPUT, 'date_format:Y-m-d']];
-        $rules += ['preferred_date1_period' => ['required_if:preferred1_type,' . self::PREF_TYPE_INPUT]];
+        $rules += ['preferred_date1_calender' => ['required_if:preferred1_type,' . AppConst::TRANSFER_PREF_TYPE_INPUT, 'date_format:Y-m-d']];
+        $rules += ['preferred_date1_period' => ['required_if:preferred1_type,' . AppConst::TRANSFER_PREF_TYPE_INPUT]];
 
         // 独自バリデーション: 第2希望日
         // フリー入力の場合 どちらかが入力されていたら必須
@@ -720,81 +625,32 @@ class TransferStudentController extends Controller
         // 授業情報から授業日・時限を取得
         $schedules = Schedule::select(
             'target_date',
-            'period_no'
+            'period_no',
+            'booth_cd',
+            'how_to_kind'
         )
             // IDを指定
             ->where('schedule_id', $request['schedule_id'])
             // 自分のアカウントIDでガードを掛ける（sid）
             ->where($this->guardStudentTableWithSid())
             ->firstOrFail();
-        $scheduleDate = $schedules->target_date;
-        $schedulePeriod = $schedules->period_no;
 
         // 振替対象日の範囲
-        $targetPeriod = $this->fncTranCandidateDateFromTo($scheduleDate);
+        $targetPeriod = $this->fncTranCandidateDateFromTo($schedules->target_date);
 
-        // 独自バリデーション: 第１希望日
-        if ($request['preferred1_type'] == self::PREF_TYPE_INPUT) {
-            // 独自バリデーション: フリー入力の日付範囲チェック
-            $validationPreferred1_input_calender =  function ($attribute, $value, $fail) use ($request, $targetPeriod) {
-                if (!$request->filled('preferred_date1_calender') || $request['preferred_date1_calender'] == '') {
-                    // 未入力の場合は必須チェックでエラー
-                    return;
-                }
-                // 範囲チェック
-                if (!$this->dtCheckDateFromTo($request['preferred_date1_calender'], $targetPeriod['from_date'], $targetPeriod['to_date'])) {
-                    // 希望日範囲外エラー
-                    return $fail(Lang::get('validation.preferred_date_out_of_range'));
-                }
-                // 休業日チェック
-                // 期間区分の取得（年間授業予定）
-                $dateKind = $this->getYearlyDateKind($request['campus_cd'], $request['preferred_date1_calender']);
-                if ($dateKind == AppConst::CODE_MASTER_38_9) {
-                    // 休業日の場合、エラー
-                    return $fail(Lang::get('validation.preferred_date_closed'));
-                }
-            };
-            $validationPreferred1_input =  function ($attribute, $value, $fail) use ($request, $scheduleDate, $schedulePeriod) {
-                if ((!$request->filled('preferred_date1_calender') || $request['preferred_date1_calender'] == '') ||
-                    (!$request->filled('preferred_date1_period') || $request['preferred_date1_period'] == '')
-                ) {
-                    // 未入力の場合は必須チェックでエラー
-                    return;
-                }
+        // 独自バリデーション: 第１希望日のフリー入力のチェック
+        if ($request['preferred1_type'] == AppConst::TRANSFER_PREF_TYPE_INPUT) {
+            $validationPreferred1_input_calender = $this->fncTranGetValidateInputCalender1($request, $targetPeriod);
+            $validationPreferred1_input_period = $this->fncTranGetValidateInputPeriod1($request, $targetPeriod);
+            $validationPreferred1_input = $this->fncTranGetValidateInput1($request, $schedules);
 
-                // 振替対象の選択授業日・時限とチェック
-                if (
-                    strtotime($request['preferred_date1_calender']) == strtotime($scheduleDate) &&
-                    $request['preferred_date1_period'] == $schedulePeriod
-                ) {
-                    // 重複エラー
-                    return $fail(Lang::get('validation.preferred_datetime_same'));
-                }
-            };
-            $validationPreferred1_input_period =  function ($attribute, $value, $fail) use ($request) {
-                if ((!$request->filled('preferred_date1_calender') || $request['preferred_date1_calender'] == '') ||
-                    (!$request->filled('preferred_date1_period') || $request['preferred_date1_period'] == '')
-                ) {
-                    // 未入力の場合は必須チェックでエラー
-                    return;
-                }
-
-                // 時限リストを取得
-                $list = $this->mdlGetPeriodListByDate($request['campus_cd'], $request['preferred_date1_calender']);
-                if (!isset($list[$value])) {
-                    // 不正な値エラー
-                    return $fail(Lang::get('validation.invalid_input'));
-                }
-            };
-
-            // フリー入力の場合
             $rules += ['preferred_date1_calender' => [$validationPreferred1_input_calender, $validationPreferred1_input]];
             $rules += ['preferred_date1_period' => [$validationPreferred1_input, $validationPreferred1_input_period]];
         }
 
         // 独自バリデーション: 第２希望日のチェック 候補日選択リスト
         $validationPreferred2_select =  function ($attribute, $value, $fail) use ($request) {
-            if ($request->filled('preferred2_type') && $request['preferred2_type'] == self::PREF_TYPE_INPUT) {
+            if ($request->filled('preferred2_type') && $request['preferred2_type'] == AppConst::TRANSFER_PREF_TYPE_INPUT) {
                 return;
             }
             if (!$request->filled('preferred_date2_select') || $request['preferred_date2_select'] == '') {
@@ -803,7 +659,7 @@ class TransferStudentController extends Controller
             // 第１～２候補日を取得
             $preferred_datetime = [];
             for ($i = 1; $i <= 2; $i++) {
-                if ($request['preferred' . $i . '_type'] == self::PREF_TYPE_SELECT) {
+                if ($request['preferred' . $i . '_type'] == AppConst::TRANSFER_PREF_TYPE_SELECT) {
                     // 候補日選択の場合
                     $preferred_datetime[$i] = $request['preferred_date' . $i . '_select'];
                 } else {
@@ -812,117 +668,6 @@ class TransferStudentController extends Controller
                 }
             }
 
-            if ($preferred_datetime[2] != '_') {
-                if ($preferred_datetime[1] == $preferred_datetime[2]) {
-                    // 希望日重複エラー
-                    return $fail(Lang::get('validation.preferred_datetime_distinct'));
-                }
-            }
-        };
-        // 独自バリデーション: 第２希望日日付のチェック フリー入力
-        $validationPreferred2_input_calender =  function ($attribute, $value, $fail) use ($request, $targetPeriod) {
-            if ($request->filled('preferred2_type') && $request['preferred2_type'] == self::PREF_TYPE_SELECT) {
-                return;
-            }
-            if ((!$request->filled('preferred_date2_calender') || $request['preferred_date2_calender'] == '') &&
-                (!$request->filled('preferred_date2_period') || $request['preferred_date2_period'] == '')
-            ) {
-                // フリー入力を選択しているが、カレンダーも時限も未入力の場合はOK
-                return;
-            }
-
-            if ((!$request->filled('preferred_date2_calender') || $request['preferred_date2_calender'] == '') &&
-                ($request->filled('preferred_date2_period') && $request['preferred_date2_period'] != '')
-            ) {
-                // 時限入力あり・カレンダー入力なし エラー
-                return $fail(Lang::get('validation.preferred_input_reqired'));
-            }
-
-            // 休業日チェック
-            // 期間区分の取得（年間授業予定）
-            $dateKind = $this->getYearlyDateKind($request['campus_cd'], $request['preferred_date2_calender']);
-            if ($dateKind == AppConst::CODE_MASTER_38_9) {
-                // 休業日の場合、エラー
-                return $fail(Lang::get('validation.preferred_date_closed'));
-            }
-
-            // カレンダー入力ありの場合
-            if ($request->filled('preferred_date2_calender') && $request['preferred_date2_calender'] != '') {
-                // 範囲チェック
-                if (!$this->dtCheckDateFromTo($request['preferred_date2_calender'], $targetPeriod['from_date'], $targetPeriod['to_date'])) {
-                    // 希望日範囲外エラー
-                    return $fail(Lang::get('validation.preferred_date_out_of_range'));
-                }
-            }
-        };
-        // 独自バリデーション: 第２希望日時限のチェック フリー入力
-        $validationPreferred2_input_period =  function ($attribute, $value, $fail) use ($request, $targetPeriod) {
-            if ($request->filled('preferred2_type') && $request['preferred2_type'] == self::PREF_TYPE_SELECT) {
-                return;
-            }
-            if ((!$request->filled('preferred_date2_calender') || $request['preferred_date2_calender'] == '') &&
-                (!$request->filled('preferred_date2_period') || $request['preferred_date2_period'] == '')
-            ) {
-                // フリー入力を選択しているが、カレンダーも時限も未入力の場合はOK
-                return;
-            }
-            if (($request->filled('preferred_date2_calender') && $request['preferred_date2_calender'] != '') &&
-                (!$request->filled('preferred_date2_period') || $request['preferred_date2_period'] == '')
-            ) {
-                // カレンダー入力あり・時限入力なし エラー
-                return $fail(Lang::get('validation.preferred_input_reqired'));
-            }
-
-            // 時限リストを取得
-            $list = $this->mdlGetPeriodListByDate($request['campus_cd'], $request['preferred_date2_calender']);
-            if (!isset($list[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-        };
-        $validationPreferred2_input =  function ($attribute, $value, $fail) use ($request, $scheduleDate, $schedulePeriod) {
-            if ($request->filled('preferred2_type') && $request['preferred2_type'] == self::PREF_TYPE_SELECT) {
-                return;
-            }
-            if ((!$request->filled('preferred_date2_calender') || $request['preferred_date2_calender'] == '') &&
-                (!$request->filled('preferred_date2_period') || $request['preferred_date2_period'] == '')
-            ) {
-                // フリー入力を選択しているが、カレンダーも時限も未入力の場合はOK
-                return;
-            }
-            if (($request->filled('preferred_date2_calender') && $request['preferred_date2_calender'] != '') &&
-                (!$request->filled('preferred_date2_period') || $request['preferred_date2_period'] == '')
-            ) {
-                // カレンダー入力あり・時限入力なし エラー
-                return $fail(Lang::get('validation.preferred_input_reqired'));
-            }
-            if ((!$request->filled('preferred_date2_calender') || $request['preferred_date2_calender'] == '') &&
-                ($request->filled('preferred_date2_period') && $request['preferred_date2_period'] != '')
-            ) {
-                // 時限入力あり・カレンダー入力なし エラー
-                return $fail(Lang::get('validation.preferred_input_reqired'));
-            }
-
-            // 振替対象の選択授業日・時限とチェック
-            if (
-                strtotime($request['preferred_date2_calender']) == strtotime($scheduleDate) &&
-                $request['preferred_date2_period'] == $schedulePeriod
-            ) {
-                // 重複エラー
-                return $fail(Lang::get('validation.preferred_datetime_same'));
-            }
-
-            // 第１～２候補日を取得
-            $preferred_datetime = [];
-            for ($i = 1; $i <= 2; $i++) {
-                if ($request['preferred' . $i . '_type'] == self::PREF_TYPE_SELECT) {
-                    // 候補日選択の場合
-                    $preferred_datetime[$i] = $request['preferred_date' . $i . '_select'];
-                } else {
-                    // フリー入力の場合
-                    $preferred_datetime[$i] = $request['preferred_date' . $i . '_calender'] . '_' . $request['preferred_date' . $i . '_period'];
-                }
-            }
             if ($preferred_datetime[2] != '_') {
                 if ($preferred_datetime[1] == $preferred_datetime[2]) {
                     // 希望日重複エラー
@@ -932,13 +677,20 @@ class TransferStudentController extends Controller
         };
         // 候補日選択の場合
         $rules += ['preferred_date2_select' => [$validationPreferred2_select]];
-        // フリー入力の場合(時限の下に表示)
-        $rules += ['preferred_date2_calender' => [$validationPreferred2_input_calender, $validationPreferred2_input]];
-        $rules += ['preferred_date2_period' => [$validationPreferred2_input_period, $validationPreferred2_input]];
+
+        // 独自バリデーション: 第２希望日・時限のチェック フリー入力
+        if ($request->filled('preferred2_type') && $request['preferred2_type'] == AppConst::TRANSFER_PREF_TYPE_INPUT) {
+            $validationPreferred2_input_calender = $this->fncTranGetValidateInputCalender2($request, $targetPeriod);
+            $validationPreferred2_input_period = $this->fncTranGetValidateInputPeriod2($request, $targetPeriod);
+            $validationPreferred2_input = $this->fncTranGetValidateInput2($request, $schedules);
+
+            $rules += ['preferred_date2_calender' => [$validationPreferred2_input_calender, $validationPreferred2_input]];
+            $rules += ['preferred_date2_period' => [$validationPreferred2_input_period, $validationPreferred2_input]];
+        }
 
         // 独自バリデーション: 第３希望日のチェック 候補日選択リスト
         $validationPreferred3_select =  function ($attribute, $value, $fail) use ($request) {
-            if ($request->filled('preferred3_type') && $request['preferred3_type'] == self::PREF_TYPE_INPUT) {
+            if ($request->filled('preferred3_type') && $request['preferred3_type'] == AppConst::TRANSFER_PREF_TYPE_INPUT) {
                 return;
             }
             if (!$request->filled('preferred_date3_select') || $request['preferred_date3_select'] == '') {
@@ -947,120 +699,7 @@ class TransferStudentController extends Controller
             // 第１～３候補日を取得
             $preferred_datetime = [];
             for ($i = 1; $i <= 3; $i++) {
-                if ($request['preferred' . $i . '_type'] == self::PREF_TYPE_SELECT) {
-                    // 候補日選択の場合
-                    $preferred_datetime[$i] = $request['preferred_date' . $i . '_select'];
-                } else {
-                    // フリー入力の場合
-                    $preferred_datetime[$i] = $request['preferred_date' . $i . '_calender'] . '_' . $request['preferred_date' . $i . '_period'];
-                }
-            }
-            if ($preferred_datetime[3] != '_') {
-                if (
-                    $preferred_datetime[1] == $preferred_datetime[3] ||
-                    $preferred_datetime[2] == $preferred_datetime[3]
-                ) {
-                    // 希望日重複エラー
-                    return $fail(Lang::get('validation.preferred_datetime_distinct'));
-                }
-            }
-        };
-        // 独自バリデーション: 第３希望日日付のチェック フリー入力
-        $validationPreferred3_input_calender =  function ($attribute, $value, $fail) use ($request, $targetPeriod) {
-            if ($request->filled('preferred3_type') && $request['preferred3_type'] == self::PREF_TYPE_SELECT) {
-                return;
-            }
-            if ((!$request->filled('preferred_date3_calender') || $request['preferred_date3_calender'] == '') &&
-                (!$request->filled('preferred_date3_period') || $request['preferred_date3_period'] == '')
-            ) {
-                // フリー入力を選択しているが、カレンダーも時限も未入力の場合はOK
-                return;
-            }
-            if ((!$request->filled('preferred_date3_calender') || $request['preferred_date3_calender'] == '') &&
-                ($request->filled('preferred_date3_period') && $request['preferred_date3_period'] != '')
-            ) {
-                // 時限入力あり・カレンダー入力なし エラー
-                return $fail(Lang::get('validation.preferred_input_reqired'));
-            }
-
-            // 休業日チェック
-            // 期間区分の取得（年間授業予定）
-            $dateKind = $this->getYearlyDateKind($request['campus_cd'], $request['preferred_date3_calender']);
-            if ($dateKind == AppConst::CODE_MASTER_38_9) {
-                // 休業日の場合、エラー
-                return $fail(Lang::get('validation.preferred_date_closed'));
-            }
-
-            // カレンダー入力ありの場合
-            if ($request->filled('preferred_date3_calender') && $request['preferred_date3_calender'] != '') {
-                // 範囲チェック
-                if (!$this->dtCheckDateFromTo($request['preferred_date3_calender'], $targetPeriod['from_date'], $targetPeriod['to_date'])) {
-                    // 希望日範囲外エラー
-                    return $fail(Lang::get('validation.preferred_date_out_of_range'));
-                }
-            }
-        };
-        // 独自バリデーション: 第３希望日時限のチェック フリー入力
-        $validationPreferred3_input_period =  function ($attribute, $value, $fail) use ($request, $targetPeriod) {
-            if ($request->filled('preferred3_type') && $request['preferred3_type'] == self::PREF_TYPE_SELECT) {
-                return;
-            }
-            if ((!$request->filled('preferred_date3_calender') || $request['preferred_date3_calender'] == '') &&
-                (!$request->filled('preferred_date3_period') || $request['preferred_date3_period'] == '')
-            ) {
-                // フリー入力を選択しているが、カレンダーも時限も未入力の場合はOK
-                return;
-            }
-            if (($request->filled('preferred_date3_calender') && $request['preferred_date3_calender'] != '') &&
-                (!$request->filled('preferred_date3_period') || $request['preferred_date3_period'] == '')
-            ) {
-                // カレンダー入力あり・時限入力なし エラー
-                return $fail(Lang::get('validation.preferred_input_reqired'));
-            }
-
-            // 時限リストを取得
-            $list = $this->mdlGetPeriodListByDate($request['campus_cd'], $request['preferred_date3_calender']);
-            if (!isset($list[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-        };
-        $validationPreferred3_input =  function ($attribute, $value, $fail) use ($request, $scheduleDate, $schedulePeriod) {
-            if ($request->filled('preferred3_type') && $request['preferred3_type'] == self::PREF_TYPE_SELECT) {
-                return;
-            }
-            if ((!$request->filled('preferred_date3_calender') || $request['preferred_date3_calender'] == '') &&
-                (!$request->filled('preferred_date3_period') || $request['preferred_date3_period'] == '')
-            ) {
-                // フリー入力を選択しているが、カレンダーも時限も未入力の場合はOK
-                return;
-            }
-            if (($request->filled('preferred_date3_calender') && $request['preferred_date3_calender'] != '') &&
-                (!$request->filled('preferred_date3_period') || $request['preferred_date3_period'] == '')
-            ) {
-                // カレンダー入力あり・時限入力なし エラー
-                return $fail(Lang::get('validation.preferred_input_reqired'));
-            }
-            if ((!$request->filled('preferred_date3_calender') || $request['preferred_date3_calender'] == '') &&
-                ($request->filled('preferred_date3_period') && $request['preferred_date3_period'] != '')
-            ) {
-                // 時限入力あり・カレンダー入力なし エラー
-                return $fail(Lang::get('validation.preferred_input_reqired'));
-            }
-
-            // 振替対象の選択授業日・時限とチェック
-            if (
-                strtotime($request['preferred_date3_calender']) == strtotime($scheduleDate) &&
-                $request['preferred_date3_period'] == $schedulePeriod
-            ) {
-                // 重複エラー
-                return $fail(Lang::get('validation.preferred_datetime_same'));
-            }
-
-            // 第１～３候補日を取得
-            $preferred_datetime = [];
-            for ($i = 1; $i <= 3; $i++) {
-                if ($request['preferred' . $i . '_type'] == self::PREF_TYPE_SELECT) {
+                if ($request['preferred' . $i . '_type'] == AppConst::TRANSFER_PREF_TYPE_SELECT) {
                     // 候補日選択の場合
                     $preferred_datetime[$i] = $request['preferred_date' . $i . '_select'];
                 } else {
@@ -1080,9 +719,16 @@ class TransferStudentController extends Controller
         };
         // 候補日選択の場合
         $rules += ['preferred_date3_select' => [$validationPreferred3_select]];
-        // フリー入力の場合(時限の下に表示)
-        $rules += ['preferred_date3_calender' => [$validationPreferred3_input_calender, $validationPreferred3_input]];
-        $rules += ['preferred_date3_period' => [$validationPreferred3_input_period, $validationPreferred3_input]];
+
+        // 独自バリデーション: 第３希望日・時限のチェック フリー入力
+        if ($request->filled('preferred3_type') && $request['preferred3_type'] == AppConst::TRANSFER_PREF_TYPE_INPUT) {
+            $validationPreferred3_input_calender = $this->fncTranGetValidateInputCalender3($request, $targetPeriod);
+            $validationPreferred3_input_period = $this->fncTranGetValidateInputPeriod3($request, $targetPeriod);
+            $validationPreferred3_input = $this->fncTranGetValidateInput3($request, $schedules);
+
+            $rules += ['preferred_date3_calender' => [$validationPreferred3_input_calender, $validationPreferred3_input]];
+            $rules += ['preferred_date3_period' => [$validationPreferred3_input_period, $validationPreferred3_input]];
+        }
 
         return $rules;
     }
@@ -1099,100 +745,5 @@ class TransferStudentController extends Controller
         $validator = Validator::make($request->all(), $this->rulesForApproval($request));
         // 項目チェックエラーがある場合はここでエラー情報を返す
         return $validator->errors();
-    }
-
-    /**
-     * バリデーションルールを取得(承認用)
-     *
-     * @return array ルール
-     */
-    private function rulesForApproval(?Request $request)
-    {
-        $rules = array();
-
-        // 独自バリデーション: ステータスと希望日選択
-        // 承認ステータス
-        $validationApprovalStatus = function ($attribute, $value, $fail) use ($request) {
-
-            // 振替承認ステータスリストを取得
-            $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_3, [AppConst::CODE_MASTER_3_SUB_1]);
-            if (!isset($statusList[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-
-            // 承認の場合、希望日選択必須
-            if ($request->filled('approval_status') && $request['approval_status'] == AppConst::CODE_MASTER_3_2) {
-                // 振替希望日選択チェック
-                if (!$request->filled('transfer_date_id') || $request['transfer_date_id'] == '') {
-                    // 希望日選択なしエラー
-                    return $fail(Lang::get('validation.preferred_approval_not_select'));
-                }
-
-                // 授業情報取得
-                $schedule = $this->fncTranGetScheduleByTranAppId($request['transfer_apply_id']);
-                // 振替依頼日程情報取得
-                $transferDate = $this->fncTranGetTransferDate($request['transfer_date_id']);
-                // 振替依頼日・時限 開始～終了時間取得
-                $periodTime = $this->getTimetablePeriodTimeByDatePeriod($schedule->campus_cd, $transferDate->transfer_date, $transferDate->period_no);
-                // 終了時刻計算
-                $endTime = $this->fncTranEndTime($periodTime->start_time, $schedule->minites);
-
-                // 生徒スケジュール重複チェック
-                if (!$this->fncScheChkDuplidateSid(
-                    $transferDate->transfer_date,
-                    $periodTime->start_time,
-                    $endTime,
-                    $schedule->student_id
-                )) {
-                    return $fail(Lang::get('validation.duplicate_student'));
-                }
-
-                // 講師スケジュール重複チェック
-                if (!$this->fncScheChkDuplidateTid(
-                    $transferDate->transfer_date,
-                    $periodTime->start_time,
-                    $endTime,
-                    $schedule->tutor_id
-                )) {
-                    return $fail(Lang::get('validation.duplicate_tutor'));
-                }
-
-                // ブース空きチェック
-                if ($this->fncScheSearchBooth(
-                    $schedule->campus_cd,
-                    $schedule->booth_cd,
-                    $transferDate->transfer_date,
-                    $transferDate->period_no,
-                    $schedule->how_to_kind,
-                    null,
-                    false
-                ) == null) {
-                    return $fail(Lang::get('validation.duplicate_booth'));
-                }
-            }
-
-            // 振替希望日選択チェック
-            if ($request->filled('transfer_date_id') && $request['transfer_date_id'] != '') {
-                // 希望日選択ありだが承認待ち・差戻し(日程不都合)・〃(代講希望)の場合、エラー
-                if (
-                    $request->filled('approval_status') &&
-                    ($request['approval_status'] == AppConst::CODE_MASTER_3_1 ||
-                        $request['approval_status'] == AppConst::CODE_MASTER_3_3 ||
-                        $request['approval_status'] == AppConst::CODE_MASTER_3_4)
-                ) {
-                    // 希望日選択ありエラー
-                    return $fail(Lang::get('validation.preferred_status_not_apply'));
-                }
-            }
-        };
-
-        // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
-        // その他を第二引数で指定する
-        $rules += TransferApplication::fieldRules('approval_status', ['required', $validationApprovalStatus]);
-        // コメント:承認ステータス=差戻し(日程不都合) or 差戻し(代講希望) の場合に必須
-        $rules += TransferApplication::fieldRules('comment', ['required_if:approval_status,' . AppConst::CODE_MASTER_3_3, 'required_if:approval_status,' . AppConst::CODE_MASTER_3_4]);
-
-        return $rules;
     }
 }

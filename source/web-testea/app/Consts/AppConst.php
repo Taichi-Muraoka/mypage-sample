@@ -1942,4 +1942,19 @@ class AppConst
      * 授業報告書 その他教材・単元の下2桁
      */
     const REPORT_OTHER_TEXT_UNIT_CODE = 99;
+
+    
+    //-----------
+    // 授業振替依頼 希望選択
+    //-----------
+    /**
+     * 講師空き時間選択
+     */
+    const TRANSFER_PREF_TYPE_SELECT = 1;
+
+    /**
+     * フリー入力
+     */
+    const TRANSFER_PREF_TYPE_INPUT = 2;
+
 }
