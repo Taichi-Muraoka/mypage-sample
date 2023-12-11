@@ -284,7 +284,6 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
 
     // PDF出力
     Route::get('/invoice/pdf/{date}', [InvoiceController::class, 'pdf'])->name('invoice-pdf');
-
 });
 
 //===============================================
@@ -446,6 +445,9 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // 詳細取得用
     Route::post('/surcharge/get_data', [SurchargeController::class, 'getData'])->name('surcharge-get_data');
 
+    // 請求種別プルダウン選択時にサブコードを返却する
+    Route::post('/surcharge/get_data_select', [SurchargeController::class, 'getDataSelect'])->name('surcharge-get_data_select');
+
     // 新規登録
     Route::get('/surcharge/new', [SurchargeController::class, 'new'])->name('surcharge-new');
 
@@ -461,6 +463,8 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // バリデーション(登録用)
     Route::post('/surcharge/vd_input', [SurchargeController::class, 'validationForInput'])->name('surcharge-vd_input');
 
+    // 削除処理
+    Route::post('/surcharge/delete', [SurchargeController::class, 'delete'])->name('surcharge-delete');
     //---------------------
     // 給与明細
     //---------------------
@@ -495,7 +499,6 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
 
     // 資料のダウンロード
     Route::get('/training/download/{trnId}', [TrainingController::class, 'download'])->name('training-download');
-
 });
 
 //===============================================
@@ -1478,13 +1481,13 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/overtime/search', [OvertimeController::class, 'search'])->name('overtime-search');
 
-//});
+    //});
 
-//===============================================
-// 以下は全体管理者のみアクセス可とする
-//===============================================
+    //===============================================
+    // 以下は全体管理者のみアクセス可とする
+    //===============================================
 
-//Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
+    //Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
 
     //---------------------
     // 給与算出
@@ -1962,5 +1965,4 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 検索結果取得
     Route::post('/year_schedule_import/search', [YearScheduleImportController::class, 'search'])->name('year_schedule_import-search');
-
 });
