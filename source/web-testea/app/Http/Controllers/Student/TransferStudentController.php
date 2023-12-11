@@ -356,7 +356,7 @@ class TransferStudentController extends Controller
     public function update(Request $request)
     {
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForApproval($request))->validate();
+        Validator::make($request->all(), $this->fncTranRulesForApproval($request))->validate();
 
         // トランザクション(例外時は自動的にロールバック)
         DB::transaction(function () use ($request) {
@@ -626,6 +626,10 @@ class TransferStudentController extends Controller
         $schedules = Schedule::select(
             'target_date',
             'period_no',
+            'campus_cd',
+            'tutor_id',
+            'student_id',
+            'minites',
             'booth_cd',
             'how_to_kind'
         )
@@ -638,6 +642,25 @@ class TransferStudentController extends Controller
         // 振替対象日の範囲
         $targetPeriod = $this->fncTranCandidateDateFromTo($schedules->target_date);
 
+        // 独自バリデーション: 第１希望日のチェック 候補日選択リスト
+        if ($request['preferred1_type'] == AppConst::TRANSFER_PREF_TYPE_SELECT) {
+            $validationPreferred1_select =  function ($attribute, $value, $fail) use ($request, $schedules, $targetPeriod) {
+                if (!$request->filled('preferred_date1_select') || $request['preferred_date1_select'] == '') {
+                    return;
+                }
+
+                // 候補日リストチェック
+                // 振替候補日を取得
+                $candidates = $this->fncTranGetTransferCandidateDates($schedules, $targetPeriod);
+                if (!isset($candidates[$value])) {
+                    // 不正な値エラー
+                    return $fail(Lang::get('validation.invalid_input'));
+                }
+            };
+
+            $rules += ['preferred_date1_select' => [$validationPreferred1_select]];
+        }
+
         // 独自バリデーション: 第１希望日のフリー入力のチェック
         if ($request['preferred1_type'] == AppConst::TRANSFER_PREF_TYPE_INPUT) {
             $validationPreferred1_input_calender = $this->fncTranGetValidateInputCalender1($request, $targetPeriod);
@@ -649,13 +672,22 @@ class TransferStudentController extends Controller
         }
 
         // 独自バリデーション: 第２希望日のチェック 候補日選択リスト
-        $validationPreferred2_select =  function ($attribute, $value, $fail) use ($request) {
+        $validationPreferred2_select =  function ($attribute, $value, $fail) use ($request, $schedules, $targetPeriod) {
             if ($request->filled('preferred2_type') && $request['preferred2_type'] == AppConst::TRANSFER_PREF_TYPE_INPUT) {
                 return;
             }
             if (!$request->filled('preferred_date2_select') || $request['preferred_date2_select'] == '') {
                 return;
             }
+
+            // 候補日リストチェック
+            // 振替候補日を取得
+            $candidates = $this->fncTranGetTransferCandidateDates($schedules, $targetPeriod);
+            if (!isset($candidates[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+
             // 第１～２候補日を取得
             $preferred_datetime = [];
             for ($i = 1; $i <= 2; $i++) {
@@ -689,13 +721,22 @@ class TransferStudentController extends Controller
         }
 
         // 独自バリデーション: 第３希望日のチェック 候補日選択リスト
-        $validationPreferred3_select =  function ($attribute, $value, $fail) use ($request) {
+        $validationPreferred3_select =  function ($attribute, $value, $fail) use ($request, $schedules, $targetPeriod) {
             if ($request->filled('preferred3_type') && $request['preferred3_type'] == AppConst::TRANSFER_PREF_TYPE_INPUT) {
                 return;
             }
             if (!$request->filled('preferred_date3_select') || $request['preferred_date3_select'] == '') {
                 return;
             }
+
+            // 候補日リストチェック
+            // 振替候補日を取得
+            $candidates = $this->fncTranGetTransferCandidateDates($schedules, $targetPeriod);
+            if (!isset($candidates[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+
             // 第１～３候補日を取得
             $preferred_datetime = [];
             for ($i = 1; $i <= 3; $i++) {
@@ -742,7 +783,7 @@ class TransferStudentController extends Controller
     public function validationForApproval(Request $request)
     {
         // リクエストデータチェック（項目チェック）
-        $validator = Validator::make($request->all(), $this->rulesForApproval($request));
+        $validator = Validator::make($request->all(), $this->fncTranRulesForApproval($request));
         // 項目チェックエラーがある場合はここでエラー情報を返す
         return $validator->errors();
     }

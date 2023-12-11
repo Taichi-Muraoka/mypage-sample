@@ -520,7 +520,7 @@ class TransferTutorController extends Controller
     public function update(Request $request)
     {
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForApproval($request))->validate();
+        Validator::make($request->all(), $this->fncTranRulesForApproval($request))->validate();
 
         // トランザクション(例外時は自動的にロールバック)
         DB::transaction(function () use ($request) {
@@ -839,7 +839,7 @@ class TransferTutorController extends Controller
     public function validationForApproval(Request $request)
     {
         // リクエストデータチェック（項目チェック）
-        $validator = Validator::make($request->all(), $this->rulesForApproval($request));
+        $validator = Validator::make($request->all(), $this->fncTranRulesForApproval($request));
         // 項目チェックエラーがある場合はここでエラー情報を返す
         return $validator->errors();
     }

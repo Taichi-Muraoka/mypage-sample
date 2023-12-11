@@ -719,7 +719,8 @@ trait FuncTransferTrait
             $freeCheck[$i] = null;
             if ($tran_period[$i] != null && $tran_period[$i] != '') {
                 // 対象日が、過去の場合は選択不可
-                if (strtotime($tran_date[$i]) < strtotime('now')) {
+                // TODO:仕様確認中・要調整(当日をどうするか)
+                if (strtotime($tran_date[$i]) < strtotime(date('Y-m-d'))) {
                     $freeCheck[$i] = Lang::get('validation.invalid_date_cannot_select');
                 } else {
                     // 対象日・対象校舎の時限・開始～終了時刻を取得
@@ -1358,7 +1359,7 @@ trait FuncTransferTrait
      *
      * @return array ルール
      */
-    private function rulesForApproval(?Request $request)
+    private function fncTranRulesForApproval(?Request $request)
     {
         $rules = array();
 
