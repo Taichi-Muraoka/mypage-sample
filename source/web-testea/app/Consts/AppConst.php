@@ -117,22 +117,22 @@ class AppConst
     const CODE_MASTER_4 = 4;
 
     /**
-     * 承認ステータス 対象外
+     * 報告書承認ステータス 対象外
      */
     const CODE_MASTER_4_0 = 0;
 
     /**
-     * 承認ステータス 承認待ち
+     * 報告書承認ステータス 承認待ち
      */
     const CODE_MASTER_4_1 = 1;
 
     /**
-     * 承認ステータス 承認
+     * 報告書承認ステータス 承認
      */
     const CODE_MASTER_4_2 = 2;
 
     /**
-     * 承認ステータス 差戻し
+     * 報告書承認ステータス 差戻し
      */
     const CODE_MASTER_4_3 = 3;
 
@@ -1122,6 +1122,11 @@ class AppConst
      */
     const CODE_MASTER_35_SUB_2 = 2;
 
+    /**
+     * 出欠ステータス サブコード １対１・画面非表示対象（振替済・リセット）
+     */
+    const CODE_MASTER_35_SUB_3 = 3;
+
     //-----------
     // 仮登録フラグ
     //-----------
@@ -1943,6 +1948,21 @@ class AppConst
      */
     const REPORT_OTHER_TEXT_UNIT_CODE = 99;
 
+    /**
+     * 授業報告書 ステータス
+     */
+
+    // ―（登録不要）
+    const REPORT_STATUS_1 = '1';
+
+    // ×（要登録・差戻し）
+    const REPORT_STATUS_2 = '2';
+
+    // △（承認待ち）
+    const REPORT_STATUS_3 = '3';
+
+    // 〇（登録済み）
+    const REPORT_STATUS_4 = '4';
     
     //-----------
     // 授業振替依頼 希望選択
@@ -1956,5 +1976,4 @@ class AppConst
      * フリー入力
      */
     const TRANSFER_PREF_TYPE_INPUT = 2;
-
 }
