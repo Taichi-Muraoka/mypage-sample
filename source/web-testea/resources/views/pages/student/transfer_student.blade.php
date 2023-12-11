@@ -30,7 +30,7 @@
         <tr v-for="item in paginator.data" v-cloak>
             <x-bs.td-sp caption="申請日">@{{$filters.formatYmd(item.apply_date)}}</x-bs.td-sp>
             <x-bs.td-sp caption="申請者種別">@{{item.apply_kind_name}}</x-bs.td-sp>
-            <x-bs.td-sp caption="授業日・時限">@{{$filters.formatYmd(item.target_date)}} @{{item.period_no}}限</x-bs.td-sp>
+            <x-bs.td-sp caption="授業日・時限">@{{$filters.formatYmdDay(item.target_date)}} @{{item.period_no}}限</x-bs.td-sp>
             {{-- <x-bs.td-sp caption="授業日・時限">@{{item.target_date}} @{{item.period_no}}限</x-bs.td-sp> --}}
             <x-bs.td-sp caption="コース">@{{item.course_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="講師名">@{{item.tutor_name}}</x-bs.td-sp>
