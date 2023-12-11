@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Traits;
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
 use App\Models\CodeMaster;
-use App\Models\MstCampus;
 use App\Models\MstSystem;
 use App\Models\Surcharge;
 use Illuminate\Support\Carbon;

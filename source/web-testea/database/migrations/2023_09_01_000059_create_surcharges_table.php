@@ -27,7 +27,7 @@ return new class extends Migration
             $table->text('comment')->nullable()->comment('内容');
             $table->unsignedSmallInteger('approval_status')->default(1)->comment('承認状態（1:承認待ち、2:承認、3:差戻し）');
             $table->date('payment_date')->nullable()->comment('支払年月');
-            $table->unsignedSmallInteger('payment_status')->nullable()->default(0)->comment('支払状況（0:未処理、1:支払済）');
+            $table->unsignedSmallInteger('payment_status')->default(0)->comment('支払状況（0:未処理、1:支払済）');
             $table->text('admin_comment')->nullable()->comment('管理者コメント');
             $table->timestamps();
             $table->softDeletes();

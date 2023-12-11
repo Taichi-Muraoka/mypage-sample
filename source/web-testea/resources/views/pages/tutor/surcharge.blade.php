@@ -31,7 +31,7 @@
             <x-bs.td-sp caption="申請日">@{{$filters.formatYmd(item.apply_date)}}</x-bs.td-sp>
             <x-bs.td-sp caption="請求種別">@{{item.surcharge_kind_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="時間(分)">@{{item.minutes}}</x-bs.td-sp>
-            <x-bs.td-sp caption="金額">@{{item.tuition}}</x-bs.td-sp>
+            <x-bs.td-sp caption="金額" class="t-price">@{{$filters.toLocaleString(item.tuition)}}</x-bs.td-sp>
             <x-bs.td-sp caption="ステータス">@{{item.approval_status_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="支払年月">@{{$filters.formatYm(item.payment_date)}}</x-bs.td-sp>
             <x-bs.td-sp caption="支払状況">@{{item.payment_status_name}}</x-bs.td-sp>

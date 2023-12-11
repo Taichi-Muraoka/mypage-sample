@@ -26,7 +26,7 @@
     </tr>
     <tr>
         <th>金額</th>
-        <td>@{{item.tuition}}</td>
+        <td>@{{$filters.toLocaleString(item.tuition)}}</td>
     </tr>
     <tr>
         <th>内容(作業・費目等)</th>
