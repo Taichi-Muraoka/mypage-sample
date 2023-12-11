@@ -52,7 +52,7 @@ class SurchargeController extends Controller
     public function search(Request $request)
     {
         // データを取得
-        $surcharges = $this->getSurchargeList();
+        $surcharges = $this->getSurchargeList(null);
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $surcharges);

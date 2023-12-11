@@ -10,130 +10,56 @@
     <li>支払年月を設定（申請日の翌月に自動設定）</li>
 </ul>
 
-{{-- <x-bs.table :hover=false :vHeader=true> --}}
-<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true  vShow="item.id == 2">
-    {{-- モック用処理 --}}
+<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true>
     <tr>
-        <th>申請日</th>
-        <td>2023/01/09</td>
+        <th width="35%">申請日</th>
+        <td>@{{$filters.formatYmd(item.apply_date)}}</td>
     </tr>
-    <tr width="35%">
+    <tr>
         <th>講師名</th>
-        <td>CWテスト教師１０１</td>
+        <td>@{{item.tutor_name}}</td>
     </tr>
     <tr>
         <th>請求種別</th>
-        <td>経費</td>
+        <td>@{{item.surcharge_kind_name}}</td>
     </tr>
     <tr>
         <th>校舎</th>
-        <td>久我山</td>
+        <td>@{{item.campus_name}}</td>
     </tr>
     <tr>
         <th>実施日</th>
-        <td>2023/01/09</td>
+        <td>@{{$filters.formatYmd(item.working_date)}}</td>
     </tr>
-{{-- 種別：事務作業の場合 --}}
-    {{-- <tr>
+    {{-- 請求種別 = サブコード8 時給のみ表示 --}}
+    <tr v-show="item.sub_code == {{ App\Consts\AppConst::CODE_MASTER_26_SUB_8 }}">
         <th>開始時刻</th>
-        <td>16:00</td>
+        <td>@{{item.start_time}}</td>
     </tr>
-    <tr>
-        <th>時間（分）</th>
-        <td>60</td>
-    </tr> --}}
-    <tr>
-        <th>金額</th>
-        <td>2000</td>
-    </tr>
-    <tr>
-        <th>内容（作業・費目等）</th>
-        <td>テキスト購入</td>
-    </tr>
-    <tr>
-        <th>ステータス</th>
-        <td>承認待ち</td>
-    </tr>
-    <tr>
-        <th>管理者コメント</th>
-        <td></td>
-    </tr>
-    <tr>
-        <th>支払年月</th>
-        <td>2023/02</td>
-    </tr>
-
-    {{-- 本番用処理 --}}
-    {{-- <tr>
-        <th width="35%">生徒名</th>
-        <td>@{{item.sname}}</td>
-    </tr>
-    <tr>
-        <th>授業日時</th>
-        <td>@{{$filters.formatYmd(item.lesson_date)}} @{{$filters.formatHm(item.start_time)}}</td>
-    </tr>
-    <tr>
-        <th>校舎</th>
-        <td>@{{item.room_name}}</td>
-    </tr>
-    <tr>
-        <th>講師名</th>
-        <td>@{{item.tname}}</td>
-    </tr> --}}
-</x-bs.table>
-
-<x-bs.table :hover=false :vHeader=true :smartPhoneModal=true  vShow="item.id == 3">
-    {{-- モック用処理 --}}
-    <tr>
-        <th>申請日</th>
-        <td>2023/01/05</td>
-    </tr>
-    <tr width="35%">
-        <th>講師名</th>
-        <td>CWテスト教師１０３</td>
-    </tr>
-    <tr>
-        <th>請求種別</th>
-        <td>業務依頼（教室）</td>
-    </tr>
-    <tr>
-        <th>校舎</th>
-        <td>西永福</td>
-    </tr>
-    <tr>
-        <th>実施日</th>
-        <td>2023/01/04</td>
-    </tr>
-{{-- 種別：事務作業の場合 --}}
-    <tr>
-        <th>開始時刻</th>
-        <td>17:00</td>
-    </tr>
-    <tr>
-        <th>時間（分）</th>
-        <td>90</td>
+    <tr v-show="item.sub_code == {{ App\Consts\AppConst::CODE_MASTER_26_SUB_8 }}">
+        <th>時間(分)</th>
+        <td>@{{item.minutes}}</td>
     </tr>
     <tr>
         <th>金額</th>
-        <td>1500</td>
+        <td>@{{$filters.toLocaleString(item.tuition)}}</td>
     </tr>
     <tr>
-        <th>内容（作業・費目等）</th>
-        <td>教材プリントコピー作業</td>
+        <th>内容(作業・費目等)</th>
+        <td class="nl2br">@{{item.comment}}</td>
     </tr>
     <tr>
         <th>ステータス</th>
-        <td>承認待ち</td>
+        <td>@{{item.approval_status_name}}</td>
     </tr>
     <tr>
         <th>管理者コメント</th>
-        <td></td>
+        <td class="nl2br">@{{item.admin_comment}}</td>
     </tr>
-    <tr>
+    <tr v-show="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_2_1 }}">
         <th>支払年月</th>
-        <td>2023/02</td>
+        <td>@{{$filters.formatYm(item.payment_date)}}</td>
     </tr>
-
 </x-bs.table>
 
 @overwrite
