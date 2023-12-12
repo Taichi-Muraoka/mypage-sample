@@ -9,29 +9,27 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="roomcd" caption="校舎" :select2=true >
-                <option value="1">久我山</option>
-                <option value="2">西永福</option>
-                <option value="3">下高井戸</option>
-                <option value="4">駒込</option>
-                <option value="5">日吉</option>
-                <option value="6">自由が丘</option>
-            </x-input.select>
+            @can('roomAdmin')
+            {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData :select2Search=false :blank=false/>
+            @else
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData :select2Search=false/>
+            @endcan
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="授業日 From" id="holiday_date_from"/>
+            <x-input.date-picker caption="授業日 From" id="target_date_from" />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="授業日 To" id="holiday_date_to" />
+            <x-input.date-picker caption="授業日 To" id="target_date_to" />
         </x-bs.col2>
     </x-bs.row>
 
 </x-bs.card>
 
 {{-- 結果リスト --}}
-<x-bs.card-list :mock=true>
+<x-bs.card-list>
 
     {{-- テーブル --}}
     <x-bs.table :button=true>
@@ -56,42 +54,26 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>100101</td>
-            <td>CWテスト教師１０１</td>
-            <td class="t-price">18</td>
-            <td class="t-price">3</td>
-            <td class="t-price">4.5</td>
-            <td class="t-price">3</td>
-            <td class="t-price">6</td>
-            <td class="t-price">2</td>
-            <td class="t-price">10</td>
-            <td class="t-price">0</td>
-            <td class="t-price">1</td>
-            <td class="t-price">1</td>
-            <td class="t-price">0</td>
-            <td class="t-price">2</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{item.tutor_id}}</td>
+            <td>@{{item.tutor_name}}</td>
+            <td class="t-price">@{{item.personal_min}}</td>
+            <td class="t-price">@{{item.two_min}}</td>
+            <td class="t-price">@{{item.three_min}}</td>
+            <td class="t-price">@{{item.group_min}}</td>
+            <td class="t-price">@{{item.home_min}}</td>
+            <td class="t-price">@{{item.exercise_min}}</td>
+            <td class="t-price">@{{item.high_min}}</td>
+            <td class="t-price">@{{item.normal_sub_get}}</td>
+            <td class="t-price">@{{item.emergency_sub_get}}</td>
+            <td class="t-price">@{{item.normal_sub_out}}</td>
+            <td class="t-price">@{{item.emergency_sub_out}}</td>
+            <td class="t-price">@{{item.trial_class}}</td>
             <td>
-                <x-button.list-dtl />
-            </td>
-        </tr>
-        <tr>
-            <td>100102</td>
-            <td>CWテスト教師１０２</td>
-            <td class="t-price">18</td>
-            <td class="t-price">3</td>
-            <td class="t-price">4.5</td>
-            <td class="t-price">3</td>
-            <td class="t-price">6</td>
-            <td class="t-price">2</td>
-            <td class="t-price">10</td>
-            <td class="t-price">0</td>
-            <td class="t-price">0</td>
-            <td class="t-price">0</td>
-            <td class="t-price">0</td>
-            <td class="t-price">0</td>
-            <td>
-                <x-button.list-dtl/>
+                <x-button.list-dtl :vueDataAttr="['tutor_id' => 'item.tutor_id',
+                    'campus_cd' => 'item.campus_cd',
+                    'target_date_from' => 'item.target_date_from',
+                    'target_date_to' => 'item.target_date_to']" />
             </td>
         </tr>
 

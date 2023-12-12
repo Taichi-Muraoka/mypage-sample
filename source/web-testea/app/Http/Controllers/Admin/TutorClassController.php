@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtSchedule;
+use App\Models\CodeMaster;
+use App\Models\Student;
+use App\Models\Tutor;
+use App\Models\Schedule;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
-//use App\Http\Controllers\Traits\FuncReportTrait;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\UrlWindow;
 use Carbon\Carbon;
 
 /**
@@ -41,9 +44,13 @@ class TutorClassController extends Controller
      */
     public function index()
     {
+        // 校舎プルダウン
+        $rooms = $this->mdlGetRoomList(false);
+
         return view('pages.admin.tutor_class', [
-            'rules' => $this->rulesForSearch(),
-            'editData' => null
+            'rules' => $this->rulesForSearch(null),
+            'editData' => null,
+            'rooms' => $rooms
         ]);
     }
 
@@ -56,9 +63,207 @@ class TutorClassController extends Controller
     public function search(Request $request)
     {
         // バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForSearch())->validate();
-        // ページネータで返却（モック用）
-        return $this->getListAndPaginatorMock();
+        Validator::make($request->all(), $this->rulesForSearch($request))->validate();
+
+        // 初期表示は処理を行わず、空のページネーターを返す
+        if ($request['target_date_from'] == null && $request['target_date_to'] == null) {
+            // 1ページあたりの件数
+            $countPage = config('appconf.page_count');
+
+            // ページャへのパラメータを固定で設定
+            $page = 1;
+            $items = null;
+            $itemCount = 0;
+
+            // ページャ取得
+            $paginator = new LengthAwarePaginator(
+                // 表示するデータ
+                $items,
+                // 件数
+                $itemCount,
+                // 1ページあたりの件数
+                $countPage,
+                // 現在のページ数
+                $page,
+            );
+
+            // ページャを取得する
+            $window = UrlWindow::make($paginator);
+            $elements = array_filter([
+                $window['first'],
+                is_array($window['slider']) ? '...' : null,
+                $window['slider'],
+                is_array($window['last']) ? '...' : null,
+                $window['last'],
+            ]);
+
+            return ['paginator' => $paginator, 'elements' => $elements];
+        }
+
+        // formを取得
+        $form = $request->all();
+
+        // クエリを作成
+        $query = Schedule::query();
+
+        // 校舎コード選択による絞り込み条件
+        if (isset($form['campus_cd']) && filled($form['campus_cd'])) {
+            // 検索フォームから取得（スコープ）
+            $query->SearchCampusCd($form);
+        }
+
+        // 日付の絞り込み条件
+        $query->SearchTargetDateFrom($form);
+        $query->SearchTargetDateTo($form);
+
+        // スケジュール情報取得し、サブクエリを作成
+        $schedules = $query
+            ->where('schedules.tentative_status', 0)
+            ->whereNotNull('schedules.tutor_id')
+            ->whereNull('schedules.deleted_at')
+            ->whereIn('schedules.absent_status', [0])
+            ->select(
+                'schedules.schedule_id',
+                'schedules.tutor_id',
+                'schedules.course_cd',
+                'schedules.lesson_kind',
+                'schedules.substitute_kind',
+                'schedules.absent_tutor_id',
+                'tutors.name as tutor_name'
+            )
+            ->selectRaw('SUM(schedules.minites) as sum_minites')
+            // 講師名の取得
+            ->sdLeftJoin(Tutor::class, 'schedules.tutor_id', '=', 'tutors.tutor_id')
+            ->groupBy('schedules.tutor_id', 'schedules.course_cd');
+
+        // コース別時間集計
+        $course_count = DB::table($schedules)
+            ->select(
+                'tutor_id',
+                'tutor_name'
+            )
+            ->selectRaw('MAX(CASE WHEN course_cd = 10100 THEN sum_minites ELSE 0 END) AS personal_min')
+            ->selectRaw('MAX(CASE WHEN course_cd = 10200 THEN sum_minites ELSE 0 END) AS two_min')
+            ->selectRaw('MAX(CASE WHEN course_cd = 10300 THEN sum_minites ELSE 0 END) AS three_min')
+            ->selectRaw('MAX(CASE WHEN course_cd = 10400 THEN sum_minites ELSE 0 END) AS home_min')
+            ->selectRaw('MAX(CASE WHEN course_cd = 10500 THEN sum_minites ELSE 0 END) AS exercise_min')
+            ->selectRaw('MAX(CASE WHEN course_cd = 10600 THEN sum_minites ELSE 0 END) AS high_min')
+            ->selectRaw('MAX(CASE WHEN course_cd = 20100 THEN sum_minites ELSE 0 END) AS group_min')
+            ->selectRaw('0 as normal_sub_get')
+            ->selectRaw('0 as emergency_sub_get')
+            ->selectRaw('0 as normal_sub_out')
+            ->selectRaw('0 as emergency_sub_out')
+            ->selectRaw('0 as trial_class')
+            ->groupBy('tutor_id');
+
+        // 代講（受）集計
+        $substitute_get_count = DB::table($schedules)
+            ->whereIn('substitute_kind', [AppConst::CODE_MASTER_34_1, AppConst::CODE_MASTER_34_2])
+            ->select(
+                'tutor_id',
+                'tutor_name'
+            )
+            ->selectRaw('0 AS personal_min')
+            ->selectRaw('0 AS two_min')
+            ->selectRaw('0 AS three_min')
+            ->selectRaw('0 AS home_min')
+            ->selectRaw('0 AS exercise_min')
+            ->selectRaw('0 AS high_min')
+            ->selectRaw('0 AS group_min')
+            ->selectRaw('SUM(CASE WHEN substitute_kind = 1 THEN 1 ELSE 0 END) as normal_sub_get')
+            ->selectRaw('SUM(CASE WHEN substitute_kind = 2 THEN 1 ELSE 0 END) as emergency_sub_get')
+            ->selectRaw('0 as normal_sub_out')
+            ->selectRaw('0 as emergency_sub_out')
+            ->selectRaw('0 as trial_class')
+            ->groupBy('tutor_id');
+
+        // 代講（出）集計
+        $substitute_out_count = DB::table($schedules)
+            ->whereIn('substitute_kind', [AppConst::CODE_MASTER_34_1, AppConst::CODE_MASTER_34_2])
+            ->select(
+                'absent_tutor_id as tutor_id',
+                'tutor_name'
+            )
+            ->selectRaw('0 AS personal_min')
+            ->selectRaw('0 AS two_min')
+            ->selectRaw('0 AS three_min')
+            ->selectRaw('0 AS home_min')
+            ->selectRaw('0 AS exercise_min')
+            ->selectRaw('0 AS high_min')
+            ->selectRaw('0 AS group_min')
+            ->selectRaw('0 as normal_sub_get')
+            ->selectRaw('0 as emergency_sub_get')
+            ->selectRaw('SUM(CASE WHEN substitute_kind = 1 THEN 1 ELSE 0 END) as normal_sub_out')
+            ->selectRaw('SUM(CASE WHEN substitute_kind = 2 THEN 1 ELSE 0 END) as emergency_sub_out')
+            ->selectRaw('0 as trial_class')
+            ->groupBy('tutor_id');
+
+        // 体験授業集計
+        $trial_class_count = DB::table($schedules)
+            ->whereIn('lesson_kind', [AppConst::CODE_MASTER_31_5])
+            ->select(
+                'tutor_id',
+                'tutor_name'
+            )
+            ->selectRaw('0 AS personal_min')
+            ->selectRaw('0 AS two_min')
+            ->selectRaw('0 AS three_min')
+            ->selectRaw('0 AS home_min')
+            ->selectRaw('0 AS exercise_min')
+            ->selectRaw('0 AS high_min')
+            ->selectRaw('0 AS group_min')
+            ->selectRaw('0 as normal_sub_get')
+            ->selectRaw('0 as emergency_sub_get')
+            ->selectRaw('0 as normal_sub_out')
+            ->selectRaw('0 as emergency_sub_out')
+            ->selectRaw('COUNT(schedule_id) as trial_class')
+            ->groupBy('tutor_id');
+
+        // unionで結合
+        $uniondata = $course_count
+            ->union($substitute_get_count)
+            ->union($substitute_out_count)
+            ->union($trial_class_count);
+
+        // unionで結合したデータをまとめる
+        $schedule_count = DB::table($uniondata)
+            ->select(
+                'tutor_id',
+                'tutor_name'
+            )
+            ->selectRaw('SUM(personal_min) AS personal_min')
+            ->selectRaw('SUM(two_min) AS two_min')
+            ->selectRaw('SUM(three_min) AS three_min')
+            ->selectRaw('SUM(home_min) AS home_min')
+            ->selectRaw('SUM(exercise_min) AS exercise_min')
+            ->selectRaw('SUM(high_min) AS high_min')
+            ->selectRaw('SUM(group_min) AS group_min')
+            ->selectRaw('SUM(normal_sub_get) as normal_sub_get')
+            ->selectRaw('SUM(emergency_sub_get) as emergency_sub_get')
+            ->selectRaw('SUM(normal_sub_out) as normal_sub_out')
+            ->selectRaw('SUM(emergency_sub_out) as emergency_sub_out')
+            ->selectRaw('SUM(trial_class) as trial_class')
+            ->groupBy('tutor_id');
+        
+        return $this->getListAndPaginator($request, $schedule_count, function ($items) use ($form) {
+            // データ加工
+            foreach ($items as $item) {
+                // 検索条件を付与(モーダル表示に使用)
+                $item->campus_cd = $form['campus_cd'];
+                $item->target_date_from = $form['target_date_from'];
+                $item->target_date_to = $form['target_date_to'];
+                // 授業(分)を授業(時間)に変換(小数点1位以下を切り捨て)
+                $item->personal_min = floor($item->personal_min / 60 * 10) / 10;
+                $item->two_min = floor($item->two_min / 60 * 10) / 10;
+                $item->three_min = floor($item->three_min / 60 * 10) / 10;
+                $item->home_min = floor($item->home_min / 60 * 10) / 10;
+                $item->exercise_min = floor($item->exercise_min / 60 * 10) / 10;
+                $item->high_min = floor($item->high_min / 60 * 10) / 10;
+                $item->group_min = floor($item->group_min / 60 * 10) / 10;
+            } 
+
+            return $items;
+        });
     }
 
     /**
@@ -70,7 +275,7 @@ class TutorClassController extends Controller
     public function validationForSearch(Request $request)
     {
         // リクエストデータチェック
-        $validator = Validator::make($request->all(), $this->rulesForSearch());
+        $validator = Validator::make($request->all(), $this->rulesForSearch($request));
         return $validator->errors();
     }
 
@@ -79,10 +284,48 @@ class TutorClassController extends Controller
      *
      * @return array ルール
      */
-    private function rulesForSearch()
+    private function rulesForSearch(?Request $request)
     {
-
         $rules = array();
+
+        // 独自バリデーション: リストのチェック 校舎
+        $validationCampusList =  function ($attribute, $value, $fail) {
+
+            // 初期表示の時はエラーを発生させないようにする
+            if ($value == -1) return;
+
+            // 校舎リストを取得
+            $rooms = $this->mdlGetRoomList(false);
+            if (!isset($rooms[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: 日付チェック
+        $validationDateFromTo = function ($attribute, $value, $fail) use($request) {
+            $from_date = $request['target_date_from'];
+            $to_date = $request['target_date_to'];
+
+            $from_date_plus_half_year = Carbon::parse($from_date)->addMonthsNoOverflow(6)->toDateString();
+
+            if ($from_date_plus_half_year < $to_date) {
+                // 不正な値エラー
+                return $fail(Lang::get('授業日は６ヵ月以内で指定してください'));
+            }
+        };
+
+        $ruleTargetDate = Schedule::getFieldRule('target_date');
+        // FromとToの大小チェックバリデーションを追加(Fromが存在する場合のみ)
+        $validateFromTo = [];
+        $keyFrom = 'target_date_from';
+        if (isset($request[$keyFrom]) && filled($request[$keyFrom])) {
+            $validateFromTo = ['after_or_equal:' . $keyFrom];
+        }
+
+        $rules += Schedule::fieldRules('campus_cd', [$validationCampusList]);
+        $rules += ['target_date_from' => array_merge(['required_with:target_date_to'], $ruleTargetDate, [$validationDateFromTo])];
+        $rules += ['target_date_to' => array_merge(['required_with:target_date_from'], $validateFromTo, $ruleTargetDate)];
 
         return $rules;
     }
@@ -95,7 +338,54 @@ class TutorClassController extends Controller
      */
     public function getData(Request $request)
     {
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request);
+
+        // formを取得
+        $form = $request->all();
+
+        // 講師ID取得
+        $tutor_id = $request->input('tutor_id');
+        
+        $query = Schedule::query();
+
+        // 校舎コード選択による絞り込み条件
+        if ($request->input('campus_cd') != null) {
+            // 検索フォームから取得（スコープ）
+            $query->SearchCampusCd($form);
+        }
+
+        // 日付の絞り込み条件
+        $query->SearchTargetDateFrom($form);
+        $query->SearchTargetDateTo($form);
+
+        $schedules = $query
+            ->select(
+                'schedules.student_id',
+                // 生徒情報の名前
+                'students.name as student_name',
+                'students.enter_date as enter_date',
+                'schedules.target_date',
+                // 会員ステータス
+                'mst_codes.name as stu_status',
+            )
+            ->where('tutor_id', '=', $tutor_id)
+            ->where('lesson_kind', '=', AppConst::CODE_MASTER_31_5)
+            ->where('schedules.tentative_status', 0)
+            ->whereNotNull('schedules.tutor_id')
+            ->whereNull('schedules.deleted_at')
+            ->whereIn('schedules.absent_status', [0])
+            // 生徒名を取得
+            ->sdLeftJoin(Student::class, 'schedules.student_id', '=', 'students.student_id')
+            // コードマスターとJOIN
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('students.stu_status', '=', 'mst_codes.code')
+                    ->where('data_type', AppConst::CODE_MASTER_28);
+            })
+            ->get();
+
         return [
+            'schedules' => $schedules
         ];
     }
 }

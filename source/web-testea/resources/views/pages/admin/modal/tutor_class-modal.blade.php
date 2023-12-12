@@ -10,17 +10,11 @@
         <th>会員ステータス</th>
         <th>入会日</th>
     </tr>
-    <tr>
-        <td>CWテスト生徒１０</td>
-        <td>2023/06/17</td>
-        <td>見込客</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>CWテスト生徒１１</td>
-        <td>2023/06/10</td>
-        <td>入会</td>
-        <td>2023/06/25</td>
+    <tr v-for="item in item.schedules" v-cloak>
+        <td>@{{item.student_name}}</td>
+        <td>@{{$filters.formatYmdDay(item.target_date)}}</td>
+        <td>@{{item.stu_status}}</td>
+        <td>@{{$filters.formatYmd(item.enter_date)}}</td>
     </tr>
 </x-bs.table>
 
