@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Traits\FuncCalendarTrait;
+use App\Http\Controllers\Traits\FuncInvoiceTrait;
+use App\Http\Controllers\Traits\FuncMemberDetailTrait;
+use App\Http\Controllers\Traits\FuncSchoolSearchTrait;
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
 use App\Models\Invoice;
@@ -21,16 +23,19 @@ use App\Models\CodeMaster;
 use App\Models\MstGrade;
 use App\Models\Badge;
 use App\Models\StudentView;
-use App\Http\Controllers\Traits\FuncCalendarTrait;
-use App\Http\Controllers\Traits\FuncInvoiceTrait;
-use App\Http\Controllers\Traits\FuncMemberDetailTrait;
-use App\Http\Controllers\Traits\FuncSchoolSearchTrait;
+use App\Models\Record;
+use App\Models\RegularClass;
+use App\Models\RegularClassMember;
+use App\Mail\MypageGuideToStudent;
+use App\Mail\MypageGuideRejoinToStudent;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\MypageGuideToStudent;
-use App\Mail\MypageGuideRejoinToStudent;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 /**
  * 会員管理 - コントローラ
@@ -55,7 +60,8 @@ class MemberMngController extends Controller
      * @return void
      */
     public function __construct()
-    { }
+    {
+    }
 
     //==========================
     // 一覧
@@ -1595,13 +1601,33 @@ class MemberMngController extends Controller
      *
      * @return view
      */
-    public function leaveEdit()
+    public function leaveEdit($sid)
     {
+        // IDのバリデーション
+        $this->validateIds($sid);
+
+        // 教室管理者の場合、自分の校舎コードの生徒のみにガードを掛ける
+        $this->guardRoomAdminSid($sid);
+
+        // 会員ステータス「退会処理中」「退会済」の場合は退会登録画面を表示しない
+        $student = Student::where('student_id', $sid)
+            ->first();
+        if ($student->stu_status == AppConst::CODE_MASTER_28_4 || $student->stu_status == AppConst::CODE_MASTER_28_5) {
+            return $this->illegalResponseErr();
+        }
+
+        // 生徒名の取得
+        $student_name = $this->mdlGetStudentName($sid);
+
+        // editDataセット 「対応日」は現在日時を設定
+        $editData = [
+            'student_id' => $sid,
+            'student_name' => $student_name,
+            'received_date' => date('Y/m/d')
+        ];
 
         return view('pages.admin.member_mng-leave', [
-            'editData' => [
-                'leave_date' => date('Y/m/d')
-            ],
+            'editData' => $editData,
             'rules' => $this->rulesForInput(null)
         ]);
     }
@@ -1614,6 +1640,78 @@ class MemberMngController extends Controller
      */
     public function leaveUpdate(Request $request)
     {
+        // 登録前バリデーション。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForInputLeave($request))->validate();
+
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($request) {
+            //-------------------------
+            // 連絡記録情報の登録
+            //-------------------------
+            // ログイン中管理者のID・所属校舎を取得
+            $account = Auth::user();
+            $adm_id = $account->account_id;
+            $campus_cd = $account->campus_cd;
+
+            // 保存データセット
+            $record = new Record;
+            $record->student_id = $request['student_id'];
+            // ログイン中管理者の校舎をセット
+            $record->campus_cd = $campus_cd;
+            // 記録種別「退会」
+            $record->record_kind = AppConst::CODE_MASTER_46_5;
+            $record->received_date = $request['received_date'];
+            // 対応時刻・登録日は現在日時
+            $record->received_time =  Carbon::now();
+            $record->regist_time =  Carbon::now();
+            $record->adm_id = $adm_id;
+            $record->memo = $request['memo'];
+            // 保存
+            // $record->save();
+
+            //-------------------------
+            // 生徒情報の更新
+            //-------------------------
+            // 対象データを取得
+            $student = Student::where('student_id', $request['student_id'])
+                // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
+                ->where($this->guardRoomAdminTableWithSid())
+                // 会員ステータス「退会処理中」「退会済」は除外する
+                ->whereNotIn('stu_status', [AppConst::CODE_MASTER_28_4, AppConst::CODE_MASTER_28_5])
+                // 該当データがない場合はエラーを返す
+                ->firstOrFail();
+
+            // 会員ステータスを「退会処理中」にセット
+            $student->stu_status = AppConst::CODE_MASTER_28_4;
+            // 退会日をセット
+            $student->leave_date = $request['leave_date'];
+            // 更新
+            // $student->save();
+
+            //-------------------------
+            // スケジュール削除
+            //-------------------------
+            // スケジュール情報 削除
+            Schedule::where('student_id', $request['student_id'])
+                ->where('target_date', '>', $request['leave_date'])
+                ->delete();
+
+            // 受講生徒情報 削除
+            ClassMember::where('class_members.student_id', $request['student_id'])
+                // スケジュール情報とJOIN
+                ->sdLeftJoin(Schedule::class, 'schedules.schedule_id', '=', 'class_members.schedule_id')
+                ->where('target_date', '>', $request['leave_date'])
+                ->delete();
+
+            // レギュラー授業情報 削除
+            RegularClass::where('student_id', $request['student_id'])
+                ->delete();
+
+            // レギュラー受講生徒情報 削除
+            RegularClassMember::where('student_id', $request['student_id'])
+                ->delete();
+        });
+
         return;
     }
 
@@ -1637,7 +1735,20 @@ class MemberMngController extends Controller
      */
     private function rulesForInputLeave(?Request $request)
     {
+        // 独自バリデーション: 退会日はシステム日付より未来日
+        $validationLeaveDate = function ($attribute, $value, $fail) use ($request) {
+            // 退会日の数値が現在日時の数値を下回っていないかチェック
+            if (strtotime($request['leave_date']) < strtotime('now')) {
+                // 下回っていた（未来日でない）場合エラー
+                return $fail(Lang::get('validation.after_tomorrow'));
+            }
+        };
+
         $rules = array();
+
+        $rules += Student::fieldRules('leave_date', ['required', $validationLeaveDate]);
+        $rules += Record::fieldRules('memo', ['required']);
+        $rules += Record::fieldRules('received_date', ['required']);
 
         return $rules;
     }
