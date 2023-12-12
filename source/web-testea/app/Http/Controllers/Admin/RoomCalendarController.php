@@ -1506,30 +1506,30 @@ class RoomCalendarController extends Controller
 
         // 独自バリデーション: 時限と開始時刻の相関チェック
         $validationPeriodStartTime =  function ($attribute, $value, $fail) use ($request) {
-            return $this->fncScheGetValidatePeriodStartTime($request, $attribute, $value, $fail);
+            return $this->fncScheValidatePeriodStartTime($request, $attribute, $value, $fail);
         };
 
         // 独自バリデーション: 面談開始時刻のチェック
         $validationConferenceStartTime =  function ($attribute, $value, $fail) use ($request) {
-            return $this->fncScheGetValidateConferenceStartTime($request, $attribute, $value, $fail);
+            return $this->fncScheValidateConferenceStartTime($request, $attribute, $value, $fail);
         };
 
         // 独自バリデーション: 生徒スケジュール重複チェック
         $validationDupStudent =  function ($attribute, $value, $fail) use ($request) {
             $kind = $request['kind'];
-            return $this->fncScheGetValidateStudent($request, $kind, $attribute, $value, $fail);
+            return $this->fncScheValidateStudent($request, $kind, $attribute, $value, $fail);
         };
 
         // 独自バリデーション: 生徒スケジュール重複チェック（複数指定）
         $validationDupStudentMulti =  function ($attribute, $value, $fail) use ($request) {
             $kind = $request['kind'];
-            return $this->fncScheGetValidateStudent($request, $kind, $attribute, $value, $fail);
+            return $this->fncScheValidateStudent($request, $kind, $attribute, $value, $fail);
         };
 
         // 独自バリデーション: 講師スケジュール重複チェック
         $validationDupTutor =  function ($attribute, $value, $fail) use ($request) {
             $kind = $request['kind'];
-            return $this->fncScheGetValidateTutor($request, $kind, $attribute, $value, $fail);
+            return $this->fncScheValidateTutor($request, $kind, $attribute, $value, $fail);
         };
 
         // 独自バリデーション: 授業区分（見込客）

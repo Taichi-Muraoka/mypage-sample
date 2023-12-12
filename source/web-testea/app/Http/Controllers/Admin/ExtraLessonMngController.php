@@ -772,17 +772,17 @@ class ExtraLessonMngController extends Controller
 
         // 独自バリデーション: 生徒スケジュール重複チェック
         $validationDupStudent =  function ($attribute, $value, $fail) use ($request) {
-            return $this->fncScheGetValidateStudent($request, AppConst::SCHEDULE_KIND_NEW, $attribute, $value, $fail);
+            return $this->fncScheValidateStudent($request, AppConst::SCHEDULE_KIND_NEW, $attribute, $value, $fail);
         };
 
         // 独自バリデーション: 講師スケジュール重複チェック
         $validationDupTutor =  function ($attribute, $value, $fail) use ($request) {
-            return $this->fncScheGetValidateTutor($request, AppConst::SCHEDULE_KIND_NEW, $attribute, $value, $fail);
+            return $this->fncScheValidateTutor($request, AppConst::SCHEDULE_KIND_NEW, $attribute, $value, $fail);
         };
 
         // 独自バリデーション: 時限と開始時刻の相関チェック
         $validationPeriodStartTime =  function ($attribute, $value, $fail) use ($request) {
-            return $this->fncScheGetValidatePeriodStartTime($request, $attribute, $value, $fail);
+            return $this->fncScheValidatePeriodStartTime($request, $attribute, $value, $fail);
         };
 
         // 独自バリデーション: 空きブースチェック

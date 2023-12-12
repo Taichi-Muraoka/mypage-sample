@@ -1266,7 +1266,7 @@ trait FuncScheduleTrait
      * @param $value
      * @param $fail
      */
-    function fncScheGetValidateStudent($request, $kind, $attribute, $value, $fail)
+    function fncScheValidateStudent($request, $kind, $attribute, $value, $fail)
     {
         $this->debug($attribute);
         if (
@@ -1355,7 +1355,7 @@ trait FuncScheduleTrait
      * @param $value
      * @param $fail
      */
-    function fncScheGetValidateTutor($request, $kind, $attribute, $value, $fail)
+    function fncScheValidateTutor($request, $kind, $attribute, $value, $fail)
     {
         $this->debug($attribute);
         if (
@@ -1419,7 +1419,7 @@ trait FuncScheduleTrait
      * @param $value
      * @param $fail
      */
-    function fncScheGetValidatePeriodStartTime($request, $attribute, $value, $fail)
+    function fncScheValidatePeriodStartTime($request, $attribute, $value, $fail)
     {
         if (
             !$request->filled('campus_cd') || !$request->filled('target_date')
@@ -1451,7 +1451,7 @@ trait FuncScheduleTrait
      * @param $value
      * @param $fail
      */
-    function fncScheGetValidateConferenceStartTime($request, $attribute, $value, $fail)
+    function fncScheValidateConferenceStartTime($request, $attribute, $value, $fail)
     {
         $startTimeMin = Carbon::createFromTimeString(config('appconf.lesson_start_time_min'));
         $startTime = Carbon::createFromTimeString($value);
