@@ -1927,11 +1927,6 @@ class AppConst
      */
     const SYSTEM_KEY_ID_3 = 102;
 
-    /**
-     * システム変数ID 事務作業給
-     */
-    const SYSTEM_KEY_ID_2 = 101;
-
     //-----------
     // 授業報告書サブコード
     //-----------
