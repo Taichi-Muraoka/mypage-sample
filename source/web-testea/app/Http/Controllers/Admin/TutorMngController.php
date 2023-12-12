@@ -1099,8 +1099,8 @@ class TutorMngController extends Controller
 
         // 対象データを取得(IDでユニークに取る)
         $tutor = Tutor::where('tutor_id', $request->tutor_id)
-            // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
-            ->where($this->guardRoomAdminTableWithRoomCd())
+            // 教室管理者の場合、自分の校舎の講師のみにガードを掛ける
+            ->where($this->guardRoomAdminTableWithTid())
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
