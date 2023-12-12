@@ -761,7 +761,9 @@ trait FuncCalendarTrait
                 $orQuery->where('schedules.student_id', $studentId)
                     ->orWhereExists(function ($query) use ($studentId) {
                         $query->from('class_members')->whereColumn('class_members.schedule_id', 'schedules.schedule_id')
-                            ->where('class_members.student_id', $studentId);
+                            ->where('class_members.student_id', $studentId)
+                            // delete_dt条件の追加
+                            ->whereNull('class_members.deleted_at');
                     });
             });
         }
@@ -772,7 +774,6 @@ trait FuncCalendarTrait
 
         if (AuthEx::isStudent() || AuthEx::isTutor()) {
             // アカウントが生徒・講師の場合、仮登録のデータを除外
-            $this->debug("not admin!!");
             $query->where('schedules.tentative_status', "!=", AppConst::CODE_MASTER_36_1);
         }
 
