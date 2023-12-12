@@ -215,7 +215,9 @@ class SurchargeAcceptController extends Controller
                 $surcharge->approval_status = AppConst::CODE_MASTER_2_1;
 
                 // 支払年月を実施日の翌月に設定する
-                $nextMonth = date('Y-m', strtotime($surcharge->working_date . '+1 month'));
+                // 不具合回避のため、実施日をその月の1日にフォーマット(実施日:2023/12/31 → フォーマット後:2023/12/01)
+                $workingDateFormat = date('Y-m-d', strtotime('first day of ' . $surcharge->working_date));
+                $nextMonth = date('Y-m', strtotime($workingDateFormat . '+1 month'));
                 $surcharge->payment_date = $nextMonth;
 
                 // 保存

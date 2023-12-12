@@ -243,7 +243,6 @@ trait FuncSurchargeTrait
         $surcharge->approval_status = AppConst::CODE_MASTER_2_0;
         $surcharge->payment_date = null;
         $surcharge->payment_status = AppConst::CODE_MASTER_27_0;
-        $surcharge->admin_comment = null;
 
         // 請求種別によって保存項目分岐
         if ($request['sub_code'] == AppConst::CODE_MASTER_26_SUB_8) {
@@ -322,11 +321,14 @@ trait FuncSurchargeTrait
      */
     private function getPaymentDateList($workingDate)
     {
+        // 不具合回避のため、実施日をその月の1日にフォーマット(実施日:2023/12/31 → フォーマット後:2023/12/01)
+        $workingDateFormat = date('Y-m-d', strtotime('first day of ' . $workingDate));
+
         // 支払年月リストを作成 翌月以降3ヶ月分（例：2023/02～2023/04）
         $paymentDateList = [];
         for ($i = 1; $i <= 3; $i++) {
-            // 実施日を基に加算する
-            $addDate = strtotime($workingDate . '+' . $i . 'month');
+            // フォーマットされた実施日を基に加算する
+            $addDate = strtotime($workingDateFormat . '+' . $i . 'month');
             // codeはY-m形式(データ保存用)、valueはY/m形式(画面表示用)とする
             $paymentDateList += array(date('Y-m', $addDate) => ["value" => date('Y/m', $addDate)]);
         }
