@@ -12,100 +12,72 @@
 
     <p>個別指導授業の振替依頼を行います。振替日は第３希望まで指定できます。</p>
 
-    <x-input.select caption="生徒名" id="student" :select2=true :editData="$editData">
-        <option value="1">CWテスト生徒１</option>
-        <option value="2">CWテスト生徒２</option>
-        <option value="3">CWテスト生徒３</option>
-    </x-input.select>
+    {{-- hidden --}}
+    <x-input.hidden id="tutor_id" :editData=$editData />
+    <x-input.hidden id="monthly_count" :editData=$editData />
+    <x-input.hidden id="skip_count" :editData=$editData />
 
-    <p class="alert-msg"  v-show="form.student != ''">今月 <b>2</b> 回目の振替調整です</p>
+    <x-input.select caption="生徒名" id="student_id" :select2=true :editData=$editData :mastrData=$students
+        :editData=$editData :select2Search=true onChange="selectChangeStudent" />
 
-    <x-input.select caption="授業日・時限" id="id" :select2=true :editData="$editData">
-        <option value="1">2023/01/30 3限</option>
-        <option value="2">2023/01/30 4限</option>
-        <option value="3">2023/01/31 2限</option>
+    <div v-show="form.monthly_count >= form.skip_count">
+        <p class="alert-msg" id="monthly_message"></p>
+    </div>
+
+    <x-input.select caption="授業日・時限" id="schedule_id" :select2=true onChange="selectChangeSchedule" :editData=$editData
+        :select2Search=false :blank=true>
+        {{-- vueで動的にプルダウンを作成 --}}
+        <option v-for="item in selectGetItemSchedule" :value="item.id">
+            @{{ item.value }}
+        </option>
     </x-input.select>
 
     <div v-cloak>
-        <x-bs.table vShow="form.id" :hover=false :vHeader=true>
+        <x-bs.table vShow="form.schedule_id" :hover=false :vHeader=true :smartPhone=true>
             <tr>
                 <th>校舎</th>
-                <td>久我山</td>
+                <td>
+                    <div id="campus_name"></div>
+                </td>
             </tr>
             <tr>
                 <th>コース</th>
-                <td>個別指導コース</td>
+                <td>
+                    <div id="course_name"></div>
+                </td>
             </tr>
             <tr>
                 <th>教科</th>
-                <td>数学</td>
-            </tr>
+                <td>
+                    <div id="subject_name"></div>
+                </td>
         </x-bs.table>
     </div>
 
+    <div v-show="form.schedule_id" class="callout callout-info mt-4 mb-4">
+        <p id="preferred_range"></p>
+    </div>
+
     <x-bs.form-title>振替希望日</x-bs.form-title>
-    {{-- 第１希望日 --}}
-    {{-- id="preferred_date3" --}}
+    @for ($i = 1; $i <= 3; $i++)
     <x-bs.card>
-        <x-input.date-picker caption="第１希望日" id="transfer_date1" />
+        <x-input.date-picker caption="第{{$i}}希望日" id="preferred_date{{$i}}_calender" />
 
-        <x-input.select caption="時限" id="period1" :select2=true :select2Search=false :editData=$editData>
-            <option value="1">1限</option>
-            <option value="2">2限</option>
-            <option value="3">3限</option>
-            <option value="4">4限</option>
-            <option value="5">5限</option>
-            <option value="6">6限</option>
-            <option value="7">7限</option>
-            <option value="8">8限</option>
+        <x-input.select caption="時限" id="preferred_date{{$i}}_period" :select2=true :select2Search=false :blank=true
+            :editData=$editData>
+            {{-- vueで動的にプルダウンを作成 --}}
+            <option v-for="item in selectGetItemPeriod{{$i}}" :value="item.code">
+                @{{ item.value }}
+            </option>
         </x-input.select>
-
     </x-bs.card>
-
-    {{-- 第２希望日 --}}
-    {{-- id="preferred_date2" --}}
-    <x-bs.card>
-        <x-input.date-picker caption="第２希望日" id="transfer_date2" />
-
-        <x-input.select caption="時限" id="period2" :select2=true :select2Search=false :editData=$editData>
-            <option value="1">1限</option>
-            <option value="2">2限</option>
-            <option value="3">3限</option>
-            <option value="4">4限</option>
-            <option value="5">5限</option>
-            <option value="6">6限</option>
-            <option value="7">7限</option>
-            <option value="8">8限</option>
-        </x-input.select>
-
-    </x-bs.card>
-
-    {{-- 第３希望日 --}}
-    {{-- id="preferred_date3" --}}
-    <x-bs.card>
-        <x-input.date-picker caption="第３希望日" id="transfer_date3" />
-
-        <x-input.select caption="時限" id="period3" :select2=true :select2Search=false :editData=$editData>
-            <option value="1">1限</option>
-            <option value="2">2限</option>
-            <option value="3">3限</option>
-            <option value="4">4限</option>
-            <option value="5">5限</option>
-            <option value="6">6限</option>
-            <option value="7">7限</option>
-            <option value="8">8限</option>
-        </x-input.select>
-
-    </x-bs.card>
+    @endfor
 
     <x-input.textarea caption="振替理由／連絡事項など" id="transfer_reason" :rules=$rules />
 
-    {{-- hidden --}}
-    <x-input.hidden id="transfer_tutor_id" :editData=$editData />
-
     <x-bs.callout title="振替調整の注意事項" type="warning">
-        同一生徒への振替希望については、月１回まで管理者の承認なしで調整可能です。<br>
-        ２回目からは管理者に送られ、管理者のチェック・承認が必要となります。<br>
+        同一生徒への振替希望については、月{{($editData['skip_count'] - 1)}}回まで管理者の承認なしで調整可能です。<br>
+        {{($editData['skip_count'])}}回目からは管理者に依頼が送られ、管理者のチェック・承認が必要となります。<br>
     </x-bs.callout>
 
     {{-- フッター --}}

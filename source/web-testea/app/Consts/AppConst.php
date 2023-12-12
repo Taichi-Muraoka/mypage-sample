@@ -1916,11 +1916,16 @@ class AppConst
      * システム変数ID 現年度
      */
     const SYSTEM_KEY_ID_1 = 100;
-
+    
     /**
      * システム変数ID 事務作業給
      */
     const SYSTEM_KEY_ID_2 = 101;
+
+    /**
+     * システム変数ID 振替調整スキップ回数
+     */
+    const SYSTEM_KEY_ID_3 = 102;
 
     //-----------
     // 授業報告書サブコード
@@ -1973,4 +1978,17 @@ class AppConst
 
     // 〇（登録済み）
     const REPORT_STATUS_4 = '4';
+    
+    //-----------
+    // 授業振替依頼 希望選択
+    //-----------
+    /**
+     * 講師空き時間選択
+     */
+    const TRANSFER_PREF_TYPE_SELECT = 1;
+
+    /**
+     * フリー入力
+     */
+    const TRANSFER_PREF_TYPE_INPUT = 2;
 }

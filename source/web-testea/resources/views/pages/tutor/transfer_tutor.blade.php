@@ -9,29 +9,22 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="roomcd" caption="校舎" :select2=false >
-                <option value="1">久我山</option>
-                <option value="2">西永福</option>
-                <option value="3">本郷</option>
-            </x-input.select>
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+                onChange="selectChangeGetRoom" :select2Search=false emptyValue="-1" />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="生徒名" id="student" :select2=true :editData="$editData">
-                <option value="1">CWテスト生徒１</option>
-                <option value="2">CWテスト生徒２</option>
-                <option value="3">CWテスト生徒３</option>
+            <x-input.select caption="生徒名" id="student_id" :select2=true :editData=$editData :select2Search=true>
+                {{-- vueで動的にプルダウンを作成 --}}
+                <option v-for="item in selectGetItem.selectItems" :value="item.id">
+                    @{{ item.value }}
+                </option>
             </x-input.select>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="approval_state" caption="ステータス" :select2=false >
-                <option value="0">管理者承認待ち</option>
-                <option value="1">承認待ち</option>
-                <option value="2">承認</option>
-                <option value="3">差戻し</option>
-                <option value="4">管理者対応済</option>
-            </x-input.select>
+            <x-input.select caption="ステータス" id="approval_status" :select2=true :mastrData=$statusList
+                :select2Search=false :editData=$editData />
         </x-bs.col2>
     </x-bs.row>
 
@@ -61,45 +54,21 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/01/10</td>
-            <td>講師</td>
-            <td>2023/01/30 4限</td>
-            <td>個別指導コース</td>
-            <td>CWテスト生徒１</td>
-            <td>久我山</td>
-            <td>承認待ち</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <x-bs.td-sp caption="申請日">@{{$filters.formatYmd(item.apply_date)}}</x-bs.td-sp>
+            <x-bs.td-sp caption="申請者種別">@{{item.apply_kind_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="授業日・時限">@{{$filters.formatYmdDay(item.target_date)}} @{{item.period_no}}限</x-bs.td-sp>
+            <x-bs.td-sp caption="コース">@{{item.course_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="生徒名">@{{item.student_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="校舎名">@{{item.campus_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="ステータス">@{{item.approval_status_name}}</x-bs.td-sp>
             <td>
-                <x-button.list-dtl />
-                {{-- 申請者種別が教師のため更新ボタン非活性 --}}
-                <x-button.list-edit href="{{ route('transfer_tutor-edit', 1) }}" caption="承認" disabled=true/>
-            </td>
-        </tr>
-        <tr>
-            <td>2023/01/09</td>
-            <td>生徒</td>
-            <td>2023/01/29 3限</td>
-            <td>家庭教師</td>
-            <td>CWテスト生徒１</td>
-            <td>久我山</td>
-            <td>承認待ち</td>
-            <td>
-                <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('transfer_tutor-edit', 2) }}" caption="承認" />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/01/08</td>
-            <td>講師</td>
-            <td>2023/01/15 6限</td>
-            <td>個別指導コース</td>
-            <td>CWテスト生徒２</td>
-            <td>久我山</td>
-            <td>管理者承認待ち</td>
-            <td>
-                <x-button.list-dtl />
-                {{-- 申請者種別が教師のため更新ボタン非活性 --}}
-                <x-button.list-edit href="{{ route('transfer_tutor-edit', 1) }}" caption="承認" disabled=true/>
+                {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
+                <x-button.list-dtl :vueDataAttr="['id' => 'item.transfer_apply_id']" />
+                {{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
+                <x-button.list-edit vueHref="'{{ route('transfer_tutor-edit', '') }}/' + item.transfer_apply_id"
+                    caption="承認" {{-- 申請者種別=生徒 かつ 承認待ちのときは活性 --}}
+                    vueDisabled="!(item.approval_status=={{ App\Consts\AppConst::CODE_MASTER_3_1 }} && item.apply_kind=={{ App\Consts\AppConst::CODE_MASTER_53_1 }})" />
             </td>
         </tr>
     </x-bs.table>

@@ -376,11 +376,23 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // 詳細取得用
     Route::post('/transfer_tutor/get_data', [TransferTutorController::class, 'getData'])->name('transfer_tutor-get_data');
 
+    // 校舎選択プルダウンを選択された際に生徒プルダウンの情報を返却する
+    Route::post('/transfer_tutor/get_data_select_search', [TransferTutorController::class, 'getDataSelectSearch'])->name('transfer_tutor-get_data_select_search');
+
     // 振替希望日登録
     Route::get('/transfer_tutor/new', [TransferTutorController::class, 'new'])->name('transfer_tutor-new');
 
     // 新規登録処理
     Route::post('/transfer_tutor/create', [TransferTutorController::class, 'create'])->name('transfer_tutor-create');
+
+    // 生徒選択プルダウンを選択された際に授業日・時限プルダウンの情報を返却する
+    Route::post('/transfer_tutor/get_data_select_student', [TransferTutorController::class, 'getDataSelectStudentSchedule'])->name('transfer_tutor-get_data_select_student');
+
+    // 授業日・時限選択プルダウンを選択された際に授業情報を返却する
+    Route::post('/transfer_tutor/get_data_select_schedule', [TransferTutorController::class, 'getDataSelectSchedule'])->name('transfer_tutor-get_data_select_schedule');
+
+    // 振替希望日カレンダー入力した際に時限情報を返却する
+    Route::post('/transfer_tutor/get_data_select_calender', [TransferTutorController::class, 'getDataSelectCalender'])->name('transfer_tutor-get_data_select_calender');
 
     // 振替日承認
     Route::get('/transfer_tutor/edit/{transferId}', [TransferTutorController::class, 'edit'])->name('transfer_tutor-edit');
@@ -390,6 +402,9 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
 
     // バリデーション(登録用)
     Route::post('/transfer_tutor/vd_input', [TransferTutorController::class, 'validationForInput'])->name('transfer_tutor-vd_input');
+
+    // バリデーション(承認用)
+    Route::post('/transfer_tutor/vd_approval', [TransferTutorController::class, 'validationForApproval'])->name('transfer_tutor-vd_approval');
 
     //---------------------
     // 生徒成績
