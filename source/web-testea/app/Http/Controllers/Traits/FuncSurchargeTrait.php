@@ -7,7 +7,9 @@ use App\Libs\AuthEx;
 use App\Models\CodeMaster;
 use App\Models\MstSystem;
 use App\Models\Surcharge;
+use App\Models\Tutor;
 use Illuminate\Support\Carbon;
+use Illuminate\Http\Request;
 
 /**
  * 追加請求 - 機能共通処理
@@ -20,8 +22,11 @@ trait FuncSurchargeTrait
     /**
      * 一覧を取得
      */
-    private function getSurchargeList()
+    private function getSurchargeList(?Request $request)
     {
+        // 本部ありで校舎名を取得する用のクエリ 後述使用
+        $campus_names = $this->mdlGetRoomQuery();
+
         // クエリ作成
         $query = Surcharge::query();
         $query->select(
@@ -34,6 +39,10 @@ trait FuncSurchargeTrait
             'surcharges.approval_status',
             'surcharges.payment_date',
             'surcharges.payment_status',
+            // 校舎の名称（本部あり）
+            'campus_names.room_name as campus_name',
+            // 講師の名称
+            'tutors.name as tutor_name',
             // コードマスタの名称（請求種別）
             'mst_codes_26.name as surcharge_kind_name',
             // コードマスタの名称（承認ステータス）
@@ -41,6 +50,12 @@ trait FuncSurchargeTrait
             // コードマスタの名称（支払状況）
             'mst_codes_27.name as payment_status_name',
         )
+            // 校舎名の取得JOIN
+            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
+                $join->on('surcharges.campus_cd', '=', 'campus_names.code');
+            })
+            // 講師情報とJOIN
+            ->sdLeftJoin(Tutor::class, 'surcharges.tutor_id', '=', 'tutors.tutor_id')
             // コードマスターとJOIN 請求種別
             ->sdLeftJoin(CodeMaster::class, function ($join) {
                 $join->on('surcharges.surcharge_kind', '=', 'mst_codes_26.code')
@@ -59,7 +74,40 @@ trait FuncSurchargeTrait
 
         // ログイン者によってボタン押下制御・ガード・ソート順を分岐
         if (AuthEx::isAdmin()) {
-            // 運用側実装時に記述
+            // 管理者の場合
+            // 承認ステータス「承認待ち」のコードを取得
+            $statusCd = AppConst::CODE_MASTER_2_0;
+
+            // 承認ステータス「承認待ち」に該当しない場合、trueをセットする（承認・更新不可）
+            $query->selectRaw(
+                "CASE
+                    WHEN approval_status != $statusCd THEN true
+                END AS disabled_btn"
+            );
+
+            // 校舎の絞り込み条件
+            if (AuthEx::isRoomAdmin()) {
+                // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+                $query->where($this->guardRoomAdminTableWithRoomCd());
+            } else {
+                // 本部管理者の場合検索フォームから取得
+                $query->SearchCampusCd($request);
+            }
+
+            // 講師の絞り込み条件
+            $query->SearchTutorId($request);
+            // 請求種別の絞り込み条件
+            $query->SearchSurchargeKind($request);
+            // ステータスの絞り込み条件
+            $query->SearchApprovalStatus($request);
+            // 支払状況の絞り込み条件
+            $query->SearchPaymentStatus($request);
+            // 申請日の絞り込み条件
+            $query->SearchApplyDateFrom($request);
+            $query->SearchApplyDateTo($request);
+
+            $query->orderBy('apply_date', 'desc')
+                ->orderBy('working_date', 'desc');
         }
         if (AuthEx::isTutor()) {
             // 講師の場合
@@ -102,7 +150,7 @@ trait FuncSurchargeTrait
 
         $surcharge = $query->select(
             'surcharges.tutor_id',
-            'surcharges.campus_cd',
+            'surcharges.apply_date',
             'surcharges.surcharge_kind',
             'surcharges.working_date',
             'surcharges.start_time',
@@ -115,6 +163,8 @@ trait FuncSurchargeTrait
             'surcharges.admin_comment',
             // 校舎の名称（本部あり）
             'campus_names.room_name as campus_name',
+            // 講師の名称
+            'tutors.name as tutor_name',
             // コードマスタのサブコード（請求種別）
             'mst_codes_26.sub_code',
             // コードマスタの名称（請求種別）
@@ -128,6 +178,8 @@ trait FuncSurchargeTrait
             ->leftJoinSub($campus_names, 'campus_names', function ($join) {
                 $join->on('surcharges.campus_cd', '=', 'campus_names.code');
             })
+            // 講師情報とJOIN
+            ->sdLeftJoin(Tutor::class, 'surcharges.tutor_id', '=', 'tutors.tutor_id')
             // コードマスターとJOIN 請求種別
             ->sdLeftJoin(CodeMaster::class, function ($join) {
                 $join->on('surcharges.surcharge_kind', '=', 'mst_codes_26.code')
@@ -191,7 +243,6 @@ trait FuncSurchargeTrait
         $surcharge->approval_status = AppConst::CODE_MASTER_2_0;
         $surcharge->payment_date = null;
         $surcharge->payment_status = AppConst::CODE_MASTER_27_0;
-        $surcharge->admin_comment = null;
 
         // 請求種別によって保存項目分岐
         if ($request['sub_code'] == AppConst::CODE_MASTER_26_SUB_8) {
@@ -218,5 +269,70 @@ trait FuncSurchargeTrait
 
         // 保存
         $surcharge->save();
+    }
+
+    //==========================
+    // 管理者用
+    //==========================
+    /**
+     * 対象データを取得
+     * 承認・編集時に使用
+     */
+    private function getTargetSurchargeAdmin($surchargeId)
+    {
+        // 本部ありで校舎名を取得する用のクエリ 後述使用
+        $campus_names = $this->mdlGetRoomQuery();
+
+        // データ取得
+        $query = Surcharge::query();
+        $surcharge = $query->select(
+            'surcharges.*',
+            // 校舎の名称（本部あり）
+            'campus_names.room_name as campus_name',
+            // 講師の名称
+            'tutors.name as tutor_name',
+            // コードマスタの名称（請求種別）
+            'mst_codes_26.name as surcharge_kind_name',
+        )
+            // 校舎名の取得JOIN
+            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
+                $join->on('surcharges.campus_cd', '=', 'campus_names.code');
+            })
+            // 講師情報とJOIN
+            ->sdLeftJoin(Tutor::class, 'surcharges.tutor_id', '=', 'tutors.tutor_id')
+            // コードマスターとJOIN 請求種別
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('surcharges.surcharge_kind', '=', 'mst_codes_26.code')
+                    ->where('mst_codes_26.data_type', AppConst::CODE_MASTER_26);
+            }, 'mst_codes_26')
+            //指定の申請IDに絞る
+            ->where('surcharge_id', $surchargeId)
+            // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+            ->where($this->guardRoomAdminTableWithRoomCd())
+            // ステータス「承認待ち」のみ更新可能とする
+            ->where('approval_status', AppConst::CODE_MASTER_2_0)
+            ->firstOrFail();
+
+        return $surcharge;
+    }
+
+    /**
+     * 支払年月リストを作成
+     */
+    private function getPaymentDateList($workingDate)
+    {
+        // 不具合回避のため、実施日をその月の1日にフォーマット(実施日:2023/12/31 → フォーマット後:2023/12/01)
+        $workingDateFormat = date('Y-m-d', strtotime('first day of ' . $workingDate));
+
+        // 支払年月リストを作成 翌月以降3ヶ月分（例：2023/02～2023/04）
+        $paymentDateList = [];
+        for ($i = 1; $i <= 3; $i++) {
+            // フォーマットされた実施日を基に加算する
+            $addDate = strtotime($workingDateFormat . '+' . $i . 'month');
+            // codeはY-m形式(データ保存用)、valueはY/m形式(画面表示用)とする
+            $paymentDateList += array(date('Y-m', $addDate) => ["value" => date('Y/m', $addDate)]);
+        }
+
+        return $paymentDateList;
     }
 }
