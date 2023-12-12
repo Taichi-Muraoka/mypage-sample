@@ -1927,15 +1927,9 @@ class AppConst
      */
     const SYSTEM_KEY_ID_3 = 102;
 
-    /**
-     * システム変数ID 事務作業給
-     */
-    const SYSTEM_KEY_ID_2 = 101;
-
-    //-----------
+    //==========================
     // 授業報告書サブコード
-    //-----------
-
+    //==========================
     /**
      * 授業報告書 授業内容教材1
      */
@@ -1968,25 +1962,9 @@ class AppConst
      */
     const REPORT_OTHER_TEXT_UNIT_CODE = 99;
 
-    /**
-     * 授業報告書 ステータス
-     */
-
-    // ―（登録不要）
-    const REPORT_STATUS_1 = '1';
-
-    // ×（要登録・差戻し）
-    const REPORT_STATUS_2 = '2';
-
-    // △（承認待ち）
-    const REPORT_STATUS_3 = '3';
-
-    // 〇（登録済み）
-    const REPORT_STATUS_4 = '4';
-    
-    //-----------
+    //==========================
     // 授業振替依頼 希望選択
-    //-----------
+    //==========================
     /**
      * 講師空き時間選択
      */
@@ -1996,4 +1974,14 @@ class AppConst
      * フリー入力
      */
     const TRANSFER_PREF_TYPE_INPUT = 2;
+
+    //==========================
+    // 教室カレンダー・レギュラースケジュール
+    //==========================
+    /**
+     * スケジュール追加更新種別
+     */
+    const SCHEDULE_KIND_NEW = 1;
+    const SCHEDULE_KIND_UPD = 2;
+    const SCHEDULE_KIND_CPY = 3;
 }

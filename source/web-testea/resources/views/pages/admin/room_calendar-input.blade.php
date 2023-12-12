@@ -42,6 +42,7 @@
 
     {{-- hidden 退避用--}}
     <x-input.hidden id="period_no_bef" :editData=$editData />
+    <x-input.hidden id="timetable_kind" :editData=$editData />
 
     <x-input.select vShow="form.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}" id="period_no" caption="時限" :select2=true
         onChange="selectChangeGetTimetable" :select2Search=false :blank=true>
