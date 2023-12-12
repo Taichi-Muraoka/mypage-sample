@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('tutor_free_periods', function (Blueprint $table) {
             /* カラム */
-            $table->increments('free_priod_id')->comment('空き時間ID');
+            $table->increments('free_period_id')->comment('空き時間ID');
             $table->unsignedInteger('tutor_id')->comment('講師ID');
             $table->unsignedInteger('day_cd')->comment('曜日コード');
             $table->unsignedInteger('period_no')->comment('時限');
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->softDeletes();
 
             /* インデックス */
-            $table->unique(['tutor_id','day_cd','period_no'],'tutor_free_priods_UNIQUE');
+            $table->unique(['tutor_id','day_cd','period_no'],'tutor_free_periods_UNIQUE');
 
             /* テーブル名コメント */
             $table->comment('講師空き時間情報');

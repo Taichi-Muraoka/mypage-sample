@@ -444,7 +444,7 @@ class RoomCalendarController extends Controller
         $substituteKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_34);
 
         // 出欠ステータスリストを取得
-        $todayabsentList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_35, [AppConst::CODE_MASTER_35_SUB_0, AppConst::CODE_MASTER_35_SUB_1]);
+        $todayabsentList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_35, [AppConst::CODE_MASTER_35_SUB_0, AppConst::CODE_MASTER_35_SUB_1, AppConst::CODE_MASTER_35_SUB_3]);
 
         // スケジュール更新区分=UPDATE
         $schedule['kind'] = self::SCHE_KIND_UPD;

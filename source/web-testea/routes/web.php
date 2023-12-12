@@ -284,7 +284,6 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
 
     // PDF出力
     Route::get('/invoice/pdf/{date}', [InvoiceController::class, 'pdf'])->name('invoice-pdf');
-
 });
 
 //===============================================
@@ -377,11 +376,23 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // 詳細取得用
     Route::post('/transfer_tutor/get_data', [TransferTutorController::class, 'getData'])->name('transfer_tutor-get_data');
 
+    // 校舎選択プルダウンを選択された際に生徒プルダウンの情報を返却する
+    Route::post('/transfer_tutor/get_data_select_search', [TransferTutorController::class, 'getDataSelectSearch'])->name('transfer_tutor-get_data_select_search');
+
     // 振替希望日登録
     Route::get('/transfer_tutor/new', [TransferTutorController::class, 'new'])->name('transfer_tutor-new');
 
     // 新規登録処理
     Route::post('/transfer_tutor/create', [TransferTutorController::class, 'create'])->name('transfer_tutor-create');
+
+    // 生徒選択プルダウンを選択された際に授業日・時限プルダウンの情報を返却する
+    Route::post('/transfer_tutor/get_data_select_student', [TransferTutorController::class, 'getDataSelectStudentSchedule'])->name('transfer_tutor-get_data_select_student');
+
+    // 授業日・時限選択プルダウンを選択された際に授業情報を返却する
+    Route::post('/transfer_tutor/get_data_select_schedule', [TransferTutorController::class, 'getDataSelectSchedule'])->name('transfer_tutor-get_data_select_schedule');
+
+    // 振替希望日カレンダー入力した際に時限情報を返却する
+    Route::post('/transfer_tutor/get_data_select_calender', [TransferTutorController::class, 'getDataSelectCalender'])->name('transfer_tutor-get_data_select_calender');
 
     // 振替日承認
     Route::get('/transfer_tutor/edit/{transferId}', [TransferTutorController::class, 'edit'])->name('transfer_tutor-edit');
@@ -391,6 +402,9 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
 
     // バリデーション(登録用)
     Route::post('/transfer_tutor/vd_input', [TransferTutorController::class, 'validationForInput'])->name('transfer_tutor-vd_input');
+
+    // バリデーション(承認用)
+    Route::post('/transfer_tutor/vd_approval', [TransferTutorController::class, 'validationForApproval'])->name('transfer_tutor-vd_approval');
 
     //---------------------
     // 生徒成績
@@ -446,6 +460,9 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // 詳細取得用
     Route::post('/surcharge/get_data', [SurchargeController::class, 'getData'])->name('surcharge-get_data');
 
+    // 請求種別プルダウン選択時にサブコードを返却する
+    Route::post('/surcharge/get_data_select', [SurchargeController::class, 'getDataSelect'])->name('surcharge-get_data_select');
+
     // 新規登録
     Route::get('/surcharge/new', [SurchargeController::class, 'new'])->name('surcharge-new');
 
@@ -461,6 +478,8 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // バリデーション(登録用)
     Route::post('/surcharge/vd_input', [SurchargeController::class, 'validationForInput'])->name('surcharge-vd_input');
 
+    // 削除処理
+    Route::post('/surcharge/delete', [SurchargeController::class, 'delete'])->name('surcharge-delete');
     //---------------------
     // 給与明細
     //---------------------
@@ -495,7 +514,6 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
 
     // 資料のダウンロード
     Route::get('/training/download/{trnId}', [TrainingController::class, 'download'])->name('training-download');
-
 });
 
 //===============================================
@@ -1478,13 +1496,13 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/overtime/search', [OvertimeController::class, 'search'])->name('overtime-search');
 
-//});
+    //});
 
-//===============================================
-// 以下は全体管理者のみアクセス可とする
-//===============================================
+    //===============================================
+    // 以下は全体管理者のみアクセス可とする
+    //===============================================
 
-//Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
+    //Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
 
     //---------------------
     // 給与算出
@@ -1962,5 +1980,4 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 検索結果取得
     Route::post('/year_schedule_import/search', [YearScheduleImportController::class, 'search'])->name('year_schedule_import-search');
-
 });

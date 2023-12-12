@@ -14,7 +14,7 @@
     </tr>
     <tr>
         <th>授業日・時限</th>
-        <td v-cloak>@{{$filters.formatYmd(item.lesson_target_date)}} @{{item.lesson_period_no}}限</td>
+        <td v-cloak>@{{$filters.formatYmdDay(item.lesson_target_date)}} @{{item.lesson_period_no}}限</td>
     </tr>
     <tr>
         <th>校舎</th>
@@ -34,19 +34,19 @@
     </tr>
     <tr>
         <th>振替希望日・時限１</th>
-        <td v-cloak>@{{$filters.formatYmd(item.transfer_date_1)}} @{{item.period_no_1}}限</td>
+        <td v-cloak>@{{$filters.formatYmdDay(item.transfer_date_1)}} @{{item.period_no_1}}限</td>
     </tr>
     <tr>
         <th>振替希望日・時限２</th>
         <td v-cloak>
-            <span v-if="item.transfer_date_2 != null">@{{$filters.formatYmd(item.transfer_date_2)}}
+            <span v-if="item.transfer_date_2 != null">@{{$filters.formatYmdDay(item.transfer_date_2)}}
                 @{{item.period_no_2}}限</span>
         </td>
     </tr>
     <tr>
         <th>振替希望日・時限３</th>
         <td v-cloak>
-            <span v-if="item.transfer_date_3 != null">@{{$filters.formatYmd(item.transfer_date_3)}}
+            <span v-if="item.transfer_date_3 != null">@{{$filters.formatYmdDay(item.transfer_date_3)}}
                 @{{item.period_no_3}}限</span>
         </td>
     </tr>
@@ -71,7 +71,7 @@
                   item.transfer_kind == {{ App\Consts\AppConst::CODE_MASTER_54_2 }})">
         <th>振替日・時限（確定）</th>
         <td v-cloak>
-            <span v-if="item.transfer_schedule_id != null">@{{$filters.formatYmd(item.transfer_target_date)}}
+            <span v-if="item.transfer_schedule_id != null">@{{$filters.formatYmdDay(item.transfer_target_date)}}
                 @{{item.transfer_period_no}}限</span>
         </td>
     </tr>

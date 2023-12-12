@@ -117,22 +117,22 @@ class AppConst
     const CODE_MASTER_4 = 4;
 
     /**
-     * 承認ステータス 対象外
+     * 報告書承認ステータス 対象外
      */
     const CODE_MASTER_4_0 = 0;
 
     /**
-     * 承認ステータス 承認待ち
+     * 報告書承認ステータス 承認待ち
      */
     const CODE_MASTER_4_1 = 1;
 
     /**
-     * 承認ステータス 承認
+     * 報告書承認ステータス 承認
      */
     const CODE_MASTER_4_2 = 2;
 
     /**
-     * 承認ステータス 差戻し
+     * 報告書承認ステータス 差戻し
      */
     const CODE_MASTER_4_3 = 3;
 
@@ -461,7 +461,7 @@ class AppConst
     /**
      * 請求情報ファイル項目定義
      */
-//    const CODE_MASTER_18 = 18;
+    //    const CODE_MASTER_18 = 18;
 
 
     //-----------
@@ -821,6 +821,21 @@ class AppConst
      */
     const CODE_MASTER_26_32 = 32;
 
+    /**
+     * 請求種別 サブコード 請求区分:時給
+     */
+    const CODE_MASTER_26_SUB_8 = 8;
+
+    /**
+     * 請求種別 サブコード 請求区分:金額（源泉徴収対象）
+     */
+    const CODE_MASTER_26_SUB_9 = 9;
+
+    /**
+     * 請求種別 サブコード 請求区分:金額（源泉徴収対象外）
+     */
+    const CODE_MASTER_26_SUB_10 = 10;
+
     //-----------
     // 支払状況
     //-----------
@@ -1121,6 +1136,11 @@ class AppConst
      * 出欠ステータス サブコード １対多のみ
      */
     const CODE_MASTER_35_SUB_2 = 2;
+
+    /**
+     * 出欠ステータス サブコード １対１・画面非表示対象（振替済・リセット）
+     */
+    const CODE_MASTER_35_SUB_3 = 3;
 
     //-----------
     // 仮登録フラグ
@@ -1896,6 +1916,16 @@ class AppConst
      * システム変数ID 現年度
      */
     const SYSTEM_KEY_ID_1 = 100;
+    
+    /**
+     * システム変数ID 事務作業給
+     */
+    const SYSTEM_KEY_ID_2 = 101;
+
+    /**
+     * システム変数ID 振替調整スキップ回数
+     */
+    const SYSTEM_KEY_ID_3 = 102;
 
     //-----------
     // 授業報告書サブコード
@@ -1932,4 +1962,33 @@ class AppConst
      * 授業報告書 その他教材・単元の下2桁
      */
     const REPORT_OTHER_TEXT_UNIT_CODE = 99;
+
+    /**
+     * 授業報告書 ステータス
+     */
+
+    // ―（登録不要）
+    const REPORT_STATUS_1 = '1';
+
+    // ×（要登録・差戻し）
+    const REPORT_STATUS_2 = '2';
+
+    // △（承認待ち）
+    const REPORT_STATUS_3 = '3';
+
+    // 〇（登録済み）
+    const REPORT_STATUS_4 = '4';
+    
+    //-----------
+    // 授業振替依頼 希望選択
+    //-----------
+    /**
+     * 講師空き時間選択
+     */
+    const TRANSFER_PREF_TYPE_SELECT = 1;
+
+    /**
+     * フリー入力
+     */
+    const TRANSFER_PREF_TYPE_INPUT = 2;
 }

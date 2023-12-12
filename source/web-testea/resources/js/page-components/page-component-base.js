@@ -153,6 +153,14 @@ export default class PageComponentBase {
                     return year + '年' + month +'ヶ月';
                 }
             },
+            // 曜日
+            formatWeek(date) {
+                if (ValueCom.isEmpty(date)) {
+                    return "";
+                } else {
+                    return moment(date).format("ddd");
+                }
+            },
         };
     }
 

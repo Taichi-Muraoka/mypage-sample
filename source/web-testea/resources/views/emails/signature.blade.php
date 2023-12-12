@@ -1,5 +1,6 @@
---
-コー・ワークス塾システム
-株式会社 コー・ワークス
-URL  http://www.testsite.jp/
-TEL  022-XXX-XXXX   FAX  022-XXX-XXXX
+--------------------
+個別指導塾テスティー
+マイページURL: https://testea-mypage.com/login
+
+このメールアドレスは送信専用です。
+お問い合わせはマイページの「問い合わせ」ページへお願いいたします。

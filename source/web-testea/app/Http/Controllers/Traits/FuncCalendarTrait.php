@@ -121,6 +121,7 @@ trait FuncCalendarTrait
             unset($schedule['summary_kind']);
             unset($schedule['absent_tutor_id']);
             unset($schedule['absent_status']);
+            unset($schedule['report_id']);
 
             if (!AuthEx::isAdmin()) {
                 // 管理者以外（生徒想定）の場合に表示しない項目をunset
@@ -209,6 +210,7 @@ trait FuncCalendarTrait
             unset($schedule['summary_kind']);
             unset($schedule['absent_tutor_id']);
             unset($schedule['absent_status']);
+            unset($schedule['report_id']);
 
             if (!AuthEx::isAdmin()) {
                 // 管理者以外（講師想定）の場合に表示しない項目をunset
@@ -367,6 +369,7 @@ trait FuncCalendarTrait
             unset($schedule['absent_tutor_id']);
             unset($schedule['absent_status']);
             unset($schedule['tentative_status']);
+            unset($schedule['report_id']);
         }
         $scheduleData = collect($timeTables)->merge($schedules);
 
@@ -683,13 +686,13 @@ trait FuncCalendarTrait
             // 年間予定情報とJOIN
             ->sdJoin(YearlySchedule::class, function ($join) use ($targetDate) {
                 $join->on('mst_timetables.campus_cd', 'yearly_schedules.campus_cd')
-                ->where('yearly_schedules.lesson_date', $targetDate);
+                    ->where('yearly_schedules.lesson_date', $targetDate);
             })
             // 期間区分
             ->sdJoin(CodeMaster::class, function ($join) {
                 $join->on('yearly_schedules.date_kind', '=', 'mst_codes.code')
-                ->on('mst_timetables.timetable_kind', '=', 'mst_codes.sub_code')
-                ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
+                    ->on('mst_timetables.timetable_kind', '=', 'mst_codes.sub_code')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
             })
             // 指定校舎で絞り込み
             ->where('mst_timetables.campus_cd', $campusCd)
@@ -773,53 +776,76 @@ trait FuncCalendarTrait
             $query->where('schedules.tentative_status', "!=", AppConst::CODE_MASTER_36_1);
         }
 
+        // スケジュール情報表示用のquery作成（select句・join句）
+        $this->getScheduleQuery($query);
+
+        // 個別の絞り込み条件を付加する
+        $schedules = $query
+            // カレンダーの表示範囲で絞り込み
+            ->whereBetween('schedules.target_date', [$startDate, $endDate])
+            ->orderBy('schedules.target_date', 'asc')
+            ->orderBy('schedules.start_time', 'asc')
+            ->get();
+
+        return $schedules;
+    }
+
+    /**
+     * スケジュール情報表示用のquery作成
+     * select句・join句を設定する
+     * 個別のwhere条件・ガードは呼び元で行うこと
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     */
+    private function getScheduleQuery($query)
+    {
         // 教室名取得のサブクエリ
         $room_names = $this->mdlGetRoomQuery();
 
         // スケジュール情報の取得
-        $schedules = $query
-            ->select(
-                'schedules.schedule_id',
-                'schedules.campus_cd',
-                'room_names.room_name as room_name',
-                'room_names.room_name_symbol as room_symbol',
-                'schedules.target_date',
-                'schedules.period_no',
-                'schedules.start_time',
-                'schedules.end_time',
-                'schedules.booth_cd',
-                'mst_booths.name as booth_name',
-                'schedules.course_cd',
-                'mst_courses.course_kind',
-                'mst_courses.summary_kind',
-                'mst_courses.name as course_name',
-                'mst_courses.short_name as course_sname',
-                'schedules.student_id',
-                'schedules.tutor_id',
-                'schedules.subject_cd',
-                'mst_subjects.name as subject_name',
-                'mst_subjects.short_name as subject_sname',
-                'schedules.lesson_kind',
-                'mst_codes_31.name as lesson_kind_name',
-                'schedules.create_kind',
-                'mst_codes_32.name as create_kind_name',
-                'schedules.how_to_kind',
-                'mst_codes_33.name as how_to_kind_name',
-                'schedules.substitute_kind',
-                'mst_codes_34.name as substitute_kind_name',
-                'schedules.absent_tutor_id',
-                'org_tutors.name as tutor_name',
-                'absent_tutors.name as absent_tutor_name',
-                'students.name as student_name',
-                'schedules.absent_status',
-                'mst_codes_35.name as absent_name',
-                'schedules.tentative_status',
-                'mst_codes_36.name as tentative_name',
-                'transfer_schedules.target_date as transfer_date',
-                'transfer_schedules.period_no as transfer_period_no',
-                'admin_users.name as admin_name',
-                'schedules.memo'
-            )
+        $query->select(
+            'schedules.schedule_id',
+            'schedules.campus_cd',
+            'room_names.room_name as room_name',
+            'room_names.room_name_symbol as room_symbol',
+            'schedules.target_date',
+            'schedules.period_no',
+            'schedules.start_time',
+            'schedules.end_time',
+            'schedules.booth_cd',
+            'mst_booths.name as booth_name',
+            'schedules.course_cd',
+            'mst_courses.course_kind',
+            'mst_courses.summary_kind',
+            'mst_courses.name as course_name',
+            'mst_courses.short_name as course_sname',
+            'schedules.student_id',
+            'schedules.tutor_id',
+            'schedules.subject_cd',
+            'mst_subjects.name as subject_name',
+            'mst_subjects.short_name as subject_sname',
+            'schedules.lesson_kind',
+            'mst_codes_31.name as lesson_kind_name',
+            'schedules.create_kind',
+            'mst_codes_32.name as create_kind_name',
+            'schedules.how_to_kind',
+            'mst_codes_33.name as how_to_kind_name',
+            'schedules.substitute_kind',
+            'mst_codes_34.name as substitute_kind_name',
+            'schedules.absent_tutor_id',
+            'org_tutors.name as tutor_name',
+            'absent_tutors.name as absent_tutor_name',
+            'students.name as student_name',
+            'schedules.absent_status',
+            'mst_codes_35.name as absent_name',
+            'schedules.tentative_status',
+            'mst_codes_36.name as tentative_name',
+            'transfer_schedules.target_date as transfer_date',
+            'transfer_schedules.period_no as transfer_period_no',
+            'admin_users.name as admin_name',
+            'schedules.report_id',
+            'schedules.memo'
+        )
             // 校舎名の取得
             ->leftJoinSub($room_names, 'room_names', function ($join) {
                 $join->on('schedules.campus_cd', 'room_names.code');
@@ -887,14 +913,7 @@ trait FuncCalendarTrait
                 $join->on('schedules.transfer_class_id', '=', 'transfer_schedules.schedule_id');
             }, 'transfer_schedules')
             // 振替済・リセット済スケジュールを除外
-            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
-            // カレンダーの表示範囲で絞り込み
-            ->whereBetween('schedules.target_date', [$startDate, $endDate])
-            ->orderBy('schedules.target_date', 'asc')
-            ->orderBy('schedules.start_time', 'asc')
-            ->get();
-
-        return $schedules;
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7]);
     }
 
     /**

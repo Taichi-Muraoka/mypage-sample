@@ -133,4 +133,47 @@ class TransferApplication extends Model
     // 検索条件
     //-------------------------------
 
+    /**
+     * 検索 申請者種別
+     */
+    public function scopeSearchApplyKind($query, $obj)
+    {
+        $key = 'apply_kind';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 振替承認ステータス
+     */
+    public function scopeSearchApprovalStatus($query, $obj)
+    {
+        $key = 'approval_status';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 生徒ID
+     */
+    public function scopeSearchStudentId($query, $obj)
+    {
+        $key = 'student_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 講師ID
+     */
+    public function scopeSearchTutorId($query, $obj)
+    {
+        $key = 'tutor_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 }

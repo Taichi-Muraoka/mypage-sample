@@ -496,26 +496,7 @@ trait FuncScheduleTrait
         }
 
         // スケジュール情報から対象ブースが使用されているか検索
-        $account = Auth::user();
-        $query = Schedule::query();
-        if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、所属校舎で絞る（ガード）
-            $query->where('campus_cd', $account->campus_cd);
-        }
-
-        // 変更時は更新中のキー以外を検索
-        if ($scheduleId) {
-            $query->where('schedule_id', '!=', $scheduleId);
-        }
-
-        $exists = $query
-            // 校舎・日付・時限・ブースコードで検索
-            ->where('campus_cd', $campusCd)
-            ->where('target_date', $targetDate)
-            ->where('period_no', $periodNo)
-            ->where('booth_cd', $boothCd)
-            ->exists();
-
+        $exists = $this->fncScheChkBoothFromSchedule($campusCd, $targetDate, $periodNo, $boothCd, $scheduleId, false);
         if (!$exists) {
             // 重複なしの場合、ブースコードをそのまま返す
             return $boothCd;
@@ -585,6 +566,8 @@ trait FuncScheduleTrait
             ->where('start_time', '<', $endTime)
             ->where('end_time', '>', $startTime)
             ->where('booth_cd', $boothCd)
+            // 振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->exists();
 
         if (!$exists) {
@@ -636,6 +619,8 @@ trait FuncScheduleTrait
             ->where('target_date', $targetDate)
             ->where('start_time', '<=', $endTime)
             ->where('end_time', '>=', $startTime)
+            // 振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->get();
 
         // 配列に格納
@@ -744,22 +729,7 @@ trait FuncScheduleTrait
             return $boothCd;
         }
         // スケジュール情報から対象ブースが使用されているか検索
-        $account = Auth::user();
-        $query = Schedule::query();
-        if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、所属校舎で絞る（ガード）
-            $query->where('campus_cd', $account->campus_cd);
-        }
-
-        $exists = $query
-            // 校舎・日付・時限・ブースコードで検索
-            ->where('campus_cd', $campusCd)
-            ->where('target_date', $targetDate)
-            ->where('period_no', $periodNo)
-            ->where('booth_cd', $boothCd)
-            // 一括作成データを除外
-            ->where('create_kind', '!=', AppConst::CODE_MASTER_32_0)
-            ->exists();
+        $exists = $this->fncScheChkBoothFromSchedule($campusCd, $targetDate, $periodNo, $boothCd, null, true);
         if (!$exists) {
             // 重複なしの場合、ブースコードをそのまま返す
             return $boothCd;
@@ -829,9 +799,10 @@ trait FuncScheduleTrait
      * @param int $periodNo 時限
      * @param int $boothCd ブースコード
      * @param int $scheduleId スケジュールID
+     * @param bool $bulkFlg 一括登録かどうか
      * @return bool
      */
-    private function fncScheChkBoothFromSchedule($campusCd, $targetDate, $periodNo, $boothCd, $scheduleId)
+    private function fncScheChkBoothFromSchedule($campusCd, $targetDate, $periodNo, $boothCd, $scheduleId = null, $bulkFlg = false)
     {
         // スケジュール情報より、ブース空きチェック
         $account = Auth::user();
@@ -846,12 +817,19 @@ trait FuncScheduleTrait
             $query->where('schedule_id', '!=', $scheduleId);
         }
 
+        // 一括登録時は一括登録データ以外を検索
+        if ($bulkFlg) {
+            $query->where('create_kind', '!=', AppConst::CODE_MASTER_32_0);
+        }
+
         $exists = $query
             // 校舎・日付・時限・ブースコードで検索
             ->where('campus_cd', $campusCd)
             ->where('target_date', $targetDate)
             ->where('period_no', $periodNo)
             ->where('booth_cd', $boothCd)
+            // 振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->exists();
 
         return $exists;
@@ -964,6 +942,8 @@ trait FuncScheduleTrait
             ->where('campus_cd', $campusCd)
             ->where('target_date', $targetDate)
             ->where('period_no', $periodNo)
+            // 振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->get();
 
         // 配列に格納
