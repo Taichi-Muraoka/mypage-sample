@@ -70,10 +70,12 @@
             <td class="t-price">@{{item.emergency_sub_out}}</td>
             <td class="t-price">@{{item.trial_class}}</td>
             <td>
-                <x-button.list-dtl :vueDataAttr="['tutor_id' => 'item.tutor_id',
-                    'campus_cd' => 'item.campus_cd',
-                    'target_date_from' => 'item.target_date_from',
-                    'target_date_to' => 'item.target_date_to']" />
+                <span v-if="item.trial_class > 0">
+                    <x-button.list-dtl :vueDataAttr="['tutor_id' => 'item.tutor_id',
+                        'campus_cd' => 'item.campus_cd',
+                        'target_date_from' => 'item.target_date_from',
+                        'target_date_to' => 'item.target_date_to']" />
+                </span>
             </td>
         </tr>
 

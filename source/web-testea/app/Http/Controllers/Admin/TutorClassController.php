@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\CodeMaster;
 use App\Models\Student;
-use App\Models\Tutor;
 use App\Models\Schedule;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
@@ -116,39 +115,36 @@ class TutorClassController extends Controller
         $query->SearchTargetDateFrom($form);
         $query->SearchTargetDateTo($form);
 
-        // スケジュール情報取得し、サブクエリを作成
-        $schedules = $query
-            ->where('schedules.tentative_status', 0)
-            ->whereNotNull('schedules.tutor_id')
-            ->whereNull('schedules.deleted_at')
-            ->whereIn('schedules.absent_status', [0])
-            ->select(
-                'schedules.schedule_id',
-                'schedules.tutor_id',
-                'schedules.course_cd',
-                'schedules.lesson_kind',
-                'schedules.substitute_kind',
-                'schedules.absent_tutor_id',
-                'tutors.name as tutor_name'
-            )
-            ->selectRaw('SUM(schedules.minites) as sum_minites')
-            // 講師名の取得
-            ->sdLeftJoin(Tutor::class, 'schedules.tutor_id', '=', 'tutors.tutor_id')
-            ->groupBy('schedules.tutor_id', 'schedules.course_cd');
-
-        // コース別時間集計
-        $course_count = DB::table($schedules)
+        // スケジュール情報取得し、授業時間カウントのサブクエリを作成
+        $course_sub_query = DB::table($query)
+            ->where('tentative_status', AppConst::CODE_MASTER_36_0)
+            ->whereNotNull('tutor_id')
+            ->whereIn('absent_status', [AppConst::CODE_MASTER_35_0])
             ->select(
                 'tutor_id',
-                'tutor_name'
+                'course_cd',
             )
-            ->selectRaw('MAX(CASE WHEN course_cd = 10100 THEN sum_minites ELSE 0 END) AS personal_min')
-            ->selectRaw('MAX(CASE WHEN course_cd = 10200 THEN sum_minites ELSE 0 END) AS two_min')
-            ->selectRaw('MAX(CASE WHEN course_cd = 10300 THEN sum_minites ELSE 0 END) AS three_min')
-            ->selectRaw('MAX(CASE WHEN course_cd = 10400 THEN sum_minites ELSE 0 END) AS home_min')
-            ->selectRaw('MAX(CASE WHEN course_cd = 10500 THEN sum_minites ELSE 0 END) AS exercise_min')
-            ->selectRaw('MAX(CASE WHEN course_cd = 10600 THEN sum_minites ELSE 0 END) AS high_min')
-            ->selectRaw('MAX(CASE WHEN course_cd = 20100 THEN sum_minites ELSE 0 END) AS group_min')
+            ->selectRaw('SUM(minites) as sum_minites')
+            ->groupBy('tutor_id', 'course_cd');
+
+        // スケジュール情報取得し、代講カウントのサブクエリを作成
+        $sub_query = DB::table($query)
+            ->where('tentative_status', AppConst::CODE_MASTER_36_0)
+            ->whereNotNull('tutor_id')
+            ->whereIn('absent_status', [AppConst::CODE_MASTER_35_0]);
+
+        // コース別時間集計
+        $course_count = DB::table($course_sub_query)
+            ->select(
+                'tutor_id'
+            )
+            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS personal_min', [AppConst::COURSE_CD_10100])
+            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS two_min', [AppConst::COURSE_CD_10200])
+            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS three_min', [AppConst::COURSE_CD_10300])
+            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS home_min', [AppConst::COURSE_CD_10400])
+            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS exercise_min', [AppConst::COURSE_CD_10500])
+            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS high_min', [AppConst::COURSE_CD_10600])
+            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS group_min', [AppConst::COURSE_CD_20100])
             ->selectRaw('0 as normal_sub_get')
             ->selectRaw('0 as emergency_sub_get')
             ->selectRaw('0 as normal_sub_out')
@@ -157,11 +153,10 @@ class TutorClassController extends Controller
             ->groupBy('tutor_id');
 
         // 代講（受）集計
-        $substitute_get_count = DB::table($schedules)
+        $substitute_get_count = DB::table($sub_query)
             ->whereIn('substitute_kind', [AppConst::CODE_MASTER_34_1, AppConst::CODE_MASTER_34_2])
             ->select(
-                'tutor_id',
-                'tutor_name'
+                'tutor_id'
             )
             ->selectRaw('0 AS personal_min')
             ->selectRaw('0 AS two_min')
@@ -170,19 +165,18 @@ class TutorClassController extends Controller
             ->selectRaw('0 AS exercise_min')
             ->selectRaw('0 AS high_min')
             ->selectRaw('0 AS group_min')
-            ->selectRaw('SUM(CASE WHEN substitute_kind = 1 THEN 1 ELSE 0 END) as normal_sub_get')
-            ->selectRaw('SUM(CASE WHEN substitute_kind = 2 THEN 1 ELSE 0 END) as emergency_sub_get')
+            ->selectRaw('SUM(CASE WHEN substitute_kind = ? THEN 1 ELSE 0 END) as normal_sub_get', [AppConst::CODE_MASTER_34_1])
+            ->selectRaw('SUM(CASE WHEN substitute_kind = ? THEN 1 ELSE 0 END) as emergency_sub_get', [AppConst::CODE_MASTER_34_2])
             ->selectRaw('0 as normal_sub_out')
             ->selectRaw('0 as emergency_sub_out')
             ->selectRaw('0 as trial_class')
             ->groupBy('tutor_id');
 
         // 代講（出）集計
-        $substitute_out_count = DB::table($schedules)
+        $substitute_out_count = DB::table($sub_query)
             ->whereIn('substitute_kind', [AppConst::CODE_MASTER_34_1, AppConst::CODE_MASTER_34_2])
             ->select(
                 'absent_tutor_id as tutor_id',
-                'tutor_name'
             )
             ->selectRaw('0 AS personal_min')
             ->selectRaw('0 AS two_min')
@@ -193,17 +187,16 @@ class TutorClassController extends Controller
             ->selectRaw('0 AS group_min')
             ->selectRaw('0 as normal_sub_get')
             ->selectRaw('0 as emergency_sub_get')
-            ->selectRaw('SUM(CASE WHEN substitute_kind = 1 THEN 1 ELSE 0 END) as normal_sub_out')
-            ->selectRaw('SUM(CASE WHEN substitute_kind = 2 THEN 1 ELSE 0 END) as emergency_sub_out')
+            ->selectRaw('SUM(CASE WHEN substitute_kind = ? THEN 1 ELSE 0 END) as normal_sub_out', [AppConst::CODE_MASTER_34_1])
+            ->selectRaw('SUM(CASE WHEN substitute_kind = ? THEN 1 ELSE 0 END) as emergency_sub_out', [AppConst::CODE_MASTER_34_2])
             ->selectRaw('0 as trial_class')
             ->groupBy('tutor_id');
 
         // 体験授業集計
-        $trial_class_count = DB::table($schedules)
+        $trial_class_count = DB::table($sub_query)
             ->whereIn('lesson_kind', [AppConst::CODE_MASTER_31_5])
             ->select(
                 'tutor_id',
-                'tutor_name'
             )
             ->selectRaw('0 AS personal_min')
             ->selectRaw('0 AS two_min')
@@ -226,10 +219,10 @@ class TutorClassController extends Controller
             ->union($trial_class_count);
 
         // unionで結合したデータをまとめる
-        $schedule_count = DB::table($uniondata)
+        $schedule_count = DB::table($uniondata, 'uniondata')
             ->select(
-                'tutor_id',
-                'tutor_name'
+                'uniondata.tutor_id',
+                'tutors.name as tutor_name'
             )
             ->selectRaw('SUM(personal_min) AS personal_min')
             ->selectRaw('SUM(two_min) AS two_min')
@@ -243,8 +236,10 @@ class TutorClassController extends Controller
             ->selectRaw('SUM(normal_sub_out) as normal_sub_out')
             ->selectRaw('SUM(emergency_sub_out) as emergency_sub_out')
             ->selectRaw('SUM(trial_class) as trial_class')
-            ->groupBy('tutor_id');
-        
+            // 講師名の取得
+            ->leftJoin('tutors', 'uniondata.tutor_id', '=', 'tutors.tutor_id')
+            ->groupBy('uniondata.tutor_id');
+
         return $this->getListAndPaginator($request, $schedule_count, function ($items) use ($form) {
             // データ加工
             foreach ($items as $item) {
@@ -253,14 +248,14 @@ class TutorClassController extends Controller
                 $item->target_date_from = $form['target_date_from'];
                 $item->target_date_to = $form['target_date_to'];
                 // 授業(分)を授業(時間)に変換(小数点1位以下を切り捨て)
-                $item->personal_min = floor($item->personal_min / 60 * 10) / 10;
-                $item->two_min = floor($item->two_min / 60 * 10) / 10;
-                $item->three_min = floor($item->three_min / 60 * 10) / 10;
-                $item->home_min = floor($item->home_min / 60 * 10) / 10;
-                $item->exercise_min = floor($item->exercise_min / 60 * 10) / 10;
-                $item->high_min = floor($item->high_min / 60 * 10) / 10;
-                $item->group_min = floor($item->group_min / 60 * 10) / 10;
-            } 
+                $item->personal_min = $this->conversion_time($item->personal_min);
+                $item->two_min = $this->conversion_time($item->two_min);
+                $item->three_min = $this->conversion_time($item->three_min);
+                $item->home_min = $this->conversion_time($item->home_min);
+                $item->exercise_min = $this->conversion_time($item->exercise_min);
+                $item->high_min = $this->conversion_time($item->high_min);
+                $item->group_min = $this->conversion_time($item->group_min);
+            }
 
             return $items;
         });
@@ -303,7 +298,7 @@ class TutorClassController extends Controller
         };
 
         // 独自バリデーション: 日付チェック
-        $validationDateFromTo = function ($attribute, $value, $fail) use($request) {
+        $validationDateFromTo = function ($attribute, $value, $fail) use ($request) {
             $from_date = $request['target_date_from'];
             $to_date = $request['target_date_to'];
 
@@ -311,7 +306,7 @@ class TutorClassController extends Controller
 
             if ($from_date_plus_half_year < $to_date) {
                 // 不正な値エラー
-                return $fail(Lang::get('授業日は６ヵ月以内で指定してください'));
+                return $fail(Lang::get('target_date_term'));
             }
         };
 
@@ -346,7 +341,7 @@ class TutorClassController extends Controller
 
         // 講師ID取得
         $tutor_id = $request->input('tutor_id');
-        
+
         $query = Schedule::query();
 
         // 校舎コード選択による絞り込み条件
@@ -387,5 +382,18 @@ class TutorClassController extends Controller
         return [
             'schedules' => $schedules
         ];
+    }
+
+    /**
+     * 分を時間に変換
+     *
+     * @param 授業時間(分)
+     * @return 授業時間(時間)
+     */
+    public function conversion_time($minites)
+    {
+        $time = floor($minites / 60 * 10) / 10;
+
+        return $time;
     }
 }
