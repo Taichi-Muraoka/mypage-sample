@@ -6,63 +6,47 @@
 
 {{-- 検索フォーム --}}
 <x-bs.card :search=true>
-
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="roomcd" caption="校舎" :select2=true >
-                <option value="1">久我山</option>
-                <option value="2">西永福</option>
-                <option value="3">下高井戸</option>
-                <option value="4">駒込</option>
-                <option value="5">日吉</option>
-                <option value="6">自由が丘</option>
-            </x-input.select>
+            @can('roomAdmin')
+            {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+                :select2Search=false :blank=false />
+            @else
+            {{-- 全体管理者の場合、検索を非表示・未選択を表示する --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+                :select2Search=false :blank=true />
+            @endcan
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="講師名" id="tname" :select2=true :editData=$editData>
-                <option value="1">CWテスト教師１０１</option>
-                <option value="2">CWテスト教師１０２</option>
-            </x-input.select>
+            <x-input.select id="tutor_id" caption="講師名" :select2=true :mastrData=$tutorList :editData=$editData
+                :select2Search=true :blank=true />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="kinds" caption="請求種別" :select2=true>
-                <option value="1">研修（本部）</option>
-                <option value="2">研修（教室）</option>
-                <option value="3">特別交通費</option>
-                <option value="4">生徒獲得</option>
-                <option value="5">業務依頼（本部）</option>
-                <option value="6">業務依頼（教室）</option>
-                <option value="7">経費</option>
-                <option value="8">その他</option>
-            </x-input.select>
+            <x-input.select id="surcharge_kind" caption="請求種別" :select2=true :mastrData=$surchargeKindList
+                :editData=$editData :select2Search=false :blank=true />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="status" caption="ステータス" :select2=true>
-                <option value="1">承認待ち</option>
-                <option value="2">承認</option>
-                <option value="3">差戻し</option>
-            </x-input.select>
+            <x-input.select id="approval_status" caption="ステータス" :select2=true :mastrData=$approvalStatusList
+                :editData=$editData :select2Search=false :blank=true />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="payment" caption="支払状況" :select2=true>
-                <option value="1">未処理</option>
-                <option value="2">支払済</option>
-            </x-input.select>
+            <x-input.select id="payment_status" caption="支払状況" :select2=true :mastrData=$paymentStatusList
+                :editData=$editData :select2Search=false :blank=true />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="申請日 From" id="holiday_date_from" />
+            <x-input.date-picker caption="申請日 From" id="apply_date_from" />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="申請日 To" id="holiday_date_to" />
+            <x-input.date-picker caption="申請日 To" id="apply_date_to" />
         </x-bs.col2>
     </x-bs.row>
-
 </x-bs.card>
 
 {{-- 結果リスト --}}
@@ -77,7 +61,7 @@
             <th>講師名</th>
             <th>請求種別</th>
             <th>校舎</th>
-            <th>時間（分）</th>
+            <th>時間(分)</th>
             <th>金額</th>
             <th>ステータス</th>
             <th>支払年月</th>
@@ -86,62 +70,32 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/01/10</td>
-            <td>CWテスト教師１０１</td>
-            <td>業務依頼（教室）</td>
-            <td>久我山</td>
-            <td>60</td>
-            <td>1000</td>
-            <td>承認</td>
-            <td>2023/02</td>
-            <td>未処理</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmd(item.apply_date)}}</td>
+            <td>@{{item.tutor_name}}</td>
+            <td>@{{item.surcharge_kind_name}}</td>
+            <td>@{{item.campus_name}}</td>
+            <td>@{{item.minutes}}</td>
+            <td class="t-price">@{{$filters.toLocaleString(item.tuition)}}</td>
+            <td>@{{item.approval_status_name}}</td>
+            <td>@{{$filters.formatYm(item.payment_date)}}</td>
+            <td>@{{item.payment_status_name}}</td>
             <td>
-                <x-button.list-dtl :vueDataAttr="['id' => '1']"/>
-                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-acceptance" :vueDataAttr="['id' => '1']" disabled/>
-                <x-button.list-edit href="{{ route('surcharge_accept-edit', 1) }}" />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/01/09</td>
-            <td>CWテスト教師１０１</td>
-            <td>経費</td>
-            <td>久我山</td>
-            <td></td>
-            <td>2000</td>
-            <td>承認待ち</td>
-            <td></td>
-            <td></td>
-            <td>
-                <x-button.list-dtl :vueDataAttr="['id' => '2']"/>
-                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-acceptance" :vueDataAttr="['id' => '2']" />
-                <x-button.list-edit href="{{ route('surcharge_accept-edit', 1) }}" />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/01/5</td>
-            <td>CWテスト教師１０３</td>
-            <td>業務依頼（教室）</td>
-            <td>西永福</td>
-            <td>90</td>
-            <td>1500</td>
-            <td>承認待ち</td>
-            <td></td>
-            <td></td>
-            <td>
-                <x-button.list-dtl :vueDataAttr="['id' => '3']"/>
-                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-acceptance" :vueDataAttr="['id' => '3']" />
-                <x-button.list-edit href="{{ route('surcharge_accept-edit', 1) }}" />
+                <x-button.list-dtl :vueDataAttr="['id' => 'item.surcharge_id']" />
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-acceptance"
+                    :vueDataAttr="['id' => 'item.surcharge_id']" vueDisabled="item.disabled_btn" />
+                <x-button.list-edit vueHref="'{{ route('surcharge_accept-edit', '') }}/' + item.surcharge_id"
+                    vueDisabled="item.disabled_btn" />
             </td>
         </tr>
     </x-bs.table>
 
 </x-bs.card-list>
 
-{{-- モーダル --}}
+{{-- 詳細モーダル --}}
 @include('pages.admin.modal.surcharge_accept-modal')
-{{-- モーダル(送信確認モーダル) --}}
+{{-- 承認モーダル(送信確認モーダル) --}}
 @include('pages.admin.modal.surcharge_accept_acceptance-modal', ['modal_send_confirm' => true, 'modal_id' =>
-'modal-dtl-acceptance'])
+'modal-dtl-acceptance', 'caption_OK' => '承認'])
 
 @stop
