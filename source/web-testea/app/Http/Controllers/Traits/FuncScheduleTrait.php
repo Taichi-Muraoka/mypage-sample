@@ -1268,7 +1268,6 @@ trait FuncScheduleTrait
      */
     function fncScheValidateStudent($request, $kind, $attribute, $value, $fail)
     {
-        $this->debug($attribute);
         if (
             !$request->filled('target_date') || !$request->filled('start_time')
             || !$request->filled('end_time') || !$request->filled($attribute)
@@ -1357,7 +1356,6 @@ trait FuncScheduleTrait
      */
     function fncScheValidateTutor($request, $kind, $attribute, $value, $fail)
     {
-        $this->debug($attribute);
         if (
             !$request->filled('target_date') || !$request->filled('start_time')
             || !$request->filled('end_time') || !$request->filled('tutor_id')

@@ -395,15 +395,16 @@ class ExtraLessonMngController extends Controller
                 'start_time',
                 'end_time',
                 'course_cd',
-                'course_kind',
                 'student_id',
                 'tutor_id',
                 'subject_cd',
-                'lesson_kind',
                 'how_to_kind',
-                'tentative_status',
                 'memo',
             );
+            // 内部で設定する固定値
+            $scheduleData['course_kind'] = AppConst::CODE_MASTER_42_1;
+            $scheduleData['lesson_kind'] = AppConst::CODE_MASTER_31_3;
+            $scheduleData['tentative_status'] = AppConst::CODE_MASTER_36_0;
 
             //------------------------
             // 空きブース検索
