@@ -1991,4 +1991,14 @@ class AppConst
      * フリー入力
      */
     const TRANSFER_PREF_TYPE_INPUT = 2;
+
+    //==========================
+    // 教室カレンダー・レギュラースケジュール
+    //==========================
+    /**
+     * スケジュール追加更新種別
+     */
+    const SCHEDULE_KIND_NEW = 1;
+    const SCHEDULE_KIND_UPD = 2;
+    const SCHEDULE_KIND_CPY = 3;
 }

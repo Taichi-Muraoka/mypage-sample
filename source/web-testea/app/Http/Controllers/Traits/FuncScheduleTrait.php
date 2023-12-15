@@ -19,6 +19,7 @@ use App\Models\TutorCampus;
 use App\Models\TutorFreePeriod;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Lang;
 
 /**
  * スケジュール関連 - 共通処理
@@ -1250,5 +1251,251 @@ trait FuncScheduleTrait
             }
         }
         return;
+    }
+
+    //------------------------------
+    // バリデーション（共通処理）
+    //------------------------------
+
+    /**
+     * スケジュール登録時の生徒スケジュール重複チェック
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @param $kind
+     * @param $attribute
+     * @param $value
+     * @param $fail
+     */
+    function fncScheValidateStudent($request, $kind, $attribute, $value, $fail)
+    {
+        if (
+            !$request->filled('target_date') || !$request->filled('start_time')
+            || !$request->filled('end_time') || !$request->filled($attribute)
+            || !$request->filled('campus_cd')
+        ) {
+            // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+            return;
+        }
+
+        $scheduleId = null;
+        if ($kind == AppConst::SCHEDULE_KIND_UPD && $request->filled('schedule_id')) {
+            // 更新の場合のみ、スケジュールIDをセット（除外用）
+            $scheduleId = $request['schedule_id'];
+        }
+
+        // 繰り返し登録有無チェック
+        $targetDates = [];
+        if ($request->filled('repeat_chk') && $request->filled('repeat_times')) {
+            if ($request['repeat_chk'] == 'true' && intval($request['repeat_times']) > 0) {
+                // 繰り返し登録有りの場合
+                // 対象日と同一曜日の授業日を回数分取得
+                $repeatTimes = intval($request['repeat_times']) + 1;
+                $targetDates = $this->fncScheGetScheduleDate($request['campus_cd'], $request['target_date'], $repeatTimes, null);
+            } else {
+                // 繰り返し登録なしの場合
+                array_push($targetDates, $request['target_date']);
+            }
+        } else {
+            // 繰り返し登録対象外の場合
+            array_push($targetDates, $request['target_date']);
+        }
+        foreach ($targetDates as $targetDate) {
+            $members = [];
+            // チェック対象の生徒IDを設定
+            if ($attribute == 'class_member_id') {
+                // 複数生徒指定の場合
+                $members = explode(",", $value);
+            } else {
+                // 単一生徒指定の場合
+                array_push($members, $value);
+            }
+            foreach ($members as $member) {
+                // 生徒リストを取得
+                // 生徒スケジュール重複チェック
+                $chk = $this->fncScheChkDuplidateSid(
+                    $targetDate,
+                    $request['start_time'],
+                    $request['end_time'],
+                    $member,
+                    $scheduleId,
+                    false
+                );
+                if (!$chk) {
+                    // 生徒スケジュール重複エラー
+                    $validateMsg = Lang::get('validation.duplicate_student');
+                    if ($targetDate != $request['target_date']) {
+                        // 繰り返し登録データの場合、対象日も合わせて表示する
+                        $validateMsg = $validateMsg . "(" . $targetDate;
+                        if ($attribute == 'class_member_id') {
+                            // 生徒複数指定の場合、生徒名も合わせて表示する
+                            $studentName = $this->mdlGetStudentName($member);
+                            $validateMsg = $validateMsg . " " . $studentName;
+                        }
+                        $validateMsg = $validateMsg . ")";
+                    } else {
+                        if ($attribute == 'class_member_id') {
+                            // 生徒複数指定の場合、生徒名も合わせて表示する
+                            $studentName = $this->mdlGetStudentName($member);
+                            $validateMsg = $validateMsg . "(" . $studentName . ")";
+                        }
+                    }
+                    return $fail($validateMsg);
+                }
+            }
+        }
+    }
+
+    /**
+     * スケジュール登録時の講師スケジュール重複チェック
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @param $kind
+     * @param $attribute
+     * @param $value
+     * @param $fail
+     */
+    function fncScheValidateTutor($request, $kind, $attribute, $value, $fail)
+    {
+        if (
+            !$request->filled('target_date') || !$request->filled('start_time')
+            || !$request->filled('end_time') || !$request->filled('tutor_id')
+            || !$request->filled('campus_cd')
+        ) {
+            // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+            return;
+        }
+
+        $scheduleId = null;
+        if ($kind == AppConst::SCHEDULE_KIND_UPD && $request->filled('schedule_id')) {
+            // 更新の場合のみ、スケジュールIDをセット（除外用）
+            $scheduleId = $request['schedule_id'];
+        }
+
+        // 繰り返し登録有無チェック
+        $targetDates = [];
+        if ($request->filled('repeat_chk') && $request->filled('repeat_times')) {
+            if ($request['repeat_chk'] == 'true' && intval($request['repeat_times']) > 0) {
+                // 繰り返し登録有りの場合
+                // 対象日と同一曜日の授業日を回数分取得
+                $repeatTimes = intval($request['repeat_times']) + 1;
+                $targetDates = $this->fncScheGetScheduleDate($request['campus_cd'], $request['target_date'], $repeatTimes, null);
+            } else {
+                // 繰り返し登録なしの場合
+                array_push($targetDates, $request['target_date']);
+            }
+        } else {
+            // 繰り返し登録対象外の場合
+            array_push($targetDates, $request['target_date']);
+        }
+        foreach ($targetDates as $targetDate) {
+            // 講師スケジュール重複チェック
+            $chk = $this->fncScheChkDuplidateTid(
+                $targetDate,
+                $request['start_time'],
+                $request['end_time'],
+                $value,
+                $scheduleId,
+                false
+        );
+            if (!$chk) {
+                // 講師スケジュール重複エラー
+                $validateMsg = Lang::get('validation.duplicate_tutor');
+                if ($targetDate != $request['target_date']) {
+                    // 繰り返し登録データの場合、対象日も合わせて表示する
+                    $validateMsg = $validateMsg . "(" . $targetDate . ")";
+                }
+                return $fail($validateMsg);
+            }
+        }
+    }
+
+    /**
+     * スケジュール登録時の時限と開始時刻の相関チェック
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @param $attribute
+     * @param $value
+     * @param $fail
+     */
+    function fncScheValidatePeriodStartTime($request, $attribute, $value, $fail)
+    {
+        if (
+            !$request->filled('campus_cd') || !$request->filled('target_date')
+            || !$request->filled('period_no')
+        ) {
+            // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+            return;
+        }
+        // 対象日の時間割区分を取得
+        $timetableKind = $this->fncScheGetTimeTableKind($request['campus_cd'], $request['target_date']);
+        // 時限と開始時刻の相関チェック
+        $chk = $this->fncScheChkStartTime(
+            $request['campus_cd'],
+            $timetableKind,
+            $request['period_no'],
+            $value
+        );
+        if (!$chk) {
+            // 開始時刻範囲エラー
+            return $fail(Lang::get('validation.out_of_range_period'));
+        }
+    }
+
+    /**
+     * スケジュール登録時の面談開始時刻チェック
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @param $attribute
+     * @param $value
+     * @param $fail
+     */
+    function fncScheValidateConferenceStartTime($request, $attribute, $value, $fail)
+    {
+        $startTimeMin = Carbon::createFromTimeString(config('appconf.lesson_start_time_min'));
+        $startTime = Carbon::createFromTimeString($value);
+
+        // 開始時刻が8:00より前の場合エラーとする
+        if ($startTime < $startTimeMin) {
+            return $fail(Lang::get('validation.invalid_input'));
+        }
+    }
+
+    /**
+     * スケジュール登録時の授業区分チェック（見込客）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @param $attribute
+     * @param $value
+     * @param $fail
+     */
+    function fncScheValidateLessonKindTrial($request, $attribute, $value, $fail)
+    {
+        if (!$request->filled('student_id')) {
+            // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+            return;
+        }
+        // 生徒情報を取得
+        $student = $this->fncScheGetStudentInfo($request['student_id']);
+        if ($student->stu_status == AppConst::CODE_MASTER_28_0) {
+            // 見込客の場合、体験授業以外ならエラー
+            if (
+                $value != AppConst::CODE_MASTER_31_5
+                && $value != AppConst::CODE_MASTER_31_6
+                && $value != AppConst::CODE_MASTER_31_7
+            ) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        } else {
+            // 見込客以外の場合、体験授業ならエラー
+            if (
+                $value == AppConst::CODE_MASTER_31_5
+                || $value == AppConst::CODE_MASTER_31_6
+                || $value == AppConst::CODE_MASTER_31_7
+            ) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        }
     }
 }

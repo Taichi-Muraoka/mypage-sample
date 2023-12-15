@@ -830,6 +830,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 時限プルダウンを選択された際に時間割の情報を返却する
     Route::post('/extra_lesson_mng/get_data_select_timetable', [ExtraLessonMngController::class, 'getDataSelectTimetable'])->name('extra_lesson_mng-get_data_select_timetable');
 
+    // 日付を変更された際に時限プルダウンを返却する
+    Route::post('/extra_lesson_mng/get_data_select', [ExtraLessonMngController::class, 'getDataSelect'])->name('extra_lesson_mng-get_data_select');
+
     // 新規登録
     Route::get('/extra_lesson_mng/new/{sid}/{campusCd}', [ExtraLessonMngController::class, 'new'])->name('extra_lesson_mng-new');
 
