@@ -920,10 +920,10 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::get('/member_mng/leave/edit/{sid}', [MemberMngController::class, 'leaveEdit'])->name('member_mng-leave-edit');
 
     // 編集処理
-    Route::post('/member_mng/leave/update', [MemberMngController::class, 'leaveUpdate'])->name('member_mng-leave-update');
+    Route::post('/member_mng/update_leave', [MemberMngController::class, 'leaveUpdate'])->name('member_mng-leave-update');
 
     // バリデーション(登録用)
-    Route::post('/member_mng/leave/vd_input', [MemberMngController::class, 'validationForInputLeave'])->name('member_mng-leave-vd_input');
+    Route::post('/member_mng/vd_input_leave', [MemberMngController::class, 'validationForInputLeave'])->name('member_mng-leave-vd_input');
 
     //---------------------
     // 連絡記録
