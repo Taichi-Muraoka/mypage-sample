@@ -8,10 +8,10 @@
 <x-bs.card :search=true>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="対象期間 From" id="date_from" />
+            <x-input.date-picker caption="対象期間 From" id="target_date_from" :editData=$editData/>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="対象期間 To" id="date_to" />
+            <x-input.date-picker caption="対象期間 To" id="target_date_to" :editData=$editData/>
         </x-bs.col2>
     </x-bs.row>
 </x-bs.card>
@@ -39,23 +39,14 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>101</td>
-            <td>CWテスト教師１０１</td>
-            <td>2023/04/10</td>
-            <td>04時間 30分</td>
-            <td>00時間 00分</td>
-            <td>00時間 30分</td>
-            <td>00時間 00分</td>
-        </tr>
-        <tr>
-            <td>102</td>
-            <td>CWテスト教師１０２</td>
-            <td>2023/04/10</td>
-            <td>10時間 00分</td>
-            <td>02時間 00分</td>
-            <td>00時間 00分</td>
-            <td>00時間 00分</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{item.tutor_id}}</td>
+            <td>@{{item.tutor_name}}</td>
+            <td>@{{$filters.formatYmd(item.target_date)}}</td>
+            <td>@{{item.sum_minites}}</td>
+            <td>@{{item.over_time}}</td>
+            <td></td>
+            <td></td>
         </tr>
 
     </x-bs.table>
