@@ -46,9 +46,20 @@ class TutorClassController extends Controller
         // 校舎プルダウン
         $rooms = $this->mdlGetRoomList(false);
 
+        // 先月初日
+        $first_date = date('Y/m/01', strtotime('-1 month'));
+
+        // 今月末日
+        $last_date = date('Y/m/t', strtotime('-1 month'));
+
+        $editData = [
+            'target_date_from' => $first_date,
+            'target_date_to' => $last_date
+        ];
+
         return view('pages.admin.tutor_class', [
             'rules' => $this->rulesForSearch(null),
-            'editData' => null,
+            'editData' => $editData,
             'rooms' => $rooms
         ]);
     }

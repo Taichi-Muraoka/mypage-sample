@@ -19,10 +19,10 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="授業日 From" id="target_date_from" />
+            <x-input.date-picker caption="授業日 From" id="target_date_from" :editData=$editData/>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="授業日 To" id="target_date_to" />
+            <x-input.date-picker caption="授業日 To" id="target_date_to" :editData=$editData/>
         </x-bs.col2>
     </x-bs.row>
 
