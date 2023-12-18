@@ -251,8 +251,14 @@ class ExtraLessonMngController extends Controller
      */
     public function getDataSelectTimetable(Request $request)
     {
-        // 校舎コード・時限を取得
+        // 時限のバリデーション
+        $this->validateIdsFromRequest($request, 'period_no');
+        // 日付のバリデーション
+        $this->validateDatesFromRequest($request, 'target_date');
+
+        // 校舎コード・日付・時限を取得
         $campusCd = $request->input('campus_cd');
+        $targetDate = $request->input('target_date');
         $periodNo = $request->input('period_no');
 
         //------------------------
@@ -271,14 +277,55 @@ class ExtraLessonMngController extends Controller
         //---------------------------
         // 時間割情報（開始時刻・終了時刻）を返却する
         //---------------------------
-        // 時間割区分・指定時限から、対応する時間割情報を取得 時間割区分=通常
-        $periodInfo = $this->fncScheGetTimetableByPeriod($campusCd, AppConst::CODE_MASTER_37_0, $periodNo);
+        // 日付から時間割区分を取得
+        $timetableKind = $this->fncScheGetTimeTableKind($campusCd, $targetDate);
+
+        // 時間割区分・指定時限から、対応する時間割情報を取得
+        $periodInfo = $this->fncScheGetTimetableByPeriod($campusCd, $timetableKind, $periodNo);
         $startTime = $periodInfo->start_time;
         $endTime = $periodInfo->end_time;
 
         return [
             'start_time' => $startTime->format('H:i'),
-            'end_time' => $endTime->format('H:i')
+            'end_time' => $endTime->format('H:i'),
+            'timetable_kind' => $timetableKind
+        ];
+    }
+
+    /**
+     * 時限情報取得（日付ピッカー変更）
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array 時限情報
+     */
+    public function getDataSelect(Request $request)
+    {
+        // 日付のバリデーション
+        if ($request->input('target_date')) {
+            $this->validateDatesFromRequest($request, 'target_date');
+        }
+
+        // 校舎コード・日付を取得
+        $campusCd = $request->input('campus_cd');
+        $targetDate = $request->input('target_date');
+
+        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        $this->guardRoomAdminRoomcd($campusCd);
+
+        //---------------------------
+        // 時限リストを返却する
+        //---------------------------
+        // 時限リストを取得（校舎・日付から）
+        $periods = $this->mdlGetPeriodListByDate($campusCd, $targetDate);
+        // 日付から時間割区分を取得
+        $timetableKind = null;
+        if (count($periods) > 0) {
+            $timetableKind = $this->fncScheGetTimeTableKind($campusCd, $targetDate);
+        }
+
+        return [
+            'selectItems' => $this->objToArray($periods),
+            'timetable_kind' => $timetableKind
         ];
     }
 
@@ -300,8 +347,6 @@ class ExtraLessonMngController extends Controller
         // 校舎名を取得する
         $campusName = $this->mdlGetRoomName($campusCd);
 
-        // 時限リストを取得 時間割区分=通常
-        $periods = $this->mdlGetPeriodListByKind($campusCd, AppConst::CODE_MASTER_37_0);
         // コースリストを取得 コース種別=授業単に絞る
         $courses = $this->mdlGetCourseList(AppConst::CODE_MASTER_42_1);
         // 講師リストを取得 講師所属校舎に絞る
@@ -315,7 +360,6 @@ class ExtraLessonMngController extends Controller
             'rules' => $this->rulesForInput(null),
             'studentName' => $studentName,
             'campusName' => $campusName,
-            'periods' => $periods,
             'courses' => $courses,
             'tutors' => $tutors,
             'subjects' => $subjects,
@@ -337,21 +381,59 @@ class ExtraLessonMngController extends Controller
     {
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
-
-        // 登録データの関連バリデーション + 登録データを$scheduleDataにセット
-        try {
-            $scheduleData = $this->validateScheduleRelated($request);
-        } catch (ReadDataValidateException  $e) {
-            // 通常は事前にバリデーションするため、ここはありえないのでエラーとする
-            return $this->responseErr();
-        }
+        // 登録前バリデーション（関連チェック）。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForInputRelated($request))->validate();
 
         // トランザクション(例外時は自動的にロールバック)
-        DB::transaction(function () use ($scheduleData) {
+        DB::transaction(function () use ($request) {
+
+            // スケジュール情報をセット
+            $scheduleData = $request->only(
+                'campus_cd',
+                'target_date',
+                'period_no',
+                'start_time',
+                'end_time',
+                'course_cd',
+                'student_id',
+                'tutor_id',
+                'subject_cd',
+                'how_to_kind',
+                'memo',
+            );
+            // 内部で設定する固定値
+            $scheduleData['course_kind'] = AppConst::CODE_MASTER_42_1;
+            $scheduleData['lesson_kind'] = AppConst::CODE_MASTER_31_3;
+            $scheduleData['tentative_status'] = AppConst::CODE_MASTER_36_0;
+
+            //------------------------
+            // 空きブース検索
+            //------------------------
+            // ブースマスタから対象校舎のブースを取得
+            $boothFirst = null;
+            $arrMstBooths = $this->fncScheGetBoothFromMst($scheduleData['campus_cd'], $scheduleData['how_to_kind']);
+            if ($arrMstBooths) {
+                $boothFirst = $arrMstBooths[0];
+            }
+            // 空きブース取得
+            $booth = $this->fncScheSearchBooth(
+                $scheduleData['campus_cd'],
+                $boothFirst,
+                $scheduleData['target_date'],
+                $scheduleData['period_no'],
+                $scheduleData['how_to_kind'],
+                null,
+                false
+            );
+            if (!$booth) {
+                // 空きなし時は不正な値としてエラーレスポンスを返却（事前にバリデーションを行っているため）
+                $this->illegalResponseErr();
+            }
+
             //------------------------
             // スケジュール登録
             //------------------------
-            $this->fncScheCreateSchedule($scheduleData, $scheduleData['target_date'], $scheduleData['booth_cd'], AppConst::CODE_MASTER_32_1);
+            $this->fncScheCreateSchedule($scheduleData, $scheduleData['target_date'], $booth, AppConst::CODE_MASTER_32_1);
 
             //-------------------------
             // お知らせメッセージの登録（生徒）
@@ -582,7 +664,7 @@ class ExtraLessonMngController extends Controller
      */
     public function validationForInput(Request $request)
     {
-        // リクエストデータチェック
+        // リクエストデータチェック（項目チェック）
         $validator = Validator::make($request->all(), $this->rulesForInput($request));
         if (count($validator->errors()) != 0) {
             // 項目チェックエラーがある場合はここでエラー情報を返す
@@ -592,12 +674,9 @@ class ExtraLessonMngController extends Controller
         // スケジュール登録データの関連バリデーション
         // MEMO:依頼編集画面はこのバリデーションは飛ばすよう、$requestにstatusが有るか無いか判定する
         if (!isset($request['status'])) {
-            try {
-                $datas = $this->validateScheduleRelated($request);
-            } catch (ReadDataValidateException $e) {
-                // 入力項目とは別のバリデーションエラーとして返却
-                return ['validate_schedule' => [$e->getMessage()]];
-            }
+            $validatorRerated = Validator::make($request->all(), $this->rulesForInputRelated($request));
+            // 項目チェックエラー無し時は関連チェックを行い、結果を返す
+            return $validatorRerated->errors();
         }
     }
 
@@ -658,33 +737,13 @@ class ExtraLessonMngController extends Controller
             }
         };
 
-        // 独自バリデーション: 時限と開始時刻の相関チェック
-        $validationPeriodStartTime =  function ($attribute, $value, $fail) use ($request) {
-            if (
-                !$request->filled('campus_cd') || !$request->filled('target_date')
-                || !$request->filled('period_no') || !$request->filled('start_time')
-            ) {
-                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
-                return;
-            }
-
-            // 対象日の時間割区分を取得
-            $timetableKind = $this->fncScheGetTimeTableKind($request['campus_cd'], $request['target_date']);
-            // 時限と開始時刻の相関チェック
-            $chk = $this->fncScheChkStartTime($request['campus_cd'], $timetableKind, $request['period_no'], $request['start_time']);
-            if (!$chk) {
-                // 開始時刻範囲エラー
-                return $fail(Lang::get('validation.out_of_range_period'));
-            }
-        };
-
         $rules = array();
 
         // 追加授業スケジュール登録画面のバリデーション
         if ($request && !isset($request['status'])) {
             $rules += Schedule::fieldRules('target_date', ['required']);
             $rules += Schedule::fieldRules('period_no', ['required', $validationPeriodList]);
-            $rules += Schedule::fieldRules('start_time', ['required', $validationPeriodStartTime]);
+            $rules += Schedule::fieldRules('start_time', ['required']);
             $rules += Schedule::fieldRules('end_time', ['required']);
             $rules += Schedule::fieldRules('course_cd', ['required', $validationCourseList]);
             $rules += Schedule::fieldRules('tutor_id', ['required', $validationTutorList]);
@@ -703,87 +762,63 @@ class ExtraLessonMngController extends Controller
     }
 
     /**
-     * スケジュール登録データの関連バリデーション
-     * 登録データの設定も行う
-     * バリデーションエラー時はException発生し、処理を継続しない
+     * バリデーションルールを取得(登録用・関連チェック)
      *
      * @param \Illuminate\Http\Request $request リクエスト
-     * @return array 登録データ（スケジュール情報）
+     * @return array ルール
      */
-    private function validateScheduleRelated(?Request $request)
+    private function rulesForInputRelated(?Request $request)
     {
-        $targetDate = $request->input('target_date');
-        $periodNo = $request->input('period_no');
-        $startTime = $request->input('start_time');
-        $endTime = $request->input('end_time');
-        $courseCd = $request->input('course_cd');
-        $tutorId = $request->input('tutor_id');
-        $subjectCd = $request->input('subject_cd');
-        $howToKind = $request->input('how_to_kind');
-        $memo = $request->input('memo');
-        $studentId = $request->input('student_id');
-        $campusCd = $request->input('campus_cd');
+        $rules = array();
 
-        //---------------------------
-        // 講師・生徒のスケジュール重複チェック
-        //---------------------------
-        // 講師スケジュール重複チェック
-        $chk = $this->fncScheChkDuplidateTid($targetDate, $startTime, $endTime, $tutorId, null, false);
-        if (!$chk) {
-            // 講師スケジュール重複
-            throw new ReadDataValidateException(Lang::get('validation.duplicate_tutor')
-                . "(" . $targetDate .  " " . $periodNo . "限" . ")");
+        // 独自バリデーション: 生徒スケジュール重複チェック
+        $validationDupStudent =  function ($attribute, $value, $fail) use ($request) {
+            return $this->fncScheValidateStudent($request, AppConst::SCHEDULE_KIND_NEW, $attribute, $value, $fail);
+        };
+
+        // 独自バリデーション: 講師スケジュール重複チェック
+        $validationDupTutor =  function ($attribute, $value, $fail) use ($request) {
+            return $this->fncScheValidateTutor($request, AppConst::SCHEDULE_KIND_NEW, $attribute, $value, $fail);
+        };
+
+        // 独自バリデーション: 時限と開始時刻の相関チェック
+        $validationPeriodStartTime =  function ($attribute, $value, $fail) use ($request) {
+            return $this->fncScheValidatePeriodStartTime($request, $attribute, $value, $fail);
+        };
+
+        // 独自バリデーション: 空きブースチェック
+        $validationDupBooth =  function ($attribute, $value, $fail) use ($request) {
+
+            if (
+                !$request->filled('campus_cd')|| !$request->filled('target_date')
+                || !$request->filled('period_no') || !$request->filled('how_to_kind')
+            ) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return true;
+            }
+
+            // ブースマスタから対象校舎のブースを取得
+            $boothFirst = null;
+            $arrMstBooths = $this->fncScheGetBoothFromMst($request['campus_cd'], $request['how_to_kind']);
+            if ($arrMstBooths) {
+                $boothFirst = $arrMstBooths[0];
+            }
+            // ブース重複チェック（空きブース検索あり）
+            $booth = $this->fncScheSearchBooth(
+                $request['campus_cd'],$boothFirst,$request['target_date'],$request['period_no'],$request['how_to_kind'],null,false);
+            if (!$booth) {
+                // ブース空きなしエラー
+                return false;
+            }
+            return true;
+        };
+
+        $rules += ['student_id' => [$validationDupStudent]];
+        $rules += ['tutor_id' => [$validationDupTutor]];
+        $rules += ['start_time' => [$validationPeriodStartTime]];
+        // 空きブースチェック
+        Validator::extendImplicit('duplicate_booth', $validationDupBooth);
+        $rules += ['booth_cd' => ['duplicate_booth']];
+        return $rules;
         }
-
-        // 生徒スケジュール重複チェック
-        $chk = $this->fncScheChkDuplidateSid($targetDate, $startTime, $endTime, $studentId, null, false);
-        if (!$chk) {
-            // 生徒スケジュール重複
-            throw new ReadDataValidateException(Lang::get('validation.duplicate_student')
-                . "(" . $targetDate .  " " . $periodNo . "限" . ")");
-        }
-
-        //---------------------------
-        // 空きブース検索
-        //---------------------------
-        // ブースマスタから対象校舎のブースを取得
-        $arrMstBooths = $this->fncScheGetBoothFromMst($campusCd, $howToKind);
-
-        // スケジュール情報より、使用ブースを取得
-        $arrUsedBooths = $this->fncScheGetUseBoothFromSchedule($campusCd, $targetDate, $periodNo);
-
-        // マスタのブース - 使用ブース で差分を取得（空きブース）
-        $arrFreeBooths = array_diff($arrMstBooths, $arrUsedBooths);
-        if (count($arrFreeBooths) > 0) {
-            // 空きブースありの場合
-            // ソート順先頭のブースを返す
-            $arrFreeBooths = array_values($arrFreeBooths);
-            $booth = $arrFreeBooths[0];
-        } else {
-            // 空きブース無し
-            throw new ReadDataValidateException(Lang::get('validation.duplicate_booth')
-                . "(" . $targetDate .  " " . $periodNo . "限" . ")");
-        }
-
-        // スケジュール情報をセットして返す
-        $scheduleData = [
-            'campus_cd' => $campusCd,
-            'target_date' => $targetDate,
-            'period_no' => $periodNo,
-            'start_time' => $startTime,
-            'end_time' => $endTime,
-            'booth_cd' => $booth,
-            'subject_cd' => $subjectCd,
-            'course_kind' => AppConst::CODE_MASTER_42_1,
-            'course_cd' => $courseCd,
-            'tutor_id' => $tutorId,
-            'student_id' => $studentId,
-            'lesson_kind' => AppConst::CODE_MASTER_31_3,
-            'how_to_kind' => $howToKind,
-            'tentative_status' => AppConst::CODE_MASTER_36_0,
-            'memo' => $memo,
-        ];
-
-        return $scheduleData;
-    }
 }

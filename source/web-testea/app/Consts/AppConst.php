@@ -2016,4 +2016,14 @@ class AppConst
 
     // 集団指導
     const COURSE_CD_20100 = 20100;
+    
+    //==========================
+    // 教室カレンダー・レギュラースケジュール
+    //==========================
+    /**
+     * スケジュール追加更新種別
+     */
+    const SCHEDULE_KIND_NEW = 1;
+    const SCHEDULE_KIND_UPD = 2;
+    const SCHEDULE_KIND_CPY = 3;
 }
