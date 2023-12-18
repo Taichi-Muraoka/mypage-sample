@@ -402,7 +402,7 @@ class InvoiceImportController extends Controller
                 '姓' => 'string|max:50',
                 '名' => 'string|max:50',
                 '支払方法' => 'integer|required',
-                '校舎コード' => 'string|max:2|required',
+                '校舎コード' => 'string|max:2|digits:2|required',
                 '請求額' => 'integer|max:99999999|required',
             ];
 
