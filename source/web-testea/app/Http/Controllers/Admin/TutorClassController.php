@@ -103,7 +103,10 @@ class TutorClassController extends Controller
         $form = $request->all();
 
         // クエリを作成
-        $query = Schedule::query();
+        $query = Schedule::query()
+            ->where('tentative_status', AppConst::CODE_MASTER_36_0)
+            ->whereNotNull('tutor_id')
+            ->whereIn('absent_status', [AppConst::CODE_MASTER_35_0]);
 
         // 校舎コード選択による絞り込み条件
         if (isset($form['campus_cd']) && filled($form['campus_cd'])) {
@@ -117,21 +120,12 @@ class TutorClassController extends Controller
 
         // スケジュール情報取得し、授業時間カウントのサブクエリを作成
         $course_sub_query = DB::table($query)
-            ->where('tentative_status', AppConst::CODE_MASTER_36_0)
-            ->whereNotNull('tutor_id')
-            ->whereIn('absent_status', [AppConst::CODE_MASTER_35_0])
             ->select(
                 'tutor_id',
                 'course_cd',
             )
             ->selectRaw('SUM(minites) as sum_minites')
             ->groupBy('tutor_id', 'course_cd');
-
-        // スケジュール情報取得し、代講カウントのサブクエリを作成
-        $sub_query = DB::table($query)
-            ->where('tentative_status', AppConst::CODE_MASTER_36_0)
-            ->whereNotNull('tutor_id')
-            ->whereIn('absent_status', [AppConst::CODE_MASTER_35_0]);
 
         // コース別時間集計
         $course_count = DB::table($course_sub_query)
@@ -153,7 +147,7 @@ class TutorClassController extends Controller
             ->groupBy('tutor_id');
 
         // 代講（受）集計
-        $substitute_get_count = DB::table($sub_query)
+        $substitute_get_count = DB::table($query)
             ->whereIn('substitute_kind', [AppConst::CODE_MASTER_34_1, AppConst::CODE_MASTER_34_2])
             ->select(
                 'tutor_id'
@@ -173,7 +167,7 @@ class TutorClassController extends Controller
             ->groupBy('tutor_id');
 
         // 代講（出）集計
-        $substitute_out_count = DB::table($sub_query)
+        $substitute_out_count = DB::table($query)
             ->whereIn('substitute_kind', [AppConst::CODE_MASTER_34_1, AppConst::CODE_MASTER_34_2])
             ->select(
                 'absent_tutor_id as tutor_id',
@@ -193,7 +187,7 @@ class TutorClassController extends Controller
             ->groupBy('tutor_id');
 
         // 体験授業集計
-        $trial_class_count = DB::table($sub_query)
+        $trial_class_count = DB::table($query)
             ->whereIn('lesson_kind', [AppConst::CODE_MASTER_31_5])
             ->select(
                 'tutor_id',
@@ -221,7 +215,26 @@ class TutorClassController extends Controller
         // unionで結合したデータをまとめる
         $schedule_count = DB::table($uniondata, 'uniondata')
             ->select(
-                'uniondata.tutor_id',
+                'uniondata.tutor_id'
+            )
+            ->selectRaw('SUM(personal_min) AS personal_min')
+            ->selectRaw('SUM(two_min) AS two_min')
+            ->selectRaw('SUM(three_min) AS three_min')
+            ->selectRaw('SUM(home_min) AS home_min')
+            ->selectRaw('SUM(exercise_min) AS exercise_min')
+            ->selectRaw('SUM(high_min) AS high_min')
+            ->selectRaw('SUM(group_min) AS group_min')
+            ->selectRaw('SUM(normal_sub_get) as normal_sub_get')
+            ->selectRaw('SUM(emergency_sub_get) as emergency_sub_get')
+            ->selectRaw('SUM(normal_sub_out) as normal_sub_out')
+            ->selectRaw('SUM(emergency_sub_out) as emergency_sub_out')
+            ->selectRaw('SUM(trial_class) as trial_class')
+            ->groupBy('uniondata.tutor_id');
+
+        // 講師名をJoinしたデータ
+        $schedule_count_join_tutor = DB::table($schedule_count, 'schedule_count')
+            ->select(
+                'schedule_count.tutor_id',
                 'tutors.name as tutor_name'
             )
             ->selectRaw('SUM(personal_min) AS personal_min')
@@ -237,10 +250,11 @@ class TutorClassController extends Controller
             ->selectRaw('SUM(emergency_sub_out) as emergency_sub_out')
             ->selectRaw('SUM(trial_class) as trial_class')
             // 講師名の取得
-            ->leftJoin('tutors', 'uniondata.tutor_id', '=', 'tutors.tutor_id')
-            ->groupBy('uniondata.tutor_id');
+            ->leftJoin('tutors', 'schedule_count.tutor_id', '=', 'tutors.tutor_id')
+            ->groupBy('schedule_count.tutor_id', 'tutor_name');
 
-        return $this->getListAndPaginator($request, $schedule_count, function ($items) use ($form) {
+
+        return $this->getListAndPaginator($request, $schedule_count_join_tutor, function ($items) use ($form) {
             // データ加工
             foreach ($items as $item) {
                 // 検索条件を付与(モーダル表示に使用)
@@ -285,10 +299,6 @@ class TutorClassController extends Controller
 
         // 独自バリデーション: リストのチェック 校舎
         $validationCampusList =  function ($attribute, $value, $fail) {
-
-            // 初期表示の時はエラーを発生させないようにする
-            if ($value == -1) return;
-
             // 校舎リストを取得
             $rooms = $this->mdlGetRoomList(false);
             if (!isset($rooms[$value])) {
@@ -306,7 +316,7 @@ class TutorClassController extends Controller
 
             if ($from_date_plus_half_year < $to_date) {
                 // 不正な値エラー
-                return $fail(Lang::get('target_date_term'));
+                return $fail(Lang::get('validation.target_date_term'));
             }
         };
 
@@ -319,8 +329,8 @@ class TutorClassController extends Controller
         }
 
         $rules += Schedule::fieldRules('campus_cd', [$validationCampusList]);
-        $rules += ['target_date_from' => array_merge(['required_with:target_date_to'], $ruleTargetDate, [$validationDateFromTo])];
-        $rules += ['target_date_to' => array_merge(['required_with:target_date_from'], $validateFromTo, $ruleTargetDate)];
+        $rules += ['target_date_from' => array_merge(['required'], $ruleTargetDate, [$validationDateFromTo])];
+        $rules += ['target_date_to' => array_merge(['required'], $validateFromTo, $ruleTargetDate)];
 
         return $rules;
     }
