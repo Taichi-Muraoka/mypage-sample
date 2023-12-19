@@ -419,13 +419,42 @@ class InvoiceImportController extends Controller
             // バリデーションルールチェック
             $validator = Validator::make($values, $rules);
             if ($validator->fails()) {
-                throw new ReadDataValidateException(Lang::get('validation.invalid_file') . "(データ項目不正)");
+                $errCol = "";
+                if ($validator->errors()->has('生徒ID')) {
+                    $errCol = "生徒ID=" . $values['生徒ID'];
+                } else if ($validator->errors()->has('姓')) {
+                    $errCol = "姓=" . $values['姓'];
+                } else if ($validator->errors()->has('名')) {
+                    $errCol =  "名=" . $values['名'];
+                } else if ($validator->errors()->has('支払方法')) {
+                    $errCol =  "支払方法=" . $values['支払方法'];
+                } else if ($validator->errors()->has('校舎コード')) {
+                    $errCol =  "校舎コード=" . $values['校舎コード'];
+                } else if ($validator->errors()->has('請求額')) {
+                    $errCol =  "請求額=" . $values['請求額'];
+                }
+                for ($i = 0; $i < 20; $i++) {
+                    if ($validator->errors()->has('摘要' . $i)) {
+                        $errCol =  "摘要=" . $values['摘要' . $i];
+                    } else if ($validator->errors()->has('コマ単価' . $i)) {
+                        $errCol =  "コマ単価=" . $values['コマ単価' . $i];
+                    } else if ($validator->errors()->has('コマ数' . $i)) {
+                        $errCol =  "コマ数=" . $values['コマ数' . $i];
+                    } else if ($validator->errors()->has('小計' . $i)) {
+                        $errCol =  "小計=" . $values['小計' . $i];
+                    }
+                }
+                throw new ReadDataValidateException(Lang::get('validation.invalid_file')
+                    . "：データ項目不正( 生徒ID=" . $values['生徒ID'] . ", "
+                    . "エラー項目：" . $errCol . " )");
             }
 
             // 支払方法のコードが存在しなかったらエラー
             $payTypeKey = $values['支払方法'];
             if (!isset($payType[$payTypeKey])) {
-                throw new ReadDataValidateException(Lang::get('validation.invalid_file') . "(支払方法不正)");
+                throw new ReadDataValidateException(Lang::get('validation.invalid_file')
+                    . "：支払方法不正( 生徒ID=" . $values['生徒ID'] . ", "
+                    . "支払方法=" . $values['支払方法'] . " )");
             }
 
             // 1生徒につき1請求書のチェック
@@ -437,7 +466,8 @@ class InvoiceImportController extends Controller
             $max = max($value_count);
             // 最大出現回数が1でない場合（既に存在する場合）はエラー
             if ($max != 1) {
-                throw new ReadDataValidateException(Lang::get('validation.invalid_file') . "(生徒重複)");
+                throw new ReadDataValidateException(Lang::get('validation.invalid_file')
+                    . "：生徒重複( 生徒ID=" . $values['生徒ID'] . " )");
             }
 
             // $datas配列に1行分のデータを格納する
