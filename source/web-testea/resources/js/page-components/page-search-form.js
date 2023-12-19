@@ -58,12 +58,6 @@ export default class PageSearchForm extends PageComponentBase {
             option["initSearch"] = true;
         }
 
-        // 検索フォームにDatePickerを使う場合、ここで初期化が必要
-        // ※DatePickerありの入力フォームから呼び出される検索モーダルでDatePickerを使う場合は、要検討
-        if (option["useSearchDatePicker"] == undefined) {
-            option["useSearchDatePicker"] = false;
-        }
-
         //--------------------
         // Vueの定義
         //--------------------
@@ -99,13 +93,7 @@ export default class PageSearchForm extends PageComponentBase {
                 this.option = option;
 
                 // ライブラリの初期化
-                // self.initLibs(this, option);
-                // 検索モーダル・フォームでも使用するSelect2,DatePickerを、この画面内で初期化する
-                self.initSelect2(this, option);
-                // 検索フォームでDatePickerを使用する場合は、option指定が必要
-                if (option["useSearchDatePicker"]) {
-                    self.initDatePicker(this, option);
-                }
+                self.initLibs(this, option);
 
                 // afterSearch用
                 const _self = this;
@@ -132,7 +120,7 @@ export default class PageSearchForm extends PageComponentBase {
             },
             updated() {
                 // Vue更新後、ライブラリの初期化
-                self.updatedLibs();
+                self.updatedLibs(this);
             },
             methods: Object.assign(
                 {

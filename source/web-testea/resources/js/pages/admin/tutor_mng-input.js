@@ -31,8 +31,6 @@ export default class AppClass extends PageBase {
         const vueForm = this.getVueInputForm({
             afterEdit: afterEdit,
             afterNew: afterNew,
-            // 選択モーダルを使用する場合
-            useModalSelect: true,
         });
 
         // 選択後イベント

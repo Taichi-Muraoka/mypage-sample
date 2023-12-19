@@ -28,8 +28,6 @@ export default class AppClass extends PageBase {
             afterEdit: afterEdit,
             // 別画面でも更新・削除を使用するのでURLを変更
             urlSuffix: "plan",
-            // 選択モーダルを使用する場合
-            useModalSelect: true,
         });
 
         // 確定後イベント
