@@ -195,7 +195,7 @@ class TutorClassController extends Controller
             ->selectRaw('SUM(CASE WHEN substitute_kind = ? THEN 1 ELSE 0 END) as normal_sub_out', [AppConst::CODE_MASTER_34_1])
             ->selectRaw('SUM(CASE WHEN substitute_kind = ? THEN 1 ELSE 0 END) as emergency_sub_out', [AppConst::CODE_MASTER_34_2])
             ->selectRaw('0 as trial_class')
-            ->groupBy('tutor_id');
+            ->groupBy('absent_tutor_id');
 
         // 体験授業集計
         $trial_class_count = DB::table($query)
@@ -246,24 +246,22 @@ class TutorClassController extends Controller
         $schedule_count_join_tutor = DB::table($schedule_count, 'schedule_count')
             ->select(
                 'schedule_count.tutor_id',
-                'tutors.name as tutor_name'
+                'tutors.name as tutor_name',
+                'personal_min',
+                'two_min',
+                'three_min',
+                'home_min',
+                'exercise_min',
+                'high_min',
+                'group_min',
+                'normal_sub_get',
+                'emergency_sub_get',
+                'normal_sub_out',
+                'emergency_sub_out',
+                'trial_class'
             )
-            ->selectRaw('SUM(personal_min) AS personal_min')
-            ->selectRaw('SUM(two_min) AS two_min')
-            ->selectRaw('SUM(three_min) AS three_min')
-            ->selectRaw('SUM(home_min) AS home_min')
-            ->selectRaw('SUM(exercise_min) AS exercise_min')
-            ->selectRaw('SUM(high_min) AS high_min')
-            ->selectRaw('SUM(group_min) AS group_min')
-            ->selectRaw('SUM(normal_sub_get) as normal_sub_get')
-            ->selectRaw('SUM(emergency_sub_get) as emergency_sub_get')
-            ->selectRaw('SUM(normal_sub_out) as normal_sub_out')
-            ->selectRaw('SUM(emergency_sub_out) as emergency_sub_out')
-            ->selectRaw('SUM(trial_class) as trial_class')
             // 講師名の取得
-            ->leftJoin('tutors', 'schedule_count.tutor_id', '=', 'tutors.tutor_id')
-            ->groupBy('schedule_count.tutor_id', 'tutor_name');
-
+            ->leftJoin('tutors', 'schedule_count.tutor_id', '=', 'tutors.tutor_id');
 
         return $this->getListAndPaginator($request, $schedule_count_join_tutor, function ($items) use ($form) {
             // データ加工
