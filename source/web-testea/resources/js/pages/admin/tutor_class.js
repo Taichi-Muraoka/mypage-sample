@@ -22,9 +22,6 @@ export default class AppClass extends PageBase {
         this.getVueSearchForm(
             {
                 initSearch: false,
-                
-                // 検索フォーム内にDatePickerを使用する場合
-                useSearchDatePicker: true,
             }
         );
     }

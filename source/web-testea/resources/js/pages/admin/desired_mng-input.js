@@ -33,8 +33,6 @@ export default class AppClass extends PageBase {
             afterNew: afterNew,
             // 別画面でも更新・削除を使用するのでURLを変更
             urlSuffix: "desired_mng",
-            // 選択モーダルを使用する場合
-            useModalSelect: true,
         });
 
         // 選択後イベント
