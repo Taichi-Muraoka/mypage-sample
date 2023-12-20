@@ -115,10 +115,13 @@
 </x-bs.card>
 
 <x-bs.card>
+    {{-- 新規登録は本部のみ可能 --}}
+    @can('allAdmin')
     <x-slot name="tools">
         <x-button.new href="{{ route('tutor_mng-campus-new', $tutor->tutor_id) }}" caption="新規登録" icon="" :small=true
             disabled={{$disabledNewBtn}} />
     </x-slot>
+    @endcan
 
     <x-slot name="card_title">
         所属情報

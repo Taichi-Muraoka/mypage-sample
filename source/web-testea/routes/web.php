@@ -830,6 +830,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 時限プルダウンを選択された際に時間割の情報を返却する
     Route::post('/extra_lesson_mng/get_data_select_timetable', [ExtraLessonMngController::class, 'getDataSelectTimetable'])->name('extra_lesson_mng-get_data_select_timetable');
 
+    // 日付を変更された際に時限プルダウンを返却する
+    Route::post('/extra_lesson_mng/get_data_select', [ExtraLessonMngController::class, 'getDataSelect'])->name('extra_lesson_mng-get_data_select');
+
     // 新規登録
     Route::get('/extra_lesson_mng/new/{sid}/{campusCd}', [ExtraLessonMngController::class, 'new'])->name('extra_lesson_mng-new');
 
@@ -920,10 +923,10 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::get('/member_mng/leave/edit/{sid}', [MemberMngController::class, 'leaveEdit'])->name('member_mng-leave-edit');
 
     // 編集処理
-    Route::post('/member_mng/leave/update', [MemberMngController::class, 'leaveUpdate'])->name('member_mng-leave-update');
+    Route::post('/member_mng/update_leave', [MemberMngController::class, 'leaveUpdate'])->name('member_mng-leave-update');
 
     // バリデーション(登録用)
-    Route::post('/member_mng/leave/vd_input', [MemberMngController::class, 'validationForInputLeave'])->name('member_mng-leave-vd_input');
+    Route::post('/member_mng/vd_input_leave', [MemberMngController::class, 'validationForInputLeave'])->name('member_mng-leave-vd_input');
 
     //---------------------
     // 連絡記録

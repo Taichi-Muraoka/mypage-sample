@@ -5,7 +5,7 @@
 {{-- 子ページ --}}
 @section('child_page', true)
 
-@section('parent_page', route('member_mng-detail', 1))
+@section('parent_page', route('member_mng-detail', $editData['student_id']))
 
 @section('parent_page_title', '生徒カルテ')
 
@@ -18,11 +18,11 @@
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="15%">生徒ID</th>
-            <td>1</td>
+            <td>{{$editData['student_id']}}</td>
         </tr>
         <tr>
-            <th width="15%">生徒名</th>
-            <td>CWテスト生徒１</td>
+            <th>生徒名</th>
+            <td>{{$editData['student_name']}}</td>
         </tr>
     </x-bs.table>
 
@@ -31,7 +31,7 @@
 
     <x-input.date-picker caption="退会日" id="leave_date" :editData=$editData />
 
-    <x-input.textarea caption="退会理由・やり取りの記録等" id="karte_text" :editData=$editData />
+    <x-input.textarea caption="退会理由・やり取りの記録等" id="memo" :editData=$editData />
 
     <x-input.date-picker caption="対応日" id="received_date" :editData=$editData />
 
@@ -42,20 +42,17 @@
     </x-bs.callout>
 
     {{-- hidden --}}
-    <x-input.hidden id="sid" :editData=$editData />
+    <x-input.hidden id="student_id" :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
             {{-- 生徒カルテに戻る --}}
-            <x-button.back url="{{route('member_mng-detail', 1)}}" />
+            <x-button.back url="{{route('member_mng-detail', $editData['student_id'])}}" />
 
             <div class="d-flex justify-content-end">
-                {{-- 削除機能なし --}}
-                {{-- <x-button.submit-delete /> --}}
                 <x-button.submit-edit caption="登録" />
             </div>
-
         </div>
     </x-slot>
 

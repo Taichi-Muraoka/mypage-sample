@@ -185,7 +185,7 @@ export default class PageComponentBase {
         bsCustomFileInput.init();
 
         // 取り消しボタンの挙動
-        $(".inputFileReset").on("click", function (element) {
+        $($vue.appId + " .inputFileReset").on("click", function (element) {
             bsCustomFileInput.destroy();
 
             // 同じform-group内のfileを取得
@@ -214,10 +214,10 @@ export default class PageComponentBase {
         // select2
         //---------------------
 
-        $(".select2").select2({});
+        $($vue.appId + " .select2").select2({});
 
         // 複数選択プルダウンの値の変更がうまく反映されないためこちらで対応
-        $(".select2").each(function (index, element) {
+        $($vue.appId + " .select2").each(function (index, element) {
             if ($(element).attr("multiple")) {
                 $(element).change(function (e) {
                     // 変更後のvalを$vue.formにセットする
@@ -248,7 +248,7 @@ export default class PageComponentBase {
         };
 
         // date
-        $(".date-picker").each(function (index, element) {
+        $($vue.appId + " .date-picker").each(function (index, element) {
             // _xxx がカレンダーinputなので先頭1文字削除し、本当のIDを取得
             var id = element.id.substr(1);
 
@@ -343,12 +343,12 @@ export default class PageComponentBase {
      * Vueの更新(updated)の際に呼ぶ
      * select2もそうだが、Vueの更新が終わった後に初期化が必要な処理
      */
-    updatedLibs() {
+    updatedLibs($vue) {
         // お知らせ管理で動的にプルダウン(select2)を変更しているが、
         // プルダウンを選択したり、再描画すると、うまく表示できないケースがある。
         // Vue上は正しく反映しているが、select2の描画がうまく行かないようだ。
         // Vueのupdatedイベントで呼んでもらう
-        $(".select2").select2();
+        $($vue.appId + " .select2").select2();
     }
 
     /**
