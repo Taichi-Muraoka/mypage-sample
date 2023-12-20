@@ -19,6 +19,10 @@ export default class AppClass extends PageBase {
         this.getVueModal();
 
         // Vue: 検索フォーム
-        this.getVueSearchForm();
+        this.getVueSearchForm(
+            {
+                initSearch: false,
+            }
+        );
     }
 }
