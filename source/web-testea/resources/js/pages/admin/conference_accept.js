@@ -22,8 +22,6 @@ export default class AppClass extends PageBase {
 
         // Vue: 検索フォーム
         this.getVueSearchForm({
-            // 検索フォーム内にDatePickerを使用する場合
-            useSearchDatePicker: true,
             // 画面読み込み時
             vueMounted: function ($vue, option) {
                 // 初期表示時に、生徒プルダウンを初期化する。

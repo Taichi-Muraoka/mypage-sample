@@ -68,14 +68,6 @@ export default class PageInputForm extends PageComponentBase {
             option["progressShow"] = false;
         }
 
-        // ライブラリを初期化するかどうか
-        // 選択モーダル対応時に、フォームとモーダルの両方を呼ぶため
-        // 制御できるようにした。(select2対応)
-        // →最後に一回だけ呼べるようにしたいが、とりあえずフラグで制御
-        if (option["useModalSelect"] == undefined) {
-            option["useModalSelect"] = false;
-        }
-
         // ターゲットのID
         if (option["id"] == undefined) {
             option["id"] = "#app-form";
@@ -131,14 +123,7 @@ export default class PageInputForm extends PageComponentBase {
                 this.option = option;
 
                 // ライブラリの初期化
-                if (!option["useModalSelect"]) {
-                    self.initLibs(this, option);
-                }else{
-                    // 検索モーダル・フォームで使用するSelect2は、検索モーダル・フォームで初期化
-                    // ※DatePickerありの入力フォームから呼び出される検索モーダルでDatePickerを使う場合は、要検討
-                    self.initFileInput(this, option);
-                    self.initDatePicker(this, option);
-                }
+                self.initLibs(this, option);
 
                 // 確認モーダルの表示用
                 if (!ValueCom.isEmpty(option["confirmModal"])) {
@@ -185,9 +170,7 @@ export default class PageInputForm extends PageComponentBase {
                 }
 
                 // Vue更新後、ライブラリの初期化
-                if (!option["useModalSelect"]) {
-                    self.updatedLibs();
-                }
+                self.updatedLibs(this);
             },
             // オプションでメソッドを追加する
             methods: Object.assign(
