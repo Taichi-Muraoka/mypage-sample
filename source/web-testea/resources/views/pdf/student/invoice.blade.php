@@ -1,3 +1,5 @@
+@inject('formatter','App\Libs\CommonDateFormat')
+
 <style type="text/css">
     table.border {
         border: 1px solid #030303;
@@ -24,15 +26,16 @@
 <br>
 <br>
 <br>
-<p style="text-align:center;font-size:14pt;text-decoration: underline;">{{$invoice->invoice_date->format('Y年n月')}}分 お月謝のお知らせ</p>
+<p style="text-align:center;font-size:14pt;text-decoration: underline;">{{$invoice->invoice_date->format('Y年n月')}}分
+    お月謝のお知らせ</p>
 
 <table>
     <tr>
-        <td class="text-right">{{$invoice->issue_date->format('Y年n月j日')}} 発行</td>
+        <td class="text-right">{{$invoice_import->issue_date->format('Y年n月j日')}} 発行</td>
     </tr>
 </table>
 
-<p style="font-size:12pt;">{{$invoice->sname}} 様 保護者様</p>
+<p style="font-size:12pt;">{{$invoice->student_name}} 様 保護者様</p>
 <br>
 
 いつもお世話になっております、個別指導塾TESTEAです。<br>
@@ -40,8 +43,8 @@
 <br>
 
 【{{$invoice->invoice_date->format('Y年n月')}}分お月謝期間】<br>
-7月10日（月）～8月5日（土）実施分となります。<br>
-※7月21日（金）より夏期特別期間となります。<br>
+{{$invoice_import->term_text1}}<br>
+{{$invoice_import->term_text2}}<br>
 <br>
 
 【明細】<br>
@@ -55,19 +58,27 @@
     @if(count($invoice_detail) > 0)
     {{-- テーブル行 --}}
     @for ($i = 0; $i < count($invoice_detail); $i++) <tr>
-        <td>{{$invoice_detail[$i]->cost_name}}</td>
-        <td class="text-right">{{number_format($invoice_detail[$i]->unit_cost)}}円</td>
-        <td class="text-right">{{number_format($invoice_detail[$i]->times)}}</td>
-        <td class="text-right">{{number_format($invoice_detail[$i]->cost)}}円</td>
+        <td>{{$invoice_detail[$i]->description}}</td>
+        <td class="text-right">
+            @if($invoice_detail[$i]->unit_price != null)
+            {{number_format($invoice_detail[$i]->unit_price)}}円
+            @endif
+        </td>
+        <td class="text-right">
+            @if($invoice_detail[$i]->times != null)
+            {{number_format($invoice_detail[$i]->times)}}
+            @endif
+        </td>
+        <td class="text-right">{{number_format($invoice_detail[$i]->amount)}}円</td>
         </tr>
-    @endfor
-    <tr>
-        <td></td>
-        <td></td>
-        <td class="text-right" style="font-size:14pt;">合計</td>
-        <td class="text-right" style="font-size:14pt;">{{number_format($invoice->cost_sum)}}円</td>
-    </tr>
-    @endif
+        @endfor
+        <tr>
+            <td></td>
+            <td></td>
+            <td class="text-right" style="font-size:14pt;">合計</td>
+            <td class="text-right" style="font-size:14pt;">{{number_format($invoice->total_amount)}}円</td>
+        </tr>
+        @endif
 </table>
 
 <br>
@@ -77,24 +88,23 @@
 <table class="border">
     <tr>
         <th width="120px">お支払い方法</th>
-        <td width="420px">{{$invoice->pay_name}}</td>
+        <td width="420px">{{$invoice->pay_type_name}}</td>
     </tr>
-    @if ($invoice->billflg == 1)
     <tr>
-        <th>お引落日</th>
-        <td>{{$invoice->bill_date->format('Y年n月j日')}}</td>
+        @if ($invoice->billflg == 1)<th>お引落日</th>
+        @elseif($invoice->billflg == 2)<th>お振込期限</th>
+        @endif
+        <td>{{$formatter::formatYmdDayString($invoice_import->bill_date)}}</td>
     </tr>
-    @endif
     <tr>
         <th>備考</th>
-        <td>{{$invoice->note}}</td>
+        <td>{!! nl2br(e($invoice->note)) !!}</td>
     </tr>
 </table>
 <br>
 <br>
 <br>
-お月謝についてのお問い合わせは、校舎のメールアドレス（kugayama@testea.net）
+お月謝についてのお問い合わせは、校舎のメールアドレス（{{$invoice->email_campus}}）
 または、マイページの「問い合わせ」ページへお願いいたします。<br>
 <br>
 どうぞよろしくお願いいたします。<br>
-

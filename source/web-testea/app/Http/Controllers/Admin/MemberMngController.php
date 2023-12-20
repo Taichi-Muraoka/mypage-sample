@@ -492,7 +492,6 @@ class MemberMngController extends Controller
      */
     public function invoice($sid)
     {
-
         // IDのバリデーション
         $this->validateIds($sid);
 
@@ -519,7 +518,6 @@ class MemberMngController extends Controller
      */
     public function searchInvoice(Request $request)
     {
-
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'sid');
 
@@ -537,10 +535,8 @@ class MemberMngController extends Controller
             ->select(
                 'invoice_date'
             )
-            ->where('sid', $sid)
-            ->orderby('invoice_date', 'desc')
-            // 個別教室・家庭教師両方の場合もあるため、１つにまとめる
-            ->distinct();
+            ->where('student_id', $sid)
+            ->orderby('invoice_date', 'desc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $invoices, function ($items) use ($sid) {
@@ -568,19 +564,17 @@ class MemberMngController extends Controller
      */
     public function detailInvoice($sid, $date)
     {
-
         // IDのバリデーション
         $this->validateIds($sid, $date);
 
         // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
         $this->guardRoomAdminSid($sid);
 
-        // TODO: 個別・家庭教師両方の場合、重複する明細をどのように表示するか？顧客確認中
-
         // データの取得
         $dtlData = $this->getInvoiceDetail($date, $sid);
 
         return view('pages.admin.member_mng-invoice_detail', [
+            'invoice_import' => $dtlData['invoice_import'],
             'invoice' => $dtlData['invoice'],
             'invoice_detail' => $dtlData['invoice_detail'],
             // PDF用にIDを渡す
@@ -600,7 +594,6 @@ class MemberMngController extends Controller
      */
     public function pdf($sid, $date)
     {
-
         // IDのバリデーション
         $this->validateIds($sid, $date);
 
@@ -611,6 +604,7 @@ class MemberMngController extends Controller
         $dtlData = $this->getInvoiceDetail($date, $sid);
 
         $pdfData = [
+            'invoice_import' => $dtlData['invoice_import'],
             'invoice' => $dtlData['invoice'],
             'invoice_detail' => $dtlData['invoice_detail'],
         ];
