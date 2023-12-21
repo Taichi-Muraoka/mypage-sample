@@ -713,7 +713,10 @@ trait FuncMemberDetailTrait
                 $join->on('schedules.campus_cd', '=', 'campus_names.code');
             })
             // ブース名の取得
-            ->sdLeftJoin(MstBooth::class, 'schedules.booth_cd', '=', 'mst_booths.booth_cd')
+            ->sdLeftJoin(MstBooth::class, function ($join) {
+                $join->on('schedules.campus_cd', 'mst_booths.campus_cd');
+                $join->on('schedules.booth_cd', 'mst_booths.booth_cd');
+            })
             // コース名の取得
             ->sdLeftJoin(MstCourse::class, 'schedules.course_cd', '=', 'mst_courses.course_cd')
             // 生徒名の取得

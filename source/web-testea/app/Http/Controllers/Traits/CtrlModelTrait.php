@@ -341,14 +341,12 @@ trait CtrlModelTrait
         $query = MstBooth::query();
 
         if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、校舎コードで絞る
+            // 教室管理者の場合、校舎コードで絞る（ガード）
             $account = Auth::user();
             $query->where('campus_cd', $account->campus_cd);
         }
-        // 校舎が指定された場合絞り込み
-        $query->when($campusCd, function ($query) use ($campusCd) {
-            return $query->where('campus_cd', $campusCd);
-        });
+        // 指定された校舎コードで絞り込み
+        $query->where('campus_cd', $campusCd);
         // 用途種別が指定された場合絞り込み
         $query->when($usageKind, function ($query) use ($usageKind) {
             return $query->where('usage_kind', $usageKind);

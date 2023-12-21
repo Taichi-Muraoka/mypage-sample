@@ -337,7 +337,8 @@ class ConferenceAcceptController extends Controller
             ->sdLeftJoin(Schedule::class, 'conferences.conference_schedule_id', '=', 'schedules.schedule_id')
             // ブース名の取得
             ->sdLeftJoin(MstBooth::class, function ($join) {
-                $join->on('schedules.booth_cd', '=', 'mst_booths.booth_cd');
+                $join->on('schedules.campus_cd', 'mst_booths.campus_cd');
+                $join->on('schedules.booth_cd', 'mst_booths.booth_cd');
             })
             // アカウントテーブルをLeftJOIN
             ->sdLeftJoin(AdminUser::class, 'schedules.adm_id', '=', 'admin_users.adm_id')

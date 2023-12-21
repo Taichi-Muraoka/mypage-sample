@@ -869,6 +869,7 @@ trait FuncCalendarTrait
             })
             // ブース名の取得
             ->sdLeftJoin(MstBooth::class, function ($join) {
+                $join->on('schedules.campus_cd', 'mst_booths.campus_cd');
                 $join->on('schedules.booth_cd', 'mst_booths.booth_cd');
             })
             // コース情報の取得
@@ -1016,12 +1017,16 @@ trait FuncCalendarTrait
         }
         if ($studentId) {
             // 生徒ID指定の場合、生徒IDで絞り込み
-            // スケジュール情報に存在するかチェックする。existsを使用した
-            $query->where('regular_classes.student_id', $studentId)
-                ->orWhereExists(function ($query) use ($studentId) {
-                    $query->from('regular_class_members')->whereColumn('regular_class_members.schedule_id', 'regular_classes.schedule_id')
-                        ->where('regular_class_members.student_id', $studentId);
-                });
+            // レギュラースケジュール情報に存在するかチェックする。existsを使用した
+            $query->where(function ($orQuery) use ($studentId) {
+                $orQuery->where('regular_classes.student_id', $studentId)
+                    ->orWhereExists(function ($query) use ($studentId) {
+                        $query->from('regular_class_members')->whereColumn('regular_class_members.schedule_id', 'regular_classes.schedule_id')
+                            ->where('regular_class_members.student_id', $studentId)
+                            // delete_dt条件の追加
+                            ->whereNull('regular_class_members.deleted_at');
+                    });
+            });
         }
         if ($tutorId) {
             // 講師ID指定の場合、講師IDで絞り込み
@@ -1077,6 +1082,7 @@ trait FuncCalendarTrait
             })
             // ブース名の取得
             ->sdLeftJoin(MstBooth::class, function ($join) {
+                $join->on('regular_classes.campus_cd', 'mst_booths.campus_cd');
                 $join->on('regular_classes.booth_cd', 'mst_booths.booth_cd');
             })
             // コース情報の取得

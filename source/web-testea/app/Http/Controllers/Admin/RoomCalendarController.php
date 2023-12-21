@@ -1679,6 +1679,7 @@ class RoomCalendarController extends Controller
             })
             // ブース名の取得
             ->sdLeftJoin(MstBooth::class, function ($join) {
+                $join->on('schedules.campus_cd', 'mst_booths.campus_cd');
                 $join->on('schedules.booth_cd', 'mst_booths.booth_cd');
             })
             // 講師名の取得
