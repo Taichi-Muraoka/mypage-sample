@@ -241,7 +241,7 @@ class OvertimeController extends Controller
                 'tutor_id',
                 'target_date',
                 'start_time',
-                'end_time as end',
+                'end_time',
                 'minites',
             )
             ->selectRaw('CASE WHEN TIME_TO_SEC(start_time) >= TIME_TO_SEC(?) THEN minites ELSE 0 END AS late_time1', ['22:00'])
@@ -277,6 +277,8 @@ class OvertimeController extends Controller
             )
             // 講師名の取得
             ->leftJoin('tutors', 'overtime_worker.tutor_id', '=', 'tutors.tutor_id');
+
+        $this->debug($overtime_worker_join_tutor->toSql());
 
         return $overtime_worker_join_tutor;
     }
