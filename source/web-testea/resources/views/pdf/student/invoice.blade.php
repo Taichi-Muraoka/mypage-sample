@@ -19,13 +19,6 @@
     }
 </style>
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
 <p style="text-align:center;font-size:14pt;text-decoration: underline;">{{$invoice->invoice_date->format('Y年n月')}}分
     お月謝のお知らせ</p>
 
@@ -43,8 +36,8 @@
 <br>
 
 【{{$invoice->invoice_date->format('Y年n月')}}分お月謝期間】<br>
-{{$invoice_import->term_text1}}<br>
-{{$invoice_import->term_text2}}<br>
+@if ($invoice_import->term_text1 != ''){{$invoice_import->term_text1}}<br>@endif
+@if ($invoice_import->term_text2 != ''){{$invoice_import->term_text2}}<br>@endif
 <br>
 
 【明細】<br>

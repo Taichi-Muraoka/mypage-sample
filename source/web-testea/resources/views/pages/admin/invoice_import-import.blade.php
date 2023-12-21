@@ -18,7 +18,7 @@
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="30%">請求書年月</th>
-            <td>{{$invoice_import->invoice_date->format('Y年m月')}}分</td>
+            <td>{{$editData['invoice_date']->format('Y年m月')}}分</td>
         </tr>
     </x-bs.table>
 

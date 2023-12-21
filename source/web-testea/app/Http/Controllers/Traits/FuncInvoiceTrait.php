@@ -152,16 +152,11 @@ trait FuncInvoiceTrait
         // ページを追加
         $pdf->addPage();
 
-        // フォントの指定(事前にフォントをインストールする必要がある)
-        $pdf->SetFont('ipaexg', '', 12);
-
-        // PDFをHTML(blade)から作成
-        $pdf->writeHTML(view("pdf.student.invoice", $data)->render());
-
         // 右上のロゴの表示(HTMLでは難しいのでここで指定)
-        // writeHTMLの内容が長すぎる場合、2ページ目にも表示されるので、2ページ目が想定される場合は対応が必要
+        // MEMO:最大摘要数での出力に対応するため、HTMLより先に設定した
         $pdf->Image(resource_path('pdf/testea_logo.png'), 150, 10, 48.0);
 
+        // フォントの指定(事前にフォントをインストールする必要がある)
         $pdf->SetFont('ipaexg', '', 10);
         $pdf->SetXY(148, 26);
         $pdf->Write(1, '個別指導塾テスティー株式会社');
@@ -178,7 +173,12 @@ trait FuncInvoiceTrait
         $pdf->SetXY(148, 39);
         $pdf->Write(1, '東京都杉並区久我山2-16-27');
         $pdf->SetXY(148, 43);
-        $pdf->Write(1, '関口花園ビル2F');
+        // 最後は改行して終える（直後のwriteHTMLのレイアウトが崩れるため）
+        $pdf->Write(1, '関口花園ビル2F', '', false, '', true);
+
+        $pdf->SetFont('ipaexg', '', 12);
+        // PDFをHTML(blade)から作成
+        $pdf->writeHTML(view("pdf.student.invoice", $data)->render());
 
         $date_str = $data['invoice']->invoice_date->format('Y年m月');
         $student_name = $data['invoice']->student_name;
