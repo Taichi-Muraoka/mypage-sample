@@ -25,7 +25,7 @@
     </x-slot>
 
     {{-- テーブル --}}
-    <x-bs.table :button=true :smartPhone=true>
+    <x-bs.table :button=true>
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
@@ -45,12 +45,15 @@
             <td>@{{$filters.formatYmd(item.target_date)}}</td>
             <td>@{{item.sum_minites}}</td>
             <td>@{{item.over_time}}</td>
-            <td></td>
-            <td></td>
+            <td>@{{item.late_time}}</td>
+            <td>@{{item.over_late_time}}</td>
         </tr>
 
     </x-bs.table>
 
 </x-bs.card-list>
+
+{{-- モーダル(送信確認モーダル) 出力 --}}
+@include('pages.admin.modal.overtime_output-modal', ['modal_send_confirm' => true])
 
 @stop

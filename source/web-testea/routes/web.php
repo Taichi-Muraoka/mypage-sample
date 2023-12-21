@@ -1499,6 +1499,12 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/overtime/search', [OvertimeController::class, 'search'])->name('overtime-search');
 
+    // 詳細取得用（CSV出力確認モーダル）
+    Route::post('/overtime/get_data', [OvertimeController::class, 'getData'])->name('overtime-get_data');
+
+    // モーダル処理（CSV出力）
+    Route::post('/overtime/exec_modal', [OvertimeController::class, 'execModal'])->name('overtime-exec_modal');
+
     //});
 
     //===============================================
