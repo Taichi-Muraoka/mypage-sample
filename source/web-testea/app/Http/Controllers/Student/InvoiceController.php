@@ -37,10 +37,8 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-
         return view('pages.student.invoice');
     }
-
 
     /**
      * 検索結果取得
@@ -50,7 +48,6 @@ class InvoiceController extends Controller
      */
     public function search(Request $request)
     {
-
         // クエリを作成
         $query = Invoice::query();
 
@@ -62,9 +59,7 @@ class InvoiceController extends Controller
             // 自分の生徒IDのみにガードを掛ける
             ->where($this->guardStudentTableWithSid())
             // ソート
-            ->orderby('invoice_date', 'desc')
-            // 個別教室・家庭教師両方の場合もあるため、１つにまとめる
-            ->distinct();
+            ->orderby('invoice_date', 'desc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $invoices, function ($items) {
@@ -98,12 +93,11 @@ class InvoiceController extends Controller
         $account = Auth::user();
         $sid = $account->account_id;
 
-        // TODO: 個別・家庭教師両方の場合、重複する明細をどのように表示するか？顧客確認中
-
         // データの取得
         $dtlData = $this->getInvoiceDetail($date, $sid);
 
         return view('pages.student.invoice-detail', [
+            'invoice_import' => $dtlData['invoice_import'],
             'invoice' => $dtlData['invoice'],
             'invoice_detail' => $dtlData['invoice_detail'],
             // PDF用にIDを渡す
@@ -130,12 +124,11 @@ class InvoiceController extends Controller
         $account = Auth::user();
         $sid = $account->account_id;
 
-        // TODO: 個別・家庭教師両方の場合、重複する明細をどのように表示するか？顧客確認中
-
         // データの取得
         $dtlData = $this->getInvoiceDetail($date, $sid);
 
         $pdfData = [
+            'invoice_import' => $dtlData['invoice_import'],
             'invoice' => $dtlData['invoice'],
             'invoice_detail' => $dtlData['invoice_detail'],
         ];
