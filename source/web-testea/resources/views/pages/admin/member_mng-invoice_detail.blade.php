@@ -74,8 +74,8 @@
             <td>{{$invoice->pay_type_name}}</td>
         </tr>
         <tr>
-            @if ($invoice->billflg == 1)<th>お引落日</th>
-            @elseif($invoice->billflg == 2)<th>お振込期限</th>
+            @if ($invoice->pay_type == AppConst::CODE_MASTER_21_1)<th>お引落日</th>
+            @elseif ($invoice->pay_type == AppConst::CODE_MASTER_21_2)<th>お振込期限</th>
             @endif
             <td>{{$formatter::formatYmdDayString($invoice_import->bill_date)}}</td>
         </tr>

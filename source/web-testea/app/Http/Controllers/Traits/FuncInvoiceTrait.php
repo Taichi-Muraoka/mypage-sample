@@ -119,19 +119,11 @@ trait FuncInvoiceTrait
 
         // 支払方法による備考文言分岐
         if ($invoice->pay_type ==  AppConst::CODE_MASTER_21_1) {
-            // 口座引落ならフラグを1にする
-            $invoice['billflg'] = 1;
-            $invoice['note'] = "ご登録いただきました口座から引落をさせていただきます。";
+            // 口座引落の場合
+            $invoice['note'] = Lang::get('message.invoice.withdrawal.note');
         } else {
             // 振込の場合
-            $invoice['billflg'] = 2;
-            $invoice['note'] = "お振込先\n" .
-                "三菱UFJ銀行　久我山支店（567）\n" .
-                "普通口座　0043210\n" .
-                "個別指導塾テスティー株式会社\n" .
-                "\n" .
-                "お振込者名は生徒様のお名前で入力をお願いいたします。\n" .
-                "恐れ入りますが、振込手数料はご負担ください。";
+            $invoice['note'] = Lang::get('message.invoice.transfer.note');
         }
 
         $invoiceData = [
