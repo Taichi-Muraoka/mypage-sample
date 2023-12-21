@@ -18,6 +18,7 @@
         <tr>
             <th width="35%">お月謝期間</th>
             <x-bs.td-sp>
+                {{$invoice_import->term_text0}}<br>
                 @if ($invoice_import->term_text1 != ''){{$invoice_import->term_text1}}<br>@endif
                 @if ($invoice_import->term_text2 != ''){{$invoice_import->term_text2}}@endif
             </x-bs.td-sp>

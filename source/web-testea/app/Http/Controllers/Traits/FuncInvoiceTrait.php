@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Traits;
 use TCPDF;
 use Illuminate\Support\Facades\Lang;
 use App\Consts\AppConst;
+use App\Libs\CommonDateFormat;
 use App\Models\InvoiceDetail;
 use App\Models\CodeMaster;
 use App\Models\Invoice;
@@ -47,6 +48,8 @@ trait FuncInvoiceTrait
             ->select(
                 'invoice_import.issue_date',
                 'invoice_import.bill_date',
+                'invoice_import.start_date',
+                'invoice_import.end_date',
                 'invoice_import.term_text1',
                 'invoice_import.term_text2',
             )
@@ -116,6 +119,16 @@ trait FuncInvoiceTrait
             // ソート連番順
             ->orderBy('invoice_seq')
             ->get();
+
+        // お月謝期間の文言追加
+        $invoiceImport['term_text0'] = Lang::get(
+            'message.invoice.term_text',
+            [
+                'invoiceDate' => $invoice['invoice_date']->format('n月'),
+                'startDate' => CommonDateFormat::formatMdDayString($invoiceImport['start_date']),
+                'endDate' => CommonDateFormat::formatMdDayString($invoiceImport['end_date']),
+            ]
+        );
 
         // 支払方法による備考文言分岐
         if ($invoice->pay_type ==  AppConst::CODE_MASTER_21_1) {

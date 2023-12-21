@@ -43,4 +43,21 @@ class CommonDateFormat
 
         return Carbon::parse($targetDate)->isoFormat('YYYY年MM月DD日(ddd)');
     }
+
+    /**
+     * 日付を曜日ありでフォーマット
+     * @param   $dateData 日付
+     * @return  フォーマット後の文字列(MM月DD日(曜日))
+     */
+    public static function formatMdDayString($dateData = null)
+    {
+        $targetDate = null;
+        if (isset($dateData)) {
+            $targetDate = Carbon::parse($dateData);
+        }else{
+            $targetDate = Carbon::now();
+        }
+
+        return Carbon::parse($targetDate)->isoFormat('MM月DD日(ddd)');
+    }
 }
