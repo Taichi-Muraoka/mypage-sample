@@ -128,20 +128,55 @@ class InvoiceImportController extends Controller
         }
 
         // 請求情報取込を取得
-        $invoice_import = InvoiceImport::select('invoice_date')
+        $invoice_import = InvoiceImport::select(
+            'invoice_date',
+            'bill_date',
+            'start_date',
+            'end_date',
+            'term_text1',
+            'term_text2',
+        )
             ->where('invoice_date', '=', $idDate)
             ->firstOrFail();
 
+        // $editDataに値をセット
+        // 発行日は常にシステム日付
+        $editData['issue_date'] = date('Y/m/d');
+        // hidden用にセット
+        $editData['invoiceDate'] = $invoiceDate;
+        // 請求書年月
+        $editData['invoice_date'] = $invoice_import->invoice_date;
+
+        // 各項目の有無によってセットする値を分岐
+        if ($invoice_import->bill_date != null) {
+            $editData['bill_date'] = $invoice_import->bill_date;
+        } else {
+            $editData['bill_date'] = $idDate;
+        }
+
+        if ($invoice_import->start_date != null) {
+            $editData['start_date'] = $invoice_import->start_date;
+        } else {
+            $editData['start_date'] = $idDate;
+        }
+
+        if ($invoice_import->end_date != null) {
+            $editData['end_date'] = $invoice_import->end_date;
+        } else {
+            $editData['end_date'] = $idEnd;
+        }
+
+        if ($invoice_import->term_text1 != null) {
+            $editData['term_text1'] = $invoice_import->term_text1;
+        }
+
+        if ($invoice_import->term_text2 != null) {
+            $editData['term_text2'] = $invoice_import->term_text2;
+        }
+
         return view('pages.admin.invoice_import-import', [
             'rules' => $this->rulesForInput(null),
-            'invoice_import' => $invoice_import,
-            'editData' => [
-                'invoiceDate' => $invoiceDate,
-                'issue_date' => date('Y/m/d'),
-                'start_date' => $idDate,
-                'end_date' => $idEnd,
-                'bill_date' => $idDate
-            ]
+            'editData' => $editData,
         ]);
     }
 
