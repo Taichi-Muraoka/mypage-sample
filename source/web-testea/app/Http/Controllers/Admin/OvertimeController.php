@@ -87,9 +87,6 @@ class OvertimeController extends Controller
 
             // データ加工
             foreach ($items as $item) {
-                // 深夜超過労働
-                $item->over_late_time = $item->over_time + $item->late_time;
-
                 // 時間変換
                 $item->sum_minites = $this->conversion_time($item->sum_minites);
                 $item->over_time = $this->conversion_time($item->over_time);
@@ -173,7 +170,7 @@ class OvertimeController extends Controller
                 $this->conversion_time($data->sum_minites),
                 $this->conversion_time($data->over_time),
                 $this->conversion_time($data->late_time),
-                $this->conversion_time($data->over_time + $data->late_time),
+                $this->conversion_time($data->over_late_time),
             ];
         }
 
@@ -208,7 +205,8 @@ class OvertimeController extends Controller
 
         $hour = floor($conversion_hour);
 
-        $minites = floor($minites % 60 * 10) / 10;
+        // 15分単位に切り捨て
+        $minites = intval(floor(floor($minites % 60 * 10) / 10) / 15) * 15;
 
         return $hour . '時間' . $minites . '分';
     }
@@ -257,6 +255,9 @@ class OvertimeController extends Controller
             ->selectRaw('SUM(minites) as sum_minites')
             ->selectRaw('CASE WHEN SUM(minites) > 480 THEN SUM(minites) - 480 ELSE 0 END as over_time')
             ->selectRaw('SUM(late_time1) + SUM(late_time2) as late_time')
+            ->selectRaw('CASE WHEN (SUM(late_time1) + SUM(late_time2) > 0 and SUM(minites) > 480) and SUM(late_time1) + SUM(late_time2) >= SUM(minites) - 480 THEN SUM(minites) - 480
+                WHEN (SUM(late_time1) + SUM(late_time2) > 0 and SUM(minites) > 480) and SUM(late_time1) + SUM(late_time2) <= SUM(minites) - 480 THEN SUM(late_time1) + SUM(late_time2)
+                ELSE 0 END AS over_late_time')
             ->groupBy('tutor_id', 'target_date')
             ->having(function ($orQuery) {
                 $orQuery->havingRaw('over_time > 0')
@@ -265,7 +266,7 @@ class OvertimeController extends Controller
             ->orderBy('target_date')
             ->orderBy('tutor_id');
 
-        // 講師名JOIN
+        // 講師名JOINと深夜超過
         $overtime_worker_join_tutor = DB::table($overtime_worker, 'overtime_worker')
             ->select(
                 'overtime_worker.tutor_id',
@@ -273,12 +274,11 @@ class OvertimeController extends Controller
                 'sum_minites',
                 'over_time',
                 'late_time',
-                'tutors.name as tutor_name'
+                'over_late_time',
+                'tutors.name as tutor_name',
             )
             // 講師名の取得
             ->leftJoin('tutors', 'overtime_worker.tutor_id', '=', 'tutors.tutor_id');
-
-        $this->debug($overtime_worker_join_tutor->toSql());
 
         return $overtime_worker_join_tutor;
     }
