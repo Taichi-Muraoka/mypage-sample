@@ -49,7 +49,6 @@ export default class AppClass extends PageBase {
                     campus_cd: campusCd,
                     target_date: targetDate,
                 },
-                // $vue.option,
                 // URLを分けた
                 {
                     urlSuffix: "calender",
@@ -79,88 +78,51 @@ export default class AppClass extends PageBase {
 
             vueData: {
                 // プルダウン変更用のプロパティを用意
-                selectGetItemFreeSchedule: {},
                 selectGetItemPeriod1: {},
                 selectGetItemPeriod2: {},
                 selectGetItemPeriod3: {}
             },
             vueMethods: {
+                // 授業情報変更時の項目クリア処理
+                lessonListReset: function () {
+                    this.selectGetItem = {};
+                    this.selectGetItemPeriod1 = {};
+                    this.selectGetItemPeriod2 = {};
+                    this.selectGetItemPeriod3 = {};
+                    this.form.campus_cd = "";
+                    this.form.tutor_id = "";
+                    for (var i = 1; i <= 3; i++) {
+                        // 希望日のフォームをクリア
+                        this.form['preferred' + i + '_type'] = "1";
+                        this.form['preferred_date' + i + '_select'] = "";
+                        this.form['preferred_date' + i + '_calender'] = "";
+                        this.form['preferred_date' + i + '_period'] = "";
+                        // datepickerのinputをクリア
+                        $('#_preferred_date' + i + '_calender').val("");
+                    }
+                },
                 // 授業日・時限プルダウン変更イベント
                 selectChangeSchedule: function (event) {
+                    // 初期化
+                    this.lessonListReset();
 
-                    // 未選択となった場合は項目リセット
-                    if (ValueCom.isEmpty(this.form['schedule_id'])) {
-                        document.getElementById('campas_name').innerText = "";
-                        document.getElementById('course_name').innerText = "";
-                        document.getElementById('tutor_name').innerText = "";
-                        document.getElementById('subject_name').innerText = "";
-                        document.getElementById('preferred_range').innerText = "";
-
-                        this.form.campus_cd = "";
-                        this.form.course_cd = "";
-                        this.form.tutor_id = "";
-                        this.form.subject_cd = "";
-
-                        for (var i = 1; i <= 3; i++) {
-                            // 希望日のフォームをクリア
-                            this.form['preferred' + i + '_type'] = "1";
-                            this.form['preferred_date' + i + '_select'] = "";
-                            this.form['preferred_date' + i + '_calender'] = "";
-                            this.form['preferred_date' + i + '_period'] = "";
-                            // datepickerのinputをクリア
-                            $('#_preferred_date' + i + '_calender').val("");
+                    // チェンジイベントを発生させる
+                    var selected = this.form.schedule_id;
+                    self.selectChangeGetCallBack(
+                        this,
+                        selected,
+                        // URLを分けた
+                        {
+                            urlSuffix: "schedule",
+                        },
+                        // 受信後のコールバック
+                        (data) => {
+                            // データをセット
+                            this.selectGetItem = data;
+                            this.form.campus_cd = data.campus_cd;
+                            this.form.tutor_id = data.tutor_id;
                         }
-                    }
-
-                    AjaxCom.getPromise()
-                        .then(() => {
-                            // 初期化
-                            document.getElementById('campas_name').innerText = "";
-                            document.getElementById('course_name').innerText = "";
-                            document.getElementById('tutor_name').innerText = "";
-                            document.getElementById('subject_name').innerText = "";
-                            document.getElementById('preferred_range').innerText = "";
-                            this.form.campus_cd = "";
-                            this.form.course_cd = "";
-                            this.form.tutor_id = "";
-                            this.form.subject_cd = "";
-                            for (var i = 1; i <= 3; i++) {
-                                // 希望日のフォームをクリア
-                                this.form['preferred' + i + '_type'] = "1";
-                                this.form['preferred_date' + i + '_select'] = "";
-                                this.form['preferred_date' + i + '_calender'] = "";
-                                this.form['preferred_date' + i + '_period'] = "";
-                                // datepickerのinputをクリア
-                                $('#_preferred_date' + i + '_calender').val("");
-                            }
-
-                            // チェンジイベントを発生させる
-                            var selected = this.form.schedule_id;
-                            self.selectChangeGetCallBack(
-                                this,
-                                selected,
-                                // URLを分けた
-                                {
-                                    urlSuffix: "schedule",
-                                },
-                                // 受信後のコールバック
-                                (data) => {
-                                    // データをセット
-                                    this.selectGetItemFreeSchedule = data.candidates;
-
-                                    document.getElementById('campas_name').innerText = data.campus_name;
-                                    document.getElementById('course_name').innerText = data.course_name;
-                                    document.getElementById('tutor_name').innerText = data.tutor_name;
-                                    document.getElementById('subject_name').innerText = data.subject_name;
-                                    document.getElementById('preferred_range').innerText = "振替希望日は " + data.preferred_from + " ～ " + data.preferred_to + " の範囲で指定してください。";
-                                    this.form.campus_cd = data.campus_cd;
-                                    this.form.course_cd = data.course_cd;
-                                    this.form.tutor_id = data.tutor_id;
-                                    this.form.subject_cd = data.subject_cd;
-                                }
-                            );
-                        })
-                        .catch(AjaxCom.fail);
+                    );
                 },
             }
         });

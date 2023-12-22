@@ -1098,7 +1098,7 @@ trait FuncScheduleTrait
      * @param date $targetDate 対象日付
      * @param string $booth ブース
      * @param int $createKind データ作成区分
-     * @return void
+     * @return int
      */
     private function fncScheCreateSchedule($data, $targetDate, $booth, $createKind)
     {
@@ -1149,6 +1149,12 @@ trait FuncScheduleTrait
             // 一括登録の場合のみ設定
             $schedule->regular_class_id = $data['regular_class_id'];
         }
+        if ($createKind == AppConst::CODE_MASTER_32_2) {
+            // 振替登録の場合のみ設定
+            $schedule->transfer_class_id = $data['schedule_id'];
+            $schedule->substitute_kind = $data['substitute_kind'];
+            $schedule->absent_tutor_id = $data['absent_tutor_id'];
+        }
         $schedule->adm_id = $account->account_id;
         // 登録
         $schedule->save();
@@ -1170,7 +1176,7 @@ trait FuncScheduleTrait
                 $classmember->save();
             }
         }
-        return;
+        return $schedule->schedule_id;
     }
 
     /**

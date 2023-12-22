@@ -15,6 +15,12 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+        // Vue: 検索フォーム
+        var searchForm = this.getVueSearchForm();
+
+        // Vue: モーダル
+        this.getVueModal();
+
         // Vue: モーダル(承認)
         this.getVueModal({
             // IDを分けた
@@ -26,8 +32,5 @@ export default class AppClass extends PageBase {
                 searchForm.vueSearchList.refresh();
             }
         });
-
-        // Vue: 検索フォーム
-        this.getVueSearchForm();
     }
 }

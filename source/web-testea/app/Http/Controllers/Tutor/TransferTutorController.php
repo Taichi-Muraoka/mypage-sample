@@ -119,8 +119,8 @@ class TransferTutorController extends Controller
             $campusCd = $form['campus_cd'];
         }
 
-        // クエリを作成
-        $transfers = $this->fncTranGetATransferApplicationList(null, $account_id, $campusCd, null, false);
+        // クエリを作成（ユーザー権限によるガードはfunction内で行う）
+        $transfers = $this->fncTranGetATransferApplicationList($campusCd);
 
         // 生徒の絞り込み条件
         $transfers->SearchStudentId($form);
@@ -145,12 +145,8 @@ class TransferTutorController extends Controller
         // IDを取得
         $id = $request->input('id');
 
-        // ログイン者の情報を取得する
-        $account = Auth::user();
-        $account_id = $account->account_id;
-
-        // データを取得
-        $tranApp = $this->fncTranGetTransferApplicationData($id, null, $account_id);
+        // データを取得（ユーザー権限によるガードはfunction内で行う）
+        $tranApp = $this->fncTranGetTransferApplicationData($id);
 
         return $tranApp;
     }
@@ -213,8 +209,7 @@ class TransferTutorController extends Controller
             }
         };
 
-
-        $rules += ['campus_cd' => $validationCampusList];
+        $rules += Schedule::fieldRules('campus_cd', [$validationCampusList]);
         $rules += TransferApplication::fieldRules('student_id', [$validationStudentList]);
         $rules += TransferApplication::fieldRules('approval_status', [$validationStatus]);
 
@@ -274,7 +269,7 @@ class TransferTutorController extends Controller
         // 振替対象日の範囲
         $targetPeriod = $this->fncTranTargetDateFromTo();
         // 授業情報を取得
-        $lessons = $this->fncTranGetTransferSchedule($targetPeriod['from_date'], $targetPeriod['to_date'], $student_id, $account_id);
+        $lessons = $this->fncTranGetTransferSchedule($targetPeriod['from_date'], $targetPeriod['to_date'], $student_id);
         // プルダウン用にリスト作成
         $lesson_list = $this->mdlGetScheduleMasterList($lessons);
 
@@ -298,15 +293,11 @@ class TransferTutorController extends Controller
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'id');
 
-        // ログイン者の情報を取得する
-        $account = Auth::user();
-        $account_id = $account->account_id;
-
         // IDを取得
         $schedule_id = $request->input('id');
 
-        // 授業情報を取得
-        $lesson = $this->fncTranGetTargetScheduleInfo($schedule_id, null, $account_id);
+        // 授業情報を取得（ユーザー権限によるガードはfunction内で行う）
+        $lesson = $this->fncTranGetTargetScheduleInfo($schedule_id);
 
         // 振替候補日の範囲
         $targetPeriod = $this->fncTranCandidateDateFromTo($lesson->target_date);
@@ -317,10 +308,7 @@ class TransferTutorController extends Controller
         return [
             'campus_cd' => $lesson->campus_cd,
             'campus_name' => $lesson->campus_name,
-            'course_cd' => $lesson->course_cd,
             'course_name' => $lesson->course_name,
-            'course_kind' => $lesson->course_kind,
-            'subject_cd' => $lesson->subject_cd,
             'subject_name' => $lesson->subject_name,
             'preferred_from' => $targetPeriod['from_date'],
             'preferred_to' => $targetPeriod['to_date'],
@@ -494,12 +482,8 @@ class TransferTutorController extends Controller
         // IDのバリデーション
         $this->validateIds($transferId);
 
-        // ログイン者の情報を取得する
-        $account = Auth::user();
-        $account_id = $account->account_id;
-
         // データを取得
-        $editdata = $this->fncTranGetEditTransferData($transferId, null, $account_id);
+        $editdata = $this->fncTranGetEditTransferData($transferId);
 
         // 承認ステータスリスト用データ
         $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_3, [AppConst::CODE_MASTER_3_SUB_1]);
