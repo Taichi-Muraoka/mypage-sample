@@ -205,8 +205,7 @@ class OvertimeController extends Controller
 
         $hour = floor($conversion_hour);
 
-        // 15分単位に切り捨て
-        $minites = intval(floor(floor($minites % 60 * 10) / 10) / 15) * 15;
+        $minites = floor($minites % 60 * 10) / 10;
 
         return $hour . '時間' . $minites . '分';
     }
