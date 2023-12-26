@@ -1402,7 +1402,7 @@ trait FuncScheduleTrait
                 $value,
                 $scheduleId,
                 false
-        );
+        	);
             if (!$chk) {
                 // 講師スケジュール重複エラー
                 $validateMsg = Lang::get('validation.duplicate_tutor');
@@ -1502,6 +1502,101 @@ trait FuncScheduleTrait
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
+        }
+    }
+    /**
+     * レギュラー授業スケジュール登録時の生徒スケジュール重複チェック
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @param $kind
+     * @param $attribute
+     * @param $value
+     * @param $fail
+     */
+    function fncScheValidateStudentRegular($request, $kind, $attribute, $value, $fail)
+    {
+        if (
+            !$request->filled('day_cd') || !$request->filled('start_time')
+            || !$request->filled('end_time') || !$request->filled($attribute)
+            || !$request->filled('campus_cd')
+        ) {
+            // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+            return;
+        }
+
+        $regularClassId = null;
+        if ($kind == AppConst::SCHEDULE_KIND_UPD && $request->filled('regular_class_id')) {
+            // 更新の場合のみ、スケジュールIDをセット（除外用）
+            $regularClassId = $request['regular_class_id'];
+        }
+
+        $members = [];
+        // チェック対象の生徒IDを設定
+        if ($attribute == 'class_member_id') {
+            // 複数生徒指定の場合
+            $members = explode(",", $value);
+        } else {
+            // 単一生徒指定の場合
+            array_push($members, $value);
+        }
+        foreach ($members as $member) {
+            // 生徒スケジュール重複チェック（生徒毎）
+            $chk = $this->fncScheChkDuplidateSidRegular(
+                $request['day_cd'],
+                $request['start_time'],
+                $request['end_time'],
+                $member,
+                $regularClassId
+            );
+            if (!$chk) {
+                // 生徒スケジュール重複エラー
+                $validateMsg = Lang::get('validation.duplicate_student');
+                if ($attribute == 'class_member_id') {
+                    // 生徒複数指定の場合、対象生徒名も合わせて表示する
+                    $studentName = $this->mdlGetStudentName($member);
+                    $validateMsg = $validateMsg . "(" . $studentName . ")";
+                }
+                return $fail($validateMsg);
+            }
+        }
+    }
+
+    /**
+     * レギュラー授業スケジュール登録時の講師スケジュール重複チェック
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @param $kind
+     * @param $attribute
+     * @param $value
+     * @param $fail
+     */
+    function fncScheValidateTutorRegular($request, $kind, $attribute, $value, $fail)
+    {
+        if (
+            !$request->filled('day_cd') || !$request->filled('start_time')
+            || !$request->filled('end_time')
+        ) {
+            // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+            return;
+        }
+
+        $regularClassId = null;
+        if ($kind == AppConst::SCHEDULE_KIND_UPD && $request->filled('schedule_id')) {
+            // 更新の場合のみ、スケジュールIDをセット（除外用）
+            $regularClassId = $request['regular_class_id'];
+        }
+
+        // 講師スケジュール重複チェック
+        $chk = $this->fncScheChkDuplidateTidRegular(
+            $request['day_cd'],
+            $request['start_time'],
+            $request['end_time'],
+            $value,
+            $regularClassId
+        );
+        if (!$chk) {
+            // 講師スケジュール重複エラー
+            return $fail(Lang::get('validation.duplicate_tutor'));
         }
     }
 }
