@@ -33,13 +33,6 @@ class RegularScheduleController extends Controller
     use FuncScheduleTrait;
 
     /**
-     * スケジュール追加更新種別
-     */
-    const SCHE_KIND_NEW = 1;
-    const SCHE_KIND_UPD = 2;
-    const SCHE_KIND_CPY = 3;
-
-    /**
      * コンストラクタ
      *
      * @return void
@@ -223,7 +216,7 @@ class RegularScheduleController extends Controller
             'start_time' => $startTime,
             'end_time' => $endTime,
             // スケジュール更新区分=NEW
-            'kind' => self::SCHE_KIND_NEW
+            'kind' => AppConst::SCHEDULE_KIND_NEW
         ];
 
         // 登録画面表示時の校舎コードをセッションに保存
@@ -467,7 +460,7 @@ class RegularScheduleController extends Controller
         $howToKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_33);
 
         // スケジュール更新区分=UPDATE
-        $regularClass['kind'] = self::SCHE_KIND_UPD;
+        $regularClass['kind'] = AppConst::SCHEDULE_KIND_UPD;
 
         // 編集画面表示時の校舎コードをセッションに保存
         session(['session_campus_cd' => $campusCd]);
@@ -579,7 +572,7 @@ class RegularScheduleController extends Controller
         $howToKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_33);
 
         // スケジュール更新区分=COPY
-        $regularClass['kind'] = self::SCHE_KIND_CPY;
+        $regularClass['kind'] = AppConst::SCHEDULE_KIND_CPY;
 
         // コピー登録画面表示時の校舎コードをセッションに保存
         session(['session_campus_cd' => $campusCd]);
@@ -627,7 +620,7 @@ class RegularScheduleController extends Controller
             'how_to_kind'
         );
 
-        if ($request['kind'] == self::SCHE_KIND_CPY) {
+        if ($request['kind'] == AppConst::SCHEDULE_KIND_CPY) {
             // コピー登録の場合
             // ブースのチェック・空きブース取得
             $booth = $this->fncScheSearchBoothRegular(
@@ -1001,11 +994,11 @@ class RegularScheduleController extends Controller
             }
 
             $regularClassId = null;
-            if ($request['kind'] == self::SCHE_KIND_UPD && $request->filled('regular_class_id')) {
+            if ($request['kind'] == AppConst::SCHEDULE_KIND_UPD && $request->filled('regular_class_id')) {
                 // 更新の場合のみ、スケジュールIDをセット（除外用）
                 $regularClassId = $request['regular_class_id'];
             }
-            if ($request['kind'] == self::SCHE_KIND_CPY) {
+            if ($request['kind'] == AppConst::SCHEDULE_KIND_CPY) {
                 // コピー登録の場合、空きブース検索ありとする
                 $checkOnly = false;
             } else {
@@ -1053,95 +1046,20 @@ class RegularScheduleController extends Controller
 
         // 独自バリデーション: 生徒スケジュール重複チェック
         $validationDupStudent =  function ($attribute, $value, $fail) use ($request) {
-
-            if (
-                !$request->filled('day_cd') || !$request->filled('start_time')
-                || !$request->filled('end_time') || !$request->filled('student_id')
-            ) {
-                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
-                return;
-            }
-
-            $regularClassId = null;
-            if ($request['kind'] == self::SCHE_KIND_UPD && $request->filled('regular_class_id')) {
-                // 更新の場合のみ、スケジュールIDをセット（除外用）
-                $regularClassId = $request['regular_class_id'];
-            }
-            // 生徒スケジュール重複チェック
-            $chk = $this->fncScheChkDuplidateSidRegular(
-                $request['day_cd'],
-                $request['start_time'],
-                $request['end_time'],
-                $request['student_id'],
-                $regularClassId
-            );
-            if (!$chk) {
-                // 生徒スケジュール重複エラー
-                return $fail(Lang::get('validation.duplicate_student'));
-            }
+            $kind = $request['kind'];
+            return $this->fncScheValidateStudentRegular($request, $kind, $attribute, $value, $fail);
         };
 
         // 独自バリデーション: 生徒スケジュール重複チェック（複数指定）
         $validationDupStudentMulti =  function ($attribute, $value, $fail) use ($request) {
-
-            if (
-                !$request->filled('day_cd') || !$request->filled('start_time')
-                || !$request->filled('end_time') || !$request->filled('class_member_id')
-            ) {
-                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
-                return;
-            }
-
-            $regularClassId = null;
-            if ($request['kind'] == self::SCHE_KIND_UPD && $request->filled('regular_class_id')) {
-                // 更新の場合のみ、スケジュールIDをセット（除外用）
-                $regularClassId = $request['regular_class_id'];
-            }
-            foreach (explode(",", $value) as $member) {
-                // 生徒リストを取得
-                // 生徒スケジュール重複チェック（一人ずつ）
-                $chk = $this->fncScheChkDuplidateSidRegular(
-                    $request['day_cd'],
-                    $request['start_time'],
-                    $request['end_time'],
-                    $member,
-                    $regularClassId
-                );
-                if (!$chk) {
-                    // 生徒スケジュール重複エラー
-                    return $fail(Lang::get('validation.duplicate_student'));
-                }
-            }
+            $kind = $request['kind'];
+            return $this->fncScheValidateStudentRegular($request, $kind, $attribute, $value, $fail);
         };
 
         // 独自バリデーション: 講師スケジュール重複チェック
         $validationDupTutor =  function ($attribute, $value, $fail) use ($request) {
-
-            if (
-                !$request->filled('day_cd') || !$request->filled('start_time')
-                || !$request->filled('end_time') || !$request->filled('tutor_id')
-            ) {
-                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
-                return;
-            }
-
-            $regularClassId = null;
-            if ($request['kind'] == self::SCHE_KIND_UPD && $request->filled('regular_class_id')) {
-                // 更新の場合のみ、スケジュールIDをセット（除外用）
-                $regularClassId = $request['regular_class_id'];
-            }
-            // 講師スケジュール重複チェック
-            $chk = $this->fncScheChkDuplidateTidRegular(
-                $request['day_cd'],
-                $request['start_time'],
-                $request['end_time'],
-                $value,
-                $regularClassId
-            );
-            if (!$chk) {
-                // 講師スケジュール重複
-                return $fail(Lang::get('validation.duplicate_tutor'));
-            }
+            $kind = $request['kind'];
+            return $this->fncScheValidateTutorRegular($request, $kind, $attribute, $value, $fail);
         };
 
         // 関連チェックは項目チェックと分けて行う
