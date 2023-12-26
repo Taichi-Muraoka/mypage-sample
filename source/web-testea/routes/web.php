@@ -773,8 +773,8 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 編集処理
     Route::post('/transfer_check/update_edit', [TransferCheckController::class, 'update'])->name('transfer_check-update');
 
-    // 振替調整登録画面(直接生徒ID付きで選択された状態にする)
-    Route::get('/transfer_check/new/{sid}', [TransferCheckController::class, 'newDirect'])->name('transfer_check-new_direct');
+    // 振替調整登録画面(直接スケジュールID付きで選択された状態にする)
+    Route::get('/transfer_check/new_required/{scheduleId}', [TransferCheckController::class, 'newRequired'])->name('transfer_check-required');
 
     //---------------------
     // 要振替授業管理

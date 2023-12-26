@@ -84,7 +84,61 @@ trait FuncTransferTrait
             // 対象の授業日範囲
             ->whereBetween('schedules.target_date', [$fromDate, $toDate])
             // 仮登録状態 = 0:本登録
-            ->whereIn('schedules.tentative_status', [AppConst::CODE_MASTER_36_0, AppConst::CODE_MASTER_35_3])
+            ->where('schedules.tentative_status', AppConst::CODE_MASTER_36_0)
+            ->orderby('schedules.target_date')
+            ->orderby('schedules.period_no')
+            ->get();
+
+        return $lessons;
+    }
+
+    /**
+     * 振替依頼対象スケジュール情報を取得（管理者用）
+     * 対象期間によらず未振替の授業を含める
+     *
+     * @param   $fromDate 対象開始日
+     * @param   $toDate   対象終了日
+     * @param   $sid      生徒ID（プルダウンより絞り込み）
+     * @return  object スケジュール情報
+     */
+    private function fncTranGetTransferScheduleAdmin($fromDate, $toDate, $sid)
+    {
+
+        $query = Schedule::query();
+
+        // ユーザー権限による絞り込みを入れる
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎でガードを掛ける
+            $query->where($this->guardRoomAdminTableWithRoomCd());
+        }
+
+        $lessons = $query
+            ->select(
+                'schedule_id',
+                'target_date',
+                'period_no'
+            )
+            // コース種別 = 授業単 のみ対象とする
+            ->sdJoin(MstCourse::class, function ($join) {
+                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd')
+                    ->where('mst_courses.course_kind', '=', AppConst::CODE_MASTER_42_1);;
+            })
+            // 生徒IDで絞り込み
+            ->where('schedules.student_id', $sid)
+            // 仮登録状態 = 0:本登録
+            ->where('schedules.tentative_status', AppConst::CODE_MASTER_36_0)
+            // 出欠ステータスにより条件を分ける
+            ->where(function ($orQuery) use ($fromDate, $toDate) {
+                $orQuery
+                    // 出欠ステータスが0:実施前・出席 かつ 対象の授業日範囲
+                    ->where(function ($subQuery) use ($fromDate, $toDate) {
+                        $subQuery
+                            ->where('schedules.absent_status', AppConst::CODE_MASTER_35_0)
+                            ->whereBetween('schedules.target_date', [$fromDate, $toDate]);
+                    })
+                    // 出欠ステータスが3:未振替 （授業日範囲指定なし）
+                    ->orWhere('schedules.absent_status', AppConst::CODE_MASTER_35_3);
+            })
             ->orderby('schedules.target_date')
             ->orderby('schedules.period_no')
             ->get();
@@ -129,6 +183,7 @@ trait FuncTransferTrait
                 'schedules.minites',
                 'schedules.booth_cd',
                 'schedules.how_to_kind',
+                'schedules.absent_status',
                 // 校舎名
                 'campus_names.room_name as campus_name',
                 'schedules.student_id',

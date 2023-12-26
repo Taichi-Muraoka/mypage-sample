@@ -325,17 +325,17 @@ class TransferCheckController extends Controller
         $this->validateIdsFromRequest($request, 'id');
 
         // 対象生徒IDを取得
-        $student_id = $request->input('id');
+        $studentId = $request->input('id');
 
         // 振替対象日の範囲（当日も許可）
         $targetPeriod = $this->fncTranTargetDateFromTo(true);
         // 授業情報を取得
-        $lessons = $this->fncTranGetTransferSchedule($targetPeriod['from_date'], $targetPeriod['to_date'], $student_id);
+        $lessons = $this->fncTranGetTransferScheduleAdmin($targetPeriod['from_date'], $targetPeriod['to_date'], $studentId);
         // プルダウン用にリスト作成
-        $lesson_list = $this->mdlGetScheduleMasterList($lessons);
+        $lessonList = $this->mdlGetScheduleMasterList($lessons);
 
         return [
-            'lessons' => $this->objToArray($lesson_list)
+            'lessons' => $this->objToArray($lessonList)
         ];
     }
 
@@ -350,15 +350,13 @@ class TransferCheckController extends Controller
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'id');
         // 対象スケジュールIDを取得
-        $schedule_id = $request->input('id');
+        $scheduleId = $request->input('id');
 
         // 授業情報を取得（ユーザー権限によるガードはfunction内で行う）
-        $lesson = $this->fncTranGetTargetScheduleInfo($schedule_id);
+        $lesson = $this->fncTranGetTargetScheduleInfo($scheduleId);
 
         // 講師リストを取得
         $tutorList = $this->mdlGetTutorList($lesson->campus_cd);
-        // 振替候補日の範囲
-        $targetPeriod = $this->fncTranCandidateDateFromTo($lesson->target_date, true);
 
         return [
             'campus_cd' => $lesson->campus_cd,
@@ -366,8 +364,6 @@ class TransferCheckController extends Controller
             'course_name' => $lesson->course_name,
             'tutor_name' => $lesson->tutor_name,
             'subject_name' => $lesson->subject_name,
-            'preferred_from' => $targetPeriod['from_date'],
-            'preferred_to' => $targetPeriod['to_date'],
             'tutors' => $this->objToArray($tutorList)
         ];
     }
@@ -395,24 +391,44 @@ class TransferCheckController extends Controller
     }
 
     /**
-     * 登録画面(生徒IDを指定して直接遷移)
-     * 他画面から遷移する
+     * 登録画面(スケジュールIDを指定して直接遷移)
+     * 要振替授業一覧画面から遷移する
      *
-     * @param int $sid 生徒ID
+     * @param int $scheduleId スケジュールID
      * @return view
      */
-    public function newDirect($sid)
+    public function newRequired($scheduleId)
     {
-        // 生徒リストを取得
-        $studentList = $this->mdlGetStudentList();
+        // IDのバリデーション
+        $this->validateIds($scheduleId);
 
-        // 登録画面用テンプレートを使用
-        return view('pages.admin.transfer_check-new', [
+        // 授業情報を取得（ユーザー権限によるガードはfunction内で行う）
+        $lesson = $this->fncTranGetTargetScheduleInfo($scheduleId);
+
+        // 出欠ステータスが「未振替」以外はエラーとする
+        if ($lesson->absent_status != AppConst::CODE_MASTER_35_3) {
+            $this->illegalResponseErr();
+        }
+
+        // 講師リストを取得
+        $tutorList = $this->mdlGetTutorList($lesson->campus_cd);
+
+        // 要振替画面からの遷移用テンプレートを使用
+        return view('pages.admin.transfer_check-required', [
             'editData' => [
-                'student_id' => $sid,
+                'schedule_id' => $scheduleId,
+                'campus_cd' => $lesson->campus_cd,
+                'student_id' => $lesson->student_id,
             ],
             'rules' => $this->rulesForInput(null),
-            'students' => $studentList,
+            'student_name' => $lesson->student_name,
+            'target_date' => $lesson->target_date,
+            'period_no' => $lesson->period_no,
+            'campus_name' => $lesson->campus_name,
+            'course_name' => $lesson->course_name,
+            'tutor_name' => $lesson->tutor_name,
+            'subject_name' => $lesson->subject_name,
+            'tutors' => $tutorList
         ]);
     }
 
@@ -909,7 +925,7 @@ class TransferCheckController extends Controller
             // 振替対象授業日の範囲（当日も許可）
             $targetPeriod = $this->fncTranTargetDateFromTo(true);
             // 授業情報を取得
-            $lessons = $this->fncTranGetTransferSchedule($targetPeriod['from_date'], $targetPeriod['to_date'], $request['student_id']);
+            $lessons = $this->fncTranGetTransferScheduleAdmin($targetPeriod['from_date'], $targetPeriod['to_date'], $request['student_id']);
             // プルダウン用にリスト作成
             $list = $this->mdlGetScheduleMasterList($lessons);
 
@@ -982,8 +998,15 @@ class TransferCheckController extends Controller
         // 振替授業情報設定
         $transferSchedule = $this->fncTranSetTrasferSchedule(AppConst::CODE_MASTER_54_1, $request, $schedule);
 
-        // 独自バリデーション: 振替日の範囲チェック
-        $validationTargetDate = $this->fncTranGetValidateTargetDate($transferSchedule, $schedule);
+        // 独自バリデーション: 振替日の範囲チェック（管理者登録用）
+        $validationTargetDate = function ($attribute, $value, $fail) use ($request) {
+            $today = date('Y-m-d');
+            // 当日より過去日の場合エラーとする
+            if ($value < $today) {
+                // 振替日範囲外エラー
+                return $fail(Lang::get('validation.preferred_date_out_of_range'));
+            }
+        };
         // 独自バリデーション: 振替日・時限の関連チェック
         $validationDatePeriod = $this->fncTranGetValidateDatePeriod($transferSchedule, $schedule, $request);
         // 独自バリデーション: 変更時講師の重複チェック

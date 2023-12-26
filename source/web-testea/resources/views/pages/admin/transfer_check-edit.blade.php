@@ -102,7 +102,7 @@
         <x-input.select vShow="form.transfer_kind == {{ App\Consts\AppConst::CODE_MASTER_54_1 }}" caption="時限" id="period_no" :rules=$rules
             :select2=true :editData=$editData :select2Search=false :blank=true>
             {{-- vueで動的にプルダウンを作成 --}}
-            <option v-for="item in selectGetItemDate" :value="item.code">
+            <option v-for="item in selectGetItemPeriods" :value="item.code">
                 @{{ item.value }}
             </option>
         </x-input.select>

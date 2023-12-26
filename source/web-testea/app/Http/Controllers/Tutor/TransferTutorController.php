@@ -209,7 +209,7 @@ class TransferTutorController extends Controller
             }
         };
 
-        $rules += Schedule::fieldRules('campus_cd', [$validationCampusList]);
+        $rules += ['campus_cd' => $validationCampusList];
         $rules += TransferApplication::fieldRules('student_id', [$validationStudentList]);
         $rules += TransferApplication::fieldRules('approval_status', [$validationStatus]);
 

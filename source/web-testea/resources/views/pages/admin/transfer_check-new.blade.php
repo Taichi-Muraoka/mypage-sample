@@ -47,10 +47,6 @@
         </x-bs.table>
     </div>
 
-    <div v-cloak v-show="form.schedule_id" class="callout callout-info mt-4 mb-4">
-        <p>振替日は @{{selectGetItem.preferred_from}} ～ @{{selectGetItem.preferred_to}} の範囲で指定してください。</p>
-    </div>
-
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
