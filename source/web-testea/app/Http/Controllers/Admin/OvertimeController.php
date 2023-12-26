@@ -178,7 +178,7 @@ class OvertimeController extends Controller
         // ファイル名の取得と出力
         //---------------------
         $filename = Lang::get(
-            'message.file.member_output.name',
+            'message.file.overtime_output.name',
             [
                 'outputDate' => date("Ymd")
             ]
