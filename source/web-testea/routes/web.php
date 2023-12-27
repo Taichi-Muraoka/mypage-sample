@@ -749,17 +749,32 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 振替調整登録画面
     Route::get('/transfer_check/new', [TransferCheckController::class, 'new'])->name('transfer_check-new');
 
+    // バリデーション(登録用)
+    Route::post('/transfer_check/vd_input', [TransferCheckController::class, 'validationForInput'])->name('transfer_check-vd_input');
+
+    // 振替調整登録処理
+    Route::post('/transfer_check/create', [TransferCheckController::class, 'create'])->name('transfer_check-create');
+
     // 振替連絡編集
     Route::get('/transfer_check/edit/{transferApplyId}', [TransferCheckController::class, 'edit'])->name('transfer_check-edit');
 
-    // // カレンダーを選択された際に教室・講師の情報を返却する
-    // Route::post('/transfer_check/get_data_select', [TransferCheckController::class, 'getDataSelect'])->name('transfer_check-get_data_select');
+    // 生徒選択プルダウンを選択された際に授業日・時限プルダウンの情報を返却する
+    Route::post('/transfer_check/get_data_select_student', [TransferCheckController::class, 'getDataSelectStudent'])->name('transfer_check-get_data_select_student');
+
+    // 授業日・時限選択プルダウンを選択された際に授業情報を返却する
+    Route::post('/transfer_check/get_data_select_schedule', [TransferCheckController::class, 'getDataSelectSchedule'])->name('transfer_check-get_data_select_schedule');
+
+    // 振替希望日カレンダー入力した際に時限情報を返却する
+    Route::post('/transfer_check/get_data_select_calender', [TransferCheckController::class, 'getDataSelectCalender'])->name('transfer_check-get_data_select_calender');
+
+    // バリデーション(編集用)
+    Route::post('/transfer_check/vd_input_edit', [TransferCheckController::class, 'validationForInputEdit'])->name('transfer_check-vd_input_edit');
 
     // 編集処理
-    Route::post('/transfer_check/update', [TransferCheckController::class, 'update'])->name('transfer_check-update');
+    Route::post('/transfer_check/update_edit', [TransferCheckController::class, 'update'])->name('transfer_check-update');
 
-    // バリデーション(登録用)
-    Route::post('/transfer_check/vd_input', [TransferCheckController::class, 'validationForInput'])->name('transfer_check-vd_input');
+    // 振替調整登録画面(直接スケジュールID付きで選択された状態にする)
+    Route::get('/transfer_check/new_required/{scheduleId}', [TransferCheckController::class, 'newRequired'])->name('transfer_check-required');
 
     //---------------------
     // 要振替授業管理

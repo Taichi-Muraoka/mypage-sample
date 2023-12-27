@@ -145,6 +145,10 @@
         @hasSection('parent_page')
         , parent2: '@yield("parent_page2")'
         @endif
+        {{-- 他機能の画面からの遷移の場合。遷移元のURLを保持しておく。戻るボタンに使用する --}}
+        @hasSection('base_page')
+        , base: '@yield("base_page")'
+        @endif
         };
     </script>
 

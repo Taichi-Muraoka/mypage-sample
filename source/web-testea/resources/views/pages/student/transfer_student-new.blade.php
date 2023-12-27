@@ -19,33 +19,25 @@
         <x-bs.table vShow="form.schedule_id" :hover=false :vHeader=true :smartPhone=true>
             <tr>
                 <th>校舎</th>
-                <td>
-                    <div id="campas_name"></div>
-                </td>
+                <td>@{{selectGetItem.campus_name}}</td>
             </tr>
             <tr>
                 <th>コース</th>
-                <td>
-                    <div id="course_name"></div>
-                </td>
+                <td>@{{selectGetItem.course_name}}</td>
             </tr>
             <tr>
                 <th>講師名</th>
-                <td>
-                    <div id="tutor_name"></div>
-                </td>
+                <td>@{{selectGetItem.tutor_name}}</td>
             </tr>
             <tr>
                 <th>教科</th>
-                <td>
-                    <div id="subject_name"></div>
-                </td>
+                <td>@{{selectGetItem.subject_name}}</td>
             </tr>
         </x-bs.table>
     </div>
 
-    <div v-show="form.schedule_id" class="callout callout-info mt-4 mb-4">
-        <p id="preferred_range"></p>
+    <div v-cloak v-show="form.schedule_id" class="callout callout-info mt-4 mb-4">
+        <p>振替日は @{{selectGetItem.preferred_from}} ～ @{{selectGetItem.preferred_to}} の範囲で指定してください。</p>
     </div>
 
     <x-bs.form-title>振替希望日</x-bs.form-title>
@@ -66,7 +58,7 @@
         <x-input.select vShow="form.preferred{{$i}}_type == 1" id="preferred_date{{$i}}_select" :select2=true
             :select2Search=false :editData=$editData>
             {{-- vueで動的にプルダウンを作成 --}}
-            <option v-for="item in selectGetItemFreeSchedule" :value="item.id">
+            <option v-for="item in selectGetItem.candidates" :value="item.id">
                 @{{ item.value }}
             </option>
         </x-input.select>
@@ -89,9 +81,7 @@
 {{-- hidden --}}
 <x-input.hidden id="student_id" :editData=$editData />
 <x-input.hidden id="campus_cd" :editData=$editData />
-<x-input.hidden id="course_cd" :editData=$editData />
 <x-input.hidden id="tutor_id" :editData=$editData />
-<x-input.hidden id="subject_cd" :editData=$editData />
 
 {{-- フッター --}}
 <x-slot name="footer">

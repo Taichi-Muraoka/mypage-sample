@@ -135,6 +135,18 @@ return [
                 "生徒：:studentName\n"
         ],
 
+        //-------------------
+        // 振替調整 代講授業登録(管理者登録)
+        //-------------------
+        'substitute_regist_schedule' => [
+            'title' => "代講授業登録のお知らせ",
+            'text' => "下記の授業について、代講授業が登録されました。\n" .
+                "授業日・時限：:targetDate :targetPeriodNo時限目\n" .
+                "校舎：:roomName\n" .
+                "代講講師：:tutorName\n" .
+                "生徒：:studentName\n"
+        ],
+
         //--------------
         // 追加授業登録（生徒）
         //--------------
@@ -273,16 +285,9 @@ return [
         ],
 
         //-------------------
-        // 振替調整 代講授業登録(生徒へ)
+        // 振替調整 代講授業登録(管理者登録)
         //-------------------
-        'substitute_regist_to_student' => [
-            'subject' => "【" . config('app.name') . "】" . "代講授業登録のお知らせ"
-        ],
-
-        //-------------------
-        // 振替調整 代講授業登録(講師へ)
-        //-------------------
-        'substitute_regist_to_tutor' => [
+        'substitute_regist_schedule' => [
             'subject' => "【" . config('app.name') . "】" . "代講授業登録のお知らせ"
         ],
 
