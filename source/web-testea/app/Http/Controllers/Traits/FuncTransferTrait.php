@@ -16,7 +16,9 @@ use App\Models\Tutor;
 use App\Models\TransferApplication;
 use App\Models\TransferApplicationDate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
+use App\Libs\AuthEx;
 
 /**
  * 振替申請 - 機能共通処理
@@ -35,17 +37,31 @@ trait FuncTransferTrait
 
     /**
      * 振替依頼対象スケジュール情報を取得
-     * 
+     *
      * @param   $fromDate 対象開始日
      * @param   $toDate   対象終了日
-     * @param   $sid      生徒ID
-     * @param   $tid      講師ID
+     * @param   $sid      生徒ID（プルダウンより絞り込み）
      * @return  object スケジュール情報
      */
-    private function fncTranGetTransferSchedule($fromDate, $toDate, $sid = null, $tid = null)
+    private function fncTranGetTransferSchedule($fromDate, $toDate, $sid = null)
     {
 
         $query = Schedule::query();
+
+        // ユーザー権限による絞り込みを入れる
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎でガードを掛ける
+            $query->where($this->guardRoomAdminTableWithRoomCd());
+        }
+        if (AuthEx::isStudent()) {
+            // 生徒の場合、自分の生徒IDのみにガードを掛ける
+            $query->where($this->guardStudentTableWithSid());
+        }
+        if (AuthEx::isTutor()) {
+            // 講師の場合、自分の講師IDのみにガードを掛ける
+            $query->where($this->guardTutorTableWithTid());
+        }
+
         $lessons = $query
             ->select(
                 'schedule_id',
@@ -62,17 +78,67 @@ trait FuncTransferTrait
             ->when($sid, function ($query) use ($sid) {
                 return $query->where('schedules.student_id', $sid);
             })
-            // 講師IDが指定された場合のみ絞り込み
-            ->when($tid, function ($query) use ($tid) {
-                return $query->where('schedules.tutor_id', $tid);
-            })
 
             // 出欠・振替コードが0:実施前・出席、3:未振替
             ->whereIn('schedules.absent_status', [AppConst::CODE_MASTER_35_0, AppConst::CODE_MASTER_35_3])
             // 対象の授業日範囲
             ->whereBetween('schedules.target_date', [$fromDate, $toDate])
             // 仮登録状態 = 0:本登録
-            ->whereIn('schedules.tentative_status', [AppConst::CODE_MASTER_36_0, AppConst::CODE_MASTER_35_3])
+            ->where('schedules.tentative_status', AppConst::CODE_MASTER_36_0)
+            ->orderby('schedules.target_date')
+            ->orderby('schedules.period_no')
+            ->get();
+
+        return $lessons;
+    }
+
+    /**
+     * 振替依頼対象スケジュール情報を取得（管理者用）
+     * 対象期間によらず未振替の授業を含める
+     *
+     * @param   $fromDate 対象開始日
+     * @param   $toDate   対象終了日
+     * @param   $sid      生徒ID（プルダウンより絞り込み）
+     * @return  object スケジュール情報
+     */
+    private function fncTranGetTransferScheduleAdmin($fromDate, $toDate, $sid)
+    {
+
+        $query = Schedule::query();
+
+        // ユーザー権限による絞り込みを入れる
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎でガードを掛ける
+            $query->where($this->guardRoomAdminTableWithRoomCd());
+        }
+
+        $lessons = $query
+            ->select(
+                'schedule_id',
+                'target_date',
+                'period_no'
+            )
+            // コース種別 = 授業単 のみ対象とする
+            ->sdJoin(MstCourse::class, function ($join) {
+                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd')
+                    ->where('mst_courses.course_kind', '=', AppConst::CODE_MASTER_42_1);;
+            })
+            // 生徒IDで絞り込み
+            ->where('schedules.student_id', $sid)
+            // 仮登録状態 = 0:本登録
+            ->where('schedules.tentative_status', AppConst::CODE_MASTER_36_0)
+            // 出欠ステータスにより条件を分ける
+            ->where(function ($orQuery) use ($fromDate, $toDate) {
+                $orQuery
+                    // 出欠ステータスが0:実施前・出席 かつ 対象の授業日範囲
+                    ->where(function ($subQuery) use ($fromDate, $toDate) {
+                        $subQuery
+                            ->where('schedules.absent_status', AppConst::CODE_MASTER_35_0)
+                            ->whereBetween('schedules.target_date', [$fromDate, $toDate]);
+                    })
+                    // 出欠ステータスが3:未振替 （授業日範囲指定なし）
+                    ->orWhere('schedules.absent_status', AppConst::CODE_MASTER_35_3);
+            })
             ->orderby('schedules.target_date')
             ->orderby('schedules.period_no')
             ->get();
@@ -82,18 +148,31 @@ trait FuncTransferTrait
 
     /**
      * 選択対象スケジュール情報を取得
-     * 
+     *
      * @param   $scheduleId スケジュールID
-     * @param   $sid        生徒ID
-     * @param   $tid        講師ID
      * @return  object スケジュール情報(選択時表示用)
      */
-    private function fncTranGetTargetScheduleInfo($scheduleId, $sid, $tid = null)
+    private function fncTranGetTargetScheduleInfo($scheduleId)
     {
         // 校舎名取得のサブクエリ
         $campus_names = $this->mdlGetRoomQuery();
 
         $query = Schedule::query();
+
+        // ユーザー権限による絞り込みを入れる
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎でガードを掛ける
+            $query->where($this->guardRoomAdminTableWithRoomCd());
+        }
+        if (AuthEx::isStudent()) {
+            // 生徒の場合、自分の生徒IDのみにガードを掛ける
+            $query->where($this->guardStudentTableWithSid());
+        }
+        if (AuthEx::isTutor()) {
+            // 講師の場合、自分の講師IDのみにガードを掛ける
+            $query->where($this->guardTutorTableWithTid());
+        }
+
         $lesson = $query
             // キーの指定
             ->where('schedules.schedule_id', '=', $scheduleId)
@@ -104,6 +183,7 @@ trait FuncTransferTrait
                 'schedules.minites',
                 'schedules.booth_cd',
                 'schedules.how_to_kind',
+                'schedules.absent_status',
                 // 校舎名
                 'campus_names.room_name as campus_name',
                 'schedules.student_id',
@@ -135,14 +215,6 @@ trait FuncTransferTrait
             ->sdLeftJoin(MstSubject::class, function ($join) {
                 $join->on('mst_subjects.subject_cd', '=', 'schedules.subject_cd');
             })
-            // 生徒IDが指定された場合のみ絞り込み
-            ->when($sid, function ($query) use ($sid) {
-                return $query->where('schedules.student_id', $sid);
-            })
-            // 講師IDが指定された場合のみ絞り込み
-            ->when($tid, function ($query) use ($tid) {
-                return $query->where('schedules.tutor_id', $tid);
-            })
             ->firstOrFail();
 
         return $lesson;
@@ -150,20 +222,30 @@ trait FuncTransferTrait
 
     /**
      * 一覧表示用 振替依頼情報を取得SQLを作成
-     * 
-     * @param   $sid        生徒ID
-     * @param   $tid        講師ID
+     * 生徒・講師権限による絞り込みあり
+     * 校舎コード以外の検索項目の絞り込みは呼び元のscopeで行う
      * @param   $campusCd   校舎コード
-     * @param   $status     振替依頼承認ステータス
-     * @param   $forS       生徒向け(ステータス条件あり)
      * @return  object 振替依頼情報
      */
-    private function fncTranGetATransferApplicationList($sid = null, $tid = null, $campusCd = null, $status = null, $forS = true)
+    private function fncTranGetATransferApplicationList($campusCd)
     {
         // 校舎名取得のサブクエリ
         $campus_names = $this->mdlGetRoomQuery();
 
         $query = TransferApplication::query();
+
+        // 生徒・講師権限による絞り込みを入れる
+        if (AuthEx::isStudent()) {
+            // 生徒の場合、自分の生徒IDのみにガードを掛ける
+            $query->where($this->guardStudentTableWithSid());
+            // 生徒の場合、承認ステータス＝管理者承認待ちを除外
+            $query->where('transfer_applications.approval_status', '!=', AppConst::CODE_MASTER_3_0);
+        }
+        if (AuthEx::isTutor()) {
+            // 講師の場合、自分の講師IDのみにガードを掛ける
+            $query->where($this->guardTutorTableWithTid());
+        }
+
         // データを取得
         $transfers = $query
             ->select(
@@ -218,29 +300,11 @@ trait FuncTransferTrait
                 $join->on('transfer_applications.approval_status', '=', 'mst_codes_3.code')
                     ->where('mst_codes_3.data_type', '=', AppConst::CODE_MASTER_3);
             }, 'mst_codes_3')
-
             // キーの指定
-            // 生徒IDが指定された場合のみ絞り込み
-            ->when($sid, function ($query) use ($sid) {
-                return $query->where('transfer_applications.student_id', $sid);
-            })
-            // 講師IDが指定された場合のみ絞り込み
-            ->when($tid, function ($query) use ($tid) {
-                return $query->where('transfer_applications.tutor_id', $tid);
-            })
             // 校舎コードが指定された場合のみ絞り込み
             ->when($campusCd, function ($query) use ($campusCd) {
                 return $query->where('schedules.campus_cd', $campusCd);
             })
-            // 振替承認ステータスが指定された場合のみ絞り込み
-            ->when($status, function ($query) use ($status) {
-                return $query->where('transfer_applications.approval_status', $status);
-            })
-            // 生徒向けフラグ=trueの場合のみ絞り込み
-            ->when($forS, function ($query) {
-                return $query->where('transfer_applications.approval_status', '!=', AppConst::CODE_MASTER_3_0);
-            })
-
             ->orderby('apply_date', 'desc')
             ->orderby('target_date', 'asc')
             ->orderby('period_no', 'asc');
@@ -250,18 +314,33 @@ trait FuncTransferTrait
 
     /**
      * 振替依頼情報を取得
-     * 
+     * ユーザー権限による絞り込みあり
+     *
      * @param   $id    振替依頼情報ID
-     * @param   $sid   生徒ID
-     * @param   $tid   講師ID
      * @return  object 振替依頼情報・振替依頼日程情報
      */
-    private function fncTranGetTransferApplicationData($id, $sid = null, $tid = null)
+    private function fncTranGetTransferApplicationData($id)
     {
         // 校舎名取得のサブクエリ
         $campus_names = $this->mdlGetRoomQuery();
 
         $query = TransferApplication::query();
+
+        // ユーザー権限による絞り込みを入れる
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎でガードを掛ける
+            $account = Auth::user();
+            $query->where('lesson_schedules.campus_cd', $account->campus_cd);
+        }
+        if (AuthEx::isStudent()) {
+            // 生徒の場合、自分の生徒IDのみにガードを掛ける
+            $query->where($this->guardStudentTableWithSid());
+        }
+        if (AuthEx::isTutor()) {
+            // 講師の場合、自分の講師IDのみにガードを掛ける
+            $query->where($this->guardTutorTableWithTid());
+        }
+
         $tranApp = $query
             ->where('transfer_applications.transfer_apply_id', '=', $id)
             ->select(
@@ -367,16 +446,6 @@ trait FuncTransferTrait
                 $join->on('transfer_applications.transfer_apply_id', '=', 'transfer_application_dates_3.transfer_apply_id')
                     ->where('transfer_application_dates_3.request_no', '=', 3);
             }, 'transfer_application_dates_3')
-
-            // 生徒IDが指定された場合のみ絞り込み
-            ->when($sid, function ($query) use ($sid) {
-                return $query->where('transfer_applications.student_id', $sid);
-            })
-            // 講師IDが指定された場合のみ絞り込み
-            ->when($tid, function ($query) use ($tid) {
-                return $query->where('transfer_applications.tutor_id', $tid);
-            })
-
             ->firstOrFail();
 
         return $tranApp;
@@ -384,7 +453,7 @@ trait FuncTransferTrait
 
     /**
      * 講師の空き時間情報を取得
-     * 
+     *
      * @param   $tutorId    講師ID
      * @return  object      曜日,時限のリスト
      */
@@ -405,7 +474,7 @@ trait FuncTransferTrait
     /**
      * 講師の空き授業時間を指定期間の範囲で取得
      * 対象講師、生徒の登録済みスケジュールもチェックする
-     * 
+     *
      * @param $tutorId  講師ID
      * @param $fromDate 開始日
      * @param $toDate   終了日
@@ -494,10 +563,10 @@ trait FuncTransferTrait
 
     /**
      * 対象のスケジュール情報から、振替候補日のリストを取得
-     * 
+     *
      * @param $schedule     スケジュール情報
      * @param $targetPeriod 候補日対象範囲
-     * @return object 
+     * @return object
      */
     private function fncTranGetTransferCandidateDates($schedule, $targetPeriod)
     {
@@ -593,7 +662,7 @@ trait FuncTransferTrait
     /**
      * 当月振替依頼回数を取得
      * 依頼日がシステム日付と同月の、申請者種別別・講師＆生徒の組合せの依頼をカウント
-     * 
+     *
      * @param   $tutorId        講師ID
      * @param   $studentId      生徒ID
      * @param   $applicantType  申請者種別
@@ -625,7 +694,7 @@ trait FuncTransferTrait
 
     /**
      * 振替依頼情報IDからスケジュール情報を取得
-     * 
+     *
      * @param $tranAppId    振替依頼情報ID
      * @return object       スケジュール情報
      */
@@ -639,6 +708,9 @@ trait FuncTransferTrait
             ->select(
                 'schedules.schedule_id',
                 'schedules.target_date',
+                'schedules.period_no',
+                'schedules.start_time',
+                'schedules.end_time',
                 'schedules.period_no',
                 'schedules.campus_cd',
                 'schedules.booth_cd',
@@ -659,7 +731,7 @@ trait FuncTransferTrait
 
     /**
      * 振替依頼日程情報を取得
-     * 
+     *
      * @param   $transferDateId 振替依頼日程情報ID
      * @return  object
      */
@@ -690,17 +762,15 @@ trait FuncTransferTrait
     }
 
     /**
-     * 承認画面用 振替依頼情報依頼情報
-     * 
+     * 承認画面用 振替依頼情報
+     *
      * @param $transferId   振替依頼情報ID
-     * @param $sId          生徒ID
-     * @param $tId          講師ID
      * @return object 表示用データ
      */
-    private function fncTranGetEditTransferData($transferId, $sId, $tId)
+    private function fncTranGetEditTransferData($transferId)
     {
         // データを取得
-        $tranApp = $this->fncTranGetTransferApplicationData($transferId, $sId, $tId);
+        $tranApp = $this->fncTranGetTransferApplicationData($transferId);
 
         // 希望日のスケジュール重複チェック
         $campusCd = $tranApp->campus_cd;
@@ -718,8 +788,7 @@ trait FuncTransferTrait
         for ($i = 1; $i <= 3; $i++) {
             $freeCheck[$i] = null;
             if ($tran_period[$i] != null && $tran_period[$i] != '') {
-                // 対象日が、過去の場合は選択不可
-                // TODO:仕様確認中・要調整(当日をどうするか)
+                // 対象日が、過去の場合は選択不可（当日は許可）
                 if (strtotime($tran_date[$i]) < strtotime(date('Y-m-d'))) {
                     $freeCheck[$i] = Lang::get('validation.invalid_date_cannot_select');
                 } else {
@@ -773,6 +842,7 @@ trait FuncTransferTrait
             'transfer_apply_id' => $tranApp->transfer_apply_id,
             'target_date' => CommonDateFormat::formatYmdDay($tranApp->lesson_target_date),
             'period_no' => $tranApp->lesson_period_no,
+            'campus_cd' => $tranApp->campus_cd,
             'campus_name' => $tranApp->campus_name,
             'course_name' => $tranApp->course_name,
             'tutor_name' => $tranApp->lesson_tutor_name,
@@ -784,6 +854,7 @@ trait FuncTransferTrait
             'transfer_date_id_3' => $tranApp->transfer_date_id_3,
             'subject_name' => $tranApp->subject_name,
             'approval_status' => $tranApp->approval_status,
+            'approval_status_name' => $tranApp->approval_status_name,
             'comment' => $tranApp->comment
         ];
         for ($i = 1; $i <= 3; $i++) {
@@ -800,16 +871,66 @@ trait FuncTransferTrait
         return $editdata;
     }
 
+    /**
+     * 振替・代講授業情報を設定
+     *
+     * @param   int $transferKind 振替代講区分
+     * @param   object $request request情報
+     * @param   object $schedule 振替元スケジュール情報
+     * @return  object
+     */
+    private function fncTranSetTrasferSchedule($transferKind, $request, $schedule)
+    {
+        // 振替元授業情報をベースにする
+        $transferSchedule = clone $schedule;
+
+        if ($transferKind == AppConst::CODE_MASTER_54_1) {
+            // 振替代講区分＝振替の場合
+            $transferSchedule->target_date = $request->input('target_date');
+            $transferSchedule->period_no = $request->input('period_no');
+            // 時限から開始時間取得
+            $periodTime = $this->getTimetablePeriodTimeByDatePeriod(
+                $schedule->campus_cd,
+                $transferSchedule->target_date,
+                $transferSchedule->period_no
+            );
+            // 開始時刻設定
+            $transferSchedule->start_time = $request->filled('start_time') ? $request->input('start_time') : $periodTime->start_time;
+            // 終了時刻計算
+            $transferSchedule->end_time = $this->fncTranEndTime($transferSchedule->start_time, $schedule->minites);
+            // 対象講師ID・欠席講師ID設定（講師変更時のみ）
+            if ($request->filled('change_tid')) {
+                // 授業代講種別設定
+                $transferSchedule->substitute_kind = AppConst::CODE_MASTER_34_1;
+                // 対象講師ID設定
+                $transferSchedule->tutor_id = $request->input('change_tid');
+                // 欠席講師ID設定
+                $transferSchedule->absent_tutor_id = $schedule->tutor_id;
+            }
+        } else if ($request->input('transfer_kind') == AppConst::CODE_MASTER_54_2) {
+            // 振替代講区分＝代講の場合
+            // 授業代講種別設定
+            $transferSchedule->substitute_kind = AppConst::CODE_MASTER_34_1;
+            // 対象講師ID設定
+            $transferSchedule->tutor_id = $request->input('substitute_tid');
+            // 欠席講師ID設定
+            $transferSchedule->absent_tutor_id = $schedule->tutor_id;
+        }
+
+        return $transferSchedule;
+    }
+
     //------------------------------
     // 日付・時刻計算
     //------------------------------
 
     /**
      * システム日時を基準に振替調整対象授業日の範囲を取得
-     * 
+     *
+     * @param bool  $adminFlg 管理者設定時true（省略時false）
      * @return array 開始日～終了日
      */
-    protected function fncTranTargetDateFromTo()
+    protected function fncTranTargetDateFromTo($adminFlg = false)
     {
         $nowTime = date('H:i');
         $fromDate = null;
@@ -823,6 +944,10 @@ trait FuncTransferTrait
             $fromDate = date('Y/m/d', strtotime('+2 day'));
             $toDate = date('Y/m/d', strtotime('+32 day'));
         }
+        // 管理者設定時は、当日も許可する
+        if ($adminFlg == true) {
+            $fromDate = date('Y/m/d');
+        }
 
         return [
             'from_date' => $fromDate,
@@ -832,23 +957,28 @@ trait FuncTransferTrait
 
     /**
      * 対象日を基準に振替候補日の範囲を取得
-     * 
+     *
      * @param string  $target_date 基準日
+     * @param bool  $adminFlg 管理者設定時true（省略時false）
      * @return object 開始日～終了日
      */
-    protected function fncTranCandidateDateFromTo($target_date)
+    protected function fncTranCandidateDateFromTo($target_date, $adminFlg = false)
     {
         // システム日付から、候補の開始日の最小値を求める
         $nowTime = date('H:i');
         $minDate = null;
-        if ($nowTime < '22:00') {
-            // 現在時刻が22時までは、翌日以降
-            $minDate = date('Y/m/d', strtotime('+1 day'));
+        // 管理者設定時は、当日も許可する
+        if ($adminFlg == true) {
+            $minDate = date('Y/m/d');
         } else {
-            // 現在時刻が22時以降は、翌々日以降
-            $minDate = date('Y/m/d', strtotime('+2 day'));
+            if ($nowTime < '22:00') {
+                // 現在時刻が22時までは、翌日以降
+                $minDate = date('Y/m/d', strtotime('+1 day'));
+            } else {
+                // 現在時刻が22時以降は、翌々日以降
+                $minDate = date('Y/m/d', strtotime('+2 day'));
+            }
         }
-
         // 対象日から前後2週間の日付
         $fromDate = date('Y/m/d', strtotime($target_date . ' -2 week'));
         $toDate = date('Y/m/d', strtotime($target_date . ' +2 week'));
@@ -1447,5 +1577,131 @@ trait FuncTransferTrait
         $rules += TransferApplication::fieldRules('comment', ['required_if:approval_status,' . AppConst::CODE_MASTER_3_3, 'required_if:approval_status,' . AppConst::CODE_MASTER_3_4]);
 
         return $rules;
+    }
+
+    /**
+     * 運用管理 振替日の範囲チェック
+     */
+    private function fncTranGetValidateTargetDate($transferSchedule, $schedule)
+    {
+        // 独自バリデーション: 振替日の範囲チェック
+        $validationTargetDate =  function ($attribute, $value, $fail) use ($transferSchedule, $schedule) {
+
+            // 振替対象日の範囲（管理者用に設定）
+            $targetPeriod = $this->fncTranCandidateDateFromTo($schedule->target_date, true);
+            // 範囲チェック
+            if (!$this->dtCheckDateFromTo($transferSchedule->target_date, $targetPeriod['from_date'], $targetPeriod['to_date'])) {
+                // 振替日範囲外エラー
+                return $fail(Lang::get('validation.preferred_date_out_of_range'));
+            }
+        };
+        return $validationTargetDate;
+    }
+
+    /**
+     * 運用管理 振替日・時限の関連チェック
+     */
+    private function fncTranGetValidateDatePeriod($transferSchedule, $schedule, $request)
+    {
+        // 独自バリデーション: 振替日・時限の関連チェック
+        $validationDatePeriod =  function ($attribute, $value, $fail) use ($transferSchedule, $schedule, $request) {
+
+            // 振替対象の授業日・時限と重複チェック
+            if (
+                $transferSchedule->target_date == $schedule->target_date &&
+                $transferSchedule->period_no == $schedule->period_no
+            ) {
+                // 重複エラー
+                return $fail(Lang::get('validation.transfer_lesson_datetime_same'));
+            }
+
+            // 生徒スケジュール重複チェック
+            if (!$this->fncScheChkDuplidateSid(
+                $transferSchedule->target_date,
+                $transferSchedule->start_time,
+                $transferSchedule->end_time,
+                $transferSchedule->student_id
+            )) {
+                return $fail(Lang::get('validation.duplicate_student'));
+            }
+
+            // ブース空きチェック
+            if ($this->fncScheSearchBooth(
+                $transferSchedule->campus_cd,
+                $transferSchedule->booth_cd,
+                $transferSchedule->target_date,
+                $transferSchedule->period_no,
+                $transferSchedule->how_to_kind,
+                null,
+                false
+            ) == null) {
+                return $fail(Lang::get('validation.duplicate_booth'));
+            }
+
+            // 講師スケジュール重複チェック（講師変更なしの場合のみ）
+            if (!$request->filled('change_tid')) {
+                if (!$this->fncScheChkDuplidateTid(
+                    $transferSchedule->target_date,
+                    $transferSchedule->start_time,
+                    $transferSchedule->end_time,
+                    $transferSchedule->tutor_id
+                )) {
+                    // 重複エラー
+                    return $fail(Lang::get('validation.duplicate_tutor'));
+                }
+            }
+        };
+        return $validationDatePeriod;
+    }
+    /**
+     * 運用管理 変更時講師の重複チェック
+     */
+    private function fncTranGetValidateChangeTutor($transferSchedule, $schedule)
+    {
+        // 独自バリデーション: 変更時講師の重複チェック
+        $validationChangeTutor =  function ($attribute, $value, $fail) use ($transferSchedule, $schedule) {
+            // 振替前講師と重複チェック
+            if ($value == $schedule->tutor_id) {
+                // 重複エラー['
+                return $fail(Lang::get('validation.different'));
+            }
+
+            // 講師スケジュール重複チェック
+            if (!$this->fncScheChkDuplidateTid(
+                $transferSchedule->target_date,
+                $transferSchedule->start_time,
+                $transferSchedule->end_time,
+                $value
+            )) {
+                // 重複エラー
+                return $fail(Lang::get('validation.duplicate_tutor'));
+            }
+        };
+        return $validationChangeTutor;
+    }
+
+    /**
+     * 運用管理 振替日の範囲チェック
+     */
+    private function fncTranGetValidatePeriodStartTime($transferSchedule)
+    {
+        // 独自バリデーション: 時限と開始時刻の相関チェック
+        $validationPeriodStartTime =  function ($attribute, $value, $fail) use ($transferSchedule) {
+
+            // 対象日の時間割区分を取得
+            $timetableKind = $this->fncScheGetTimeTableKind($transferSchedule->campus_cd, $transferSchedule->target_date);
+            // 時限と開始時刻の相関チェック
+            $chk = $this->fncScheChkStartTime(
+                $transferSchedule->campus_cd,
+                $timetableKind,
+                $transferSchedule->period_no,
+                $transferSchedule->start_time
+            );
+            if (!$chk) {
+                // 開始時刻範囲エラー
+                return $fail(Lang::get('validation.out_of_range_period'));
+            }
+        };
+        return $validationPeriodStartTime;
     }
 }

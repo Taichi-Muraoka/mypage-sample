@@ -42,6 +42,14 @@ export default class PageBase {
         location.href = appInfo.parent2;
     }
 
+    /**
+     * 遷移元ページへリダイレクト（他機能からの遷移）
+     */
+    redirectToBasePage() {
+        // MEMO: bladeで@yield('base_page')を指定する。
+        location.href = appInfo.base;
+    }
+
     //--------------------------------------------
     // モーダル処理
     //--------------------------------------------

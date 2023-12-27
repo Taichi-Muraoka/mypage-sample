@@ -9,39 +9,30 @@
 
     <x-bs.row>
         <x-bs.col2>
-            {{-- @can('roomAdmin') --}}
+            @can('roomAdmin')
             {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-            {{-- <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
-                :select2Search=false :blank=false />
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+				:select2Search=false :blank=false />
             @else
-            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
-            @endcan --}}
-            <x-input.select id="roomcd" caption="校舎" :select2=true >
-                <option value="1">久我山</option>
-                <option value="2">西永福</option>
-                <option value="3">下高井戸</option>
-                <option value="4">駒込</option>
-                <option value="5">日吉</option>
-                <option value="6">自由が丘</option>
-            </x-input.select>
+            {{-- 全体管理者の場合、検索を非表示・未選択を表示する --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+				:select2Search=false :blank=true />
+            @endcan
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="approval_state" caption="ステータス" :select2=false >
-                <option value="0">管理者承認待ち</option>
-                <option value="1">承認待ち</option>
-                <option value="2">承認</option>
-                <option value="3">差戻し</option>
-                <option value="4">管理者対応済</option>
-            </x-input.select>
+            <x-input.select id="approval_status" caption="ステータス" :select2=true :mastrData=$statusList :select2Search=false
+            :select2Search=false :blank=true />
         </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.text caption="生徒名" id="student_name" :rules=$rules />
+            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$studentList :select2Search=true
+                :blank=true />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text caption="講師名" id="teacher_name" :rules=$rules />
+            <x-input.select id="tutor_id" caption="講師名" :select2=true :mastrData=$tutorList :select2Search=true
+                :blank=true />
         </x-bs.col2>
     </x-bs.row>
 
@@ -73,52 +64,25 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/01/16</td>
-            <td>生徒</td>
-            <td>久我山</td>
-            <td>2023/01/30 4限</td>
-            <td>個別指導コース</td>
-            <td>CWテスト生徒１</td>
-            <td>CWテスト教師１０１</td>
-            <td>1</td>
-            <td>承認</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmd(item.apply_date)}}</td>
+            <td>@{{item.apply_kind_name}}</td>
+            <td>@{{item.campus_name}}</td>
+            <td>@{{$filters.formatYmdDay(item.target_date)}} @{{item.period_no}}限</td>
+            <td>@{{item.course_name}}</td>
+            <td>@{{item.student_name}}</td>
+            <td>@{{item.tutor_name}}</td>
+            <td>@{{item.monthly_count}}</td>
+            <td>@{{item.approval_status_name}}</td>
             <td>
-                <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('transfer_check-edit', 1) }}" disabled />
-                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval" disabled />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/01/17</td>
-            <td>講師</td>
-            <td>久我山</td>
-            <td>2023/01/31 4限</td>
-            <td>家庭教師</td>
-            <td>CWテスト生徒１</td>
-            <td>CWテスト教師１０１</td>
-            <td>1</td>
-            <td>承認待ち</td>
-            <td>
-                <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('transfer_check-edit', 1) }}"/>
-                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval" disabled />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/01/08</td>
-            <td>講師</td>
-            <td>久我山</td>
-            <td>2023/01/15 6限</td>
-            <td>個別指導コース</td>
-            <td>CWテスト生徒２</td>
-            <td>CWテスト教師１０１</td>
-            <td>2</td>
-            <td>管理者承認待ち</td>
-            <td>
-                <x-button.list-dtl />
-                <x-button.list-edit href="{{ route('transfer_check-edit', 1) }}"/>
-                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval" />
+                <x-button.list-dtl :vueDataAttr="['id' => 'item.transfer_apply_id']" />
+                {{-- 承認 管理者承認待ち以外のときは非活性 --}}
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval"
+                    :vueDataAttr="['id' => 'item.transfer_apply_id']"
+                    vueDisabled="item.approval_status!={{ App\Consts\AppConst::CODE_MASTER_3_0 }}" />
+                {{-- 編集 URLとIDを指定。承認・管理者調整済のときは非活性 --}}
+                <x-button.list-edit vueHref="'{{ route('transfer_check-edit', '') }}/' + item.transfer_apply_id"
+                    vueDisabled="item.approval_status=={{ App\Consts\AppConst::CODE_MASTER_3_2 }} || item.approval_status=={{ App\Consts\AppConst::CODE_MASTER_3_5 }}" />
             </td>
         </tr>
 
@@ -130,6 +94,6 @@
 @include('pages.admin.modal.transfer_check-modal')
 {{-- モーダル(送信確認モーダル) 承認 --}}
 @include('pages.admin.modal.transfer_check_approval-modal', ['modal_send_confirm' => true, 'modal_id' =>
-'modal-dtl-approval'])
+'modal-dtl-approval', 'caption_OK' => '承認'])
 
 @stop

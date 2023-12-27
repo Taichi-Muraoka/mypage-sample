@@ -20,14 +20,14 @@
     <x-input.select caption="生徒名" id="student_id" :select2=true :editData=$editData :mastrData=$students
         :editData=$editData :select2Search=true onChange="selectChangeStudent" />
 
-    <div v-show="form.monthly_count >= form.skip_count">
-        <p class="alert-msg" id="monthly_message"></p>
+    <div v-cloak v-show="form.monthly_count >= form.skip_count">
+        <p class="alert-msg">今月 <b>@{{selectGetItemSchedule.monthly_count}}</b> 回目の振替調整です。管理者承認が発生します。</p>
     </div>
 
     <x-input.select caption="授業日・時限" id="schedule_id" :select2=true onChange="selectChangeSchedule" :editData=$editData
         :select2Search=false :blank=true>
         {{-- vueで動的にプルダウンを作成 --}}
-        <option v-for="item in selectGetItemSchedule" :value="item.id">
+        <option v-for="item in selectGetItemSchedule.lessons" :value="item.id">
             @{{ item.value }}
         </option>
     </x-input.select>
@@ -36,26 +36,20 @@
         <x-bs.table vShow="form.schedule_id" :hover=false :vHeader=true :smartPhone=true>
             <tr>
                 <th>校舎</th>
-                <td>
-                    <div id="campus_name"></div>
-                </td>
+                <td>@{{selectGetItem.campus_name}}</td>
             </tr>
             <tr>
                 <th>コース</th>
-                <td>
-                    <div id="course_name"></div>
-                </td>
+                <td>@{{selectGetItem.course_name}}</td>
             </tr>
             <tr>
                 <th>教科</th>
-                <td>
-                    <div id="subject_name"></div>
-                </td>
+                <td>@{{selectGetItem.subject_name}}</td>
         </x-bs.table>
     </div>
 
-    <div v-show="form.schedule_id" class="callout callout-info mt-4 mb-4">
-        <p id="preferred_range"></p>
+    <div v-cloak v-show="form.schedule_id" class="callout callout-info mt-4 mb-4">
+        <p>振替日は @{{selectGetItem.preferred_from}} ～ @{{selectGetItem.preferred_to}} の範囲で指定してください。</p>
     </div>
 
     <x-bs.form-title>振替希望日</x-bs.form-title>
