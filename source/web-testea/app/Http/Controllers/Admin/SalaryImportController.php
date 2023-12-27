@@ -15,6 +15,7 @@ use App\Models\SalaryImport;
 use App\Models\CodeMaster;
 use App\Exceptions\ReadDataValidateException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Arr;
 
 /**
  * 給与情報取込 - コントローラ
@@ -275,11 +276,7 @@ class SalaryImportController extends Controller
         // ヘッダ行成型用
         $csvHeaderNames = [];
         $csvHeaderPref = ["講師番号", "講師名", "出社回数"];
-        // $csvHeaderSuf = [];
-        $dataHeaderPref = ["tid", "name"];
-        $dataHeaderSuf = ["dependents", "tax_table"];
-
-        $csvHeaderSalary = [
+        $csvHeaderSuf = [
             "個別コース", "時給",
             "１対２", "時給",
             "１対３", "時給",
@@ -289,6 +286,32 @@ class SalaryImportController extends Controller
             "ハイプラン", "時給",
             "インターン", "時給",
             "作業時間", "時給",
+            "交通費",
+            "特別報酬",
+            "ペナルティ",
+            "源泉計算用小計",
+            "交通費等",
+            "扶養者数",
+            "種別",
+            "源泉徴収月額",
+            "住民税徴収",
+            "経費精算",
+            "年末調整",
+            "支払",
+            "備考"
+        ];
+        $dataHeaderPref = [
+            "個別コース",
+            "１対２",
+            "１対３",
+            "集団",
+            "家庭教師",
+            "演習",
+            "ハイプラン",
+            "インターン",
+            "作業時間"
+        ];
+        $dataHeaderSuf = [
             "交通費",
             "特別報酬",
             "ペナルティ",
@@ -351,7 +374,7 @@ class SalaryImportController extends Controller
         //     }
         // }
 
-        $csvHeaders = array_merge($csvHeaderPref, $csvHeaderSalary);
+        $csvHeaders = array_merge($csvHeaderPref, $csvHeaderSuf);
         // $csvHeaders = array_merge($csvHeaders, $csvHeaderSuf);
 
         // array_combine用
@@ -379,11 +402,6 @@ class SalaryImportController extends Controller
         // 1行ずつ取得
         foreach ($file as $i => $line) {
 
-            // 8行目までは読み飛ばす
-            // if ($i < 7) {
-            //     continue;
-            // }
-
             // 0行目がヘッダ行
             if ($i === 0) {
                 //-------------
@@ -406,13 +424,25 @@ class SalaryImportController extends Controller
                     . "(データ列数不正)");
             }
 
-            // headerをもとに、値をセットしたオブジェクトを生成
-            $values = array_combine($headers, $line);
+            $details_lists = [];
+            $i = 1;
+            foreach ($dataHeaderPref as $content) {
+                $details_list = [
+                    $content => $content,
+                    "時給".$i => "時給".$i
+                ];
+                array_push($details_lists, $details_list);
+                $i++;
+            }
+            // array_combine用
+            $arrayDetails = Arr::flatten($details_lists);
+            $dataHeaders = array_merge($csvHeaderPref, $arrayDetails, $dataHeaderSuf);
 
-            // 合計行で終了 ただし10行目以降の場合
-            // if (empty($values['tid']) && $i > 8) {
-            //     break;
-            // }
+            // headerをもとに、値をセットしたオブジェクトを生成
+            array_splice($line, count($dataHeaders));
+            $values = array_combine($dataHeaders, $line);
+
+            $this->debug($values);
 
             // [バリデーション] データ行の値のチェック
             // $rules = [
@@ -472,13 +502,12 @@ class SalaryImportController extends Controller
                 $salary_detail['amount'] = str_replace(',', '', $values[$salary_group_1[$count_group_1]]);
                 $salary_detail['hour_payment'] = (int) str_replace(',', '', $values[$salary_group_1[$count_group_1]]);
                 $salary_detail['hour'] = (int) str_replace(',', '', $values[$salary_group_1[$count_group_1]]);
-                // $salary_detail['created_at'] = $now;
-                // $salary_detail['updated_at'] = $now;
-                // $salary_detail['deleted_at'] = null;
                 array_push($salary_details, $salary_detail);
                 $seq++;
                 $count_group_1++;
             }
+
+            $this->debug($values);
 
             // 控除
             foreach ($salary_group_2 as $salary_detail) {
@@ -492,15 +521,10 @@ class SalaryImportController extends Controller
                 $salary_detail['amount'] = (int) str_replace(',', '', $values[$salary_group_2[$count_group_2]]);
                 $salary_detail['hour_payment'] = (int) str_replace(',', '', $values[$salary_group_2[$count_group_2]]);
                 $salary_detail['hour'] = (int) str_replace(',', '', $values[$salary_group_2[$count_group_2]]);
-                // $salary_detail['created_at'] = $now;
-                // $salary_detail['updated_at'] = $now;
-                // $salary_detail['deleted_at'] = null;
                 array_push($salary_details, $salary_detail);
                 $seq++;
                 $count_group_2++;
             }
-
-            $this->debug($values);
 
             // その他
             $salary_detail = [];
@@ -513,9 +537,6 @@ class SalaryImportController extends Controller
             $salary_detail['amount'] = (int) str_replace(',', '', $values[$salary_group_3[0]]);
             $salary_detail['hour_payment'] = (int) str_replace(',', '', $values[$salary_group_3[0]]);
             $salary_detail['hour'] = (int) str_replace(',', '', $values[$salary_group_3[0]]);
-            // $salary_detail['created_at'] = $now;
-            // $salary_detail['updated_at'] = $now;
-            // $salary_detail['deleted_at'] = null;
             array_push($salary_details, $salary_detail);
             $seq++;
 
@@ -530,9 +551,6 @@ class SalaryImportController extends Controller
             $salary_detail['amount'] = (int) str_replace(',', '', $values[$salary_group_4[0]]);
             $salary_detail['hour_payment'] = (int) str_replace(',', '', $values[$salary_group_4[0]]);
             $salary_detail['hour'] = (int) str_replace(',', '', $values[$salary_group_4[0]]);
-            // $salary_detail['created_at'] = $now;
-            // $salary_detail['updated_at'] = $now;
-            // $salary_detail['deleted_at'] = null;
             array_push($salary_details, $salary_detail);
         }
 
