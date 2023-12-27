@@ -245,7 +245,7 @@ trait CtrlModelTrait
         // アカウントテーブルとJOIN（削除管理者アカウント非表示対応）
         $query->sdJoin(Account::class, function ($join) {
             $join->on('admin_users.adm_id', '=', 'accounts.account_id')
-                ->where('account.account_type', '=', AppConst::CODE_MASTER_7_3);
+                ->where('accounts.account_type', '=', AppConst::CODE_MASTER_7_3);
         });
 
         // プルダウンリストを取得する

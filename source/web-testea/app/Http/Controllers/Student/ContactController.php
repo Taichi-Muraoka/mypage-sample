@@ -181,7 +181,7 @@ class ContactController extends Controller
 
         // 保存
         $contact = new Contact;
-        $contact->sid = $sid;
+        $contact->student_id = $sid;
         $contact->regist_time = $now;
         $contact->contact_state = AppConst::CODE_MASTER_17_0;
         $contact->fill($form)->save();

@@ -139,6 +139,18 @@ class Contact extends Model
     }
 
     /**
+     * 検索 生徒ID
+     */
+    public function scopeSearchStudentId($query, $obj)
+    {
+        $key = 'student_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
      * 検索 contact_state
      */
     public function scopeSearchContactStates($query, $obj)
