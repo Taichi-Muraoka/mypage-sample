@@ -65,7 +65,8 @@
             <td>@{{item.subject_name}}</td>
             <td>@{{item.status_name}}</td>
             <td>
-                <x-button.list-edit href="{{ route('transfer_check-new') }}" icon="" caption="振替情報登録" />
+                <x-button.list-edit vueHref="'{{ route('transfer_check-required', '') }}/' + item.id"
+                caption="振替情報登録" vueDisabled="item.absent_status != {{ App\Consts\AppConst::CODE_MASTER_35_3 }}" />
             </td>
         </tr>
     </x-bs.table>

@@ -86,16 +86,18 @@ export default class AppClass extends PageBase {
 
                     // 生徒プルダウンは動的に変わるので、一旦クリアする
                     this.form.student_id = "";
-
-                    // チェンジイベントを発生させる
-                    self.selectChangeGet(
-                        this,
-                        {
-                            destinationType: destinationType,
-                            campus_cd_student: campus_cd_student,
-                        },
-                        this.option
-                    );
+                    this.selectGetItem = {};
+                    if (destinationType) {
+                        // チェンジイベントを発生させる
+                        self.selectChangeGet(
+                            this,
+                            {
+                                destinationType: destinationType,
+                                campus_cd_student: campus_cd_student,
+                            },
+                            this.option
+                        );
+                    }
                 },
             },
         });

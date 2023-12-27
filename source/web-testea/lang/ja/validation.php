@@ -255,6 +255,9 @@ return [
     // 日付のエラー
     'invalid_date_cannot_select' => '選択できない日付です。',
 
+    // 振替日・時限 振替対象授業と重複エラー
+    'transfer_lesson_datetime_same' => '振替元の授業と異なる日・時限を指定してください。',
+
     // 講師授業集計 授業日期間指定エラー
     'target_date_term' => '授業日は６ヵ月以内で指定してください。',
 
