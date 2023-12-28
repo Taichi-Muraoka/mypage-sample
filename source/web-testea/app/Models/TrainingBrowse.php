@@ -33,7 +33,7 @@ class TrainingBrowse extends Model
 
     protected $primaryKey = [
         'trn_id',
-        'tid'
+        'tutor_id'
     ];
 
     /**
@@ -56,7 +56,7 @@ class TrainingBrowse extends Model
      * @var array
      */
     protected $casts = [
-        'browse_time' => 'date',
+        'browse_time' => 'datetime',
     ];
 
     /**

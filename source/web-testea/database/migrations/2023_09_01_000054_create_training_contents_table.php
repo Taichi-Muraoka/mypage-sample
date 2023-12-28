@@ -17,7 +17,7 @@ return new class extends Migration
             /* カラム */
             $table->increments('trn_id')->comment('研修ID');
             $table->unsignedSmallInteger('trn_type')->comment('研修形式（1:資料、2:動画）');
-            $table->text('text')->comment('研修内容');
+            $table->string('text', 100)->comment('研修内容');
             $table->text('url')->comment('研修資料URL（ファイルならはサーバ内のURL、動画なら外部のURL）');
             $table->date('regist_time')->default('1000-01-01')->comment('登録日');
             $table->date('release_date')->comment('公開日');

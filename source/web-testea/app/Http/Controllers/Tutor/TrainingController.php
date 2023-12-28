@@ -75,7 +75,7 @@ class TrainingController extends Controller
             // 閲覧状況を取得
             ->sdLeftJoin(TrainingBrowse::class, function ($join) use ($account_id) {
                 $join->on('training_browses.trn_id', '=', 'training_contents.trn_id')
-                    ->where('training_browses.tid', '=', $account_id);
+                    ->where('training_browses.tutor_id', '=', $account_id);
             })
             // 形式名を取得
             ->sdLeftJoin(CodeMaster::class, function ($join) {
@@ -182,7 +182,7 @@ class TrainingController extends Controller
 
         // すでに閲覧しているか確認
         $exists = TrainingBrowse::where('trn_id', '=', $trn_id)
-            ->where('tid', '=', $account_id)
+            ->where('tutor_id', '=', $account_id)
             ->exists();
 
         // 未閲覧だった場合、レコード作成
@@ -190,7 +190,7 @@ class TrainingController extends Controller
             // 保存
             $training_browse = new TrainingBrowse;
             $training_browse->trn_id = $trn_id;
-            $training_browse->tid = $account_id;
+            $training_browse->tutor_id = $account_id;
             $training_browse->browse_time = Carbon::now();
             $training_browse->save();
         }
@@ -248,7 +248,7 @@ class TrainingController extends Controller
 
         // すでに閲覧しているか確認
         $exists = TrainingBrowse::where('trn_id', '=', $trnId)
-            ->where('tid', '=', $account_id)
+            ->where('tutor_id', '=', $account_id)
             ->exists();
 
         // 未閲覧だった場合、レコード作成
@@ -256,7 +256,7 @@ class TrainingController extends Controller
             // 保存
             $training_browse = new TrainingBrowse;
             $training_browse->trn_id = $trnId;
-            $training_browse->tid = $account_id;
+            $training_browse->tutor_id = $account_id;
             $training_browse->browse_time = Carbon::now();
             $training_browse->save();
         }
