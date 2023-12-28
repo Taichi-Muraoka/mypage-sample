@@ -32,7 +32,7 @@
     <x-input.textarea caption="回答内容" id="answer_text" :rules=$rules :editData=$editData />
 
     <x-input.select id="contact_state" caption="ステータス" :editData=$editData :mastrData=$contactState
-        :select2=true :select2Search=true  />
+        :select2=true :select2Search=false :blank=false />
 
     {{-- hidden --}}
     <x-input.hidden id="contact_id" :editData=$editData />
