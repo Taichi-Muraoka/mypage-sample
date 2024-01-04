@@ -12,9 +12,9 @@ use Illuminate\Support\Facades\Storage;
 use App\Consts\AppConst;
 use App\Models\CodeMaster;
 use App\Libs\AuthEx;
-use App\Models\ExtRirekisho;
+use App\Models\Tutor;
 use App\Models\TrainingBrowse;
-use App\Models\TrainingContents;
+use App\Models\TrainingContent;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Traits\FuncTrainingTrait;
 use Carbon\Carbon;
@@ -84,7 +84,7 @@ class TrainingMngController extends Controller
         $form = $request->all();
 
         // クエリを作成
-        $query = TrainingContents::query();
+        $query = TrainingContent::query();
 
         // 検索条件の指定
         $query->SearchTrnType($form);
@@ -134,9 +134,9 @@ class TrainingMngController extends Controller
         };
         $rules = array();
 
-        $rules += TrainingContents::fieldRules('trn_type', [$validationTrainingTypeList]);
-        $rules += TrainingContents::fieldRules('text');
-        $rules += TrainingContents::fieldRules('regist_time');
+        $rules += TrainingContent::fieldRules('trn_type', [$validationTrainingTypeList]);
+        $rules += TrainingContent::fieldRules('text');
+        $rules += TrainingContent::fieldRules('regist_time');
 
         return $rules;
     }
@@ -156,7 +156,7 @@ class TrainingMngController extends Controller
         // IDのバリデーション
         $this->validateIds($trnId);
 
-        $query = TrainingContents::query();
+        $query = TrainingContent::query();
         $training = $query
             ->select(
                 'trn_id',
@@ -200,26 +200,26 @@ class TrainingMngController extends Controller
         // クエリ取得
         $query = TrainingBrowse::query();
 
-        // 教師の教室の検索(教師関連情報参照)
+        // 講師の所属教室で絞り込み
         if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、強制的に教室コードで検索する
+            // 教室管理者の場合、強制的に校舎コードで検索する
             $account = Auth::user();
-            $this->mdlWhereTidByRoomQuery($query, TrainingBrowse::class, $account->roomcd);
+            $this->mdlWhereTidByRoomQuery($query, TrainingBrowse::class, $account->campus_cd);
         }
 
         // 一覧取得
         $trainingBrowse = $query
             ->select(
-                'ext_rirekisho.name',
-                'training_browse.browse_time'
+                'tutors.name',
+                'training_browses.browse_time'
             )
             // 教師名の取得
-            ->sdLeftJoin(ExtRirekisho::class, function ($join) {
-                $join->on('ext_rirekisho.tid', '=', 'training_browse.tid');
+            ->sdLeftJoin(Tutor::class, function ($join) {
+                $join->on('tutors.tutor_id', '=', 'training_browses.tutor_id');
             })
             // 研修IDで絞り込み
-            ->where('training_browse.trn_id', '=', $trnId)
-            ->orderBy('training_browse.browse_time', 'desc');
+            ->where('training_browses.trn_id', '=', $trnId)
+            ->orderBy('training_browses.browse_time', 'desc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $trainingBrowse);
@@ -271,7 +271,7 @@ class TrainingMngController extends Controller
         );
 
         // クエリ
-        $traningContents = new TrainingContents;
+        $traningContents = new TrainingContent;
 
         // 形式で判断
         $trnType = $request->input('trn_type');
@@ -316,7 +316,7 @@ class TrainingMngController extends Controller
         $trainingType = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_12);
 
         // IDから編集するデータを取得する
-        $training = TrainingContents::select(
+        $training = TrainingContent::select(
             'trn_id',
             'trn_type',
             'text',
@@ -366,7 +366,7 @@ class TrainingMngController extends Controller
         );
 
         // 対象データを取得(IDでユニークに取る)
-        $traningContents = TrainingContents::where('trn_id', $form['trn_id'])
+        $traningContents = TrainingContent::where('trn_id', $form['trn_id'])
             ->firstOrFail();
 
         // 更新データの種別
@@ -380,11 +380,11 @@ class TrainingMngController extends Controller
         // 資料から動画へ変更になった場合、既存の資料ディレクトリを削除する。
         if ($traningContents->trn_type == AppConst::CODE_MASTER_12_1 && $trnType == AppConst::CODE_MASTER_12_2) {
 
-             // 古い資料をディレクトリごと削除
-             $deleteDir = $trainingPath . $traningContents->trn_id;
-             if (File::isDirectory($deleteDir)) {
-                 File::deleteDirectory($deleteDir);
-             }
+            // 古い資料をディレクトリごと削除
+            $deleteDir = $trainingPath . $traningContents->trn_id;
+            if (File::isDirectory($deleteDir)) {
+                File::deleteDirectory($deleteDir);
+            }
         }
 
         // 形式で判断
@@ -439,7 +439,7 @@ class TrainingMngController extends Controller
         $trnId = $request->input('trn_id');
 
         // 対象データを取得(IDでユニークに取る)
-        $training = TrainingContents::where('trn_id', $trnId)
+        $training = TrainingContent::where('trn_id', $trnId)
             ->firstOrFail();
 
         DB::transaction(function () use ($trnId, $training) {
@@ -517,17 +517,17 @@ class TrainingMngController extends Controller
 
         $rules = array();
 
-        $rules += TrainingContents::fieldRules('trn_id');
-        $rules += TrainingContents::fieldRules('trn_type', ['required', $validationTrnType, $validationTrainingTypeList]);
-        $rules += TrainingContents::fieldRules('text', ['required']);
-        $rules += TrainingContents::fieldRules('release_date', ['required']);
-        $rules += TrainingContents::fieldRules('limit_date', [$validationLimitDate]);
+        $rules += TrainingContent::fieldRules('trn_id');
+        $rules += TrainingContent::fieldRules('trn_type', ['required', $validationTrnType, $validationTrainingTypeList]);
+        $rules += TrainingContent::fieldRules('text', ['required']);
+        $rules += TrainingContent::fieldRules('release_date', ['required']);
+        $rules += TrainingContent::fieldRules('limit_date', [$validationLimitDate]);
 
         // 編集時のみ登録日を必須指定する
         if ($request && $request->input('trn_id')) {
-            $rules += TrainingContents::fieldRules('regist_time', ['required']);
+            $rules += TrainingContent::fieldRules('regist_time', ['required']);
         } else {
-            $rules += TrainingContents::fieldRules('regist_time');
+            $rules += TrainingContent::fieldRules('regist_time');
         }
 
         if ($request && $request->input('trn_type') == AppConst::CODE_MASTER_12_1) {
@@ -536,7 +536,7 @@ class TrainingMngController extends Controller
             //-------
 
             // URL 項目のバリデーションルールをベースにする
-            $ruleUrl = TrainingContents::getFieldRule('url');
+            $ruleUrl = TrainingContent::getFieldRule('url');
             $rules += ['file_doc' => array_merge($ruleUrl, ['required'])];
 
             // ファイルアップロードのチェック
@@ -551,10 +551,10 @@ class TrainingMngController extends Controller
             //-------
             // 動画
             //-------
-            $rules += TrainingContents::fieldRules('url', ['required', 'url']);
+            $rules += TrainingContent::fieldRules('url', ['required', 'url']);
         } else {
             // 登録画面表示時、1000文字以内の文字数制限のみviewに反映する
-            $rules += TrainingContents::fieldRules('url');
+            $rules += TrainingContent::fieldRules('url');
         }
 
         return $rules;

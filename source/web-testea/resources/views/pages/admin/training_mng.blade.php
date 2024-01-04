@@ -9,7 +9,8 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select caption="形式" id="trn_type" :select2=true :mastrData=$training_type />
+            <x-input.select caption="形式" id="trn_type" :select2=true :mastrData=$training_type
+                :select2Search=false :blank=true />
         </x-bs.col2>
         <x-bs.col2>
             <x-input.date-picker caption="登録日" id="regist_time" />
