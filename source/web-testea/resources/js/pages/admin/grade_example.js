@@ -21,6 +21,13 @@ export default class AppClass extends PageBase {
         var searchForm = this.getVueSearchForm({
             // 初期検索を行わない
             initSearch: false,
+            // 検索完了後の実行ボタン制御あり
+            afterSearchBtnListExec: true,
+            // SearchList側に追加するvueData
+            vueSearchListData: {
+                // CSV出力ボタンの非活性状態（初期表示時disable）
+                disabledBtnListExec: true,
+            },
             vueData: {
                 // 学校区分プルダウン変更用のプロパティを用意
                 selectGetItemGrade: {},
@@ -30,53 +37,39 @@ export default class AppClass extends PageBase {
             vueMethods: {
                 // 学校区分プルダウン選択時、学年リストを取得
                 selectChangeGetGrade: function (event) {
-                    AjaxCom.getPromise()
-                        .then(() => {
-                            // 初期化
-                            this.selectGetItemGrade = {};
-                            this.form.grade_cd = "";
-                            // チェンジイベントを発生させる
-                            var schoolKind = this.form.school_kind;
-                            self.selectChangeGetCallBack(
-                                this,
-                                schoolKind,
-                                // URLを分けた
-                                {
-                                    urlSuffix: "grade",
-                                },
-                                // 受信後のコールバック
-                                (data) => {
-                                    // データをセット
-                                    this.selectGetItemGrade = data.gradeList;
-                                }
-                            );
-                        })
-                        .catch(AjaxCom.fail);
+                    // 初期化
+                    this.selectGetItemGrade = {};
+                    this.form.grade_cd = "";
+                    // チェンジイベントを発生させる
+                    var schoolKind = this.form.school_kind;
+                    self.selectChangeGet2(
+                        this,
+                        schoolKind,
+                        // URLを分けた
+                        {
+                            urlSuffix: "grade",
+                        },
+                        // vueData指定
+                        'selectGetItemGrade',
+                    );
                 },
                 // 種別プルダウン選択時、定期考査リストまたは学期リストを取得
                 selectChangeGetExam: function (event) {
-                    AjaxCom.getPromise()
-                        .then(() => {
-                            // 初期化
-                            this.selectGetItemExam = {};
-                            this.form.exam_cd = "";
-                            // チェンジイベントを発生させる
-                            var examType = this.form.exam_type;
-                            self.selectChangeGetCallBack(
-                                this,
-                                examType,
-                                // URLを分けた
-                                {
-                                    urlSuffix: "exam",
-                                },
-                                // 受信後のコールバック
-                                (data) => {
-                                    // データをセット
-                                    this.selectGetItemExam = data.examList;
-                                }
-                            );
-                        })
-                        .catch(AjaxCom.fail);
+                    // 初期化
+                    this.selectGetItemExam = {};
+                    this.form.exam_cd = "";
+                    // チェンジイベントを発生させる
+                    var examType = this.form.exam_type;
+                    self.selectChangeGet2(
+                        this,
+                        examType,
+                        // URLを分けた
+                        {
+                            urlSuffix: "exam",
+                        },
+                        // vueData指定
+                        'selectGetItemExam',
+                    );
                 },
             },
         });

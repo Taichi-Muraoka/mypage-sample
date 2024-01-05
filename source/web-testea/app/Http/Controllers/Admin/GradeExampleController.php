@@ -80,7 +80,7 @@ class GradeExampleController extends Controller
         $gradeList = $this->mdlGetGradeList($schoolKind);
 
         return [
-            'gradeList' => $gradeList,
+            'gradeList' => $this->objToArray($gradeList),
         ];
     }
 
@@ -109,7 +109,7 @@ class GradeExampleController extends Controller
         }
 
         return [
-            'examList' => $examList,
+            'examList' => $this->objToArray($examList),
         ];
     }
 
