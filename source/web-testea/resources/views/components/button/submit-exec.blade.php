@@ -6,18 +6,22 @@
 {{--
   caption: ボタン表示名
   dataTarget: モーダルのIDを指定 Def: #modal-dtl
+  vueDisabled: Vueの使用不可条件
   vueDataAttr: data属性を定義
   dataAttr: data属性を定義
   class: 追加のクラス
   icon: アイコン
   small: 小さいボタンにするかどうか
 --}}
-@props(['dataTarget' => '', 'vueDataAttr' => [], 'dataAttr' => [], 'caption' => '', 'class' => '', 
+@props(['dataTarget' => '', 'vueDataAttr' => [], 'dataAttr' => [], 'vueDisabled' => '', 'caption' => '', 'class' => '', 
   'icon' => 'fas fa-paper-plane', 'small' => false])
 
 <button type="button" 
   class="btn btn-success ml-3 @if (!empty($class)){{ $class }}@endif @if ($small) btn-sm @endif" 
   data-toggle="modal"
+
+  {{-- vue.jsのdisabled追加 --}}
+  @if (!empty($vueDisabled)) v-bind:disabled="{{ $vueDisabled }}" @endif
 
   {{-- 開くモーダルを指定。動的に指定する場合は、vueDataAttr=['target' => 'xxx'] のように指定するのでそれ以外の場合 --}} 
   @if (!isset($vueDataAttr['target']))

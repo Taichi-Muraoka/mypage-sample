@@ -149,4 +149,112 @@ class Score extends Model
             $this->mdlWhereSidByRoomQuery($query, self::class, $obj[$key]);
         }
     }
+
+    /**
+     * 検索 学年
+     */
+    public function scopeSearchGradeCd($query, $obj)
+    {
+        $key = 'grade_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->whereIn($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 模試
+     */
+    public function scopeSearchPracticeExam($query, $obj)
+    {
+        $key = 'exam_type';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 定期考査コード
+     */
+    public function scopeSearchRegularExamCd($query, $obj)
+    {
+        // bladeでidとして使う名前が異なるため、テーブル項目名を$dbKeyで指定した
+        $key = 'exam_cd';
+        $dbKey = 'regular_exam_cd';
+
+        $col = $this->getTable() . '.' . $dbKey;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // 配列の絞り込みwhereIn
+            $query->whereIn($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 学期コード
+     */
+    public function scopeSearchTermCd($query, $obj)
+    {
+        // bladeでidとして使う名前が異なるため、テーブル項目名を$dbKeyで指定した
+        $key = 'exam_cd';
+        $dbKey = 'term_cd';
+
+        $col = $this->getTable() . '.' . $dbKey;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // 配列の絞り込みwhereIn
+            $query->whereIn($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 対象期間From（試験開始日）
+     */
+    public function scopeSearchExamDateFrom($query, $obj)
+    {
+        $key = 'date_from';
+        // Ymdに変換して検索する
+        $col = $this->mdlFormatYmd('exam_date');
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, '>=', $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 対象期間To（試験開始日）
+     */
+    public function scopeSearchExamDateTo($query, $obj)
+    {
+        $key = 'date_to';
+        // Ymdに変換して検索する
+        $col = $this->mdlFormatYmd('exam_date');
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, '<=', $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 対象期間From（登録日）
+     */
+    public function scopeSearchRegistDateFrom($query, $obj)
+    {
+        $key = 'date_from';
+        // Ymdに変換して検索する
+        $col = $this->mdlFormatYmd('regist_date');
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, '>=', $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 対象期間To（登録日）
+     */
+    public function scopeSearchRegistDateTo($query, $obj)
+    {
+        $key = 'date_to';
+        // Ymdに変換して検索する
+        $col = $this->mdlFormatYmd('regist_date');
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, '<=', $obj[$key]);
+        }
+    }
 }
