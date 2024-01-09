@@ -66,7 +66,7 @@
 
     {{-- カードヘッダ右 --}}
     <x-slot name="tools">
-        <x-button.submit-exec caption="CSVダウンロード" icon="fas fa-download" vueDisabled="disabledBtnListExec"/>
+        <x-button.submit-exec caption="CSVダウンロード" icon="fas fa-download" vueDisabled="disabledBtnListExec" />
     </x-slot>
 
     {{-- テーブル --}}
@@ -78,6 +78,7 @@
             <th>生徒名</th>
             <th>種別</th>
             <th>学期・試験名</th>
+            <th>試験日(開始日)</th>
         </x-slot>
 
         {{-- テーブル行 --}}
@@ -87,6 +88,7 @@
             <td>@{{item.student_name}}</td>
             <td>@{{item.exam_type_name}}</td>
             <td>@{{item.practice_exam_name}} @{{item.regular_exam_name}} @{{item.term_name}}</td>
+            <td>@{{$filters.formatYmd(item.exam_date)}}</td>
         </tr>
     </x-bs.table>
 

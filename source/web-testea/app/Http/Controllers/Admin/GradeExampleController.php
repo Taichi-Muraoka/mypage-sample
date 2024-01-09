@@ -566,7 +566,6 @@ class GradeExampleController extends Controller
             $gradeHeader = ['登録日', '学年', '生徒名', '種別', '学期'];
 
             // 最大教科数分の成績詳細ヘッダを用意する
-            $detailHeader = [];
             for ($i = 1; $i <= count($subjectList); $i++) {
                 array_push($detailHeader, '教科', '評定');
             }
