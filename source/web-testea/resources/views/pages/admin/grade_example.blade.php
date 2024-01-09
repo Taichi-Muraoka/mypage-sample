@@ -25,12 +25,14 @@
                 :mastrData=$schoolKindList :editData=$editData :select2Search=false :blank=true />
 
             <div v-cloak v-show="form.school_kind != ''">
-                <x-input.select id="grade_cd" :select2=true :editData=$editData :select2Search=false :blank=false
-                    multiple>
-                    <option v-for="item in selectGetItemGrade.gradeList" :value="item.code">
-                        @{{ item.value }}
-                    </option>
-                </x-input.select>
+                <x-bs.card>
+                    <x-bs.form-group name="grade_cd">
+                        <div v-for="item in selectGetItemGrade.gradeList" class="d-inline">
+                            <x-input.checkbox caption="item.value" id="'grade_cd_' + item.code" name="grade_cd"
+                                value="item.code" :editData=$editData vBind=true />
+                        </div>
+                    </x-bs.form-group>
+                </x-bs.card>
             </div>
         </x-bs.col2>
         <x-bs.col2>
@@ -38,12 +40,14 @@
                 :mastrData=$examTypeList :editData=$editData :select2Search=false :blank=true />
 
             <div v-cloak v-show="form.exam_type != '' && form.exam_type != {{AppConst::CODE_MASTER_43_0}}">
-                <x-input.select id="exam_cd" :select2=true :editData=$editData :select2Search=false :blank=false
-                    multiple>
-                    <option v-for="item in selectGetItemExam.examList" :value="item.code">
-                        @{{ item.value }}
-                    </option>
-                </x-input.select>
+                <x-bs.card>
+                    <x-bs.form-group name="exam_cd">
+                        <div v-for="item in selectGetItemExam.examList" class="d-inline">
+                            <x-input.checkbox caption="item.value" id="'exam_cd_' + item.code" name="exam_cd"
+                                value="item.code" :editData=$editData vBind=true />
+                        </div>
+                    </x-bs.form-group>
+                </x-bs.card>
             </div>
         </x-bs.col2>
     </x-bs.row>

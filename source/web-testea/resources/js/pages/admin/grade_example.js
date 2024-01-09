@@ -39,7 +39,7 @@ export default class AppClass extends PageBase {
                 selectChangeGetGrade: function (event) {
                     // 初期化
                     this.selectGetItemGrade = {};
-                    this.form.grade_cd = "";
+                    this.form.grade_cd = [];
                     // チェンジイベントを発生させる
                     var schoolKind = this.form.school_kind;
                     self.selectChangeGet2(
@@ -57,7 +57,7 @@ export default class AppClass extends PageBase {
                 selectChangeGetExam: function (event) {
                     // 初期化
                     this.selectGetItemExam = {};
-                    this.form.exam_cd = "";
+                    this.form.exam_cd = [];
                     // チェンジイベントを発生させる
                     var examType = this.form.exam_type;
                     self.selectChangeGet2(

@@ -37,14 +37,34 @@ export default class FormCom {
                         if ($(element).is(":checked")) {
                             inputVals[name] = $(element).val();
                         }
+                    } else if ($(element).is("select") && $(element).attr("multiple")) {
+                        // 複数選択プルダウンの場合、配列で扱う
+                        inputVals[id] = [];
+
                     } else if ($(element).is(":file")) {
                         // file選択のinputは無視する。
                     } else {
                         inputVals[id] = $(element).val();
                     }
                 }
-            });
+                if (ValueCom.isEmpty(id) && !ValueCom.isEmpty(name) && !$(element).is(":disabled")) {
+                    // チェックボックスでid名が動的である場合、
+                    // 初期化時にidが取得できないためこちらで対応する
+                    if ($(element).is(":checkbox")) {
+                        // チェックボックスの場合(同じnameが複数ある想定)
+                        // arrayで渡す
+                        if (!inputVals[name]) {
+                            // nameが同じ場合、配列で扱う
+                            inputVals[name] = [];
+                        }
 
+                        if ($(element).is(":checked")) {
+                            // チェックされた値を取得
+                            inputVals[name].push($(element).val());
+                        }
+                    }
+                }
+            });
         return inputVals;
     }
 
