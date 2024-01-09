@@ -170,7 +170,7 @@ trait FuncGradesTrait
             )
             // 成績科目名の取得
             ->sdLeftJoin(MstGradeSubject::class, 'mst_grade_subjects.g_subject_cd', '=', 'score_details.g_subject_cd')
-            ->orderBy('score_details.score_datail_id')
+            ->orderBy('score_details.g_subject_cd')
             ->get();
     }
 
