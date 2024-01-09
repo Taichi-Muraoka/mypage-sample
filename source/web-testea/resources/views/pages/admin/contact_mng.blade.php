@@ -28,7 +28,8 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.text caption="生徒名" id="name" :rules=$rules />
+            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$students :editData=$editData
+                :rules=$rules :select2Search=true :blank=true />
         </x-bs.col2>
     </x-bs.row>
 

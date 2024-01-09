@@ -50,16 +50,16 @@
 
             {{-- テーブルタイトル行 --}}
             <x-slot name="thead">
-                <th>教師名</th>
+                <th>講師名</th>
                 <th>閲覧日時</th>
             </x-slot>
 
             {{-- テーブル行 --}}
             <tr v-for="item in paginator.data" v-cloak>
                 <td>@{{item.name}}</td>
-                <td>@{{$filters.formatYmd(item.browse_time)}}</td>
+                <td>@{{$filters.formatYmdHm(item.browse_time)}}</td>
             </tr>
-            
+
         </x-bs.table>
 
     </x-bs.card-list>

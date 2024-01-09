@@ -13,13 +13,9 @@
 {{-- formを指定 --}}
 <x-bs.card :form=true>
 
-    <p>教室または本部へ問い合わせを行います。</p>
+    <p>校舎または本部へ問い合わせを行います。</p>
 
-    <x-input.select caption="宛先" id="campus_cd" :select2=true >
-        <option value="110">久我山</option>
-        <option value="160">西永福</option>
-        <option value="900">本郷</option>
-    </x-input.select>
+    <x-input.select caption="宛先校舎" id="campus_cd" :select2=true :mastrData=$rooms :select2Search=false :blank=false />
 
     <x-input.text caption="問い合わせ件名" id="title" :rules=$rules />
 
