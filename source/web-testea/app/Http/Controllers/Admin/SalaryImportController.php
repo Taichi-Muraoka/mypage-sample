@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
 use App\Consts\AppConst;
+use App\Libs\AuthEx;
 use Carbon\Carbon;
 use App\Models\Salary;
 use App\Models\SalaryDetail;
@@ -101,6 +102,10 @@ class SalaryImportController extends Controller
      */
     public function import($salaryDate)
     {
+        // 全体管理者でない場合は画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
 
         // IDのバリデーション
         $this->validateIds($salaryDate);
@@ -138,14 +143,16 @@ class SalaryImportController extends Controller
      */
     public function create(Request $request)
     {
+        // 全体管理者でない場合は画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
 
         // アップロードされたかチェック(アップロードされた場合は該当の項目にファイル名をセットする)
         $this->fileUploadSetVal($request, 'upload_file');
 
         // バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput())->validate();
-
-        $this->debug($request);
 
         // アップロード先(アップ先は用途ごとに分ける)
         $uploadDir = config('appconf.upload_dir_salary_import') . date("YmdHis");
@@ -175,52 +182,78 @@ class SalaryImportController extends Controller
             return $this->responseErr();
         }
 
-        $this->debug($datas);
+        try {
+            // トランザクション(例外時は自動的にロールバック)
+            DB::transaction(function () use ($datas, $idDate) {
 
-        // try {
+                //==========================
+                // 既存データ削除
+                //==========================
+                // 給与情報テーブルから対象月の給与IDを取得する
+                $salaryies = Salary::select('salary_id')
+                    ->where('salary_date', '=', $idDate)
+                    ->get();
 
-        //     // トランザクション(例外時は自動的にロールバック)
-        //     DB::transaction(function () use ($datas, $idDate) {
+                // 取得した請求IDリストを作る
+                $salaryIdList = [];
+                foreach ($salaryies as $salary) {
+                    $salaryIdList[] = $salary['salary_id'];
+                }
 
-        //         // 給与情報明細から対象月のレコードを物理削除する
-        //         SalaryDetail::where('salary_date', '=', $idDate)
-        //             ->forceDelete();
+                // 給与情報から対象月のレコードを物理削除する
+                Salary::where('salary_date', '=', $idDate)
+                    ->forceDelete();
 
-        //         // 給与情報から対象月のレコードを物理削除する
-        //         Salary::where('salary_date', '=', $idDate)
-        //             ->forceDelete();
+                // 給与情報明細から対象月のレコードを物理削除する
+                SalaryDetail::whereIn('salary_id', $salaryIdList)
+                    ->forceDelete();
 
-        //         // 給与情報に取込データを挿入する
-        //         // MEMO: 一括Insertは、INSERT_CHUNK数 ずつ分割して行う
-        //         $salary = new Salary;
-        //         $salarysChunks = array_chunk($datas['salarys'], self::INSERT_CHUNK);
-        //         foreach ($salarysChunks as $salaryChunk) {
-        //             $salary->insert($salaryChunk);
-        //         }
+                // 給与情報明細数
+                $detailCnt = AppConst::COUNT_SALARY;
 
-        //         // 給与情報明細数をカウント
-        //         $detailCnt = CodeMaster::where('data_type', '=', AppConst::CODE_MASTER_19)
-        //             ->count();
+                $seq = 0;
+                foreach ($datas['salarys'] as $salaryData) {
 
-        //         // 給与明細情報に取込データを挿入する
-        //         // MEMO: 一括Insertは、INSERT_CHUNK * 明細数 ずつ分割して行う
-        //         $salaryDetail = new SalaryDetail;
-        //         $salarysChunks = array_chunk($datas['salary_details'], self::INSERT_CHUNK * $detailCnt);
-        //         foreach ($salarysChunks as $salaryChunk) {
-        //             $salaryDetail->insert($salaryChunk);
-        //         }
+                    // 給与情報に取込データを挿入する
+                    $salary = new Salary;
+                    $salary->tutor_id = $salaryData['tutor_id'];
+                    $salary->salary_date = $salaryData['salary_date'];
+                    $salary->total_amount = $salaryData['total_amount'];
+                    $salary->memo = $salaryData['memo'];
+                    // 保存
+                    $salary->save();
 
-        //         // 該当する給与情報取込を更新する
-        //         $salaryImport = SalaryImport::where('salary_date', '=', $idDate)->firstOrFail();
-        //         $salaryImport->import_state = AppConst::CODE_MASTER_20_1;
-        //         $salaryImport->import_date = $datas['import_date'];
-        //         $salaryImport->save();
-        //     });
-        // } catch (\Exception  $e) {
-        //     // この時点では補足できないエラーとして、詳細は返さずエラーとする
-        //     Log::error($e);
-        //     return $this->responseErr();
-        // }
+                    for ($i = 0; $i < $detailCnt; $i++) {
+                        // 給与明細情報に取込データを挿入する
+                        $salaryDetail = new SalaryDetail;
+                        $salaryDetail->salary_id = $salary->salary_id;
+                        $salaryDetail->salary_seq = $datas['salary_details'][$seq]['salary_seq'];
+                        $salaryDetail->salary_group = $datas['salary_details'][$seq]['salary_group'];
+                        $salaryDetail->item_name = $datas['salary_details'][$seq]['item_name'];
+                        $salaryDetail->hour_payment = $datas['salary_details'][$seq]['hour_payment'];
+                        $salaryDetail->hour = $datas['salary_details'][$seq]['hour'];
+                        $salaryDetail->amount = $datas['salary_details'][$seq]['amount'];
+                        // 保存
+                        $salaryDetail->save();
+                        $seq++;
+                    }
+                }
+
+                foreach ($datas['salary_details'] as $data_salary_detail) {
+                    $data_salary_detail['salary_id'] = 1;
+                }
+
+                // 該当する給与情報取込を更新する
+                $salaryImport = SalaryImport::where('salary_date', '=', $idDate)->firstOrFail();
+                $salaryImport->import_state = AppConst::CODE_MASTER_20_1;
+                $salaryImport->import_date = $datas['import_date'];
+                $salaryImport->save();
+            });
+        } catch (\Exception  $e) {
+            // この時点では補足できないエラーとして、詳細は返さずエラーとする
+            Log::error($e);
+            return $this->responseErr();
+        }
 
         return;
     }
@@ -273,185 +306,78 @@ class SalaryImportController extends Controller
      */
     private function readData($path, $salaryDate, $create = false)
     {
-<<<<<<< HEAD
 
         // 取込対象月
         $date = $this->fmYmToDate($salaryDate);
 
         // ヘッダ行成型用
         $csvHeaderNames = [];
-        $csvHeaderPref = ["講師番号", "講師名", "出社回数"];
-        $csvHeaderSuf = [
-            "個別コース", "時給",
-            "１対２", "時給",
-            "１対３", "時給",
-            "集団", "時給",
-            "家庭教師", "時給",
-            "演習", "時給",
-            "ハイプラン", "時給",
-            "インターン", "時給",
-            "作業時間", "時給",
-            "交通費",
-            "特別報酬",
-            "ペナルティ",
-            "源泉計算用小計",
-            "交通費等",
-            "扶養者数",
-            "種別",
-            "源泉徴収月額",
-            "住民税徴収",
-            "経費精算",
-            "年末調整",
-            "支払",
-            "備考"
-        ];
-        $dataHeaderPref = [
-            "個別コース",
-            "１対２",
-            "１対３",
-            "集団",
-            "家庭教師",
-            "演習",
-            "ハイプラン",
-            "インターン",
-            "作業時間"
-        ];
-        $dataHeaderSuf = [
-            "交通費",
-            "特別報酬",
-            "ペナルティ",
-            "源泉計算用小計",
-            "交通費等",
-            "扶養者数",
-            "種別",
-            "源泉徴収月額",
-            "住民税徴収",
-            "経費精算",
-            "年末調整",
-            "支払",
-            "備考"
-        ];
 
         // 各表示グループ
-        $salary_group_1 = [
-            "個別コース",
-            "１対２",
-            "１対３",
-            "集団",
-            "家庭教師",
-            "演習",
-            "ハイプラン",
-            "インターン",
-            "作業時間",
-        ];
-        $salary_group_2 = [
-            "交通費",
-            "経費精算",
-            "年末調整",
-        ];
+        $salary_group_1 = [];
+        $salary_group_2 = [];
         $salary_group_3 = [];
         $salary_group_4 = [];
+        $salary_group_0 = [];
 
-        // // コードマスタから項目名を取得
-        // $salary_headers = CodeMaster::select(
-        //     'sub_code',
-        //     'name'
-        // )
-        //     ->where('data_type', '=', AppConst::CODE_MASTER_19)
-        //     ->orderBy('order_code', 'asc')
-        //     ->get();
-
-        // foreach ($salary_headers as $salary_header) {
-        //     // array_push($csvHeaderNames, $salary_header->name);
-        //     switch ($salary_header->sub_code) {
-        //         case AppConst::SALARY_GROUP_1:
-        //             array_push($salary_group_1, $salary_header->name);
-        //             break;
-        //         case AppConst::SALARY_GROUP_2:
-        //             array_push($salary_group_2, $salary_header->name);
-        //             break;
-        //         case AppConst::SALARY_GROUP_3:
-        //             array_push($salary_group_3, $salary_header->name);
-        //             break;
-        //         case AppConst::SALARY_GROUP_4:
-        //             array_push($salary_group_4, $salary_header->name);
-        //             break;
-        //     }
-        // }
-
-        $csvHeaders = array_merge($csvHeaderPref, $csvHeaderSuf);
-        // $csvHeaders = array_merge($csvHeaders, $csvHeaderSuf);
-
-        // array_combine用
-        // $dataHeaders = array_merge($dataHeaderPref, $csvHeaderNames);
-        // $dataHeaders = array_merge($dataHeaders, $dataHeaderSuf);
+        // コードマスタからCSV汎用項目１を取得
+        $salary_headers = CodeMaster::select(
+            'sub_code',
+            'gen_item1'
+        )
+            ->where('data_type', '=', AppConst::CODE_MASTER_19)
+            ->orderBy('code', 'asc')
+            ->get();
 
         //-------------
         // グループ分け
         //-------------
+        foreach ($salary_headers as $salary_header) {
+            array_push($csvHeaderNames, $salary_header->gen_item1);
+            switch ($salary_header->sub_code) {
+                case AppConst::SALARY_GROUP_1:
+                    array_push($salary_group_1, $salary_header->gen_item1);
+                    break;
+                case AppConst::SALARY_GROUP_2:
+                    array_push($salary_group_2, $salary_header->gen_item1);
+                    break;
+                case AppConst::SALARY_GROUP_3:
+                    array_push($salary_group_3, $salary_header->gen_item1);
+                    break;
+                case AppConst::SALARY_GROUP_4:
+                    array_push($salary_group_4, $salary_header->gen_item1);
+                    break;
+                case AppConst::SALARY_GROUP_0:
+                    array_push($salary_group_0, $salary_header->gen_item1);
+                    break;
+            }
+        }
 
         // CSVのデータをリストで保持
         $datas = [];
-=======
-        $csvHeaders = [
-            '講師番号',
-            '講師名',
-            '出社回数',
-            '個別コース',
-            '時給',
-            '１対２',
-            '時給',
-            '１対３',
-            '時給',
-            '集団',
-            '時給',
-            '家庭教師',
-            '時給',
-            '演習',
-            '時給',
-            'ハイプラン',
-            '時給',
-            'インターン',
-            '時給',
-            '作業時間',
-            '時給',
-            '交通費',
-            '特別報酬',
-            'ペナルティ',
-            '源泉計算用小計',
-            '交通費等',
-            '扶養者数',
-            '種別',
-            '源泉徴収月額',
-            '住民税徴収',
-            '経費精算',
-            '年末調整',
-            '支払',
-            '備考'
-        ];
->>>>>>> be03ee147de4ac642013565ae3b8acfe3cf125ce
         $headers = [];
+
+        // DB保存用配列
+        $salarys = [];
+        $salary_details = [];
 
         // CSV読み込み
         $file = $this->readCsv($path, "sjis");
 
         // 1行ずつ取得
-        foreach ($file as $i => $line) {
-<<<<<<< HEAD
+        foreach ($file as $line_i => $line) {
 
             // 0行目がヘッダ行
-=======
->>>>>>> be03ee147de4ac642013565ae3b8acfe3cf125ce
-            if ($i === 0) {
+            if ($line_i === 0) {
                 //-------------
                 // ヘッダ行
                 //-------------
                 $headers = $line;
 
                 // [バリデーション] ヘッダが想定通りかチェック
-                if ($headers !== $csvHeaders) {
+                if ($headers !== $csvHeaderNames) {
                     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                         . "：ヘッダ行不正)");
+                        . "：ヘッダ行不正)");
                 }
                 continue;
             }
@@ -460,51 +386,99 @@ class SalaryImportController extends Controller
             // データ行
             //-------------
             // [バリデーション] データ行の列の数のチェック
-            if (count($line) !== count($csvHeaders)) {
+            if (count($line) !== count($csvHeaderNames)) {
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                     . "：データ列数不正)");
+                    . "：データ列数不正)");
             }
+
+            $csvHeaderPref = [
+                "講師番号",
+                "講師名",
+                "出社回数"
+            ];
+
+            $dataHeaderPref = [
+                "個別コース",
+                "１対２",
+                "１対３",
+                "集団",
+                "家庭教師",
+                "演習",
+                "ハイプラン",
+                "インターン",
+                "作業時間"
+            ];
+
+            $dataHeaderSuf = [
+                "特別報酬",
+                "ペナルティ",
+                "源泉計算用小計",
+                "交通費",
+                "扶養者",
+                "種別",
+                "源泉徴収月額",
+                "交通費等",
+                "住民税徴収",
+                "経費精算",
+                "年末調整",
+                "支払",
+                "備考"
+            ];
 
             $details_lists = [];
             $i = 1;
+
             foreach ($dataHeaderPref as $content) {
                 $details_list = [
                     $content => $content,
-                    "時給".$i => "時給".$i
+                    "時給" . $i => "時給" . $i
                 ];
                 array_push($details_lists, $details_list);
                 $i++;
             }
+
             // array_combine用
             $arrayDetails = Arr::flatten($details_lists);
             $dataHeaders = array_merge($csvHeaderPref, $arrayDetails, $dataHeaderSuf);
 
             // headerをもとに、値をセットしたオブジェクトを生成
-<<<<<<< HEAD
             array_splice($line, count($dataHeaders));
             $values = array_combine($dataHeaders, $line);
 
-            $this->debug($values);
-
             // [バリデーション] データ行の値のチェック
-            // $rules = [
-            //     'name' => 'string|required',
-            // ];
-            // $rules += Salary::fieldRules('tid', ['required'], '_csv');
-            // $rules += Salary::fieldRules('tax_table', ['required']);
-            // $rules += Salary::fieldRules('dependents', ['required']);
+            $rules = [
+                "講師番号" => 'integer|min:1|max:9|required',
+                "講師名" => 'string|max:50|required',
+                "出社回数" => 'integer|max:99999999|required',
+                "特別報酬" => 'required|integer|max:99999999',
+                "ペナルティ" => 'integer|max:99999999',
+                "源泉計算用小計" => 'max:99999999',
+                "交通費" => 'required|integer|max:99999999',
+                "扶養者" => 'required|integer|max:999',
+                "種別" => 'string|max:1',
+                "源泉徴収月額" => 'max:99999999',
+                "交通費等" => 'required|integer|max:99999999',
+                "住民税徴収" => 'required|integer|min:0|max:99999999',
+                "経費精算" => 'required|integer|min:0|max:99999999',
+                "年末調整" => 'required|integer|min:0|max:99999999',
+                "支払" => 'required|integer|min:0|max:99999999',
+                "備考" => 'string|max:1000'
+            ];
 
-            // foreach ($csvHeaderNames as $csvHeaderName) {
-            //     $rules += [
-            //         $csvHeaderName => 'required|vdPrice|vdPriceDigits'
-            //     ];
-            // }
+            $i = 1;
+            foreach ($dataHeaderPref as $dataHeader) {
+                $rules += [
+                    $dataHeader => 'required|max:999',
+                    "時給" . $i => 'required|integer|max:99999999'
+                ];
+                $i++;
+            }
 
-            // $validator = Validator::make($values, $rules);
-            // if ($validator->fails()) {
-            //     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-            //         . "(データ項目不正)");
-            // }
+            $validator = Validator::make($values, $rules);
+            if ($validator->fails()) {
+                throw new ReadDataValidateException(Lang::get('validation.invalid_file')
+                    . "(データ項目不正):" . $line_i + 1 . "行目\n" . "講師番号:" . $values['講師番号']);
+            }
 
             // 登録前バリデーションの場合のみ、データ成型を行う
             if (!$create) {
@@ -513,13 +487,10 @@ class SalaryImportController extends Controller
 
             // 給与情報
             $salary = [
-                'tid' => $values['講師番号'],
+                'tutor_id' => $values['講師番号'],
                 'salary_date' => $date,
                 'total_amount' => $values['支払'],
-                'memo' => $values['備考'],
-                // 'created_at' => $now,
-                // 'updated_at' => $now,
-                // 'deleted_at' => null
+                'memo' => $values['備考']
             ];
             array_push($salarys, $salary);
 
@@ -534,35 +505,42 @@ class SalaryImportController extends Controller
 
             // 支給
             foreach ($salary_group_1 as $salary_detail) {
-                $salary_detail = [];
-                // $salary_detail['tid'] = (int) $values['tid'];
-                // $salary_detail['salary_date'] = $date;
-                $salary_detail['salary_seq'] = $seq;
-                // $salary_detail['order_code'] = $seq;
-                $salary_detail['salary_group'] = 1;
-                $salary_detail['item_name'] = $salary_group_1[$count_group_1];
-                $salary_detail['amount'] = str_replace(',', '', $values[$salary_group_1[$count_group_1]]);
-                $salary_detail['hour_payment'] = (int) str_replace(',', '', $values[$salary_group_1[$count_group_1]]);
-                $salary_detail['hour'] = (int) str_replace(',', '', $values[$salary_group_1[$count_group_1]]);
-                array_push($salary_details, $salary_detail);
-                $seq++;
+                if ($salary_detail != "時給") {
+                    $hp = '時給' . $count_group_1 + 1;
+                    $salary_detail = [];
+                    $salary_detail['salary_seq'] = $seq;
+                    $salary_detail['salary_group'] = AppConst::SALARY_GROUP_1;
+                    $salary_detail['item_name'] = $salary_group_1[$count_group_1];
+                    if ($count_group_1 < AppConst::COUNT_HOUR_SALARY) {
+                        $salary_detail['hour'] = $values[$salary_group_1[$count_group_1]];
+                    } else {
+                        $salary_detail['hour'] = null;
+                    }
+                    if ($count_group_1 < AppConst::COUNT_HOUR_SALARY) {
+                        $salary_detail['hour_payment'] = $values[$hp];
+                    } else {
+                        $salary_detail['hour_payment'] = null;
+                    }
+                    if ($count_group_1 < AppConst::COUNT_HOUR_SALARY) {
+                        $salary_detail['amount'] = (float)$values[$salary_group_1[$count_group_1]] * (int)$values[$hp];
+                    } else {
+                        $salary_detail['amount'] = (int)$values[$salary_group_1[$count_group_1]];
+                    }
+                    array_push($salary_details, $salary_detail);
+                    $seq++;
+                }
                 $count_group_1++;
             }
-
-            $this->debug($values);
 
             // 控除
             foreach ($salary_group_2 as $salary_detail) {
                 $salary_detail = [];
-                // $salary_detail['tid'] = (int) $values['tid'];
-                // $salary_detail['salary_date'] = $date;
                 $salary_detail['salary_seq'] = $seq;
-                // $salary_detail['order_code'] = $seq;
-                $salary_detail['salary_group'] = 2;
+                $salary_detail['salary_group'] = AppConst::SALARY_GROUP_2;
                 $salary_detail['item_name'] = $salary_group_2[$count_group_2];
-                $salary_detail['amount'] = (int) str_replace(',', '', $values[$salary_group_2[$count_group_2]]);
-                $salary_detail['hour_payment'] = (int) str_replace(',', '', $values[$salary_group_2[$count_group_2]]);
-                $salary_detail['hour'] = (int) str_replace(',', '', $values[$salary_group_2[$count_group_2]]);
+                $salary_detail['hour'] = null;
+                $salary_detail['hour_payment'] = null;
+                $salary_detail['amount'] = (int)$values[$salary_group_2[$count_group_2]];
                 array_push($salary_details, $salary_detail);
                 $seq++;
                 $count_group_2++;
@@ -570,290 +548,40 @@ class SalaryImportController extends Controller
 
             // その他
             $salary_detail = [];
-            // $salary_detail['tid'] = (int) $values['tid'];
-            // $salary_detail['salary_date'] = $date;
             $salary_detail['salary_seq'] = $seq;
-            // $salary_detail['order_code'] = $seq;
-            $salary_detail['salary_group'] = 3;
+            $salary_detail['salary_group'] = AppConst::SALARY_GROUP_3;
             $salary_detail['item_name'] = $salary_group_3[0];
-            $salary_detail['amount'] = (int) str_replace(',', '', $values[$salary_group_3[0]]);
-            $salary_detail['hour_payment'] = (int) str_replace(',', '', $values[$salary_group_3[0]]);
-            $salary_detail['hour'] = (int) str_replace(',', '', $values[$salary_group_3[0]]);
+            $salary_detail['hour'] = null;
+            $salary_detail['hour_payment'] = null;
+            $salary_detail['amount'] = (int)$values[$salary_group_3[0]];
             array_push($salary_details, $salary_detail);
             $seq++;
 
             // 合計
             $salary_detail = [];
-            // $salary_detail['tid'] = (int) $values['tid'];
-            // $salary_detail['salary_date'] = $date;
             $salary_detail['salary_seq'] = $seq;
-            // $salary_detail['order_code'] = $seq;
-            $salary_detail['salary_group'] = 4;
+            $salary_detail['salary_group'] = AppConst::SALARY_GROUP_4;
             $salary_detail['item_name'] = $salary_group_4[0];
-            $salary_detail['amount'] = (int) str_replace(',', '', $values[$salary_group_4[0]]);
-            $salary_detail['hour_payment'] = (int) str_replace(',', '', $values[$salary_group_4[0]]);
-            $salary_detail['hour'] = (int) str_replace(',', '', $values[$salary_group_4[0]]);
+            $salary_detail['hour'] = null;
+            $salary_detail['hour_payment'] = null;
+            $salary_detail['amount'] = (int)$values[$salary_group_4[0]];
             array_push($salary_details, $salary_detail);
-=======
-            $values = array_combine($headers, $line);
 
-            // // [バリデーション] データ行の値のチェック
-            // $rules = [];
-            // $rules += ['年月日' => [YearlySchedule::fieldRules('lesson_date'), 'required']];
-            // $rules += ['曜日' => ['required', 'max:1', 'regex:/^(月|火|水|木|金|土|日\d*)$/']];
-            // $rules += ['期間区分' => ['string', 'max:50']];
-            // $rules += ['期間区分コード' => ['required', 'max:1', 'regex:/^([0-3]|[9]\d*)$/']];
-            // $rules += ['月度' => ['required', 'max:2', 'regex:/^([0-9]|[1][0-2]\d*)$/']];
-            // $rules += ['週数' => ['required', 'max:1', 'regex:/^(0|[0-4]\d*)$/']];
-
-            // $validator = Validator::make($values, $rules);
-
-            // if ($validator->fails()) {
-            //     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-            //          . "：データ項目不正)");
-            // }
-
-            // foreach ($values as $key => $val) {
-            //     // 空白はnullに変換
-            //     if ($values[$key] === '') {
-            //         $values[$key] = null;
-            //     }
-            // }
-
-            // // リストに保持しておく
-            // $datas["datas"][] = $values;
-            // $datas["ids"]['lesson_date'] = $values["年月日"];
-            // $datas["ids"]['campus_cd'] = 02;
->>>>>>> be03ee147de4ac642013565ae3b8acfe3cf125ce
+            // $datas配列に1行分のデータを格納する
+            array_push($datas, $values);
         }
 
+        // 現在日時を取得
+        $now = Carbon::now();
 
-        // // 取込対象月
-        // $date = $this->fmYmToDate($salaryDate);
+        // 取込のタイムスタンプを揃えるため、処理開始時点のタイムスタンプも渡しておく
+        $datas = [
+            'salarys' => $salarys,
+            'salary_details' => $salary_details,
+            'import_date' => $now
+        ];
 
-        // // ヘッダ行成型用
-        // $csvHeaderNames = [];
-        // $csvHeaderPref = ["", "項目名"];
-        // $csvHeaderSuf = ["扶養人数", "税額表"];
-        // $dataHeaderPref = ["tid", "name"];
-        // $dataHeaderSuf = ["dependents", "tax_table"];
-
-        // // 各表示グループ
-        // $salary_group_1 = [];
-        // $salary_group_2 = [];
-        // $salary_group_3 = [];
-        // $salary_group_4 = [];
-
-        // // コードマスタから項目名を取得
-        // $salary_headers = CodeMaster::select(
-        //     'sub_code',
-        //     'name'
-        // )
-        //     ->where('data_type', '=', AppConst::CODE_MASTER_19)
-        //     ->orderBy('order_code', 'asc')
-        //     ->get();
-
-        // foreach ($salary_headers as $salary_header) {
-        //     array_push($csvHeaderNames, $salary_header->name);
-        //     switch ($salary_header->sub_code) {
-        //         case AppConst::SALARY_GROUP_1:
-        //             array_push($salary_group_1, $salary_header->name);
-        //             break;
-        //         case AppConst::SALARY_GROUP_2:
-        //             array_push($salary_group_2, $salary_header->name);
-        //             break;
-        //         case AppConst::SALARY_GROUP_3:
-        //             array_push($salary_group_3, $salary_header->name);
-        //             break;
-        //         case AppConst::SALARY_GROUP_4:
-        //             array_push($salary_group_4, $salary_header->name);
-        //             break;
-        //     }
-        // }
-
-        // $csvHeaders = array_merge($csvHeaderPref, $csvHeaderNames);
-        // $csvHeaders = array_merge($csvHeaders, $csvHeaderSuf);
-
-        // // array_combine用
-        // $dataHeaders = array_merge($dataHeaderPref, $csvHeaderNames);
-        // $dataHeaders = array_merge($dataHeaders, $dataHeaderSuf);
-
-        // //-------------
-        // // グループ分け
-        // //-------------
-
-        // // CSVのデータをリストで保持
-        // $datas = [];
-        // $headers = [];
-
-        // // DB保存用配列
-        // $salarys = [];
-        // $salary_details = [];
-
-        // // 現在日時を取得
-        // $now = Carbon::now();
-
-        // // CSV読み込み
-        // $file = $this->readCsv($path, "sjis");
-
-        // // 1行ずつ取得
-        // foreach ($file as $i => $line) {
-
-        //     // 8行目までは読み飛ばす
-        //     if ($i < 7) {
-        //         continue;
-        //     }
-
-        //     // 8行目がヘッダ行
-        //     if ($i === 7) {
-        //         //-------------
-        //         // ヘッダ行
-        //         //-------------
-        //         $headers = $line;
-
-        //         // [バリデーション] ヘッダが想定通りかチェック
-        //         if ($headers !== $csvHeaders) {
-        //             throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-        //                 . "(ヘッダ行不正)");
-        //         }
-
-        //         continue;
-        //     }
-
-        //     // [バリデーション] データ行の列の数のチェック
-        //     if (count($line) !== count($csvHeaders)) {
-        //         throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-        //             . "(データ列数不正)");
-        //     }
-
-        //     // headerをもとに、値をセットしたオブジェクトを生成
-        //     $values = array_combine($dataHeaders, $line);
-
-        //     // 合計行で終了 ただし10行目以降の場合
-        //     if (empty($values['tid']) && $i > 8) {
-        //         break;
-        //     }
-
-        //     // [バリデーション] データ行の値のチェック
-        //     $rules = [
-        //         'name' => 'string|required',
-        //     ];
-        //     $rules += Salary::fieldRules('tid', ['required'], '_csv');
-        //     $rules += Salary::fieldRules('tax_table', ['required']);
-        //     $rules += Salary::fieldRules('dependents', ['required']);
-
-        //     foreach ($csvHeaderNames as $csvHeaderName) {
-        //         $rules += [
-        //             $csvHeaderName => 'required|vdPrice|vdPriceDigits'
-        //         ];
-        //     }
-
-        //     $validator = Validator::make($values, $rules);
-        //     if ($validator->fails()) {
-        //         throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-        //             . "(データ項目不正)");
-        //     }
-
-        //     // 登録前バリデーションの場合のみ、データ成型を行う
-        //     if (!$create) {
-        //         continue;
-        //     }
-
-        //     // 給与情報
-        //     $salary = [
-        //         'tid' => $values['tid'],
-        //         'salary_date' => $date,
-        //         'dependents' => $values['dependents'],
-        //         'tax_table' => $values['tax_table'],
-        //         'created_at' => $now,
-        //         'updated_at' => $now,
-        //         'deleted_at' => null
-        //     ];
-        //     array_push($salarys, $salary);
-
-        //     //-------------
-        //     // グループごとにsalary_detailsを作る
-        //     //-------------
-
-        //     // 給与情報通番と表示順を連番にする
-        //     $seq = 1;
-        //     $count_group_1 = 0;
-        //     $count_group_2 = 0;
-
-        //     // 支給
-        //     foreach ($salary_group_1 as $salary_detail) {
-        //         $salary_detail = [];
-        //         $salary_detail['tid'] = (int) $values['tid'];
-        //         $salary_detail['salary_date'] = $date;
-        //         $salary_detail['salary_seq'] = $seq;
-        //         $salary_detail['order_code'] = $seq;
-        //         $salary_detail['salary_group'] = 1;
-        //         $salary_detail['item_name'] = $salary_group_1[$count_group_1];
-        //         $salary_detail['amount'] = (int) str_replace(',', '', $values[$salary_group_1[$count_group_1]]);
-        //         $salary_detail['created_at'] = $now;
-        //         $salary_detail['updated_at'] = $now;
-        //         $salary_detail['deleted_at'] = null;
-        //         array_push($salary_details, $salary_detail);
-        //         $seq++;
-        //         $count_group_1++;
-        //     }
-
-        //     // 控除
-        //     foreach ($salary_group_2 as $salary_detail) {
-        //         $salary_detail = [];
-        //         $salary_detail['tid'] = (int) $values['tid'];
-        //         $salary_detail['salary_date'] = $date;
-        //         $salary_detail['salary_seq'] = $seq;
-        //         $salary_detail['order_code'] = $seq;
-        //         $salary_detail['salary_group'] = 2;
-        //         $salary_detail['item_name'] = $salary_group_2[$count_group_2];
-        //         $salary_detail['amount'] = (int) str_replace(',', '', $values[$salary_group_2[$count_group_2]]);
-        //         $salary_detail['created_at'] = $now;
-        //         $salary_detail['updated_at'] = $now;
-        //         $salary_detail['deleted_at'] = null;
-        //         array_push($salary_details, $salary_detail);
-        //         $seq++;
-        //         $count_group_2++;
-        //     }
-
-        //     // その他
-        //     $salary_detail = [];
-        //     $salary_detail['tid'] = (int) $values['tid'];
-        //     $salary_detail['salary_date'] = $date;
-        //     $salary_detail['salary_seq'] = $seq;
-        //     $salary_detail['order_code'] = $seq;
-        //     $salary_detail['salary_group'] = 3;
-        //     $salary_detail['item_name'] = $salary_group_3[0];
-        //     $salary_detail['amount'] = (int) str_replace(',', '', $values[$salary_group_3[0]]);
-        //     $salary_detail['created_at'] = $now;
-        //     $salary_detail['updated_at'] = $now;
-        //     $salary_detail['deleted_at'] = null;
-        //     array_push($salary_details, $salary_detail);
-        //     $seq++;
-
-        //     // 合計
-        //     $salary_detail = [];
-        //     $salary_detail['tid'] = (int) $values['tid'];
-        //     $salary_detail['salary_date'] = $date;
-        //     $salary_detail['salary_seq'] = $seq;
-        //     $salary_detail['order_code'] = $seq;
-        //     $salary_detail['salary_group'] = 4;
-        //     $salary_detail['item_name'] = $salary_group_4[0];
-        //     $salary_detail['amount'] = (int) str_replace(',', '', $values[$salary_group_4[0]]);
-        //     $salary_detail['created_at'] = $now;
-        //     $salary_detail['updated_at'] = $now;
-        //     $salary_detail['deleted_at'] = null;
-        //     array_push($salary_details, $salary_detail);
-        // }
-
-        // // 取込のタイムスタンプを揃えるため、処理開始時点のタイムスタンプも渡しておく
-        // $datas = [
-        //     'salarys' => $salarys,
-        //     'salary_details' => $salary_details,
-        //     'import_date' => $now
-        // ];
-
-        return;
+        return $datas;
     }
 
     /**
