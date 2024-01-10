@@ -1424,14 +1424,23 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 一覧画面
     Route::get('/grade_example', [GradeExampleController::class, 'index'])->name('grade_example');
 
+    // 学校区分プルダウン選択時、学年リストを返却する
+    Route::post('/grade_example/get_data_select_grade', [GradeExampleController::class, 'getDataSelectGrade'])->name('grade_example-get_data_select_grade');
+
+    // 種別プルダウン選択時、定期考査リストまたは学期リストを返却する
+    Route::post('/grade_example/get_data_select_exam', [GradeExampleController::class, 'getDataSelectExam'])->name('grade_example-get_data_select_exam');
+
     // バリデーション(検索用)
     Route::post('/grade_example/vd_search', [GradeExampleController::class, 'validationForSearch'])->name('grade_example-vd_search');
 
     // 検索結果取得
     Route::post('/grade_example/search', [GradeExampleController::class, 'search'])->name('tgrade_example-search');
 
-    // 詳細取得用
+    // 詳細取得用（CSV出力確認モーダル）
     Route::post('/grade_example/get_data', [GradeExampleController::class, 'getData'])->name('grade_example-get_data');
+
+    // モーダル処理（CSV出力）
+    Route::post('/grade_example/exec_modal', [GradeExampleController::class, 'execModal'])->name('grade_example-exec_modal');
 
     //---------------------
     // 研修管理

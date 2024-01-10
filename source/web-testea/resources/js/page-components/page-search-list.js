@@ -38,6 +38,16 @@ export default class PageSearchList extends PageComponentBase {
             option["afterSearch"] = () => {};
         }
 
+        // 検索完了後の処理(検索ボタンの活性のため)
+        if (option["afterSearch2"] == undefined) {
+            option["afterSearch2"] = () => {};
+        }
+
+        // Vueにdataを追加
+        if (option["vueData"] == undefined) {
+            option["vueData"] = {};
+        }
+
         // Vueにmethodsを追加
         if (option["vueMethods"] == undefined) {
             option["vueMethods"] = {};
@@ -59,7 +69,8 @@ export default class PageSearchList extends PageComponentBase {
 
         const vueApp = {
             data() {
-                return {
+                return Object.assign(
+                {
                     paginator: {},
                     elements: [],
 
@@ -71,7 +82,9 @@ export default class PageSearchList extends PageComponentBase {
 
                     // ページ数を保持
                     page: 1,
-                };
+                },
+                option["vueData"]
+                );
             },
             methods: Object.assign(
                 {
@@ -185,7 +198,7 @@ export default class PageSearchList extends PageComponentBase {
                                 FormCom.loadingForCardOff(id);
 
                                 // 検索後の処理
-                                option["afterSearch"]();
+                                option["afterSearch"](this);
                             })
                             .catch(AjaxCom.fail);
                     },
