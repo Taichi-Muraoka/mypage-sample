@@ -239,10 +239,6 @@ class SalaryImportController extends Controller
                     }
                 }
 
-                foreach ($datas['salary_details'] as $data_salary_detail) {
-                    $data_salary_detail['salary_id'] = 1;
-                }
-
                 // 該当する給与情報取込を更新する
                 $salaryImport = SalaryImport::where('salary_date', '=', $idDate)->firstOrFail();
                 $salaryImport->import_state = AppConst::CODE_MASTER_20_1;
@@ -377,7 +373,7 @@ class SalaryImportController extends Controller
                 // [バリデーション] ヘッダが想定通りかチェック
                 if ($headers !== $csvHeaderNames) {
                     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                        . "：ヘッダ行不正)");
+                        . "(ヘッダ行不正)");
                 }
                 continue;
             }
@@ -388,7 +384,7 @@ class SalaryImportController extends Controller
             // [バリデーション] データ行の列の数のチェック
             if (count($line) !== count($csvHeaderNames)) {
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                    . "：データ列数不正)");
+                    . "(データ列数不正)");
             }
 
             $csvHeaderPref = [
@@ -447,20 +443,20 @@ class SalaryImportController extends Controller
 
             // [バリデーション] データ行の値のチェック
             $rules = [
-                "講師番号" => 'integer|min:1|max:9|required',
+                "講師番号" => 'integer|min:1|max:9999999999|required',
                 "講師名" => 'string|max:50|required',
                 "出社回数" => 'integer|max:99999999|required',
-                "特別報酬" => 'required|integer|max:99999999',
+                "交通費" => 'integer|max:99999999',
+                "特別報酬" => 'integer|max:99999999',
                 "ペナルティ" => 'integer|max:99999999',
                 "源泉計算用小計" => 'max:99999999',
-                "交通費" => 'required|integer|max:99999999',
-                "扶養者" => 'required|integer|max:999',
+                "扶養者" => 'integer|max:999',
                 "種別" => 'string|max:1',
                 "源泉徴収月額" => 'max:99999999',
-                "交通費等" => 'required|integer|max:99999999',
-                "住民税徴収" => 'required|integer|min:0|max:99999999',
-                "経費精算" => 'required|integer|min:0|max:99999999',
-                "年末調整" => 'required|integer|min:0|max:99999999',
+                "交通費等" => 'integer|max:99999999',
+                "住民税徴収" => 'integer|min:0|max:99999999',
+                "経費精算" => 'integer|min:0|max:99999999',
+                "年末調整" => 'integer|min:0|max:99999999',
                 "支払" => 'required|integer|min:0|max:99999999',
                 "備考" => 'string|max:1000'
             ];
@@ -468,7 +464,7 @@ class SalaryImportController extends Controller
             $i = 1;
             foreach ($dataHeaderPref as $dataHeader) {
                 $rules += [
-                    $dataHeader => 'required|max:999',
+                    $dataHeader => 'required|numeric|max:999',
                     "時給" . $i => 'required|integer|max:99999999'
                 ];
                 $i++;
@@ -476,8 +472,52 @@ class SalaryImportController extends Controller
 
             $validator = Validator::make($values, $rules);
             if ($validator->fails()) {
+                $errCol = "";
+                if ($validator->errors()->has('講師番号')) {
+                    $errCol = "講師番号=" . $values['講師番号'];
+                } else if ($validator->errors()->has('講師名')) {
+                    $errCol = "講師名=" . $values['講師名'];
+                } else if ($validator->errors()->has('出社回数')) {
+                    $errCol =  "出社回数=" . $values['出社回数'];
+                } else if ($validator->errors()->has('交通費')) {
+                    $errCol =  "交通費=" . $values['交通費'];
+                } else if ($validator->errors()->has('特別報酬')) {
+                    $errCol =  "特別報酬=" . $values['特別報酬'];
+                } else if ($validator->errors()->has('ペナルティ')) {
+                    $errCol =  "ペナルティ=" . $values['ペナルティ'];
+                } else if ($validator->errors()->has('源泉計算用小計')) {
+                    $errCol = "源泉計算用小計=" . $values['源泉計算用小計'];
+                } else if ($validator->errors()->has('交通費等')) {
+                    $errCol =  "交通費等=" . $values['交通費等'];
+                } else if ($validator->errors()->has('扶養者数')) {
+                    $errCol =  "扶養者数=" . $values['扶養者数'];
+                } else if ($validator->errors()->has('種別')) {
+                    $errCol =  "種別=" . $values['種別'];
+                } else if ($validator->errors()->has('源泉徴収月額')) {
+                    $errCol =  "源泉徴収月額=" . $values['源泉徴収月額'];
+                } else if ($validator->errors()->has('住民税徴収')) {
+                    $errCol = "住民税徴収=" . $values['住民税徴収'];
+                } else if ($validator->errors()->has('経費精算')) {
+                    $errCol =  "経費精算=" . $values['経費精算'];
+                } else if ($validator->errors()->has('年末調整')) {
+                    $errCol =  "年末調整=" . $values['年末調整'];
+                } else if ($validator->errors()->has('支払')) {
+                    $errCol =  "支払=" . $values['支払'];
+                } else if ($validator->errors()->has('備考')) {
+                    $errCol =  "備考=" . $values['備考'];
+                }
+                $i = 1;
+                foreach ($dataHeaderPref as $dataHeader) {
+                    if ($validator->errors()->has('時給' . $i)) {
+                        $errCol =  "時給=" . $values['時給' . $i];
+                    } else if ($validator->errors()->has($dataHeader)) {
+                        $errCol = $dataHeader . "=" . $values[$dataHeader];
+                    }
+                    $i++;
+                }
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                    . "(データ項目不正):" . $line_i + 1 . "行目\n" . "講師番号:" . $values['講師番号']);
+                    . "：データ項目不正(" . $line_i + 1 . "行目\n講師番号=" . $values['講師番号']
+                    . "エラー項目：" . $errCol . " )");
             }
 
             // 登録前バリデーションの場合のみ、データ成型を行う
@@ -501,18 +541,18 @@ class SalaryImportController extends Controller
             // 給与情報通番と表示順を連番にする
             $seq = 1;
             $count_group_1 = 0;
-            $count_group_2 = 0;
 
             // 支給
-            foreach ($salary_group_1 as $salary_detail) {
-                if ($salary_detail != "時給") {
-                    $hp = '時給' . $count_group_1 + 1;
+            foreach ($salary_group_1 as $salary_group) {
+                if ($salary_group != "時給") {
+                    $count_group_1++;
+                    $hp = '時給' . $count_group_1;
                     $salary_detail = [];
                     $salary_detail['salary_seq'] = $seq;
                     $salary_detail['salary_group'] = AppConst::SALARY_GROUP_1;
-                    $salary_detail['item_name'] = $salary_group_1[$count_group_1];
+                    $salary_detail['item_name'] = $salary_group;
                     if ($count_group_1 < AppConst::COUNT_HOUR_SALARY) {
-                        $salary_detail['hour'] = $values[$salary_group_1[$count_group_1]];
+                        $salary_detail['hour'] = $values[$salary_group];
                     } else {
                         $salary_detail['hour'] = null;
                     }
@@ -522,28 +562,26 @@ class SalaryImportController extends Controller
                         $salary_detail['hour_payment'] = null;
                     }
                     if ($count_group_1 < AppConst::COUNT_HOUR_SALARY) {
-                        $salary_detail['amount'] = (float)$values[$salary_group_1[$count_group_1]] * (int)$values[$hp];
+                        $salary_detail['amount'] = (float)$values[$salary_group] * (int)$values[$hp];
                     } else {
-                        $salary_detail['amount'] = (int)$values[$salary_group_1[$count_group_1]];
+                        $salary_detail['amount'] = (int)$values[$salary_group];
                     }
                     array_push($salary_details, $salary_detail);
                     $seq++;
                 }
-                $count_group_1++;
             }
 
             // 控除
-            foreach ($salary_group_2 as $salary_detail) {
+            foreach ($salary_group_2 as $salary_group) {
                 $salary_detail = [];
                 $salary_detail['salary_seq'] = $seq;
                 $salary_detail['salary_group'] = AppConst::SALARY_GROUP_2;
-                $salary_detail['item_name'] = $salary_group_2[$count_group_2];
+                $salary_detail['item_name'] = $salary_group;
                 $salary_detail['hour'] = null;
                 $salary_detail['hour_payment'] = null;
-                $salary_detail['amount'] = (int)$values[$salary_group_2[$count_group_2]];
+                $salary_detail['amount'] = (int)$values[$salary_group];
                 array_push($salary_details, $salary_detail);
                 $seq++;
-                $count_group_2++;
             }
 
             // その他
@@ -566,9 +604,6 @@ class SalaryImportController extends Controller
             $salary_detail['hour_payment'] = null;
             $salary_detail['amount'] = (int)$values[$salary_group_4[0]];
             array_push($salary_details, $salary_detail);
-
-            // $datas配列に1行分のデータを格納する
-            array_push($datas, $values);
         }
 
         // 現在日時を取得
