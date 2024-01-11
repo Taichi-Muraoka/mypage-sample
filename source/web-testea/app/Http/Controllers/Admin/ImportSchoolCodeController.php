@@ -306,6 +306,10 @@ class ImportSchoolCodeController extends Controller
                         . basename($path)
                         . "：学校種不正( 学校コード=" . $values['学校コード'] . ", "
                         . "学校種=" . $values['学校種'] . " )");
+                } else {
+                    // 問題なければ、学校種に該当するコードマスタ学校種コードをセットする
+                    // 例：'A1' → 1, 'F1' → 11
+                    $values['学校種コード'] = $schoolKindList[$schoolKindKey]['code'];
                 }
 
                 // 設置区分のコードが存在しなかったらエラー
@@ -336,15 +340,6 @@ class ImportSchoolCodeController extends Controller
                 } else {
                     // 存在しなければ適当な値をセットし配列に追加する
                     $duplicateCheck[$schoolCode] = 1;
-                }
-
-                // 学校種に該当するコードマスタ学校種コードをセットする
-                // 例：'A1' → 1, 'F1' → 11
-                foreach ($schoolKindList as $schoolKind) {
-                    if ($values['学校種'] == $schoolKind['gen_item1']) {
-                        $values['学校種コード'] = $schoolKind['code'];
-                        break;
-                    }
                 }
 
                 // return用の$datas配列に1行分のデータを格納する
