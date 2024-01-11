@@ -9,7 +9,7 @@ use App\Models\MstTutorGrade;
 use App\Models\MstSchool;
 use App\Models\MstSubject;
 use App\Models\AdminUser;
-use App\Models\TutorView;
+use App\Models\Tutor;
 use App\Models\TutorCampus;
 use App\Models\TutorSubject;
 use App\Models\CodeMaster;
@@ -32,57 +32,66 @@ trait FuncTutorDetailTrait
     private function getTutorDetail($tid)
     {
         // 講師の基本情報を取得する
-        $query = TutorView::query();
+        $query = Tutor::query();
+
+        // 勤続期間の月数取得のサブクエリ
+        $enter_term_query = $this->mdlGetTutorEnterTermQuery();
+
         $tutor = $query
             ->select(
-                'tutors_view.tutor_id',
-                'tutors_view.name',
-                'tutors_view.name_kana',
-                'tutors_view.tel',
-                'tutors_view.email',
-                'tutors_view.address',
-                'tutors_view.birth_date',
-                'tutors_view.gender_cd',
+                'tutors.tutor_id',
+                'tutors.name',
+                'tutors.name_kana',
+                'tutors.tel',
+                'tutors.email',
+                'tutors.address',
+                'tutors.birth_date',
+                'tutors.gender_cd',
                 // コードマスタの名称（性別）
                 'mst_codes_30.name as gender_name',
-                'tutors_view.grade_cd',
+                'tutors.grade_cd',
                 // 学年マスタの名称
                 'mst_tutor_grades.name as grade_name',
-                'tutors_view.school_cd_j',
-                'tutors_view.school_cd_h',
-                'tutors_view.school_cd_u',
+                'tutors.school_cd_j',
+                'tutors.school_cd_h',
+                'tutors.school_cd_u',
                 // 学校マスタの名称（中高大）
                 'mst_schools_j.name as school_j_name',
                 'mst_schools_h.name as school_h_name',
                 'mst_schools_u.name as school_u_name',
-                'tutors_view.hourly_base_wage',
-                'tutors_view.tutor_status',
+                'tutors.hourly_base_wage',
+                'tutors.tutor_status',
                 // コードマスタの名称(講師ステータス)
                 'mst_codes_29.name as status_name',
-                'tutors_view.enter_date',
-                'tutors_view.leave_date',
-                'tutors_view.enter_term',
-                'tutors_view.memo',
+                'tutors.enter_date',
+                'tutors.leave_date',
+                // 勤続期間の月数
+                'enter_term_query.enter_term',
+                'tutors.memo',
             )
+            // 勤続期間の月数の取得
+            ->leftJoinSub($enter_term_query, 'enter_term_query', function ($join) {
+                $join->on('tutors.tutor_id', '=', 'enter_term_query.tutor_id');
+            })
             // 学年の名称取得
-            ->sdLeftJoin(MstTutorGrade::class, 'tutors_view.grade_cd', '=', 'mst_tutor_grades.grade_cd')
+            ->sdLeftJoin(MstTutorGrade::class, 'tutors.grade_cd', '=', 'mst_tutor_grades.grade_cd')
             // 出身学校（中）の学校名の取得
-            ->sdLeftJoin(MstSchool::class, 'tutors_view.school_cd_j', '=', 'mst_schools_j.school_cd', 'mst_schools_j')
+            ->sdLeftJoin(MstSchool::class, 'tutors.school_cd_j', '=', 'mst_schools_j.school_cd', 'mst_schools_j')
             // 出身学校（高）の学校名の取得
-            ->sdLeftJoin(MstSchool::class, 'tutors_view.school_cd_h', '=', 'mst_schools_h.school_cd', 'mst_schools_h')
+            ->sdLeftJoin(MstSchool::class, 'tutors.school_cd_h', '=', 'mst_schools_h.school_cd', 'mst_schools_h')
             // 所属学校（大）の学校名の取得
-            ->sdLeftJoin(MstSchool::class, 'tutors_view.school_cd_u', '=', 'mst_schools_u.school_cd', 'mst_schools_u')
+            ->sdLeftJoin(MstSchool::class, 'tutors.school_cd_u', '=', 'mst_schools_u.school_cd', 'mst_schools_u')
             // コードマスターとJOIN 性別
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('tutors_view.gender_cd', '=', 'mst_codes_30.code')
+                $join->on('tutors.gender_cd', '=', 'mst_codes_30.code')
                     ->where('mst_codes_30.data_type', AppConst::CODE_MASTER_30);
             }, 'mst_codes_30')
             // コードマスターとJOIN ステータス
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('tutors_view.tutor_status', '=', 'mst_codes_29.code')
+                $join->on('tutors.tutor_status', '=', 'mst_codes_29.code')
                     ->where('mst_codes_29.data_type', AppConst::CODE_MASTER_29);
             }, 'mst_codes_29')
-            ->where('tutors_view.tutor_id', '=', $tid)
+            ->where('tutors.tutor_id', '=', $tid)
             ->firstOrFail();
 
         // 担当教科の取得
