@@ -86,6 +86,11 @@ return [
      */
     "upload_dir_year_schedule_import" =>  "file_upload/year_schedule_import/",
 
+    /**
+     * 学校コード取込
+     */
+    "upload_dir_school_code_import" =>  "file_upload/school_code_import/",
+
     //==========================
     // アップロードファイル名
     //==========================
