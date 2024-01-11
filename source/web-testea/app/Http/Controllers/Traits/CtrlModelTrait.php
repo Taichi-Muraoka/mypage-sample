@@ -1023,6 +1023,26 @@ trait CtrlModelTrait
         return $query;
     }
 
+    /**
+     * 生徒の通塾期間月数用JOINクエリを取得
+     * leftJoinSubされる想定
+     *
+     * @return array
+     */
+    protected function mdlGetStudentEnterTermQuery()
+    {
+        // 生徒情報から通塾期間の月数を算出するクエリ
+        $query = Student::query();
+        $query->select('students.student_id')
+            ->selectRaw(
+                'CASE WHEN stu_status = ' . AppConst::CODE_MASTER_28_5 . ' THEN past_enter_term'
+                . ' ELSE past_enter_term + PERIOD_DIFF(DATE_FORMAT(curdate(), "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
+                . ' END as enter_term'
+            );
+
+        return $query;
+    }
+
     //------------------------------
     // whereの条件
     //------------------------------
