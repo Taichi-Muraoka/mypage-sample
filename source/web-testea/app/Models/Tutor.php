@@ -146,16 +146,77 @@ class Tutor extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
+    /**
+     * 検索 講師ID
+     */
+    public function scopeSearchTutorId($query, $obj)
+    {
+        $key = 'tutor_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 
     /**
-     * 検索 name
+     * 検索 講師名
      */
     public function scopeSearchName($query, $obj)
     {
         $key = 'name';
         if (isset($obj[$key]) && filled($obj[$key])) {
-            // nameが他とかぶるので、テーブル名を指定した
             $query->where($this->getTable() . '.' . $key, 'LIKE',  '%' . $obj[$key] . '%');
+        }
+    }
+
+    /**
+     * 検索 学年
+     */
+    public function scopeSearchGradeCd($query, $obj)
+    {
+        $key = 'grade_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($this->getTable() . '.' . $key,  $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 ベース給
+     */
+    public function scopeSearchHourlyBaseWage($query, $obj)
+    {
+        $key = 'hourly_base_wage';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 講師ステータス
+     */
+    public function scopeSearchTutorStatus($query, $obj, $group)
+    {
+        // $groupは、選択したステータスの配列 [1 => '1',5 => '5'];
+        // bladeでnameとして使う名前が異なるため、テーブル項目名を$dbKeyで指定した
+        $key = 'status_groups';
+        $dbKey = 'tutor_status';
+
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // 配列の絞り込みwhereIn
+            $query->whereIn($this->getTable() . '.' . $dbKey, $group);
+        }
+    }
+
+    /**
+     * 検索 講師の所属校舎
+     */
+    public function scopeSearchRoom($query, $obj)
+    {
+        $key = 'campus_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // 指定された校舎コードで講師IDを絞り込む
+            $this->mdlWhereTidByRoomQuery($query, self::class, $obj[$key]);
         }
     }
 }

@@ -268,7 +268,7 @@ return [
     /**
      * 会員一覧 通塾期間プルダウンリスト
      */
-    // MEMO:'term'には通塾期間の検索用に月数範囲を指定（StudentViewモデルで使用）
+    // MEMO:'term'には通塾期間の検索用に月数範囲を指定（Studentモデルで使用）
     'enter_term' => [
         1 => [
             "term" => 1,

@@ -11,7 +11,6 @@ use App\Models\MstCourse;
 use App\Models\MstSubject;
 use App\Models\MstSystem;
 use App\Models\Student;
-use App\Models\StudentView;
 use App\Models\StudentCampus;
 use App\Models\Record;
 use App\Models\AdminUser;
@@ -51,51 +50,60 @@ trait FuncMemberDetailTrait
     private function getMemberDetail($sid)
     {
         // 生徒の基本情報を取得する
-        $query = StudentView::query();
+        $query = Student::query();
+
+        // 通塾期間の月数取得のサブクエリ
+        $enter_term_query = $this->mdlGetStudentEnterTermQuery();
+
         $student = $query
             ->select(
-                'students_view.student_id',
-                'students_view.name',
-                'students_view.name_kana',
-                'students_view.tel_stu',
-                'students_view.tel_par',
-                'students_view.email_stu',
-                'students_view.email_par',
-                'students_view.birth_date',
-                'students_view.grade_cd',
+                'students.student_id',
+                'students.name',
+                'students.name_kana',
+                'students.tel_stu',
+                'students.tel_par',
+                'students.email_stu',
+                'students.email_par',
+                'students.birth_date',
+                'students.grade_cd',
                 // 学年マスタの名称
                 'mst_grades.name as grade_name',
-                'students_view.school_cd_e',
-                'students_view.school_cd_h',
-                'students_view.school_cd_j',
+                'students.school_cd_e',
+                'students.school_cd_h',
+                'students.school_cd_j',
                 // 学校マスタの名称（小中高）
                 'mst_schools_e.name as school_e_name',
                 'mst_schools_j.name as school_j_name',
                 'mst_schools_h.name as school_h_name',
-                'students_view.stu_status',
+                'students.stu_status',
                 // コードマスタの名称(会員ステータス)
                 'mst_codes.name as status_name',
-                'students_view.enter_date',
-                'students_view.leave_date',
-                'students_view.enter_term',
-                'students_view.lead_id',
-                'students_view.storage_link',
-                'students_view.memo',
+                'students.enter_date',
+                'students.leave_date',
+                // 通塾期間の月数
+                'enter_term_query.enter_term',
+                'students.lead_id',
+                'students.storage_link',
+                'students.memo',
             )
+            // 通塾期間の月数の取得
+            ->leftJoinSub($enter_term_query, 'enter_term_query', function ($join) {
+                $join->on('students.student_id', '=', 'enter_term_query.student_id');
+            })
             // 学年の取得
-            ->sdLeftJoin(MstGrade::class, 'students_view.grade_cd', '=', 'mst_grades.grade_cd')
+            ->sdLeftJoin(MstGrade::class, 'students.grade_cd', '=', 'mst_grades.grade_cd')
             // 所属学校（小）の学校名の取得
-            ->sdLeftJoin(MstSchool::class, 'students_view.school_cd_e', '=', 'mst_schools_e.school_cd', 'mst_schools_e')
+            ->sdLeftJoin(MstSchool::class, 'students.school_cd_e', '=', 'mst_schools_e.school_cd', 'mst_schools_e')
             // 所属学校（中）の学校名の取得
-            ->sdLeftJoin(MstSchool::class, 'students_view.school_cd_j', '=', 'mst_schools_j.school_cd', 'mst_schools_j')
+            ->sdLeftJoin(MstSchool::class, 'students.school_cd_j', '=', 'mst_schools_j.school_cd', 'mst_schools_j')
             // 所属学校（高）の学校名の取得
-            ->sdLeftJoin(MstSchool::class, 'students_view.school_cd_h', '=', 'mst_schools_h.school_cd', 'mst_schools_h')
+            ->sdLeftJoin(MstSchool::class, 'students.school_cd_h', '=', 'mst_schools_h.school_cd', 'mst_schools_h')
             // コードマスターとJOIN
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('students_view.stu_status', '=', 'mst_codes.code')
+                $join->on('students.stu_status', '=', 'mst_codes.code')
                     ->where('mst_codes.data_type', AppConst::CODE_MASTER_28);
             })
-            ->where('students_view.student_id', '=', $sid)
+            ->where('students.student_id', '=', $sid)
             ->firstOrFail();
 
         // 生徒IDから所属校舎を取得する。
@@ -137,7 +145,7 @@ trait FuncMemberDetailTrait
 
         // 会員ステータスによって退会ボタンの押下を制御する（退会処理中・退会済は押下不可）
         $disabled = false;
-        if($student['stu_status'] == AppConst::CODE_MASTER_28_4 || $student['stu_status'] == AppConst::CODE_MASTER_28_5){
+        if ($student['stu_status'] == AppConst::CODE_MASTER_28_4 || $student['stu_status'] == AppConst::CODE_MASTER_28_5) {
             $disabled = true;
         }
 

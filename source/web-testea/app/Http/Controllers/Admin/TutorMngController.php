@@ -18,7 +18,6 @@ use App\Models\Account;
 use App\Models\Salary;
 use App\Models\CodeMaster;
 use App\Models\Tutor;
-use App\Models\TutorView;
 use App\Models\TutorSubject;
 use App\Models\TutorCampus;
 use App\Libs\AuthEx;
@@ -102,7 +101,7 @@ class TutorMngController extends Controller
         $form = $request->all();
 
         // クエリを作成
-        $query = TutorView::query();
+        $query = Tutor::query();
 
         // 校舎の検索
         if (AuthEx::isRoomAdmin()) {
@@ -133,28 +132,36 @@ class TutorMngController extends Controller
         // ベース給の検索
         $query->SearchHourlyBaseWage($form);
 
+        // 勤続期間の月数取得のサブクエリ
+        $enter_term_query = $this->mdlGetTutorEnterTermQuery();
+
         // データを取得
         $tutors = $query
             ->select(
-                'tutors_view.tutor_id',
-                'tutors_view.name',
-                'tutors_view.grade_cd',
+                'tutors.tutor_id',
+                'tutors.name',
+                'tutors.grade_cd',
                 // 学年の名称
                 'mst_tutor_grades.name as grade_name',
-                'tutors_view.hourly_base_wage',
-                'tutors_view.tutor_status',
+                'tutors.hourly_base_wage',
+                'tutors.tutor_status',
                 // コードマスタの名称（講師ステータス）
                 'mst_codes.name as status_name',
-                'tutors_view.enter_term',
+                // 勤続期間の月数
+                'enter_term_query.enter_term',
             )
+            // 勤続期間の月数の取得
+            ->leftJoinSub($enter_term_query, 'enter_term_query', function ($join) {
+                $join->on('tutors.tutor_id', '=', 'enter_term_query.tutor_id');
+            })
             // 講師学年マスタの名称を取得
-            ->sdLeftJoin(MstTutorGrade::class, 'tutors_view.grade_cd', '=', 'mst_tutor_grades.grade_cd')
+            ->sdLeftJoin(MstTutorGrade::class, 'tutors.grade_cd', '=', 'mst_tutor_grades.grade_cd')
             // コードマスターとJOIN
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('tutors_view.tutor_status', '=', 'mst_codes.code')
+                $join->on('tutors.tutor_status', '=', 'mst_codes.code')
                     ->where('data_type', AppConst::CODE_MASTER_29);
             })
-            ->orderBy('tutors_view.tutor_id', 'asc');
+            ->orderBy('tutors.tutor_id', 'asc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $tutors);
@@ -229,10 +236,10 @@ class TutorMngController extends Controller
 
         $rules += MstCampus::fieldRules('campus_cd', [$validationRoomList]);
         $rules += ['status_groups' => [$validationStatusList]];
-        $rules += TutorView::fieldRules('tutor_id');
-        $rules += TutorView::fieldRules('name');
-        $rules += TutorView::fieldRules('grade_cd', [$validationGradeList]);
-        $rules += TutorView::fieldRules('hourly_base_wage');
+        $rules += Tutor::fieldRules('tutor_id');
+        $rules += Tutor::fieldRules('name');
+        $rules += Tutor::fieldRules('grade_cd', [$validationGradeList]);
+        $rules += Tutor::fieldRules('hourly_base_wage');
 
         return $rules;
     }

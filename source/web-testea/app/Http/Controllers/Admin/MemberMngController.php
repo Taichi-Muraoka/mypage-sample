@@ -22,7 +22,6 @@ use App\Models\ClassMember;
 use App\Models\CodeMaster;
 use App\Models\MstGrade;
 use App\Models\Badge;
-use App\Models\StudentView;
 use App\Models\Record;
 use App\Models\RegularClass;
 use App\Models\RegularClassMember;
@@ -102,8 +101,7 @@ class MemberMngController extends Controller
     private function getSearchResult($form)
     {
         // クエリを作成
-        // 通塾期間参照のため、Viewを利用する
-        $query = StudentView::query();
+        $query = Student::query();
 
         // 校舎の検索
         if (AuthEx::isRoomAdmin()) {
@@ -141,34 +139,42 @@ class MemberMngController extends Controller
             ->where('badges.badge_type', AppConst::CODE_MASTER_55_2)
             ->groupBy('badges.student_id');
 
+        // 通塾期間の月数取得のサブクエリ
+        $enter_term_query = $this->mdlGetStudentEnterTermQuery();
+
         // 会員情報取得
         $students = $query
             ->select(
-                'students_view.student_id',
-                'students_view.name',
-                'students_view.grade_cd',
+                'students.student_id',
+                'students.name',
+                'students.grade_cd',
                 // 学年マスタの名称
                 'mst_grades.name as grade_name',
-                'students_view.stu_status',
+                'students.stu_status',
                 // コードマスタの名称（会員ステータス）
                 'mst_codes.name as stu_status_name',
-                'students_view.enter_date',
-                'students_view.enter_term',
+                'students.enter_date',
+                // 通塾期間の月数
+                'enter_term_query.enter_term',
                 // 通塾バッジ数
                 'badge_count_query.badge_count'
             )
+            // 通塾期間の月数の取得
+            ->leftJoinSub($enter_term_query, 'enter_term_query', function ($join) {
+                $join->on('students.student_id', '=', 'enter_term_query.student_id');
+            })
             // 通塾バッジ数の取得
             ->leftJoinSub($badge_count_query, 'badge_count_query', function ($join) {
-                $join->on('students_view.student_id', '=', 'badge_count_query.student_id');
+                $join->on('students.student_id', '=', 'badge_count_query.student_id');
             })
             // 学年マスタの名称を取得
-            ->sdLeftJoin(MstGrade::class, 'students_view.grade_cd', '=', 'mst_grades.grade_cd')
+            ->sdLeftJoin(MstGrade::class, 'students.grade_cd', '=', 'mst_grades.grade_cd')
             // コードマスターとJOIN
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('students_view.stu_status', '=', 'mst_codes.code')
+                $join->on('students.stu_status', '=', 'mst_codes.code')
                     ->where('data_type', AppConst::CODE_MASTER_28);
             })
-            ->orderBy('students_view.student_id', 'asc');
+            ->orderBy('students.student_id', 'asc');
 
         return $students;
     }
@@ -272,11 +278,11 @@ class MemberMngController extends Controller
         };
 
         $rules += MstCampus::fieldRules('campus_cd', [$validationRoomList]);
-        $rules += StudentView::fieldRules('grade_cd', [$validationGradeList]);
-        $rules += StudentView::fieldRules('student_id');
-        $rules += StudentView::fieldRules('name');
-        $rules += StudentView::fieldRules('stu_status', [$validationStatusList]);
-        $rules += StudentView::fieldRules('enter_term', [$validationEnterTermList]);
+        $rules += Student::fieldRules('grade_cd', [$validationGradeList]);
+        $rules += Student::fieldRules('student_id');
+        $rules += Student::fieldRules('name');
+        $rules += Student::fieldRules('stu_status', [$validationStatusList]);
+        $rules += ['enter_term' => [$validationEnterTermList]];
 
         return $rules;
     }
