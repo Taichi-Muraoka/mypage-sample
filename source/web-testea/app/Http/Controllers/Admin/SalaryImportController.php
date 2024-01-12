@@ -406,14 +406,14 @@ class SalaryImportController extends Controller
             ];
 
             $dataHeaderSuf = [
+                "交通費",
                 "特別報酬",
                 "ペナルティ",
                 "源泉計算用小計",
-                "交通費",
+                "交通費等",
                 "扶養者",
                 "種別",
                 "源泉徴収月額",
-                "交通費等",
                 "住民税徴収",
                 "経費精算",
                 "年末調整",
@@ -516,8 +516,8 @@ class SalaryImportController extends Controller
                     $i++;
                 }
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                    . "：データ項目不正(" . $line_i + 1 . "行目\n講師番号=" . $values['講師番号']
-                    . "エラー項目：" . $errCol . " )");
+                    . "データ項目不正( " . $line_i + 1 . "行目 講師番号=" . $values['講師番号']
+                    . " エラー項目：" . $errCol . " )");
             }
 
             // 登録前バリデーションの場合のみ、データ成型を行う
