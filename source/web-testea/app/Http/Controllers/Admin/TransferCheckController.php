@@ -8,6 +8,7 @@ use App\Consts\AppConst;
 use App\Libs\CommonDateFormat;
 use App\Models\Schedule;
 use App\Models\TransferApplication;
+use App\Models\TransferApplicationDate;
 use App\Models\Notice;
 use App\Models\NoticeDestination;
 use Illuminate\Support\Facades\Mail;
@@ -1167,5 +1168,55 @@ class TransferCheckController extends Controller
             }
         }
         return $rules;
+    }
+
+    /**
+     * 削除処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function delete(Request $request)
+    {
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request, 'transfer_apply_id');
+
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($request) {
+
+            // 振替依頼情報取得
+            $transApp = TransferApplication::where('transfer_apply_id', $request->input('transfer_apply_id'))
+                // 該当データがない場合はエラーを返す
+                ->firstOrFail();
+
+            //----------------
+            // スケジュール情報更新
+            // （振替の情報をリセット）
+            //----------------
+            // 振替元スケジュール情報取得
+            $schedule = Schedule::where('schedule_id', $transApp->schedule_id)
+                // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+                ->where($this->guardRoomAdminTableWithRoomCd())
+                ->firstOrFail();
+
+            // 出欠ステータス:実施前・出席
+            $schedule->absent_status = AppConst::CODE_MASTER_35_0;
+            // 振替依頼ID：null
+            $schedule->transfer_id = null;
+            // 更新
+            $schedule->save();
+
+            //----------------
+            // 振替依頼情報削除
+            //----------------
+            // 振替依頼IDに紐づく日程情報を全て削除
+            TransferApplicationDate::where('transfer_apply_id', $transApp->transfer_apply_id)
+                ->delete();
+
+            // 振替依頼情報の削除
+            $transApp->delete();
+        });
+
+        return;
     }
 }

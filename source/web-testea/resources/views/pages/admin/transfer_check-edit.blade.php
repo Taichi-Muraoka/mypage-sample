@@ -119,8 +119,9 @@
     </x-bs.card>
 
     <x-bs.callout title="登録の際の注意事項" type="warning">
-        入力した振替授業または代講授業のスケジュールが登録・更新されます。<br>
-        対象の生徒・講師へお知らせが通知されます。
+        ・「振替授業登録」欄に入力した振替授業または代講授業のスケジュールが登録されます。<br>
+        &emsp;対象の生徒・講師へお知らせが通知されます。<br>
+        ・削除ボタン押下により、振替依頼の取消し・キャンセルが行われます。
     </x-bs.callout>
 
     {{-- フッター --}}
@@ -130,6 +131,7 @@
 
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
+                <x-button.submit-delete />
                 <x-button.submit-edit />
             </div>
 
