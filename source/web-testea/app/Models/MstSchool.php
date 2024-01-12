@@ -112,7 +112,7 @@ class MstSchool extends Model
             'school_cd' => ['string', 'max:13'],
             'school_kind' => ['string', 'max:2'],
             'school_kind_cd' => ['integer'],
-            'pref_cd'=> ['string', 'max:2'],
+            'pref_cd' => ['string', 'max:2'],
             'establish_kind' => ['integer'],
             'branch_kind' => ['integer'],
             'name' => ['string', 'max:50'],
@@ -121,7 +121,7 @@ class MstSchool extends Model
             'setting_date' => ['date_format:Y-m-d'],
             'abolition_date' => ['date_format:Y-m-d'],
             'old_shool_cd' => ['string', 'max:6'],
-            'change_flg' => ['string', 'max:13'],
+            'change_flg' => ['string', 'max:100'],
         ];
         return $_fieldRules;
     }

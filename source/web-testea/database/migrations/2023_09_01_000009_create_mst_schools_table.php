@@ -27,7 +27,7 @@ return new class extends Migration
             $table->date('setting_date')->nullable()->comment('設定年月日');
             $table->date('abolition_date')->nullable()->comment('廃止年月日');
             $table->string('old_shool_cd', 6)->nullable()->comment('旧学校調査番号');
-            $table->string('change_flg', 13)->nullable()->comment('移行後学校コード');
+            $table->string('change_flg', 100)->nullable()->comment('移行後学校コード');
             $table->timestamps();
             $table->softDeletes();
 
