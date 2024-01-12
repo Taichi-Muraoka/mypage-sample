@@ -631,7 +631,7 @@ class TutorMngController extends Controller
             // プラン種類：通常
             $account->plan_type = AppConst::CODE_MASTER_10_0;
             // ログイン可否：可
-            $account->login_flg = AppConst::CODE_MASTER_9_1;
+            $account->login_flg = AppConst::CODE_MASTER_9_0;
             // 保存
             $account->save();
 
@@ -828,7 +828,7 @@ class TutorMngController extends Controller
 
             if ($tutor->tutor_status == AppConst::CODE_MASTER_29_3 && $request['tutor_status'] == AppConst::CODE_MASTER_29_1) {
                 // ログイン可否：可
-                $account->login_flg = AppConst::CODE_MASTER_9_1;
+                $account->login_flg = AppConst::CODE_MASTER_9_0;
                 // 保存
                 $account->save();
 

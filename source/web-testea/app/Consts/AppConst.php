@@ -229,12 +229,12 @@ class AppConst
     /**
      * 可
      */
-    const CODE_MASTER_9_1 = 0;
+    const CODE_MASTER_9_0 = 0;
 
     /**
      * 不可
      */
-    const CODE_MASTER_9_2 = 1;
+    const CODE_MASTER_9_1 = 1;
 
     //-----------
     // 生徒プラン種別
@@ -1916,7 +1916,7 @@ class AppConst
      * システム変数ID 現年度
      */
     const SYSTEM_KEY_ID_1 = 100;
-    
+
     /**
      * システム変数ID 事務作業給
      */
@@ -1978,7 +1978,7 @@ class AppConst
 
     // 〇（登録済み）
     const REPORT_STATUS_4 = '4';
-    
+
     //-----------
     // 授業振替依頼 希望選択
     //-----------
@@ -1991,39 +1991,4 @@ class AppConst
      * フリー入力
      */
     const TRANSFER_PREF_TYPE_INPUT = 2;
-
-    /**
-     * コース (授業集計SQL用)
-     */
-
-    // 個別指導コース
-    const COURSE_CD_10100 = 10100;
-
-    // 1対2コース
-    const COURSE_CD_10200 = 10200;
-
-    // 1対3コース
-    const COURSE_CD_10300 = 10300;
-
-    // 家庭教師
-    const COURSE_CD_10400 = 10400;
-
-    // 演習
-    const COURSE_CD_10500 = 10500;
-
-    // ハイプラン
-    const COURSE_CD_10600 = 10600;
-
-    // 集団指導
-    const COURSE_CD_20100 = 20100;
-    
-    //==========================
-    // 教室カレンダー・レギュラースケジュール
-    //==========================
-    /**
-     * スケジュール追加更新種別
-     */
-    const SCHEDULE_KIND_NEW = 1;
-    const SCHEDULE_KIND_UPD = 2;
-    const SCHEDULE_KIND_CPY = 3;
 }

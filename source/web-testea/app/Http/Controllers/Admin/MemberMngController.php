@@ -766,7 +766,7 @@ class MemberMngController extends Controller
             // プラン種類：通常
             $account->plan_type = AppConst::CODE_MASTER_10_0;
             // ログイン可否：可
-            $account->login_flg = AppConst::CODE_MASTER_9_1;
+            $account->login_flg = AppConst::CODE_MASTER_9_0;
 
             // 保存
             $account->save();
@@ -1083,7 +1083,7 @@ class MemberMngController extends Controller
                 // プラン種類：通常
                 $account->plan_type = AppConst::CODE_MASTER_10_0;
                 // ログイン可否：可
-                $account->login_flg = AppConst::CODE_MASTER_9_1;
+                $account->login_flg = AppConst::CODE_MASTER_9_0;
 
                 // 保存
                 $account->save();
@@ -1114,7 +1114,7 @@ class MemberMngController extends Controller
                     // 3.会員ステータス「退会済」から「在籍」に変更した時、ログイン可にする
                     if ($student->stu_status == AppConst::CODE_MASTER_28_5 && $request['stu_status'] == AppConst::CODE_MASTER_28_1) {
                         // ログイン可否：可
-                        $account->login_flg = AppConst::CODE_MASTER_9_1;
+                        $account->login_flg = AppConst::CODE_MASTER_9_0;
                     }
 
                     // 保存
