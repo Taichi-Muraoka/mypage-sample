@@ -11,7 +11,7 @@ use Carbon\Carbon;
 use App\Consts\AppConst;
 
 /**
- * 生徒退会処理 - バッチ処理
+ * 生徒休塾処理 - バッチ処理
  */
 class StudentRecessSetting extends Command
 {

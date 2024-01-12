@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Lang;
 
 /**
- * パスワードリセット - メール
+ * 翌日授業リマインド - メール
  */
 class LessonReminder extends Mailable
 {

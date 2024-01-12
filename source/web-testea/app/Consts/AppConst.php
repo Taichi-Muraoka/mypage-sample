@@ -1991,4 +1991,38 @@ class AppConst
      * フリー入力
      */
     const TRANSFER_PREF_TYPE_INPUT = 2;
+    /**
+     * コース (授業集計SQL用)
+     */
+
+    // 個別指導コース
+    const COURSE_CD_10100 = 10100;
+
+    // 1対2コース
+    const COURSE_CD_10200 = 10200;
+
+    // 1対3コース
+    const COURSE_CD_10300 = 10300;
+
+    // 家庭教師
+    const COURSE_CD_10400 = 10400;
+
+    // 演習
+    const COURSE_CD_10500 = 10500;
+
+    // ハイプラン
+    const COURSE_CD_10600 = 10600;
+
+    // 集団指導
+    const COURSE_CD_20100 = 20100;
+
+    //==========================
+    // 教室カレンダー・レギュラースケジュール
+    //==========================
+    /**
+     * スケジュール追加更新種別
+     */
+    const SCHEDULE_KIND_NEW = 1;
+    const SCHEDULE_KIND_UPD = 2;
+    const SCHEDULE_KIND_CPY = 3;
 }
