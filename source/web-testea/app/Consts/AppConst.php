@@ -1854,6 +1854,11 @@ class AppConst
      */
     const SALARY_GROUP_4 = 4;
 
+    /**
+     * 給与表示グループ 未使用
+     */
+    const SALARY_GROUP_0 = 0;
+
     //-----------
     // バッチ種別
     //-----------
@@ -2025,4 +2030,13 @@ class AppConst
     const SCHEDULE_KIND_NEW = 1;
     const SCHEDULE_KIND_UPD = 2;
     const SCHEDULE_KIND_CPY = 3;
+
+    /**
+     * 給与取込 固定値
+     */
+    // 時給ありの明細数
+    const COUNT_HOUR_SALARY = 10;
+
+    // 給与情報明細数
+    const COUNT_SALARY = 17;
 }
