@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * パスワードリセット - モデル
@@ -74,9 +73,6 @@ class PasswordResets extends Model
     {
         // 更新時、空白をnullに変換する処理
         self::whenSaveEmptyToNull();
-
-        // テーブル操作時、ログを残す処理
-        self::saveToLog();
     }
 
     //-------------------------------
