@@ -159,7 +159,6 @@ export default class RoomCalendar {
                 // カレンダーの条件を送信
                 var sendData = Object.assign(formData, {
                 });
-                //console.log(sendData);
 
                 // 詳細データを取得
                 var url = UrlCom.getFuncUrl() + "/get_booth";
@@ -199,7 +198,6 @@ export default class RoomCalendar {
                     start: info.start.valueOf(),
                     end: info.end.valueOf(),
                 });
-                //console.log(sendData);
                 // 詳細データを取得
                 var url = UrlCom.getFuncUrl() + "/get_calendar";
                 return axios.post(url, sendData);
@@ -221,7 +219,6 @@ export default class RoomCalendar {
      */
     _eventClick = (e) => {
         // 時間割のスケジュールはモーダル表示しない
-        //if (e.event._def.resourceIds[0] !== '000' && e.event._def.resourceIds[0] !== '800') {
         if (e.event._def.resourceIds[0] !== "000") {
             // モーダルの中身を更新
             this._vueModal.item = Object.assign(
