@@ -13,20 +13,24 @@
     <x-bs.table :hover=false :vHeader=true class="mb-3 fix">
         <tr>
             <th width="35%">対象年月</th>
-            <td>2023年03月</td>
+            <td>{{$salary_mng->salary_date->format('Y年m月')}}</td>
         </tr>
         <tr>
             <th>確定日</th>
-            <td> </td>
+            <td>
+                <span v-if="{{$salary_mng->confirm_date}} != null">
+                    {{$salary_mng->confirm_date}}
+                </span>
+            </td>
         </tr>
         <tr>
             <th>状態</th>
-            <td>集計済</td>
+            <td>{{$salary_mng->state_name}}</td>
         </tr>
     </x-bs.table>
 
     <div class="d-flex justify-content-end">
-        <x-button.submit-exec caption="集計実行" dataTarget="#modal-dtl-calc" />
+        <x-button.submit-exec caption="集計実行" dataTarget="#modal-dtl-calc" :dataAttr="['id' => $editData['salaryDate']]"/>
         <x-button.submit-exec caption="確定処理" dataTarget="#modal-dtl-confirm" />
     </div>
 
