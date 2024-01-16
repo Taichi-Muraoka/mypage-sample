@@ -14,9 +14,6 @@ class PasswordResets extends Model
     // モデルの共通処理
     use \App\Traits\ModelTrait;
 
-    // 論理削除
-    use SoftDeletes;
-
     /**
      * モデルと関連しているテーブル
      *
@@ -65,7 +62,7 @@ class PasswordResets extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at', 'deleted_at'
+        'created_at'
     ];
 
     /**
