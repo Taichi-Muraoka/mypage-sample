@@ -297,25 +297,10 @@ class AppMenuFilter implements FilterInterface
             // 振替授業調整
             if ((isset($item["menuid"])) && ($item["menuid"] === "id_transfer_check")) {
 
-                // 申請者種別＝生徒 かつ 承認ステータス＝承認待ち または
-                // 申請者種別＝講師 かつ 承認ステータス＝差戻し の件数
+                // 申請者種別＝生徒 かつ 承認ステータス＝承認待ち の件数
                 $query = TransferApplication::where('tutor_id', $account->account_id)
-                    // 申請者種別により条件を分ける
-                    ->where(function ($orQuery) {
-                        $orQuery
-                            // 申請者種別＝生徒 かつ 承認ステータス＝承認待ち
-                            ->where(function ($subQuery1) {
-                                $subQuery1
-                                    ->where('apply_kind', AppConst::CODE_MASTER_53_1)
-                                    ->where('approval_status', AppConst::CODE_MASTER_3_1);
-                            })
-                            // 申請者種別＝講師 かつ 承認ステータス＝差戻し
-                            ->orWhere(function ($subQuery2) {
-                                $subQuery2
-                                    ->where('apply_kind', AppConst::CODE_MASTER_53_2)
-                                    ->whereIn('approval_status', [AppConst::CODE_MASTER_3_3, AppConst::CODE_MASTER_3_4]);
-                            });
-                    });
+                    ->where('apply_kind', AppConst::CODE_MASTER_53_1)
+                    ->where('approval_status', AppConst::CODE_MASTER_3_1);
 
                 $countTransferTutor = $query->select(
                     DB::raw('count(1) as count')

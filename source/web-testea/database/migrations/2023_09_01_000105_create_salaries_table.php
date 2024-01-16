@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedInteger('tutor_id')->comment('講師ID');
             $table->date('salary_date')->comment('給与年月');
             $table->decimal('total_amount', 8, 0)->comment('支払金額');
-            $table->text('memo')->comment('備考');
+            $table->text('memo')->nullable()->comment('備考');
             $table->timestamps();
             $table->softDeletes();
 

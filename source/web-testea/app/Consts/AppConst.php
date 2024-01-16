@@ -229,12 +229,12 @@ class AppConst
     /**
      * 可
      */
-    const CODE_MASTER_9_1 = 0;
+    const CODE_MASTER_9_0 = 0;
 
     /**
      * 不可
      */
-    const CODE_MASTER_9_2 = 1;
+    const CODE_MASTER_9_1 = 1;
 
     //-----------
     // 生徒プラン種別
@@ -1854,6 +1854,11 @@ class AppConst
      */
     const SALARY_GROUP_4 = 4;
 
+    /**
+     * 給与表示グループ 未使用
+     */
+    const SALARY_GROUP_0 = 0;
+
     //-----------
     // バッチ種別
     //-----------
@@ -1916,7 +1921,7 @@ class AppConst
      * システム変数ID 現年度
      */
     const SYSTEM_KEY_ID_1 = 100;
-    
+
     /**
      * システム変数ID 事務作業給
      */
@@ -1978,7 +1983,7 @@ class AppConst
 
     // 〇（登録済み）
     const REPORT_STATUS_4 = '4';
-    
+
     //-----------
     // 授業振替依頼 希望選択
     //-----------
@@ -1991,7 +1996,6 @@ class AppConst
      * フリー入力
      */
     const TRANSFER_PREF_TYPE_INPUT = 2;
-
     /**
      * コース (授業集計SQL用)
      */
@@ -2016,7 +2020,7 @@ class AppConst
 
     // 集団指導
     const COURSE_CD_20100 = 20100;
-    
+
     //==========================
     // 教室カレンダー・レギュラースケジュール
     //==========================
@@ -2026,4 +2030,13 @@ class AppConst
     const SCHEDULE_KIND_NEW = 1;
     const SCHEDULE_KIND_UPD = 2;
     const SCHEDULE_KIND_CPY = 3;
+
+    /**
+     * 給与取込 固定値
+     */
+    // 時給ありの明細数
+    const COUNT_HOUR_SALARY = 10;
+
+    // 給与情報明細数
+    const COUNT_SALARY = 17;
 }
