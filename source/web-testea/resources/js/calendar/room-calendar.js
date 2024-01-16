@@ -78,8 +78,6 @@ export default class RoomCalendar {
                 return title;
             },
             locale: "ja",
-            //height: 700,
-            //height: 1700,
             contentHeight: "auto",
             stickyFooterScrollbar: true,
             stickyHeaderDates: true,
@@ -93,7 +91,6 @@ export default class RoomCalendar {
             events: this._eventFunc,
             // イベントクリック
             eventClick: this._eventClick,
-            //editable: false,
             selectable: true,
             // Viewエリアクリック
             select: this._selectFunc,
