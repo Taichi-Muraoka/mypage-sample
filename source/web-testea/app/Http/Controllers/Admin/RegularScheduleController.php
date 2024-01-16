@@ -1306,7 +1306,7 @@ class RegularScheduleController extends Controller
         // 曜日毎にループ
         foreach ($dayList as $dayCd => $data) {
             // レギュラースケジュール情報の取得
-            $regularClasses = $this->getRegularSchedule($dayCd, $request['campus_cd']);
+            $regularClasses = $this->fncScheGetRegularSchedule($dayCd, $request['campus_cd']);
 
             // 対象期間内・指定曜日の授業日リストを取得
             $targetDates = $this->fncScheGetScheduleDateByDayCd($request['campus_cd'], $dayCd, $request['date_from'], null, $request['date_to']);

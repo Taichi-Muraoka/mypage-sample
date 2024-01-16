@@ -7,14 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Record;
-use App\Models\CodeMaster;
-use App\Models\Student;
-use App\Models\AdminUser;
-use App\Models\ExtSchedule;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
-//use App\Http\Controllers\Traits\FuncReportTrait;
-use Carbon\Carbon;
+use App\Http\Controllers\Traits\FuncRecordTrait;
 
 /**
  * 生徒カルテ - コントローラ
@@ -22,7 +17,8 @@ use Carbon\Carbon;
 class RecordController extends Controller
 {
 
-    // 機能共通処理：
+    // 機能共通処理：連絡記録
+    use FuncRecordTrait;
 
     /**
      * コンストラクタ
@@ -76,54 +72,19 @@ class RecordController extends Controller
         // バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForSearch())->validate();
 
-        // formを取得
-        $form = $request->all();
-
         // クエリ作成
-        $query = Record::query(); 
+        $query = Record::query();
 
         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
         $query->where($this->guardRoomAdminTableWithRoomCd());
 
-        // 生徒IDの検索（スコープで指定する）
-        $query->SearchSid($form);
+        // 画面表示中生徒のデータに絞り込み
+        $query->where('records.student_id', $request->input('student_id'));
 
-        // 校舎名取得のサブクエリ
-        $campus_names = $this->mdlGetRoomQuery();
-
-        $record = $query->select(
-            'records.record_id',
-            'records.student_id',
-            // 生徒情報の名前
-            'students.name as student_name',
-            'records.campus_cd',
-            // 校舎名
-            'campus_names.room_name as campus_name',
-            'records.record_kind',
-            // コードマスタの名称（記録種別）
-            'mst_codes.name as kind_name',
-            'records.adm_id',
-            // 管理者の名前
-            'admin_users.name as admin_name',
-            'records.received_date',
-            'records.received_time',
-            'records.regist_time',
-            'records.memo'
-        )
-        // 校舎名の取得
-        ->leftJoinSub($campus_names, 'campus_names', function ($join) {
-            $join->on('records.campus_cd', '=', 'campus_names.code');
-        })
-        // 生徒名を取得
-        ->sdLeftJoin(Student::class, 'records.student_id', '=', 'students.student_id')
-        // コードマスターとJOIN
-        ->sdLeftJoin(CodeMaster::class, function ($join) {
-            $join->on('records.record_kind', '=', 'mst_codes.code')
-                ->where('data_type', AppConst::CODE_MASTER_46);
-        })
-        // 管理者名を取得
-        ->sdLeftJoin(AdminUser::class, 'records.adm_id', '=', 'admin_users.adm_id')
-        ->orderby('records.received_date', 'desc')->orderby('records.received_time', 'desc');
+        // 連絡記録情報表示用のquery作成・データ取得
+        $record = $this->fncRecdGetRecordQuery($query)
+            ->orderby('records.received_date', 'desc')
+            ->orderby('records.received_time', 'desc');
 
         // ページネータで返却（モック用）
         return $this->getListAndPaginator($request, $record);
@@ -175,46 +136,11 @@ class RecordController extends Controller
         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
         $query->where($this->guardRoomAdminTableWithRoomCd());
 
-        // 校舎名取得のサブクエリ
-        $campus_names = $this->mdlGetRoomQuery();
-
-        $record = $query
+        // 連絡記録情報表示用のquery作成・データ取得
+        $record = $this->fncRecdGetRecordQuery($query)
             // IDを指定
             ->where('records.record_id', $id)
-            // データを取得
-            ->select(
-                'records.record_id',
-            'records.student_id',
-            // 生徒情報の名前
-            'students.name as student_name',
-            'records.campus_cd',
-            // 校舎名
-            'campus_names.room_name as campus_name',
-            'records.record_kind',
-            // コードマスタの名称（記録種別）
-            'mst_codes.name as kind_name',
-            'records.adm_id',
-            // 管理者の名前
-            'admin_users.name as admin_name',
-            'records.received_date',
-            'records.received_time',
-            'records.regist_time',
-            'records.memo'
-        )
-        // 校舎名の取得
-        ->leftJoinSub($campus_names, 'campus_names', function ($join) {
-            $join->on('records.campus_cd', '=', 'campus_names.code');
-        })
-        // 生徒名を取得
-        ->sdLeftJoin(Student::class, 'records.student_id', '=', 'students.student_id')
-        // コードマスターとJOIN
-        ->sdLeftJoin(CodeMaster::class, function ($join) {
-            $join->on('records.record_kind', '=', 'mst_codes.code')
-                ->where('data_type', AppConst::CODE_MASTER_46);
-        })
-        // 管理者名を取得
-        ->sdLeftJoin(AdminUser::class, 'records.adm_id', '=', 'admin_users.adm_id')
-        ->firstOrFail();
+            ->firstOrFail();
 
         return $record;
     }
@@ -249,8 +175,7 @@ class RecordController extends Controller
         // 校舎名取得
         if ($account->campus_cd == "00") {
             $campus_name = "本部管理者";
-        }
-        else {
+        } else {
             $campus_name = $this->mdlGetRoomName($account->campus_cd);
         }
 
@@ -288,16 +213,14 @@ class RecordController extends Controller
         $record->student_id = $request['student_id'];
         $record->campus_cd = $request['campus_cd'];
         $record->record_kind = $request['record_kind'];
-        if($request['received_date'] == null) {
+        if ($request['received_date'] == null) {
             $record->received_date = now()->format('Y-m-d');
-        }
-        else {
+        } else {
             $record->received_date = $request['received_date'];
         }
-        if($request['received_time'] == null) {
+        if ($request['received_time'] == null) {
             $record->received_time = now()->format('H:i:00');
-        }
-        else {
+        } else {
             $record->received_time = $request['received_time'];
         }
         $record->regist_time = now();
@@ -342,8 +265,7 @@ class RecordController extends Controller
         // 校舎名取得
         if ($account->campus_cd == "00") {
             $campus_name = "本部管理者";
-        }
-        else {
+        } else {
             $campus_name = $this->mdlGetRoomName($account->campus_cd);
         }
 
@@ -379,16 +301,14 @@ class RecordController extends Controller
 
         $record->campus_cd = $request['campus_cd'];
         $record->record_kind = $request['record_kind'];
-        if($request['received_date'] == null) {
+        if ($request['received_date'] == null) {
             $record->received_date = now()->format('Y-m-d');
-        }
-        else {
+        } else {
             $record->received_date = $request['received_date'];
         }
-        if($request['received_time'] == null) {
+        if ($request['received_time'] == null) {
             $record->received_time = now()->format('H:i:00');
-        }
-        else {
+        } else {
             $record->received_time = $request['received_time'];
         }
         $record->regist_time = now();
