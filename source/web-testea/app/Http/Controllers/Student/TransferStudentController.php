@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Student;
 use App\Consts\AppConst;
 use App\Libs\CommonDateFormat;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\FuncCalendarTrait;
 use App\Http\Controllers\Traits\FuncScheduleTrait;
 use App\Http\Controllers\Traits\FuncTransferTrait;
 use App\Mail\TransferAdjustmentRequest;
@@ -29,8 +28,6 @@ use Illuminate\Support\Facades\Lang;
 class TransferStudentController extends Controller
 {
 
-    // カレンダー情報取得用
-    use FuncCalendarTrait;
     // スケジュール情報取得用
     use FuncScheduleTrait;
     // 振替調整取得用
@@ -378,7 +375,7 @@ class TransferStudentController extends Controller
                 );
 
                 // 振替依頼日の時限の開始・終了時刻 取得
-                $periodTime = $this->getTimetablePeriodTimeByDatePeriod(
+                $periodTime = $this->fncScheGetTimetableByDatePeriod(
                     $befSchedule->campus_cd,
                     $transAppDate->transfer_date,
                     $transAppDate->period_no

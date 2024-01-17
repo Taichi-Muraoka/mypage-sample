@@ -499,7 +499,7 @@ trait FuncTransferTrait
             // 対象日の曜日を取得
             $youbi = $this->dtGetDayOfWeekCd($lDate);
             // 対象日・対象校舎の時限・開始～終了時刻を取得
-            $timeTables = $this->getTimetableByDate($campusCd, $lDate);
+            $timeTables = $this->fncScheGetTimetableByDate($campusCd, $lDate);
             $periodList = $timeTables->keyBy('period_no');
 
             foreach ($tutorFreeList as $tutorFree) {
@@ -624,7 +624,7 @@ trait FuncTransferTrait
      */
     private function getTimetablePeriodListByDate($campusCd, $targetDate)
     {
-        $timeTables = $this->getTimetableByDate($campusCd, $targetDate);
+        $timeTables = $this->fncScheGetTimetableByDate($campusCd, $targetDate);
 
         // period_noをキーにした配列にする
         $lists = array();
@@ -793,7 +793,7 @@ trait FuncTransferTrait
                     $freeCheck[$i] = Lang::get('validation.invalid_date_cannot_select');
                 } else {
                     // 対象日・対象校舎の時限・開始～終了時刻を取得
-                    $timeTables = $this->getTimetableByDate($campusCd, $tran_date[$i]);
+                    $timeTables = $this->fncScheGetTimetableByDate($campusCd, $tran_date[$i]);
                     $periodList = $timeTables->keyBy('period_no');
                     if (!isset($periodList[$tran_period[$i]])) {
                         // 時限リストに該当の時限のデータがない
@@ -889,7 +889,7 @@ trait FuncTransferTrait
             $transferSchedule->target_date = $request->input('target_date');
             $transferSchedule->period_no = $request->input('period_no');
             // 時限から開始時間取得
-            $periodTime = $this->getTimetablePeriodTimeByDatePeriod(
+            $periodTime = $this->fncScheGetTimetableByDatePeriod(
                 $schedule->campus_cd,
                 $transferSchedule->target_date,
                 $transferSchedule->period_no
@@ -1030,7 +1030,7 @@ trait FuncTransferTrait
             }
             // 休業日チェック
             // 期間区分の取得（年間授業予定）
-            $dateKind = $this->getYearlyDateKind($request['campus_cd'], $request['preferred_date1_calender']);
+            $dateKind = $this->fncScheGetYearlyDateKind($request['campus_cd'], $request['preferred_date1_calender']);
             if ($dateKind == AppConst::CODE_MASTER_38_9) {
                 // 休業日の場合、エラー
                 return $fail(Lang::get('validation.preferred_date_closed'));
@@ -1086,7 +1086,7 @@ trait FuncTransferTrait
             }
 
             // 対象日・対象校舎の時限・開始～終了時刻を取得
-            $timeTables = $this->getTimetableByDate($request['campus_cd'], $request['preferred_date1_calender']);
+            $timeTables = $this->fncScheGetTimetableByDate($request['campus_cd'], $request['preferred_date1_calender']);
             $periodList = $timeTables->keyBy('period_no');
             if (!isset($periodList[$request['preferred_date1_period']])) {
                 // 不正な値エラー
@@ -1162,7 +1162,7 @@ trait FuncTransferTrait
                 }
                 // 休業日チェック
                 // 期間区分の取得（年間授業予定）
-                $dateKind = $this->getYearlyDateKind($request['campus_cd'], $request['preferred_date2_calender']);
+                $dateKind = $this->fncScheGetYearlyDateKind($request['campus_cd'], $request['preferred_date2_calender']);
                 if ($dateKind == AppConst::CODE_MASTER_38_9) {
                     // 休業日の場合、エラー
                     return $fail(Lang::get('validation.preferred_date_closed'));
@@ -1236,7 +1236,7 @@ trait FuncTransferTrait
             }
 
             // 対象日・対象校舎の時限・開始～終了時刻を取得
-            $timeTables = $this->getTimetableByDate($request['campus_cd'], $request['preferred_date2_calender']);
+            $timeTables = $this->fncScheGetTimetableByDate($request['campus_cd'], $request['preferred_date2_calender']);
             $periodList = $timeTables->keyBy('period_no');
             if (!isset($periodList[$request['preferred_date2_period']])) {
                 // 不正な値エラー
@@ -1336,7 +1336,7 @@ trait FuncTransferTrait
                 }
                 // 休業日チェック
                 // 期間区分の取得（年間授業予定）
-                $dateKind = $this->getYearlyDateKind($request['campus_cd'], $request['preferred_date3_calender']);
+                $dateKind = $this->fncScheGetYearlyDateKind($request['campus_cd'], $request['preferred_date3_calender']);
                 if ($dateKind == AppConst::CODE_MASTER_38_9) {
                     // 休業日の場合、エラー
                     return $fail(Lang::get('validation.preferred_date_closed'));
@@ -1410,7 +1410,7 @@ trait FuncTransferTrait
             }
 
             // 対象日・対象校舎の時限・開始～終了時刻を取得
-            $timeTables = $this->getTimetableByDate($request['campus_cd'], $request['preferred_date3_calender']);
+            $timeTables = $this->fncScheGetTimetableByDate($request['campus_cd'], $request['preferred_date3_calender']);
             $periodList = $timeTables->keyBy('period_no');
             if (!isset($periodList[$request['preferred_date3_period']])) {
                 // 不正な値エラー
@@ -1517,7 +1517,7 @@ trait FuncTransferTrait
                 // 振替依頼日程情報取得
                 $transferDate = $this->fncTranGetTransferDate($request['transfer_date_id']);
                 // 振替依頼日・時限 開始～終了時間取得
-                $periodTime = $this->getTimetablePeriodTimeByDatePeriod($schedule->campus_cd, $transferDate->transfer_date, $transferDate->period_no);
+                $periodTime = $this->fncScheGetTimetableByDatePeriod($schedule->campus_cd, $transferDate->transfer_date, $transferDate->period_no);
                 // 終了時刻計算
                 $endTime = $this->fncTranEndTime($periodTime->start_time, $schedule->minites);
 

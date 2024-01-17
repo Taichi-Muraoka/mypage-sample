@@ -15,7 +15,7 @@ use App\Models\CodeMaster;
 use App\Models\Report;
 use App\Models\AdminUser;
 use Illuminate\Support\Facades\Lang;
-use App\Http\Controllers\Traits\FuncCalendarTrait;
+use App\Http\Controllers\Traits\FuncScheduleTrait;
 use App\Http\Controllers\Traits\FuncStudentClassTrait;
 
 /**
@@ -24,8 +24,8 @@ use App\Http\Controllers\Traits\FuncStudentClassTrait;
 class StudentClassController extends Controller
 {
 
-    // 機能共通処理：カレンダー
-    use FuncCalendarTrait;
+    // 機能共通処理：スケジュール関連
+    use FuncScheduleTrait;
     // 機能共通処理：授業情報検索
     use FuncStudentClassTrait;
 
@@ -433,11 +433,10 @@ class StudentClassController extends Controller
         $query = Schedule::query();
 
         // スケジュール情報表示用のquery作成（select句・join句）
-        $this->getScheduleQuery($query);
-
-        // 個別の絞り込み条件を付加する
-        $schedule = $query->where('schedules.schedule_id', $id)
+        $schedule = $this->fncScheGetScheduleQuery($query)
+            // 個別の絞り込み条件を付加する
             // スケジュールID指定
+            ->where('schedules.schedule_id', $id)
             // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
             ->where($this->guardRoomAdminTableWithRoomCd())
             ->firstOrFail();
@@ -450,7 +449,7 @@ class StudentClassController extends Controller
 
         // １対多授業の場合、受講生徒名を取得
         if ($schedule['course_kind'] == AppConst::CODE_MASTER_42_2) {
-            $schedule['class_student_names'] = $this->getClassMembers($schedule['schedule_id']);
+            $schedule['class_student_names'] = $this->fncScheGetClassMembers($schedule['schedule_id']);
         }
 
         // 授業報告書ステータスの取得
