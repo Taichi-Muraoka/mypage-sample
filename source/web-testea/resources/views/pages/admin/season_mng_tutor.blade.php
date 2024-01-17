@@ -14,7 +14,7 @@
         </x-bs.col2>
         <x-bs.col2>
             <x-input.select id="tutor_id" caption="講師名" :select2=true :mastrData=$tutors :editData=$editData
-                :rules=$rules :select2Search=false :blank=true />
+                :rules=$rules :select2Search=true :blank=true />
         </x-bs.col2>
     </x-bs.row>
 
