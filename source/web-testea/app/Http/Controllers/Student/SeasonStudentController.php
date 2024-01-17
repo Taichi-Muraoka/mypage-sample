@@ -10,10 +10,8 @@ use App\Models\SeasonMng;
 use App\Models\SeasonStudentRequest;
 use App\Models\SeasonStudentPeriod;
 use App\Models\SeasonStudentTime;
-use App\Models\MstSubject;
 use App\Models\CodeMaster;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncSeasonTrait;
 
@@ -67,53 +65,12 @@ class SeasonStudentController extends Controller
      */
     public function search(Request $request)
     {
-        $account = Auth::user();
-        // 現在日を取得
-        $today = date("Y-m-d");
-
         // クエリを作成
         $query = SeasonStudentRequest::query();
 
-        // 校舎名取得のサブクエリ
-        $room_names = $this->mdlGetRoomQuery();
-
-        // データを取得
-        $SeasonRequests = $query
-            ->select(
-                'season_student_requests.season_student_id',
-                'season_student_requests.season_cd',
-                DB::raw('LEFT(season_student_requests.season_cd, 4) as year'),
-                'mst_codes_38.gen_item2 as season_name',
-                'room_names.room_name as campus_name',
-                'season_mng.s_start_date',
-                'season_mng.s_end_date',
-                'season_student_requests.regist_status',
-                'mst_codes_5.name as status_name',
-                'season_student_requests.apply_date'
-            )
-            // 校舎名の取得
-            ->leftJoinSub($room_names, 'room_names', function ($join) {
-                $join->on('season_student_requests.campus_cd', '=', 'room_names.code');
-            })
-            // 特別期間管理情報とJOIN
-            ->sdLeftJoin(SeasonMng::class, function ($join) {
-                $join->on('season_student_requests.season_cd', '=', 'season_mng.season_cd')
-                    ->on('season_student_requests.campus_cd', '=', 'season_mng.campus_cd');
-            })
-            // コードマスターとJOIN（登録ステータス）
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('season_student_requests.regist_status', '=', 'mst_codes_5.code')
-                    ->where('mst_codes_5.data_type', AppConst::CODE_MASTER_5);
-            }, 'mst_codes_5')
-            // コードマスターとJOIN（期間区分）
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on(DB::raw('RIGHT(season_student_requests.season_cd, 2)'), '=', 'mst_codes_38.gen_item1')
-                    ->where('mst_codes_38.data_type', AppConst::CODE_MASTER_38);
-            }, 'mst_codes_38')
-            // 自分の生徒IDで絞り込み
-            ->where('student_id', $account->account_id)
-            // 生徒受付開始日が当日以前のもの
-            ->where('season_mng.s_start_date', '<=', $today)
+        // 特別期間講習 生徒連絡情報表示用のquery作成・データ取得
+        // ガードあり
+        $SeasonRequests = $this->fncSasnGetSeasonStudentQuery($query)
             ->orderby('season_student_requests.season_cd', 'desc')
             ->orderby('season_student_requests.campus_cd');
 
@@ -136,56 +93,11 @@ class SeasonStudentController extends Controller
         // IDのバリデーション
         $this->validateIds($seasonStudentId);
 
-        // クエリを作成（生徒連絡情報）
-        $query = SeasonStudentRequest::query();
+        // データを取得（生徒連絡情報）ガードあり
+        $seasonStudent = $this->fncSasnGetSeasonStudent($seasonStudentId);
 
-        // 教室名取得のサブクエリ
-        $room = $this->mdlGetRoomQuery();
-
-        // データを取得
-        $seasonStudent = $query
-            ->select(
-                'season_student_requests.season_student_id',
-                'season_student_requests.season_cd',
-                'season_student_requests.campus_cd',
-                DB::raw('LEFT(season_student_requests.season_cd, 4) as year'),
-                'mst_codes.gen_item2 as season_name',
-                'room_names.room_name as campus_name',
-                'season_student_requests.comment'
-            )
-            // 校舎名の取得
-            ->leftJoinSub($room, 'room_names', function ($join) {
-                $join->on('season_student_requests.campus_cd', '=', 'room_names.code');
-            })
-            // コードマスターとJOIN（期間区分）
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on(DB::raw('RIGHT(season_student_requests.season_cd, 2)'), '=', 'mst_codes.gen_item1')
-                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
-            })
-            // IDを指定
-            ->where('season_student_id', $seasonStudentId)
-            // 登録済データのみ表示可
-            ->where('regist_status', AppConst::CODE_MASTER_5_1)
-            // 自分の生徒IDのみにガードを掛ける
-            ->where($this->guardStudentTableWithSid())
-            ->firstOrFail();
-
-        // クエリを作成（受講回数情報）
-        $query = SeasonStudentTime::query();
-        // データを取得
-        $subjectTimes = $query
-            ->select(
-                'season_student_times.season_student_id',
-                'mst_subjects.name as subject_name',
-                'season_student_times.times'
-            )
-            // 科目名の取得
-            ->sdLeftJoin(MstSubject::class, function ($join) {
-                $join->on('season_student_times.subject_cd', 'mst_subjects.subject_cd');
-            })
-            // IDを指定
-            ->where('season_student_id', $seasonStudentId)
-            ->get();
+        // データを取得（受講回数情報）
+        $subjectTimes = $this->fncSasnGetSeasonStudentTime($seasonStudentId);
 
         // 時限リストを取得（校舎・時間割区分から）
         $periodList = $this->mdlGetPeriodListByKind($seasonStudent['campus_cd'], AppConst::CODE_MASTER_37_1);
@@ -193,19 +105,8 @@ class SeasonStudentController extends Controller
         // 特別期間日付リストを取得（校舎・特別期間コード指定）
         $dateList = $this->fncSasnGetSeasonDate($seasonStudent['campus_cd'], $seasonStudent['season_cd']);
 
-        // 生徒連絡コマ情報を取得する
-        // クエリを作成（生徒連絡コマ情報）
-        $query = SeasonStudentPeriod::query();
-        // データを取得
-        $studentPeriods = $query
-            ->select(
-                'season_student_periods.season_student_id',
-                'season_student_periods.lesson_date',
-                'season_student_periods.period_no'
-            )
-            // IDを指定
-            ->where('season_student_id', $seasonStudentId)
-            ->get();
+        // データを取得（生徒連絡コマ情報）
+        $studentPeriods = $this->fncSasnGetSeasonStudentPeriod($seasonStudentId);
 
         // チェックボックスをセットするための値を生成
         // 例：['20231225_1', '20231226_2']
@@ -335,12 +236,8 @@ class SeasonStudentController extends Controller
         // 複数の更新のためトランザクション
         DB::transaction(function () use ($form, $datePeriods) {
 
-            // ログイン情報取得
-            $account = Auth::user();
-
             // 対象データを取得(IDでユニークに取る)
             $seasonStudent = SeasonStudentRequest::where('season_student_id', $form['season_student_id'])
-                ->where('student_id', $account->account_id)
                 ->where('season_cd', $form['season_cd'])
                 ->where('campus_cd', $form['campus_cd'])
                 // 自分の生徒IDのみにガードを掛ける
