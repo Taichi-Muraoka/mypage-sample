@@ -260,43 +260,47 @@ class TrainingMngController extends Controller
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        // 現在日時を取得
-        $now = Carbon::now();
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($request) {
 
-        $form = $request->only(
-            'trn_type',
-            'text',
-            'release_date',
-            'limit_date'
-        );
+            // 現在日時を取得
+            $now = Carbon::now();
 
-        // クエリ
-        $traningContents = new TrainingContent;
+            $form = $request->only(
+                'trn_type',
+                'text',
+                'release_date',
+                'limit_date'
+            );
 
-        // 形式で判断
-        $trnType = $request->input('trn_type');
-        if (AppConst::CODE_MASTER_12_1 == $trnType) {
+            // クエリ
+            $traningContents = new TrainingContent;
 
-            // 資料(ファイル名)
-            $traningContents->url = $request->input('file_doc');
-        } else if (AppConst::CODE_MASTER_12_2 == $trnType) {
+            // 形式で判断
+            $trnType = $request->input('trn_type');
+            if (AppConst::CODE_MASTER_12_1 == $trnType) {
 
-            // 動画URL
-            $traningContents->url = $request->input('url');
-        } else {
-            return $this->illegalResponseErr();
-        }
+                // 資料(ファイル名)
+                $traningContents->url = $request->input('file_doc');
+            } else if (AppConst::CODE_MASTER_12_2 == $trnType) {
 
-        // 登録
-        $traningContents->regist_time = $now;
-        $traningContents->fill($form)->save();
+                // 動画URL
+                $traningContents->url = $request->input('url');
+            } else {
+                return $this->illegalResponseErr();
+            }
 
-        // ファイルのアップロード
-        if (AppConst::CODE_MASTER_12_1 == $trnType) {
-            // アップロードファイルの保存(資料の場合)
-            $uploadDir = config('appconf.upload_dir_training') . $traningContents->trn_id;
-            $this->fileUploadSave($request, $uploadDir, 'file_doc');
-        }
+            // 登録
+            $traningContents->regist_time = $now;
+            $traningContents->fill($form)->save();
+
+            // ファイルのアップロード
+            if (AppConst::CODE_MASTER_12_1 == $trnType) {
+                // アップロードファイルの保存(資料の場合)
+                $uploadDir = config('appconf.upload_dir_training') . $traningContents->trn_id;
+                $this->fileUploadSave($request, $uploadDir, 'file_doc');
+            }
+        });
 
         return;
     }
@@ -356,69 +360,73 @@ class TrainingMngController extends Controller
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        $form = $request->only(
-            'trn_id',
-            'trn_type',
-            'text',
-            'regist_time',
-            'release_date',
-            'limit_date'
-        );
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($request) {
 
-        // 対象データを取得(IDでユニークに取る)
-        $traningContents = TrainingContent::where('trn_id', $form['trn_id'])
-            ->firstOrFail();
+            $form = $request->only(
+                'trn_id',
+                'trn_type',
+                'text',
+                'regist_time',
+                'release_date',
+                'limit_date'
+            );
 
-        // 更新データの種別
-        $trnType = $request->input('trn_type');
+            // 対象データを取得(IDでユニークに取る)
+            $traningContents = TrainingContent::where('trn_id', $form['trn_id'])
+                ->firstOrFail();
 
-        // 資料用に保存先を設定から取得
-        $trainingDir = config('appconf.upload_dir_training');
-        // appフォルダのフルパスを取得
-        $trainingPath = Storage::path($trainingDir);
+            // 更新データの種別
+            $trnType = $request->input('trn_type');
 
-        // 資料から動画へ変更になった場合、既存の資料ディレクトリを削除する。
-        if ($traningContents->trn_type == AppConst::CODE_MASTER_12_1 && $trnType == AppConst::CODE_MASTER_12_2) {
+            // 資料用に保存先を設定から取得
+            $trainingDir = config('appconf.upload_dir_training');
+            // appフォルダのフルパスを取得
+            $trainingPath = Storage::path($trainingDir);
 
-            // 古い資料をディレクトリごと削除
-            $deleteDir = $trainingPath . $traningContents->trn_id;
-            if (File::isDirectory($deleteDir)) {
-                File::deleteDirectory($deleteDir);
-            }
-        }
+            // 資料から動画へ変更になった場合、既存の資料ディレクトリを削除する。
+            if ($traningContents->trn_type == AppConst::CODE_MASTER_12_1 && $trnType == AppConst::CODE_MASTER_12_2) {
 
-        // 形式で判断
-        if ($trnType == AppConst::CODE_MASTER_12_1) {
-
-            // 資料(ファイル名)
-            if ($this->fileUploadCheck($request, 'file_doc')) {
-                // ファイルがアップロードされた場合に更新
-                $traningContents->url = $request->input('file_doc');
-            }
-        } else if ($trnType == AppConst::CODE_MASTER_12_2) {
-
-            // 動画URL
-            $traningContents->url = $request->input('url');
-        } else {
-            return $this->illegalResponseErr();
-        }
-
-        // 登録
-        $traningContents->fill($form)->save();
-
-        // ファイルのアップロード
-        if ($trnType == AppConst::CODE_MASTER_12_1 && $this->fileUploadCheck($request, 'file_doc')) {
-
-            // 古い資料をディレクトリごと削除
-            $deleteDir = $trainingPath . $traningContents->trn_id;
-            if (File::isDirectory($deleteDir)) {
-                File::deleteDirectory($deleteDir);
+                // 古い資料をディレクトリごと削除
+                $deleteDir = $trainingPath . $traningContents->trn_id;
+                if (File::isDirectory($deleteDir)) {
+                    File::deleteDirectory($deleteDir);
+                }
             }
 
-            // アップロードファイルの保存(資料の場合)
-            $uploadDir = $trainingDir . $traningContents->trn_id;
-            $this->fileUploadSave($request, $uploadDir, 'file_doc');
-        }
+            // 形式で判断
+            if ($trnType == AppConst::CODE_MASTER_12_1) {
+
+                // 資料(ファイル名)
+                if ($this->fileUploadCheck($request, 'file_doc')) {
+                    // ファイルがアップロードされた場合に更新
+                    $traningContents->url = $request->input('file_doc');
+                }
+            } else if ($trnType == AppConst::CODE_MASTER_12_2) {
+
+                // 動画URL
+                $traningContents->url = $request->input('url');
+            } else {
+                return $this->illegalResponseErr();
+            }
+
+            // 登録
+            $traningContents->fill($form)->save();
+
+            // ファイルのアップロード
+            if ($trnType == AppConst::CODE_MASTER_12_1 && $this->fileUploadCheck($request, 'file_doc')) {
+
+                // 古い資料をディレクトリごと削除
+                $deleteDir = $trainingPath . $traningContents->trn_id;
+                if (File::isDirectory($deleteDir)) {
+                    File::deleteDirectory($deleteDir);
+                }
+
+                // アップロードファイルの保存(資料の場合)
+                $uploadDir = $trainingDir . $traningContents->trn_id;
+                $this->fileUploadSave($request, $uploadDir, 'file_doc');
+            }
+        });
 
         return;
     }
