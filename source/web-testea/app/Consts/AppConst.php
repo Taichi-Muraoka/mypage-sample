@@ -1798,37 +1798,6 @@ class AppConst
     const NOTICE_GROUP_ID_16 = 16;
 
     //==========================
-    // カレンダー
-    //==========================
-
-    // MEMO: カレンダーの作成区分コード / 出欠・振替コード
-
-    /**
-     * 作成区分 一括作成
-     */
-    const CREATE_KIND_CD_1 = 1;
-
-    /**
-     * 作成区分 後日振替
-     */
-    const CREATE_KIND_CD_2 = 2;
-
-    /**
-     * 作成区分 増コマまたは分割振替
-     */
-    const CREATE_KIND_CD_3 = 3;
-
-    /**
-     * 出欠・振替コード 後日振替
-     */
-    const ATD_STATUS_CD_2 = 2;
-
-    /**
-     * 振替区分コード 振替日設定済
-     */
-    const TRANSEFER_KIND_CD_1 = 1;
-
-    //==========================
     // 給与情報明細
     //==========================
 
@@ -1920,17 +1889,22 @@ class AppConst
     /**
      * システム変数ID 現年度
      */
-    const SYSTEM_KEY_ID_1 = 100;
+    const SYSTEM_KEY_ID_1 = 1;
 
     /**
      * システム変数ID 事務作業給
      */
-    const SYSTEM_KEY_ID_2 = 101;
+    const SYSTEM_KEY_ID_2 = 2;
 
     /**
      * システム変数ID 振替調整スキップ回数
      */
-    const SYSTEM_KEY_ID_3 = 102;
+    const SYSTEM_KEY_ID_3 = 3;
+
+    /**
+     * システム変数ID 運用開始日
+     */
+    const SYSTEM_KEY_ID_4 = 4;
 
     //-----------
     // 授業報告書サブコード
@@ -1967,22 +1941,6 @@ class AppConst
      * 授業報告書 その他教材・単元の下2桁
      */
     const REPORT_OTHER_TEXT_UNIT_CODE = 99;
-
-    /**
-     * 授業報告書 ステータス
-     */
-
-    // ―（登録不要）
-    const REPORT_STATUS_1 = '1';
-
-    // ×（要登録・差戻し）
-    const REPORT_STATUS_2 = '2';
-
-    // △（承認待ち）
-    const REPORT_STATUS_3 = '3';
-
-    // 〇（登録済み）
-    const REPORT_STATUS_4 = '4';
 
     //-----------
     // 授業振替依頼 希望選択
