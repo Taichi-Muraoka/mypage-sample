@@ -137,9 +137,9 @@ trait GuardTrait
         return function ($query) {
 
             if (AuthEx::isRoomAdmin()) {
-                // 指定された教室コードのsidのみを絞り込む
+                // 指定された教室コードの生徒IDのみを絞り込む
                 $account = Auth::user();
-                // 主テーブルのsidに対して絞り込む
+                // 主テーブルの生徒IDに対して絞り込む
                 $this->mdlWhereSidByRoomQuery($query, get_class($query->getModel()), $account->campus_cd);
             }
         };
@@ -156,9 +156,9 @@ trait GuardTrait
         return function ($query) {
 
             if (AuthEx::isRoomAdmin()) {
-                // 指定された教室コードのsidのみを絞り込む
+                // 指定された教室コードの講師IDのみを絞り込む
                 $account = Auth::user();
-                // 主テーブルのsidに対して絞り込む
+                // 主テーブルの講師IDに対して絞り込む
                 $this->mdlWhereTidByRoomQuery($query, get_class($query->getModel()), $account->campus_cd);
             }
         };

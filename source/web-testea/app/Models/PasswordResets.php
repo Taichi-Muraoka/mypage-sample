@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * パスワードリセット - モデル
@@ -13,9 +12,6 @@ class PasswordResets extends Model
 
     // モデルの共通処理
     use \App\Traits\ModelTrait;
-
-    // 論理削除
-    use SoftDeletes;
 
     /**
      * モデルと関連しているテーブル
@@ -65,7 +61,7 @@ class PasswordResets extends Model
      * @var array
      */
     protected $hidden = [
-        'created_at', 'updated_at', 'deleted_at'
+        'created_at'
     ];
 
     /**
@@ -77,9 +73,6 @@ class PasswordResets extends Model
     {
         // 更新時、空白をnullに変換する処理
         self::whenSaveEmptyToNull();
-
-        // テーブル操作時、ログを残す処理
-        self::saveToLog();
     }
 
     //-------------------------------

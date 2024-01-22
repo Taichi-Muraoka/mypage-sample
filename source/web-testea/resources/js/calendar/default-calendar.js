@@ -67,23 +67,11 @@ export default class DefaultCalendar {
             },
             // 終日スロットは非表示
             allDaySlot: false,
-            //allDayText: "終日",
-            //themeSystem: "bootstrap",
             locale: "ja",
-            //height: 700,
             height: "auto",
-            // v5対応
-            //plugins: ["bootstrap", "interaction", "dayGrid", "timeGrid"],
             selectable: false,
             selectMirror: false,
             navLinks: true,
-            // v5対応
-            //eventRender: function(info) {
-            // ツールチップの表示も可能
-            // $(info.el).tooltip({
-            //     title: info.event.extendedProps.detail
-            // });
-            //},
             // データの読み込み処理。呼び出し元で定義する
             events: this._eventFunc,
             // クリックイベント
@@ -91,8 +79,6 @@ export default class DefaultCalendar {
             editable: false,
             // v5対応（定義追加）
             eventDisplay: "block",
-            // // 12aが表示されるのを防ぐ
-            // timeFormat: "H(:mm)"
             // v5対応
             eventTimeFormat: {
                 hour: "2-digit",
@@ -137,8 +123,6 @@ export default class DefaultCalendar {
                 return axios.post(url, sendData);
             })
             .then((response) => {
-                //console.log(response);
-
                 // コールバックで更新(eventプロパティにセットする)
                 successCallback(response.data);
 

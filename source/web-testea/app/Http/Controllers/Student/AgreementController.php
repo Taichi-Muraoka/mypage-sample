@@ -45,7 +45,7 @@ class AgreementController extends Controller
         $account_id = $account->account_id;
 
         // 生徒情報を取得
-        $agreement = $this->getStudentAgreement($account_id);
+        $agreement = $this->fncAgreGetStudentDetail($account_id);
 
         return view('pages.student.agreement', $agreement);
     }

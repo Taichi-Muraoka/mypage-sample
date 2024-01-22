@@ -102,27 +102,12 @@ class SeasonTutorController extends Controller
      */
     public function search(Request $request)
     {
-        $account = Auth::user();
-
         // クエリを作成（講師日程連絡情報）
         $query = SeasonTutorRequest::query();
 
-        // データを取得
-        $SeasonRequests = $query
-            ->select(
-                'season_tutor_requests.season_tutor_id',
-                'season_tutor_requests.season_cd',
-                DB::raw('LEFT(season_tutor_requests.season_cd, 4) as year'),
-                'mst_codes.gen_item2 as season_name',
-                'season_tutor_requests.apply_date',
-            )
-            // コードマスターとJOIN（期間区分）
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on(DB::raw('RIGHT(season_tutor_requests.season_cd, 2)'), '=', 'mst_codes.gen_item1')
-                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
-            })
-            // 自分の講師IDで絞り込み
-            ->where('tutor_id', $account->account_id)
+        // 特別期間講習 講師連絡情報表示用のquery作成・データ取得
+        // ガードあり
+        $SeasonRequests = $this->fncSasnGetSeasonTutorQuery($query)
             ->orderby('season_tutor_requests.apply_date', 'desc')
             ->orderby('season_tutor_requests.season_cd', 'desc');
 
@@ -142,30 +127,13 @@ class SeasonTutorController extends Controller
      */
     public function detail($seasonTutorId)
     {
+        // IDのバリデーション
+        $this->validateIds($seasonTutorId);
+
         $account = Auth::user();
 
-        // クエリを作成（講師連絡情報）
-        $query = SeasonTutorRequest::query();
-
-        // データを取得
-        $seasonTutor = $query
-            ->select(
-                'season_tutor_requests.season_tutor_id',
-                'season_tutor_requests.season_cd',
-                DB::raw('LEFT(season_tutor_requests.season_cd, 4) as year'),
-                'mst_codes.gen_item2 as season_name',
-                'season_tutor_requests.comment'
-            )
-            // コードマスターとJOIN（期間区分）
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on(DB::raw('RIGHT(season_tutor_requests.season_cd, 2)'), '=', 'mst_codes.gen_item1')
-                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
-            }, 'mst_codes')
-            // IDを指定
-            ->where('season_tutor_id', $seasonTutorId)
-            // 自分の講師IDのみにガードを掛ける
-            ->where($this->guardTutorTableWithTid())
-            ->firstOrFail();
+        // データを取得（講師連絡情報）ガードあり
+        $seasonTutor = $this->fncSasnGetSeasonTutor($seasonTutorId);
 
         // 時限リストを取得（講師ID・時間割区分から）
         $periodList = $this->mdlGetPeriodListForTutor($account->account_id, AppConst::CODE_MASTER_37_1);
@@ -173,18 +141,8 @@ class SeasonTutorController extends Controller
         // 特別期間日付リストを取得（講師ID・特別期間コード指定）
         $dateList = $this->fncSasnGetSeasonDateForTutor($account->account_id, $seasonTutor->season_cd);
 
-        // 講師連絡コマ情報を取得する
-        // クエリを作成（講師連絡コマ情報）
-        $query = SeasonTutorPeriod::query();
-        // データを取得
-        $tutorPeriods = $query
-            ->select(
-                'season_tutor_periods.lesson_date',
-                'season_tutor_periods.period_no'
-            )
-            // IDを指定
-            ->where('season_tutor_id', $seasonTutorId)
-            ->get();
+        // データを取得（講師連絡コマ情報）
+        $tutorPeriods = $this->fncSasnGetSeasonTutorPeriod($seasonTutorId);
 
         // チェックボックスをセットするための値を生成
         // 例：['20231225_1', '20231226_2']

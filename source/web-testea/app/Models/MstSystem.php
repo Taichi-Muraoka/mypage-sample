@@ -47,8 +47,10 @@ class MstSystem extends Model
     protected $fillable = [
         'key_id',
         'name',
+        'datatype_kind',
         'value_num',
         'value_str',
+        'value_date',
         'change_flg'
     ];
 
@@ -57,7 +59,9 @@ class MstSystem extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'value_date' => 'date',
+    ];
 
     /**
      * 属性に対するモデルのデフォルト値
@@ -103,8 +107,10 @@ class MstSystem extends Model
         static $_fieldRules = [
             'key_id' => ['integer'],
             'name' => ['string', 'max:50'],
+            'datatype_kind' => ['integer'],
             'value_num' => ['integer'],
             'value_str' => ['string', 'max:50'],
+            'value_date' => ['date_format:Y-m-d'],
             'change_flg' => ['integer']
         ];
         return $_fieldRules;

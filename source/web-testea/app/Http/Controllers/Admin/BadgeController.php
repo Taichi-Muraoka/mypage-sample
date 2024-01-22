@@ -7,17 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Badge;
-use App\Models\Student;
-use App\Models\AdminUser;
 use App\Models\CodeMaster;
 use App\Models\Notice;
 use App\Models\NoticeDestination;
-use App\Models\MstCampus;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Libs\AuthEx;
+use App\Http\Controllers\Traits\FuncBadgeTrait;
 
 /**
  * バッジ付与 - コントローラ
@@ -25,7 +22,8 @@ use App\Libs\AuthEx;
 class BadgeController extends Controller
 {
 
-    // 機能共通処理：
+    // 機能共通処理：バッジ付与管理
+    use FuncBadgeTrait;
 
     /**
      * コンストラクタ
@@ -74,48 +72,17 @@ class BadgeController extends Controller
      */
     public function search(Request $request)
     {
-        // 校舎名取得(JOIN)
-        $campus_names = $this->mdlGetRoomQuery();
-
         // クエリ作成
         $query = Badge::query();
 
-        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        $query->where($this->guardRoomAdminTableWithRoomCd());
+        // 画面表示中生徒のデータに絞り込み
+        $query->where('badges.student_id', $request['student_id']);
 
-        $badgeList = $query
-            ->select(
-                'badges.badge_id',
-                'badges.student_id',
-                // 生徒情報の名前
-                'students.name as student_name',
-                'badges.campus_cd',
-                // 校舎の名称
-                'campus_names.room_name as campus_name',
-                'badges.badge_type',
-                // コードマスタの名称（バッジ種別）
-                'mst_codes.name as kind_name',
-                'badges.reason',
-                'badges.authorization_date',
-                'badges.adm_id',
-                // 管理者アカウントの名前
-                'admin_users.name as admin_name',
-            )
-            // 画面表示中生徒のデータに絞り込み
-            ->where('badges.student_id', $request['student_id'])
-            // 校舎名の取得
-            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
-                $join->on('badges.campus_cd', '=', 'campus_names.code');
-            })
-            // 生徒名を取得
-            ->sdLeftJoin(Student::class, 'badges.student_id', '=', 'students.student_id')
-            // 管理者名を取得
-            ->sdLeftJoin(AdminUser::class, 'badges.adm_id', '=', 'admin_users.adm_id')
-            // コードマスターとJOIN
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('badges.badge_type', '=', 'mst_codes.code')
-                    ->where('data_type', AppConst::CODE_MASTER_55);
-            })
+        // 教室管理者の場合も全校舎表示対象とする
+        // 校舎コードによるガードは無し
+
+        // バッジ付与情報表示用のquery作成・データ取得
+        $badgeList = $this->fncBageGetBadgeQuery($query)
             ->orderBy('badges.authorization_date', 'desc')
             ->orderBy('badges.badge_type', 'asc')
             ->orderBy('badges.campus_cd', 'asc');
@@ -183,8 +150,8 @@ class BadgeController extends Controller
         // バッジ種別リストを取得
         $kindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_55);
 
-        // 生徒所属校舎に紐づく校舎リストを取得（メソッドは当コントローラー最下部に記載）
-        $rooms = $this->mdlGetStudentRoomList($sid);
+        // 生徒所属校舎に紐づく校舎リストを取得
+        $rooms = $this->mdlGetRoomList(false, $sid);
 
         // hidden用,route用データセット
         $editData = [
@@ -312,8 +279,8 @@ class BadgeController extends Controller
         // 生徒名を取得する
         $name = $this->mdlGetStudentName($sid);
 
-        // 生徒所属校舎に紐づく校舎リストを取得（メソッドは当コントローラー最下部に記載）
-        $rooms = $this->mdlGetStudentRoomList($sid);
+        // 生徒所属校舎に紐づく校舎リストを取得
+        $rooms = $this->mdlGetRoomList(false, $sid);
 
         // バッジ種別リストを取得
         $kindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_55);
@@ -354,7 +321,7 @@ class BadgeController extends Controller
             ->firstOrFail();
 
         // 更新
-        $badge ->fill($form)->save();
+        $badge->fill($form)->save();
 
         return;
     }
@@ -437,37 +404,5 @@ class BadgeController extends Controller
         $rules += Badge::fieldRules('reason');
 
         return $rules;
-    }
-
-    //==========================
-    // 生徒所属校舎に紐づく校舎リストの取得
-    //==========================
-    protected function mdlGetStudentRoomList($sid)
-    {
-        // 校舎マスタより校舎情報を取得
-        $model = new MstCampus;
-        $query = MstCampus::query();
-        $query->select('mst_campuses.campus_cd as code', 'name as value', 'disp_order')
-            // 非表示フラグの条件を付加
-            ->where('is_hidden', AppConst::CODE_MASTER_11_1);
-
-        // ログインユーザ
-        $account = Auth::user();
-
-        // 権限によって見れるリストを変更する
-        if (AuthEx::isRoomAdmin()) {
-            //-------------
-            // 教室管理者
-            //-------------
-            // 教室管理者の場合、自分の管理教室のみ絞り込み
-            $query->where('campus_cd', $account->campus_cd);
-        }
-
-        // 生徒所属校舎に紐づく校舎リストを絞り込み取得
-        $rooms = $query->where($this->mdlWhereRoomBySidQuery($query, $model, $sid))
-            ->orderBy('disp_order')
-            ->get()->keyBy('code');
-
-        return $rooms;
     }
 }

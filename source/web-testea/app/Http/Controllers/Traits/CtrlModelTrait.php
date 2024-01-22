@@ -260,9 +260,10 @@ trait CtrlModelTrait
      * 権限によってメニューが違う
      *
      * @param boolean $honbu 本部を表示するかどうか
+     * @param int $sid 生徒CD（管理者からの絞り込み指定）
      * @return array
      */
-    protected function mdlGetRoomList($honbu = true)
+    protected function mdlGetRoomList($honbu = true, $sid = null)
     {
         // 校舎マスタより校舎情報を取得
         $query = MstCampus::query();
@@ -278,7 +279,6 @@ trait CtrlModelTrait
             //-------------
             // 教室管理者
             //-------------
-
             // 教室管理者の場合、自分の管理教室のみ絞り込み
             // なのでここでは本部は絶対に追加されない
             $query->where('campus_cd', $account->campus_cd);
@@ -288,26 +288,14 @@ trait CtrlModelTrait
                 //-------------
                 // 生徒の場合
                 //-------------
-
-                // 自分の在籍している校舎のみ対応する（生徒所属情報とJOIN）
-                $query->sdJoin(StudentCampus::class, function ($join) use ($account) {
-                    // campus_cdでjoin
-                    $join->on('student_campuses.campus_cd', '=', 'mst_campuses.campus_cd')
-                        // 自分のものだけ
-                        ->where('student_id', $account->account_id);
-                });
+                // 自分の在籍している校舎のみ絞り込み
+                $query->where($this->mdlWhereRoomBySidQuery($query, MstCampus::class, $account->account_id));
             } else if (AuthEx::isTutor()) {
                 //-------------
                 // 講師の場合
                 //-------------
-
-                // 自分の在籍している校舎のみ対応する（講師所属情報とJOIN）
-                $query->sdJoin(TutorCampus::class, function ($join) use ($account) {
-                    // campus_cdでjoin
-                    $join->on('tutor_campuses.campus_cd', '=', 'mst_campuses.campus_cd')
-                        // 自分のものだけ
-                        ->where('tutor_id', $account->account_id);
-                });
+                // 自分の在籍している校舎のみ絞り込み
+                $query->where($this->mdlWhereRoomByTidQuery($query, MstCampus::class, $account->account_id));
             }
 
             // 本部を追加するかどうか
@@ -319,6 +307,12 @@ trait CtrlModelTrait
                 // UNIONで校舎リストに加える
                 $query->union($queryHonbu);
             }
+        }
+
+        // 指定生徒CDによる絞り込み
+        if ($sid) {
+            // 生徒所属校舎に紐づく校舎リストを絞り込み取得
+            $query->where($this->mdlWhereRoomBySidQuery($query, MstCampus::class, $sid));
         }
 
         // 校舎リストを取得
@@ -1036,8 +1030,8 @@ trait CtrlModelTrait
         $query->select('student_id')
             ->selectRaw(
                 'CASE WHEN stu_status = ' . AppConst::CODE_MASTER_28_5 . ' THEN past_enter_term'
-                . ' ELSE past_enter_term + PERIOD_DIFF(DATE_FORMAT(curdate(), "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
-                . ' END as enter_term'
+                    . ' ELSE past_enter_term + PERIOD_DIFF(DATE_FORMAT(curdate(), "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
+                    . ' END as enter_term'
             );
 
         return $query;
@@ -1056,12 +1050,12 @@ trait CtrlModelTrait
         $query->select('tutor_id')
             ->selectRaw(
                 'CASE WHEN leave_date IS NULL'
-                . ' THEN PERIOD_DIFF(DATE_FORMAT(curdate(), "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
-                . ' ELSE PERIOD_DIFF(DATE_FORMAT(leave_date, "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
-                . ' END AS enter_term'
+                    . ' THEN PERIOD_DIFF(DATE_FORMAT(curdate(), "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
+                    . ' ELSE PERIOD_DIFF(DATE_FORMAT(leave_date, "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
+                    . ' END AS enter_term'
             );
 
-            return $query;
+        return $query;
     }
 
     //------------------------------

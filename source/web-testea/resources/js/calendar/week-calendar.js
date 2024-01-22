@@ -75,7 +75,6 @@ export default class WeekCalendar {
                 return week;
             },
             locale: "ja",
-            //height: 1700,
             contentHeight: "auto",
             stickyFooterScrollbar: true,
             stickyHeaderDates: true,
@@ -91,7 +90,6 @@ export default class WeekCalendar {
             },
             // クリックイベント
             eventClick: this._eventClick,
-            //editable: false,
             selectable: true,
             select: this._selectFunc,
             eventDisplay: "block",
@@ -152,7 +150,6 @@ export default class WeekCalendar {
                 // カレンダーの条件を送信
                 var sendData = Object.assign(formData, {
                 });
-                //console.log(sendData);
 
                 // 詳細データを取得
                 var url = UrlCom.getFuncUrl() + "/get_booth";

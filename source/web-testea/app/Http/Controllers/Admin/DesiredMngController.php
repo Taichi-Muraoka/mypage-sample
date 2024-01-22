@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\FuncSchoolSearchTrait;
+use App\Http\Controllers\Traits\FuncDesireMngTrait;
 use App\Consts\AppConst;
 use App\Models\MstSchool;
-use App\Models\CodeMaster;
-use App\Models\Student;
 use App\Models\StudentEntranceExam;
 use App\Models\MstSystem;
 use Illuminate\Http\Request;
@@ -21,6 +20,9 @@ class DesiredMngController extends Controller
 {
     // 機能共通処理：学校検索モーダル
     use FuncSchoolSearchTrait;
+
+    // 機能共通処理：受験校管理
+    use FuncDesireMngTrait;
 
     /**
      * コンストラクタ
@@ -77,25 +79,15 @@ class DesiredMngController extends Controller
         // クエリ作成
         $query = StudentEntranceExam::query();
 
+        // 画面表示中生徒のデータに絞り込み
+        $query->where('student_entrance_exams.student_id', $request['student_id']);
+
         // 教室管理者の場合、自分の校舎の生徒のみにガードを掛ける
         $query->where($this->guardRoomAdminTableWithSid());
 
-        $examList = $query
-            ->select(
-                'student_entrance_exams.student_exam_id',
-                'student_entrance_exams.student_id',
-                'student_entrance_exams.school_cd',
-                'student_entrance_exams.department_name',
-                'student_entrance_exams.priority_no',
-                'student_entrance_exams.exam_year',
-                'student_entrance_exams.exam_name',
-                'student_entrance_exams.exam_date',
-                'student_entrance_exams.result',
-                // 学校名
-                'mst_schools.name as school_name',
-                // コードマスタの名称（合否）
-                'mst_codes.name as result_name',
-            )
+        // 受験校情報表示用のquery作成 FuncDegireMngTrait
+        // データを取得
+        $examList = $this->fncDsirGetEntranceExamQuery($query)
             // 更新ボタン押下制御
             // 受験年度が前年度以前の場合、trueをセットする（更新不可）
             ->selectRaw(
@@ -103,17 +95,8 @@ class DesiredMngController extends Controller
                     WHEN exam_year < $currentYear->value_num THEN true
                 END AS disabled_btn"
             )
-            // 画面表示中生徒のデータに絞り込み
-            ->where('student_entrance_exams.student_id', $request['student_id'])
-            // 学校マスタとJOIN
-            ->sdLeftJoin(MstSchool::class, 'mst_schools.school_cd', '=', 'student_entrance_exams.school_cd')
-            // コードマスターとJOIN
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('result', '=', 'mst_codes.code')
-                    ->where('data_type', AppConst::CODE_MASTER_52);
-            })
-            ->orderBy('exam_year', 'desc')
-            ->orderBy('priority_no', 'asc');
+            ->orderBy('student_entrance_exams.exam_year', 'desc')
+            ->orderBy('student_entrance_exams.priority_no', 'asc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $examList);
@@ -133,36 +116,14 @@ class DesiredMngController extends Controller
         // クエリを作成
         $query = StudentEntranceExam::query();
 
+        // 教室管理者の場合、自分の校舎の生徒のみにガードを掛ける
+        $query->where($this->guardRoomAdminTableWithSid());
+
+        // 受験校情報表示用のquery作成 FuncDegireMngTrait
         // データを取得
-        $exam = $query
-            ->select(
-                'student_entrance_exams.student_exam_id',
-                'student_entrance_exams.student_id',
-                'student_entrance_exams.school_cd',
-                'student_entrance_exams.department_name',
-                'student_entrance_exams.priority_no',
-                'student_entrance_exams.exam_year',
-                'student_entrance_exams.exam_name',
-                'student_entrance_exams.exam_date',
-                'student_entrance_exams.result',
-                'student_entrance_exams.memo',
-                // 生徒名
-                'students.name as student_name',
-                // 学校名
-                'mst_schools.name as school_name',
-                // コードマスタの名称（合否）
-                'mst_codes.name as result_name',
-            )
-            ->where('student_exam_id', $request['id'])
-            // 生徒情報とJOIN
-            ->sdLeftJoin(Student::class, 'students.student_id', '=', 'student_entrance_exams.student_id')
-            // 学校マスタとJOIN
-            ->sdLeftJoin(MstSchool::class, 'mst_schools.school_cd', '=', 'student_entrance_exams.school_cd')
-            // コードマスターとJOIN
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('result', '=', 'mst_codes.code')
-                    ->where('data_type', AppConst::CODE_MASTER_52);
-            })
+        $exam = $this->fncDsirGetEntranceExamQuery($query)
+            // IDを指定
+            ->where('student_entrance_exams.student_exam_id', $request['id'])
             ->firstOrFail();
 
         return $exam;

@@ -6,8 +6,16 @@ use App\Models\YearlySchedule;
 use App\Models\CodeMaster;
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
+use App\Models\Student;
+use App\Models\Tutor;
 use App\Models\TutorCampus;
 use App\Models\SeasonMng;
+use App\Models\SeasonStudentRequest;
+use App\Models\SeasonStudentTime;
+use App\Models\SeasonStudentPeriod;
+use App\Models\SeasonTutorRequest;
+use App\Models\SeasonTutorPeriod;
+use App\Models\MstSubject;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -64,6 +72,304 @@ trait FuncSeasonTrait
             ->distinct()
             ->get()
             ->keyBy('code');
+    }
+
+    /**
+     * 特別期間講習 生徒連絡情報
+     * 一覧表示用のquery作成
+     * select句・join句を設定する
+     * 個別のwhere条件・ソートは呼び元で行うこと
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder $query
+     */
+    private function fncSasnGetSeasonStudentQuery($query)
+    {
+        // 現在日を取得
+        $today = date("Y-m-d");
+
+        // 校舎名取得のサブクエリ
+        $rooms = $this->mdlGetRoomQuery();
+
+        if (AuthEx::isAdmin()) {
+            // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithRoomCd());
+        }
+        if (AuthEx::isStudent()) {
+            // 生徒の場合、自分の生徒IDのみにガードを掛ける
+            $query->where($this->guardStudentTableWithSid());
+        }
+
+        return $query
+            ->select(
+                'season_student_requests.season_student_id',
+                'students.name as student_name',
+                'season_student_requests.season_cd',
+                'mst_codes.gen_item2 as season_name',
+                'season_student_requests.apply_date',
+                'season_student_requests.regist_status',
+                'mst_codes_5.name as regstatus_name',
+                'mst_codes_47.name as planstatus_name',
+                'room_names.room_name as campus_name'
+            )
+            // 特別期間コードの年4桁
+            ->selectRaw('LEFT(season_student_requests.season_cd, 4) as year')
+            // 校舎名の取得
+            ->leftJoinSub($rooms, 'room_names', function ($join) {
+                $join->on('season_student_requests.campus_cd', '=', 'room_names.code');
+            })
+            // 特別期間管理情報とJOIN
+            ->sdLeftJoin(SeasonMng::class, function ($join) {
+                $join->on('season_student_requests.season_cd', '=', 'season_mng.season_cd')
+                    ->on('season_student_requests.campus_cd', '=', 'season_mng.campus_cd');
+            })
+            // 生徒名の取得
+            ->sdLeftJoin(Student::class, function ($join) {
+                $join->on('season_student_requests.student_id', 'students.student_id');
+            })
+            // コードマスターとJOIN（期間区分）
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on(DB::raw('RIGHT(season_student_requests.season_cd, 2)'), '=', 'mst_codes.gen_item1')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
+            })
+            // コードマスターとJOIN（登録ステータス）
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('season_student_requests.regist_status', '=', 'mst_codes_5.code')
+                    ->where('mst_codes_5.data_type', AppConst::CODE_MASTER_5);
+            }, 'mst_codes_5')
+            // コードマスターとJOIN（コマ組みステータス）
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('season_student_requests.plan_status', '=', 'mst_codes_47.code')
+                    ->where('mst_codes_47.data_type', AppConst::CODE_MASTER_47);
+            }, 'mst_codes_47')
+            // 生徒受付開始日が当日以前のもの
+            ->where('season_mng.s_start_date', '<=', $today);
+    }
+
+    /**
+     * 特別期間講習 生徒連絡情報取得 詳細表示用
+     *
+     * @param integer $seasonStudentId 生徒連絡情報ID
+     * @return object
+     */
+    private function fncSasnGetSeasonStudent($seasonStudentId)
+    {
+        // クエリを作成
+        $query = SeasonStudentRequest::query();
+
+        if (AuthEx::isAdmin()) {
+            // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithRoomCd());
+        }
+        if (AuthEx::isStudent()) {
+            // 生徒の場合、自分の生徒IDのみにガードを掛ける
+            $query->where($this->guardStudentTableWithSid());
+        }
+
+        // 教室名取得のサブクエリ
+        $room = $this->mdlGetRoomQuery();
+
+        // データを取得
+        $seasonStudent = $query
+            ->select(
+                'season_student_requests.season_student_id',
+                'season_student_requests.season_cd',
+                'season_student_requests.campus_cd',
+                'season_student_requests.student_id',
+                'season_student_requests.plan_status',
+                'mst_codes.gen_item2 as season_name',
+                'room_names.room_name as campus_name',
+                'students.name as student_name',
+                'season_student_requests.comment'
+            )
+            // 特別期間コードの年4桁
+            ->selectRaw('LEFT(season_student_requests.season_cd, 4) as year')
+            // 校舎名の取得
+            ->leftJoinSub($room, 'room_names', function ($join) {
+                $join->on('season_student_requests.campus_cd', '=', 'room_names.code');
+            })
+            // 生徒名の取得
+            ->sdLeftJoin(Student::class, function ($join) {
+                $join->on('season_student_requests.student_id', 'students.student_id');
+            })
+            // コードマスターとJOIN（期間区分）
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on(DB::raw('RIGHT(season_student_requests.season_cd, 2)'), '=', 'mst_codes.gen_item1')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
+            })
+            // IDを指定
+            ->where('season_student_id', $seasonStudentId)
+            // 登録済データのみ表示可
+            ->where('regist_status', AppConst::CODE_MASTER_5_1)
+            ->firstOrFail();
+
+        return $seasonStudent;
+    }
+
+    /**
+     * 特別期間講習 受講回数情報取得 詳細表示用
+     *
+     * @param integer $seasonStudentId 生徒連絡情報ID
+     * @return array
+     */
+    private function fncSasnGetSeasonStudentTime($seasonStudentId)
+    {
+        // クエリを作成
+        $query = SeasonStudentTime::query();
+
+        // データを取得
+        $studentTimes = $query
+            ->select(
+                'season_student_times.season_student_id',
+                'season_student_times.subject_cd',
+                'mst_subjects.name as subject_name',
+                'season_student_times.times'
+            )
+            // 科目名の取得
+            ->sdLeftJoin(MstSubject::class, function ($join) {
+                $join->on('season_student_times.subject_cd', 'mst_subjects.subject_cd');
+            })
+            // IDを指定
+            ->where('season_student_times.season_student_id', $seasonStudentId)
+            ->orderBy('season_student_times.subject_cd')
+            ->get();
+
+        return $studentTimes;
+    }
+
+    /**
+     * 特別期間講習 生徒連絡コマ情報取得 詳細表示用
+     *
+     * @param integer $seasonStudentId 生徒連絡情報ID
+     * @return array
+     */
+    private function fncSasnGetSeasonStudentPeriod($seasonStudentId)
+    {
+        // クエリを作成
+        $query = SeasonStudentPeriod::query();
+
+        // データを取得
+        $studentPeriods = $query
+            ->select(
+                'season_student_periods.season_student_id',
+                'season_student_periods.lesson_date',
+                'season_student_periods.period_no'
+            )
+            // IDを指定
+            ->where('season_student_id', $seasonStudentId)
+            ->get();
+
+        return $studentPeriods;
+    }
+
+    /**
+     * 特別期間講習 講師連絡情報
+     * 一覧表示用のquery作成
+     * select句・join句を設定する
+     * 個別のwhere条件・ソートは呼び元で行うこと
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder $query
+     */
+    private function fncSasnGetSeasonTutorQuery($query)
+    {
+        if (AuthEx::isAdmin()) {
+            // 教室管理者の場合、自分の校舎コードの講師のみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithTid());
+        }
+        if (AuthEx::isTutor()) {
+            // 講師の場合、自分の講師IDのみにガードを掛ける
+            $query->where($this->guardTutorTableWithTid());
+        }
+
+        return $query
+            ->select(
+                'season_tutor_requests.season_tutor_id',
+                'tutors.name as tutor_name',
+                'season_tutor_requests.season_cd',
+                'mst_codes.gen_item2 as season_name',
+                'season_tutor_requests.apply_date',
+            )
+            // 特別期間コードの年4桁
+            ->selectRaw('LEFT(season_tutor_requests.season_cd, 4) as year')
+            // コードマスターとJOIN（期間区分）
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on(DB::raw('RIGHT(season_tutor_requests.season_cd, 2)'), '=', 'mst_codes.gen_item1')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
+            })
+            // 講師名の取得
+            ->sdLeftJoin(Tutor::class, function ($join) {
+                $join->on('season_tutor_requests.tutor_id', 'tutors.tutor_id');
+            });
+    }
+
+    /**
+     * 特別期間講習 講師連絡情報取得 詳細表示用
+     *
+     * @param integer $seasonTutorId 講師連絡情報ID
+     * @return object
+     */
+    private function fncSasnGetSeasonTutor($seasonTutorId)
+    {
+        // クエリを作成
+        $query = SeasonTutorRequest::query();
+
+        if (AuthEx::isAdmin()) {
+            // 教室管理者の場合、自分の校舎コードの講師のみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithTid());
+        }
+        if (AuthEx::isTutor()) {
+            // 講師の場合、自分の講師IDのみにガードを掛ける
+            $query->where($this->guardTutorTableWithTid());
+        }
+
+        // データを取得
+        $seasonTutor = $query
+            ->select(
+                'season_tutor_requests.season_tutor_id',
+                'season_tutor_requests.season_cd',
+                'season_tutor_requests.tutor_id',
+                'mst_codes.gen_item2 as season_name',
+                'season_tutor_requests.comment'
+            )
+            // 特別期間コードの年4桁
+            ->selectRaw('LEFT(season_tutor_requests.season_cd, 4) as year')
+            // コードマスターとJOIN（期間区分）
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on(DB::raw('RIGHT(season_tutor_requests.season_cd, 2)'), '=', 'mst_codes.gen_item1')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
+            }, 'mst_codes')
+            // IDを指定
+            ->where('season_tutor_id', $seasonTutorId)
+            ->firstOrFail();
+
+        return $seasonTutor;
+    }
+
+    /**
+     * 特別期間講習 講師連絡コマ取得 詳細表示用
+     *
+     * @param integer $seasonTutorId 講師連絡情報ID
+     * @return array
+     */
+    private function fncSasnGetSeasonTutorPeriod($seasonTutorId)
+    {
+        // クエリを作成
+        $query = SeasonTutorPeriod::query();
+
+        // データを取得
+        $tutorPeriods = $query
+            ->select(
+                'season_tutor_periods.lesson_date',
+                'season_tutor_periods.period_no'
+            )
+            // IDを指定
+            ->where('season_tutor_id', $seasonTutorId)
+            ->orderBy('season_tutor_periods.lesson_date')
+            ->orderBy('season_tutor_periods.period_no')
+            ->get();
+
+        return $tutorPeriods;
     }
 
     /**
