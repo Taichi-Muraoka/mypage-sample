@@ -1973,17 +1973,14 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 保持期限超過データ削除管理
     //----------------------
 
-    // 取込
+    // 一覧
     Route::get('/data_reset', [DataResetController::class, 'index'])->name('data_reset');
-
-    // 取込処理
-    Route::post('/data_reset/create', [DataResetController::class, 'create'])->name('data_reset-create');
-
-    // バリデーション(取込用)
-    Route::post('/data_reset/vd_input', [DataResetController::class, 'validationForInput'])->name('data_reset-vd_input');
 
     // 検索結果取得
     Route::post('/data_reset/search', [DataResetController::class, 'search'])->name('data_reset-search');
+
+    // バックアップのダウンロード
+    Route::get('/data_reset/download/{batchId}', [DataResetController::class, 'download'])->name('data_reset-download');
 
     //---------------------
     // 学校コード取込
