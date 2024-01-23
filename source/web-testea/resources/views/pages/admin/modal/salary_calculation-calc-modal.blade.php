@@ -8,7 +8,7 @@ modal-normal
 @section('modal-body')
 
 <p>
-    2023年03月分の給与集計処理を行います。<br>
+    @{{$filters.formatYmString(item.salary_date)}}分の給与集計処理を行います。<br>
     よろしいですか？
 </p>
 

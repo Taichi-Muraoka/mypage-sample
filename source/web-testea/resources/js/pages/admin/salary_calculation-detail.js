@@ -15,14 +15,12 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
-        // Vue: モーダル
-        // this.getVueModal();
-
         // 検索一覧の表示
         var $vueSearchList = this.getVueSearchList({
             // 別画面でも検索を使用するのでURLを変更
             urlSuffix: "detail"
         });
+
         $vueSearchList.search();
 
         // Vue: モーダル 詳細
@@ -35,17 +33,13 @@ export default class AppClass extends PageBase {
 
         // Vue: モーダル(集計)
         this.getVueModal({
-            // 別画面でもモーダルを使用するのでURLを変更
-            // urlSuffix: "detail-calc",
-            
             // IDを分けた
             id: "#modal-dtl-calc",
 
             // 完了処理後
-            // afterExec: afterExec
             afterExec: () => {
                 // 一覧を再表示する
-                searchForm.vueSearchList.refresh();
+                $vueSearchList.refresh();
             }
         });
 
@@ -55,10 +49,9 @@ export default class AppClass extends PageBase {
             id: "#modal-dtl-confirm",
 
             // 完了処理後
-            // afterExec: afterExec
             afterExec: () => {
                 // 一覧を再表示する
-                searchForm.vueSearchList.refresh();
+                $vueSearchList.refresh();
             }
         });
 
@@ -68,10 +61,8 @@ export default class AppClass extends PageBase {
             id: "#modal-dtl-output",
 
             // 完了処理後
-            // afterExec: afterExec
             afterExec: () => {
-                // 一覧を再表示する
-                searchForm.vueSearchList.refresh();
+    
             }
         });
     }

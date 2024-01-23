@@ -1556,16 +1556,13 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // モーダル処理
     Route::post('/salary_calculation/exec_modal', [SalaryCalculationController::class, 'execModal'])->name('salary_calculation-exec_modal');
 
-    // 集計処理
-    // Route::post('/salary_calculation/calc', [SalaryCalculationController::class, 'calc'])->name('salary_calculation-calc');
-
     // 給与算出情報一覧 - 検索結果取得
     Route::post('/salary_calculation/search_detail', [SalaryCalculationController::class, 'searchDetail'])->name('salary_calculation-search_detail');
 
     // 給与算出情報一覧 - 詳細取得用
     Route::post('/salary_calculation/get_data_detail', [SalaryCalculationController::class, 'getDataDetail'])->name('salary_calculation-get_data_detail');
 
-    // 給与算出情報一覧 - 詳細取得用
+    // 給与算出情報一覧 - 確認ダイアログ
     Route::post('/salary_calculation/get_data', [SalaryCalculationController::class, 'getData'])->name('salary_calculation-get_data');
 
     //----------------------
