@@ -585,15 +585,17 @@ class SalaryImportController extends Controller
             }
 
             // その他
-            $salary_detail = [];
-            $salary_detail['salary_seq'] = $seq;
-            $salary_detail['salary_group'] = AppConst::SALARY_GROUP_3;
-            $salary_detail['item_name'] = $salary_group_3[0];
-            $salary_detail['hour'] = null;
-            $salary_detail['hour_payment'] = null;
-            $salary_detail['amount'] = (int)$values[$salary_group_3[0]];
-            array_push($salary_details, $salary_detail);
-            $seq++;
+            foreach ($salary_group_3 as $salary_group) {
+                $salary_detail = [];
+                $salary_detail['salary_seq'] = $seq;
+                $salary_detail['salary_group'] = AppConst::SALARY_GROUP_3;
+                $salary_detail['item_name'] = $salary_group;
+                $salary_detail['hour'] = null;
+                $salary_detail['hour_payment'] = null;
+                $salary_detail['amount'] = (int)$values[$salary_group];
+                array_push($salary_details, $salary_detail);
+                $seq++;
+            }
 
             // 合計
             $salary_detail = [];
