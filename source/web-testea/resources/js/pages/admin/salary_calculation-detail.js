@@ -31,16 +31,18 @@ export default class AppClass extends PageBase {
             urlSuffix: "detail"
         });
 
+        // 編集完了後は同じ画面へ
+        var afterEdit = () => {
+            UrlCom.redirect(UrlCom.getFuncUrl());
+        };
+
         // Vue: モーダル(集計)
         this.getVueModal({
             // IDを分けた
             id: "#modal-dtl-calc",
 
             // 完了処理後
-            afterExec: () => {
-                // 一覧を再表示する
-                $vueSearchList.refresh();
-            }
+            afterExec: afterEdit
         });
 
         // Vue: モーダル(確定)
@@ -49,10 +51,7 @@ export default class AppClass extends PageBase {
             id: "#modal-dtl-confirm",
 
             // 完了処理後
-            afterExec: () => {
-                // 一覧を再表示する
-                $vueSearchList.refresh();
-            }
+            afterExec: afterEdit
         });
 
         // Vue: モーダル(確定)

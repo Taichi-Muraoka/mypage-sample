@@ -12,9 +12,10 @@
   class: 追加のクラス
   icon: アイコン
   small: 小さいボタンにするかどうか
+  disabled: 使用不可 Def: false
 --}}
 @props(['dataTarget' => '', 'vueDataAttr' => [], 'dataAttr' => [], 'vueDisabled' => '', 'caption' => '', 'class' => '', 
-  'icon' => 'fas fa-paper-plane', 'small' => false])
+  'icon' => 'fas fa-paper-plane', 'small' => false, 'disabled' => false])
 
 <button type="button" 
   class="btn btn-success ml-3 @if (!empty($class)){{ $class }}@endif @if ($small) btn-sm @endif" 
@@ -37,6 +38,9 @@
   @foreach($dataAttr as $key => $val)
    data-{{$key}}="{{ $dataAttr[$key] }}"
   @endforeach
+
+  {{-- disabled追加 --}}
+  @if ($disabled) {{ 'disabled' }} @endif
 >
   <i class="{{ $icon }}"></i>
   @if (empty($caption)){{ '送信' }}@else{{ $caption }}@endif

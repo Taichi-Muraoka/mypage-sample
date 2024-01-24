@@ -137,12 +137,13 @@ class SalaryCalculationController extends Controller
             $confirm_date = $salary_mng->confirm_date->format('Y年m月d日');
         }
 
+        // ボタンの制御
         $calc_disable = false;
         $comfirm_disable = false;
         if ($salary_mng->state == AppConst::CODE_MASTER_24_2) {
             $calc_disable = true;
         }
-        if ($salary_mng->state == AppConst::CODE_MASTER_24_1) {
+        if ($salary_mng->state != AppConst::CODE_MASTER_24_1) {
             $comfirm_disable = true;
         }
 
