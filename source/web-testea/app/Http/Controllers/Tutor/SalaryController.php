@@ -37,7 +37,6 @@ class SalaryController extends Controller
      */
     public function index()
     {
-
         return view('pages.tutor.salary');
     }
 
@@ -49,14 +48,13 @@ class SalaryController extends Controller
      */
     public function search(Request $request)
     {
-
         // 給与明細を取得する
         $query = Salary::query();
         $salarys = $query
             ->select(
                 'salary_date'
             )
-            // 自分のアカウントIDでガードを掛ける（tid）
+            // 自分の講師IDでガードを掛ける
             ->where($this->guardTutorTableWithTid())
             // ソート順
             ->orderBy('salary_date', 'desc');
@@ -97,9 +95,10 @@ class SalaryController extends Controller
             'salary' => $dtlData['salary'],
             'salary_detail_1' => $dtlData['salary_detail_1'],
             'salary_detail_2' => $dtlData['salary_detail_2'],
+            'salary_detail_2_subtotal' => $dtlData['salary_detail_2_subtotal'],
             'salary_detail_3' => $dtlData['salary_detail_3'],
-            'salary_detail_4' => $dtlData['salary_detail_4'],
-            // PDF用にIDを渡す
+            'salary_detail_3_subtotal' => $dtlData['salary_detail_3_subtotal'],
+            // PDF用にdateを渡す
             'editData' => [
                 'date' => $date
             ]

@@ -341,4 +341,10 @@ return [
      * 面談時間
      */
     "conference_time" => 60,
+
+    /**
+     * 給与明細表示
+     * item_name
+     */
+    "subtotal_withholding" => '源泉計算用小計',
 ];
