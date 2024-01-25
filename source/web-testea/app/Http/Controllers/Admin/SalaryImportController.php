@@ -122,15 +122,19 @@ class SalaryImportController extends Controller
         }
 
         // 給与情報取込を取得
-        $salary_import = SalaryImport::select('salary_date')
+        $salary_import = SalaryImport::select('salary_date', 'payment_date')
             ->where('salary_date', '=', $idDate)
             ->firstOrFail();
+
+        // 支給日を取得
+        $payment_date = $salary_import->payment_date;
 
         return view('pages.admin.salary_import-import', [
             'rules' => $this->rulesForInput(),
             'salary_import' => $salary_import,
             'editData' => [
-                'salaryDate' => $salaryDate
+                'salaryDate' => $salaryDate,
+                'payment_date' => $payment_date
             ]
         ]);
     }
