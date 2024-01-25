@@ -92,6 +92,7 @@ class SalaryController extends Controller
         $dtlData = $this->getSalaryDetail($account->account_id, $date);
 
         return view('pages.tutor.salary-detail', [
+            'salary_import' => $dtlData['salary_import'],
             'salary' => $dtlData['salary'],
             'salary_detail_1' => $dtlData['salary_detail_1'],
             'salary_detail_2' => $dtlData['salary_detail_2'],

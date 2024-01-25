@@ -354,6 +354,7 @@ class TutorMngController extends Controller
         $dtlData = $this->getSalaryDetail($tid, $date);
 
         return view('pages.admin.tutor_mng-salary_detail', [
+            'salary_import' => $dtlData['salary_import'],
             'salary' => $dtlData['salary'],
             'salary_detail_1' => $dtlData['salary_detail_1'],
             'salary_detail_2' => $dtlData['salary_detail_2'],

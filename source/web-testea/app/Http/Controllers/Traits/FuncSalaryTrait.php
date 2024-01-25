@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Lang;
 use App\Models\Salary;
 use App\Models\SalaryDetail;
 use App\Consts\AppConst;
+use App\Models\SalaryImport;
 use App\Models\Tutor;
 
 /**
@@ -25,6 +26,18 @@ trait FuncSalaryTrait
     {
         // dateの形式のバリデーションと変換
         $idDate = $this->fmYmToDate($date);
+
+        //-------------------------
+        // 給与取込情報の取得
+        //-------------------------
+        // MEMO:joinだとbladeファイルで->format()が効かないため単独で取得
+        $query = SalaryImport::query();
+        $salary_import = $query
+            ->select(
+                'payment_date',
+            )
+            ->where('salary_import.salary_date', '=', $idDate)
+            ->firstOrFail();
 
         //-------------------------
         // 給与情報の取得
@@ -112,6 +125,7 @@ trait FuncSalaryTrait
         }
 
         $pdfData = [
+            'salary_import' => $salary_import,
             'salary' => $salary,
             'salary_detail_1' => $salary_detail_1,
             'salary_detail_2' => $salary_detail_2,

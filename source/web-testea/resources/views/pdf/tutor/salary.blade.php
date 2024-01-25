@@ -22,7 +22,7 @@
 <p>{{$salary->tutor_name}} 様</p>
 
 お世話になっております、個別指導塾TESTEAです。<br>
-8月16日支給分の給与明細です。<br>
+{{$salary_import->payment_date->format('n月j日')}}支給分の給与明細です。<br>
 ご確認の程よろしくお願いいたします。
 
 <p>{{$salary->salary_date->format('Y年n月')}}労働分</p>

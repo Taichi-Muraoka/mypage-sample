@@ -12,7 +12,7 @@
     <p>{{$salary->tutor_name}} 様</p>
 
     <p>{{$salary->salary_date->format('Y年n月')}} 労働分</p>
-    <p>2023年8月16日 支給</p>
+    <p>{{$salary_import->payment_date->format('Y年n月j日')}} 支給</p>
 
     <x-bs.table :hover=false :vHeader=true class="mb-4" :smartPhone=true>
         <tr>
@@ -86,7 +86,7 @@
             @endfor
                 <tr>
                     <x-bs.td-sp class="font-weight-bold">小計</x-bs.td-sp>
-                    <x-bs.td-sp class="font-weight-bold t-price" colspan="3">{{number_format($salary_detail_2_subtotal)}}円</x-bs.td-sp>
+                    <x-bs.td-sp class="font-weight-bold t-price">{{number_format($salary_detail_2_subtotal)}}円</x-bs.td-sp>
                 </tr>
         </x-bs.table>
     @endif
@@ -113,7 +113,7 @@
             @endfor
                 <tr>
                     <x-bs.td-sp class="font-weight-bold">小計</x-bs.td-sp>
-                    <x-bs.td-sp class="font-weight-bold t-price" colspan="3">{{number_format($salary_detail_3_subtotal)}}円</x-bs.td-sp>
+                    <x-bs.td-sp class="font-weight-bold t-price">{{number_format($salary_detail_3_subtotal)}}円</x-bs.td-sp>
                 </tr>
         </x-bs.table>
     @endif
