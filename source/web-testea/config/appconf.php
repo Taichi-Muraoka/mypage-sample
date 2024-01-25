@@ -208,6 +208,16 @@ return [
      */
     "db_backup_dir" => 'db_backup/',
 
+    /**
+     * 保持期限超過データバックアップ先
+     */
+    "exceeding_data_backup_dir" => "exceeding_data_backup/",
+
+    /**
+     * 保持期限超過データバックアップzipファイル名
+     */
+    "exceeding_data_backup_zip_filename" => "保持期限超過データ削除バックアップ_",
+
     //==========================
     // 画面ごと設定
     // マスタなどに持たないような設定
