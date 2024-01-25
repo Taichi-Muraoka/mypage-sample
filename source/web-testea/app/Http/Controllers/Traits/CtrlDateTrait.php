@@ -34,7 +34,7 @@ trait CtrlDateTrait
         if ($year === "present" && $day === "end") {
             // 翌年度の開始日-1日
             $nextStr = date('Y', strtotime('+10 month')) . '/03/01';
-            $dateStr = date('Y/m/d', strtotime($nextStr . '-1day'));
+            $dateStr = date('Y/m/d', strtotime($nextStr . '-1 day'));
             if ($time) {
                 $dateStr = $dateStr . ' 23:59:59';
             }
@@ -45,7 +45,7 @@ trait CtrlDateTrait
             }
         } elseif ($year === "prev" && $day === "end") {
             $nextStr = date('Y', strtotime('-2 month')) . '/03/01';
-            $dateStr = date('Y/m/d', strtotime($nextStr . '-1day'));
+            $dateStr = date('Y/m/d', strtotime($nextStr . '-1 day'));
             if ($time) {
                 $dateStr = $dateStr . ' 23:59:59';
             }
@@ -56,7 +56,7 @@ trait CtrlDateTrait
             }
         } elseif ($year === "next" && $day === "end") {
             $nextStr = date('Y', strtotime('+1 year +10 month')) . '/03/01';
-            $dateStr = date('Y/m/d', strtotime($nextStr . '-1day'));
+            $dateStr = date('Y/m/d', strtotime($nextStr . '-1 day'));
             if ($time) {
                 $dateStr = $dateStr . ' 23:59:59';
             }
@@ -67,7 +67,7 @@ trait CtrlDateTrait
             }
         } elseif ($year === "6yearsAgo" && $day === "end") {
             $nextStr = date('Y', strtotime('-5 year -2 month')) . '/03/01';
-            $dateStr = date('Y/m/d', strtotime($nextStr . '-1day'));
+            $dateStr = date('Y/m/d', strtotime($nextStr . '-1 day'));
             if ($time) {
                 $dateStr = $dateStr . ' 23:59:59';
             }
@@ -78,7 +78,7 @@ trait CtrlDateTrait
             }
         } elseif ($year === "5yearsAgo" && $day === "end") {
             $nextStr = date('Y', strtotime('-4 year -2 month')) . '/03/01';
-            $dateStr = date('Y/m/d', strtotime($nextStr . '-1day'));
+            $dateStr = date('Y/m/d', strtotime($nextStr . '-1 day'));
             if ($time) {
                 $dateStr = $dateStr . ' 23:59:59';
             }
@@ -89,7 +89,7 @@ trait CtrlDateTrait
             }
         } elseif ($year === "4yearsAgo" && $day === "end") {
             $nextStr = date('Y', strtotime('-3 year -2 month')) . '/03/01';
-            $dateStr = date('Y/m/d', strtotime($nextStr . '-1day'));
+            $dateStr = date('Y/m/d', strtotime($nextStr . '-1 day'));
             if ($time) {
                 $dateStr = $dateStr . ' 23:59:59';
             }
