@@ -40,29 +40,18 @@ class AllMemberImportController extends Controller
      */
     public function search(Request $request)
     {
-
-        // 教室名取得のサブクエリ
-        $room = $this->mdlGetRoomQuery();
-
+        // クエリ作成
         $query = BatchMng::query();
         $students = $query
             ->select(
                 'start_time',
                 'end_time',
                 'batch_state',
-                'mst_codes.name AS batch_state_name',
-                'room_names.room_name AS room_name',
-                'office.name AS executor'
+                'mst_codes.name AS batch_state_name', 
             )
             ->sdLeftJoin(CodeMaster::class, function ($join) {
                 $join->on('batch_state', '=', 'mst_codes.code')
                     ->where('mst_codes.data_type', AppConst::CODE_MASTER_22);
-            })
-            ->sdLeftJoin(AdminUser::class, function ($join) {
-                $join->on('batch_mng.adm_id', '=', 'office.adm_id');
-            })
-            ->leftJoinSub($room, 'room_names', function ($join) {
-                $join->on('office.roomcd', '=', 'room_names.code');
             })
             ->where('batch_type', '=', AppConst::BATCH_TYPE_1)
             ->orderBy('start_time', 'desc');
