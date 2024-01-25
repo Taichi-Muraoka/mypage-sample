@@ -154,8 +154,6 @@ class SalaryImportController extends Controller
         // 支給日取得
         $payment_date = $request->input('payment_date');
 
-        $this->debug($payment_date);
-
         // バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput())->validate();
 
