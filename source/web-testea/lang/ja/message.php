@@ -413,6 +413,438 @@ return [
             'name' => "成績情報一覧_:outputDate.csv",
             // CSVヘッダーはコントローラー内で記載
         ],
+
+        //--------------
+        // アカウント情報
+        // 削除データバックアップ出力
+        //--------------
+        'accounts_output' => [
+            // ファイル名
+            'name' => "アカウント情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 生徒情報
+        // 削除データバックアップ出力
+        //--------------
+        'students_output' => [
+            // ファイル名
+            'name' => "生徒情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 生徒所属情報
+        // 削除データバックアップ出力
+        //--------------
+        'student_campuses_output' => [
+            // ファイル名
+            'name' => "生徒所属情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 生徒受験情報
+        // 削除データバックアップ出力
+        //--------------
+        'student_entrance_exams_output' => [
+            // ファイル名
+            'name' => "生徒受験情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 生徒入退会履歴情報
+        // 削除データバックアップ出力
+        //--------------
+        'student_enter_histories_output' => [
+            // ファイル名
+            'name' => "生徒入退会履歴情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 連絡記録情報
+        // 削除データバックアップ出力
+        //--------------
+        'records_output' => [
+            // ファイル名
+            'name' => "連絡記録情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // バッジ付与情報
+        // 削除データバックアップ出力
+        //--------------
+        'badges_output' => [
+            // ファイル名
+            'name' => "バッジ付与情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // スケジュール情報
+        // 削除データバックアップ出力
+        //--------------
+        'schedules_output' => [
+            // ファイル名
+            'name' => "スケジュール情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 受講生徒情報
+        // 削除データバックアップ出力
+        //--------------
+        'class_members_output' => [
+            // ファイル名
+            'name' => "受講生徒情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 欠席申請情報
+        // 削除データバックアップ出力
+        //--------------
+        'absent_applications_output' => [
+            // ファイル名
+            'name' => "欠席申請情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 振替依頼情報
+        // 削除データバックアップ出力
+        //--------------
+        'transfer_applications_output' => [
+            // ファイル名
+            'name' => "振替依頼情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 振替依頼日程情報
+        // 削除データバックアップ出力
+        //--------------
+        'transfer_application_dates_output' => [
+            // ファイル名
+            'name' => "振替依頼日程情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 追加授業依頼情報
+        // 削除データバックアップ出力
+        //--------------
+        'extra_class_applications_output' => [
+            // ファイル名
+            'name' => "追加授業依頼情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 授業報告書情報
+        // 削除データバックアップ出力
+        //--------------
+        'reports_output' => [
+            // ファイル名
+            'name' => "授業報告書情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 授業報告書教材単元情報
+        // 削除データバックアップ出力
+        //--------------
+        'report_units_output' => [
+            // ファイル名
+            'name' => "授業報告書教材単元情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 特別期間講習管理
+        // 削除データバックアップ出力
+        //--------------
+        'season_mng_output' => [
+            // ファイル名
+            'name' => "特別期間講習管理_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 特別期間講習 生徒連絡情報
+        // 削除データバックアップ出力
+        //--------------
+        'season_student_requests_output' => [
+            // ファイル名
+            'name' => "特別期間講習 生徒連絡情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 特別期間講習 生徒連絡コマ情報
+        // 削除データバックアップ出力
+        //--------------
+        'season_student_periods_output' => [
+            // ファイル名
+            'name' => "特別期間講習 生徒連絡コマ情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 特別期間講習 生徒実施回数情報
+        // 削除データバックアップ出力
+        //--------------
+        'season_student_times_output' => [
+            // ファイル名
+            'name' => "特別期間講習 生徒実施回数情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 特別期間講習 講師連絡情報
+        // 削除データバックアップ出力
+        //--------------
+        'season_tutor_requests_output' => [
+            // ファイル名
+            'name' => "特別期間講習 講師連絡情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 特別期間講習 講師連絡コマ情報
+        // 削除データバックアップ出力
+        //--------------
+        'season_tutor_periods_output' => [
+            // ファイル名
+            'name' => "特別期間講習 講師連絡コマ情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 追加請求情報
+        // 削除データバックアップ出力
+        //--------------
+        'surcharges_output' => [
+            // ファイル名
+            'name' => "追加請求情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 給与算出管理情報
+        // 削除データバックアップ出力
+        //--------------
+        'salary_mng_output' => [
+            // ファイル名
+            'name' => "給与算出管理情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 給与算出情報
+        // 削除データバックアップ出力
+        //--------------
+        'salary_summarys_output' => [
+            // ファイル名
+            'name' => "給与算出情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 給与算出交通費情報
+        // 削除データバックアップ出力
+        //--------------
+        'salary_travel_costs_output' => [
+            // ファイル名
+            'name' => "給与算出交通費情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 給与取込情報
+        // 削除データバックアップ出力
+        //--------------
+        'salary_import_output' => [
+            // ファイル名
+            'name' => "給与取込情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 給与情報
+        // 削除データバックアップ出力
+        //--------------
+        'salaries_output' => [
+            // ファイル名
+            'name' => "給与情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 給与明細情報
+        // 削除データバックアップ出力
+        //--------------
+        'salary_details_output' => [
+            // ファイル名
+            'name' => "給与明細情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 請求取込情報
+        // 削除データバックアップ出力
+        //--------------
+        'invoice_import_output' => [
+            // ファイル名
+            'name' => "請求取込情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 請求情報
+        // 削除データバックアップ出力
+        //--------------
+        'invoices_output' => [
+            // ファイル名
+            'name' => "請求情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 請求明細情報
+        // 削除データバックアップ出力
+        //--------------
+        'invoice_details_output' => [
+            // ファイル名
+            'name' => "請求明細情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 教室年間予定情報
+        // 削除データバックアップ出力
+        //--------------
+        'yearly_schedules_output' => [
+            // ファイル名
+            'name' => "教室年間予定情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 教室年間予定取込情報
+        // 削除データバックアップ出力
+        //--------------
+        'yearly_schedules_import_output' => [
+            // ファイル名
+            'name' => "教室年間予定取込情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 管理者アカウント情報
+        // 削除データバックアップ出力
+        //--------------
+        'admin_users_output' => [
+            // ファイル名
+            'name' => "管理者アカウント情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 面談連絡情報
+        // 削除データバックアップ出力
+        //--------------
+        'conferences_output' => [
+            // ファイル名
+            'name' => "面談連絡情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 面談日程情報
+        // 削除データバックアップ出力
+        //--------------
+        'conference_dates_output' => [
+            // ファイル名
+            'name' => "面談日程情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 生徒成績情報
+        // 削除データバックアップ出力
+        //--------------
+        'scores_output' => [
+            // ファイル名
+            'name' => "生徒成績情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 生徒成績詳細情報
+        // 削除データバックアップ出力
+        //--------------
+        'score_details_output' => [
+            // ファイル名
+            'name' => "生徒成績詳細情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 問い合わせ情報
+        // 削除データバックアップ出力
+        //--------------
+        'contacts_output' => [
+            // ファイル名
+            'name' => "問い合わせ情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // お知らせ情報
+        // 削除データバックアップ出力
+        //--------------
+        'notices_output' => [
+            // ファイル名
+            'name' => "お知らせ情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // お知らせ宛先情報
+        // 削除データバックアップ出力
+        //--------------
+        'notice_destinations_output' => [
+            // ファイル名
+            'name' => "お知らせ宛先情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 研修資料
+        // 削除データバックアップ出力
+        //--------------
+        'training_contents_output' => [
+            // ファイル名
+            'name' => "研修資料_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 研修閲覧
+        // 削除データバックアップ出力
+        //--------------
+        'training_browses_output' => [
+            // ファイル名
+            'name' => "研修閲覧_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // バッチ実行管理
+        // 削除データバックアップ出力
+        //--------------
+        'batch_mng_output' => [
+            // ファイル名
+            'name' => "バッチ実行管理_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 講師情報
+        // 削除データバックアップ出力
+        //--------------
+        'tutors_output' => [
+            // ファイル名
+            'name' => "講師情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 講師所属情報
+        // 削除データバックアップ出力
+        //--------------
+        'tutor_campuses_output' => [
+            // ファイル名
+            'name' => "講師所属情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 講師担当科目情報
+        // 削除データバックアップ出力
+        //--------------
+        'tutor_subjects_output' => [
+            // ファイル名
+            'name' => "講師担当科目情報_:tableName_:outputDate.csv",
+        ],
+
+        //--------------
+        // 講師空き時間情報
+        // 削除データバックアップ出力
+        //--------------
+        'tutor_free_periods_output' => [
+            // ファイル名
+            'name' => "講師空き時間情報_:tableName_:outputDate.csv",
+        ],
     ],
 
     /*
