@@ -24,6 +24,9 @@
 
     {{-- 余白 --}}
     <div class="mb-3"></div>
+
+    <x-input.date-picker caption="支給日" id="payment_date" :rules=$rules />
+
     <x-input.file caption="給与情報ファイル" id="upload_file" :rules=$rules />
 
     {{-- hidden --}}
