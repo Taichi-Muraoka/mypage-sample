@@ -1996,5 +1996,5 @@ class AppConst
     const COUNT_HOUR_SALARY = 10;
 
     // 給与情報明細数
-    const COUNT_SALARY = 17;
+    const COUNT_SALARY = 18;
 }
