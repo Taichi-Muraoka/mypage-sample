@@ -22,9 +22,12 @@
     @endif
 
     {{-- 共通フォーム --}}
-    <x-input.text caption="科目コード" id="subject_cd" :rules=$rules :editData=$editData/>
+    <x-input.text caption="科目コード" id="subject_cd" :rules=$rules :editData=$editData />
+    <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData />
+    <x-input.text caption="略称" id="short_name" :rules=$rules :editData=$editData />
 
-    <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData/>
+    {{-- hidden --}}
+    <x-input.hidden id="_subject_cd" :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">
@@ -34,7 +37,7 @@
             @if (request()->routeIs('master_mng_subject-edit'))
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
-                <x-button.submit-delete />
+                <x-button.submit-delete-validation />
                 <x-button.submit-edit />
             </div>
             @else
