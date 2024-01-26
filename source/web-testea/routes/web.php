@@ -1637,9 +1637,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/master_mng_campus/search', [MasterMngCampusController::class, 'search'])->name('master_mng_campus-search');
 
-    // 詳細取得用
-    //Route::post('/master_mng_campus/get_data', [MasterMngCampusController::class, 'getData'])->name('master_mng_campus-get_data');
-
     // 登録
     Route::get('/master_mng_campus/new', [MasterMngCampusController::class, 'new'])->name('master_mng_campus-new');
 
@@ -1647,7 +1644,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/master_mng_campus/create', [MasterMngCampusController::class, 'create'])->name('master_mng_campus-create');
 
     // 編集
-    Route::get('/master_mng_campus/edit/{campusId}', [MasterMngCampusController::class, 'edit'])->name('master_mng_campus-edit');
+    Route::get('/master_mng_campus/edit/{campusCd}', [MasterMngCampusController::class, 'edit'])->name('master_mng_campus-edit');
 
     // 編集処理
     Route::post('/master_mng_campus/update', [MasterMngCampusController::class, 'update'])->name('master_mng_campus-update');
