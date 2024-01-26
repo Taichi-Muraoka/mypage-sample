@@ -58,8 +58,8 @@ class BatchMng extends Model
      * @var array
      */
     protected $casts = [
-        'start_time' => 'date',
-        'end_time' => 'date',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
     ];
 
     /**

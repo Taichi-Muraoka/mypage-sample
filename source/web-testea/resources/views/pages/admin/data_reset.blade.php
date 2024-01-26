@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- カード --}}
-<x-bs.card :form=true>
+<x-bs.card>
 
     <p>保持期限超過データ削除処理の実行ログを確認します。<br>
         バックアップ出力ボタン押下で、削除されたデータをCSV形式でダウンロードできます。</p>
@@ -30,21 +30,16 @@
             <th>終了ステータス</th>
             <th width="15%"></th>
         </x-slot>
+
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/03/01 00:00</td>
-            <td>2023/03/01 00:05</td>
-            <td>正常終了</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmdHm(item.start_time)}}</td>
+            <td>@{{$filters.formatYmdHm(item.end_time)}}</td>
+            <td>@{{item.state_name}}</td>
             <td>
-                <x-button.submit-exec caption="バックアップ出力" icon="fas fa-download" />
-            </td>
-        </tr>
-        <tr>
-            <td>2022/03/01 00:00</td>
-            <td>2022/03/01 00:04</td>
-            <td>正常終了</td>
-            <td>
-                <x-button.submit-exec caption="バックアップ出力" icon="fas fa-download" />
+                <x-button.submit-href caption="バックアップ出力" icon="fas fa-download"
+                    vueHref="'{{ route('data_reset-download', '') }}/' + item.batch_id"
+                    vueDisabled="item.batch_state != {{ App\Consts\AppConst::CODE_MASTER_22_0 }}" />
             </td>
         </tr>
 
