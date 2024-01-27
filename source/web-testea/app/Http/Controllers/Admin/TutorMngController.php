@@ -287,10 +287,10 @@ class TutorMngController extends Controller
         $this->guardRoomAdminTid($tid);
 
         // 講師名を取得する
-        $teacher = $this->getTeacherName($tid);
+        $tutor_name = $this->mdlGetTeacherName($tid);
 
         return view('pages.admin.tutor_mng-salary', [
-            'teacher_name' => $teacher->name,
+            'tutor_name' => $tutor_name,
             // 検索用にIDを渡す
             'editData' => [
                 'tid' => $tid
@@ -306,7 +306,7 @@ class TutorMngController extends Controller
      */
     public function searchSalary(Request $request)
     {
-        // IDのバリデーション（講師No.）
+        // IDのバリデーション（講師ID）
         $this->validateIdsFromRequest($request, 'tid');
 
         // 教室管理者の場合、自校舎の講師のみにガードを掛ける
@@ -318,7 +318,7 @@ class TutorMngController extends Controller
             ->select(
                 'salary_date',
             )
-            ->where('tid', '=', $request->input('tid'))
+            ->where('tutor_id', '=', $request->input('tid'))
             ->orderBy('salary_date', 'desc');
 
         // ページネータで返却
@@ -338,7 +338,7 @@ class TutorMngController extends Controller
     /**
      * 詳細画面
      *
-     * @param int $tid 講師No.
+     * @param int $tid 講師ID
      * @param date $date 年月（YYYYMM）
      * @return view
      */
@@ -354,11 +354,13 @@ class TutorMngController extends Controller
         $dtlData = $this->getSalaryDetail($tid, $date);
 
         return view('pages.admin.tutor_mng-salary_detail', [
+            'salary_import' => $dtlData['salary_import'],
             'salary' => $dtlData['salary'],
             'salary_detail_1' => $dtlData['salary_detail_1'],
             'salary_detail_2' => $dtlData['salary_detail_2'],
+            'salary_detail_2_subtotal' => $dtlData['salary_detail_2_subtotal'],
             'salary_detail_3' => $dtlData['salary_detail_3'],
-            'salary_detail_4' => $dtlData['salary_detail_4'],
+            'salary_detail_3_subtotal' => $dtlData['salary_detail_3_subtotal'],
             // PDF用にIDを渡す
             'editData' => [
                 'tid' => $tid,
@@ -370,7 +372,7 @@ class TutorMngController extends Controller
     /**
      * PDF出力
      *
-     * @param int $tid 講師No.
+     * @param int $tid 講師ID
      * @param date $date 年月（YYYYMM）
      * @return void
      */
