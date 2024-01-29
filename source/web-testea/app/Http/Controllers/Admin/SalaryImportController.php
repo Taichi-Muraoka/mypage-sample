@@ -48,6 +48,10 @@ class SalaryImportController extends Controller
      */
     public function index()
     {
+        // 全体管理者でない場合は画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
 
         return view('pages.admin.salary_import');
     }

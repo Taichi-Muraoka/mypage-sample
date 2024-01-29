@@ -45,6 +45,11 @@ class SalaryCalculationController extends Controller
      */
     public function index()
     {
+        // 全体管理者でない場合は画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         return view('pages.admin.salary_calculation');
     }
 
@@ -195,6 +200,9 @@ class SalaryCalculationController extends Controller
                         // 月末を取得
                         $last_date = date('Y-m-d', strtotime('last day of ' . $idDate));
 
+                        // 翌月を取得
+                        $next_month = date('Y-m-d', strtotime('next month', strtotime($idDate)));
+
                         // スケジュール情報のクエリを作成
                         $schedule_query = Schedule::query()
                             ->whereNotNull('tutor_id')
@@ -205,6 +213,7 @@ class SalaryCalculationController extends Controller
                         $surcharge_query = Surcharge::query()
                             ->where('approval_status', AppConst::CODE_MASTER_2_1)
                             ->where('payment_status', AppConst::CODE_MASTER_27_0)
+                            ->where('payment_date', $next_month)
                             ->whereBetween('working_date', [$idDate, $last_date]);
 
                         // スケジュール情報取得し、授業時間カウントのサブクエリを作成
@@ -231,22 +240,23 @@ class SalaryCalculationController extends Controller
                             ->leftJoin('tutors', 'course_counts.tutor_id', '=', 'tutors.tutor_id')
                             ->get();
 
-                        // 追加請求集計
+                        // 追加請求のサブクエリを作成
                         $surcharge_sub_query = DB::table($surcharge_query)
                             ->select(
                                 'tutor_id',
                                 'surcharge_kind',
-                                'tuition'
                             )
                             ->selectRaw('SUM(minutes) as sum_minutes')
-                            ->groupBy('tutor_id');
+                            ->selectRaw('SUM(tuition) as sum_tuition')
+                            ->groupBy('tutor_id', 'surcharge_kind');
 
+                        // 追加請求集計
                         $surcharge_counts = DB::table($surcharge_sub_query, 'surcharge_counts')
                             ->select(
                                 'tutor_id',
                                 'surcharge_counts.surcharge_kind',
-                                'tuition',
                                 'sum_minutes',
+                                'sum_tuition',
                                 'mst_codes.sub_code as summary_kind',
                             )
                             // 給与算出種別の取得
@@ -267,7 +277,6 @@ class SalaryCalculationController extends Controller
                                 $salary_summary->hour_payment = $course_count->hourly_base_wage;
                             }
                             $salary_summary->hour = $this->conversion_time($course_count->sum_minutes);
-                            // $salary_summary->amount = 0;
                             // 保存
                             $salary_summary->save();
                         }
@@ -287,7 +296,7 @@ class SalaryCalculationController extends Controller
                                 $salary_summary->hour_payment = $hourly_wage->value_num;
                             }
                             $salary_summary->hour = $this->conversion_time($surcharge_count->sum_minutes);
-                            $salary_summary->amount = $surcharge_count->tuition;
+                            $salary_summary->amount = $surcharge_count->sum_tuition;
                             // 保存
                             $salary_summary->save();
                         }
@@ -298,7 +307,7 @@ class SalaryCalculationController extends Controller
                                 'tutor_id',
                                 'campus_cd'
                             )
-                            ->selectRaw('COUNT(schedule_id) as goto_office')
+                            ->selectRaw('COUNT(DISTINCT target_date) as goto_office')
                             ->groupBy('tutor_id', 'campus_cd');
 
                         // 交通費を取得
@@ -309,7 +318,6 @@ class SalaryCalculationController extends Controller
                                 'goto_office',
                                 'tutor_campuses.travel_cost as travel_cost'
                             )
-                            // ->selectRaw('COUNT(travel_costs.tutor_id) as seq')
                             // 講師・校舎別に交通費を取得
                             ->join('tutor_campuses', function ($join) {
                                 $join->on('travel_costs.tutor_id', '=', 'tutor_campuses.tutor_id')
@@ -373,13 +381,10 @@ class SalaryCalculationController extends Controller
                         $surcharges = Surcharge::query()
                             ->where('approval_status', AppConst::CODE_MASTER_2_1)
                             ->where('payment_status', AppConst::CODE_MASTER_27_0)
-                            ->whereBetween('working_date', [$idDate, $last_date]);
-
-                        // 当月を取得
-                        $next_month = date('Y-m', strtotime('+1 month'));
+                            ->whereBetween('working_date', [$idDate, $last_date])
+                            ->get();
 
                         foreach ($surcharges as $surcharge) {
-                            $surcharge->payment_date = $next_month;
                             $surcharge->payment_status = AppConst::CODE_MASTER_27_1;
                             $surcharge->save();
                         }
