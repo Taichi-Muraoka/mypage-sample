@@ -888,7 +888,7 @@ trait CtrlModelTrait
         }
 
         // 翌年度分 特別期間コード生成 春期のみ
-        $seasonCodes[] = $currentYear->value_num + 1 . $term->gen_item1;
+        $seasonCodes[] = $currentYear->value_num + 1 . $termList[0]->gen_item1;
 
         return $seasonCodes;
     }
