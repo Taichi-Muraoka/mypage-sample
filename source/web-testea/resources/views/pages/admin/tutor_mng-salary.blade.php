@@ -10,7 +10,7 @@
 {{-- 結果リスト --}}
 <x-bs.card>
     <x-slot name="card_title">
-        {{$teacher_name}}
+        {{$tutor_name}}
     </x-slot>
     <x-bs.card-list>
 
@@ -28,10 +28,11 @@
 
             {{-- テーブル行 --}}
             <tr v-for="item in paginator.data" v-cloak>
-                {{-- <td>@{{$filters.formatYmString(item.salary_date)}}分給与</td> --}}
-                <td>2023年7月分給与</td>
+                <td>@{{$filters.formatYmString(item.salary_date)}}分給与</td>
                 <td>
-                    <x-button.list-dtl vueHref="'{{ route('tutor_mng-detail_salary', ['tid' => $editData['tid'], '']) }}/' + item.tid" caption="給与情報" />
+                    <x-button.list-dtl
+                        vueHref="'{{ route('tutor_mng-detail_salary', ['tid' => $editData['tid'], '']) }}/' + item.tid"
+                        caption="給与情報" />
                 </td>
             </tr>
 
