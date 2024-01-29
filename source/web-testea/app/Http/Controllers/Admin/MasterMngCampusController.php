@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
+use App\Libs\AuthEx;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
 use App\Models\CodeMaster;
@@ -39,6 +40,11 @@ class MasterMngCampusController extends Controller
      */
     public function index()
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         return view('pages.admin.master_mng_campus');
     }
 
@@ -50,6 +56,11 @@ class MasterMngCampusController extends Controller
      */
     public function search(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // データを取得
         $mstCampus = MstCampus::select(
             'mst_campuses.campus_cd',
@@ -83,6 +94,11 @@ class MasterMngCampusController extends Controller
      */
     public function new()
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 非表示フラグリストを取得
         $hiddenFlagList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_11);
 
@@ -101,6 +117,11 @@ class MasterMngCampusController extends Controller
      */
     public function create(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
@@ -182,6 +203,11 @@ class MasterMngCampusController extends Controller
      */
     public function edit($campusCd)
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 非表示フラグリストを取得
         $hiddenFlagList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_11);
 
@@ -215,6 +241,11 @@ class MasterMngCampusController extends Controller
      */
     public function update(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
@@ -246,6 +277,11 @@ class MasterMngCampusController extends Controller
      */
     public function delete(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 校舎コードのバリデーション
         $this->validateIdsFromRequest($request, '_campus_cd');
 
