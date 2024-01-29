@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
+use App\Libs\AuthEx;
 use App\Models\CodeMaster;
 use Illuminate\Support\Facades\Lang;
 use App\Models\MstGradeSubject;
@@ -35,6 +36,11 @@ class MasterMngGradeSubjectController extends Controller
      */
     public function index()
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         return view('pages.admin.master_mng_grade_subject');
     }
 
@@ -46,6 +52,11 @@ class MasterMngGradeSubjectController extends Controller
      */
     public function search(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // データを取得
         $mstGradeSubject = MstGradeSubject::select(
             'mst_grade_subjects.g_subject_cd',
@@ -76,6 +87,11 @@ class MasterMngGradeSubjectController extends Controller
      */
     public function new()
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 学校区分リストを取得
         $schoolKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_39);
 
@@ -94,6 +110,11 @@ class MasterMngGradeSubjectController extends Controller
      */
     public function create(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
@@ -119,6 +140,11 @@ class MasterMngGradeSubjectController extends Controller
      */
     public function edit($gradeSubjectCd)
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 学校区分リストを取得
         $schoolKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_39);
 
@@ -148,6 +174,11 @@ class MasterMngGradeSubjectController extends Controller
      */
     public function update(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
@@ -176,6 +207,11 @@ class MasterMngGradeSubjectController extends Controller
      */
     public function delete(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 削除前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForDelete($request))->validate();
 
