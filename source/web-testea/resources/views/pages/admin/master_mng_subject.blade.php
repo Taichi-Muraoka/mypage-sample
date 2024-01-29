@@ -7,40 +7,28 @@
 <x-bs.card-list>
 
 	{{-- カードヘッダ右 --}}
-    <x-slot name="tools">
-        <x-button.new href="{{ route('master_mng_subject-new') }}" :small=true />
-    </x-slot>
+	<x-slot name="tools">
+		<x-button.new href="{{ route('master_mng_subject-new') }}" :small=true />
+	</x-slot>
 
 	{{-- テーブル --}}
-    <x-bs.table :button=true>
+	<x-bs.table :button=true>
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
-			<th width="45%">科目コード</th>
-			<th width="45%">名称</th>
-			<th width="7%"></th>
+			<th>科目コード</th>
+			<th>名称</th>
+			<th>略称</th>
+			<th></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}
-		<tr>
-			<td>101</td>
-			<td>英語</td>
+		<tr v-for="item in paginator.data" v-cloak>
+			<td>@{{item.subject_cd}}</td>
+			<td>@{{item.name}}</td>
+			<td>@{{item.short_name}}</td>
 			<td>
-                <x-button.list-edit href="{{ route('master_mng_subject-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>102</td>
-			<td>数学</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_subject-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>103</td>
-			<td>算数</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_subject-edit',1) }}" />
+				<x-button.list-edit vueHref="'{{ route('master_mng_subject-edit', '') }}/' + item.subject_cd" />
 			</td>
 		</tr>
 

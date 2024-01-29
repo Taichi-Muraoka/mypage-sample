@@ -1763,9 +1763,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/master_mng_subject/search', [MasterMngSubjectController::class, 'search'])->name('master_mng_subject-search');
 
-    // 詳細取得用
-    //Route::post('/master_mng_subject/get_data', [MasterMngSubjectController::class, 'getData'])->name('master_mng_subject-get_data');
-
     // 登録
     Route::get('/master_mng_subject/new', [MasterMngSubjectController::class, 'new'])->name('master_mng_subject-new');
 
@@ -1783,6 +1780,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/master_mng_subject/delete', [MasterMngSubjectController::class, 'delete'])->name('master_mng_subject-delete');
+
+    // バリデーション(削除用)
+    Route::post('/master_mng_subject/vd_delete', [MasterMngSubjectController::class, 'validationForDelete'])->name('master_mng_subject-vd_delete');
 
     //---------------------
     // 成績科目マスタ
