@@ -22,13 +22,13 @@
     @endif
 
     {{-- 共通フォーム --}}
-    <x-input.text caption="成績科目コード" id="g_subject_cd" :rules=$rules :editData=$editData/>
-    <x-input.select caption="学校区分" id="school_kind" :select2=true :editData=$editData>
-        <option value="1">小学校</option>
-        <option value="2">中学校</option>
-        <option value="3">高校</option>
-    </x-input.select>
-    <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData/>
+    <x-input.text caption="成績科目コード" id="g_subject_cd" :rules=$rules :editData=$editData />
+    <x-input.select id="school_kind" caption="学校区分" :select2=true :mastrData=$schoolKindList :editData=$editData
+        :select2Search=false :blank=false />
+    <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData />
+
+    {{-- hidden --}}
+    <x-input.hidden id="_g_subject_cd" :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">
@@ -38,7 +38,7 @@
             @if (request()->routeIs('master_mng_grade_subject-edit'))
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
-                <x-button.submit-delete />
+                <x-button.submit-delete-validation />
                 <x-button.submit-edit />
             </div>
             @else

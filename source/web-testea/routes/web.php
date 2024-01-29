@@ -1793,9 +1793,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/master_mng_grade_subject/search', [MasterMngGradeSubjectController::class, 'search'])->name('master_mng_grade_subject-search');
 
-    // 詳細取得用
-    //Route::post('/master_mng_grade_subject/get_data', [MasterMngGradeSubjectController::class, 'getData'])->name('master_mng_grade_subject-get_data');
-
     // 登録
     Route::get('/master_mng_grade_subject/new', [MasterMngGradeSubjectController::class, 'new'])->name('master_mng_grade_subject-new');
 
@@ -1813,6 +1810,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/master_mng_grade_subject/delete', [MasterMngGradeSubjectController::class, 'delete'])->name('master_mng_grade_subject-delete');
+
+    // バリデーション(削除用)
+    Route::post('/master_mng_grade_subject/vd_delete', [MasterMngGradeSubjectController::class, 'validationForDelete'])->name('master_mng_grade_subject-vd_delete');
 
     //---------------------
     // 授業教材マスタ

@@ -7,12 +7,12 @@
 <x-bs.card-list>
 
 	{{-- カードヘッダ右 --}}
-    <x-slot name="tools">
-        <x-button.new href="{{ route('master_mng_grade_subject-new') }}" :small=true />
-    </x-slot>
+	<x-slot name="tools">
+		<x-button.new href="{{ route('master_mng_grade_subject-new') }}" :small=true />
+	</x-slot>
 
 	{{-- テーブル --}}
-    <x-bs.table :button=true>
+	<x-bs.table :button=true>
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
@@ -23,60 +23,13 @@
 		</x-slot>
 
 		{{-- テーブル行 --}}
-		<tr>
-			<td>001</td>
-			<td>小学校</td>
-			<td>国語</td>
+		<tr v-for="item in paginator.data" v-cloak>
+			<td>@{{item.g_subject_cd}}</td>
+			<td>@{{item.school_kind_name}}</td>
+			<td>@{{item.name}}</td>
 			<td>
-                <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>002</td>
-			<td>小学校</td>
-			<td>算数</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>003</td>
-			<td>小学校</td>
-			<td>理科</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>004</td>
-			<td>小学校</td>
-			<td>社会</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>005</td>
-			<td>小学校</td>
-			<td>英語</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>110</td>
-			<td>中学校</td>
-			<td>数学</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>259</td>
-			<td>高校</td>
-			<td>数A</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_grade_subject-edit',1) }}" />
+				{{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
+				<x-button.list-edit vueHref="'{{ route('master_mng_grade_subject-edit', '') }}/' + item.g_subject_cd" />
 			</td>
 		</tr>
 
