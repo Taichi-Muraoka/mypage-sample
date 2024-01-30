@@ -114,5 +114,26 @@ class MstUnitCategory extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
-
+    /**
+     * 検索 学年コード
+     */
+    public function scopeSearchGradeCd($query, $obj)
+    {
+        $key = 'grade_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 教科科目コード
+     */
+    public function scopeSearchSubjectCd($query, $obj)
+    {
+        $key = 't_subject_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 }

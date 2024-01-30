@@ -1862,9 +1862,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/master_mng_category/search', [MasterMngCategoryController::class, 'search'])->name('master_mng_category-search');
 
-    // 詳細取得用
-    //Route::post('/master_mng_category/get_data', [MasterMngCategoryController::class, 'getData'])->name('master_mng_category-get_data');
-
     // 登録
     Route::get('/master_mng_category/new', [MasterMngCategoryController::class, 'new'])->name('master_mng_category-new');
 
@@ -1882,6 +1879,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/master_mng_category/delete', [MasterMngCategoryController::class, 'delete'])->name('master_mng_category-delete');
+
+    // バリデーション(削除用)
+    Route::post('/master_mng_category/vd_delete', [MasterMngCategoryController::class, 'validationForDelete'])->name('master_mng_category-vd_delete');
 
     //---------------------
     // 授業単元マスタ
