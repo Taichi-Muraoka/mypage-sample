@@ -7,34 +7,26 @@
 {{-- 検索フォーム --}}
 <x-bs.card :search=true>
 
-    <x-bs.row>
-        <x-bs.col2>
-            <x-input.select id="cls_cd" caption="学年" :select2=true >
-                <option value="1">中1</option>
-                <option value="2">中2</option>
-                <option value="3">中3</option>
-                <option value="4">高1</option>
-                <option value="5">高2</option>
-                <option value="6">高3</option>
-            </x-input.select>
-        </x-bs.col2>
-		<x-bs.col2>
-            <x-input.select id="t_subject_cd" caption="教材科目" :select2=true >
-                <option value="1">英語</option>
-                <option value="2">数学</option>
-                <option value="3">国語</option>
-            </x-input.select>
-        </x-bs.col2>
-    </x-bs.row>
 	<x-bs.row>
 		<x-bs.col2>
-            <x-input.select id="t_subject_cd" caption="単元分類" :select2=true >
-                <option value="1">正負の数</option>
-                <option value="2">方程式</option>
-                <option value="3">一次関数</option>
-            </x-input.select>
-        </x-bs.col2>
-    </x-bs.row>
+			<x-input.select id="grade_cd" caption="学年" :select2=true onChange="selectChangeGetCategory"
+				:mastrData=$grades :editData=$editData :select2Search=false :blank=true />
+		</x-bs.col2>
+		<x-bs.col2>
+			<x-input.select id="t_subject_cd" caption="教材科目" :select2=true onChange="selectChangeGetCategory"
+				:mastrData=$subjects :editData=$editData :select2Search=false :blank=true />
+		</x-bs.col2>
+	</x-bs.row>
+	<x-bs.row>
+		<x-bs.col2>
+			<x-input.select id="unit_category_cd" caption="単元分類" :select2=true :editData=$editData :select2Search=true
+				:blank=true>
+				<option v-for="item in selectGetItemCategory.categories" :value="item.code">
+					@{{ item.value }}
+				</option>
+			</x-input.select>
+		</x-bs.col2>
+	</x-bs.row>
 
 </x-bs.card>
 
@@ -42,52 +34,33 @@
 <x-bs.card-list>
 
 	{{-- カードヘッダ右 --}}
-    <x-slot name="tools">
-        <x-button.new href="{{ route('master_mng_unit-new') }}" :small=true />
-    </x-slot>
+	<x-slot name="tools">
+		<x-button.new href="{{ route('master_mng_unit-new') }}" :small=true />
+	</x-slot>
 
 	{{-- テーブル --}}
 	<x-bs.table :button=true>
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
-			<th width="10%">学年</th>
-			<th width="10%">教材科目</th>
+			<th>学年</th>
+			<th>教材科目</th>
 			<th>単元分類</th>
-			<th width="15%">単元コード</th>
+			<th>単元コード</th>
 			<th>名称</th>
-			<th width="7%"></th>
+			<th></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}
-		<tr>
-			<td>中1</td>
-			<td>数学</td>
-			<td>正負の数</td>
-			<td>01</td>
-			<td>負の数とは</td>
+		<tr v-for="item in paginator.data" v-cloak>
+			<td>@{{item.grade_name}}</td>
+			<td>@{{item.subject_name}}</td>
+			<td>@{{item.category_name}}</td>
+			<td>@{{item.unit_cd}}</td>
+			<td>@{{item.name}}</td>
 			<td>
-                <x-button.list-edit href="{{ route('master_mng_unit-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>中1</td>
-			<td>数学</td>
-			<td>正負の数</td>
-			<td>99</td>
-			<td>その他</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_unit-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>中1</td>
-			<td>数学</td>
-			<td>方程式</td>
-			<td>01</td>
-			<td>方程式とは</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_unit-edit',1) }}" />
+				{{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
+				<x-button.list-edit vueHref="'{{ route('master_mng_unit-edit', '') }}/' + item.unit_id" />
 			</td>
 		</tr>
 

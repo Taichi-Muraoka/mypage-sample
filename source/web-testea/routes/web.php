@@ -1889,14 +1889,14 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 一覧
     Route::get('/master_mng_unit', [MasterMngUnitController::class, 'index'])->name('master_mng_unit');
 
+    // 学年または教材科目プルダウン選択時、単元分類リストを返却する
+    Route::post('/master_mng_unit/get_data_select_category', [MasterMngUnitController::class, 'getDataSelectCategory'])->name('master_mng_unit-get_data_select_category');
+
     // バリデーション(検索用)
     Route::post('/master_mng_unit/vd_search', [MasterMngUnitController::class, 'validationForSearch'])->name('master_mng_unit-vd_search');
 
     // 検索結果取得
     Route::post('/master_mng_unit/search', [MasterMngUnitController::class, 'search'])->name('master_mng_unit-search');
-
-    // 詳細取得用
-    //Route::post('/master_mng_unit/get_data', [MasterMngUnitController::class, 'getData'])->name('master_mng_unit-get_data');
 
     // 登録
     Route::get('/master_mng_unit/new', [MasterMngUnitController::class, 'new'])->name('master_mng_unit-new');
