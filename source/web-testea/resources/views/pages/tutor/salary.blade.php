@@ -8,7 +8,7 @@
 <x-bs.card-list>
 
     {{-- テーブル --}}
-    <x-bs.table :button=true>
+    <x-bs.table :button=true :smartPhone=true>
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
@@ -18,8 +18,7 @@
 
         {{-- テーブル行 --}}
         <tr v-for="item in paginator.data" v-cloak>
-            {{-- <td>@{{$filters.formatYmString(item.salary_date)}}分給与</td> --}}
-            <td>2023年7月分給与</td>
+            <x-bs.td-sp caption="給与年月">@{{$filters.formatYmString(item.salary_date)}}分給与</x-bs.td-sp>
             <td>
                 <x-button.list-dtl vueHref="'{{ route('salary-detail', '') }}/' + item.id" caption="給与情報" />
             </td>
