@@ -397,6 +397,8 @@ class SalaryCalculationController extends Controller
                     // 結果を取得
                     ->get();
 
+                $this->debug($details);
+
                 //---------------------
                 // CSV出力内容を配列に保持
                 //---------------------
@@ -413,6 +415,7 @@ class SalaryCalculationController extends Controller
                     $arrayCsv[] = [
                         $data->tutor_id,
                         $data->tutor_name,
+                        $data->hourly_base_wage,
                         $data->hour_personal,
                         $data->hour_two,
                         $data->hour_three,
