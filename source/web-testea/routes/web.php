@@ -562,7 +562,7 @@ use App\Http\Controllers\Admin\MasterMngTextController;
 use App\Http\Controllers\Admin\MasterMngCategoryController;
 use App\Http\Controllers\Admin\MasterMngUnitController;
 use App\Http\Controllers\Admin\MasterMngSystemController;
-use App\Http\Controllers\Admin\AllMemberImportController;
+use App\Http\Controllers\Admin\GradeUpdateController;
 use App\Http\Controllers\Admin\TransferResetController;
 use App\Http\Controllers\Admin\DataResetController;
 use App\Http\Controllers\Admin\ImportSchoolCodeController;
@@ -1941,20 +1941,14 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/master_mng_system/vd_input', [MasterMngSystemController::class, 'validationForInput'])->name('master_mng_system-vd_input');
 
     //----------------------
-    // 生徒学年情報更新
+    // 学年更新管理
     //----------------------
 
-    // 取込
-    Route::get('/all_member_import', [AllMemberImportController::class, 'index'])->name('all_member_import');
-
-    // 取込処理
-    Route::post('/all_member_import/create', [AllMemberImportController::class, 'create'])->name('all_member_import-create');
-
-    // バリデーション(取込用)
-    Route::post('/all_member_import/vd_input', [AllMemberImportController::class, 'validationForInput'])->name('all_member_import-vd_input');
+    // 一覧
+    Route::get('/grade_update', [GradeUpdateController::class, 'index'])->name('grade_update');
 
     // 検索結果取得
-    Route::post('/all_member_import/search', [AllMemberImportController::class, 'search'])->name('all_member_import-search');
+    Route::post('/grade_update/search', [GradeUpdateController::class, 'search'])->name('grade_update-search');
 
     //----------------------
     // 振替残数リセット処理
