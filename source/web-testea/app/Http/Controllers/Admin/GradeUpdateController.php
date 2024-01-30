@@ -10,9 +10,9 @@ use App\Consts\AppConst;
 use App\Libs\AuthEx;
 
 /**
- * 学年情報取込 - コントローラ
+ * 学年更新 - コントローラ
  */
-class AllMemberImportController extends Controller
+class GradeUpdateController extends Controller
 {
     /**
      * コンストラクタ
@@ -73,9 +73,7 @@ class AllMemberImportController extends Controller
             return $this->illegalResponseErr();
         }
 
-        return view('pages.admin.all_member_import', [
-            'editData' => ["this_year"=>"2022","next_year"=>"2023"]
-        ]);
+        return view('pages.admin.grade_update');
     }
 
 }

@@ -14,9 +14,9 @@ use Carbon\Carbon;
 use App\Consts\AppConst;
 
 /**
- * 学年情報取込 - バッチ処理
+ * 学年更新 - バッチ処理
  */
-class AllMemberImport extends Command
+class GradeUpdate extends Command
 {
 
     // 年度取得用
@@ -27,7 +27,7 @@ class AllMemberImport extends Command
      *
      * @var string
      */
-    protected $signature = 'command:allMemberImport';
+    protected $signature = 'command:gradeUpdate';
 
     /**
      * The console command description.
@@ -55,7 +55,7 @@ class AllMemberImport extends Command
     public function handle()
     {
         try {
-            Log::info("Batch allMemberImport Start.");
+            Log::info("Batch gradeUpdate Start.");
 
             $now = Carbon::now();
 
@@ -75,7 +75,7 @@ class AllMemberImport extends Command
                 ->firstOrFail();
 
             // 生徒情報を取得
-            $students = Student::whereNotIn('grade_cd', [13, 14, 15, 16])
+            $students = Student::where('grade_cd', '<=', AppConst::GRADE_CD_12)
                 ->select(
                     'student_id',
                     'birth_date',
@@ -94,6 +94,12 @@ class AllMemberImport extends Command
                 $system->value_num = $system->value_num + 1;
                 $system->save();
 
+                // 新年度の年齢での学年を取得
+                $grade_age = MstGrade::whereNot('age', 0)
+                    ->select('grade_cd', 'age')
+                    ->get()
+                    ->keyBy('age');
+
                 // 生徒の学年更新
                 foreach ($students as $student) {
                     // 誕生日
@@ -102,13 +108,17 @@ class AllMemberImport extends Command
                     // 年齢
                     $age = floor(($next_year_start_date - $birthday) / 10000);
 
-                    // 新年度の年齢での学年を取得
-                    $grade_age = MstGrade::where('age', $age)
-                        ->select('grade_cd', 'age')
-                        ->firstOrFail();
+                    // 次年度が19歳以上で現高3の生徒は大学生
+                    if ($student->grade_cd == AppConst::GRADE_CD_12 && $age > AppConst::GRADE_CD_12_AGE) {
+                        $next_grade_cd = AppConst::GRADE_CD_16;
+                    }
+                    else {
+                        // 次年度の年齢
+                        $next_grade_cd = $grade_age[$age]['grade_cd'];
+                    }
 
                     // 学年コード更新
-                    $student->grade_cd = $grade_age->grade_cd;
+                    $student->grade_cd = $next_grade_cd;
                     // 学年設定年度更新
                     $student->grade_year = $system->value_num;
                     // 更新
@@ -124,7 +134,7 @@ class AllMemberImport extends Command
                         'updated_at' => $end
                     ]);
 
-                Log::info("allMemberImport Succeeded.");
+                Log::info("gradeUpdate Succeeded.");
             });
         } catch (\Exception  $e) {
             // バッチ管理テーブルのレコードを更新：異常終了

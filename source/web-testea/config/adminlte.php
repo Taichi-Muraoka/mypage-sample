@@ -793,8 +793,8 @@ return [
             'submenu' => [
                 [
                     'text' => '学年更新管理',
-                    'route' => 'all_member_import',
-                    'active' => ['all_member_import*']
+                    'route' => 'grade_update',
+                    'active' => ['grade_update*']
                 ],
                 [
                     'text' => '振替残数リセット',
