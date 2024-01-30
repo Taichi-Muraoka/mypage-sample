@@ -342,7 +342,7 @@ class SalaryCalculationController extends Controller
                 } catch (\Exception  $e) {
                     // この時点では補足できないエラーとして、詳細は返さずエラーとする
                     Log::error($e);
-                    return $this->responseErr();
+                    return $this->illegalResponseErr();
                 }
 
                 return;
@@ -381,7 +381,7 @@ class SalaryCalculationController extends Controller
                 } catch (\Exception  $e) {
                     // この時点では補足できないエラーとして、詳細は返さずエラーとする
                     Log::error($e);
-                    return $this->responseErr();
+                    return $this->illegalResponseErr();
                 }
                 return;
             case "#modal-dtl-output":
