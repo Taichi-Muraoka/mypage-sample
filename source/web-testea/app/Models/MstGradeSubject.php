@@ -102,8 +102,8 @@ class MstGradeSubject extends Model
     {
         static $_fieldRules = [
             'g_subject_cd' => ['string', 'max:3', 'digits:3'],
-            'usage_kind' => ['integer'],
-            'name' => ['string', 'max:50'],
+            'school_kind' => ['integer'],
+            'name' => ['string', 'max:30'],
         ];
         return $_fieldRules;
     }

@@ -1643,9 +1643,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/master_mng_campus/search', [MasterMngCampusController::class, 'search'])->name('master_mng_campus-search');
 
-    // 詳細取得用
-    //Route::post('/master_mng_campus/get_data', [MasterMngCampusController::class, 'getData'])->name('master_mng_campus-get_data');
-
     // 登録
     Route::get('/master_mng_campus/new', [MasterMngCampusController::class, 'new'])->name('master_mng_campus-new');
 
@@ -1653,7 +1650,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/master_mng_campus/create', [MasterMngCampusController::class, 'create'])->name('master_mng_campus-create');
 
     // 編集
-    Route::get('/master_mng_campus/edit/{campusId}', [MasterMngCampusController::class, 'edit'])->name('master_mng_campus-edit');
+    Route::get('/master_mng_campus/edit/{campusCd}', [MasterMngCampusController::class, 'edit'])->name('master_mng_campus-edit');
 
     // 編集処理
     Route::post('/master_mng_campus/update', [MasterMngCampusController::class, 'update'])->name('master_mng_campus-update');
@@ -1772,9 +1769,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/master_mng_subject/search', [MasterMngSubjectController::class, 'search'])->name('master_mng_subject-search');
 
-    // 詳細取得用
-    //Route::post('/master_mng_subject/get_data', [MasterMngSubjectController::class, 'getData'])->name('master_mng_subject-get_data');
-
     // 登録
     Route::get('/master_mng_subject/new', [MasterMngSubjectController::class, 'new'])->name('master_mng_subject-new');
 
@@ -1793,6 +1787,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 削除処理
     Route::post('/master_mng_subject/delete', [MasterMngSubjectController::class, 'delete'])->name('master_mng_subject-delete');
 
+    // バリデーション(削除用)
+    Route::post('/master_mng_subject/vd_delete', [MasterMngSubjectController::class, 'validationForDelete'])->name('master_mng_subject-vd_delete');
+
     //---------------------
     // 成績科目マスタ
     //---------------------
@@ -1801,9 +1798,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 検索結果取得
     Route::post('/master_mng_grade_subject/search', [MasterMngGradeSubjectController::class, 'search'])->name('master_mng_grade_subject-search');
-
-    // 詳細取得用
-    //Route::post('/master_mng_grade_subject/get_data', [MasterMngGradeSubjectController::class, 'getData'])->name('master_mng_grade_subject-get_data');
 
     // 登録
     Route::get('/master_mng_grade_subject/new', [MasterMngGradeSubjectController::class, 'new'])->name('master_mng_grade_subject-new');
@@ -1822,6 +1816,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/master_mng_grade_subject/delete', [MasterMngGradeSubjectController::class, 'delete'])->name('master_mng_grade_subject-delete');
+
+    // バリデーション(削除用)
+    Route::post('/master_mng_grade_subject/vd_delete', [MasterMngGradeSubjectController::class, 'validationForDelete'])->name('master_mng_grade_subject-vd_delete');
 
     //---------------------
     // 授業教材マスタ
@@ -1871,9 +1868,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/master_mng_category/search', [MasterMngCategoryController::class, 'search'])->name('master_mng_category-search');
 
-    // 詳細取得用
-    //Route::post('/master_mng_category/get_data', [MasterMngCategoryController::class, 'getData'])->name('master_mng_category-get_data');
-
     // 登録
     Route::get('/master_mng_category/new', [MasterMngCategoryController::class, 'new'])->name('master_mng_category-new');
 
@@ -1891,6 +1885,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
     // 削除処理
     Route::post('/master_mng_category/delete', [MasterMngCategoryController::class, 'delete'])->name('master_mng_category-delete');
+
+    // バリデーション(削除用)
+    Route::post('/master_mng_category/vd_delete', [MasterMngCategoryController::class, 'validationForDelete'])->name('master_mng_category-vd_delete');
 
     //---------------------
     // 授業単元マスタ
@@ -1979,17 +1976,14 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 保持期限超過データ削除管理
     //----------------------
 
-    // 取込
+    // 一覧
     Route::get('/data_reset', [DataResetController::class, 'index'])->name('data_reset');
-
-    // 取込処理
-    Route::post('/data_reset/create', [DataResetController::class, 'create'])->name('data_reset-create');
-
-    // バリデーション(取込用)
-    Route::post('/data_reset/vd_input', [DataResetController::class, 'validationForInput'])->name('data_reset-vd_input');
 
     // 検索結果取得
     Route::post('/data_reset/search', [DataResetController::class, 'search'])->name('data_reset-search');
+
+    // バックアップのダウンロード
+    Route::get('/data_reset/download/{batchId}', [DataResetController::class, 'download'])->name('data_reset-download');
 
     //---------------------
     // 学校コード取込

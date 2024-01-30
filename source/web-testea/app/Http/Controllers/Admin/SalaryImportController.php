@@ -126,15 +126,19 @@ class SalaryImportController extends Controller
         }
 
         // 給与情報取込を取得
-        $salary_import = SalaryImport::select('salary_date')
+        $salary_import = SalaryImport::select('salary_date', 'payment_date')
             ->where('salary_date', '=', $idDate)
             ->firstOrFail();
+
+        // 支給日を取得
+        $payment_date = $salary_import->payment_date;
 
         return view('pages.admin.salary_import-import', [
             'rules' => $this->rulesForInput(),
             'salary_import' => $salary_import,
             'editData' => [
-                'salaryDate' => $salaryDate
+                'salaryDate' => $salaryDate,
+                'payment_date' => $payment_date
             ]
         ]);
     }
@@ -154,6 +158,9 @@ class SalaryImportController extends Controller
 
         // アップロードされたかチェック(アップロードされた場合は該当の項目にファイル名をセットする)
         $this->fileUploadSetVal($request, 'upload_file');
+
+        // 支給日取得
+        $payment_date = $request->input('payment_date');
 
         // バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput())->validate();
@@ -188,7 +195,7 @@ class SalaryImportController extends Controller
 
         try {
             // トランザクション(例外時は自動的にロールバック)
-            DB::transaction(function () use ($datas, $idDate) {
+            DB::transaction(function () use ($datas, $idDate, $payment_date) {
 
                 //==========================
                 // 既存データ削除
@@ -245,6 +252,7 @@ class SalaryImportController extends Controller
 
                 // 該当する給与情報取込を更新する
                 $salaryImport = SalaryImport::where('salary_date', '=', $idDate)->firstOrFail();
+                $salaryImport->payment_date = $payment_date;
                 $salaryImport->import_state = AppConst::CODE_MASTER_20_1;
                 $salaryImport->import_date = $datas['import_date'];
                 $salaryImport->save();
@@ -636,6 +644,8 @@ class SalaryImportController extends Controller
         $rules = array();
 
         $rules += ['salaryDate' => ['integer', 'required']];
+
+        $rules += ['payment_date' => ['date_format:Y-m-d' ,'required']];
 
         // ファイルアップロードの必須チェック
         $rules += ['upload_file' => ['required']];

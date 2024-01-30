@@ -208,6 +208,16 @@ return [
      */
     "db_backup_dir" => 'db_backup/',
 
+    /**
+     * 保持期限超過データバックアップ先
+     */
+    "exceeding_data_backup_dir" => "exceeding_data_backup/",
+
+    /**
+     * 保持期限超過データバックアップzipファイル名
+     */
+    "exceeding_data_backup_zip_filename" => "保持期限超過データ削除バックアップ_",
+
     //==========================
     // 画面ごと設定
     // マスタなどに持たないような設定
@@ -341,4 +351,10 @@ return [
      * 面談時間
      */
     "conference_time" => 60,
+
+    /**
+     * 給与明細表示
+     * item_name
+     */
+    "subtotal_withholding" => '源泉計算用小計',
 ];

@@ -56,7 +56,7 @@ class MstSubject extends Model
      * @var array
      */
     protected $casts = [
-        'campus_cd' => 'string'
+        'subject_cd' => 'string'
     ];
 
     /**
@@ -101,7 +101,7 @@ class MstSubject extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'campus_cd' => ['string', 'max:3', 'digits:3'],
+            'subject_cd' => ['string', 'max:3', 'digits:3'],
             'name' => ['string', 'max:30'],
             'short_name' => ['string', 'max:10']
         ];
