@@ -273,14 +273,14 @@ export default class PageInputForm extends PageComponentBase {
                 const key = fileElement.id;
 
                 // ファイルを取得(1つのinput fileで複数選択しないので0しか無いはず)
-                for (var i = 0; i < fileElement.files.length; i++) {
+                for (var j = 0; j < fileElement.files.length; j++) {
                     // フラグ(アップロードするファイルがある場合)
                     existFile = true;
 
                     // ファイルを取得
-                    const file = fileElement.files[i];
+                    const file = fileElement.files[j];
 
-                    // MEMO: 複数ファイル選択に対応する場合は、i番目を追加しないといけないはず
+                    // MEMO: 複数ファイル選択に対応する場合は、j番目を追加しないといけないはず
                     formData.append(key, file);
                 }
             }
