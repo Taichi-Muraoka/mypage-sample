@@ -213,8 +213,7 @@ class SalaryCalculationController extends Controller
                         $surcharge_query = Surcharge::query()
                             ->where('approval_status', AppConst::CODE_MASTER_2_1)
                             ->where('payment_status', AppConst::CODE_MASTER_27_0)
-                            ->where('payment_date', $next_month)
-                            ->whereBetween('working_date', [$idDate, $last_date]);
+                            ->where('payment_date', $next_month);
 
                         // スケジュール情報取得し、授業時間カウントのサブクエリを作成
                         $schedule_sub_query = DB::table($schedule_query)
@@ -240,30 +239,20 @@ class SalaryCalculationController extends Controller
                             ->leftJoin('tutors', 'course_counts.tutor_id', '=', 'tutors.tutor_id')
                             ->get();
 
-                        // 追加請求のサブクエリを作成
-                        $surcharge_sub_query = DB::table($surcharge_query)
+                        // 追加請求集計
+                        $surcharge_counts = DB::table($surcharge_query)
                             ->select(
                                 'tutor_id',
-                                'surcharge_kind',
+                                'mst_codes.sub_code as summary_kind'
                             )
                             ->selectRaw('SUM(minutes) as sum_minutes')
                             ->selectRaw('SUM(tuition) as sum_tuition')
-                            ->groupBy('tutor_id', 'surcharge_kind');
-
-                        // 追加請求集計
-                        $surcharge_counts = DB::table($surcharge_sub_query, 'surcharge_counts')
-                            ->select(
-                                'tutor_id',
-                                'surcharge_counts.surcharge_kind',
-                                'sum_minutes',
-                                'sum_tuition',
-                                'mst_codes.sub_code as summary_kind',
-                            )
                             // 給与算出種別の取得
                             ->join('mst_codes', function ($join) {
-                                $join->on('surcharge_counts.surcharge_kind', '=', 'mst_codes.code')
+                                $join->on('surcharge_kind', '=', 'mst_codes.code')
                                     ->where('mst_codes.data_type', AppConst::CODE_MASTER_26);
                             })
+                            ->groupBy('tutor_id', 'summary_kind')
                             ->get();
 
                         // コースごとに集計結果を保存
@@ -368,8 +357,8 @@ class SalaryCalculationController extends Controller
                         // dateの形式のバリデーションと変換
                         $idDate = $this->fmYmToDate($request['id']);
 
-                        // 月末を取得
-                        $last_date = date('Y-m-d', strtotime('last day of ' . $idDate));
+                        // 翌月を取得
+                        $next_month = date('Y-m-d', strtotime('next month', strtotime($idDate)));
 
                         // 給与算出管理の処理状態を確定済みにする
                         $salary_mng = SalaryMng::where('salary_date', $idDate)->firstOrFail();
@@ -381,7 +370,7 @@ class SalaryCalculationController extends Controller
                         $surcharges = Surcharge::query()
                             ->where('approval_status', AppConst::CODE_MASTER_2_1)
                             ->where('payment_status', AppConst::CODE_MASTER_27_0)
-                            ->whereBetween('working_date', [$idDate, $last_date])
+                            ->where('payment_date', $next_month)
                             ->get();
 
                         foreach ($surcharges as $surcharge) {
