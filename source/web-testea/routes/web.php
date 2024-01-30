@@ -1826,9 +1826,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/master_mng_text/search', [MasterMngTextController::class, 'search'])->name('master_mng_text-search');
 
-    // 詳細取得用
-    //Route::post('/master_mng_text/get_data', [MasterMngTextController::class, 'getData'])->name('master_mng_text-get_data');
-
     // 登録
     Route::get('/master_mng_text/new', [MasterMngTextController::class, 'new'])->name('master_mng_text-new');
 
