@@ -7,47 +7,27 @@
 <x-bs.card-list>
 
 	{{-- テーブル --}}
-    <x-bs.table :button=true>
+	<x-bs.table :button=true>
 
 		{{-- テーブルタイトル行 --}}
 		<x-slot name="thead">
 			<th>システム変数ID</th>
 			<th>名称</th>
-			<th>値（数値）</th>
-			<th>値（文字列）</th>
+			<th>値</th>
 			<th>画面変更可否</th>
-			<th width="7%"></th>
+			<th></th>
 		</x-slot>
 
 		{{-- テーブル行 --}}
-		<tr>
-			<td>101</td>
-			<td>事務作業時給</td>
-			<td class="text-right">1072</td>
-			<td></td>
-			<td>可</td>
+		<tr v-for="item in paginator.data" v-cloak>
+			{{-- MEMO: 日付フォーマットを指定する --}}
+			<td>@{{item.key_id}}</td>
+			<td>@{{item.name}}</td>
+			<td>@{{item.value_num}}@{{item.value_str}}@{{item.value_date}}</td>
+			<td>@{{item.change_flg_name}}</td>
 			<td>
-                <x-button.list-edit href="{{ route('master_mng_system-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>111</td>
-			<td>振替調整スキップ回数</td>
-			<td class="text-right">2</td>
-			<td></td>
-			<td>可</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_system-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>201</td>
-			<td>現年度</td>
-			<td class="text-right">2023</td>
-			<td></td>
-			<td>不可</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_system-edit',1) }}" disabled=true />
+				{{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
+				<x-button.list-edit vueHref="'{{ route('master_mng_system-edit', '') }}/' + item.key_id" />
 			</td>
 		</tr>
 

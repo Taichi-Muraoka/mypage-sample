@@ -1907,6 +1907,24 @@ class AppConst
     const SYSTEM_KEY_ID_4 = 4;
 
     //-----------
+    // システムマスタ データ型種別
+    //-----------
+    /**
+     * システムマスタ 数値
+     */
+    const SYSTEM_DATATYPE_1 = 1;
+
+    /**
+     * システムマスタ 文字列
+     */
+    const SYSTEM_DATATYPE_2 = 2;
+
+    /**
+     * システムマスタ 日付
+     */
+    const SYSTEM_DATATYPE_3 = 3;
+
+    //-----------
     // 授業報告書サブコード
     //-----------
 
