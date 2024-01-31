@@ -1532,13 +1532,13 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // モーダル処理（CSV出力）
     Route::post('/overtime/exec_modal', [OvertimeController::class, 'execModal'])->name('overtime-exec_modal');
 
-    //});
+});
 
-    //===============================================
-    // 以下は全体管理者のみアクセス可とする
-    //===============================================
+//===============================================
+// 以下は全体管理者のみアクセス可とする
+//===============================================
 
-    //Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
+Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
 
     //---------------------
     // 給与算出
@@ -1826,9 +1826,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/master_mng_text/search', [MasterMngTextController::class, 'search'])->name('master_mng_text-search');
 
-    // 詳細取得用
-    //Route::post('/master_mng_text/get_data', [MasterMngTextController::class, 'getData'])->name('master_mng_text-get_data');
-
     // 登録
     Route::get('/master_mng_text/new', [MasterMngTextController::class, 'new'])->name('master_mng_text-new');
 
@@ -1895,9 +1892,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/master_mng_unit/search', [MasterMngUnitController::class, 'search'])->name('master_mng_unit-search');
 
-    // 詳細取得用
-    //Route::post('/master_mng_unit/get_data', [MasterMngUnitController::class, 'getData'])->name('master_mng_unit-get_data');
-
     // 登録
     Route::get('/master_mng_unit/new', [MasterMngUnitController::class, 'new'])->name('master_mng_unit-new');
 
@@ -1917,7 +1911,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/master_mng_unit/delete', [MasterMngUnitController::class, 'delete'])->name('master_mng_unit-delete');
 
     //---------------------
-    // システムマスタ モック
+    // システムマスタ
     //---------------------
     // 一覧
     Route::get('/master_mng_system', [MasterMngSystemController::class, 'index'])->name('master_mng_system');
