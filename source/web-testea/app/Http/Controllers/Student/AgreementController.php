@@ -10,7 +10,7 @@ use App\Models\Badge;
 use App\Models\MstCampus;
 
 /**
- * 生徒情報（旧；契約内容） - コントローラ
+ * 生徒情報（旧：契約内容） - コントローラ
  */
 class AgreementController extends Controller
 {
@@ -58,15 +58,8 @@ class AgreementController extends Controller
      */
     public function getData(Request $request)
     {
-        // MEMO: ログインアカウントのIDでデータを取得するのでガードは不要
-
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'student_id');
-
-        // ログイン情報
-        $account = Auth::user();
-        $account_id = $account->account_id;
-        $sid = $account_id;
 
         // クエリ作成
         $query = Badge::query();
@@ -82,7 +75,8 @@ class AgreementController extends Controller
                 'badges.reason',
                 'badges.authorization_date',
             )
-            ->where('badges.student_id', '=', $sid)
+            // ログイン中の生徒IDでガード
+            ->where($this->guardStudentTableWithSid())
             ->sdLeftJoin(MstCampus::class, 'badges.campus_cd', '=', 'mst_campuses.campus_cd')
             ->orderBy('badges.authorization_date', 'desc')
             ->get();

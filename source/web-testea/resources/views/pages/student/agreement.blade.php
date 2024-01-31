@@ -49,7 +49,11 @@
         </tr>
         <tr>
             <th>入会日</th>
-            <td>{{$student->enter_date->format('Y/m/d')}}</td>
+            <td>
+                @if(isset($student->enter_date))
+                {{$student->enter_date->format('Y/m/d')}}
+                @endif
+            </td>
         </tr>
     </x-bs.table>
 
@@ -66,7 +70,7 @@
 
         {{-- テーブル行 --}}
         <tr>
-            <x-bs.td-sp>
+            <x-bs.td-sp caption="バッジ">
                 @for ($i = 0; $i < $badges['tens_place']; $i++)
                 <img src="/img/gold.png" class="user-image"  width="60" height="60" alt="badge">
                 @endfor
@@ -74,10 +78,10 @@
                 <img src="/img/silver.png" class="user-image"  width="50" height="50" alt="badge">
                 @endfor
             </x-bs.td-sp>
-            <x-bs.td-sp>{{$badges['total_badges']}}</x-bs.td-sp>
-            <td>
+            <x-bs.td-sp caption="合計">{{$badges['total_badges']}}</x-bs.td-sp>
+            <x-bs.td-sp>
                 <x-button.list-dtl :dataAttr="['student_id' => $student->student_id]"/>
-            </td>
+            </x-bs.td-sp>
         </tr>
     </x-bs.table>
 
@@ -87,7 +91,7 @@
     <x-bs.form-title>レギュラー授業情報</x-bs.form-title>
 
     {{-- テーブル --}}
-    <x-bs.table :button=true :smartPhone=true class="inner-card">
+    <x-bs.table :smartPhone=true class="inner-card">
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
             <th width="10%">曜日</th>
@@ -101,12 +105,12 @@
         {{-- テーブル行 --}}
         @for ($i = 0; $i < count($regular_classes); $i++)
             <tr>
-                <td>{{$regular_classes[$i]->day_name}}</td>
-                <td>{{$regular_classes[$i]->period_no}}</td>
-                <td>{{$regular_classes[$i]->campus_name}}</td>
-                <td>{{$regular_classes[$i]->course_name}}</td>
-                <td>{{$regular_classes[$i]->tutor_name}}</td>
-                <td>{{$regular_classes[$i]->subject_name}}</td>
+                <x-bs.td-sp caption="曜日">{{$regular_classes[$i]->day_name}}</x-bs.td-sp>
+                <x-bs.td-sp caption="時限">{{$regular_classes[$i]->period_no}}</x-bs.td-sp>
+                <x-bs.td-sp caption="校舎">{{$regular_classes[$i]->campus_name}}</x-bs.td-sp>
+                <x-bs.td-sp caption="コース名">{{$regular_classes[$i]->course_name}}</x-bs.td-sp>
+                <x-bs.td-sp caption="講師名">{{$regular_classes[$i]->tutor_name}}</x-bs.td-sp>
+                <x-bs.td-sp caption="科目">{{$regular_classes[$i]->subject_name}}</x-bs.td-sp>
             </tr>
         @endfor
     </x-bs.table>

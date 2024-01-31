@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Traits;
 use App\Consts\AppConst;
 use App\Models\Student;
 use App\Models\StudentCampus;
-use App\Models\MstCampus;
 use App\Models\MstGrade;
 use App\Models\MstSchool;
 use App\Models\MstCourse;
@@ -77,26 +76,32 @@ trait FuncAgreementTrait
             ->firstOrFail();
 
         // 生徒IDから所属校舎を取得する。
+        // 校舎名取得サブクエリ
+        $campus_names = $this->mdlGetRoomQuery();
+
         $query = StudentCampus::query();
         $campuses = $query
             ->select(
                 'student_campuses.student_id',
                 'student_campuses.campus_cd',
                 // 校舎名
-                'mst_campuses.name as campus_name'
+                'campus_names.room_name as campus_name',
             )
-            ->sdLeftJoin(MstCampus::class, 'student_campuses.campus_cd', '=', 'mst_campuses.campus_cd')
+            // 校舎名の取得
+            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
+                $join->on('student_campuses.campus_cd', '=', 'campus_names.code');
+            })
             ->where('student_campuses.student_id', '=', $sid)
             ->orderby('campus_cd')
             ->orderby('disp_order')
             ->get();
 
-        // 複数校舎所属の場合を考慮し、校舎名を連結する
-        $str_campus_names = "";
+        // 複数校舎所属の場合を考慮し、校舎名を連結する（カンマ区切り）
+        $campusList = [];
         foreach ($campuses as $campus) {
-            $str_campus_names = $str_campus_names . " " . $campus->campus_name;
+            array_push($campusList, $campus->campus_name);
         };
-        $str_campus_names = ltrim($str_campus_names);
+        $str_campus_names = implode(',', $campusList);
 
         // バッジ情報の取得
         $badges = $this->fncAgreGetStudentBadge($sid);
