@@ -4,21 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtSchedule;
-use App\Models\TransferApply;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
 use App\Models\CodeMaster;
-use App\Models\ExtRirekisho;
-use App\Models\Notice;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\DB;
-use App\Models\NoticeDestination;
-use Carbon\Carbon;
 use App\Libs\AuthEx;
-use App\Http\Controllers\Traits\FuncTransferTrait;
 use App\Models\MstSystem;
 
 /**
@@ -186,6 +175,7 @@ class MasterMngSystemController extends Controller
     {
         $rules = array();
         $rules += MstSystem::fieldRules('name', ['required']);
+        // データ型種別により必須項目の分岐
         $rules += MstSystem::fieldRules('value_num', ['required_if:datatype_kind,' . AppConst::SYSTEM_DATATYPE_1]);
         $rules += MstSystem::fieldRules('value_str', ['required_if:datatype_kind,' . AppConst::SYSTEM_DATATYPE_2]);
         $rules += MstSystem::fieldRules('value_date', ['required_if:datatype_kind,' . AppConst::SYSTEM_DATATYPE_3]);

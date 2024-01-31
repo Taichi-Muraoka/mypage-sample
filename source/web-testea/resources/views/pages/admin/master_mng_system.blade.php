@@ -20,14 +20,14 @@
 
 		{{-- テーブル行 --}}
 		<tr v-for="item in paginator.data" v-cloak>
-			{{-- MEMO: 日付フォーマットを指定する --}}
 			<td>@{{item.key_id}}</td>
 			<td>@{{item.name}}</td>
-			<td>@{{item.value_num}}@{{item.value_str}}@{{item.value_date}}</td>
+			<td>@{{item.value_num}}@{{item.value_str}}@{{$filters.formatYmd(item.value_date)}}</td>
 			<td>@{{item.change_flg_name}}</td>
 			<td>
 				{{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
-				<x-button.list-edit vueHref="'{{ route('master_mng_system-edit', '') }}/' + item.key_id" />
+				<x-button.list-edit vueHref="'{{ route('master_mng_system-edit', '') }}/' + item.key_id"
+					vueDisabled="item.change_flg == {{ App\Consts\AppConst::CODE_MASTER_9_1 }}" />
 			</td>
 		</tr>
 
