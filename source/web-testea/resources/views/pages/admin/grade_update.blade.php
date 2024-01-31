@@ -30,15 +30,10 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/03/01 00:00</td>
-            <td>2023/03/01 00:05</td>
-            <td>正常終了</td>
-        </tr>
-        <tr>
-            <td>2022/03/01 00:00</td>
-            <td>2022/03/01 00:04</td>
-            <td>正常終了</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmdHm(item.start_time)}}</td>
+            <td>@{{$filters.formatYmdHm(item.end_time)}}</td>
+            <td>@{{item.state_name}}</td>
         </tr>
 
     </x-bs.table>

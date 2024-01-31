@@ -1997,4 +1997,16 @@ class AppConst
 
     // 給与情報明細数
     const COUNT_SALARY = 18;
+
+    /**
+     * 年次処理 学年更新
+     */
+    // 高3
+    const GRADE_CD_12 =12;
+
+    // 大学生
+    const GRADE_CD_16 =16;
+
+    // 高3年齢
+    const GRADE_CD_12_AGE =18;
 }

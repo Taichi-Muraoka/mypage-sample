@@ -77,11 +77,6 @@ return [
     "upload_dir_invoice_import" =>  "file_upload/invoice_import/",
 
     /**
-     * 年次学年情報取込
-     */
-    "upload_dir_all_member_import" =>  "file_upload/all_member_import/",
-
-    /**
      * 年度スケジュール情報取込
      */
     "upload_dir_year_schedule_import" =>  "file_upload/year_schedule_import/",
@@ -134,11 +129,6 @@ return [
      * 短期講習申込情報ファイル名（生徒）
      */
     "upload_file_name_member_import_individual" =>  "短期講習申込_",
-
-    /**
-     * 年次学年情報ファイル名（生徒）
-     */
-    "upload_file_name_all_member_import_enter" =>  "年次学年情報_",
 
     /**
      * 年度スケジュール情報ファイル名（生徒）
