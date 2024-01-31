@@ -44,13 +44,14 @@ export default class AppClass extends PageBase {
                     }
 
                     // 編集対象データ($editData)に基づいた単元分類プルダウンのvalue初期表示・リスト絞り込み
-                    this.form.unit_category_cd = this.form._unit_category_cd;
                     this.selectChangeGetCategory();
+                    this.form.unit_category_cd = this.form._unit_category_cd;
                 },
                 // 学年または教材科目プルダウン選択時、単元分類リストを取得
                 selectChangeGetCategory: function (event) {
                     // 初期化
                     this.selectGetItemCategory = {};
+                    this.form.unit_category_cd = "";
 
                     // チェンジイベントを発生させる
                     var gradeCd = this.form.grade_cd;

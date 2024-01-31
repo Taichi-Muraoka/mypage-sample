@@ -150,7 +150,9 @@ class MasterMngUnitController extends Controller
             ->sdLeftJoin(MstSubject::class, function ($join) {
                 $join->on('mst_unit_categories.t_subject_cd', '=', 'mst_subjects.subject_cd');
             })
-            ->orderby('unit_id');
+            // ソート順 単元分類コード・単元コード
+            ->orderby('mst_units.unit_category_cd')
+            ->orderby('mst_units.unit_cd');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $mstUnit);
