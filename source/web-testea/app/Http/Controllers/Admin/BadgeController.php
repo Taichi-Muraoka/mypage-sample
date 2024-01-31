@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Http\Controllers\Traits\FuncBadgeTrait;
+use App\Libs\AuthEx;
+use App\Models\AdminUser;
 
 /**
  * バッジ付与 - コントローラ
@@ -72,17 +74,40 @@ class BadgeController extends Controller
      */
     public function search(Request $request)
     {
+        // 更新ボタンの押下制御用に、ログイン中管理者の校舎を取得する（初期値は本部のコードとする）
+        $honbuCampusCd = AppConst::CODE_MASTER_6_0;
+        $adminCampus = $honbuCampusCd;
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、自教室の校舎コードをセットする
+            $account = Auth::user();
+            $adminCampus = AdminUser::where('adm_id', '=', $account->account_id)->first();
+            $adminCampus = $adminCampus->campus_cd;
+        }
+
         // クエリ作成
         $query = Badge::query();
 
         // 画面表示中生徒のデータに絞り込み
         $query->where('badges.student_id', $request['student_id']);
 
+        // 教室管理者の場合、自分の校舎の生徒のみにガードを掛ける
+        $query->where($this->guardRoomAdminTableWithSid());
+
         // 教室管理者の場合も全校舎表示対象とする
         // 校舎コードによるガードは無し
 
         // バッジ付与情報表示用のquery作成・データ取得
         $badgeList = $this->fncBageGetBadgeQuery($query)
+            // 更新ボタン押下 可／不可の判定
+            // 生徒所属校舎がログイン中管理者の校舎コードと一致すればfalse、不一致ならtrueをセットする
+            // 本部管理者の場合はfalseをセットする（全校舎更新可能）
+            ->selectRaw(
+                "CASE
+                    WHEN $adminCampus = $honbuCampusCd THEN false
+                    WHEN badges.campus_cd = $adminCampus THEN false
+                    WHEN badges.campus_cd != $adminCampus THEN true
+                END AS disabled_btn"
+            )
             ->orderBy('badges.authorization_date', 'desc')
             ->orderBy('badges.badge_type', 'asc')
             ->orderBy('badges.campus_cd', 'asc');
@@ -195,9 +220,10 @@ class BadgeController extends Controller
                 'reason',
             );
 
-            // 管理者IDを取得（ログイン者）
+            // 管理者のID・校舎コードを取得（ログイン者）
             $account = Auth::user();
             $adm_id = $account->account_id;
+            $adm_campus = $account->campus_cd;
 
             // 「認定日」用に今の日時を取得
             $now = Carbon::now();
@@ -226,9 +252,9 @@ class BadgeController extends Controller
             // お知らせ種別（その他）
             $notice->notice_type = AppConst::CODE_MASTER_14_4;
             // 管理者ID
-            $account = Auth::user();
-            $notice->adm_id = $account->account_id;
-            $notice->campus_cd = $account->campus_cd;
+            $notice->adm_id = $adm_id;
+            // 管理者校舎コード
+            $notice->campus_cd = $adm_campus;
 
             // 保存
             $notice->save();
