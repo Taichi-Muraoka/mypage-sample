@@ -1553,11 +1553,17 @@ Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
     // 給与算出情報一覧（対象月の詳細）
     Route::get('/salary_calculation/detail/{date}', [SalaryCalculationController::class, 'detail'])->name('salary_calculation-detail');
 
+    // モーダル処理
+    Route::post('/salary_calculation/exec_modal', [SalaryCalculationController::class, 'execModal'])->name('salary_calculation-exec_modal');
+
     // 給与算出情報一覧 - 検索結果取得
     Route::post('/salary_calculation/search_detail', [SalaryCalculationController::class, 'searchDetail'])->name('salary_calculation-search_detail');
 
     // 給与算出情報一覧 - 詳細取得用
     Route::post('/salary_calculation/get_data_detail', [SalaryCalculationController::class, 'getDataDetail'])->name('salary_calculation-get_data_detail');
+
+    // 給与算出情報一覧 - 確認ダイアログ
+    Route::post('/salary_calculation/get_data', [SalaryCalculationController::class, 'getData'])->name('salary_calculation-get_data');
 
     //----------------------
     // 給与情報取込

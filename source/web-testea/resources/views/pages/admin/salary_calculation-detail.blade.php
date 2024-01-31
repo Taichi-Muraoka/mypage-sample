@@ -13,21 +13,23 @@
     <x-bs.table :hover=false :vHeader=true class="mb-3 fix">
         <tr>
             <th width="35%">対象年月</th>
-            <td>2023年03月</td>
+            <td>{{$salary_mng->salary_date->format('Y年m月')}}</td>
         </tr>
         <tr>
             <th>確定日</th>
-            <td> </td>
+            <td>{{$confirm_date}}</td>
         </tr>
         <tr>
             <th>状態</th>
-            <td>集計済</td>
+            <td>{{$salary_mng->state_name}}</td>
         </tr>
     </x-bs.table>
 
     <div class="d-flex justify-content-end">
-        <x-button.submit-exec caption="集計実行" dataTarget="#modal-dtl-calc" />
-        <x-button.submit-exec caption="確定処理" dataTarget="#modal-dtl-confirm" />
+        <x-button.submit-exec caption="集計実行" dataTarget="#modal-dtl-calc" :dataAttr="['id' => $editData['id']]"
+            disabled={{$calc_disable}}/>
+        <x-button.submit-exec caption="確定処理" dataTarget="#modal-dtl-confirm" :dataAttr="['id' => $editData['id']]"
+            disabled={{$comfirm_disable}}/>
     </div>
 
     {{-- 余白 --}}
@@ -42,7 +44,7 @@
         </x-slot>
 
         {{-- 検索時にIDを送信 --}}
-        <x-input.hidden id="event_id" />
+        <x-input.hidden id="id" :editData=$editData/>
 
         {{-- テーブル --}}
         <x-bs.table :button="true">
@@ -69,26 +71,26 @@
             </x-slot>
 
             {{-- テーブル行 --}}
-            <tr>
-                <td>101</td>
-                <td>CWテスト講師１０１</td>
-                <td class="t-price">1,300</td>
-                <td class="t-price">18</td>
-                <td class="t-price">3</td>
-                <td class="t-price">4.5</td>
-                <td class="t-price">3</td>
-                <td class="t-price">6</td>
-                <td class="t-price">2</td>
-                <td class="t-price">10</td>
-                <td class="t-price">2</td>
-                <td class="t-price">1,500</td>
-                <td class="t-price">800</td>
-                <td class="t-price">4,000</td>
-                <td class="t-price">1,200</td>
-                <td class="t-price">0</td>
+            <tr v-for="item in paginator.data" v-cloak>
+                <td>@{{item.tutor_id}}</td>
+                <td>@{{item.tutor_name}}</td>
+                <td class="t-price">@{{$filters.toLocaleString(item.hourly_base_wage)}}</td>
+                <td class="t-price">@{{$filters.numberRound(item.hour_personal)}}</td>
+                <td class="t-price">@{{$filters.numberRound(item.hour_two)}}</td>
+                <td class="t-price">@{{$filters.numberRound(item.hour_three)}}</td>
+                <td class="t-price">@{{$filters.numberRound(item.hour_home)}}</td>
+                <td class="t-price">@{{$filters.numberRound(item.hour_practice)}}</td>
+                <td class="t-price">@{{$filters.numberRound(item.hour_high)}}</td>
+                <td class="t-price">@{{$filters.numberRound(item.hour_group)}}</td>
+                <td class="t-price">@{{$filters.numberRound(item.hour_work)}}</td>
+                <td class="t-price">@{{$filters.toLocaleString(item.cost)}}</td>
+                <td class="t-price">@{{$filters.toLocaleString(item.untaxed_cost)}}</td>
+                <td class="t-price">@{{$filters.toLocaleString(item.amount1)}}</td>
+                <td class="t-price">@{{$filters.toLocaleString(item.amount2)}}</td>
+                <td class="t-price">@{{$filters.toLocaleString(item.amount3)}}</td>
                 <td>
                     {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
-                    <x-button.list-dtl/>
+                    <x-button.list-dtl :dataAttr="['id' => $editData['id']]" :vueDataAttr="['tutor_id' => 'item.tutor_id']"/>
                 </td>
             </tr>
 
@@ -102,7 +104,7 @@
             <x-button.back />
 
             <div class="d-flex justify-content-end">
-                <x-button.submit-exec caption="データ出力" dataTarget="#modal-dtl-output" icon="fas fa-download" />
+                <x-button.submit-exec caption="データ出力" dataTarget="#modal-dtl-output" :dataAttr="['id' => $editData['id']]" icon="fas fa-download" />
             </div>
         </div>
     </x-slot>

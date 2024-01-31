@@ -20,13 +20,49 @@ export default class AppClass extends PageBase {
             // 別画面でも検索を使用するのでURLを変更
             urlSuffix: "detail"
         });
+
         $vueSearchList.search();
 
         // Vue: モーダル 詳細
         this.getVueModal({
+            // IDを分けた
+            id: "#modal-dtl",
             // 別画面でもモーダルを使用するのでURLを変更
             urlSuffix: "detail"
         });
 
+        // 編集完了後は同じ画面へ
+        var afterEdit = () => {
+            UrlCom.redirect(UrlCom.getFuncUrl());
+        };
+
+        // Vue: モーダル(集計)
+        this.getVueModal({
+            // IDを分けた
+            id: "#modal-dtl-calc",
+
+            // 完了処理後
+            afterExec: afterEdit
+        });
+
+        // Vue: モーダル(確定)
+        this.getVueModal({
+            // IDを分けた
+            id: "#modal-dtl-confirm",
+
+            // 完了処理後
+            afterExec: afterEdit
+        });
+
+        // Vue: モーダル(確定)
+        this.getVueModal({
+            // IDを分けた
+            id: "#modal-dtl-output",
+
+            // 完了処理後
+            afterExec: () => {
+    
+            }
+        });
     }
 }
