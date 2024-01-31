@@ -1951,14 +1951,11 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 取込
     Route::get('/transfer_reset', [TransferResetController::class, 'index'])->name('transfer_reset');
 
-    // 取込処理
-    Route::post('/transfer_reset/create', [TransferResetController::class, 'create'])->name('transfer_reset-create');
-
-    // バリデーション(取込用)
-    Route::post('/transfer_reset/vd_input', [TransferResetController::class, 'validationForInput'])->name('transfer_reset-vd_input');
-
     // 検索結果取得
     Route::post('/transfer_reset/search', [TransferResetController::class, 'search'])->name('transfer_reset-search');
+
+    // リスト出力
+    Route::get('/transfer_reset/download/{batchId}', [TransferResetController::class, 'download'])->name('transfer_reset-download');
 
     //----------------------
     // 保持期限超過データ削除管理
