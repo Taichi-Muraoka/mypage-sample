@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Lang;
+use App\Libs\AuthEx;
 use App\Models\MstGrade;
 use App\Models\MstSubject;
 use App\Models\MstText;
@@ -35,6 +36,11 @@ class MasterMngTextController extends Controller
      */
     public function index()
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 学年リストを取得
         $grades = $this->mdlGetGradeList();
 
@@ -71,6 +77,11 @@ class MasterMngTextController extends Controller
      */
     public function search(Request $request)
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForSearch($request))->validate();
 
@@ -132,32 +143,12 @@ class MasterMngTextController extends Controller
 
         // 独自バリデーション: リストのチェック 学年
         $validationGradesList =  function ($attribute, $value, $fail) {
-            // 学年リストを取得
-            $grades = $this->mdlGetGradeList(false);
-            if (!isset($grades[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
+            return $this->getValidationGradesList($value, $fail);
         };
 
-        // 独自バリデーション: リストのチェック 授業教科
-        $validationSubjectsList =  function ($attribute, $value, $fail) {
-            // リストを取得し存在チェック
-            $subjects = $this->mdlGetSubjectList();
-            if (!isset($subjects[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-        };
-
-        // 独自バリデーション: リストのチェック 教材教科
-        $validationTextSubjectsList =  function ($attribute, $value, $fail) {
-            // リストを取得し存在チェック
-            $textSubjects = $this->mdlGetSubjectList();
-            if (!isset($textSubjects[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
+        // 独自バリデーション: リストのチェック 授業教科・教材教科
+        $validationSubjectsList = function ($attribute, $value, $fail) {
+            return $this->getValidationSubjectsList($value, $fail);
         };
 
         // 学年コード
@@ -165,7 +156,7 @@ class MasterMngTextController extends Controller
         // 授業教科コード
         $rules += MstText::fieldRules('l_subject_cd', [$validationSubjectsList]);
         // 教材教科コード
-        $rules += MstText::fieldRules('t_subject_cd', [$validationTextSubjectsList]);
+        $rules += MstText::fieldRules('t_subject_cd', [$validationSubjectsList]);
 
         return $rules;
     }
@@ -181,6 +172,11 @@ class MasterMngTextController extends Controller
      */
     public function new()
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 学年リストを取得
         $grades = $this->mdlGetGradeList();
         $gradeLists = $this->mdlFormatInputList($grades, 2);
@@ -206,6 +202,11 @@ class MasterMngTextController extends Controller
      */
     public function create(Request $request)
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
@@ -233,6 +234,11 @@ class MasterMngTextController extends Controller
      */
     public function edit($textCd)
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // コース種別リストを取得
         // 学年リストを取得
         $grades = $this->mdlGetGradeList();
@@ -271,6 +277,11 @@ class MasterMngTextController extends Controller
      */
     public function update(Request $request)
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
@@ -302,6 +313,11 @@ class MasterMngTextController extends Controller
      */
     public function delete(Request $request)
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 削除前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForDelete($request))->validate();
 
@@ -347,24 +363,12 @@ class MasterMngTextController extends Controller
 
         // 独自バリデーション: リストのチェック 学年
         $validationGradesList =  function ($attribute, $value, $fail) {
-
-            // 学年リストを取得
-            $grades = $this->mdlGetGradeList(false);
-            if (!isset($grades[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
+            return $this->getValidationGradesList($value, $fail);
         };
 
         // 独自バリデーション: リストのチェック 授業教科・教材教科
-        $validationSubjectsList =  function ($attribute, $value, $fail) {
-
-            // リストを取得し存在チェック
-            $subjects = $this->mdlGetSubjectList();
-            if (!isset($subjects[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
+        $validationSubjectsList = function ($attribute, $value, $fail) {
+            return $this->getValidationSubjectsList($value, $fail);
         };
 
         // 独自バリデーション: 重複チェック
@@ -441,4 +445,29 @@ class MasterMngTextController extends Controller
         return $rules;
     }
 
+    /**
+     * バリデーションチェック(学年マスタ)
+     */
+    private function getValidationGradesList($value, $fail)
+    {
+        // 学年リストを取得
+        $grades = $this->mdlGetGradeList(false);
+        if (!isset($grades[$value])) {
+            // 不正な値エラー
+            return $fail(Lang::get('validation.invalid_input'));
+        }
+    }
+
+    /**
+     * バリデーションチェック(授業科目コード)
+     */
+    private function getValidationSubjectsList($value, $fail)
+    {
+        // リストを取得し存在チェック
+        $subjects = $this->mdlGetSubjectList();
+        if (!isset($subjects[$value])) {
+            // 不正な値エラー
+            return $fail(Lang::get('validation.invalid_input'));
+        }
+    }
 }
