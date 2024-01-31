@@ -11,7 +11,7 @@
 <x-bs.card :form=true>
 
     <p>以下の授業振替依頼について、振替希望日一覧から１つ選択し、承認を行います。</p>
-    <x-bs.table :hover=false :vHeader=true smartPhone=true>
+    <x-bs.table :hover=false :vHeader=true :smartPhone=false>
         <tr>
             <th>授業日・時限</th>
             <td>{{$editData['target_date']}} {{$editData['period_no']}}限</td>
