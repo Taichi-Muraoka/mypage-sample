@@ -135,6 +135,14 @@ export default class PageComponentBase {
                     return Number(numString).toLocaleString();
                 }
             },
+            // 小数点以下0切り捨て
+            numberRound(numString) {
+                if (ValueCom.isEmpty(numString)) {
+                    return "";
+                } else {
+                    return Number(numString);
+                }
+            },
             // YYYY年MM月
             formatYmString(date) {
                 if (ValueCom.isEmpty(date)) {

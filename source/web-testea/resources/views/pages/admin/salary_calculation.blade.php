@@ -18,37 +18,13 @@
             <th></th>
         </x-slot>
 
-        {{-- テーブル行 --}}
-        <tr>
-            <td>2023年04月</td>
-            <td> </td>
-            <td>未処理</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmString(item.salary_date)}}</td>
+            <td>@{{$filters.formatYmString(item.comfirm_date)}}</td>
+            <td><span v-if="item.state == {{ App\Consts\AppConst::CODE_MASTER_24_0 }}"
+                    class="text-danger">@{{item.state_name}}</span><span v-else>@{{item.state_name}}</span></td>
             <td>
-                <x-button.list-dtl href="{{ route('salary_calculation-detail', 1) }}"/>
-            </td>
-        </tr>
-        <tr>
-            <td>2023年03月</td>
-            <td> </td>
-            <td>集計済</td>
-            <td>
-                <x-button.list-dtl href="{{ route('salary_calculation-detail', 1) }}"/>
-            </td>
-        </tr>
-        <tr>
-            <td>2023年02月</td>
-            <td>2023/03/05</td>
-            <td>確定済</td>
-            <td>
-                <x-button.list-dtl href="{{ route('salary_calculation-detail', 1) }}"/>
-            </td>
-        </tr>
-        <tr>
-            <td>2023年01月</td>
-            <td>2023/02/07</td>
-            <td>確定済</td>
-            <td>
-                <x-button.list-dtl href="{{ route('salary_calculation-detail', 1) }}"/>
+                <x-button.list-dtl vueHref="'{{ route('salary_calculation-detail', '')}}/' + item.id"/>
             </td>
         </tr>
 

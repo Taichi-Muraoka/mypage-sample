@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('summary_kind')->comment('給与集計種別');
             $table->decimal('hour_payment', 8, 0)->nullable()->comment('単価');
             $table->decimal('hour', 5, 2)->nullable()->comment('時間（h）');
-            $table->decimal('amount', 8, 0)->comment('金額');
+            $table->decimal('amount', 8, 0)->nullable()->comment('金額');
             $table->timestamps();
             $table->softDeletes();
 

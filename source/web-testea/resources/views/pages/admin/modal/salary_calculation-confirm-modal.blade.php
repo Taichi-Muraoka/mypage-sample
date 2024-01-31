@@ -8,7 +8,7 @@ modal-normal
 @section('modal-body')
 
 <p>
-    2023年03月分の確定処理を行い、対象月の追加請求を「支払済」とします。<br>
+    @{{$filters.formatYmString(item.salary_date)}}分の確定処理を行い、対象月の追加請求を「支払済」とします。<br>
     よろしいですか？
 </p>
 
