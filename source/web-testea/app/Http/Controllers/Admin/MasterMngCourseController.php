@@ -9,7 +9,6 @@ use App\Consts\AppConst;
 use App\Models\CodeMaster;
 use App\Models\MstCourse;
 use Illuminate\Support\Facades\Lang;
-use App\Libs\AuthEx;
 
 /**
  * コースマスタ管理 - コントローラ
@@ -49,9 +48,6 @@ class MasterMngCourseController extends Controller
     {
         // クエリを作成
         $query = MstCourse::query();
-
-        // 校舎名取得のサブクエリ
-        $campus_names = $this->mdlGetRoomQuery();
 
         // データを取得
         $mstCourse = $query
