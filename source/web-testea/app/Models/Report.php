@@ -122,7 +122,7 @@ class Report extends Model
             'report_id' => ['integer'],
             'tutor_id' => ['integer'],
             'schedule_id' => ['integer'],
-            'campus_cd' => ['string', 'max:2', 'digits:2'],
+            'campus_cd' => ['string', 'max:2'],
             'course_cd' => ['string', 'max:5', 'digits:5'],
             'lesson_date' => ['date_format:Y-m-d'],
             'period_no' => ['integer', 'min:0', 'max:99'],
@@ -135,7 +135,7 @@ class Report extends Model
             'goodbad_point' => ['string', 'max:1000'],
             'solution' => ['string', 'max:1000'],
             'others_comment' => ['string', 'max:1000'],
-            'approval_status' => ['integer', 'in:1,2,3'],
+            'approval_status' => ['integer'],
             'admin_comment' => ['string', 'max:1000'],
             'regist_date' => ['date_format:Y-m-d']
         ];
@@ -158,7 +158,19 @@ class Report extends Model
     }
 
     /**
-     * 検索 student_id
+     * 検索 学年コード
+     */
+    public function scopeSearchGradeCd($query, $obj)
+    {
+        $key = 'grade_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // 生徒IDでスケジュールを絞り込む(共通処理)
+            $this->mdlWhereScheduleBySidQuery($query, self::class, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 生徒ID
      */
     public function scopeSearchSid($query, $obj)
     {
@@ -166,6 +178,68 @@ class Report extends Model
         if (isset($obj[$key]) && filled($obj[$key])) {
             // 生徒IDでスケジュールを絞り込む(共通処理)
             $this->mdlWhereScheduleBySidQuery($query, self::class, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 講師ID
+     */
+    public function scopeSearchTid($query, $obj)
+    {
+        $key = 'tutor_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 コースコード
+     */
+    public function scopeSearchCourseCd($query, $obj)
+    {
+        $key = 'course_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 承認ステータス
+     */
+    public function scopeSearchApprovalStatus($query, $obj)
+    {
+        $key = 'approval_status';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 授業実施日From
+     */
+    public function scopeSearchLessonDateFrom($query, $obj)
+    {
+        $key = 'lesson_date_from';
+        // Ymdに変換して検索する
+        $col = $this->mdlFormatYmd('lesson_date');
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, '>=', $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 授業実施日To
+     */
+    public function scopeSearchLessonDateTo($query, $obj)
+    {
+        $key = 'lesson_date_to';
+        // Ymdに変換して検索する
+        $col = $this->mdlFormatYmd('lesson_date');
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, '<=', $obj[$key]);
         }
     }
 

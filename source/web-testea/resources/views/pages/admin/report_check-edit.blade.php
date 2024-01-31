@@ -1,4 +1,5 @@
 @extends('adminlte::page')
+@inject('formatter','App\Libs\CommonDateFormat')
 
 @section('title', '授業報告書編集')
 
@@ -15,115 +16,154 @@
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th>登録日</th>
-            <td>2023/05/15</td>
+            <td>{{$report['regist_date']->format('Y/m/d')}}</td>
         </tr>
         <tr>
-            <th width="35%">授業日・時限</th>
-            {{-- <td>{{$editData->lesson_date->format('Y/m/d')}} {{$editData->start_time->format('H:i')}}</td> --}}
-            <td>2023/05/15 4限</td>
+            <th width="20%">授業日・時限</th>
+            <td>{{$formatter::formatYmdDay($report['lesson_date'])}} {{$report['period_no']}}限</td>
         </tr>
         <tr>
             <th>校舎</th>
-            <td>久我山</td>
+            <td>{{$report['campus_name']}}</td>
         </tr>
         <tr>
             <th>コース</th>
-            <td>個別指導</td>
+            <td>{{$report['course_name']}}</td>
         </tr>
-        <tr>
-            <th>生徒名</th>
-            <td>CWテスト生徒１</td>
+        {{-- 個別指導の場合 --}}
+        <tr v-show="{{$report['course_kind']}} == {{ App\Consts\AppConst::CODE_MASTER_42_1 }}">
+            <th>生徒</th>
+            <td>{{$report['student_name']}}</td>
+        </tr>
+        {{-- 集団授業の場合 --}}
+        <tr v-show="{{$report['course_kind']}} == {{ App\Consts\AppConst::CODE_MASTER_42_2 }}">
+            <th>受講生徒名</th>
+            <td>
+                @foreach ($class_member_names as $class_member_name)
+                    {{$class_member_name}}<br>
+                @endforeach
+            </td>
         </tr>
         <tr>
             <th>科目</th>
-            <td>数学</td>
+            <td>{{$report['subject_name']}}</td>
         </tr>
         <tr>
             <th>今月の目標</th>
-            <td>正負の数の計算をマスターする</td>
+            <td>{{$report['monthly_goal']}}</td>
         </tr>
         <tr>
             <th>授業教材１</th>
-            <td>中１数学ドリル演習 p13-18</td>
+            <td>
+                {{$editData['text_name_L1']}} {{$editData['free_text_name_L1']}} 
+                {{$editData['text_page_L1']}}
+            </td>
         </tr>
         <tr>
             <th>授業単元１</th>
-            <td>正負の数・乗法と除法<br>
-                正負の数・四則の混じった計算<br>
-                正負の数・その他（単元まとめ）
+            <td>
+                {{$editData['category_name1_L1']}} {{$editData['free_category_name1_L1']}}
+                {{$editData['unit_name1_L1']}} {{$editData['free_unit_name1_L1']}}<br>
+                {{$editData['category_name2_L1']}} {{$editData['free_category_name2_L1']}}
+                {{$editData['unit_name2_L1']}} {{$editData['free_unit_name2_L1']}}<br>
+                {{$editData['category_name3_L1']}} {{$editData['free_category_name3_L1']}}
+                {{$editData['unit_name3_L1']}} {{$editData['free_unit_name3_L1']}}
             </td>
         </tr>
         <tr>
             <th>授業教材２</th>
-            <td></td>
+            <td>
+                {{$editData['text_name_L2']}} {{$editData['free_text_name_L2']}} 
+                {{$editData['text_page_L2']}}
+            </td>
         </tr>
         <tr>
             <th>授業単元２</th>
-            <td></td>
+            <td>
+                {{$editData['category_name1_L2']}} {{$editData['free_category_name1_L2']}}
+                {{$editData['unit_name1_L2']}} {{$editData['free_unit_name1_L2']}}<br>
+                {{$editData['category_name2_L2']}} {{$editData['free_category_name2_L2']}}
+                {{$editData['unit_name2_L2']}} {{$editData['free_unit_name2_L2']}}<br>
+                {{$editData['category_name3_L2']}} {{$editData['free_category_name3_L2']}}
+                {{$editData['unit_name3_L2']}} {{$editData['free_unit_name3_L2']}}
+            </td>
         </tr>
         <tr>
             <th>確認テスト内容</th>
-            <td>数学ドリル p19</td>
+            <td>{{$report['test_contents']}}</td>
         </tr>
         <tr>
             <th>確認テスト得点</th>
-            <td>10/10点</td>
+            <td>
+                {{$report['test_score']}} / {{$report['test_full_score']}}
+                {{-- <span v-if="{{$report['test_score']}} != 0 && {{$report['test_full_score']}} != 0">点</span> --}}
+            </td>
         </tr>
         <tr>
             <th>宿題達成度</th>
-            <td>100%</td>
+            <td>
+                <span v-if="{{intval($report['achievement'])}} != 0">
+                    {{intval($report['achievement'])}} %
+                </span>
+            </td>
         </tr>
         <tr>
             <th>達成・課題点</th>
             {{-- nl2br: 改行 --}}
-            <td class="nl2br">よく理解できています</td>
+            <td class="nl2br">{{$report['goodbad_point']}}</td>
         </tr>
         <tr>
             <th>解決策</th>
-            <td class="nl2br"></td>
+            <td class="nl2br">{{$report['solution']}}</td>
         </tr>
         <tr>
             <th>その他</th>
-            <td class="nl2br"></td>
+            <td class="nl2br">{{$report['others_comment']}}</td>
         </tr>
         <tr>
             <th>宿題教材１</th>
-            <td>中１数学ドリル演習 p19-20</td>
+            <td>
+                {{$editData['text_name_H1']}} {{$editData['free_text_name_H1']}} 
+                {{$editData['text_page_H1']}}
+            </td>
         </tr>
         <tr>
             <th>宿題単元１</th>
             <td>
-                正負の数・その他（単元まとめ）
+                {{$editData['category_name1_H1']}} {{$editData['free_category_name1_H1']}}
+                <br>
+                {{$editData['category_name2_H1']}} {{$editData['free_category_name2_H1']}}
+                <br>
+                {{$editData['category_name3_H1']}} {{$editData['free_category_name3_H1']}}
+
             </td>
         </tr>
         <tr>
             <th>宿題教材２</th>
-            <td></td>
+            <td>
+                {{$editData['text_name_H2']}} {{$editData['free_text_name_H2']}} 
+                {{$editData['text_page_H2']}}
+            </td>
         </tr>
         <tr>
             <th>宿題単元２</th>
-            <td></td>
+            <td>
+                {{$editData['category_name1_H2']}} {{$editData['free_category_name1_H2']}}<br>
+                {{$editData['category_name2_H2']}} {{$editData['free_category_name2_H2']}}<br>
+                {{$editData['category_name3_H2']}} {{$editData['free_category_name3_H2']}}
+            </td>
         </tr>
     </x-bs.table>
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.select caption="承認ステータス" id="status" :select2=true :editData=$editData>
-        <option value="1">承認待ち</option>
-        <option value="2">承認</option>
-        <option value="3">差戻し</option>
-    </x-input.select>
+    <x-input.select id="approval_status" caption="承認ステータス" :select2=true :mastrData=$statusList :editData=$editData
+        :select2Search=false :blank=true />
 
     <x-input.textarea caption="管理者コメント" id="admin_comment" :rules=$rules :editData=$editData />
 
     {{-- hidden --}}
     <x-input.hidden id="report_id" :editData=$editData />
-    {{-- hidden --}}
-    <x-input.hidden id="tid" :editData=$editData />
-
-    <x-bs.callout title="登録の際の注意事項" type="warning">
-        承認ステータスを「承認」として更新ボタンを押下すると、 生徒に授業報告書が開示されます。
-    </x-bs.callout>
 
     {{-- フッター --}}
     <x-slot name="footer">

@@ -12,7 +12,7 @@ use App\Models\Contact;
 use App\Models\Student;
 use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncContactTrait;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * 問い合わせ管理 - コントローラ
@@ -47,6 +47,9 @@ class ContactMngController extends Controller
         // 教室リストを取得（＋本部）
         $rooms = $this->mdlGetRoomList();
 
+        // 生徒リストを取得
+        $studentList = $this->mdlGetStudentList();
+
         // 回答状態取得
         $contactState = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_17);
 
@@ -54,6 +57,7 @@ class ContactMngController extends Controller
             'rules' => $this->rulesForSearch(),
             'rooms' => $rooms,
             'editData' => null,
+            'students' => $studentList,
             'contactState' => $contactState
         ]);
     }
@@ -101,8 +105,8 @@ class ContactMngController extends Controller
         // 問い合わせのステータスの検索
         $query->SearchContactStates($form);
 
-        // 生徒名の検索(生徒基本情報参照)
-        (new Student)->scopeSearchName($query, $form);
+        // 生徒IDの検索
+        $query->SearchStudentId($form);
 
         $contactList = $query
             ->select(
@@ -114,7 +118,7 @@ class ContactMngController extends Controller
                 'mst_codes.name as contact_state',
                 'contacts.created_at'
             )
-            // 名前を検索できるようにテーブルを結合
+            // 生徒情報テーブルを結合
             ->sdLeftJoin(Student::class, function ($join) {
                 $join->on('contacts.student_id', '=', 'students.student_id');
             })
@@ -175,7 +179,7 @@ class ContactMngController extends Controller
             )
             ->where('contact_id', $id)
             // 宛先と教室名の結合
-            ->leftJoinSub($rooms, 'room_contact', function ($join) {
+            ->leftJoinSub($rooms, 'room_contacts', function ($join) {
                 $join->on('contacts.campus_cd', '=', 'room_contacts.code');
             })
             // 生徒名取得
@@ -185,7 +189,7 @@ class ContactMngController extends Controller
             // 回答者所属取得
             ->sdLeftJoin(AdminUser::class, 'contacts.adm_id', '=', 'admin_users.adm_id')
             ->leftJoinSub($rooms, 'room_admin', function ($join) {
-                $join->on('admin_users.campus_cd', '=', 'room_admin_users.code');
+                $join->on('admin_users.campus_cd', '=', 'room_admin.code');
             })
             // 回答状態取得
             ->sdLeftJoin(CodeMaster::class, function ($join) {
@@ -218,6 +222,15 @@ class ContactMngController extends Controller
             }
         };
 
+        // 独自バリデーション: リストのチェック 生徒
+        $validationStudentList =  function ($attribute, $value, $fail) {
+            // 生徒リストを取得
+            $students = $this->mdlGetStudentList();
+            if (!isset($students[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
 
         // 独自バリデーション: リストのチェック ステータス
         $validationStateList =  function ($attribute, $value, $fail) {
@@ -232,7 +245,7 @@ class ContactMngController extends Controller
 
         $rules += Contact::fieldRules('campus_cd', [$validationRoomList]);
         $rules += Contact::fieldRules('contact_state', [$validationStateList]);
-        $rules += Student::fieldRules('name');
+        $rules += Contact::fieldRules('student_id', [$validationStudentList]);
 
         return $rules;
     }
@@ -263,7 +276,15 @@ class ContactMngController extends Controller
 
         // 問い合わせ情報の取得
         $editData = Contact::select(
-            '*',
+            'contact_id',
+            'regist_time',
+            'campus_cd',
+            'title',
+            'text',
+            'adm_id',
+            'answer_time',
+            'answer_text',
+            'contact_state',
             // 生徒名の取得
             'students.name'
         )
@@ -277,10 +298,17 @@ class ContactMngController extends Controller
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
-        // 回答日が未入力時、当日の日時をセット
+        // 回答日が未入力時、当日の日付をセット
         if (!$editData->answer_time) {
-            $now = Carbon::now();
-            $editData->answer_time = $now;
+            $today = date("Y-m-d");
+            $editData->answer_time = $today;
+        }
+
+        // 回答者が未入力時、ログイン者をセット
+        if (!$editData->adm_id) {
+            // ログイン者のIDを取得
+            $account = Auth::user();
+            $editData->adm_id = $account->account_id;
         }
 
         return view('pages.admin.contact_mng-edit', [
@@ -415,9 +443,9 @@ class ContactMngController extends Controller
         $rules += Contact::fieldRules('campus_cd', ['required', $validationRoomList]);
         $rules += Contact::fieldRules('title', ['required']);
         $rules += Contact::fieldRules('text', ['required']);
-        $rules += Contact::fieldRules('adm_id', [$validationAdmList]);
-        $rules += Contact::fieldRules('answer_time');
-        $rules += Contact::fieldRules('answer_text');
+        $rules += Contact::fieldRules('adm_id', ['required_if:contact_state,' . AppConst::CODE_MASTER_17_1, $validationAdmList]);
+        $rules += Contact::fieldRules('answer_time', ['required_if:contact_state,' . AppConst::CODE_MASTER_17_1]);
+        $rules += Contact::fieldRules('answer_text', ['required_if:contact_state,' . AppConst::CODE_MASTER_17_1]);
         $rules += Contact::fieldRules('contact_state', ['required', $validationStateList]);
 
         return $rules;

@@ -55,7 +55,7 @@ body {
     color: #fff;
 }
 
-/* 
+/*
   サイドバー アイコンとテキストのマージン
 */
 .sidebar .nav-link > i {
@@ -102,7 +102,7 @@ body {
 /* tdの背景は白にする */
 /* ホバーが効かなくなるのでコメント
 .table td {
-     background-color: white; 
+     background-color: white;
 }
 */
 
@@ -160,7 +160,7 @@ body {
 
 /* カードタグ ------------------------*/
 
-/* 
+/*
   カードの枠に線を表示。
   影も外す
   下にマージンを取る。
@@ -258,7 +258,7 @@ body {
 */
 .login-page,
 .register-page {
-    background: $testea-color;
+    background-color: $testea-color;
 }
 
 /* ログイン画面のタイトルなどの幅 */
@@ -346,6 +346,11 @@ label:not(.form-check-label):not(.custom-file-label) {
     /*font-weight: bold;*/
 }
 
+/* 非アクティブ時のボタンカーソルの統一 ------------------------*/
+.btn.disabled, .btn:disabled {
+    cursor: pointer !important;
+}
+
 /* カレンダー ----------------------------*/
 
 /* 当日の背景色 */
@@ -383,59 +388,39 @@ label:not(.form-check-label):not(.custom-file-label) {
 
 /* 時間割の背景色 */
 [id^="calendar"] .cal_period {
-//    background: #0073b7;
-//    border-color: #0073b7;
     background: #00205b;
     border-color: #00205b;
     font-size: 1em !important;
 }
 
+/* 休業日の予定の背景色 */
+[id^="calendar"] .cal_closed {
+    background: #474747;
+    border-color: #474747;
+}
+
+/* 休業日の予定の背景色 */
+[id^="calendar"] .cal_closed_room {
+    background: #474747;
+    border-color: #474747;
+    font-size: 1.15em !important;
+    padding : 5px;
+}
+
 /* 個別授業の予定の背景色 */
 [id^="calendar"] .cal_class {
-    //background: #f39c12;
-    //border-color: #f39c12;
     background: #0073b7;
     border-color: #0073b7;
 }
 
-/* 個別授業 振替日の予定の背景色 */
-[id^="calendar"] .cal_class_furikae {
-//    background: #8b9b00;
-//    border-color: #8b9b00;
-    background: #7ac143;
-    border-color: #7ac143;
-}
-
-/* 個別授業 後日振替の予定の背景色（短期講習も同様） */
-[id^="calendar"] .cal_class_gojitsu_furikae {
-    //background: #9e9e9e;
-    //border-color: #9e9e9e;
-    background: #6c757d;
-    border-color: #6c757d;
-}
-
 /* 集団授業の予定の背景色 */
 [id^="calendar"] .cal_group {
-    //background: #7507b4;
-    //border-color: #7507b4;
-//    background: #af0058;
-//    border-color: #af0058;
     background: #7507b4;
     border-color: #7507b4;
 }
 
-/* 短期講習 振替日の予定の背景色 */
-[id^="calendar"] .cal_tanki_koshu_furikae {
-//    background: #007932;
-//    border-color: #007932;
-    background: #af0058;
-    border-color: #af0058;
-}
-
 /* 演習の予定の背景色 */
 [id^="calendar"] .cal_ensyu {
-//    background: yellowgreen;
-//    border-color: yellowgreen;
     background: #7ac143;
     border-color: #7ac143;
 }
@@ -452,30 +437,24 @@ label:not(.form-check-label):not(.custom-file-label) {
 [id^="calendar"] .cal_three {
     background: #00a78e;
     border-color: #00a78e;
-//    background: yellow;
-//    border-color: yellow;
 }
+
+/* 家庭教師の予定の背景色 */
+[id^="calendar"] .cal_home {
+    background: #d2691e;
+    border-color: #d2691e;
+    }
 
 /* ハイプランの予定の背景色 */
 [id^="calendar"] .cal_highplan {
-    //background: salmon;
-    //border-color: salmon;
     background: #f39c12;
     border-color: #f39c12;
 }
 
 /* 自習の予定の背景色 */
 [id^="calendar"] .cal_jisyu {
-    //background: #0073b7;
-    //border-color: #0073b7;
     background: salmon;
     border-color: salmon;
-}
-
-/* イベントの予定の背景色 */
-[id^="calendar"] .cal_event {
-    background: orangered;
-    border-color: orangered;
 }
 
 /* 面談の背景色 */
@@ -486,16 +465,16 @@ label:not(.form-check-label):not(.custom-file-label) {
     border-color: #af0058;
 }
 
-/* 休業日の予定の背景色 */
-[id^="calendar"] .cal_closed {
-    background: #474747;
-    border-color: #474747;
+/* 振替中・未振替の予定の背景色 */
+[id^="calendar"] .cal_class_furikae {
+    background: #6c757d;
+    border-color: #6c757d;
 }
 
-/* マーカー表示（オンライン） */
-[id^="calendar"] .class_marker {
-    font-weight: bold;
-    background:linear-gradient(transparent 50%, yellow 85%);
+/* イベントの予定の背景色 */
+[id^="calendar"] .cal_event {
+    background: orangered;
+    border-color: orangered;
 }
 
 /* 授業特記表示（振替・初回・体験・追加） */
@@ -504,6 +483,12 @@ label:not(.form-check-label):not(.custom-file-label) {
     font-weight: bold;
     background: red;
     padding: 2px 2px;
+}
+
+/* マーカー表示（オンライン） */
+[id^="calendar"] .class_marker {
+    font-weight: bold;
+    background:linear-gradient(transparent 50%, yellow 85%);
 }
 
 /* fullcalendar v6 対応 */
@@ -546,10 +531,40 @@ label:not(.form-check-label):not(.custom-file-label) {
     box-shadow: 0 0 0 0 rgba(38, 143, 255, 0.5);
 }
 
+/* カスタムボタン（ページ内リンク） */
+.fc .fc-topLinkButton-button {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.fc .fc-topLinkButton-button:hover  {
+    background-color: #5a6268;
+    border-color: #545b62;
+    }
+
+.fc .fc-topLinkButton-button:focus, .fc .fc-topLinkButton-button.focus {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.fc .fc-topLinkButton-button.disabled, .fc .fc-topLinkButton-button:disabled {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+.fc .fc-topLinkButton-button:not(:disabled):not(.disabled):active, .fc .fc-topLinkButton-button:not(:disabled):not(.disabled).active,
+      .show > .btn-secondary.dropdown-toggle {
+        color: #fff;
+        background-color: #545b62;
+        border-color: #4e555b;
+      }
+
+.fc .fc-topLinkButton-button:not(:disabled):not(.disabled):active:focus, .fc .fc-topLinkButton-button:not(:disabled):not(.disabled).active:focus,
+.show > .fc .fc-topLinkButton-buttony.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0 rgba(130, 138, 145, 0.5);
+}
+
 /* 空き時間・特別期間講習 コマ枠 ----------*/
-//.card.pa-table-checked {
-//    overflow-x: scroll;
-//}
 
 .table-checked th {
     text-align: center;
@@ -561,8 +576,9 @@ label:not(.form-check-label):not(.custom-file-label) {
     white-space: nowrap;
 }
 
-.table-checked td {
+.table-checked td:not(.tt) {
     padding: 0;
+    max-width: 50px;
 }
 
 .table-checked td div {
@@ -571,6 +587,7 @@ label:not(.form-check-label):not(.custom-file-label) {
     width: 100%;
 }
 
+/* 講師空き時間 空きコマ枠 */
 .chk-wt {
     display: none;
 }
@@ -579,8 +596,9 @@ label:not(.form-check-label):not(.custom-file-label) {
     background-color: rgb(201, 233, 143);
 }
 
-.chk-wt.except + div {
-    background-color: #4c4c4c;
+/* 講師空き時間 レギュラー授業の枠 */
+.chk-wt:disabled + div {
+    background-color: #4c4c4c !important;
 }
 
 /* 特別期間講習 授業コマ枠 */
@@ -588,27 +606,38 @@ label:not(.form-check-label):not(.custom-file-label) {
     display: none;
 }
 
+/* 特別期間講習 授業不可の枠 */
 .chk-wt2:checked + div {
-    background-color: #4c4c4c;
+    background-color: #4c4c4c !important;
 }
 
-/*  授業登録済みの枠 */
-//.chk-wt2:disabled + div {
-//    background-color: rgb(201, 233, 143);
-//}
-.table-checked td div .class-info {
-    padding: 0.75rem;
-    font-size: 0.875rem;
+/* 特別期間講習 コマ組み画面 */
+.chk-season-plan {
+    display: none;
+}
+
+/* 特別期間講習 コマ組み画面 授業不可の枠 */
+.chk-season-plan:disabled + div {
+    background-color: #4c4c4c !important;
+}
+
+/* 特別期間講習 コマ組み画面 授業登録済みの枠 */
+.chk-season-plan:checked + div {
     background-color: rgb(201, 233, 143);
+}
+
+.table-checked td div .class-info {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.725rem;
 }
 
 /*  生徒コマ組み 講師選択の枠 */
 .table-checked td div .sel-button {
-    padding: 0.75rem;
+    padding: 0.75rem 0.5rem;
     font-size: 0.725rem;
 }
 
-/*テーブルごとの個別調整*/
+/* テーブルごとの個別調整 ----------*/
 .table > thead > tr > th.t-minimum {
     width: 1px;
     white-space: nowrap;
@@ -714,9 +743,12 @@ label:not(.form-check-label):not(.custom-file-label) {
 
     .card-body .table.smart-phone tbody > tr > td:last-of-type {
         border: 1px solid #dee2e6;
-        text-align: center;
         border: none;
         padding: 6px 12px;
+    }
+
+    .card-body .table.smart-phone.table-button tbody > tr > td:last-of-type {
+        text-align: center;
     }
 
     .card-body .table.smart-phone tbody > tr > td.not-center:last-of-type {
@@ -748,6 +780,12 @@ label:not(.form-check-label):not(.custom-file-label) {
     }
     .table > thead > tr > th.t-week {
         width: 14%;
+        font-size: 0.725rem;
+        padding: 0.25rem;
+    }
+
+    /*特別期間講習*/
+    .table > thead > tr > th.t-period {
         font-size: 0.725rem;
         padding: 0.25rem;
     }
@@ -830,9 +868,12 @@ label:not(.form-check-label):not(.custom-file-label) {
 
     .table.smart-phone-modal.modal-fix tbody > tr > td:last-of-type {
         border: 1px solid #dee2e6;
-        text-align: center;
         border: none;
         padding: 6px 12px;
+    }
+
+    .table.smart-phone-modal.modal-fix.table-button tbody > tr > td:last-of-type {
+        text-align: center;
     }
 
     .table.smart-phone-modal.modal-fix tbody > tr > td.not-center:last-of-type {

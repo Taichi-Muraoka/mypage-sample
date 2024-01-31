@@ -1,6 +1,7 @@
 @extends('adminlte::page')
+@inject('formatter','App\Libs\CommonDateFormat')
 
-@section('title', '授業欠席登録'))
+@section('title', '授業欠席登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)
@@ -12,31 +13,32 @@
 <x-bs.card :form=true>
 
     {{-- hidden --}}
-    <x-input.hidden id="roomcd" :editData=$editData />
-    <x-input.hidden id="schedule_id" :editData=$editData />
+    <x-input.hidden id="campus_cd" :editData=$schedule />
+    <x-input.hidden id="schedule_id" :editData=$schedule />
+    <x-input.hidden id="studentCnt" :editData=$schedule :rules=$rules />
 
     <p>１対多授業の欠席登録を行います。</p>
 
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="35%">校舎</th>
-            <td>久我山</td>
+            <td>{{$schedule->campus_name}}</td>
         </tr>
         <tr>
             <th>ブース</th>
-            <td>Aテーブル</td>
+            <td>{{$schedule->booth_name}}</td>
         </tr>
         <tr>
             <th>コース名</th>
-            <td>集団授業</td>
+            <td>{{$schedule->course_name}}</td>
         </tr>
         <tr>
             <th>授業日・時限</th>
-            <td>2023/05/25 5限</td>
+            <td>{{$formatter::formatYmdDay($schedule->target_date)}} {{$schedule->period_no}}限</td>
         </tr>
         <tr>
             <th>講師名</th>
-            <td>CWテスト教師１０１</td>
+            <td>{{$schedule->tutor_name}}</td>
         </tr>
     </x-bs.table>
 
@@ -44,55 +46,36 @@
     <div class="mb-3"></div>
 
     {{-- テーブル --}}
-    <x-bs.table :bordered=false :hover=false >
+    <x-bs.table :bordered=false :hover=false class="mb-small">
+        {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-          <td>受講生徒</td>
+          <td width="40%">受講生徒</td>
           <td>出欠ステータス</td>
         </x-slot>
 
-        <tr>
-            <td id="student_1">CWテスト生徒１</td>
+        {{-- テーブル行 --}}
+        @for ($i = 0; $i < $schedule['studentCnt']; $i++) <tr>
+            {{-- hidden --}}
+            <x-input.hidden id="class_member_id_{{$i}}" :editData=$classMembers[$i] />
+            <x-input.hidden id="student_id_{{$i}}" :editData=$classMembers[$i] />
+            <td>{{$classMembers[$i]['student_name_' . $i]}}</td>
             <td>
-                <x-input.select id="absent_1" :select2=true :select2Search=false :editData="$editData">
-                    <option value="0" selected>実施前・出席</option>
-                    <option value="5">欠席（集団授業）</option>
-                </x-input.select>
+                <x-input.select id="absent_status_{{$i}}" :select2=true :select2Search=false :blank=false 
+                    :mastrData=$todayabsentList :rules=$rules :editData=$classMembers[$i] />
             </td>
         </tr>
-        <tr>
-            <td id="student_2">CWテスト生徒２</td>
-            <td>
-                <x-input.select id="absent_2" :select2=true :select2Search=false :editData="$editData">
-                    <option value="0" selected>実施前・出席</option>
-                    <option value="5">欠席（集団授業）</option>
-                </x-input.select>
-            </td>
-        </tr>
-      </x-bs.table>
+        @endfor
+    </x-bs.table>
 
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
-            {{-- idを置換 --}}
             <x-button.back url="{{ route('room_calendar') }}" />
-
-            @if (request()->routeIs('room_calendar-edit'))
-            {{-- 編集時 --}}
-            <div class="d-flex justify-content-end">
-                <x-button.submit-delete />
-                <x-button.submit-edit />
-            </div>
-            @else
-            {{-- 登録時 --}}
-            <x-button.submit-new />
-            @endif
-
+            {{-- 編集のみ --}}
+            <x-button.submit-edit />
         </div>
     </x-slot>
 
-
 </x-bs.card>
-
-
 
 @stop

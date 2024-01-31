@@ -12,58 +12,62 @@
 
     <p>以下の追加請求申請について、編集を行います。</p>
 
-    {{-- 種別：事務作業の場合 --}}
     <x-bs.table :hover=false :vHeader=true>
         <tr>
-            <th>講師名</th>
-            <td>CWテスト教師１０１</td>
+            <th width="35%">講師名</th>
+            <td>{{$editData['tutor_name']}}</td>
         </tr>
         <tr>
-            <th width="35%">請求種別</th>
-            <td>業務依頼（教室）</td>
+            <th>請求種別</th>
+            <td>{{$editData['surcharge_kind_name']}}</td>
         </tr>
         <tr>
             <th>校舎</th>
-            <td>久我山</td>
+            <td>{{$editData['campus_name']}}</td>
         </tr>
         <tr>
             <th>実施日</th>
-            <td>2023/01/10</td>
+            <td>{{$editData['working_date']->format('Y/m/d')}}</td>
         </tr>
+
+        {{-- 開始時刻・時間はデータがあるときのみ表示 --}}
+        @if(isset($editData['start_time']))
         <tr>
             <th>開始時刻</th>
-            <td>16:00</td>
+            <td>
+                {{$editData['start_time']->format('H:i')}}
+            </td>
         </tr>
         <tr>
             <th>時間（分）</th>
-            <td>60</td>
+            <td>{{$editData['minutes']}}</td>
         </tr>
+        @endif
+
         <tr>
             <th>金額</th>
-            <td>1000</td>
+            <td>{{number_format($editData['tuition'])}}</td>
         </tr>
         <tr>
             <th>内容（作業・費目等）</th>
-            <td>教材プリントコピー作業</td>
+            <td class="nl2br">{{$editData['comment']}}</td>
         </tr>
     </x-bs.table>
 
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.select caption="ステータス" id="status" :select2=true :editData="$editData">
-        <option value="1">承認待ち</option>
-        <option value="2">承認</option>
-        <option value="3">差戻し</option>
-    </x-input.select>
+    <x-input.select id="approval_status" caption="ステータス" :select2=true :mastrData=$approvalStatusList
+        :editData=$editData :select2Search=false :blank=false />
 
-    <x-input.textarea caption="管理者コメント" id="text" :rules=$rules />
+    <x-input.textarea caption="管理者コメント" id="admin_comment" :rules=$rules :editData=$editData />
 
-    <x-input.select caption="支払年月" id="payment" :select2=true :editData="$editData">
-        <option value="1">2023/04</option>
-        <option value="2">2023/05</option>
-        <option value="3">2023/06</option>
-    </x-input.select>
+    <x-input.select id="payment_date" caption="支払年月" :select2=true :mastrData=$paymentDateList :editData=$editData
+        :select2Search=false :blank=false vShow="form.approval_status == {{ App\Consts\AppConst::CODE_MASTER_2_1 }}" />
+
+    {{-- hidden --}}
+    <x-input.hidden id="surcharge_id" :editData=$editData />
+    <x-input.hidden id="working_date" :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">

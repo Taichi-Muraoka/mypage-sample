@@ -1,4 +1,5 @@
 @extends('adminlte::page')
+@inject('formatter','App\Libs\CommonDateFormat')
 
 @section('title', '請求書表示')
 
@@ -10,21 +11,22 @@
 <x-bs.card :form=true>
 
     <p>{{$invoice->invoice_date->format('Y年n月')}}分 お月謝のお知らせ</p>
-    <p>{{$invoice->sname}} 様 保護者様</p>
-    <p>{{$invoice->issue_date->format('Y年n月j日')}} 発行</p>
+    <p>{{$invoice->student_name}} 様 保護者様</p>
+    <p>{{$invoice_import->issue_date->format('Y年n月j日')}} 発行</p>
 
-    <x-bs.table :hover=false :vHeader=true class="mb-4">
+    <x-bs.table :hover=false :vHeader=true class="mb-4" :smartPhone=true>
         <tr>
             <th width="35%">お月謝期間</th>
-            <td>
-            @if ($invoice->agreement1 != ''){{$invoice->agreement1}}@endif
-            @if ($invoice->agreement2 != '')<br>{{$invoice->agreement2}}@endif
-            </td>
+            <x-bs.td-sp>
+                {{$invoice_import->term_text0}}<br>
+                @if ($invoice_import->term_text1 != ''){{$invoice_import->term_text1}}<br>@endif
+                @if ($invoice_import->term_text2 != ''){{$invoice_import->term_text2}}@endif
+            </x-bs.td-sp>
         </tr>
     </x-bs.table>
 
     {{-- テーブル --}}
-    <x-bs.table>
+    <x-bs.table :smartPhone=true>
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
@@ -37,55 +39,62 @@
         @if(count($invoice_detail) > 0)
         {{-- テーブル行 --}}
         @for ($i = 0; $i < count($invoice_detail); $i++) <tr>
-            <td>{{$invoice_detail[$i]->cost_name}}</td>
-            <td class="t-price">{{number_format($invoice_detail[$i]->unit_cost)}}円</td>
-            <td class="t-price">{{number_format($invoice_detail[$i]->times)}}</td>
-            <td class="t-price">{{number_format($invoice_detail[$i]->cost)}}円</td>
+            <x-bs.td-sp caption="摘要">{{$invoice_detail[$i]->description}}</x-bs.td-sp>
+            <x-bs.td-sp caption="単価" class="t-price">
+                @if($invoice_detail[$i]->unit_price != null)
+                {{number_format($invoice_detail[$i]->unit_price)}}円
+                @endif
+            </x-bs.td-sp>
+            <x-bs.td-sp caption="コマ数" class="t-price">
+                @if($invoice_detail[$i]->times != null)
+                {{number_format($invoice_detail[$i]->times)}}
+                @endif
+            </x-bs.td-sp>
+            <x-bs.td-sp caption="金額（税込）" class="t-price">{{number_format($invoice_detail[$i]->amount)}}円</x-bs.td-sp>
             </tr>
-        @endfor
-        <tr>
-            <td class="font-weight-bold">合計</td>
-            <td></td>
-            <td></td>
-            <td class="font-weight-bold t-price">{{number_format($invoice->cost_sum)}}円</td>
-        </tr>
-        @endif
+            @endfor
+            <tr>
+                <td class="font-weight-bold">合計</td>
+                <td class="font-weight-bold t-price" colspan="3">{{number_format($invoice->total_amount)}}円</td>
+            </tr>
+            @endif
 
     </x-bs.table>
 
     {{-- 余白 --}}
     <div class="mb-4"></div>
 
-    <x-bs.table :hover=false :vHeader=true class="mb-4">
+    <x-bs.table :hover=false :vHeader=true class="mb-4" :smartPhone=true>
         <tr>
             <th width="35%">お支払方法</th>
-            <td>{{$invoice->pay_name}}</td>
+            <x-bs.td-sp>{{$invoice->pay_type_name}}</x-bs.td-sp>
         </tr>
-        @if ($invoice->billflg == 1)
         <tr>
-            <th>お引落日</th>
-            <td>{{$invoice->bill_date->format('Y年n月j日')}}</td>
+            @if ($invoice->pay_type == AppConst::CODE_MASTER_21_1)<th>お引落日</th>
+            @elseif($invoice->pay_type == AppConst::CODE_MASTER_21_2)<th>お振込期限</th>
+            @endif
+            <x-bs.td-sp>{{$formatter::formatYmdDayString($invoice_import->bill_date)}}</x-bs.td-sp>
         </tr>
         <tr>
             <th>備考</th>
-            <td>{{$invoice->note}}</td>
+            <x-bs.td-sp>{!! nl2br(e($invoice->note)) !!}</x-bs.td-sp>
         </tr>
-        @endif
+
     </x-bs.table>
 
     {{-- 余白 --}}
     <div class="mb-4"></div>
 
-    {{-- TODO:校舎メールアドレスは校舎マスタより取得する --}}
-    <p>お月謝についてのお問い合わせは、校舎のメールアドレス（kugayama@testea.net）または、<br>
-    マイページの「問い合わせ」ページへお願いいたします。</p>
+    <p>お月謝についてのお問い合わせは、校舎のメールアドレス（{{$invoice->email_campus}}）または、<br>
+        マイページの「問い合わせ」ページへお願いいたします。</p>
 
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
             <x-button.back />
             <div class="d-flex justify-content-end">
-                <x-button.submit-href caption="PDFダウンロード" icon="fas fa-download" href="{{ Route('invoice-pdf', $editData['date']) }}"/>
+                <x-button.submit-href caption="PDFダウンロード" icon="fas fa-download"
+                    href="{{ Route('invoice-pdf', $editData['date']) }}" />
             </div>
         </div>
     </x-slot>

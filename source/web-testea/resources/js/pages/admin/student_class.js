@@ -15,6 +15,7 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
+
         // Vue: モーダル
         this.getVueModal();
 

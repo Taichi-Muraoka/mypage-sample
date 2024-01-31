@@ -109,7 +109,7 @@ class MstTimetable extends Model
             'period_no' => ['integer'],
             'start_time' => ['vdTime'],
             'end_time' => ['vdTime', 'after:start_time'],
-            'timetable_kind' => ['integer', 'in:0,1']
+            'timetable_kind' => ['integer']
         ];
         return $_fieldRules;
     }

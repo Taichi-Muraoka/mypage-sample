@@ -5,18 +5,12 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Score;
 use App\Models\ScoreDetail;
-use App\Models\CodeMaster;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtRoom;
-use App\Models\ExtTrialMaster;
 use Illuminate\Support\Facades\DB;
 use App\Consts\AppConst;
-use App\Libs\AuthEx;
 use App\Http\Controllers\Traits\FuncGradesTrait;
-use Illuminate\Support\Facades\Lang;
+use Carbon\Carbon;
 
 /**
  * 生徒成績 - コントローラ
@@ -33,8 +27,7 @@ class GradesMngController extends Controller
      * @return void
      */
     public function __construct()
-    {
-    }
+    { }
 
     //==========================
     // 一覧
@@ -51,33 +44,19 @@ class GradesMngController extends Controller
         // IDのバリデーション
         $this->validateIds($sid);
 
-        // 教室リストを取得
-        $rooms = $this->mdlGetRoomList(false);
+        // 教室管理者の場合、自分の校舎の生徒のみにガードを掛ける
+        $this->guardRoomAdminSid($sid);
 
-        // 学年リストを取得
-        $classes = $this->mdlMenuFromExtGenericMaster(AppConst::EXT_GENERIC_MASTER_112);
+        // 生徒名を取得する
+        $name = $this->mdlGetStudentName($sid);
 
         return view('pages.admin.grades_mng', [
-            'rules' => $this->rulesForSearch(),
-            'name' => "CWテスト生徒１",
-            'sid' => $sid,
-            'rooms' => $rooms,
-            //'classes' => $classes,
-            'editData' => null
+            'name' => $name,
+            // 一覧初期表示時の検索用にIDを渡す（hidden）
+            'editData' => [
+                'student_id' => $sid
+            ]
         ]);
-    }
-
-    /**
-     * バリデーション(検索用)
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return mixed バリデーション結果
-     */
-    public function validationForSearch(Request $request)
-    {
-        // リクエストデータチェック
-        $validator = Validator::make($request->all(), $this->rulesForSearch());
-        return $validator->errors();
     }
 
     /**
@@ -88,64 +67,23 @@ class GradesMngController extends Controller
      */
     public function search(Request $request)
     {
-        // バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForSearch())->validate();
-
-        // formを取得
-        $form = $request->all();
+        // 生徒IDを取得
+        $sid = $request->input('student_id');
 
         // クエリを作成
         $query = Score::query();
 
-        // 生徒の教室の検索(生徒基本情報参照)
-        if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
-            $query->where($this->guardRoomAdminTableWithSid());
-        } else {
-            // 管理者の場合検索フォームから取得
-            $query->SearchRoom($form);
-        }
+        // 教室管理者の場合、自分の校舎コードの生徒のみにガードを掛ける
+        $query->where($this->guardRoomAdminTableWithSid());
 
-        // 学年の検索(生徒基本情報参照)
-        (new ExtStudentKihon)->scopeSearchCls($query, $form);
-
-        // 生徒名の検索(生徒基本情報参照)
-        (new ExtStudentKihon)->scopeSearchName($query, $form);
+        // 画面表示中生徒のデータに絞り込み
+        $query->where('scores.student_id', $sid);
 
         // データを取得
-        $grades = $query
-            ->select(
-                'grades_id as id',
-                'regist_time',
-                'ext_student_kihon.name as sname',
-                'mst_codes_9.name as type_name',
-                'mst_codes.name as teiki_name',
-                'ext_trial_master.name as moshi_name',
-                'scores.created_at'
-            )
-            // 試験種別名の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('scores.exam_type', '=', 'mst_codes_9.code')
-                    ->where('mst_codes_9.data_type', AppConst::CODE_MASTER_9);
-            }, 'mst_codes_9')
-            // 定期試験名の取得
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('scores.exam_id', '=', 'mst_codes.code')
-                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_10)
-                    ->where('scores.exam_type', AppConst::CODE_MASTER_9_2);
-            })
-            // 模擬試験名の取得
-            ->sdLeftJoin(ExtTrialMaster::class, function ($join) {
-                $join->on('scores.exam_id', '=', 'ext_trial_master.tmid')
-                    ->where('scores.exam_type', AppConst::CODE_MASTER_9_1);
-            })
-            // 生徒名の取得
-            ->sdLeftJoin(ExtStudentKihon::class, 'scores.student_id', '=', 'ext_student_kihon.sid')
-            ->orderBy('scores.regist_time', 'desc')
-            ->orderBy('scores.created_at', 'desc');
+        $scores = $this->getScoreList($query);
 
         // ページネータで返却
-        return $this->getListAndPaginator($request, $grades);
+        return $this->getListAndPaginator($request, $scores);
     }
 
     /**
@@ -159,107 +97,27 @@ class GradesMngController extends Controller
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'id');
 
-        return ['id' => $request->id];
+        // 成績IDを取得
+        $id = $request->input('id');
 
-    //==========================
-    // 本番用処理
-    //==========================
-        // // IDのバリデーション
-        // $this->validateIdsFromRequest($request, 'id');
+        // 生徒成績を取得
+        $score = $this->getScore($id);
 
-        // // IDを取得
-        // $id = $request->input('id');
+        // 生徒成績詳細を取得
+        $scoreDetails = $this->getScoreDetail($id);
 
-        // // クエリを作成
-        // $query = Score::query();
-
-        // // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
-        // $query->where($this->guardRoomAdminTableWithSid());
-
-        // // データを取得（生徒成績）
-        // $grades = $query
-        //     // IDを指定
-        //     ->where('scores.grades_id', $id)
-        //     // データを取得
-        //     ->select(
-        //         'scores.regist_time',
-        //         'ext_student_kihon.name as sname',
-        //         'mst_codes_9.name as type_name',
-        //         'mst_codes.name as teiki_name',
-        //         'ext_trial_master.name as moshi_name',
-        //         'student_comment'
-        //     )
-        //     // 試験種別名の取得
-        //     ->sdLeftJoin(CodeMaster::class, function ($join) {
-        //         $join->on('scores.exam_type', '=', 'mst_codes_9.code')
-        //             ->where('mst_codes_9.data_type', AppConst::CODE_MASTER_9);
-        //     }, 'mst_codes_9')
-        //     // 定期試験名の取得
-        //     ->sdLeftJoin(CodeMaster::class, function ($join) {
-        //         $join->on('scores.exam_id', '=', 'mst_codes.code')
-        //             ->where('mst_codes.data_type', AppConst::CODE_MASTER_10)
-        //             ->where('scores.exam_type', AppConst::CODE_MASTER_9_2);
-        //     })
-        //     // 模擬試験名の取得
-        //     ->sdLeftJoin(ExtTrialMaster::class, function ($join) {
-        //         $join->on('scores.exam_id', '=', 'ext_trial_master.tmid')
-        //             ->where('scores.exam_type', AppConst::CODE_MASTER_9_1);
-        //     })
-        //     // 生徒名の取得
-        //     ->sdLeftJoin(ExtStudentKihon::class, 'scores.student_id', '=', 'ext_student_kihon.sid')
-        //     ->firstOrFail();
-
-        // // データを取得（生徒成績詳細）
-        // $gradesDetails = $this->getGradesDetail($id);
-
-        // return [
-        //     'regist_time' => $grades->regist_time,
-        //     'sname' => $grades->sname,
-        //     'type_name' => $grades->type_name,
-        //     'teiki_name' => $grades->teiki_name,
-        //     'moshi_name' => $grades->moshi_name,
-        //     'student_comment' => $grades->student_comment,
-        //     'gradesDetails' => $gradesDetails
-        // ];
-    }
-
-    /**
-     * バリデーションルールを取得(検索用)
-     *
-     * @return array ルール
-     */
-    private function rulesForSearch()
-    {
-
-        $rules = array();
-
-        // 独自バリデーション: リストのチェック 教室
-        $validationRoomList =  function ($attribute, $value, $fail) {
-
-            // 教室リストを取得
-            $rooms = $this->mdlGetRoomList(false);
-            if (!isset($rooms[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-        };
-
-        // 独自バリデーション: リストのチェック 学年
-        $validationClasseList =  function ($attribute, $value, $fail) {
-
-            // 学年リストを取得
-            $classes = $this->mdlMenuFromExtGenericMaster(AppConst::EXT_GENERIC_MASTER_112);
-
-            if (!isset($classes[$value])) {
-                // 不正な値エラー
-                return $fail(Lang::get('validation.invalid_input'));
-            }
-        };
-        $rules += ExtStudentKihon::fieldRules('name');
-        $rules += ExtStudentKihon::fieldRules('cls_cd', [$validationClasseList]);
-        $rules += ExtRoom::fieldRules('roomcd', [$validationRoomList]);
-
-        return $rules;
+        return [
+            'exam_type' => $score->exam_type,
+            'regist_date' => $score->regist_date,
+            'student_name' => $score->student_name,
+            'exam_type_name' => $score->exam_type_name,
+            'practice_exam_name' => $score->practice_exam_name,
+            'regular_exam_name' => $score->regular_exam_name,
+            'term_name' => $score->term_name,
+            'exam_date' => $score->exam_date,
+            'student_comment' => $score->student_comment,
+            'scoreDetails' => $scoreDetails
+        ];
     }
 
     //==========================
@@ -267,29 +125,79 @@ class GradesMngController extends Controller
     //==========================
 
     /**
+     * 成績入力欄数の取得
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed テンプレート
+     */
+    public function getDataSelect(Request $request)
+    {
+        // reバリデーション
+        $this->validateIdsFromRequest($request, 'exam_type', 'school_kind');
+
+        $count = $this->getDisplayCount($request->exam_type, $request->school_kind);
+
+        return [
+            'count' => $count,
+        ];
+    }
+
+    /**
      * 登録画面
      *
      * @return view
      */
-    public function new()
+    public function new($sid)
     {
+        // IDのバリデーション
+        $this->validateIds($sid);
+
+        // 教室管理者の場合、自分の教室の生徒のみにガードを掛ける
+        $this->guardRoomAdminSid($sid);
+
+        // 生徒名を取得する
+        $name = $this->mdlGetStudentName($sid);
+
+        // 生徒の学年を取得する
+        $grade = $this->getGradeAtRegist($sid);
+        // 学年に応じた教科リストを取得する
+        $subjectList = $this->mdlGetGradeSubjectList($grade->school_kind);
+        // 学年に応じた成績入力欄数を取得する（模試用）
+        $display_count = $this->getDisplayCount(AppConst::CODE_MASTER_43_0, $grade->school_kind);
+
         // 試験種別リストを取得
-        $examTypes = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_9);
+        // 学校区分によって非表示項目があるためFuncGradesTraitで処理
+        $examTypeList = $this->getExamTypeList($grade->school_kind);
 
         // 定期考査名リストを取得
-        $teikiNames = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_10);
+        $teikiList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_45);
+        // 学期リストを取得
+        $termList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_44);
 
+        // hidden用,route用データセット
         $editData = [
-            "student_id" => 1,
+            "student_id" => $sid,
+            "grade_cd" => $grade->grade_cd,
+            // 模試を初期表示とする
+            "exam_type" => AppConst::CODE_MASTER_43_0,
+        ];
+
+        // 成績入力欄数の判定用データセット
+        $displayCountData = [
+            "school_kind" => $grade->school_kind,
+            "display_count" => $display_count,
         ];
 
         return view('pages.admin.grades_mng-input', [
+            'rules' => $this->rulesForInput(null),
+            'name' => $name,
+            'examTypeList' => $examTypeList,
+            'teikiList' => $teikiList,
+            'termList' => $termList,
+            'subjectList' => $subjectList,
             'editData' => $editData,
             'editDataDtls' => [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
-            'rules' => $this->rulesForInput(null),
-            'examTypes' => $examTypes,
-            'teikiNames' => $teikiNames,
-            'curriculums' => null,
+            'displayCountData' => $displayCountData,
         ]);
     }
 
@@ -301,34 +209,41 @@ class GradesMngController extends Controller
      */
     public function create(Request $request)
     {
-
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        // ログイン者の情報を取得する
-        $account = Auth::user();
-
         // トランザクション(例外時は自動的にロールバック)
-        DB::transaction(function () use ($request, $account) {
+        DB::transaction(function () use ($request) {
 
-            // 現在日時を取得
-            $now = Carbon::now();
-            // Gradesテーブルへのinsert
-            $grades = new Grades;
-            // 登録
-            $grades->student_id = $account->account_id;
-            $grades->exam_type =  $request['exam_type'];
-            if ($request['exam_type'] == AppConst::CODE_MASTER_9_1) {
-                $grades->exam_id = $request['moshi_id'];
-            } else {
-                $grades->exam_id = $request['teiki_id'];
+            $score = new Score;
+            // 共通保存項目
+            $score->student_id = $request->student_id;
+            $score->exam_type =  $request['exam_type'];
+            $score->grade_cd =  $request['grade_cd'];
+            $score->student_comment = $request['student_comment'];
+            $score->regist_date = Carbon::now();
+
+            // 試験種別によって保存項目分岐
+            if ($request['exam_type'] == AppConst::CODE_MASTER_43_0) {
+                // 模試
+                $score->practice_exam_name = $request['practice_exam_name'];
+                $score->exam_date = $request['exam_date'];
             }
-            $grades->student_comment = $request['student_comment'];
-            $grades->regist_time = $now;
-            $grades->save();
+            if ($request['exam_type'] == AppConst::CODE_MASTER_43_1) {
+                // 定期考査
+                $score->regular_exam_cd = $request['regular_exam_cd'];
+                $score->exam_date = $request['exam_date'];
+            }
+            if ($request['exam_type'] == AppConst::CODE_MASTER_43_2) {
+                // 評定
+                $score->term_cd = $request['term_cd'];
+            }
 
-            // GradesDetailテーブルへのinsert
-            $this->saveToGradesDetail($request, $grades->grades_id);
+            // Scoreテーブルへのinsert
+            $score->save();
+
+            // ScoreDetailテーブルへのinsert
+            $this->saveToScoreDetail($request, $score->score_id);
         });
 
         return;
@@ -342,61 +257,57 @@ class GradesMngController extends Controller
      */
     public function edit($gradesId)
     {
-        // // IDのバリデーション
-        // $this->validateIds($gradesId);
+        // IDのバリデーション
+        $this->validateIds($gradesId);
+
+        // クエリを作成(PKでユニークに取る)
+        $score = Score::where('score_id', $gradesId)
+            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+            ->where($this->guardRoomAdminTableWithRoomCd())
+            // 該当データがない場合はエラーを返す
+            ->firstOrFail();
+
+        // データを取得（生徒成績詳細）
+        $scoreDetails = $this->getScoreDetailEdit($gradesId);
+
+        // 生徒IDを取得
+        $sid = $score->student_id;
+        // 生徒名を取得する
+        $name = $this->mdlGetStudentName($sid);
+
+        // 成績登録時の学年を取得する
+        $grade = $this->getGradeAtEdit($gradesId);
+        // 成績登録時の学年に応じた教科リストを取得する
+        $subjectList = $this->mdlGetGradeSubjectList($grade->school_kind);
+        // 学年に応じた成績入力欄数を取得する
+        $display_count = $this->getDisplayCount($score->exam_type, $grade->school_kind);
 
         // 試験種別リストを取得
-        $examTypes = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_9);
+        // 学校区分によって非表示項目があるためFuncGradesTraitで処理
+        $examTypeList = $this->getExamTypeList($grade->school_kind);
 
         // 定期考査名リストを取得
-        $teikiNames = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_10);
+        $teikiList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_45);
+        // 学期リストを取得
+        $termList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_44);
 
-        // // クエリを作成
-        // $query = Score::query();
-
-        // // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
-        // $query->where($this->guardRoomAdminTableWithSid());
-
-        // // データを取得（生徒成績）
-        // $grades = $query
-        //     // データを取得
-        //     ->select(
-        //         'regist_time',
-        //         'ext_student_kihon.name as sname',
-        //         'grades_id',
-        //         'scores.student_id',
-        //         'exam_type',
-        //         'exam_id as teiki_id',
-        //         'exam_id as moshi_id',
-        //         'student_comment'
-        //     )
-        //     // 生徒名の取得
-        //     ->sdLeftJoin(ExtStudentKihon::class, 'scores.student_id', '=', 'ext_student_kihon.sid')
-        //     // IDを指定
-        //     ->where('scores.grades_id', $gradesId)
-        //     // MEMO: 取得できない場合はエラーとする
-        //     ->firstOrFail();
-
-        // // データを取得（生徒成績詳細）
-        // $gradesDetails = $this->getGradesDetailEdit($gradesId);
-
-        // // 教科リストを取得（対象生徒のもの）
-        // $curriculums = $this->getCurriculumList($grades->student_id);
-
-        // // 模試名リストを取得（対象生徒のもの）
-        // $moshiNames = $this->getTrialList($grades->student_id);
-
-        $editData = [
-            "student_id" => 1,
+        // 成績入力欄数の判定用データセット
+        $displayCountData = [
+            "school_kind" => $grade->school_kind,
+            "display_count" => $display_count,
         ];
 
         return view('pages.admin.grades_mng-input', [
-            'editData' => $editData,
-            'editDataDtls' => [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
             'rules' => $this->rulesForInput(null),
-            'examTypes' => $examTypes,
-            'teikiNames' => $teikiNames,
-            'curriculums' => null,
+            'name' => $name,
+            'grade' => $grade,
+            'examTypeList' => $examTypeList,
+            'teikiList' => $teikiList,
+            'termList' => $termList,
+            'subjectList' => $subjectList,
+            'editData' => $score,
+            'editDataDtls' => $scoreDetails,
+            'displayCountData' => $displayCountData,
         ]);
     }
 
@@ -408,7 +319,6 @@ class GradesMngController extends Controller
      */
     public function update(Request $request)
     {
-
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
@@ -418,37 +328,55 @@ class GradesMngController extends Controller
         // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
         $query->where($this->guardRoomAdminTableWithSid());
 
-        $grades = $query
-            // gradesテーブルより対象データを取得(PKでユニークに取る)
-            ->where('grades_id', $request['grades_id'])
+        $score = $query
+            // 対象データを取得(PKでユニークに取る)
+            ->where('score_id', $request['score_id'])
             // MEMO: 取得できない場合はエラーとする
             ->firstOrFail();
 
         // トランザクション(例外時は自動的にロールバック)
-        DB::transaction(function () use ($request, $grades) {
+        DB::transaction(function () use ($request, $score) {
 
-            // Gradesテーブルへのupdate
-            // MEMO: 必ず登録する項目のみに絞る。
-            $grades->regist_time =  $request['regist_time'];
-            $grades->exam_type =  $request['exam_type'];
-            if ($request['exam_type'] == AppConst::CODE_MASTER_9_1) {
-                $grades->exam_id = $request['moshi_id'];
-            } else {
-                $grades->exam_id = $request['teiki_id'];
+            // 共通保存項目
+            $score->exam_type =  $request['exam_type'];
+            $score->student_comment = $request['student_comment'];
+            $score->regist_date = $request['regist_date'];
+
+            // 試験種別によって保存項目分岐
+            // 編集時に試験種別を変更した場合に対応し、明示的にnullを保存する
+            if ($request['exam_type'] == AppConst::CODE_MASTER_43_0) {
+                // 模試
+                $score->regular_exam_cd = null;
+                $score->practice_exam_name = $request['practice_exam_name'];
+                $score->term_cd = null;
+                $score->exam_date = $request['exam_date'];
             }
-            $grades->student_comment = $request['student_comment'];
-            // 登録
-            $grades->save();
+            if ($request['exam_type'] == AppConst::CODE_MASTER_43_1) {
+                // 定期考査
+                $score->regular_exam_cd = $request['regular_exam_cd'];
+                $score->practice_exam_name = null;
+                $score->term_cd = null;
+                $score->exam_date = $request['exam_date'];
+            }
+            if ($request['exam_type'] == AppConst::CODE_MASTER_43_2) {
+                // 評定
+                $score->regular_exam_cd = null;
+                $score->practice_exam_name = null;
+                $score->term_cd = $request['term_cd'];
+                $score->exam_date = null;
+            }
 
-            // GradesDatailテーブルの更新
+            $score->save();
+
+            // ScoreDatailテーブルの更新
             // MEMO: updateではなく、forceDelete・insertとする
 
             // 成績IDに紐づく成績詳細を全て削除（forceDelete）
-            ScoreDetail::where('grades_id', $request['grades_id'])
+            ScoreDetail::where('score_id', $request['score_id'])
                 ->forceDelete();
 
-            // GradesDetailテーブルへのinsert
-            $this->saveToGradesDetail($request, $grades->grades_id);
+            // ScoreDetailテーブルへのinsert
+            $this->saveToScoreDetail($request, $score->score_id);
         });
 
         return;
@@ -462,9 +390,8 @@ class GradesMngController extends Controller
      */
     public function delete(Request $request)
     {
-
         // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'grades_id');
+        $this->validateIdsFromRequest($request, 'score_id');
 
         // クエリを作成
         $query = Score::query();
@@ -472,25 +399,21 @@ class GradesMngController extends Controller
         // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
         $query->where($this->guardRoomAdminTableWithSid());
 
-        $grades = $query
-            // gradesテーブルより対象データを取得(PKでユニークに取る)
-            ->where('grades_id', $request['grades_id'])
+        $score = $query
+            // 対象データを取得(PKでユニークに取る)
+            ->where('score_id', $request['score_id'])
             // MEMO: 取得できない場合はエラーとする
             ->firstOrFail();
 
-        // リクエストのデータが存在するかチェック
-        $this->checkGradesDetailFromReqest($request);
-
         // トランザクション(例外時は自動的にロールバック)
-        DB::transaction(function () use ($request, $grades) {
-
-            // Gradesテーブルのdelete
-            $grades->delete();
-
-            // GradesDatailテーブルのdelete
+        DB::transaction(function () use ($score) {
+            // ScoreDatailテーブルのdelete
             // 成績IDに紐づく成績詳細を全て削除(論理削除)
-            ScoreDetail::where('grades_id', $request['grades_id'])
+            ScoreDetail::where('score_id', $score->score_id)
                 ->delete();
+
+            // Scoreテーブルのdelete
+            $score->delete();
         });
 
         return;
@@ -517,20 +440,7 @@ class GradesMngController extends Controller
      */
     private function rulesForInput(?Request $request)
     {
-
         $rules = array();
-
-        // 生徒ID取得(sidをチェックに使うのでリクエストで受け取らない)
-        $sid = null;
-        if (isset($request)) {
-            // 生徒成績からsidを取得
-            $grades = Score::select(
-                'student_id',
-            )
-                ->where('grades_id', $request->grades_id)
-                ->firstOrFail();
-            $sid = $grades->student_id;
-        }
 
         // 独自バリデーション: リストのチェック 試験種別
         $validationExamTypeList =  function ($attribute, $value, $fail) {
@@ -544,50 +454,32 @@ class GradesMngController extends Controller
             return $this->validationTeikiNameList($request, $value, $fail);
         };
 
-        // 独自バリデーション: リストのチェック 模試名
-        $validationMoshiNameList =  function ($attribute, $value, $fail) use ($request, $sid) {
-
-            return $this->validationMoshiNameList($request, $sid, $value, $fail);
-        };
-
         // 独自バリデーション: 生徒成績の存在チェック(1件以上)
-        $validationGradesDetail = function ($attribute, $value, $parameters) use ($request) {
+        $validationScoreDetail = function ($attribute, $value, $parameters) use ($request) {
 
-            return $this->validationGradesDetail($request);
+            return $this->validationScoreDetail($request);
         };
 
-        // 独自バリデーション: 重複チェック(模試ID)
-        $validationKeyMoshi = function ($attribute, $value, $fail) use ($request, $sid) {
-
-            // 対象データを取得(対象生徒のデータ)
-            return $this->validationKeyMoshi($request, $sid, $fail);
-        };
-
-        // 独自バリデーション: 重複チェック(定期考査ID)
-        $validationKeyTeiki = function ($attribute, $value, $fail) use ($request, $sid) {
-
-            // 対象データを取得(対象生徒のデータ)
-            return $this->validationKeyTeiki($request, $sid, $fail);
-        };
-
+        // 全種別共通
+        $rules += Score::fieldRules('exam_type', ['required', $validationExamTypeList]);
         // Laravelの独自バリデーションは、空白の時は呼んでくれないので、
         // 今回のように存在チェックの場合は、以下のように指定し空の場合も呼んでもらう
-        Validator::extendImplicit('array_required', $validationGradesDetail);
+        Validator::extendImplicit('array_required', $validationScoreDetail);
 
-        // 生徒成績 項目のバリデーションルールをベースにする
-        $ruleExamId = Score::getFieldRule('exam_id');
+        // 模試・定期考査
+        $rules += Score::fieldRules('exam_date', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_0 . ',' . AppConst::CODE_MASTER_43_1]);
 
-        // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
-        // その他を第二引数で指定する
-        $rules += Score::fieldRules('regist_time', ['required']);
-        $rules += Score::fieldRules('exam_type', ['required', $validationExamTypeList]);
-        $rules += ['moshi_id' =>  array_merge($ruleExamId, ['required_if:exam_type,1', $validationKeyMoshi, $validationMoshiNameList])];
-        // 定期考査の場合、定期考査IDの重複チェックは行わないこととする（複数年度登録不具合対応）
-        //$rules += ['teiki_id' =>  array_merge($ruleExamId, ['required_if:exam_type,2', $validationKeyTeiki, $validationTeikiNameList])];
-        $rules += Score::fieldRules('student_comment', ['required']);
+        // 模試
+        $rules += Score::fieldRules('practice_exam_name', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_0]);
 
-        // 生徒成績のルールを取得する
-        $rules = $this->setRulesForGradesDetail($rules, $sid);
+        // 定期考査
+        $rules += Score::fieldRules('regular_exam_cd', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_1, $validationTeikiNameList]);
+
+        // 評定
+        $rules += Score::fieldRules('term_cd', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_2]);
+
+        // 成績欄のルールを取得する
+        $rules = $this->setRulesForScoreDetail($rules, $request);
 
         return $rules;
     }

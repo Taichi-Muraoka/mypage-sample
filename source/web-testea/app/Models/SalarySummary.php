@@ -107,7 +107,7 @@ class SalarySummary extends Model
             'salary_summary_id' => ['integer'],
             'salary_date' => ['date_format:Y-m-d'],
             'tutor_id' => ['integer'],
-            'summary_kind' => ['integer', 'in:1,2,3,4,5,6,7,8,9,10'],
+            'summary_kind' => ['integer'],
             'hour_payment' => ['integer', 'min:0', 'max:99999999'],
             'hour' => ['integer', 'min:0', 'max:999'],
             'amount' => ['integer', 'min:0', 'max:99999999'],

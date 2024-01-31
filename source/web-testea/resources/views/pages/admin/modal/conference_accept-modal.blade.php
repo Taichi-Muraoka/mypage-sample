@@ -7,43 +7,51 @@
 
     <tr>
         <th>校舎</th>
-        <td>久我山</td>
+        <td>@{{item.campus_name}}</td>
+    </tr>
+    <tr>
+        <th>ブース</th>
+        <td>@{{item.booth_name}}</td>
     </tr>
     <tr>
         <th>生徒名</th>
-        <td>CWテスト生徒１</td>
+        <td>@{{item.student_name}}</td>
     </tr>
     <tr>
         <th>第１希望日時</th>
-        <td>2023/01/30 16:00</td>
+        <td>@{{$filters.formatYmdDay(item.conference_date1)}} @{{$filters.formatHm(item.start_time1)}}</td>
     </tr>
     <tr>
         <th>第２希望日時</th>
-        <td>2023/01/31 16:00</td>
+        <td>@{{$filters.formatYmdDay(item.conference_date2)}} @{{$filters.formatHm(item.start_time2)}}</td>
     </tr>
     <tr>
         <th>第３希望日時</th>
-        <td>2023/02/01 16:00</td>
+        <td>@{{$filters.formatYmdDay(item.conference_date3)}} @{{$filters.formatHm(item.start_time3)}}</td>
     </tr>
     <tr>
         <th>特記事項</th>
-        <td></td>
+        <td class="nl2br">@{{item.comment}}</td>
     </tr>
     <tr>
         <th>面談日</th>
-        <td>2023/01/30</td>
-    </tr>
-    <tr>
-        <th>面談担当者</th>
-        <td>久我山教室長</td>
+        <td>@{{$filters.formatYmdDay(item.conference_date)}}</td>
     </tr>
     <tr>
         <th>開始時刻</th>
-        <td>16:00</td>
+        <td>@{{item.start_time}}</td>
+    </tr>
+    <tr>
+        <th>面談担当者</th>
+        <td>@{{item.adm_name}}</td>
+    </tr>
+    <tr>
+        <th>管理者メモ</th>
+        <td class="nl2br">@{{item.memo}}</td>
     </tr>
     <tr>
         <th>ステータス</th>
-        <td>登録済</td>
+        <td>@{{item.status}}</td>
     </tr>
 
 </x-bs.table>

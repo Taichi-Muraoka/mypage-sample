@@ -15,7 +15,8 @@
 
     <p>研修教材の{{(request()->routeIs('training_mng-edit')) ? '変更' : '登録'}}を行います。</p>
 
-    <x-input.select caption="形式" id="trn_type" :select2=true :mastrData=$trainingType :editData=$editData />
+    <x-input.select caption="形式" id="trn_type" :select2=true :mastrData=$trainingType :editData=$editData
+        :select2Search=false :blank=true />
 
     <x-input.text caption="内容" id="text" :rules=$rules :editData=$editData />
 
@@ -34,7 +35,7 @@
         :editData=$editData />
     <span v-show="form.trn_type == {{ App\Consts\AppConst::CODE_MASTER_12_1 }}">
         <x-bs.callout>
-            最大ファイルアップロードサイズ：{{ini_get('upload_max_filesize')}}
+            最大ファイルアップロードサイズ：{{ini_get('upload_max_filesize')}}B
         </x-bs.callout>
     </span>
 

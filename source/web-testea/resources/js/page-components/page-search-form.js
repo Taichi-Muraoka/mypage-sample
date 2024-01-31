@@ -43,9 +43,19 @@ export default class PageSearchForm extends PageComponentBase {
             option["vueMounted"] = ($vue, option) => {};
         }
 
+        // Vueにdataを追加
+        if (option["vueData"] == undefined) {
+            option["vueData"] = {};
+        }
+
         // Vueにmethodsを追加
         if (option["vueMethods"] == undefined) {
             option["vueMethods"] = {};
+        }
+
+        // Vue(List)にdataを追加
+        if (option["vueSearchListData"] == undefined) {
+            option["vueSearchListData"] = {};
         }
 
         // Vue(List)にmethodsを追加
@@ -58,6 +68,11 @@ export default class PageSearchForm extends PageComponentBase {
             option["initSearch"] = true;
         }
 
+        // 検索完了後の実行ボタン制御を行うかどうか
+        if (option["afterSearchBtnListExec"] == undefined) {
+            option["afterSearchBtnListExec"] = false;
+        }
+
         //--------------------
         // Vueの定義
         //--------------------
@@ -65,28 +80,31 @@ export default class PageSearchForm extends PageComponentBase {
         const self = this;
         const vueApp = {
             data() {
-                return {
-                    // VueのIdを格納する
-                    appId: id,
-                    // フォームインプット
-                    // 検索条件をはじめから選択する場合。(例：教室管理者の場合、プルダウンを教室のみにする)
-                    form: formData,
-                    // 検索後の検索条件を保持(ギフトカードの一覧出力)
-                    formAfterSearch: {},
-                    // オプションを保持しておく
-                    option: null,
-                    // フォームエラー
-                    form_err: {
-                        msg: {},
-                        class: {},
+                return Object.assign(
+                    {
+                        // VueのIdを格納する
+                        appId: id,
+                        // フォームインプット
+                        // 検索条件をはじめから選択する場合。(例：教室管理者の場合、プルダウンを教室のみにする)
+                        form: formData,
+                        // 検索後の検索条件を保持(ギフトカードの一覧出力)
+                        formAfterSearch: {},
+                        // オプションを保持しておく
+                        option: null,
+                        // フォームエラー
+                        form_err: {
+                            msg: {},
+                            class: {},
+                        },
+                        // プルダウン選択後の詳細を格納する
+                        selectGetItem: {},
+                        // 検索一覧を保持する
+                        vueSearchList: null,
+                        // 検索ボタンの非活性
+                        disabledBtnSearch: false,
                     },
-                    // プルダウン選択後の詳細を格納する
-                    selectGetItem: {},
-                    // 検索一覧を保持する
-                    vueSearchList: null,
-                    // 検索ボタンの非活性
-                    disabledBtnSearch: false,
-                };
+                    option["vueData"]
+                );
             },
             mounted() {
                 // optionを保持
@@ -102,10 +120,15 @@ export default class PageSearchForm extends PageComponentBase {
                 const pageSearchlist = new PageSearchList();
                 this.vueSearchList = pageSearchlist.getVueApp(
                     Object.assign(option, {
-                        afterSearch: function () {
+                        afterSearch: function (searchList) {
                             // 検索完了後は検索ボタンを活性化する
                             _self.disabledBtnSearch = false;
+                            if (option["afterSearchBtnListExec"]) {
+                                // 検索完了後はリストの実行ボタンを活性化する
+                                searchList.disabledBtnListExec = false;
+                            }
                         },
+                        vueData: option["vueSearchListData"],
                         vueMethods: option["vueSearchListMethods"],
                     })
                 );
@@ -120,7 +143,7 @@ export default class PageSearchForm extends PageComponentBase {
             },
             updated() {
                 // Vue更新後、ライブラリの初期化
-                self.updatedLibs();
+                self.updatedLibs(this);
             },
             methods: Object.assign(
                 {

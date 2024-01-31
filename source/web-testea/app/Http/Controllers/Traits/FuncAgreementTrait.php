@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Traits;
 use App\Consts\AppConst;
 use App\Models\Student;
 use App\Models\StudentCampus;
-use App\Models\MstCampus;
 use App\Models\MstGrade;
 use App\Models\MstSchool;
 use App\Models\MstCourse;
@@ -25,12 +24,17 @@ trait FuncAgreementTrait
     // 応答共通処理
     use CtrlResponseTrait;
 
+    //==========================
+    // 関数名を区別するために
+    // fncAgreを先頭につける
+    //==========================
+
     /**
      * 生徒情報を取得する
      *
      * @param integer $sid 生徒ID
      */
-    private function getStudentAgreement($sid)
+    private function fncAgreGetStudentDetail($sid)
     {
         // 生徒の基本情報を取得する
         $query = Student::query();
@@ -72,32 +76,38 @@ trait FuncAgreementTrait
             ->firstOrFail();
 
         // 生徒IDから所属校舎を取得する。
+        // 校舎名取得サブクエリ
+        $campus_names = $this->mdlGetRoomQuery();
+
         $query = StudentCampus::query();
         $campuses = $query
             ->select(
                 'student_campuses.student_id',
                 'student_campuses.campus_cd',
                 // 校舎名
-                'mst_campuses.name as campus_name'
+                'campus_names.room_name as campus_name',
             )
-            ->sdLeftJoin(MstCampus::class, 'student_campuses.campus_cd', '=', 'mst_campuses.campus_cd')
+            // 校舎名の取得
+            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
+                $join->on('student_campuses.campus_cd', '=', 'campus_names.code');
+            })
             ->where('student_campuses.student_id', '=', $sid)
             ->orderby('campus_cd')
             ->orderby('disp_order')
             ->get();
 
-        // 複数校舎所属の場合を考慮し、校舎名を連結する
-        $str_campus_names = "";
+        // 複数校舎所属の場合を考慮し、校舎名を連結する（カンマ区切り）
+        $campusList = [];
         foreach ($campuses as $campus) {
-            $str_campus_names = $str_campus_names . " " . $campus->campus_name;
+            array_push($campusList, $campus->campus_name);
         };
-        $str_campus_names = ltrim($str_campus_names);
+        $str_campus_names = implode(',', $campusList);
 
         // バッジ情報の取得
-        $badges = $this->getStudentBadge($sid);
+        $badges = $this->fncAgreGetStudentBadge($sid);
 
         // レギュラー授業情報の取得
-        $regular_classes = $this->getStudentRegularClass($sid);
+        $regular_classes = $this->fncAgreGetRegularClass($sid);
 
         return [
             'student' => $student,
@@ -112,7 +122,7 @@ trait FuncAgreementTrait
      *
      * @param integer $sid 生徒ID
      */
-    private function getStudentBadge($sid)
+    private function fncAgreGetStudentBadge($sid)
     {
         // 生徒のバッジ情報を取得する
         $query = Badge::query();
@@ -125,8 +135,8 @@ trait FuncAgreementTrait
             ->count();
 
         // バッジ色の分岐用に10の位,1の位を分ける
-        $tens_place = ($total_badges/10) % 10;
-        $ones_place = ($total_badges/1) % 10;
+        $tens_place = ($total_badges / 10) % 10;
+        $ones_place = ($total_badges / 1) % 10;
 
         return [
             'total_badges' => $total_badges,
@@ -140,8 +150,11 @@ trait FuncAgreementTrait
      *
      * @param integer $sid 生徒ID
      */
-    private function getStudentRegularClass($sid)
+    private function fncAgreGetRegularClass($sid)
     {
+        // 校舎名取得
+        $campus_names = $this->mdlGetRoomQuery();
+
         // 生徒のレギュラー授業情報を取得する
         $query = RegularClass::query();
 
@@ -150,7 +163,7 @@ trait FuncAgreementTrait
                 'regular_classes.regular_class_id',
                 'regular_classes.campus_cd',
                 // 校舎の名称
-                'mst_campuses.name as campus_name',
+                'campus_names.room_name as campus_name',
                 'regular_classes.day_cd',
                 // コードマスタの名称(曜日)
                 'mst_codes.name as day_name',
@@ -166,7 +179,9 @@ trait FuncAgreementTrait
                 'mst_subjects.name as subject_name',
             )
             // 校舎名の取得
-            ->sdLeftJoin(MstCampus::class, 'regular_classes.campus_cd', '=', 'mst_campuses.campus_cd')
+            ->leftJoinSub($campus_names, 'campus_names', function ($join) {
+                $join->on('regular_classes.campus_cd', '=', 'campus_names.code');
+            })
             // コース名の取得
             ->sdLeftJoin(MstCourse::class, 'regular_classes.course_cd', '=', 'mst_courses.course_cd')
             // 講師名の取得
@@ -180,8 +195,11 @@ trait FuncAgreementTrait
             })
             // レギュラー受講生徒情報とJOIN
             ->sdLeftJoin(RegularClassMember::class, 'regular_classes.regular_class_id', '=', 'regular_class_members.regular_class_id')
-            ->where('regular_classes.student_id', '=', $sid)
-            ->orWhere('regular_class_members.student_id', '=', $sid)
+            // 画面表示中生徒のデータに絞り込み レギュラー情報またはレギュラー受講生徒情報
+            ->where(function ($query) use ($sid) {
+                $query->where('regular_classes.student_id', '=', $sid)
+                    ->orWhere('regular_class_members.student_id', '=', $sid);
+            })
             ->orderBy('regular_classes.day_cd', 'asc')
             ->orderBy('regular_classes.period_no', 'asc')
             ->get();

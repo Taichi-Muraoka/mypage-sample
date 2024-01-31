@@ -56,12 +56,12 @@ class CalendarController extends Controller
         $account = Auth::user();
         $account_id = $account->account_id;
 
-        // ダミーデータを返却
+        // カレンダーデータを返却
         if (AuthEx::isStudent()) {
             // 生徒
             return $this->getStudentCalendar($request, $account_id);
         } else {
-            // 教師
+            // 講師
             return $this->getTutorCalendar($request, $account_id);
         }
     }

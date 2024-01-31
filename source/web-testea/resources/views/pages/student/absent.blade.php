@@ -11,39 +11,35 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    {{-- チェンジイベントを取得し、校舎と講師を取得する --}}
-    <x-input.select caption="授業日・時限" id="id" :select2=true onChange="" :editData=$editData >
-        <option value="1">2023/04/17 4限</option>
-        <option value="2">2023/04/24 4限</option>
-        <option value="3">2023/05/01 4限</option>
-    </x-input.select>
+    {{-- チェンジイベントを取得し、テーブル表示に必要な情報を取得する --}}
+    <x-input.select caption="授業日・時限" id="schedule_id" :select2=true onChange="selectChangeGet" :mastrData=$scheduleList
+        :select2Search=false />
 
     {{-- 詳細を表示 --}}
     <div v-cloak>
-        <x-bs.table :hover=false :vHeader=true class="mb-4" vShow="form.id != 0">
-            {{-- モック用処理 --}}
+        <x-bs.table :hover=false :vHeader=true class="mb-4">
             <tr>
-                <th class="t-minimum" width="25%">校舎</th>
-                <td><span v-cloak v-show="form.id != 0">久我山</span></td>
+                <th width="35%">校舎</th>
+                <td><span v-cloak>@{{selectGetItem.campus_name}}</span></td>
+            </tr>
+            <tr>
+                <th>コース</th>
+                <td><span v-cloak>@{{selectGetItem.course_name}}</span></td>
             </tr>
             <tr>
                 <th>講師</th>
-                <td><span v-cloak v-show="form.id != 0">CWテスト講師１０１<span v-show="form.id != 0">先生</span></span></td>
+                <td><span v-cloak>@{{selectGetItem.tutor_name}}<span v-if="selectGetItem.teacher_name">先生</span></span>
+                </td>
             </tr>
             <tr>
-                <th class="t-minimum" width="25%">校舎連絡先</th>
-                <td><span v-cloak v-show="form.id != 0"><a href="tel:000-1234-5678">000-1234-5678</a></span></td>
-            </tr>
-
-            {{-- 本番用処理 --}}
-            {{-- <tr>
-                <th class="t-minimum" width="25%">校舎</th>
-                <td><span v-cloak>@{{selectGetItem.class_name}}</span></td>
+                <th>教科</th>
+                <td><span v-cloak>@{{selectGetItem.subject_name}}</span></td>
             </tr>
             <tr>
-                <th>講師</th>
-                <td><span v-cloak>@{{selectGetItem.teacher_name}}<span v-if="selectGetItem.teacher_name">先生</span></span></td>
-            </tr> --}}
+                <th>校舎連絡先</th>
+                <td><span v-cloak><a href="tel:@{{selectGetItem.tel_campus}}">@{{selectGetItem.tel_campus}}</a></span>
+                </td>
+            </tr>
         </x-bs.table>
     </div>
 

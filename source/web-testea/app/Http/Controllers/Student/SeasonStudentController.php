@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
-use App\Models\WeeklyShift;
+use App\Models\SeasonMng;
+use App\Models\SeasonStudentRequest;
+use App\Models\SeasonStudentPeriod;
+use App\Models\SeasonStudentTime;
+use App\Models\CodeMaster;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
-use App\Http\Controllers\Traits\FuncAgreementTrait;
+use App\Http\Controllers\Traits\FuncSeasonTrait;
 
 /**
  * 特別期間講習日程連絡（生徒） - コントローラ
@@ -18,8 +21,13 @@ use App\Http\Controllers\Traits\FuncAgreementTrait;
 class SeasonStudentController extends Controller
 {
 
-    // 機能共通処理：空き時間
-    //use FuncAgreementTrait;
+    // 機能共通処理：特別期間講習
+    use FuncSeasonTrait;
+
+    /**
+     * 教科受講回数欄の行数
+     */
+    const SUBJECT_LINE_MAX = 5;
 
     /**
      * コンストラクタ
@@ -41,40 +49,12 @@ class SeasonStudentController extends Controller
      */
     public function index()
     {
-        // 教室リストを取得
-        //$rooms = $this->mdlGetRoomList(false);
-
-        // ステータスのプルダウン取得
-        //$statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_2);
+        // 現在日を取得
+        $todayYmd = date("Ymd");
 
         return view('pages.student.season_student', [
-            //'statusList' => $statusList,
-            //'rooms' => $rooms,
-            'editData' => null,
-            'rules' => $this->rulesForSearch()
+            'todayYmd' => $todayYmd,
         ]);
-    }
-
-    /**
-     * 詳細取得
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return mixed 詳細データ
-     */
-    public function getData(Request $request)
-    {
-        return;
-    }
-
-    /**
-     * バリデーション(検索用)
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return mixed バリデーション結果
-     */
-    public function validationForSearch(Request $request)
-    {
-        return;
     }
 
     /**
@@ -85,19 +65,19 @@ class SeasonStudentController extends Controller
      */
     public function search(Request $request)
     {
-        // ページネータで返却（モック用）
-        return $this->getListAndPaginatorMock();
+        // クエリを作成
+        $query = SeasonStudentRequest::query();
+
+        // 特別期間講習 生徒連絡情報表示用のquery作成・データ取得
+        // ガードあり
+        $SeasonRequests = $this->fncSasnGetSeasonStudentQuery($query)
+            ->orderby('season_student_requests.season_cd', 'desc')
+            ->orderby('season_student_requests.campus_cd');
+
+        // ページネータで返却
+        return $this->getListAndPaginator($request, $SeasonRequests);
     }
 
-    /**
-     * バリデーションルールを取得(検索用)
-     *
-     * @return array ルール
-     */
-    private function rulesForSearch()
-    {
-        return;
-    }
     //==========================
     // 詳細
     //==========================
@@ -105,90 +85,46 @@ class SeasonStudentController extends Controller
     /**
      * 提出スケジュール詳細画面
      *
-     * @param int $sid 生徒ID
+     * @param int $seasonStudentId 生徒連絡情報ID
      * @return view
      */
-    public function detail($sid)
+    public function detail($seasonStudentId)
     {
+        // IDのバリデーション
+        $this->validateIds($seasonStudentId);
 
-        //==========================
-        // モック用処理
-        //==========================
-        // 曜日の配列を取得 コードマスタより取得
-        //$weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
+        // データを取得（生徒連絡情報）ガードあり
+        $seasonStudent = $this->fncSasnGetSeasonStudent($seasonStudentId);
 
-        // 時限リスト
-        //$timeList = array(
-        //    '1時限目','2時限目','3時限目','4時限目','5時限目','6時限目','7時限目',
-        //);
-        $periodIdList = array(
-            1, 2, 3, 4, 5, 6, 7
-        );
+        // データを取得（受講回数情報）
+        $subjectTimes = $this->fncSasnGetSeasonStudentTime($seasonStudentId);
 
-        // コロンを除いた値をIDとして扱う
-        // 管理画面では送信しないが、教師画面と統一した
-        //$timeIdList = [];
-        //foreach ($timeList as $time) {
-        //    //$timeId = str_replace(":", "", $time);
-        //    $timeId = str_replace("時限目", "", $time);
-        //    array_push($timeIdList, $timeId);
-        //}
-        //$periodList = [];
-        //foreach ($periodIdList as $periodId) {
-        //    //$timeId = str_replace(":", "", $time);
-        //    $periodStr = $periodId . "時限目";
-        //    array_push($periodList, $periodStr);
-        //}
+        // 時限リストを取得（校舎・時間割区分から）
+        $periodList = $this->mdlGetPeriodListByKind($seasonStudent['campus_cd'], AppConst::CODE_MASTER_37_1);
 
-        // 期間リスト（日付・曜日）
-        //$dayList = array(
-        //    '03/27(月)','03/28(火)','03/29(水)','03/30(木)','03/31(金)','04/01(土)',
-        //    '04/03(月)','04/04(火)','04/05(水)','04/06(木)','04/07(金)','04/08(土)'
-        //);
+        // 特別期間日付リストを取得（校舎・特別期間コード指定）
+        $dateList = $this->fncSasnGetSeasonDate($seasonStudent['campus_cd'], $seasonStudent['season_cd']);
 
-        $dayListWk = array(
-            '2023/03/27','2023/03/28','2023/03/29','2023/03/30','2023/03/31','2023/04/01',
-            '2023/04/03','2023/04/04','2023/04/05','2023/04/06','2023/04/07','2023/04/08'
-        );
-
-        $week = array( "日", "月", "火", "水", "木", "金", "土" );
-        $dayList = [];
-        foreach ($dayListWk as $day) {
-            // 配列に追加
-            array_push($dayList, 
-                date('m/d',strtotime($day)) . '(' . $week[date('w', strtotime($day))] . ')');
-        }
-
-        $dayIdList = [];
-        foreach ($dayListWk as $day) {
-            array_push($dayIdList, date('md',strtotime($day)));
-        }
-        // 教師の空き時間を取得する
-        //$weeklyShift = WeeklyShift::where('tid', $tid)
-        //    ->get();
+        // データを取得（生徒連絡コマ情報）
+        $studentPeriods = $this->fncSasnGetSeasonStudentPeriod($seasonStudentId);
 
         // チェックボックスをセットするための値を生成
-        // 例：['0401_1', '0401_2']
-        $editData = ['0329_1', '0329_2'];
-        //$editData = [];
-        //foreach ($weeklyShift as $ws) {
-        //    // 配列に追加
-        //    array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
-        //}
-
-        // 教師名を取得する
-        //$teacher = $this->getTeacherName($tid);
+        // 例：['20231225_1', '20231226_2']
+        $editData = [];
+        foreach ($studentPeriods as $datePeriod) {
+            // 配列に追加
+            array_push($editData, $datePeriod->lesson_date->format('Ymd') . '_' . $datePeriod->period_no);
+        }
 
         return view('pages.student.season_student-detail', [
-            //'weekdayList' => $weekdayList,
-            //'periodList' => $periodList,
-            'periodIdList' => $periodIdList,
-            'dayList' => $dayList,
-            'dayIdList' => $dayIdList,
+            'rules' => null,
+            'seasonStudent' => $seasonStudent,
+            'subjectTimesList' => $subjectTimes,
+            'periodList' => $periodList,
+            'dateList' => $dateList,
             'editData' => [
                 'chkWs' => $editData
-            ],
-            //'extRirekisho' => $teacher,
+            ]
         ]);
     }
 
@@ -202,95 +138,62 @@ class SeasonStudentController extends Controller
      * @param int $seasonStudenId
      * @return void
      */
-    public function edit($seasonStudenId)
+    public function edit($seasonStudentId)
     {
-        //==========================
-        // 既存処理
-        //==========================
-        // // 曜日の配列を取得 コードマスタより取得
-        // $weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
 
-        // // 時間帯 コードマスタにないのでappconfに定義した。
-        // $timeList = config('appconf.weekly_shift_time');
+        // IDのバリデーション
+        $this->validateIds($seasonStudentId);
 
-        // // コロンを除いた値をIDとして扱う
-        // $timeIdList = [];
-        // foreach ($timeList as $time) {
-        //     $timeId = str_replace(":", "", $time);
-        //     array_push($timeIdList, $timeId);
-        // }
+        // クエリを作成
+        $query = SeasonStudentRequest::query();
 
-        // // ログイン情報取得
-        // $account = Auth::user();
+        // 教室名取得のサブクエリ
+        $room = $this->mdlGetRoomQuery();
 
-        // // 教師の空き時間を取得する
-        // $weeklyShift = WeeklyShift::where('tid', $account->account_id)
-        //     ->get();
+        // データを取得
+        $seasonStudent = $query
+            ->select(
+                'season_student_requests.season_student_id',
+                'season_student_requests.season_cd',
+                'season_student_requests.campus_cd',
+                DB::raw('LEFT(season_student_requests.season_cd, 4) as year'),
+                'mst_codes.gen_item2 as season_name',
+                'room_names.room_name as campus_name'
+            )
+            // 校舎名の取得
+            ->leftJoinSub($room, 'room_names', function ($join) {
+                $join->on('season_student_requests.campus_cd', '=', 'room_names.code');
+            })
+            // コードマスターとJOIN（期間区分）
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on(DB::raw('RIGHT(season_student_requests.season_cd, 2)'), '=', 'mst_codes.gen_item1')
+                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
+            })
+            // IDを指定
+            ->where('season_student_id', $seasonStudentId)
+            // 未登録時のみ表示可
+            ->where('regist_status', AppConst::CODE_MASTER_5_0)
+            // 自分の生徒IDのみにガードを掛ける
+            ->where($this->guardStudentTableWithSid())
+            ->firstOrFail();
 
-        // // チェックボックスをセットするための値を生成
-        // // 例：['1_1030', '2_1030']
-        // $editData = [];
-        // foreach ($weeklyShift as $ws) {
-        //     // 配列に追加
-        //     array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
-        // }
+        // 科目リストを取得
+        $subjects = $this->mdlGetSubjectList();
 
-        // return view('pages.tutor.weekly_shift', [
-        //     'weekdayList' => $weekdayList,
-        //     'timeList' => $timeList,
-        //     'timeIdList' => $timeIdList,
-        //     'editData' => [
-        //         'chkWs' => $editData
-        //     ]
-        // ]);
+        // 時限リストを取得（校舎・時間割区分から）
+        $periodList = $this->mdlGetPeriodListByKind($seasonStudent['campus_cd'], AppConst::CODE_MASTER_37_1);
 
-        //==========================
-        // モック用処理
-        //==========================
-        // 曜日の配列を取得 コードマスタより取得
-        //$weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
-
-        // 時限リスト
-        $timeList = array(
-            '1時限目','2時限目','3時限目','4時限目','5時限目','6時限目','7時限目',
-        );
-
-        // 期間リスト（日付・曜日）
-        $dayList = array(
-            '03/27(月)','03/28(火)','03/29(水)','03/30(木)','03/31(金)','04/01(土)',
-            '04/03(月)','04/04(火)','04/05(水)','04/06(木)','04/07(金)','04/08(土)'
-        );
-
-        // コロンを除いた値をIDとして扱う
-        $timeIdList = [];
-        foreach ($timeList as $time) {
-            //$timeId = str_replace(":", "", $time);
-            $timeId = str_replace("時限目", "", $time);
-            array_push($timeIdList, $timeId);
-        }
-
-        // ログイン情報取得
-        $account = Auth::user();
-
-        // 教師の空き時間を取得する
-        //$weeklyShift = WeeklyShift::where('tid', $account->account_id)
-        //    ->get();
-
-        // チェックボックスをセットするための値を生成
-        // 例：['1_1030', '2_1030']
-        $editData = [];
-        //foreach ($weeklyShift as $ws) {
-        //    // 配列に追加
-        //    array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
-        //}
+        // 特別期間日付リストを取得（校舎・特別期間コード指定）
+        $dateList = $this->fncSasnGetSeasonDate($seasonStudent['campus_cd'], $seasonStudent['season_cd']);
 
         return view('pages.student.season_student-input', [
-            //'weekdayList' => $weekdayList,
-            'periodList' => $timeList,
-            'periodIdList' => $timeIdList,
-            'dayList' => $dayList,
+            'rules' => $this->rulesForInput(null),
+            'seasonStudent' => $seasonStudent,
+            'subjects' => $subjects,
+            'periodList' => $periodList,
+            'dateList' => $dateList,
             'editData' => [
-                'chkWs' => $editData
+                'chkWs' => null
             ]
         ]);
     }
@@ -303,54 +206,92 @@ class SeasonStudentController extends Controller
      */
     public function update(Request $request)
     {
-        //==========================
-        // 既存処理
-        //==========================
-        // // MEMO: ログインアカウントのIDでデータを更新するのでガードは不要
+        // MEMO: ログインアカウントのIDでデータを更新するのでガードは不要
 
-        // // 登録前バリデーション。NGの場合はレスポンスコード422を返却
-        // Validator::make($request->all(), $this->rulesForInput())->validate();
+        // 登録前バリデーション。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        // // MEMO: 必ず登録する項目のみに絞る。
-        // $form = $request->only(
-        //     'chkWs'
-        // );
+        // MEMO: 必ず登録する項目のみに絞る。
+        $form = $request->only(
+            'campus_cd',
+            'season_student_id',
+            'season_cd',
+            'chkWs',
+            'subject_cd_1',
+            'times_1',
+            'subject_cd_2',
+            'times_2',
+            'subject_cd_3',
+            'times_3',
+            'subject_cd_4',
+            'times_4',
+            'subject_cd_5',
+            'times_5',
+            'comment',
+        );
 
-        // // リクエストを配列に変換する
-        // $weekDayTime = $this->splitValue($form['chkWs']);
+        // リクエストを配列に変換する
+        $datePeriods = $this->fncSasnSplitValue($form['chkWs']);
 
-        // // 複数の更新のためトランザクション
-        // DB::transaction(function () use ($weekDayTime) {
+        // 複数の更新のためトランザクション
+        DB::transaction(function () use ($form, $datePeriods) {
 
-        //     // ログイン情報取得
-        //     $account = Auth::user();
+            // 対象データを取得(IDでユニークに取る)
+            $seasonStudent = SeasonStudentRequest::where('season_student_id', $form['season_student_id'])
+                ->where('season_cd', $form['season_cd'])
+                ->where('campus_cd', $form['campus_cd'])
+                // 自分の生徒IDのみにガードを掛ける
+                ->where($this->guardStudentTableWithSid())
+                // 該当データがない場合はエラーを返す
+                ->firstOrFail();
 
-        //     //----------------
-        //     // 物理削除を行う
-        //     //----------------
+            //----------------
+            // 物理削除
+            //----------------
+            // 対象の生徒連絡コマ情報を全て削除（forceDelete）
+            SeasonStudentPeriod::where('season_student_id', $form['season_student_id'])
+                ->forceDelete();
 
-        //     // ログインしている教師のデータを全て削除（forceDelete）
-        //     WeeklyShift::where('tid', $account->account_id)
-        //         ->forceDelete();
+            // 対象の生徒受講回数情報を全て削除（forceDelete）
+            SeasonStudentTime::where('season_student_id', $form['season_student_id'])
+                ->forceDelete();
 
-        //     //----------------
-        //     // 登録を行う
-        //     //----------------
+            //----------------
+            // 登録処理
+            //----------------
+            // 生徒連絡コマ情報の登録
+            foreach ($datePeriods as $datePeriod) {
+                // モデルのインスンタンス生成
+                $seasonPeriod = new SeasonStudentPeriod;
+                $seasonPeriod->season_student_id = $form['season_student_id'];
+                $seasonPeriod->lesson_date = $datePeriod['lesson_date'];
+                $seasonPeriod->period_no = $datePeriod['period_no'];
+                // 登録
+                $seasonPeriod->save();
+            }
 
-        //     foreach ($weekDayTime as $weekDayTimeObj) {
+            // 生徒受講回数情報の登録
+            for ($i = 1; $i <= self::SUBJECT_LINE_MAX; $i++) {
+                if (isset($form['subject_cd_' . $i]) && filled($form['subject_cd_' . $i])) {
+                    // モデルのインスンタンス生成
+                    $seasonTimes = new SeasonStudentTime;
+                    $seasonTimes->season_student_id = $form['season_student_id'];
+                    $seasonTimes->subject_cd =  $form['subject_cd_' . $i];
+                    $seasonTimes->times =  $form['times_' . $i];
+                    // 登録
+                    $seasonTimes->save();
+                }
+            }
 
-        //         // モデルのインスンタンス生成
-        //         $weeklyShift = new WeeklyShift;
-        //         $weeklyShift->tid = $account->account_id;
-        //         $weeklyShift->weekdaycd = $weekDayTimeObj['weekdaycd'];
-
-        //         // time型なので秒を追加する
-        //         $weeklyShift->start_time = $weekDayTimeObj['start_time'] . ':00';
-
-        //         // 登録
-        //         $weeklyShift->save();
-        //     }
-        // });
+            //----------------
+            // 更新処理
+            //----------------
+            $seasonStudent->apply_date = date('Y-m-d');
+            $seasonStudent->comment = $form['comment'];
+            $seasonStudent->regist_status = AppConst::CODE_MASTER_5_1;
+            // 更新
+            $seasonStudent->save();
+        });
 
         return;
     }
@@ -363,12 +304,9 @@ class SeasonStudentController extends Controller
      */
     public function validationForInput(Request $request)
     {
-        //==========================
-        // 既存処理
-        //==========================
-        // // リクエストデータチェック
-        // $validator = Validator::make($request->all(), $this->rulesForInput());
-        // return $validator->errors();
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForInput($request));
+        return $validator->errors();
 
         return;
     }
@@ -378,113 +316,179 @@ class SeasonStudentController extends Controller
      *
      * @return array ルール
      */
-    private function rulesForInput()
+    private function rulesForInput(?Request $request)
     {
 
         $rules = array();
 
         // 独自バリデーション: チェックボックスの値が正しいかチェック
-        $validationValue = function ($attribute, $value, $fail) {
+        $validationValue = function ($attribute, $value, $fail) use ($request) {
 
             // 空白は無視する
             if (!filled($value)) {
                 return;
             }
 
-            // 曜日の配列を取得 コードマスタより取得
-            $weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
+            if (!$request) {
+                return;
+            }
+            if (
+                !$request->filled('campus_cd') || !$request->filled('season_cd')
+            ) {
+                // 検索項目がrequestにない場合はチェックしない
+                return;
+            }
 
-            // 時間帯 コードマスタにないのでappconfに定義した。
-            $timeList = config('appconf.weekly_shift_time');
+            // 特別期間日付リストを取得（校舎・特別期間コード指定）
+            $dateIdList = $this->fncSasnGetSeasonDate($request['campus_cd'], $request['season_cd']);
+
+            // 時限リストを取得（校舎・時間割区分から）
+            $periodList = $this->mdlGetPeriodListByKind($request['campus_cd'], AppConst::CODE_MASTER_37_1);
 
             // リクエストを配列に変換する
-            $weekDayTime = $this->splitValue($value);
-
+            $datePeriods = $this->fncSasnSplitValue($value);
             // リクエストの中身のチェック
-            foreach ($weekDayTime as $weekDayTimeObj) {
+            foreach ($datePeriods as $datePeriod) {
 
-                // 曜日のチェック。配列のキーとして存在するか
-                $key = $weekDayTimeObj['weekdaycd'];
-                if (!isset($weekdayList[$key])) {
+                // 日付のチェック。配列に存在するか
+                if (!in_array($datePeriod['dateId'], array_column($dateIdList, 'dateId'))) {
                     // 存在しない場合はエラー
                     return $fail(Lang::get('validation.invalid_input'));
                 }
 
-                // 時間帯のチェック。配列に存在するか
-                if (!in_array($weekDayTimeObj['start_time'], $timeList)) {
+                // 時限のチェック。配列のキーとして存在するか
+                $key = $datePeriod['period_no'];
+                if (!isset($periodList[$key])) {
                     // 存在しない場合はエラー
                     return $fail(Lang::get('validation.invalid_input'));
                 }
             }
         };
 
+        // 独自バリデーション: リストのチェック 教科
+        $validationSubjectList =  function ($attribute, $value, $fail) {
+
+            // 科目リストを取得
+            $list = $this->mdlGetSubjectList();
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: 教科の重複チェック
+        $validationDupSubject =  function ($attribute, $value, $fail) use ($request) {
+
+            if (!$request) {
+                return;
+            }
+
+            $subjects = [];
+            // 1件以上存在するかチェック
+            for ($i = 0; $i < self::SUBJECT_LINE_MAX; $i++) {
+                if (isset($request['subject_cd_' . $i]) && filled($request['subject_cd_' . $i])) {
+                    // 科目選択されている場合、配列にセット
+                    array_push($subjects, $request['subject_cd_' . $i]);
+                }
+            }
+            // 科目毎にカウントし、カウント数が1より大きい場合は重複エラーとする
+            $counts = array_count_values($subjects);
+            foreach ($counts as $key => $val) {
+                if ($key == $value && $val > 1) {
+                    // 科目重複エラー
+                    return $fail(Lang::get('validation.duplicate_subject'));
+                }
+            }
+        };
+
+        // 独自バリデーション: 教科の存在チェック(1件以上)
+        $validationSubjectTimes = function ($attribute, $value, $parameters) use ($request) {
+
+            if (!$request) {
+                return true;
+            }
+
+            // 1件以上存在するかチェック
+            for ($i = 0; $i < self::SUBJECT_LINE_MAX; $i++) {
+                if (isset($request['subject_cd_' . $i]) && filled($request['subject_cd_' . $i])) {
+                    // 指定された
+                    return true;
+                }
+            }
+            // エラー
+            return false;
+        };
+
+        // 独自バリデーション: 生徒登録期間内チェック
+        $validationDateTerm =  function ($attribute, $value, $fail) use ($request) {
+
+            if (!$request) {
+                return true;
+            }
+            if (
+                !$request->filled('campus_cd') || !$request->filled('season_cd')
+            ) {
+                // 検索項目がrequestにない場合はチェックしない
+                return true;
+            }
+
+            // 生徒登録開始日・終了日を取得
+            $seasonMng = SeasonMng::select(
+                's_start_date',
+                's_end_date'
+            )
+                ->where('season_cd', $request['season_cd'])
+                ->where('campus_cd', $request['campus_cd'])
+                // 該当データがない場合はエラーを返す
+                ->firstOrFail();
+
+            if (!$seasonMng['s_start_date'] || !$seasonMng['s_end_date']) {
+                // null（未設定）の場合、登録期間外エラーとする
+                return false;
+            }
+            // 現在日を取得
+            $today = date("Y-m-d");
+            // $today が 登録期間内か
+            if (
+                strtotime($today) < strtotime($seasonMng['s_start_date']) ||
+                strtotime($today) > strtotime($seasonMng['s_end_date'])
+            ) {
+                // 登録期間外エラー
+                return false;
+            }
+            return true;
+        };
+
+        // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
+        // その他を第二引数で指定する
+        $rules += SeasonStudentRequest::fieldRules('campus_cd');
+        $rules += SeasonStudentRequest::fieldRules('season_cd');
+        $rules += SeasonStudentRequest::fieldRules('season_student_id');
+        $rules += SeasonStudentRequest::fieldRules('comment');
         $rules += ['chkWs' => [$validationValue]];
 
+        // Laravelの独自バリデーションは、空白の時は呼んでくれないので、
+        // 今回のように存在チェックの場合は、以下のように指定し空の場合も呼んでもらう
+        Validator::extendImplicit('array_required', $validationSubjectTimes);
+
+        // 登録期間チェックも、以下のように指定し呼んでもらう
+        Validator::extendImplicit('out_of_range_regist_term', $validationDateTerm);
+        $rules += ['s_date_term' => ['out_of_range_regist_term']];
+
+        // 生徒実施回数情報 項目のバリデーションルールをベースにする
+        $ruleSubject = SeasonStudentTime::getFieldRule('subject_cd');
+        $ruleTimes = SeasonStudentTime::getFieldRule('times');
+        for ($i = 1; $i <= self::SUBJECT_LINE_MAX; $i++) {
+            $rule = [];
+            if ($i == 1) {
+                // 1行目に「1件以上の必須チェック」を入れる
+                $rule[] = 'array_required';
+            }
+            $rule[] = 'required_with:times_' . $i;
+            $rules += ['subject_cd_' . $i =>  array_merge($ruleSubject, $rule, [$validationSubjectList], [$validationDupSubject])];
+            $rules += ['times_' . $i =>  array_merge($ruleTimes, ['required_with:subject_cd_' . $i],)];
+        }
+
         return $rules;
-    }
-
-    /**
-     * チェックボックスの値を分割する
-     * ある程度フォーマットのチェックは行っている
-     *
-     * @param string $value チェックボックスの値
-     * @return array 配列
-     */
-    private function splitValue($value)
-    {
-        // パラメータ：
-        // カンマ区切りで曜日_時間 のように飛んでくる。
-        // 1_2030,2_1230
-        //
-        // 戻り値：
-        // array (
-        //   0 =>
-        //   array (
-        //     'weekdaycd' => '1',
-        //     'start_time' => '20:30',
-        //   ),
-        //   1 =>
-        //   array (
-        //     'weekdaycd' => '2',
-        //     'start_time' => '12:30',
-        //   ),
-        // )
-
-        $rtn = [];
-
-        // 空の場合は処理なし
-        if (!filled($value)) {
-            return $rtn;
-        }
-
-        // カンマ区切りで分割
-        $commaList = explode(",", $value);
-
-        foreach ($commaList as $commaVal) {
-
-            // アンダーバー区切りで分割
-            $weekDayTime = explode("_", $commaVal);
-
-            // 必ず2つになる
-            if (count($weekDayTime) != 2) {
-                // 不正なエラー
-                $this->illegalResponseErr();
-            }
-
-            // 1730 -> 17:30
-            $timeId = $weekDayTime[1];
-            if (strlen($timeId) != 4) {
-                // 不正なエラー
-                $this->illegalResponseErr();
-            }
-
-            array_push($rtn, [
-                'weekdaycd' => $weekDayTime[0],
-                // コロン区切りの時間にする
-                'start_time' => substr($timeId, 0, 2) . ':' . substr($timeId, 2, 2),
-            ]);
-        }
-
-        return $rtn;
     }
 }

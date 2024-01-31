@@ -50,7 +50,7 @@ class TransferApplication extends Model
         'student_id',
         'tutor_id',
         'transfer_reason',
-        'transfer_date',
+        'apply_date',
         'monthly_count',
         'approval_status',
         'confirm_date_id',
@@ -66,7 +66,7 @@ class TransferApplication extends Model
      * @var array
      */
     protected $casts = [
-        'transfer_date' => 'date'
+        'apply_date' => 'date'
     ];
 
     /**
@@ -112,13 +112,14 @@ class TransferApplication extends Model
     {
         static $_fieldRules = [
             'transfer_apply_id' => ['integer'],
-            'apply_kind' => ['integer', 'in:1,2'],
+            'apply_kind' => ['integer'],
             'schedule_id' => ['integer'],
             'student_id' => ['integer'],
             'tutor_id' => ['integer'],
             'transfer_reason' => ['string', 'max:1000'],
+            'apply_date' => ['date_format:Y-m-d'],
             'monthly_count' => ['integer'],
-            'approval_status' => ['integer', 'in:0,1,2,3,4'],
+            'approval_status' => ['integer'],
             'confirm_date_id' => ['integer'],
             'comment' => ['string', 'max:1000'],
             'transfer_schedule_id' => ['integer'],
@@ -132,4 +133,47 @@ class TransferApplication extends Model
     // 検索条件
     //-------------------------------
 
+    /**
+     * 検索 申請者種別
+     */
+    public function scopeSearchApplyKind($query, $obj)
+    {
+        $key = 'apply_kind';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 振替承認ステータス
+     */
+    public function scopeSearchApprovalStatus($query, $obj)
+    {
+        $key = 'approval_status';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 生徒ID
+     */
+    public function scopeSearchStudentId($query, $obj)
+    {
+        $key = 'student_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 講師ID
+     */
+    public function scopeSearchTutorId($query, $obj)
+    {
+        $key = 'tutor_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 }

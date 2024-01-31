@@ -7,47 +7,56 @@
 {{-- 子ページ --}}
 @section('child_page', true)
 
-{{-- フォーム --}}
+{{-- フォームなし --}}
 <x-bs.card>
 
     {{-- 詳細を表示 --}}
     <x-bs.table :hover=false :vHeader=true class="mb-4">
       <tr>
-          <th class="t-minimum" width="25%">特別期間</th>
-          <td>2023年春期</td>
+          <th width="40%">特別期間</th>
+          <td>{{$seasonTutor->year}}年{{$seasonTutor->season_name}}</td>
+      </tr>
+      <tr>
+        <th>講師コメント</th>
+        {{-- nl2br: 改行 --}}
+        <td class="nl2br">{{$seasonTutor->comment}}</td>
       </tr>
     </x-bs.table>
 
-  <x-bs.table :hover=false class="table-checked">
+    {{-- 余白 --}}
+    <div class="mb-3"></div>
+
+    <x-bs.form-title>授業不可コマ連絡情報</x-bs.form-title>
+    <x-bs.table :hover=false class="table-checked">
 
     {{-- テーブルタイトル行 --}}
     <x-slot name="thead">
-      <th class="t-minimum t-week-time"></th>
+      <th class="t-minimum t-period-day"></th>
 
       {{-- 時限を表示 --}}
-      @for ($i = 0; $i < count($periodList); $i++)
-        <th class="t-week">{{$periodList[$i]}}</th>
-      @endfor
+      @foreach ($periodList as $periodKey => $periodVal)
+        <th class="t-period">{{$periodKey}}限</th>
+      @endforeach
     </x-slot>
 
     {{-- 二重ループで組み立てる --}}
-    @for ($j = 0; $j < count($dayList); $j++) <tr>
+    @foreach ($dateList as $date) <tr>
       {{-- 日付を表示 --}}
-      <td class="tt">{{$dayList[$j]}}</td>
+      <td class="tt">{{$date['dateLabel']}}</td>
 
-      @for ($i = 0; $i < count($periodList); $i++)
+      @foreach ($periodList as $periodKey => $periodVal)
       <td>
         {{-- チェックボックス。裏でクリックされた時間帯を保持している --}}
-        <x-input.checkbox id="{{$j}}_{{$periodIdList[$i]}}" class="chk-wt2" name="chkWs" :icheck=false
-          value="{{$j}}_{{$periodIdList[$i]}}" :editData=$editData />
+        <x-input.checkbox id="{{$date['dateId']}}_{{$periodKey}}" class="chk-wt2" name="chkWs" :icheck=false
+          value="{{$date['dateId']}}_{{$periodKey}}" :editData=$editData />
 
         {{-- 表のDiv --}}
-        <div class="chk-t" data-wt="{{$j}}_{{$periodIdList[$i]}}"></div>
+        <div class="chk-t" data-wt="{{$date['dateId']}}_{{$periodKey}}"></div>
       </td>
-      @endfor
+      @endforeach
 
       </tr>
-    @endfor
+    @endforeach
 
   </x-bs.table>
 

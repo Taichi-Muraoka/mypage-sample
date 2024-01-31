@@ -77,14 +77,14 @@ return [
     "upload_dir_invoice_import" =>  "file_upload/invoice_import/",
 
     /**
-     * 年次学年情報取込
-     */
-    "upload_dir_all_member_import" =>  "file_upload/all_member_import/",
-
-    /**
      * 年度スケジュール情報取込
      */
     "upload_dir_year_schedule_import" =>  "file_upload/year_schedule_import/",
+
+    /**
+     * 学校コード取込
+     */
+    "upload_dir_school_code_import" =>  "file_upload/school_code_import/",
 
     //==========================
     // アップロードファイル名
@@ -129,11 +129,6 @@ return [
      * 短期講習申込情報ファイル名（生徒）
      */
     "upload_file_name_member_import_individual" =>  "短期講習申込_",
-
-    /**
-     * 年次学年情報ファイル名（生徒）
-     */
-    "upload_file_name_all_member_import_enter" =>  "年次学年情報_",
 
     /**
      * 年度スケジュール情報ファイル名（生徒）
@@ -203,45 +198,35 @@ return [
      */
     "db_backup_dir" => 'db_backup/',
 
+    /**
+     * 保持期限超過データバックアップ先
+     */
+    "exceeding_data_backup_dir" => "exceeding_data_backup/",
+
+    /**
+     * 保持期限超過データバックアップzipファイル名
+     */
+    "exceeding_data_backup_zip_filename" => "保持期限超過データ削除バックアップ_",
+
     //==========================
     // 画面ごと設定
     // マスタなどに持たないような設定
     //==========================
 
     /**
-     * 空き時間登録の時間
-     */
-    'weekly_shift_time' => array(
-        '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
-        '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
-        '18:00', '18:30', '19:00', '19:30', '20:00', '20:30'
-    ),
-
-    /**
-     * 模試・イベント申込の参加人数
-     */
-    'event_members' => [
-        1 => ["value" => 1],
-        2 => ["value" => 2],
-        3 => ["value" => 3],
-        4 => ["value" => 4],
-        5 => ["value" => 5],
-    ],
-
-    /**
-     * 模試・イベント申込の参加人数
+     * 時限リスト（時間割マスタ用）
      */
     'period_no' => [
-        1 => ["value" => '1時限'],
-        2 => ["value" => '2時限'],
-        3 => ["value" => '3時限'],
-        4 => ["value" => '4時限'],
-        5 => ["value" => '5時限'],
-        6 => ["value" => '6時限'],
-        7 => ["value" => '7時限'],
-        8 => ["value" => '8時限'],
-        9 => ["value" => '9時限'],
-        10 => ["value" => '10時限'],
+        1 => ["value" => '1限'],
+        2 => ["value" => '2限'],
+        3 => ["value" => '3限'],
+        4 => ["value" => '4限'],
+        5 => ["value" => '5限'],
+        6 => ["value" => '6限'],
+        7 => ["value" => '7限'],
+        8 => ["value" => '8限'],
+        9 => ["value" => '9限'],
+        10 => ["value" => '10限'],
     ],
 
     /**
@@ -268,7 +253,77 @@ return [
     /**
      * 授業時間チェック 開始時刻
      */
-    "lesson_start_time_min" => '08:00:00',
+    'lesson_start_time_min' => '08:00:00',
+
+    /**
+     * 教室カレンダー 固定ブースエリア定義
+     */
+    'timetable_boothId' => '000',
+    'timetable_booth' => [
+        'id' => '000',
+        'title' => '時間割'
+    ],
+
+    'transfer_boothId' => '999',
+    'transfer_booth' => [
+        'id' => '999',
+        'title' => '未振替・振替中'
+    ],
+
+    /**
+     * 会員一覧 通塾期間プルダウンリスト
+     */
+    // MEMO:'term'には通塾期間の検索用に月数範囲を指定（Studentモデルで使用）
+    'enter_term' => [
+        1 => [
+            "term" => 1,
+            "value" => "0～1ヶ月"
+        ],
+        2 => [
+            "term" => [2, 3],
+            "value" => "2～3ヶ月"
+        ],
+        3 => [
+            "term" => [4, 6],
+            "value" => "4～6ヶ月"
+        ],
+        4 => [
+            "term" => [7, 12],
+            "value" => "7ヶ月～1年"
+        ],
+        5 => [
+            "term" => [13, 24],
+            "value" => "1年～2年"
+        ],
+        6 => [
+            "term" => [25, 36],
+            "value" => "2年～3年"
+        ],
+        7 => [
+            "term" => [37, 48],
+            "value" => "3年～4年"
+        ],
+        8 => [
+            "term" => [49, 60],
+            "value" => "4年～5年"
+        ],
+        9 => [
+            "term" => [61, 72],
+            "value" => "5年～6年"
+        ],
+        10 => [
+            "term" => [73, 84],
+            "value" => "6年～7年"
+        ],
+        11 => [
+            "term" => [85, 96],
+            "value" => "7年～8年"
+        ],
+        12 => [
+            "term" => 97,
+            "value" => "8年～"
+        ],
+    ],
 
     /**
      * 削除アカウントのメールアドレスに付加する文字列
@@ -280,6 +335,16 @@ return [
      * 削除アカウントのメールアドレスに付加する文字列の抽出条件
      * 末尾に「DELyyyymmddhhmmss@」
      */
-    "delete_email_rule" => '/^.+(DEL[0-9]{14}@)$/'
+    "delete_email_rule" => '/^.+(DEL[0-9]{14}@)$/',
 
+    /**
+     * 面談時間
+     */
+    "conference_time" => 60,
+
+    /**
+     * 給与明細表示
+     * item_name
+     */
+    "subtotal_withholding" => '源泉計算用小計',
 ];

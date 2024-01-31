@@ -18,29 +18,24 @@
 
     @else
     {{-- 登録時 --}}
-    <p>授業教材の登録を行います。</p>
+    <p>
+        授業教材の登録を行います。<br>
+    </p>
     @endif
 
     {{-- 共通フォーム --}}
-    <x-input.text caption="教材コード" id="text_cd" :rules=$rules :editData=$editData/>
-    <x-input.select caption="学年" id="grade_cd" :select2=true :editData=$editData>
-        <option value="7">7（中1）</option>
-        <option value="8">8（中2）</option>
-        <option value="9">9（中3）</option>
-    </x-input.select>
-    <x-input.select caption="授業科目コード" id="l_subject_cd" :select2=true :editData=$editData>
-        <option value="101">101（英語）</option>
-        <option value="102">102（数学）</option>
-        <option value="103">103（国語）</option>
-        <option value="503">503（数学・英語）</option>
-    </x-input.select>
-    <x-input.select caption="教材科目コード" id="t_subject_cd" :select2=true :editData=$editData>
-        <option value="101">101（英語）</option>
-        <option value="102">102（数学）</option>
-        <option value="103">103（国語）</option>
-        <option value="503">503（数学・英語）</option>
-    </x-input.select>
-    <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData/>
+    <x-input.text caption="教材コード　(学年コード(2桁) + 授業教科コード(3桁) + 教科連番(1桁) + 教材名連番(2桁・その他は99))" id="text_cd" :rules=$rules
+        :editData=$editData />
+    <x-input.select id="grade_cd" caption="学年" :select2=true :mastrData=$grades :editData=$editData :select2Search=false
+        :blank=true />
+    <x-input.select id="l_subject_cd" caption="授業教科コード" :select2=true :mastrData=$subjects :editData=$editData
+        :select2Search=false :blank=true />
+    <x-input.select id="t_subject_cd" caption="教材教科コード" :select2=true :mastrData=$textSubjects :editData=$editData
+        :select2Search=false :blank=true />
+    <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData />
+
+    {{-- hidden --}}
+    <x-input.hidden id="_text_cd" :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">
@@ -50,7 +45,7 @@
             @if (request()->routeIs('master_mng_text-edit'))
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
-                <x-button.submit-delete />
+                <x-button.submit-delete-validation />
                 <x-button.submit-edit />
             </div>
             @else

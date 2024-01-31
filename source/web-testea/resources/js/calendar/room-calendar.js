@@ -37,6 +37,8 @@ export default class RoomCalendar {
         var calendarEl = document.getElementById(calendarId);
 
         this._calendar = new Calendar(calendarEl, {
+            // license key for premium features
+            schedulerLicenseKey: '0477382314-fcs-1699842877',
             initialView: "resourceTimeGridDay",
             datesSet: this._dateChangeFunc,
             initialDate: initDate,
@@ -48,11 +50,7 @@ export default class RoomCalendar {
             },
             headerToolbar: {
                 left: "prev,next today",
-                //left: "prev,next today datePickerButton",
-                //left: "",
                 center: "title",
-                //right: ""
-                //right: "datePickerButton timeGridWeek,resourceTimeGridDay"
                 right: "datePickerButton",
             },
             buttonText: {
@@ -61,38 +59,40 @@ export default class RoomCalendar {
                 week: "週",
                 day: "日",
             },
-            //themeSystem: "bootstrap",
+            // タイトルの書式
+            titleFormat: function (date) {
+                const year = date.date.year
+                const month = date.date.month + 1;
+                const day = date.date.day;
+                const weekNum = date.date.marker.getDay();
+                const week = [
+                    "(日)",
+                    "(月)",
+                    "(火)",
+                    "(水)",
+                    "(木)",
+                    "(金)",
+                    "(土)"
+                ][weekNum];
+                const title = year + "年" + month + "月" + day + "日 " + week
+                return title;
+            },
             locale: "ja",
-            //height: 700,
-            height: 1700,
+            contentHeight: "auto",
+            stickyFooterScrollbar: true,
+            stickyHeaderDates: true,
             dayMinWidth: 150,
             selectable: false,
             selectMirror: false,
             navLinks: true,
-            // v5対応
-            //eventRender: function(info) {
-            // ツールチップの表示も可能
-            // $(info.el).tooltip({
-            //     title: info.event.extendedProps.detail
-            // });
-            //},
-            // 左側のリソースの一覧
-            resources: [
-                { id: "000", title: "時間割" },
-                { id: "001", title: "Aテーブル" },
-                { id: "002", title: "Bテーブル" },
-                { id: "003", title: "Cテーブル" },
-                { id: "004", title: "Dテーブル" },
-                { id: "005", title: "E教室" },
-                { id: "800", title: "面談ブース" },
-                { id: "999", title: "未振替・振替中" },
-            ],
-            // データの読み込み処理
+            // リソース（ブース）の読み込み処理
+            resources: this._resourceFunc,
+            // スケジュールデータの読み込み処理
             events: this._eventFunc,
-            // クリックイベント
+            // イベントクリック
             eventClick: this._eventClick,
-            //editable: false,
             selectable: true,
+            // Viewエリアクリック
             select: this._selectFunc,
             eventDisplay: "block",
             eventTimeFormat: {
@@ -122,6 +122,7 @@ export default class RoomCalendar {
      * 再描画
      */
     refetchEvents() {
+        this._calendar.refetchResources();
         this._calendar.refetchEvents();
     }
 
@@ -131,14 +132,47 @@ export default class RoomCalendar {
      * @param dateInfo
      */
     _dateChangeFunc = (dateInfo) => {
-        //console.log("date change!!");
-        //console.log(dateInfo.start);
-        $("#curDate").val(dateInfo.start);
-        //console.log($('#curDate').val());
+        $("#target_date").val(moment(dateInfo.start).format("YYYY-MM-DD"));
     };
 
     /**
-     * 表示イベント
+     * リソース表示
+     *
+     * @param info
+     * @param successCallback
+     * @param failureCallback
+     */
+    _resourceFunc = (info, successCallback, failureCallback) => {
+        // カレンダーのカードタグのID
+        var cardId = "#card-calendar";
+
+        $.when()
+            .then(() => {
+                // カードのローディング開始
+                FormCom.loadingForCardOn(cardId);
+                // カードカレンダーの中のHidden値を取得。会員管理のように子画面にカレンダーがある場合
+                var formData = FormCom.getFormArrayData(cardId);
+
+                // カレンダーの条件を送信
+                var sendData = Object.assign(formData, {
+                });
+
+                // 詳細データを取得
+                var url = UrlCom.getFuncUrl() + "/get_booth";
+                return axios.post(url, sendData);
+            })
+            .then((response) => {
+                // コールバックで更新(eventプロパティにセットする)
+                successCallback(response.data);
+
+                // カードのローディング終了
+                FormCom.loadingForCardOff(cardId);
+            })
+            .fail(AjaxCom.fail);
+    };
+
+    /**
+     * イベント表示
      *
      * @param info
      * @param successCallback
@@ -152,7 +186,7 @@ export default class RoomCalendar {
             .then(() => {
                 // カードのローディング開始
                 FormCom.loadingForCardOn(cardId);
-                //console.log("loadingForCardOn");
+                $("#target_date").val(moment(info.start.valueOf()).format("YYYY-MM-DD"));
                 // カードカレンダーの中のHidden値を取得。会員管理のように子画面にカレンダーがある場合
                 var formData = FormCom.getFormArrayData(cardId);
 
@@ -160,16 +194,12 @@ export default class RoomCalendar {
                 var sendData = Object.assign(formData, {
                     start: info.start.valueOf(),
                     end: info.end.valueOf(),
-                    curDate: info.start.valueOf(),
                 });
-
                 // 詳細データを取得
                 var url = UrlCom.getFuncUrl() + "/get_calendar";
                 return axios.post(url, sendData);
             })
             .then((response) => {
-                //console.log(response.data);
-
                 // コールバックで更新(eventプロパティにセットする)
                 successCallback(response.data);
 
@@ -186,7 +216,6 @@ export default class RoomCalendar {
      */
     _eventClick = (e) => {
         // 時間割のスケジュールはモーダル表示しない
-        //if (e.event._def.resourceIds[0] !== '000' && e.event._def.resourceIds[0] !== '800') {
         if (e.event._def.resourceIds[0] !== "000") {
             // モーダルの中身を更新
             this._vueModal.item = Object.assign(
@@ -210,27 +239,23 @@ export default class RoomCalendar {
      * @param info
      */
     _selectFunc = (info) => {
-        //console.log(info);
+        // カレンダーのカードタグのID
+        var cardId = "#card-calendar";
+        var formData = FormCom.getFormArrayData(cardId);
         if (
             info.resource._resource.id !== "000" &&
-            info.resource._resource.id !== "800"
+            info.resource._resource.id !== "999"
         ) {
-            // 登録画面に遷移
-            //var url = UrlCom.getFuncUrl() + "/new?"
-            //        + "roomcd=" + "110"
-            //        + "&date=" + moment(info.start).format("YYYYMMDD")
-            //        + "&start_time=" + moment(info.start).format("HHmm")
-            //        + "&end_time=" + moment(info.end).format("HHmm");
             var url =
                 UrlCom.getFuncUrl() +
                 "/new" +
                 "/" +
-                "01" +
+                formData.campus_cd +
                 "/" +
                 moment(info.start).format("YYYYMMDD") +
                 moment(info.start).format("HHmm") +
                 "/" +
-                "101";
+                info.resource._resource.id;
             location.href = url;
         }
     };
@@ -239,10 +264,6 @@ export default class RoomCalendar {
      * ボタンクリックイベント
      */
     _datePickerButtonClick = (e) => {
-        //var currentDate = calendar.getDate();
-        //var newDate = moment(currentDate).add(7, 'days').format();
-        //calendar.gotoDate(newDate);
-
         const button = e.target;
         const self = this;
 
@@ -263,11 +284,6 @@ export default class RoomCalendar {
                 // カレンダーのポップアップ位置を自動で調整
                 // 下の方にテキストボックスがあれば、カレンダーは上にポップアップされる
                 drops: "auto",
-                //}, function(start, end, label) {
-                //console.log(start);
-                //var currentDate = calendar.getDate();
-                //var newDate = moment(currentDate).add(7, 'days').format();
-                //calendar.gotoDate(newDate);
             })
             .on("apply.daterangepicker", function (ev, picker) {
                 // 適用ボタンクリックイベントで取得

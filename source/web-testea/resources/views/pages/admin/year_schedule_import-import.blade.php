@@ -12,11 +12,11 @@
     <x-bs.table :hover=false :vHeader=true>
         <tr>
             <th width="30%">年度</th>
-            <td>2023年度</td>
+            <td>{{$school_year}}年度</td>
         </tr>
         <tr>
             <th width="30%">校舎</th>
-            <td>{{$school}}</td>
+            <td>{{$room_name}}</td>
         </tr>
     </x-bs.table>
 
@@ -24,6 +24,11 @@
     <div class="mb-3"></div>
 
     <x-input.file caption="年間業カレンダー情報ファイル" id="upload_file" />
+
+    {{-- hidden --}}
+    <x-input.hidden id="yearly_schedules_import_id" :editData=$editData />
+    <x-input.hidden id="campus_cd" :editData=$editData />
+    <x-input.hidden id="school_year" :editData=$editData />
 
     <x-bs.callout>
         ファイル形式：CSV形式

@@ -16,6 +16,13 @@ export default class AppClass extends PageBase {
      */
     start() {
         // Vue: 検索フォーム
-        this.getVueSearchForm();
+        var searchForm = this.getVueSearchForm();
+
+        // Vue: モーダル(一覧出力)
+        this.getVueModal({
+            // exec送信時に、検索フォームを送信する
+            // 検索条件を返す関数を指定する。
+            addSendData: searchForm.getAfterSearchCond,
+        });
     }
 }

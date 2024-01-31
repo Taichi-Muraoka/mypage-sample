@@ -108,7 +108,7 @@ class Notice extends Model
             'notice_id' => ['integer'],
             'title' => ['string', 'max:50'],
             'text' => ['string', 'max:1000'],
-            'notice_type' => ['integer', 'in:4,5,6,7,8,9,10'],
+            'notice_type' => ['integer'],
             'adm_id' => ['integer'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
             'regist_time' => ['date_format:Y-m-d H:i:s']
@@ -119,5 +119,48 @@ class Notice extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
+    /**
+     * 検索 校舎コード
+     */
+    public function scopeSearchCampusCd($query, $obj)
+    {
+        $key = 'campus_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+    /**
+     * 検索 お知らせ種別
+     */
+    public function scopeSearchNoticeType($query, $obj)
+    {
+        $key = 'notice_type';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
 
+    /**
+     * 検索 宛先種別
+     */
+    public function scopeSearchDestinationType($query, $obj)
+    {
+        $key = 'destination_type';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // 生徒IDでスケジュールを絞り込む(共通処理)
+            $this->mdlWhereScheduleBySidQuery($query, self::class, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 タイトル
+     */
+    public function scopeSearchTitle($query, $obj)
+    {
+        $key = 'title';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, 'LIKE',  '%' . $obj[$key] . '%');
+        }
+    }
 }

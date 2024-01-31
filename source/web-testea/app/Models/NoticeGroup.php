@@ -96,7 +96,7 @@ class NoticeGroup extends Model
     {
         static $_fieldRules = [
             'notice_group_id' => ['integer'],
-            'group_type' => ['integer', 'in:1,2'],
+            'group_type' => ['integer'],
             'cls_cd' => ['integer'],
             'cls_cd_next' => ['integer'],
             'group_name' => ['string', 'max:50'],

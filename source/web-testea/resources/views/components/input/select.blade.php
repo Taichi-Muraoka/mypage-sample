@@ -12,12 +12,13 @@
   onChange: Vueのチェンジイベント
   blank: 選択してくださいを表示するかどうか
   vShow: Vue.jsのv-show
+  blankText: 選択してくださいの代わりのテキスト
   emptyValue: 選択してくださいの値
   multiple: 複数選択指定
 --}}
 @props(['caption' => '', 'id' => '', 'select2' => false, 'select2Search' => true,
     'mastrData' => [], 'editData' => [], 'onChange' => '', 'blank' => true, 'vShow' => '',
-    'emptyValue' => '', 'multiple' => ''])
+    'blankText' => '', 'emptyValue' => '', 'multiple' => ''])
 
 {{-- バリデーションエラー時のスクロール先 --}}
 <span class="form-validation" data-id="{{ $id }}"></span>
@@ -69,11 +70,11 @@
 
     {{-- デフォルトの項目 --}}
     @if ($blank)
-    <option value="{{$emptyValue}}">選択して下さい</option>
+    <option value="{{$emptyValue}}">@if ($blankText) {{$blankText}} @else 選択して下さい @endif</option>
     @endif
 
     {{-- マスターの表示 --}}
-    @foreach ($mastrData as $key => $obj) 
+    @foreach ($mastrData as $key => $obj)
     <option value="{{$key}}"
       {{-- 選択 --}}
       {{-- 複数選択指定の場合 --}}

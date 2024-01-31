@@ -15,9 +15,22 @@
     <div class="mb-3"></div>
 
     {{-- 共通フォーム --}}
-    <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData/>
-    <x-input.text caption="値（数値）" id="value_num" :rules=$rules :editData=$editData/>
-    <x-input.text caption="値（文字列）" id="value_str" :rules=$rules :editData=$editData/>
+    <div v-cloak>
+        <x-input.text caption="名称" id="name" :rules=$rules :editData=$editData />
+
+        <x-input.text caption="値（数値）" id="value_num" :rules=$rules :editData=$editData
+            vShow="form.datatype_kind == {{ App\Consts\AppConst::SYSTEM_DATATYPE_1 }}" />
+
+        <x-input.text caption="値（文字列）" id="value_str" :rules=$rules :editData=$editData
+            vShow="form.datatype_kind == {{ App\Consts\AppConst::SYSTEM_DATATYPE_2 }}" />
+
+        <x-input.date-picker caption="登録日" id="value_date" :rules=$rules :editData=$editData
+            vShow="form.datatype_kind == {{ App\Consts\AppConst::SYSTEM_DATATYPE_3 }}" />
+    </div>
+
+    {{-- hidden --}}
+    <x-input.hidden id="key_id" :editData=$editData />
+    <x-input.hidden id="datatype_kind" :editData=$editData />
 
     {{-- フッター --}}
     <x-slot name="footer">

@@ -119,15 +119,15 @@ class Surcharge extends Model
             'tutor_id' => ['integer'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
             'apply_date' => ['date_format:Y-m-d'],
-            'surcharge_kind' => ['integer', 'in:11,12,13,14,21,22,31,32'],
+            'surcharge_kind' => ['integer'],
             'working_date' => ['date_format:Y-m-d'],
             'start_time' => ['vdTime'],
-            'minutes' => ['integer'],
+            'minutes' => ['integer', 'min:0', 'max:9999'],
             'tuition' => ['integer', 'min:0', 'max:99999999'],
             'comment' => ['string', 'max:1000'],
-            'approval_status' => ['integer', 'in:1,2,3'],
-            'payment_date' => ['date_format:Y-m-d'],
-            'payment_status' => ['integer', 'in:0,1'],
+            'approval_status' => ['integer'],
+            'payment_date' => ['date_format:Y-m'],
+            'payment_status' => ['integer'],
             'admin_comment' => ['string', 'max:1000'],
         ];
         return $_fieldRules;
@@ -136,5 +136,86 @@ class Surcharge extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
+    /**
+     * 検索 校舎コード
+     */
+    public function scopeSearchCampusCd($query, $obj)
+    {
+        $key = 'campus_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 
+    /**
+     * 検索 講師ID
+     */
+    public function scopeSearchTutorId($query, $obj)
+    {
+        $key = 'tutor_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 請求種別
+     */
+    public function scopeSearchSurchargeKind($query, $obj)
+    {
+        $key = 'surcharge_kind';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 ステータス
+     */
+    public function scopeSearchApprovalStatus($query, $obj)
+    {
+        $key = 'approval_status';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 支払状況
+     */
+    public function scopeSearchPaymentStatus($query, $obj)
+    {
+        $key = 'payment_status';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 申請日From
+     */
+    public function scopeSearchApplyDateFrom($query, $obj)
+    {
+        $key = 'apply_date_from';
+        // Ymdに変換して検索する
+        $col = $this->mdlFormatYmd('apply_date');
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, '>=', $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 申請日To
+     */
+    public function scopeSearchApplyDateTo($query, $obj)
+    {
+        $key = 'apply_date_to';
+        // Ymdに変換して検索する
+        $col = $this->mdlFormatYmd('apply_date');
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, '<=', $obj[$key]);
+        }
+    }
 }

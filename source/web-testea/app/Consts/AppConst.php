@@ -117,22 +117,22 @@ class AppConst
     const CODE_MASTER_4 = 4;
 
     /**
-     * 承認ステータス 対象外
+     * 報告書承認ステータス 対象外
      */
     const CODE_MASTER_4_0 = 0;
 
     /**
-     * 承認ステータス 承認待ち
+     * 報告書承認ステータス 承認待ち
      */
     const CODE_MASTER_4_1 = 1;
 
     /**
-     * 承認ステータス 承認
+     * 報告書承認ステータス 承認
      */
     const CODE_MASTER_4_2 = 2;
 
     /**
-     * 承認ステータス 差戻し
+     * 報告書承認ステータス 差戻し
      */
     const CODE_MASTER_4_3 = 3;
 
@@ -229,12 +229,12 @@ class AppConst
     /**
      * 可
      */
-    const CODE_MASTER_9_1 = 0;
+    const CODE_MASTER_9_0 = 0;
 
     /**
      * 不可
      */
-    const CODE_MASTER_9_2 = 1;
+    const CODE_MASTER_9_1 = 1;
 
     //-----------
     // 生徒プラン種別
@@ -429,6 +429,12 @@ class AppConst
      */
     const CODE_MASTER_16_7 = 7;
 
+    /**
+     * 曜日コード サブコード レギュラー登録のリストに使用
+     */
+    const CODE_MASTER_16_SUB_1 = 1;
+
+
     //-----------
     // 回答状態
     //-----------
@@ -455,7 +461,7 @@ class AppConst
     /**
      * 請求情報ファイル項目定義
      */
-//    const CODE_MASTER_18 = 18;
+    //    const CODE_MASTER_18 = 18;
 
 
     //-----------
@@ -815,6 +821,21 @@ class AppConst
      */
     const CODE_MASTER_26_32 = 32;
 
+    /**
+     * 請求種別 サブコード 請求区分:時給
+     */
+    const CODE_MASTER_26_SUB_8 = 8;
+
+    /**
+     * 請求種別 サブコード 請求区分:金額（源泉徴収対象）
+     */
+    const CODE_MASTER_26_SUB_9 = 9;
+
+    /**
+     * 請求種別 サブコード 請求区分:金額（源泉徴収対象外）
+     */
+    const CODE_MASTER_26_SUB_10 = 10;
+
     //-----------
     // 支払状況
     //-----------
@@ -872,6 +893,11 @@ class AppConst
      * 生徒会員ステータス 退会済
      */
     const CODE_MASTER_28_5 = 5;
+
+    /**
+     * 生徒会員ステータス サブコード 見込客・在籍
+     */
+    const CODE_MASTER_28_SUB_1 = 1;
 
     //-----------
     // 講師会員ステータス
@@ -1111,6 +1137,11 @@ class AppConst
      */
     const CODE_MASTER_35_SUB_2 = 2;
 
+    /**
+     * 出欠ステータス サブコード １対１・画面非表示対象（振替済・リセット）
+     */
+    const CODE_MASTER_35_SUB_3 = 3;
+
     //-----------
     // 仮登録フラグ
     //-----------
@@ -1167,21 +1198,38 @@ class AppConst
      * 春期特別期間
      */
     const CODE_MASTER_38_1 = 1;
+    /**
+     * 春期特別期間（文字列コード）
+     */
+    const CODE_MASTER_38_GEN1_1 = '01';
 
     /**
      * 夏期特別期間
      */
     const CODE_MASTER_38_2 = 2;
+    /**
+     * 夏期特別期間（文字列コード）
+     */
+    const CODE_MASTER_38_GEN1_2 = '02';
 
     /**
      * 冬期特別期間
      */
     const CODE_MASTER_38_3 = 3;
+    /**
+     * 冬期特別期間（文字列コード）
+     */
+    const CODE_MASTER_38_GEN1_3 = '03';
 
     /**
      * 休日
      */
     const CODE_MASTER_38_9 = 9;
+
+    /**
+     * サブコード 特別期間用
+     */
+    const CODE_MASTER_38_SUB_1 = 1;
 
     //-----------
     // 学校区分
@@ -1469,19 +1517,14 @@ class AppConst
     const CODE_MASTER_48 = 48;
 
     /**
-     * 受付期間前
+     * 未確定
      */
     const CODE_MASTER_48_0 = 0;
 
     /**
-     * 未確定
-     */
-    const CODE_MASTER_48_1 = 1;
-
-    /**
      * 確定済
      */
-    const CODE_MASTER_48_2 = 2;
+    const CODE_MASTER_48_1 = 1;
 
     //-----------
     // 学校種
@@ -1752,38 +1795,7 @@ class AppConst
     /**
      * お知らせグループID 講師
      */
-    const NOTICE_GROUP_ID_15 = 15;
-
-    //==========================
-    // カレンダー
-    //==========================
-
-    // MEMO: カレンダーの作成区分コード / 出欠・振替コード
-
-    /**
-     * 作成区分 一括作成
-     */
-    const CREATE_KIND_CD_1 = 1;
-
-    /**
-     * 作成区分 後日振替
-     */
-    const CREATE_KIND_CD_2 = 2;
-
-    /**
-     * 作成区分 増コマまたは分割振替
-     */
-    const CREATE_KIND_CD_3 = 3;
-
-    /**
-     * 出欠・振替コード 後日振替
-     */
-    const ATD_STATUS_CD_2 = 2;
-
-    /**
-     * 振替区分コード 振替日設定済
-     */
-    const TRANSEFER_KIND_CD_1 = 1;
+    const NOTICE_GROUP_ID_16 = 16;
 
     //==========================
     // 給与情報明細
@@ -1810,6 +1822,11 @@ class AppConst
      * 給与表示グループ 合計
      */
     const SALARY_GROUP_4 = 4;
+
+    /**
+     * 給与表示グループ 未使用
+     */
+    const SALARY_GROUP_0 = 0;
 
     //-----------
     // バッチ種別
@@ -1864,4 +1881,150 @@ class AppConst
      * バッチ種別 データ移行
      */
     const BATCH_TYPE_21 = 21;
+
+    //==========================
+    // システムマスタ システム変数ID
+    //==========================
+
+    /**
+     * システム変数ID 現年度
+     */
+    const SYSTEM_KEY_ID_1 = 1;
+
+    /**
+     * システム変数ID 事務作業給
+     */
+    const SYSTEM_KEY_ID_2 = 2;
+
+    /**
+     * システム変数ID 振替調整スキップ回数
+     */
+    const SYSTEM_KEY_ID_3 = 3;
+
+    /**
+     * システム変数ID 運用開始日
+     */
+    const SYSTEM_KEY_ID_4 = 4;
+
+    //-----------
+    // システムマスタ データ型種別
+    //-----------
+    /**
+     * システムマスタ 数値
+     */
+    const SYSTEM_DATATYPE_1 = 1;
+
+    /**
+     * システムマスタ 文字列
+     */
+    const SYSTEM_DATATYPE_2 = 2;
+
+    /**
+     * システムマスタ 日付
+     */
+    const SYSTEM_DATATYPE_3 = 3;
+
+    //-----------
+    // 授業報告書サブコード
+    //-----------
+
+    /**
+     * 授業報告書 授業内容教材1
+     */
+    const REPORT_SUBCODE_1 = 'L1';
+
+    /**
+     * 授業報告書 授業内容教材2
+     */
+    const REPORT_SUBCODE_2 = 'L2';
+
+    /**
+     * 授業報告書 宿題内容教材1
+     */
+    const REPORT_SUBCODE_3 = 'H1';
+
+    /**
+     * 授業報告書 宿題内容教材2
+     */
+    const REPORT_SUBCODE_4 = 'H2';
+
+    const REPORT_SUBCODES = [
+        AppConst::REPORT_SUBCODE_1,
+        AppConst::REPORT_SUBCODE_2,
+        AppConst::REPORT_SUBCODE_3,
+        AppConst::REPORT_SUBCODE_4
+    ];
+
+    /**
+     * 授業報告書 その他教材・単元の下2桁
+     */
+    const REPORT_OTHER_TEXT_UNIT_CODE = 99;
+
+    //-----------
+    // 授業振替依頼 希望選択
+    //-----------
+    /**
+     * 講師空き時間選択
+     */
+    const TRANSFER_PREF_TYPE_SELECT = 1;
+
+    /**
+     * フリー入力
+     */
+    const TRANSFER_PREF_TYPE_INPUT = 2;
+    /**
+     * コース (授業集計SQL用)
+     */
+
+    // 個別指導コース
+    const COURSE_CD_10100 = 10100;
+
+    // 1対2コース
+    const COURSE_CD_10200 = 10200;
+
+    // 1対3コース
+    const COURSE_CD_10300 = 10300;
+
+    // 家庭教師
+    const COURSE_CD_10400 = 10400;
+
+    // 演習
+    const COURSE_CD_10500 = 10500;
+
+    // ハイプラン
+    const COURSE_CD_10600 = 10600;
+
+    // 集団指導
+    const COURSE_CD_20100 = 20100;
+
+    //==========================
+    // 教室カレンダー・レギュラースケジュール
+    //==========================
+    /**
+     * スケジュール追加更新種別
+     */
+    const SCHEDULE_KIND_NEW = 1;
+    const SCHEDULE_KIND_UPD = 2;
+    const SCHEDULE_KIND_CPY = 3;
+
+    /**
+     * 給与取込 固定値
+     */
+    // 時給ありの明細数
+    const COUNT_HOUR_SALARY = 10;
+
+    // 給与情報明細数
+    const COUNT_SALARY = 18;
+
+    /**
+     * 年次処理 学年更新
+     */
+    // 高3
+    const GRADE_CD_12 =12;
+
+    // 大学生
+    const GRADE_CD_16 =16;
+
+    // 高3年齢
+    const GRADE_CD_12_AGE =18;
 }

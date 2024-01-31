@@ -107,7 +107,7 @@ class YearlySchedulesImport extends Model
             'yearly_schedules_import_id' => ['integer'],
             'school_year' => ['string', 'max:4', 'digits:4'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
-            'import_state' => ['integer', 'in:0,1'],
+            'import_state' => ['integer'],
             'import_date' => ['date_format:Y-m-d H:i:s']
         ];
         return $_fieldRules;

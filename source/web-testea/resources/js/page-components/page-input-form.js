@@ -68,14 +68,6 @@ export default class PageInputForm extends PageComponentBase {
             option["progressShow"] = false;
         }
 
-        // ライブラリを初期化するかどうか
-        // 選択モーダル対応時に、フォームとモーダルの両方を呼ぶため
-        // 制御できるようにした。(select2対応)
-        // →最後に一回だけ呼べるようにしたいが、とりあえずフラグで制御
-        if (option["useModalSelect"] == undefined) {
-            option["useModalSelect"] = false;
-        }
-
         // ターゲットのID
         if (option["id"] == undefined) {
             option["id"] = "#app-form";
@@ -131,9 +123,7 @@ export default class PageInputForm extends PageComponentBase {
                 this.option = option;
 
                 // ライブラリの初期化
-                if (!option["useModalSelect"]) {
-                    self.initLibs(this, option);
-                }
+                self.initLibs(this, option);
 
                 // 確認モーダルの表示用
                 if (!ValueCom.isEmpty(option["confirmModal"])) {
@@ -180,9 +170,7 @@ export default class PageInputForm extends PageComponentBase {
                 }
 
                 // Vue更新後、ライブラリの初期化
-                if (!option["useModalSelect"]) {
-                    self.updatedLibs();
-                }
+                self.updatedLibs(this);
             },
             // オプションでメソッドを追加する
             methods: Object.assign(
@@ -202,8 +190,21 @@ export default class PageInputForm extends PageComponentBase {
                     },
                     // 削除ボタン
                     submitDelete: function () {
+                        if (option["afterDelete"]) {
+                            option["afterEdit"] = option["afterDelete"];
+                        }
                         // 削除処理
                         self._sendDelete(this, option);
+                    },
+                    // バリデーションあり削除ボタン
+                    submitValidationDelete: function () {
+                        // 削除処理
+                        self._sendValidationDelete(this, option);
+                    },
+                    // 承認送信ボタン
+                    submitApproval: function () {
+                        // 承認処理
+                        self._sendApproval(this, option);
                     },
                     // プルダウンの変更イベントで詳細を取得
                     selectChangeGet: function (event) {
@@ -272,14 +273,14 @@ export default class PageInputForm extends PageComponentBase {
                 const key = fileElement.id;
 
                 // ファイルを取得(1つのinput fileで複数選択しないので0しか無いはず)
-                for (var i = 0; i < fileElement.files.length; i++) {
+                for (var j = 0; j < fileElement.files.length; j++) {
                     // フラグ(アップロードするファイルがある場合)
                     existFile = true;
 
                     // ファイルを取得
-                    const file = fileElement.files[i];
+                    const file = fileElement.files[j];
 
-                    // MEMO: 複数ファイル選択に対応する場合は、i番目を追加しないといけないはず
+                    // MEMO: 複数ファイル選択に対応する場合は、j番目を追加しないといけないはず
                     formData.append(key, file);
                 }
             }
@@ -566,6 +567,192 @@ export default class PageInputForm extends PageComponentBase {
 
                 // 完了メッセージ
                 return appDialogCom.success("削除");
+            })
+            .then(
+                // 後処理を実行する
+                option["afterEdit"]
+            )
+            .catch(AjaxCom.fail);
+    }
+
+    /**
+     * 削除(バリデーションあり)
+     *
+     * @param vueインスタンス
+     */
+    _sendValidationDelete($vue, option) {
+        // 送信フォームのデータを取得する
+        var sendData = this._getSendFormData($vue);
+
+        const self = this;
+        AjaxCom.getPromise()
+            .then((response) => {
+                // バリデート(例：http://localhost:8000/sample/edit/1 と同じ階層を想定)
+                var url =
+                    UrlCom.getFuncUrl() + "/vd_delete" + option["urlSuffix"];
+                // モック時は送信しない
+                if (!option["isMock"]) {
+                    // バリデーション
+                    return axios.post(url, sendData.data, sendData.header);
+                }
+            })
+            .then((response) => {
+                // モック時はチェックしない
+                if (!option["isMock"]) {
+                    // バリデーション結果をチェック
+                    if (!self.validateCheck($vue, response)) {
+                        // 処理を抜ける
+                        return AjaxCom.exit();
+                    }
+                }
+
+                // 確認ダイアログ
+                return appDialogCom.confirmDel();
+            })
+            .then((flg) => {
+                if (!flg) {
+                    // いいえを押した場合
+                    return AjaxCom.exit();
+                }
+
+                // ダイアログ
+                appDialogCom.progressShow();
+
+                // 削除
+                var url = UrlCom.getFuncUrl() + "/delete" + option["urlSuffix"];
+
+                // モック時は送信しない
+                if (!option["isMock"]) {
+                    // 送信
+                    return axios.post(url, $vue.form);
+                } else {
+                    // ダミーウェイト
+                    return DummyCom.wait();
+                }
+            })
+            .then((response) => {
+                // ダイアログ
+                appDialogCom.progressHide();
+
+                // エラー応答の場合は、アラートを表示する
+                if (
+                    Object.keys(response.data).length == 1 &&
+                    response.data["error"]
+                ) {
+                    appDialogCom.alert(response.data["error"]);
+                    return AjaxCom.exit();
+                }
+
+                // 完了メッセージ
+                return appDialogCom.success("削除");
+            })
+            .then(
+                // 後処理を実行する
+                option["afterEdit"]
+            )
+            .catch(AjaxCom.fail);
+    }
+
+    /**
+     * 承認
+     *
+     * @param vueインスタンス
+     */
+    _sendApproval($vue, option) {
+        // 送信フォームのデータを取得する
+        var sendData = this._getSendFormData($vue);
+
+        const self = this;
+        AjaxCom.getPromise()
+            .then(() => {
+                // バリデート(例：http://localhost:8000/sample/edit/1 と同じ階層を想定)
+                var url =
+                    UrlCom.getFuncUrl() + "/vd_approval" + option["urlSuffix"];
+                // モック時は送信しない
+                if (!option["isMock"]) {
+                    // ファイルアップロード時は大きいファイルが想定されるのでローディングを表示
+                    // 空き時間登録のチェックボックスが多くやや時間がかかるので強制的に表示する場合も想定
+                    if (sendData.upload || option["progressShow"]) {
+                        // ダイアログ
+                        appDialogCom.progressShow();
+                    }
+
+                    // バリデーション
+                    return axios.post(url, sendData.data, sendData.header);
+                }
+            })
+            .then((response) => {
+                // モック時はチェックしない
+                if (!option["isMock"]) {
+                    // ファイルアップロード時は大きいファイルが想定されるのでローディングを表示
+                    if (sendData.upload || option["progressShow"]) {
+                        // ダイアログ
+                        appDialogCom.progressHide();
+                    }
+
+                    // バリデーション結果をチェック
+                    if (!self.validateCheck($vue, response)) {
+                        // 処理を抜ける
+                        return AjaxCom.exit();
+                    }
+                }
+
+                // 確認ダイアログ
+                if (
+                    Object.keys(response.data).length == 1 &&
+                    response.data["confirm_modal_data"]
+                ) {
+                    // 確認モーダルダイアログ
+
+                    // モーダルに表示したいデータをセットする
+                    $vue.vueModal.item = response.data["confirm_modal_data"];
+
+                    // モーダルを表示する
+                    $vue.vueModal.show();
+
+                    // 確認
+                    return $vue.vueModal.confirm();
+                } else {
+                    // 通常の確認ダイアログ
+                    return appDialogCom.confirmSend(option["confirmStrEdit"]);
+                }
+            })
+            .then((flg) => {
+                if (!flg) {
+                    // いいえを押した場合
+                    return AjaxCom.exit();
+                }
+
+                // ダイアログ
+                appDialogCom.progressShow();
+
+                // 編集
+                var url = UrlCom.getFuncUrl() + "/update" + option["urlSuffix"];
+
+                // モック時は送信しない
+                if (!option["isMock"]) {
+                    // 送信
+                    return axios.post(url, sendData.data, sendData.header);
+                } else {
+                    // ダミーウェイト
+                    return DummyCom.wait();
+                }
+            })
+            .then((response) => {
+                // ダイアログ
+                appDialogCom.progressHide();
+
+                // エラー応答の場合は、アラートを表示する
+                if (
+                    Object.keys(response.data).length == 1 &&
+                    response.data["error"]
+                ) {
+                    appDialogCom.alert(response.data["error"]);
+                    return AjaxCom.exit();
+                }
+
+                // 完了メッセージ
+                return appDialogCom.success(option["confirmStrEdit"]);
             })
             .then(
                 // 後処理を実行する

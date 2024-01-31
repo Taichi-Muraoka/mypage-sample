@@ -112,7 +112,7 @@ class MstSchool extends Model
             'school_cd' => ['string', 'max:13'],
             'school_kind' => ['string', 'max:2'],
             'school_kind_cd' => ['integer'],
-            'pref_cd'=> ['string', 'max:2'],
+            'pref_cd' => ['string', 'max:2'],
             'establish_kind' => ['integer'],
             'branch_kind' => ['integer'],
             'name' => ['string', 'max:50'],
@@ -121,8 +121,59 @@ class MstSchool extends Model
             'setting_date' => ['date_format:Y-m-d'],
             'abolition_date' => ['date_format:Y-m-d'],
             'old_shool_cd' => ['string', 'max:6'],
-            'change_flg' => ['string', 'max:13'],
+            'change_flg' => ['string', 'max:100'],
         ];
         return $_fieldRules;
+    }
+
+    //-------------------------------
+    // 検索条件
+    //-------------------------------
+    /**
+     * 検索 学校種
+     */
+    public function scopeSearchSchoolKind($query, $obj)
+    {
+        $key = 'school_kind_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 設置区分
+     */
+    public function scopeSearchEstablishKind($query, $obj)
+    {
+        $key = 'establish_kind';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($key, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 学校コード
+     */
+    public function scopeSearchSchoolCd($query, $obj)
+    {
+        $key = 'school_cd';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // school_cdが他と被らないよう、テーブル名を指定した
+            $query->where($this->getTable() . '.' . $key, 'LIKE',  '%' . $obj[$key] . '%');
+        }
+    }
+
+    /**
+     * 検索 学校名
+     */
+    public function scopeSearchSchoolName($query, $obj)
+    {
+        // 学校検索モーダルのinput_textでidとして使う名前が異なるため、テーブル項目名を$dbKeyで指定した
+        $key = 'school_name';
+        $dbKey = 'name';
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            // nameが他と被らないよう、テーブル名を指定した
+            $query->where($this->getTable() . '.' . $dbKey, 'LIKE',  '%' . $obj[$key] . '%');
+        }
     }
 }

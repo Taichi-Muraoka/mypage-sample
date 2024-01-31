@@ -42,6 +42,14 @@ export default class PageBase {
         location.href = appInfo.parent2;
     }
 
+    /**
+     * 遷移元ページへリダイレクト（他機能からの遷移）
+     */
+    redirectToBasePage() {
+        // MEMO: bladeで@yield('base_page')を指定する。
+        location.href = appInfo.base;
+    }
+
     //--------------------------------------------
     // モーダル処理
     //--------------------------------------------
@@ -110,11 +118,27 @@ export default class PageBase {
     }
 
     /**
+     * プルダウンの変更イベントで詳細を取得（レスポンス結果格納エリア指定）
+     * $vue.selectGetItemは使用しない
+     */
+    selectChangeGet2($vue, selected, option, dataName) {
+        PageEvent.selectChangeGet2($vue, selected, option, dataName);
+    }
+
+    /**
      * プルダウンの変更イベントで詳細を取得
      * コールバック用とした。selectGetItemは初期化しないのでcallbackで処理してもらう
      * 例：お知らせ登録
      */
     selectChangeGetCallBack($vue, selected, option, callback) {
         PageEvent.selectChangeGetCallBack($vue, selected, option, callback);
+    }
+
+    /**
+     * プルダウンの変更イベントで詳細を取得（レスポンス結果格納エリア指定）
+     * コールバック用とした。$vue.selectGetItemは使用しない
+     */
+    selectChangeGetCallBack2($vue, selected, option, dataName, callback) {
+        PageEvent.selectChangeGetCallBack2($vue, selected, option, dataName, callback);
     }
 }

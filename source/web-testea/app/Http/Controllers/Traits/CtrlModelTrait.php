@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Traits;
 
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
+use App\Libs\CommonDateFormat;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CodeMaster;
 use App\Models\MstCampus;
@@ -12,6 +13,9 @@ use App\Models\MstCourse;
 use App\Models\MstTimetable;
 use App\Models\MstSubject;
 use App\Models\MstGradeSubject;
+use App\Models\MstText;
+use App\Models\MstUnitCategory;
+use App\Models\MstUnit;
 use App\Models\Student;
 use App\Models\StudentCampus;
 use App\Models\Tutor;
@@ -20,7 +24,10 @@ use App\Models\AdminUser;
 use App\Models\Schedule;
 use App\Models\ClassMember;
 use App\Models\Account;
+use App\Models\MstGrade;
+use App\Models\MstTutorGrade;
 use App\Models\YearlySchedule;
+use App\Models\MstSystem;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -38,23 +45,6 @@ trait CtrlModelTrait
     //------------------------------
     // プルダウン向けリストの作成
     //------------------------------
-
-    /**
-     * 汎用マスタからプルダウンメニューのリストを取得
-     * codeclsを指定する
-     *
-     * @param string $codecls
-     * @return array
-     */
-    //protected function mdlMenuFromExtGenericMaster($codecls)
-    //{
-    //    return  ExtGenericMaster::select('code', 'name1 as value')
-    //        ->where('codecls', $codecls)
-    //        ->orderby('disp_order')
-    //        ->orderby('code')
-    //        ->get()
-    //        ->keyBy('code');
-    //}
 
     /**
      * コードマスタからプルダウンメニューのリストを取得
@@ -76,6 +66,33 @@ trait CtrlModelTrait
 
         // プルダウンリストを取得する
         return $query->select('code', 'name as value')
+            ->where('data_type', $dataType)
+            ->orderby('order_code')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * コードマスタからプルダウンメニューのリストを取得
+     * data_typeと、名称として取得するカラム名を指定する
+     *
+     * @param integer $dataType
+     * @param string $colName
+     * @param array $subCode サブコード（配列で指定）省略可
+     * @return array
+     */
+    protected function mdlMenuFromCodeMasterGenItem($dataType, $colName, $subCodes = null)
+    {
+
+        $query = CodeMaster::query();
+
+        // サブコードが指定された場合絞り込み
+        $query->when($subCodes, function ($query) use ($subCodes) {
+            return $query->whereIn('sub_code', $subCodes);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('code', $colName . ' as value')
             ->where('data_type', $dataType)
             ->orderby('order_code')
             ->get()
@@ -190,11 +207,9 @@ trait CtrlModelTrait
      * 講師向け
      *
      * @param string $campusCd 校舎コード 指定なしの場合null
-     * @param int $tutorId 講師ID 
-     * @param string $excludeCampusCd 除外する校舎コード(削除予定)
+     * @param int $tutorId 講師ID
      * @return array
      */
-    //protected function mdlGetStudentListForT($campusCd, $tid, $excludeCampusCd = null)
     protected function mdlGetStudentListForT($campusCd, $tutorId)
     {
         $query = Student::query();
@@ -230,7 +245,7 @@ trait CtrlModelTrait
         // アカウントテーブルとJOIN（削除管理者アカウント非表示対応）
         $query->sdJoin(Account::class, function ($join) {
             $join->on('admin_users.adm_id', '=', 'accounts.account_id')
-                ->where('account.account_type', '=', AppConst::CODE_MASTER_7_3);
+                ->where('accounts.account_type', '=', AppConst::CODE_MASTER_7_3);
         });
 
         // プルダウンリストを取得する
@@ -245,9 +260,10 @@ trait CtrlModelTrait
      * 権限によってメニューが違う
      *
      * @param boolean $honbu 本部を表示するかどうか
+     * @param int $sid 生徒CD（管理者からの絞り込み指定）
      * @return array
      */
-    protected function mdlGetRoomList($honbu = true)
+    protected function mdlGetRoomList($honbu = true, $sid = null)
     {
         // 校舎マスタより校舎情報を取得
         $query = MstCampus::query();
@@ -263,7 +279,6 @@ trait CtrlModelTrait
             //-------------
             // 教室管理者
             //-------------
-
             // 教室管理者の場合、自分の管理教室のみ絞り込み
             // なのでここでは本部は絶対に追加されない
             $query->where('campus_cd', $account->campus_cd);
@@ -273,26 +288,14 @@ trait CtrlModelTrait
                 //-------------
                 // 生徒の場合
                 //-------------
-
-                // 自分の在籍している校舎のみ対応する（生徒所属情報とJOIN）
-                $query->sdJoin(StudentCampus::class, function ($join) use ($account) {
-                    // campus_cdでjoin
-                    $join->on('student_campuses.campus_cd', '=', 'mst_campuses.campus_cd')
-                        // 自分のものだけ
-                        ->where('student_id', $account->account_id);
-                });
+                // 自分の在籍している校舎のみ絞り込み
+                $query->where($this->mdlWhereRoomBySidQuery($query, MstCampus::class, $account->account_id));
             } else if (AuthEx::isTutor()) {
                 //-------------
                 // 講師の場合
                 //-------------
-
-                // 自分の在籍している校舎のみ対応する（講師所属情報とJOIN）
-                $query->sdJoin(TutorCampus::class, function ($join) use ($account) {
-                    // campus_cdでjoin
-                    $join->on('tutor_campuses.campus_cd', '=', 'mst_campuses.campus_cd')
-                        // 自分のものだけ
-                        ->where('tutor_id', $account->account_id);
-                });
+                // 自分の在籍している校舎のみ絞り込み
+                $query->where($this->mdlWhereRoomByTidQuery($query, MstCampus::class, $account->account_id));
             }
 
             // 本部を追加するかどうか
@@ -304,6 +307,12 @@ trait CtrlModelTrait
                 // UNIONで校舎リストに加える
                 $query->union($queryHonbu);
             }
+        }
+
+        // 指定生徒CDによる絞り込み
+        if ($sid) {
+            // 生徒所属校舎に紐づく校舎リストを絞り込み取得
+            $query->where($this->mdlWhereRoomBySidQuery($query, MstCampus::class, $sid));
         }
 
         // 校舎リストを取得
@@ -326,14 +335,12 @@ trait CtrlModelTrait
         $query = MstBooth::query();
 
         if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、校舎コードで絞る
+            // 教室管理者の場合、校舎コードで絞る（ガード）
             $account = Auth::user();
             $query->where('campus_cd', $account->campus_cd);
         }
-        // 校舎が指定された場合絞り込み
-        $query->when($campusCd, function ($query) use ($campusCd) {
-            return $query->where('campus_cd', $campusCd);
-        });
+        // 指定された校舎コードで絞り込み
+        $query->where('campus_cd', $campusCd);
         // 用途種別が指定された場合絞り込み
         $query->when($usageKind, function ($query) use ($usageKind) {
             return $query->where('usage_kind', $usageKind);
@@ -351,15 +358,20 @@ trait CtrlModelTrait
      * 管理者向け
      *
      * @param int $courseKind コース種別 省略可
+     * @param int $exceptCourseKind 除外するコース種別 省略可
      * @return array
      */
-    protected function mdlGetCourseList($courseKind = null)
+    protected function mdlGetCourseList($courseKind = null, $exceptCourseKind = null)
     {
         $query = MstCourse::query();
 
         // コース種別が指定された場合絞り込み
         $query->when($courseKind, function ($query) use ($courseKind) {
             return $query->where('course_kind', $courseKind);
+        });
+        // 除外するコース種別が指定された場合絞り込み
+        $query->when($exceptCourseKind, function ($query) use ($exceptCourseKind) {
+            return $query->where('course_kind', '<>', $exceptCourseKind);
         });
 
         // プルダウンリストを取得する
@@ -422,7 +434,7 @@ trait CtrlModelTrait
 
         if (AuthEx::isRoomAdmin()) {
             // 教室管理者の場合、所属校舎で絞る（ガード）
-            $query->where('campus_cd', $account->campus_cd);
+            $query->where('mst_timetables.campus_cd', $account->campus_cd);
         } else if (AuthEx::isTutor()) {
             // 講師の場合、所属校舎で絞る（ガード）
             $this->mdlWhereRoomByTidQuery($query, MstTimetable::class, $account->account_id);
@@ -451,6 +463,65 @@ trait CtrlModelTrait
             DB::raw('CONCAT(period_no, "限") AS value')
         )
             ->orderby('mst_timetables.campus_cd')->orderby('period_no')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 時限プルダウンメニューのリストを取得（講師ID・時間割区分指定）
+     *
+     * @param string $tutorId 講師ID
+     * @param int $timetableKind 時間割区分
+     * @return array
+     */
+    protected function mdlGetPeriodListForTutor($tutorId, $timetableKind)
+    {
+        $query = MstTimetable::query();
+
+        // プルダウンリストを取得する
+        return $query->select(
+            'period_no as code',
+            DB::raw('CONCAT(period_no, "限") AS value')
+        )
+            // 講師所属情報とJOIN
+            ->sdJoin(TutorCampus::class, function ($join) use ($tutorId) {
+                $join->on('mst_timetables.campus_cd', '=', 'tutor_campuses.campus_cd')
+                    ->where('tutor_campuses.tutor_id', $tutorId);
+            })
+            ->where('timetable_kind', $timetableKind)
+            ->orderby('period_no')
+            ->distinct()
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 時限プルダウンメニューのリストを取得（管理者用）
+     *
+     * @param int $timetableKind 時間割区分（省略可）
+     * @return array
+     */
+    protected function mdlGetPeriodListForAdmin($timetableKind = null)
+    {
+        $query = MstTimetable::query();
+
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithRoomCd());
+        }
+
+        // 時間割区分が指定された場合絞り込み
+        $query->when($timetableKind, function ($query) use ($timetableKind) {
+            return $query->where('timetable_kind', $timetableKind);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select(
+            'period_no as code',
+            DB::raw('CONCAT(period_no, "限") AS value')
+        )
+            ->orderby('period_no')
+            ->distinct()
             ->get()
             ->keyBy('code');
     }
@@ -498,7 +569,7 @@ trait CtrlModelTrait
      * 抽出したスケジュールより日時のプルダウンメニューのリストを取得
      *
      * @param array $lessons schedulesよりget
-     * @return array プルダウンメニュー用日時 Y/m/d n限
+     * @return array プルダウンメニュー用日時 Y/m/d(曜日) n限
      */
     protected function mdlGetScheduleMasterList($lessons)
     {
@@ -509,11 +580,11 @@ trait CtrlModelTrait
             foreach ($lessons as $lesson) {
                 //$lesson['target_datetime'] = $lesson['target_date']->format('Y/m/d') . " " . $lesson['period'] . "限";
                 $schedule = [
-                    'id' => $lesson['id'],
-                    'value' => $lesson['target_date']->format('Y/m/d') . " " . $lesson['period'] . "限"
+                    'id' => $lesson['schedule_id'],
+                    'value' => CommonDateFormat::formatYmdDay($lesson['target_date']) . " " . $lesson['period_no'] . "限"
                 ];
                 $schedule = (object) $schedule;
-                array_push($scheduleMasterKeys, $lesson['id']);
+                array_push($scheduleMasterKeys, $lesson['schedule_id']);
                 array_push($scheduleMasterValue, $schedule);
             }
         }
@@ -528,7 +599,7 @@ trait CtrlModelTrait
      * 権限によって制御をかける
      * getDataSelectで使用される想定
      * 校舎名と生徒名を返却する。機能のみではなかったのでここに定義
-     * 
+     *
      * @param int $schedule_id スケジュールID
      */
     protected function mdlGetScheduleDtl($schedule_id)
@@ -573,7 +644,7 @@ trait CtrlModelTrait
      * 講師向け
      * selectのIN句に指定する想定
      *
-     * @param int $tutorId 講師ID 
+     * @param int $tutorId 講師ID
      * @return array
      */
     protected function mdlGetStudentArrayForT($tutorId = null)
@@ -598,6 +669,228 @@ trait CtrlModelTrait
         }
 
         return $arrStudents;
+    }
+
+    /**
+     * 学年プルダウンメニューのリストを取得
+     * 管理者向け
+     *
+     * @param int $ schoolKind 学校区分 省略可
+     * @return array
+     */
+    protected function mdlGetGradeList($schoolKind = null)
+    {
+        $query = MstGrade::query();
+
+        // 学校区分が指定された場合絞り込み
+        $query->when($schoolKind, function ($query) use ($schoolKind) {
+            return $query->where('school_kind', $schoolKind);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('grade_cd as code', 'name as value')
+            ->orderby('grade_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 講師学年プルダウンメニューのリストを取得
+     * 管理者向け
+     *
+     * @param int $ schoolKind 学校区分 省略可
+     * @return array
+     */
+    protected function mdlGetTutorGradeList($schoolKind = null)
+    {
+        $query = MstTutorGrade::query();
+
+        // 学校区分が指定された場合絞り込み
+        $query->when($schoolKind, function ($query) use ($schoolKind) {
+            return $query->where('school_kind', $schoolKind);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('grade_cd as code', 'name as value')
+            ->orderby('grade_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 授業教材プルダウンメニューのリストを取得
+     *
+     * @param string $lSubjectCd 授業科目コード
+     * @param int $gradeCd 学年コード
+     * @param string $tSubjectCd 教材科目コード
+     * @return array
+     */
+    protected function mdlGetTextList($lSubjectCd = null, $gradeCd = null, $tSubjectCd = null)
+    {
+        $query = MstText::query();
+
+        // 授業科目コードが指定された場合絞り込み
+        $query->when($lSubjectCd, function ($query) use ($lSubjectCd) {
+            return $query->where('l_subject_cd', $lSubjectCd);
+        });
+
+        // 学年コードが指定された場合絞り込み
+        $query->when($gradeCd, function ($query) use ($gradeCd) {
+            return $query->where('grade_cd', $gradeCd);
+        });
+
+        // 教材科目コードが指定された場合絞り込み
+        $query->when($tSubjectCd, function ($query) use ($tSubjectCd) {
+            return $query->where('t_subject_cd', $tSubjectCd);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('text_cd as code', 'name as value')
+            ->orderby('text_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 授業単元分類プルダウンメニューのリストを取得
+     *
+     * @param int $gradeCd 学年コード
+     * @param string $tSubjectCd 教材科目コード
+     * @return array
+     */
+    protected function mdlGetUnitCategoryList($gradeCd = null, $tSubjectCd = null)
+    {
+        $query = MstUnitCategory::query();
+
+        // 学年コードが指定された場合絞り込み
+        $query->when($gradeCd, function ($query) use ($gradeCd) {
+            return $query->where('grade_cd', $gradeCd);
+        });
+
+        // 教材科目コードが指定された場合絞り込み
+        $query->when($tSubjectCd, function ($query) use ($tSubjectCd) {
+            return $query->where('t_subject_cd', $tSubjectCd);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('unit_category_cd as code', 'name as value')
+            ->orderby('unit_category_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 授業単元プルダウンメニューのリストを取得
+     *
+     * @param string $categoryCd 単元分類コード 省略可
+     * @return array
+     */
+    protected function mdlGetUnitList($categoryCd = null)
+    {
+        $query = MstUnit::query();
+
+        // 単元分類コードが指定された場合絞り込み
+        $query->when($categoryCd, function ($query) use ($categoryCd) {
+            return $query->where('unit_category_cd', $categoryCd);
+        });
+
+        // プルダウンリストを取得する
+        return $query->select('unit_cd as code', 'name as value')
+            ->orderby('unit_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 受験年度プルダウンメニューのリストを取得
+     *
+     * @return array
+     */
+    protected function mdlGetExamYearList()
+    {
+        // システムマスタ「現年度」を取得
+        $currentYear = MstSystem::select('value_num')
+            ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
+            ->first();
+
+        // 現年度～2年後までのリストを作る 例2023～2025
+        $examYearList = [];
+        for ($i = 0; $i <= 2; $i++) {
+            $examYearList += array($currentYear->value_num + $i => ["value" => $currentYear->value_num + $i]);
+        }
+
+        return $examYearList;
+    }
+
+    /**
+     * 志望順プルダウンメニューのリストを取得
+     *
+     * @return array
+     */
+    protected function mdlGetPriorityList()
+    {
+        // 1～10までのリストを作る
+        $priorityList = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $priorityList += array($i => ["value" => $i]);
+        }
+
+        return $priorityList;
+    }
+
+    /**
+     * 登録画面プルダウン用データフォーマット
+     * name を 「コード (名称)」 の形式にする
+     *
+     * @param  $collection リストデータ
+     * @param  int $digit コード0埋め桁数
+     * @return フォーマット後リストデータ
+     */
+    protected function mdlFormatInputList($collection, int $digit)
+    {
+        $lists = $collection->map(function ($item, $key) use ($digit) {
+            return [
+                'code' => $item['code'],
+                'value' => str_pad($item['code'], $digit, '0', STR_PAD_LEFT) . ' (' . $item['value'] . ')'
+            ];
+        });
+
+        return $lists;
+    }
+
+    /**
+     * 特別期間コードデータフォーマット
+     * コードマスタ期間区分コードを「01」の形式にする
+     *
+     * @param  $collection リストデータ
+     * @param  int $digit コード0埋め桁数
+     * @return フォーマット後リストデータ
+     */
+    protected function mdlFormatSeasonCd()
+    {
+        // 「特別期間コード」は、年＋期間区分のコードを生成し格納する。(例：202301)
+
+        // 年は、システムマスタの「現年度」から取得する。
+        $currentYear = MstSystem::select('value_num')
+            ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
+            ->first();
+
+        // 期間区分コード（2桁）を取得する（サブコード1のみ：春期01,夏期02,冬期03）
+        $termList = CodeMaster::select('gen_item1')
+            ->where('data_type', AppConst::CODE_MASTER_38)
+            ->where('sub_code', AppConst::CODE_MASTER_38_SUB_1)
+            ->get();
+
+        // 現年度分 特別期間コード生成
+        $seasonCodes = [];
+        foreach ($termList as $term) {
+            $seasonCodes[] = $currentYear->value_num . $term->gen_item1;
+        }
+
+        // 翌年度分 特別期間コード生成 春期のみ
+        $seasonCodes[] = $currentYear->value_num + 1 . $termList[0]->gen_item1;
+
+        return $seasonCodes;
     }
 
     //------------------------------
@@ -663,6 +956,42 @@ trait CtrlModelTrait
     }
 
     //------------------------------
+    // メールアドレス取得（共通で使用されるもの）
+    //------------------------------
+
+    /**
+     * アカウント情報からメールアドレスの取得
+     *
+     * @param string $accountId アカウントID
+     * @param string $accountType アカウント種別
+     * @return string メールアドレス
+     */
+    protected function mdlGetAccountMail($accountId, $accountType)
+    {
+        $account = Account::select('email')
+            ->where('account_id', $accountId)
+            ->where('account_type', $accountType)
+            ->firstOrFail();
+
+        return $account->email;
+    }
+
+    /**
+     * 校舎マスタからメールアドレスの取得
+     *
+     * @param string $campusCd 校舎コード
+     * @return string メールアドレス
+     */
+    protected function mdlGetCampusMail($campusCd)
+    {
+        $campus = MstCampus::select('email_campus')
+            ->where('campus_cd', $campusCd)
+            ->firstOrFail();
+
+        return $campus->email_campus;
+    }
+
+    //------------------------------
     // join向けリストの作成
     //------------------------------
 
@@ -684,6 +1013,47 @@ trait CtrlModelTrait
         $queryHonbu = CodeMaster::select('gen_item1', 'name as room_name', 'name as room_name_symbol', 'order_code as disp_order')
             ->where('data_type', AppConst::CODE_MASTER_6);
         $query->union($queryHonbu);
+
+        return $query;
+    }
+
+    /**
+     * 生徒の通塾期間月数用JOINクエリを取得
+     * leftJoinSubされる想定
+     *
+     * @return array
+     */
+    protected function mdlGetStudentEnterTermQuery()
+    {
+        // 生徒情報から通塾期間の月数を算出するクエリ
+        $query = Student::query();
+        $query->select('student_id')
+            ->selectRaw(
+                'CASE WHEN stu_status = ' . AppConst::CODE_MASTER_28_5 . ' THEN past_enter_term'
+                    . ' ELSE past_enter_term + PERIOD_DIFF(DATE_FORMAT(curdate(), "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
+                    . ' END as enter_term'
+            );
+
+        return $query;
+    }
+
+    /**
+     * 講師の勤続期間月数用JOINクエリを取得
+     * leftJoinSubされる想定
+     *
+     * @return array
+     */
+    protected function mdlGetTutorEnterTermQuery()
+    {
+        // 講師情報から勤続期間の月数を算出するクエリ
+        $query = Tutor::query();
+        $query->select('tutor_id')
+            ->selectRaw(
+                'CASE WHEN leave_date IS NULL'
+                    . ' THEN PERIOD_DIFF(DATE_FORMAT(curdate(), "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
+                    . ' ELSE PERIOD_DIFF(DATE_FORMAT(leave_date, "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
+                    . ' END AS enter_term'
+            );
 
         return $query;
     }
@@ -919,22 +1289,16 @@ trait CtrlModelTrait
 
             // 生徒所属情報テーブル
             $studentCampus = (new StudentCampus)->getTable();
-            // 生徒情報テーブル
-            $student = (new Student)->getTable();
 
             // 1件存在するかチェック
             $query->select(DB::raw(1))
                 ->from($studentCampus)
-                // 生徒情報とJOIN
-                ->Join($student, $studentCampus . '.student_id', '=', $student . '.student_id')
                 // 対象テーブルと生徒所属情報のcampus_cdを連結
                 ->whereRaw($table . '.campus_cd = ' . $studentCampus . '.campus_cd')
                 // 指定された生徒ID
-                ->where($student . '.student_id', $studentId)
+                ->where($studentCampus . '.student_id', $studentId)
                 // delete_dt条件の追加
-                ->whereNull($studentCampus . '.deleted_at')
-                // delete_dt条件の追加
-                ->whereNull($student . '.deleted_at');
+                ->whereNull($studentCampus . '.deleted_at');
         });
     }
 
@@ -961,22 +1325,16 @@ trait CtrlModelTrait
 
             // 講師所属情報テーブル
             $tutorCampus = (new TutorCampus)->getTable();
-            // 講師情報テーブル
-            $tutor = (new Tutor)->getTable();
 
             // 1件存在するかチェック
             $query->select(DB::raw(1))
                 ->from($tutorCampus)
-                // 講師情報とJOIN
-                ->Join($tutor, $tutorCampus . '.tutor_id', '=', $tutor . '.tutor_id')
                 // 対象テーブルと講師所属情報のcampus_cdを連結
                 ->whereRaw($table . '.campus_cd = ' . $tutorCampus . '.campus_cd')
                 // 指定された生徒ID
-                ->where($tutor . '.tutor_id', $tutorId)
+                ->where($tutorCampus . '.tutor_id', $tutorId)
                 // delete_dt条件の追加
-                ->whereNull($tutorCampus . '.deleted_at')
-                // delete_dt条件の追加
-                ->whereNull($tutor . '.deleted_at');
+                ->whereNull($tutorCampus . '.deleted_at');
         });
     }
 

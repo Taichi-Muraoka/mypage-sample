@@ -6,10 +6,11 @@ use App\Libs\AuthEx;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Traits\CtrlModelTrait;
 use App\Models\StudentCampus;
+use App\Models\TutorCampus;
 
 /**
  * ガード共通処理
- * 
+ *
  * 他人のIDを見れないかなど、リクエストを権限によってガードを掛けるための共通処理
  * 生徒・講師・教室管理者の場合にそれぞれガードをかける
  */
@@ -25,7 +26,7 @@ trait GuardTrait
 
     /**
      * プルダウンリストの値が正しいかチェックする
-     * 
+     *
      * @param $list プルダウンリスト
      * @param $value 値
      */
@@ -102,7 +103,7 @@ trait GuardTrait
      * テーブルそのものに校舎コードカラムを持っており、
      * 教室管理者の校舎コードでガードを掛ける
      * whereにそのまま指定する
-     * 
+     *
      * @param $model 絞り込む対象のテーブルモデルを指定。nullの場合は主テーブルを取得するが、教室コードが主テーブルではない場合
      */
     protected function guardRoomAdminTableWithRoomCd($model = null)
@@ -136,16 +137,35 @@ trait GuardTrait
         return function ($query) {
 
             if (AuthEx::isRoomAdmin()) {
-                // 指定された教室コードのsidのみを絞り込む
+                // 指定された教室コードの生徒IDのみを絞り込む
                 $account = Auth::user();
-                // 主テーブルのsidに対して絞り込む
+                // 主テーブルの生徒IDに対して絞り込む
                 $this->mdlWhereSidByRoomQuery($query, get_class($query->getModel()), $account->campus_cd);
             }
         };
     }
 
     /**
-     * 教室管理者の校舎コードの生徒IDかチェックしガードを掛ける
+     * テーブルそのものに講師IDカラムを持っており、
+     * 教室管理者の担当校舎の講師のみにガードを掛ける
+     * whereにそのまま指定する
+     */
+    protected function guardRoomAdminTableWithTid()
+    {
+        // クロージャで呼んでもらうため、関数で返却
+        return function ($query) {
+
+            if (AuthEx::isRoomAdmin()) {
+                // 指定された教室コードの講師IDのみを絞り込む
+                $account = Auth::user();
+                // 主テーブルの講師IDに対して絞り込む
+                $this->mdlWhereTidByRoomQuery($query, get_class($query->getModel()), $account->campus_cd);
+            }
+        };
+    }
+
+    /**
+     * 教室管理者の担当校舎の生徒IDかチェックしガードを掛ける
      */
     protected function guardRoomAdminSid($sid)
     {
@@ -160,11 +180,34 @@ trait GuardTrait
     }
 
     /**
+     * 教室管理者の担当校舎の講師IDかチェックしガードを掛ける
+     */
+    protected function guardRoomAdminTid($tid)
+    {
+        // 教室管理者の場合、見れていいidかチェックする
+        if (AuthEx::isRoomAdmin()) {
+            $account = Auth::user();
+            $exists = TutorCampus::where('campus_cd', $account->campus_cd)
+                ->where('tutor_id', $tid)->exists();
+            if (!$exists) {
+                return $this->illegalResponseErr();
+            }
+        }
+    }
+
+    /**
      * 教室管理者の校舎コードとPOSTされた校舎コードが一致しない場合にエラーを発生させたい時、使用する。
      * @param $campusCd POSTされた校舎コード
      */
     protected function guardRoomAdminRoomcd($campusCd)
     {
+        // 校舎リストを取得
+        $rooms = $this->mdlGetRoomList(true);
+        if (!isset($rooms[$campusCd])) {
+            // 不正な値エラー
+            return $this->illegalResponseErr();
+        }
+
         // 教室管理者の場合、見れていいidかチェックする
         if (AuthEx::isRoomAdmin()) {
             $account = Auth::user();

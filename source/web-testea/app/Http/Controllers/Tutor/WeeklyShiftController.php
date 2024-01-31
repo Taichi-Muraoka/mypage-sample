@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
-use App\Models\WeeklyShift;
+use App\Models\TutorFreePeriod;
+use App\Models\RegularClass;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
-use App\Http\Controllers\Traits\FuncAgreementTrait;
+use App\Http\Controllers\Traits\FuncWeeklyShiftTrait;
 
 /**
  * 空き時間 - コントローラ
@@ -19,7 +20,7 @@ class WeeklyShiftController extends Controller
 {
 
     // 機能共通処理：空き時間
-    use FuncAgreementTrait;
+    use FuncWeeklyShiftTrait;
 
     /**
      * コンストラクタ
@@ -41,96 +42,28 @@ class WeeklyShiftController extends Controller
      */
     public function index()
     {
-        //==========================
-        // 既存処理
-        //==========================
-        // // 曜日の配列を取得 コードマスタより取得
-        // $weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
-
-        // // 時間帯 コードマスタにないのでappconfに定義した。
-        // $timeList = config('appconf.weekly_shift_time');
-
-        // // コロンを除いた値をIDとして扱う
-        // $timeIdList = [];
-        // foreach ($timeList as $time) {
-        //     $timeId = str_replace(":", "", $time);
-        //     array_push($timeIdList, $timeId);
-        // }
-
-        // // ログイン情報取得
-        // $account = Auth::user();
-
-        // // 教師の空き時間を取得する
-        // $weeklyShift = WeeklyShift::where('tid', $account->account_id)
-        //     ->get();
-
-        // // チェックボックスをセットするための値を生成
-        // // 例：['1_1030', '2_1030']
-        // $editData = [];
-        // foreach ($weeklyShift as $ws) {
-        //     // 配列に追加
-        //     array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
-        // }
-
-        // return view('pages.tutor.weekly_shift', [
-        //     'weekdayList' => $weekdayList,
-        //     'timeList' => $timeList,
-        //     'timeIdList' => $timeIdList,
-        //     'editData' => [
-        //         'chkWs' => $editData
-        //     ]
-        // ]);
-
-        //==========================
-        // モック用処理
-        //==========================
-        // 曜日の配列を取得 コードマスタより取得
-        $weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
-
-        // 時間帯
-        $timeList = array(
-            '1時限目','2時限目','3時限目','4時限目','5時限目','6時限目','7時限目',
-        );
-
-        // コロンを除いた値をIDとして扱う
-        $timeIdList = [];
-        foreach ($timeList as $time) {
-            $timeId = str_replace("時限目", "", $time);
-            array_push($timeIdList, $timeId);
-        }
-
         // ログイン情報取得
         $account = Auth::user();
 
-        // 教師の空き時間を取得する
-        $weeklyShift = WeeklyShift::where('tid', $account->account_id)
-            ->get();
+        // 曜日の配列を取得 コードマスタより取得
+        $weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
 
-        // チェックボックスをセットするための値を生成
-        // 曜日コード_時限No 例：['1_1', '2_1']
-        $editData = [];
-        //foreach ($weeklyShift as $ws) {
-        //    // 配列に追加
-        //    array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
-        //}
+        // 時限リストを取得（講師ID・時間割区分から）
+        $periodList = $this->mdlGetPeriodListForTutor($account->account_id, AppConst::CODE_MASTER_37_0);
 
-        // レギュラー授業情報を取得し、チェックボックスをセットするための値を生成
+        // 講師の空き時間を取得する（緑色表示用）
         // 曜日コード_時限No 例：['1_1', '2_1']
-        $regularData = [];
-        array_push($regularData, '1_5');
-        array_push($regularData, '2_5');
-        array_push($regularData, '2_6');
-        array_push($regularData, '6_4');
-        array_push($regularData, '6_5');
-        array_push($regularData, '6_6');
-        array_push($regularData, '6_7');
+        $chkData = $this->fncWksfGetFreePeriod($account->account_id);
+
+        // レギュラー授業情報を取得する（黒色表示用）
+        // 曜日コード_時限No 例：['1_1', '2_1']
+        $regularData = $this->fncWksfGetRegularClass($account->account_id);
 
         return view('pages.tutor.weekly_shift', [
             'weekdayList' => $weekdayList,
-            'timeList' => $timeList,
-            'timeIdList' => $timeIdList,
+            'periodList' => $periodList,
             'editData' => [
-                'chkWs' => $editData
+                'chkWs' => $chkData
             ],
             'exceptData' => $regularData,
         ]);
@@ -144,54 +77,70 @@ class WeeklyShiftController extends Controller
      */
     public function update(Request $request)
     {
-        //==========================
-        // 既存処理
-        //==========================
-        // // MEMO: ログインアカウントのIDでデータを更新するのでガードは不要
+        // MEMO: ログインアカウントのIDでデータを更新するのでガードは不要
 
-        // // 登録前バリデーション。NGの場合はレスポンスコード422を返却
-        // Validator::make($request->all(), $this->rulesForInput())->validate();
+        // 登録前バリデーション。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForInput())->validate();
 
-        // // MEMO: 必ず登録する項目のみに絞る。
-        // $form = $request->only(
-        //     'chkWs'
-        // );
+        // MEMO: 必ず登録する項目のみに絞る。
+        $form = $request->only(
+            'chkWs'
+        );
 
-        // // リクエストを配列に変換する
-        // $weekDayTime = $this->splitValue($form['chkWs']);
+        // リクエストを配列に変換する
+        $weekDayPeriods = $this->fncWksfSplitValue($form['chkWs']);
 
-        // // 複数の更新のためトランザクション
-        // DB::transaction(function () use ($weekDayTime) {
+        // 複数の更新のためトランザクション
+        DB::transaction(function () use ($weekDayPeriods) {
 
-        //     // ログイン情報取得
-        //     $account = Auth::user();
+            // ログイン情報取得
+            $account = Auth::user();
 
-        //     //----------------
-        //     // 物理削除を行う
-        //     //----------------
+            // データを取得（レギュラースケジュール情報）
+            $regulars = RegularClass::select(
+                'day_cd',
+                'period_no',
+            )
+                // 講師IDを指定
+                ->where('tutor_id', $account->account_id)
+                ->orderBy('day_cd')
+                ->orderBy('period_no')
+                ->get();
 
-        //     // ログインしている教師のデータを全て削除（forceDelete）
-        //     WeeklyShift::where('tid', $account->account_id)
-        //         ->forceDelete();
+            //----------------
+            // 物理削除を行う
+            //----------------
+            // ログインしている教師のデータを全て削除（forceDelete）
+            TutorFreePeriod::where('tutor_id', $account->account_id)
+                ->forceDelete();
 
-        //     //----------------
-        //     // 登録を行う
-        //     //----------------
+            //----------------
+            // 登録を行う（チェックされた空きコマ情報）
+            //----------------
+            foreach ($weekDayPeriods as $weekDayPeriod) {
 
-        //     foreach ($weekDayTime as $weekDayTimeObj) {
+                // モデルのインスンタンス生成
+                $freePeriod = new TutorFreePeriod;
+                $freePeriod->tutor_id = $account->account_id;
+                $freePeriod->day_cd = $weekDayPeriod['dayCd'];
+                $freePeriod->period_no = $weekDayPeriod['periodNo'];
+                // 登録
+                $freePeriod->save();
+            }
+            //----------------
+            // 登録を行う（レギュラー授業情報）
+            //----------------
+            foreach ($regulars as $regular) {
 
-        //         // モデルのインスンタンス生成
-        //         $weeklyShift = new WeeklyShift;
-        //         $weeklyShift->tid = $account->account_id;
-        //         $weeklyShift->weekdaycd = $weekDayTimeObj['weekdaycd'];
-
-        //         // time型なので秒を追加する
-        //         $weeklyShift->start_time = $weekDayTimeObj['start_time'] . ':00';
-
-        //         // 登録
-        //         $weeklyShift->save();
-        //     }
-        // });
+                // モデルのインスンタンス生成
+                $freePeriod = new TutorFreePeriod;
+                $freePeriod->tutor_id = $account->account_id;
+                $freePeriod->day_cd = $regular['day_cd'];
+                $freePeriod->period_no = $regular['period_no'];
+                // 登録
+                $freePeriod->save();
+            }
+        });
 
         return;
     }
@@ -204,14 +153,9 @@ class WeeklyShiftController extends Controller
      */
     public function validationForInput(Request $request)
     {
-        //==========================
-        // 既存処理
-        //==========================
-        // // リクエストデータチェック
-        // $validator = Validator::make($request->all(), $this->rulesForInput());
-        // return $validator->errors();
-
-        return;
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForInput());
+        return $validator->errors();
     }
 
     /**
@@ -232,27 +176,31 @@ class WeeklyShiftController extends Controller
                 return;
             }
 
+            // ログイン情報取得
+            $account = Auth::user();
+
             // 曜日の配列を取得 コードマスタより取得
             $weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
 
-            // 時間帯 コードマスタにないのでappconfに定義した。
-            $timeList = config('appconf.weekly_shift_time');
+            // 時限リストを取得（講師ID・時間割区分から）
+            $periodList = $this->mdlGetPeriodListForTutor($account->account_id, AppConst::CODE_MASTER_37_0);
 
             // リクエストを配列に変換する
-            $weekDayTime = $this->splitValue($value);
+            $weekDayPeriods = $this->fncWksfSplitValue($value);
 
             // リクエストの中身のチェック
-            foreach ($weekDayTime as $weekDayTimeObj) {
+            foreach ($weekDayPeriods as $weekDayPeriod) {
 
                 // 曜日のチェック。配列のキーとして存在するか
-                $key = $weekDayTimeObj['weekdaycd'];
+                $key = $weekDayPeriod['dayCd'];
                 if (!isset($weekdayList[$key])) {
                     // 存在しない場合はエラー
                     return $fail(Lang::get('validation.invalid_input'));
                 }
 
-                // 時間帯のチェック。配列に存在するか
-                if (!in_array($weekDayTimeObj['start_time'], $timeList)) {
+                // 時限のチェック。配列のキーとして存在するか
+                $key = $weekDayPeriod['periodNo'];
+                if (!isset($periodList[$key])) {
                     // 存在しない場合はエラー
                     return $fail(Lang::get('validation.invalid_input'));
                 }
@@ -262,70 +210,5 @@ class WeeklyShiftController extends Controller
         $rules += ['chkWs' => [$validationValue]];
 
         return $rules;
-    }
-
-    /**
-     * チェックボックスの値を分割する
-     * ある程度フォーマットのチェックは行っている
-     *
-     * @param string $value チェックボックスの値
-     * @return array 配列
-     */
-    private function splitValue($value)
-    {
-        // パラメータ：
-        // カンマ区切りで曜日_時間 のように飛んでくる。
-        // 1_2030,2_1230
-        //
-        // 戻り値：
-        // array (
-        //   0 =>
-        //   array (
-        //     'weekdaycd' => '1',
-        //     'start_time' => '20:30',
-        //   ),
-        //   1 =>
-        //   array (
-        //     'weekdaycd' => '2',
-        //     'start_time' => '12:30',
-        //   ),
-        // )
-
-        $rtn = [];
-
-        // 空の場合は処理なし
-        if (!filled($value)) {
-            return $rtn;
-        }
-
-        // カンマ区切りで分割
-        $commaList = explode(",", $value);
-
-        foreach ($commaList as $commaVal) {
-
-            // アンダーバー区切りで分割
-            $weekDayTime = explode("_", $commaVal);
-
-            // 必ず2つになる
-            if (count($weekDayTime) != 2) {
-                // 不正なエラー
-                $this->illegalResponseErr();
-            }
-
-            // 1730 -> 17:30
-            $timeId = $weekDayTime[1];
-            if (strlen($timeId) != 4) {
-                // 不正なエラー
-                $this->illegalResponseErr();
-            }
-
-            array_push($rtn, [
-                'weekdaycd' => $weekDayTime[0],
-                // コロン区切りの時間にする
-                'start_time' => substr($timeId, 0, 2) . ':' . substr($timeId, 2, 2),
-            ]);
-        }
-
-        return $rtn;
     }
 }

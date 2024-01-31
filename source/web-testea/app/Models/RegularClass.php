@@ -120,14 +120,14 @@ class RegularClass extends Model
             'day_cd' => ['integer'],
             'period_no' => ['integer', 'min:0', 'max:99'],
             'start_time' => ['vdTime'],
-            'end_time' => ['vdTime'],
+            'end_time' => ['vdTime', 'vd_after_time:start_time'],
             'minites' => ['integer', 'min:0', 'max:999'],
             'booth_cd' => ['string', 'max:3', 'digits:3'],
             'course_cd' => ['string', 'max:5', 'digits:5'],
             'student_id' => ['integer'],
             'tutor_id' => ['integer'],
             'subject_cd' => ['string', 'max:3', 'digits:3'],
-            'how_to_kind'  => ['integer', 'in:0,1,2,3,4']
+            'how_to_kind'  => ['integer']
         ];
         return $_fieldRules;
     }

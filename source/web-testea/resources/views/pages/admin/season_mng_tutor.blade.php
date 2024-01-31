@@ -9,14 +9,12 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="season" caption="特別期間" :select2=true>
-                <option value="1">2023年春期</option>
-                <option value="2">2022年冬期</option>
-                <option value="3">2022年夏期</option>
-            </x-input.select>
+            <x-input.select id="season_cd" caption="特別期間" :select2=true :mastrData=$seasonList :editData=$editData
+                :rules=$rules :select2Search=false :blank=true />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="name" caption="講師名" :rules=$rules />
+            <x-input.select id="tutor_id" caption="講師名" :select2=true :mastrData=$tutors :editData=$editData
+                :rules=$rules :select2Search=true :blank=true />
         </x-bs.col2>
     </x-bs.row>
 
@@ -37,25 +35,16 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/03/05</td>
-            <td>2023年春期</td>
-            <td>CWテスト教師１０１</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmd(item.apply_date)}}</td>
+            <td>@{{item.year}}年@{{item.season_name}}</td>
+            <td>@{{item.tutor_name}}</td>
             <td>
-                <x-button.list-dtl vueHref="'{{ route('season_mng_tutor-detail', '') }}/' + 1" caption="詳細" />
+                <x-button.list-dtl vueHref="'{{ route('season_mng_tutor-detail', '') }}/' + item.season_tutor_id" caption="詳細" />
             </td>
         </tr>
-        <tr>
-            <td>2023/03/04</td>
-            <td>2023年春期</td>
-            <td>CWテスト教師１０２</td>
-            <td>
-                <x-button.list-dtl vueHref="'{{ route('season_mng_tutor-detail', '') }}/' + 1" caption="詳細" />
-            </td>
-        </tr>
-
-
     </x-bs.table>
+
 </x-bs.card-list>
 
 @stop

@@ -5,18 +5,13 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Consts\AppConst;
-use App\Libs\AuthEx;
-use App\Models\CodeMaster;
-use App\Models\CourseApply;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtRoom;
-use App\Models\Notice;
-use App\Models\NoticeDestination;
+use App\Models\SeasonTutorRequest;
+use App\Models\Student;
+use App\Models\Schedule;
+use App\Models\MstCourse;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\DB;
-//use App\Http\Controllers\Traits\FuncCourseTrait;
+use App\Http\Controllers\Traits\FuncSeasonTrait;
 
 /**
  * 特別期間講習 講師提出スケジュール - コントローラ
@@ -24,8 +19,8 @@ use Illuminate\Support\Facades\DB;
 class SeasonMngTutorController extends Controller
 {
 
-    // 機能共通処理：コース変更・授業追加
-    //use FuncCourseTrait;
+    // 機能共通処理：特別期間講習
+    use FuncSeasonTrait;
 
     /**
      * コンストラクタ
@@ -47,29 +42,18 @@ class SeasonMngTutorController extends Controller
      */
     public function index()
     {
-        // 教室リストを取得
-        //$rooms = $this->mdlGetRoomList(false);
+        // 特別期間リストを取得
+        $seasonList = $this->fncSasnGetGetSeasonList();
 
-        // ステータスのプルダウン取得
-        $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_2);
+        // 講師リストを取得
+        $tutors = $this->mdlGetTutorList();
 
         return view('pages.admin.season_mng_tutor', [
-            'statusList' => $statusList,
-            //'rooms' => $rooms,
+            'seasonList' => $seasonList,
+            'tutors' => $tutors,
             'editData' => null,
             'rules' => $this->rulesForSearch()
         ]);
-    }
-
-    /**
-     * 詳細取得
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return mixed 詳細データ
-     */
-    public function getData(Request $request)
-    {
-        return;
     }
 
     /**
@@ -80,7 +64,48 @@ class SeasonMngTutorController extends Controller
      */
     public function validationForSearch(Request $request)
     {
-        return;
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForSearch());
+        return $validator->errors();
+    }
+
+    /**
+     * バリデーションルールを取得(検索用)
+     *
+     * @return array ルール
+     */
+    private function rulesForSearch()
+    {
+        $rules = array();
+
+        // 独自バリデーション: リストのチェック 特別期間コード
+        $validationSeasonList =  function ($attribute, $value, $fail) {
+
+            // リストを取得し存在チェック
+            $list = $this->fncSasnGetGetSeasonList();
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 講師
+        $validationTutorList =  function ($attribute, $value, $fail) {
+
+            // 講師リストを取得
+            $list = $this->mdlGetTutorList();
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 特別期間コード
+        $rules += SeasonTutorRequest::fieldRules('season_cd', [$validationSeasonList]);
+        // 講師
+        $rules += SeasonTutorRequest::fieldRules('tutor_id', [$validationTutorList]);
+
+        return $rules;
     }
 
     /**
@@ -91,18 +116,29 @@ class SeasonMngTutorController extends Controller
      */
     public function search(Request $request)
     {
-        // ページネータで返却（モック用）
-        return $this->getListAndPaginatorMock();
-    }
+        // バリデーション。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForSearch())->validate();
 
-    /**
-     * バリデーションルールを取得(検索用)
-     *
-     * @return array ルール
-     */
-    private function rulesForSearch()
-    {
-        return;
+        // formを取得
+        $form = $request->all();
+
+        // クエリを作成（講師日程連絡情報）
+        $query = SeasonTutorRequest::query();
+
+        // 特別期間コードの絞り込み条件
+        $query->SearchSeasonCd($form);
+
+        // 講師の絞り込み条件
+        $query->SearchTid($form);
+
+        // 特別期間講習 講師連絡情報表示用のquery作成・データ取得
+        // ガードあり
+        $SeasonRequests = $this->fncSasnGetSeasonTutorQuery($query)
+            ->orderby('season_tutor_requests.apply_date', 'desc')
+            ->orderby('season_tutor_requests.season_tutor_id', 'desc');
+
+        // ページネータで返却
+        return $this->getListAndPaginator($request, $SeasonRequests);
     }
 
     //==========================
@@ -112,64 +148,96 @@ class SeasonMngTutorController extends Controller
     /**
      * 講師提出スケジュール詳細画面
      *
-     * @param int $tid 教師ID
+     * @param int $seasonTutorId 講師連絡情報ID
      * @return view
      */
-    public function detail($tid)
+    public function detail($seasonTutorId)
     {
 
-        //==========================
-        // モック用処理
-        //==========================
-        // 曜日の配列を取得 コードマスタより取得
-        //$weekdayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
+        // IDのバリデーション
+        $this->validateIds($seasonTutorId);
 
-        // 時限リスト
-        $timeList = array(
-            '1時限目','2時限目','3時限目','4時限目','5時限目','6時限目','7時限目',
-        );
+        // データを取得（講師連絡情報）ガードあり
+        $seasonTutor = $this->fncSasnGetSeasonTutor($seasonTutorId);
 
-        // 期間リスト（日付・曜日）
-        $dayList = array(
-            '03/27(月)','03/28(火)','03/29(水)','03/30(木)','03/31(金)','04/01(土)',
-            '04/03(月)','04/04(火)','04/05(水)','04/06(木)','04/07(金)','04/08(土)'
-        );
+        // 時限リストを取得（講師ID・時間割区分から）
+        $periodList = $this->mdlGetPeriodListForTutor($seasonTutor->tutor_id, AppConst::CODE_MASTER_37_1);
 
-        // コロンを除いた値をIDとして扱う
-        // 管理画面では送信しないが、教師画面と統一した
-        $timeIdList = [];
-        foreach ($timeList as $time) {
-            //$timeId = str_replace(":", "", $time);
-            $timeId = str_replace("時限目", "", $time);
-            array_push($timeIdList, $timeId);
-        }
+        // 特別期間日付リストを取得（講師ID・特別期間コード指定）
+        $dateList = $this->fncSasnGetSeasonDateForTutor($seasonTutor->tutor_id, $seasonTutor->season_cd);
 
-        // 教師の空き時間を取得する
-        //$weeklyShift = WeeklyShift::where('tid', $tid)
-        //    ->get();
+        // データを取得（講師連絡コマ情報）
+        $tutorPeriods = $this->fncSasnGetSeasonTutorPeriod($seasonTutorId);
 
         // チェックボックスをセットするための値を生成
-        // 例：['1_1030', '2_1030']
-        //$editData = [];
-        $editData = ['1_1', '1_2'];
-        //foreach ($weeklyShift as $ws) {
-        //    // 配列に追加
-        //    array_push($editData, $ws->weekdaycd . '_' . $ws->start_time->format('Hi'));
-        //}
+        // 例：['20231225_1', '20231226_2']
+        // 授業不可コマ情報を$exceptData にセット（グレー網掛け部）
+        $exceptData = [];
+        foreach ($tutorPeriods as $datePeriod) {
+            // 配列に追加
+            array_push($exceptData, $datePeriod->lesson_date->format('Ymd') . '_' . $datePeriod->period_no);
+        }
 
-        // 教師名を取得する
-        //$teacher = $this->getTeacherName($tid);
+        // 期間中の授業情報取得
+        // クエリを作成（スケジュール情報）
+        $query = Schedule::query();
+
+        // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+        $query->where($this->guardRoomAdminTableWithTid());
+
+        // データを取得
+        $schedules = $query
+            ->select(
+                'schedules.target_date',
+                'schedules.period_no',
+                'mst_courses.short_name as course_sname',
+                'students.name as student_name'
+            )
+            // 生徒名の取得
+            ->sdLeftJoin(Student::class, function ($join) {
+                $join->on('schedules.student_id', 'students.student_id');
+            })
+            // コース名の取得
+            ->sdLeftJoin(MstCourse::class, function ($join) {
+                $join->on('schedules.course_cd', '=', 'mst_courses.course_cd');
+            })
+            // 対象の講師ID
+            ->where('schedules.tutor_id', $seasonTutor->tutor_id)
+            // 対象の特別期間の日付範囲
+            ->whereIn('schedules.target_date', array_column($dateList, 'dateYmd'))
+            ->orderBy('schedules.target_date')
+            ->orderBy('schedules.period_no')
+            ->get();
+
+        // チェックボックスをセットするための値を生成
+        // 例：['20231225_1', '20231226_2']
+        $chkWsData = [];
+        $lessonInfo = [];
+        foreach ($schedules as $schedule) {
+            // 配列に追加
+            $classKey = $schedule->target_date->format('Ymd') . '_' . $schedule->period_no;
+            array_push($chkWsData, $classKey);
+            array_push($lessonInfo, [
+                // '20231225_1'の形式
+                'key' => $classKey,
+                // 生徒名（１対多の場合はコース名）
+                'student' => $schedule->student_name ?? $schedule->course_sname
+            ]);
+        }
+
+        // 講師名を取得
+        $tutor_name = $this->mdlGetTeacherName($seasonTutor->tutor_id);
 
         return view('pages.admin.season_mng_tutor-detail', [
-            //'weekdayList' => $weekdayList,
-            'periodList' => $timeList,
-            'periodIdList' => $timeIdList,
-            'dayList' => $dayList,
+            'tutor_name' => $tutor_name,
+            'seasonTutor' => $seasonTutor,
+            'periodList' => $periodList,
+            'dateList' => $dateList,
             'editData' => [
-                'chkWs' => $editData
+                'chkWs' => $chkWsData
             ],
-            //'extRirekisho' => $teacher,
+            'exceptData' => $exceptData,
+            'lessonInfo' => $lessonInfo,
         ]);
     }
-
 }

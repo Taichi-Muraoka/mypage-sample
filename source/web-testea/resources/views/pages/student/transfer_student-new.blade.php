@@ -12,164 +12,87 @@
 
     <p>個別指導授業の振替依頼を行います。振替日は第３希望まで指定できます。</p>
 
-    <x-input.select caption="授業日・時限" id="id" :select2=true :editData="$editData">
-        <option value="1">2023/01/30 3限</option>
-        <option value="2">2023/01/30 4限</option>
-        <option value="3">2023/01/31 2限</option>
-    </x-input.select>
+    <x-input.select caption="授業日・時限" id="schedule_id" :select2=true onChange="selectChangeSchedule"
+        :mastrData=$lesson_list :editData=$editData :select2Search=false :blank=true />
 
     <div v-cloak>
-        <x-bs.table vShow="form.id" :hover=false :vHeader=true>
+        <x-bs.table vShow="form.schedule_id" :hover=false :vHeader=true :smartPhone=true>
             <tr>
                 <th>校舎</th>
-                <td>久我山</td>
+                <td>@{{selectGetItem.campus_name}}</td>
             </tr>
             <tr>
                 <th>コース</th>
-                <td>個別指導コース</td>
+                <td>@{{selectGetItem.course_name}}</td>
             </tr>
             <tr>
                 <th>講師名</th>
-                <td>CWテスト教師１０１</td>
+                <td>@{{selectGetItem.tutor_name}}</td>
+            </tr>
+            <tr>
+                <th>教科</th>
+                <td>@{{selectGetItem.subject_name}}</td>
             </tr>
         </x-bs.table>
     </div>
 
+    <div v-cloak v-show="form.schedule_id" class="callout callout-info mt-4 mb-4">
+        <p>振替日は @{{selectGetItem.preferred_from}} ～ @{{selectGetItem.preferred_to}} の範囲で指定してください。</p>
+    </div>
+
     <x-bs.form-title>振替希望日</x-bs.form-title>
-    {{-- 第１希望日 --}}
-    {{-- id="preferred_date1" --}}
-    <x-bs.card>
-        <p class="input-title">第１希望日</p>
-        
+
+    @for ($i = 1; $i <= 3; $i++) <x-bs.card>
+        <p class="input-title">第{{$i}}希望日</p>
+
         {{-- 希望入力欄の選択 --}}
         <x-bs.form-group>
-            <x-input.radio caption="担当講師の空きコマから選択" id="preferred1_type-1" name="preferred1_type" value="1" :checked=true :editData=$editData />
-            <x-input.radio caption="フリー入力" id="preferred1_type-2" name="preferred1_type" value="2" :editData=$editData />
+            <x-input.radio caption="担当講師の空きコマから選択" id="preferred{{$i}}_type-1" name="preferred{{$i}}_type" value="1"
+                :checked=true :editData=$editData />
+            <x-input.radio caption="フリー入力" id="preferred{{$i}}_type-2" name="preferred{{$i}}_type" value="2"
+                :editData=$editData />
         </x-bs.form-group>
         {{-- 余白 --}}
         <div class="mb-3"></div>
 
-        <x-input.select id="preferred_date1_select" :select2=true :select2Search=false :editData=$editData
-        vShow="form.preferred1_type == 1" >
-            <option value="1">2023/03/20 4限</option>
-            <option value="2">2023/03/20 5限</option>
-            <option value="3">2023/03/27 4限</option>
-            <option value="4">2023/03/27 5限</option>
-            <option value="5">2023/04/03 4限</option>
-            <option value="6">2023/04/03 5限</option>
-            <option value="7">2023/04/10 4限</option>
-            <option value="8">2023/04/10 5限</option>
+        <x-input.select vShow="form.preferred{{$i}}_type == 1" id="preferred_date{{$i}}_select" :select2=true
+            :select2Search=false :editData=$editData>
+            {{-- vueで動的にプルダウンを作成 --}}
+            <option v-for="item in selectGetItem.candidates" :value="item.id">
+                @{{ item.value }}
+            </option>
         </x-input.select>
 
-        <x-input.date-picker id="preferred_date1_calender" vShow="form.preferred1_type == 2" />
+        <x-input.date-picker vShow="form.preferred{{$i}}_type == 2" id="preferred_date{{$i}}_calender" />
 
-        <x-input.select caption="時限" id="preferred_date1_period" :select2=true :select2Search=false :editData=$editData
-        vShow="form.preferred1_type == 2">
-            <option value="1">1限</option>
-            <option value="2">2限</option>
-            <option value="3">3限</option>
-            <option value="4">4限</option>
-            <option value="5">5限</option>
-            <option value="6">6限</option>
-            <option value="7">7限</option>
-            <option value="8">8限</option>
-        </x-input.select>
-    </x-bs.card>
-
-    {{-- 第２希望日 --}}
-    {{-- id="preferred_date2" --}}
-    <x-bs.card>
-        <p class="input-title">第２希望日</p>
-        {{-- 希望入力欄の選択 --}}
-        <x-bs.form-group>
-            <x-input.radio caption="担当講師の空きコマから選択" id="preferred2_type-1" name="preferred2_type" value="1" :checked=true :editData=$editData />
-            <x-input.radio caption="フリー入力" id="preferred2_type-2" name="preferred2_type" value="2" :editData=$editData />
-        </x-bs.form-group>
-        {{-- 余白 --}}
-        <div class="mb-3"></div>
-
-        <x-input.select id="preferred_date2_select" :select2=true :select2Search=false :editData=$editData
-        vShow="form.preferred2_type == 1" >
-            <option value="1">2023/03/20 4限</option>
-            <option value="2">2023/03/20 5限</option>
-            <option value="3">2023/03/27 4限</option>
-            <option value="4">2023/03/27 5限</option>
-            <option value="5">2023/04/03 4限</option>
-            <option value="6">2023/04/03 5限</option>
-            <option value="7">2023/04/10 4限</option>
-            <option value="8">2023/04/10 5限</option>
+        <x-input.select vShow="form.preferred{{$i}}_type == 2" id="preferred_date{{$i}}_period" caption="時限"
+            :select2=true :editData=$editData :select2Search=false :blank=true>
+            {{-- vueで動的にプルダウンを作成 --}}
+            <option v-for="item in selectGetItemPeriod{{$i}}" :value="item.code">
+                @{{ item.value }}
+            </option>
         </x-input.select>
 
-        <x-input.date-picker id="preferred_date2_calender" vShow="form.preferred2_type == 2" />
+</x-bs.card>
+@endfor
 
-        <x-input.select caption="時限" id="preferred_date2_period" :select2=true :select2Search=false :editData=$editData
-        vShow="form.preferred2_type == 2">
-            <option value="1">1限</option>
-            <option value="2">2限</option>
-            <option value="3">3限</option>
-            <option value="4">4限</option>
-            <option value="5">5限</option>
-            <option value="6">6限</option>
-            <option value="7">7限</option>
-            <option value="8">8限</option>
-        </x-input.select>
-    </x-bs.card>
+<x-input.textarea caption="振替理由／ご要望などはこちらへご記入ください" id="transfer_reason" :rules=$rules />
 
-    {{-- 第３希望日 --}}
-    {{-- id="preferred_date3" --}}
-    <x-bs.card>
-        <p class="input-title">第３希望日</p>
-        {{-- 希望入力欄の選択 --}}
-        <x-bs.form-group>
-            <x-input.radio caption="担当講師の空きコマから選択" id="preferred3_type-1" name="preferred3_type" value="1" :checked=true :editData=$editData />
-            <x-input.radio caption="フリー入力" id="preferred3_type-2" name="preferred3_type" value="2" :editData=$editData />
-        </x-bs.form-group>
-        {{-- 余白 --}}
-        <div class="mb-3"></div>
+{{-- hidden --}}
+<x-input.hidden id="student_id" :editData=$editData />
+<x-input.hidden id="campus_cd" :editData=$editData />
+<x-input.hidden id="tutor_id" :editData=$editData />
 
-        <x-input.select id="preferred_date3_select" :select2=true :select2Search=false :editData=$editData
-        vShow="form.preferred3_type == 1" >
-            <option value="1">2023/03/20 4限</option>
-            <option value="2">2023/03/20 5限</option>
-            <option value="3">2023/03/27 4限</option>
-            <option value="4">2023/03/27 5限</option>
-            <option value="5">2023/04/03 4限</option>
-            <option value="6">2023/04/03 5限</option>
-            <option value="7">2023/04/10 4限</option>
-            <option value="8">2023/04/10 5限</option>
-        </x-input.select>
+{{-- フッター --}}
+<x-slot name="footer">
+    <div class="d-flex justify-content-between">
+        <x-button.back />
 
-        <x-input.date-picker id="preferred_date3_calender" vShow="form.preferred3_type == 2" />
+        {{-- 登録時 --}}
+        <x-button.submit-new />
 
-        <x-input.select caption="時限" id="preferred_date3_period" :select2=true :select2Search=false :editData=$editData
-        vShow="form.preferred3_type == 2" >
-            <option value="1">1限</option>
-            <option value="2">2限</option>
-            <option value="3">3限</option>
-            <option value="4">4限</option>
-            <option value="5">5限</option>
-            <option value="6">6限</option>
-            <option value="7">7限</option>
-            <option value="8">8限</option>
-        </x-input.select>
-
-    </x-bs.card>
-
-    <x-input.textarea caption="振替理由／ご要望などはこちらへご記入ください" id="transfer_reason" :rules=$rules />
-
-    {{-- hidden --}}
-    <x-input.hidden id="transfer_student_id" :editData=$editData />
-
-    {{-- フッター --}}
-    <x-slot name="footer">
-        <div class="d-flex justify-content-between">
-            <x-button.back />
-
-            {{-- 登録時 --}}
-            <x-button.submit-new />
-
-        </div>
-    </x-slot>
+    </div>
+</x-slot>
 
 </x-bs.card>
 

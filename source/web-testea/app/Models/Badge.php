@@ -109,7 +109,7 @@ class Badge extends Model
             'student_id' => ['integer'],
             'campus_cd' => ['string', 'max:2', 'digits:2'],
             'badge_type' => ['integer'],
-            'reason' => ['string', 'max:1000'],
+            'reason' => ['string', 'max:30'],
             'authorization_date' => ['date_format:Y-m-d'],
             'adm_id' => ['integer']
         ];

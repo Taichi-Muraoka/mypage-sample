@@ -104,7 +104,7 @@ class MstUnit extends Model
     {
         static $_fieldRules = [
             'unit_category_cd' => ['string', 'max:7', 'digits:7'],
-            'unit_cd' => ['string', 'max:7', 'digits:7'],
+            'unit_cd' => ['string', 'max:2', 'digits:2'],
             'name' => ['string', 'max:50']
         ];
         return $_fieldRules;
@@ -113,5 +113,45 @@ class MstUnit extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
+    /**
+     * 検索 学年コード
+     */
+    public function scopeSearchGradeCd($query, $obj)
+    {
+        $key = 'grade_cd';
 
+        // 授業単元分類マスタから検索する
+        $col = 'mst_unit_categories.' . $key;
+
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 教材科目コード
+     */
+    public function scopeSearchTextSubjectCd($query, $obj)
+    {
+        $key = 't_subject_cd';
+
+        // 授業単元分類マスタから検索する
+        $col = 'mst_unit_categories.' . $key;
+
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 単元分類コード
+     */
+    public function scopeSearchUnitCategoryCd($query, $obj)
+    {
+        $key = 'unit_category_cd';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 }

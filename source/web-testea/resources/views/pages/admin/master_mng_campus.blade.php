@@ -27,42 +27,19 @@
 		</x-slot>
 
 		{{-- テーブル行 --}}
-		<tr>
-			<td>110</td>
-			<td>久我山</td>
-			<td>久</td>
-			<td>kugayama@testea.test.com</td>
-			<td>0311112222</td>
-			<td>1</td>
-			<td>表示</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_campus-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>120</td>
-			<td>西永福</td>
-			<td>西永</td>
-			<td>nishieihuku@testea.test.com</td>
-			<td>0333334444</td>
-			<td>2</td>
-			<td>表示</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_campus-edit',1) }}" />
-			</td>
-		</tr>
-		<tr>
-			<td>130</td>
-			<td>本郷</td>
-			<td>本</td>
-			<td>hongo@testea.test.com</td>
-			<td>0355556666</td>
-			<td>3</td>
-			<td>非表示</td>
-			<td>
-                <x-button.list-edit href="{{ route('master_mng_campus-edit',1) }}" />
-			</td>
-		</tr>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{item.campus_cd}}</td>
+            <td>@{{item.name}}</td>
+            <td>@{{item.short_name}}</td>
+            <td>@{{item.email_campus}}</td>
+			<td>@{{item.tel_campus}}</td>
+			<td>@{{item.disp_order}}</td>
+			<td>@{{item.is_hidden_name}}</td>
+            <td>
+                {{-- 編集 URLとIDを指定。IDはVueで指定される。 --}}
+                <x-button.list-edit vueHref="'{{ route('master_mng_campus-edit', '') }}/' + item.campus_cd" />
+            </td>
+        </tr>
 
 	</x-bs.table>
 </x-bs.card-list>

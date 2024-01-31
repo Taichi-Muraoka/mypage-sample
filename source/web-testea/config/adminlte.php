@@ -30,8 +30,8 @@ return [
     |
     */
 
-    'use_ico_only' => true,
-    'use_full_favicon' => false,
+    'use_ico_only' => false,
+    'use_full_favicon' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -64,9 +64,7 @@ return [
     */
 
     'logo' => 'マイページ',
-    //'login_logo_img' => 'img/co_logo_board_ol.svg',  // ログイン画面のロゴ
     'login_logo_img' => 'img/testea_logo_white.png',  // ログイン画面のロゴ
-    //'logo_img' => 'img/cw_logo.png',
     'logo_img' => 'img/testea_logo_green.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
@@ -113,7 +111,6 @@ return [
     'preloader' => [
         'enabled' => false,
         'img' => [
-            //'path' => 'img/cw_logo.png',
             'path' => 'img/testea_logo_green.png',
             'alt' => 'TESTEA Preloader Image',
             'effect' => 'animation__shake',
@@ -439,13 +436,6 @@ return [
             'active' => ['transfer_tutor/*'],
             'menuid' => 'id_transfer_check',
         ],
-        // [
-        //     'text' => '回数報告',
-        //     'route'  => 'times_regist',
-        //     'icon' => 'fas fa-history',
-        //     'can'  => 'tutor',
-        //     'active' => ['times_regist/*']
-        // ],
         [
             'text' => '生徒成績',
             'route'  => 'grades_check',
@@ -803,8 +793,8 @@ return [
             'submenu' => [
                 [
                     'text' => '学年更新管理',
-                    'route' => 'all_member_import',
-                    'active' => ['all_member_import*']
+                    'route' => 'grade_update',
+                    'active' => ['grade_update*']
                 ],
                 [
                     'text' => '振替残数リセット',
@@ -850,18 +840,6 @@ return [
         //         ],
         //     ]
         // ],
-        // [
-        //     'text' => '休業日管理',
-        //     'icon' => 'fa fa-calendar-alt',
-        //     'can'  => 'admin',
-        //     'submenu' => [
-        //         [
-        //             'text' => '休業日登録',
-        //             'route' => 'room_holiday',
-        //             'active' => ['room_holiday*']
-        //         ],
-        //     ]
-        // ],
     ],
 
     /*
@@ -885,7 +863,7 @@ return [
         JeroenNoten\LaravelAdminLte\Menu\Filters\LangFilter::class,
         JeroenNoten\LaravelAdminLte\Menu\Filters\DataFilter::class,
         // カスタムメニュー
-        //App\Filters\AppMenuFilter::class
+        App\Filters\AppMenuFilter::class
     ],
 
     /*
@@ -972,19 +950,6 @@ return [
                     // v6 premium
                     'location' => 'vendor/fullcalendar-scheduler/dist/index.global.min.js',
                 ],
-                //[
-                //    'type' => 'js',
-                //    'asset' => true,
-                //    //'location' => 'vendor/fullcalendar/locales/ja.js',
-                //    'location' => 'vendor/fullcalendar-scheduler/locales/ja.js',
-                //],
-                //[
-                //    'type' => 'css',
-                //    'asset' => true,
-                //    //'location' => 'vendor/fullcalendar/main.min.css',
-                //    //'location' => 'vendor/fullcalendar/main.css',
-                //    'location' => 'vendor/fullcalendar-scheduler/main.min.css',
-                //],
             ],
         ],
 

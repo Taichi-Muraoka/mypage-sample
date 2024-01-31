@@ -31,8 +31,6 @@ export default class AppClass extends PageBase {
         const vueForm = this.getVueInputForm({
             afterEdit: afterEdit,
             afterNew: afterNew,
-            // 選択モーダルを使用する場合
-            useModalSelect: true,
         });
 
         // 選択後イベント
@@ -42,12 +40,11 @@ export default class AppClass extends PageBase {
             // モーダルを起動したボタンのID取得
             const modalSelectId = modalButtonData.modalselectid;
 
-            // 学校名とIDを更新
-            // 名称
-            vueForm.form["text_" + modalSelectId] =
-                selectedDatas["school_name"];
-            // ID
-            vueForm.form[modalSelectId] = selectedDatas["school_id"];
+            // 学校名と学校コードを更新
+            // 学校名
+            vueForm.form["text_" + modalSelectId] = selectedDatas["school_name"];
+            // 学校コード
+            vueForm.form[modalSelectId] = selectedDatas["school_cd"];
         };
 
         // Vue: 選択モーダル(学校検索)

@@ -9,72 +9,53 @@
 
     <x-bs.row>
         <x-bs.col2>
-            {{-- @can('roomAdmin') --}}
+            @can('roomAdmin')
             {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-            {{-- <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
-                :select2Search=false :blank=false />
+           <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+                :select2Search=false :blank=false/>
             @else
-            <x-input.select id="roomcd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData />
-            @endcan --}}
-            <x-input.select id="roomcd" caption="校舎" :select2=true >
-                <option value="1">久我山</option>
-                <option value="2">西永福</option>
-                <option value="3">下高井戸</option>
-                <option value="4">駒込</option>
-                <option value="5">日吉</option>
-                <option value="6">自由が丘</option>
-            </x-input.select>
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData onChange="selectChangeGetRoom"
+                :select2Search=false emptyValue="-1"/>
+            @endcan
         </x-bs.col2>
         <x-bs.col2>
-            {{-- <x-input.select id="cls_cd" caption="学年" :select2=true :editData=$editData :mastrData=$classes /> --}}
-            <x-input.select id="cls_cd" caption="学年" :select2=true >
-                <option value="1">高3</option>
-                <option value="2">高2</option>
-                <option value="3">高1</option>
-                <option value="4">中3</option>
-                <option value="5">中2</option>
-                <option value="6">中1</option>
-            </x-input.select>
+            <x-input.select id="grade_cd" caption="学年" :select2=true :mastrData=$grades :editData=$editData
+                :select2Search=false />
         </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select caption="生徒名" id="sname" :select2=true :editData=$editData>
-                <option value="1">CWテスト生徒１</option>
-                <option value="2">CWテスト生徒２</option>
+            <x-input.select caption="生徒名" id="student_id" :select2=true :editData=$editData>
+                {{-- vueで動的にプルダウンを作成 --}}
+                <option v-for="item in selectGetItem.selectItems" :value="item.id">
+                    @{{ item.value }}
+                </option>
             </x-input.select>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="講師名" id="tname" :select2=true :editData=$editData>
-                <option value="1">CWテスト教師１０１</option>
-                <option value="2">CWテスト教師１０２</option>
-            </x-input.select>
+            <x-input.select id="tutor_id" caption="講師" :select2=true :mastrData=$tutors :editData=$editData
+                :select2Search=false />
         </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select caption="コース" id="course" :select2=true :editData=$editData>
-                <option value="1">個別指導</option>
-                <option value="2">集団授業</option>
-            </x-input.select>
+            <x-input.select id="course_cd" caption="コース" :select2=true :mastrData=$courses :editData=$editData
+                :select2Search=false :blank=true />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="承認ステータス" id="status" :select2=true :editData=$editData>
-                <option value="1">承認待ち</option>
-                <option value="2">承認</option>
-                <option value="3">差戻し</option>
-            </x-input.select>
+            <x-input.select id="approval_status" caption="承認ステータス" :select2=true :mastrData=$statusList :editData=$editData
+                :select2Search=false :blank=true />
         </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="授業実施日 From" id="report_date_from" />
+            <x-input.date-picker caption="授業実施日 From" id="lesson_date_from" :editData=$editData/>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="授業実施日 To" id="report_date_to" />
+            <x-input.date-picker caption="授業実施日 To" id="lesson_date_to" :editData=$editData/>
         </x-bs.col2>
     </x-bs.row>
 
@@ -99,19 +80,23 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <x-bs.td-sp caption="登録日">2023/05/15</x-bs.td-sp>
-            <x-bs.td-sp caption="講師名">CWテスト教師１０１</x-bs.td-sp>
-            <x-bs.td-sp caption="授業日・時限">2023/05/15 4限</x-bs.td-sp>
-            <x-bs.td-sp caption="校舎">久我山</x-bs.td-sp>
-            <x-bs.td-sp caption="コース">個別指導</x-bs.td-sp>
-            <x-bs.td-sp caption="生徒名">CWテスト生徒１</x-bs.td-sp>
-            <x-bs.td-sp caption="承認ステータス">承認待ち</x-bs.td-sp>
+        <tr v-for="item in paginator.data" v-cloak>
+            <x-bs.td-sp caption="登録日">@{{$filters.formatYmd(item.regist_date)}}</x-bs.td-sp>
+            <x-bs.td-sp caption="講師名">@{{item.tutor_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="授業日・時限">@{{$filters.formatYmdDay(item.lesson_date)}} @{{item.period_no}}限</x-bs.td-sp>
+            <x-bs.td-sp caption="校舎">@{{item.room_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="コース">@{{item.course_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="生徒名">@{{item.student_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="承認ステータス">@{{item.status_name}}</x-bs.td-sp>
             <td>
                 {{-- モーダルを開く際のIDを指定する。オブジェクトを渡すのでコロンを付ける --}}
-                <x-button.list-dtl />
-                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval" />
-                <x-button.list-edit href="{{ route('report_check-edit', '1') }}" />
+                <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
+                <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval"
+                    :vueDataAttr="['id' => 'item.id']"
+                    vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }}"/>
+                <x-button.list-edit vueHref="'{{ route('report_check-edit', '') }}/' + item.id"
+                    {{-- 承認のときは非活性 --}}
+                    vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }}"/>
             </td>
         </tr>
 
@@ -121,5 +106,6 @@
 
 {{-- モーダル --}}
 @include('pages.admin.modal.report_check-modal')
+@include('pages.admin.modal.report_check_approval-modal', ['modal_send_confirm' => true, 'modal_id' => 'modal-dtl-approval', 'caption_OK' => '承認'])
 
 @stop

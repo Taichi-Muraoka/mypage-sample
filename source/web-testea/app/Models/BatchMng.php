@@ -58,8 +58,8 @@ class BatchMng extends Model
      * @var array
      */
     protected $casts = [
-        'start_time' => 'date',
-        'end_time' => 'date',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
     ];
 
     /**
@@ -105,10 +105,10 @@ class BatchMng extends Model
     {
         static $_fieldRules = [
             'batch_id' => ['integer'],
-            'batch_type' => ['integer', 'in:1,2,3,4,5,11,12,13,14,21'],
+            'batch_type' => ['integer'],
             'start_time' => ['date_format:Y-m-d H:i:s'],
             'end_time' => ['date_format:Y-m-d H:i:s'],
-            'batch_state' => ['integer', 'in:0,1,99'],
+            'batch_state' => ['integer'],
             'adm_id' => ['integer'],
         ];
         return $_fieldRules;

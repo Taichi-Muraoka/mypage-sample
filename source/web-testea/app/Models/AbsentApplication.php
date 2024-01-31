@@ -107,7 +107,7 @@ class AbsentApplication extends Model
             'schedule_id' => ['integer'],
             'student_id' => ['integer'],
             'absent_reason' => ['string', 'max:1000'],
-            'status' => ['integer', 'in:0,1'],
+            'status' => ['integer'],
             'apply_date' => ['date_format:Y-m-d']
         ];
         return $_fieldRules;
@@ -116,5 +116,51 @@ class AbsentApplication extends Model
     //-------------------------------
     // 検索条件
     //-------------------------------
+    /**
+     * 検索 校舎コード
+     */
+    public function scopeSearchCampusCd($query, $obj)
+    {
+        $key = 'campus_cd';
+        $col = 'mst_campuses.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 
+    /**
+     * 検索 ステータス
+     */
+    public function scopeSearchStatus($query, $obj)
+    {
+        $key = 'status';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 生徒ID
+     */
+    public function scopeSearchStudentId($query, $obj)
+    {
+        $key = 'student_id';
+        $col = $this->getTable() . '.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
+
+    /**
+     * 検索 講師ID
+     */
+    public function scopeSearchTutorId($query, $obj)
+    {
+        $key = 'tutor_id';
+        $col = 'tutors.' . $key;
+        if (isset($obj[$key]) && filled($obj[$key])) {
+            $query->where($col, $obj[$key]);
+        }
+    }
 }

@@ -109,7 +109,7 @@ class InvoiceImport extends Model
             'end_date' => ['date_format:Y-m-d'],
             'term_text1' => ['string', 'max:50'],
             'term_text2' => ['string', 'max:50'],
-            'import_state' => ['integer', 'in:0,1'],
+            'import_state' => ['integer'],
             'import_date' => ['date_format:Y-m-d H:i:s']
         ];
         return $_fieldRules;

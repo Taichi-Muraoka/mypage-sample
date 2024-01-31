@@ -9,11 +9,8 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="season" caption="特別期間" :select2=true :select2Search=false>
-                <option value="1">2023年春期</option>
-                <option value="2">2022年冬期</option>
-                <option value="3">2022年夏期</option>
-            </x-input.select>
+            <x-input.select id="season_cd" caption="特別期間" :select2=true :mastrData=$seasonList :editData=$editData
+                :rules=$rules :select2Search=false :blank=true />
         </x-bs.col2>
         <x-bs.col2>
             @can('roomAdmin')
@@ -29,22 +26,18 @@
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.text id="name" caption="生徒名" :rules=$rules />
+            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$students :editData=$editData
+                :rules=$rules :select2Search=true :blank=true />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="status" caption="生徒登録状態" :select2=true :select2Search=false>
-                <option value="1">未登録</option>
-                <option value="2">登録済</option>
-            </x-input.select>
+            <x-input.select id="regist_status" caption="生徒登録状態" :select2=true :mastrData=$regStatusList :editData=$editData
+                :rules=$rules :select2Search=false :blank=true />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="status" caption="コマ組み状態" :select2=true :select2Search=false>
-                <option value="1">未対応</option>
-                <option value="2">対応中</option>
-                <option value="3">対応済</option>
-            </x-input.select>
+            <x-input.select id="plan_status" caption="コマ組み状態" :select2=true :mastrData=$planStatusList :editData=$editData
+                :rules=$rules :select2Search=false :blank=true />
         </x-bs.col2>
     </x-bs.row>
 
@@ -68,63 +61,18 @@
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/07/05</td>
-            <td>2023年夏期</td>
-            <td>久我山</td>
-            <td>CWテスト生徒１</td>
-            <td>登録済</td>
-            <td>未対応</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmd(item.apply_date)}}</td>
+            <td>@{{item.year}}年@{{item.season_name}}</td>
+            <td>@{{item.campus_name}}</td>
+            <td>@{{item.student_name}}</td>
+            <td>@{{item.regstatus_name}}</td>
+            <td>@{{item.planstatus_name}}</td>
             <td>
-                <x-button.list-edit vueHref="'{{ route('season_mng_student-detail', '') }}/' + 1" caption="詳細・コマ組み" />
+                <x-button.list-edit vueHref="'{{ route('season_mng_student-detail', '') }}/' + item.season_student_id"
+                caption="詳細・コマ組み" vueDisabled="item.regist_status == {{ App\Consts\AppConst::CODE_MASTER_5_0 }}" />
             </td>
         </tr>
-        <tr>
-            <td>2023/07/04</td>
-            <td>2023年夏期</td>
-            <td>久我山</td>
-            <td>CWテスト生徒２</td>
-            <td>登録済</td>
-            <td>未対応</td>
-            <td>
-                <x-button.list-edit vueHref="'{{ route('season_mng_student-detail', '') }}/' + 1" caption="詳細・コマ組み" />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/07/04</td>
-            <td>2023年夏期</td>
-            <td>久我山</td>
-            <td>CWテスト生徒３</td>
-            <td>登録済</td>
-            <td>対応済</td>
-            <td>
-                <x-button.list-edit vueHref="'{{ route('season_mng_student-detail', '') }}/' + 1" caption="詳細・コマ組み" />
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>2023年夏期</td>
-            <td>久我山</td>
-            <td>CWテスト生徒４</td>
-            <td>未登録</td>
-            <td>未対応</td>
-            <td>
-                <x-button.list-edit vueHref="'{{ route('season_mng_student-detail', '') }}/' + 1" caption="詳細・コマ組み" disabled=true/>
-            </td>
-        </tr>
-        <tr>
-            <td>2023/03/04</td>
-            <td>2023年春期</td>
-            <td>久我山</td>
-            <td>CWテスト生徒３</td>
-            <td>登録済</td>
-            <td>対応済</td>
-            <td>
-                <x-button.list-edit vueHref="'{{ route('season_mng_student-detail', '') }}/' + 1" caption="詳細・コマ組み" disabled=true />
-            </td>
-        </tr>
-
-
     </x-bs.table>
 </x-bs.card-list>
 

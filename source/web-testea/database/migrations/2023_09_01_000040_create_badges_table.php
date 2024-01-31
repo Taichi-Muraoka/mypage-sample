@@ -19,14 +19,12 @@ return new class extends Migration
             $table->unsignedInteger('student_id')->comment('生徒ID');
             $table->string('campus_cd', 2)->comment('校舎コード');
             $table->unsignedSmallInteger('badge_type')->comment('バッジ種別（1:紹介、2:通塾、3:成績、4:その他）');
-            $table->text('reason')->comment('認定理由');
+            $table->string('reason', 30)->nullable()->comment('認定理由');
             $table->date('authorization_date')->default('1000-01-01')->comment('認定日');
             $table->unsignedInteger('adm_id')->comment('管理者ID');
             $table->timestamps();
             $table->softDeletes();
 
-            /* インデックス */
-           
             /* テーブル名コメント */
             $table->comment('バッジ付与情報');
         });

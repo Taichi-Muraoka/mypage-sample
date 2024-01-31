@@ -45,6 +45,11 @@ export default class AppClass extends PageBase {
                     // 時限リストが取得できた場合のみ、時限(selected)をセット
                     if (data.selectItems.length != 0) {
                         $vue.form.period_no = $vue.form.period_no_bef;
+                        if (data.timetable_kind != $vue.form.timetable_kind) {
+                            // 対象日付の時間割区分が変わった場合のみ、開始・終了時刻を再設定
+                            $vue.selectChangeGetTimetable();
+                            $vue.form.timetable_kind = data.timetable_kind;
+                        }
                     }
                 }
             );
@@ -101,7 +106,6 @@ export default class AppClass extends PageBase {
                         .then(() => {
                             // 初期化
                             this.selectGetItemTimetable = {};
-                            //this.form.period_no = "";
                             // チェンジイベントを発生させる
                             var campusCd = this.form.campus_cd;
                             var targetDate = this.form.target_date;

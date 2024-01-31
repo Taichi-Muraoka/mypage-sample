@@ -9,86 +9,62 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="roomcd" caption="校舎" :select2=true >
-                <option value="1">久我山</option>
-                <option value="2">西永福</option>
-                <option value="3">下高井戸</option>
-                <option value="4">駒込</option>
-                <option value="5">日吉</option>
-                <option value="6">自由が丘</option>
-            </x-input.select>
+            @can('roomAdmin')
+            {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+                :rules=$rules :select2Search=false :blank=false />
+            @else
+            {{-- 全体管理者の場合、検索を非表示・未選択を表示する --}}
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
+                :rules=$rules :select2Search=false :blank=true />
+            @endcan
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.text id="student" caption="生徒名" />
-        </x-bs.col2>
-    </x-bs.row>
-    <x-bs.row>
-        <x-bs.col2>
-            <x-input.select id="course_cd" caption="コース名" :select2=true>
-                <option value="1">個別指導コース</option>
-                <option value="4">集団指導</option>
-                <option value="5">その他・自習</option>
-                <option value="6">面談</option>
-            </x-input.select>
-        </x-bs.col2>
-        <x-bs.col2>
-            <x-input.text id="teacher" caption="講師名" />
+            <x-input.text id="student_name" caption="生徒名" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="lesson_kind" caption="授業区分" :select2=true>
-                <option value="1">通常</option>
-                <option value="2">特別</option>
-                <option value="3">追加</option>
-                <option value="4">初回授業（入会金無料）</option>
-                <option value="5">初回授業（入会金半額）</option>
-                <option value="6">体験授業１回目</option>
-                <option value="7">体験授業２回目</option>
-                <option value="8">体験授業３回目</option>
-            </x-input.select>
+            <x-input.select id="course_cd" caption="コース" :select2=true :mastrData=$courses :editData=$editData
+                :rules=$rules :select2Search=false :blank=true />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="absent_status" caption="出欠ステータス" :select2=true>
-                <option value="1">実施前・出席</option>
-                <option value="2">当日欠席（講師出勤あり）</option>
-                <option value="3">当日欠席（講師出勤なし）</option>
-                <option value="4">振替中（未振替）</option>
-            </x-input.select>
+            <x-input.text id="tutor_name" caption="講師名" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select caption="教科" id="subject_cd" :select2=true :select2Search=false>
-                <option value="1">国語</option>
-                <option value="2">数学</option>
-                <option value="3">理科</option>
-                <option value="4">社会</option>
-                <option value="5">英語</option>
-            </x-input.select>
+            <x-input.select id="lesson_kind" caption="授業区分" :select2=true :mastrData=$lesson_kind :editData=$editData
+                :rules=$rules :select2Search=false :blank=true/>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select caption="授業報告書ステータス" id="report" :select2=true :select2Search=false>
-                <option value="1">―（登録不要）</option>
-                <option value="2">✕（要登録・差戻し）</option>
-                <option value="3">△（承認待ち）</option>
-                <option value="4">〇（登録済み）</option>
-            </x-input.select>
+            <x-input.select id="absent_status" caption="出欠ステータス" :select2=true :mastrData=$absent_status :editData=$editData
+                :rules=$rules :select2Search=false :blank=true/>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
         <x-bs.col2>
-            <x-input.date-picker caption="日付 From" id="holiday_date_from" />
+            <x-input.select caption="教科" id="subject_cd" :select2=true :mastrData=$subjects :editData=$editData
+                :rules=$rules :select2Search=false :blank=true/>
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.date-picker caption="日付 To" id="holiday_date_to" />
+            <x-input.select caption="授業報告書ステータス" id="report_status" :select2=true :mastrData=$report_status_list :editData=$editData
+                :rules=$rules :select2Search=false :blank=true/>
+        </x-bs.col2>
+    </x-bs.row>
+    <x-bs.row>
+        <x-bs.col2>
+            <x-input.date-picker caption="日付 From" id="target_date_from" :rules=$rules />
+        </x-bs.col2>
+        <x-bs.col2>
+            <x-input.date-picker caption="日付 To" id="target_date_to" :rules=$rules />
         </x-bs.col2>
     </x-bs.row>
 
 </x-bs.card>
 
 {{-- 結果リスト --}}
-<x-bs.card-list :mock=true>
+<x-bs.card-list>
 
     {{-- テーブル --}}
     <x-bs.table :button=true>
@@ -96,117 +72,53 @@
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
             <th width="10%">日付</th>
-            <th>コース名</th>
-            <th>時限</th>
-            <th>開始時刻</th>
+            <th>曜日</th>
+            <th>時限/開始</th>
+            <th>コース</th>
             <th>校舎</th>
             <th>生徒名</th>
             <th>講師名/担当者名</th>
             <th>教科</th>
             <th>授業区分</th>
-            <th>出欠ステータス</th>
-            <th>授業報告書</th>
+            <th>出欠</th>
+            <th>報告書</th>
             <th></th>
         </x-slot>
 
         {{-- テーブル行 --}}
-        <tr>
-            <td>2023/02/28</td>
-            <td>個別指導コース</td>
-            <td>6</td>
-            <td>16:00</td>
-            <td>久我山</td>
-            <td>CWテスト生徒５</td>
-            <td>CWテスト教師１０１</td>
-            <td>英語</td>
-            <td>追加</td>
-            <td>実施前・出席</td>
-            <td>〇</td>
+        <tr v-for="item in paginator.data" v-cloak>
+            <td>@{{$filters.formatYmd(item.target_date)}}</td>
+            <td>@{{$filters.formatWeek(item.target_date)}}</td>
             <td>
-                <x-button.list-dtl />
+                <span v-if="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
+                    @{{item.start_time}}
+                </span>
+                <span v-if="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
+                    @{{(item.period_no)}}限
+                </span>
             </td>
-        </tr>
-        <tr>
-            <td>2023/02/28</td>
-            <td>個別指導コース</td>
-            <td>5</td>
-            <td>16:00</td>
-            <td>久我山</td>
-            <td>CWテスト生徒１</td>
-            <td>CWテスト教師１０２</td>
-            <td>数学</td>
-            <td>通常</td>
-            <td>実施前・出席</td>
-            <td>✕</td>
+            <td>@{{(item.course_name)}}</td>
+            <td>@{{(item.room_name)}}</td>
+            <td>@{{(item.student_name)}}</td>
             <td>
-                <x-button.list-dtl />
+                <span v-if="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
+                    @{{item.admin_name}}
+                </span>
+                <span v-if="item.course_kind != {{ App\Consts\AppConst::CODE_MASTER_42_3 }}">
+                    @{{(item.tutor_name)}}
+                </span>
             </td>
-        </tr>
-        <tr>
-            <td>2023/02/24</td>
-            <td>個別指導コース</td>
-            <td>6</td>
-            <td>16:00</td>
-            <td>久我山</td>
-            <td>CWテスト生徒１</td>
-            <td>CWテスト教師１０１</td>
-            <td>理科</td>
-            <td>体験授業１回目</td>
-            <td>当日欠席（講師出勤あり）</td>
-            <td>〇</td>
+            <td>@{{(item.subject_name)}}</td>
             <td>
-                <x-button.list-dtl />
+                @{{(item.lesson_kind_name)}}
+                <span v-show="item.create_kind == {{ App\Consts\AppConst::CODE_MASTER_32_2 }}">(@{{(item.create_kind_name)}})</span>
             </td>
-        </tr>
-        <tr>
-            <td>2023/02/24</td>
-            <td>個別指導コース</td>
-            <td>5</td>
-            <td>16:00</td>
-            <td>久我山</td>
-            <td>CWテスト生徒３</td>
-            <td>CWテスト教師１０１</td>
-            <td>社会</td>
-            <td>通常</td>
-            <td>振替中（未振替）</td>
-            <td>〇</td>
             <td>
-                <x-button.list-dtl />
+                <span v-show="item.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }}">@{{(item.absent_status_name)}}</span>
             </td>
+            <td>@{{item.report_status}}</td>
+            <td><x-button.list-dtl :vueDataAttr="['id' => 'item.id']" /></td>
         </tr>
-        <tr>
-            <td>2023/02/24</td>
-            <td>個別指導コース</td>
-            <td>4</td>
-            <td>16:00</td>
-            <td>久我山</td>
-            <td>CWテスト生徒４</td>
-            <td>CWテスト教師１０２</td>
-            <td>英語</td>
-            <td>追加</td>
-            <td>実施前・出席</td>
-            <td>〇</td>
-            <td>
-                <x-button.list-dtl />
-            </td>
-        </tr>
-        <tr>
-            <td>2023/02/24</td>
-            <td>面談</td>
-            <td>3</td>
-            <td>15:00</td>
-            <td>久我山</td>
-            <td>CWテスト生徒2</td>
-            <td>CWテスト教師１０２</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-                <x-button.list-dtl />
-            </td>
-        </tr>
-
     </x-bs.table>
 
 </x-bs.card-list>

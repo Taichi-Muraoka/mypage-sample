@@ -110,8 +110,8 @@ class MstCampus extends Model
             'short_name' => ['string', 'max:10'],
             'email_campus' => ['string', 'email:rfc,filter', 'max:100'],
             'tel_campus' => ['string', 'max:20', 'vdTelephone'],
-            'disp_order' => ['integer'],
-            'is_hidden' => ['integer', 'in:0,1']
+            'disp_order' => ['integer', 'max:99'],
+            'is_hidden' => ['integer']
         ];
         return $_fieldRules;
     }

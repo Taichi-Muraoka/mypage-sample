@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * 教師登録・編集
+ * 講師退職登録
  */
 export default class AppClass extends PageBase {
     /**
@@ -15,14 +15,18 @@ export default class AppClass extends PageBase {
      * 開始処理
      */
     start() {
-        // 編集完了後は一覧へ戻る
+        const self = this;
+
+        // 完了後は講師詳細画面（二階層目）に戻る
         var afterEdit = () => {
-            UrlCom.redirect(UrlCom.getFuncUrl());
+            self.redirectToParent();
         };
 
         // Vue: 入力フォーム
         this.getVueInputForm({
-            afterEdit: afterEdit
+            afterEdit: afterEdit,
+            // vd_input_leaveとなるようにURL指定
+            urlSuffix: "leave",
         });
     }
 }
