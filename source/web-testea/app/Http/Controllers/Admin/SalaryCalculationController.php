@@ -397,8 +397,6 @@ class SalaryCalculationController extends Controller
                     // 結果を取得
                     ->get();
 
-                $this->debug($details);
-
                 //---------------------
                 // CSV出力内容を配列に保持
                 //---------------------
