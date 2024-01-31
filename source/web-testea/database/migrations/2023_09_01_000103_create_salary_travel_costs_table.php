@@ -20,9 +20,9 @@ return new class extends Migration
             $table->unsignedInteger('tutor_id')->comment('講師ID');
             $table->unsignedSmallInteger('seq')->comment('連番');
             $table->string('campus_cd', 2)->comment('校舎コード');
-            $table->decimal('unit_price', 4, 0)->default(0)->comment('単価');
+            $table->decimal('unit_price', 6, 0)->default(0)->comment('単価');
             $table->unsignedSmallInteger('times')->default(0)->comment('回数');
-            $table->decimal('amount', 4, 0)->default(0)->comment('金額');
+            $table->decimal('amount', 6, 0)->default(0)->comment('金額');
             $table->timestamps();
             $table->softDeletes();
 
