@@ -4,22 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\ExtStudentKihon;
-use App\Models\ExtSchedule;
-use App\Models\TransferApply;
 use Illuminate\Support\Facades\Validator;
 use App\Consts\AppConst;
 use App\Models\MstTimetable;
 use App\Models\CodeMaster;
-use App\Models\ExtRirekisho;
-use App\Models\Notice;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\DB;
-use App\Models\NoticeDestination;
-use Carbon\Carbon;
 use App\Libs\AuthEx;
-use App\Http\Controllers\Traits\FuncTransferTrait;
 
 /**
  * 時間割マスタ管理 - コントローラ
@@ -133,7 +123,6 @@ class MasterMngTimetableController extends Controller
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $mstTimetable);
-        // return $this->getListAndPaginatorMock();
     }
 
     /**
