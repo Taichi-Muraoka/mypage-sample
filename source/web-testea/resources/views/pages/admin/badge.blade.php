@@ -14,42 +14,43 @@
 
 <x-bs.card>
     <x-slot name="card_title">
-    {{$name}}
+        {{$name}}
     </x-slot>
 
-{{-- 結果リスト --}}
-<x-bs.card-list>
+    {{-- 結果リスト --}}
+    <x-bs.card-list>
 
-    {{-- hidden 検索一覧用--}}
-    <x-input.hidden id="student_id" :editData=$editData />
+        {{-- hidden 検索一覧用--}}
+        <x-input.hidden id="student_id" :editData=$editData />
 
-    {{-- テーブル --}}
-    <x-bs.table :button=true>
+        {{-- テーブル --}}
+        <x-bs.table :button=true>
 
-        {{-- テーブルタイトル行 --}}
-        <x-slot name="thead">
-            <th width="15%">認定日</th>
-            <th width="15%">バッジ種別</th>
-            <th width="15%">校舎</th>
-            <th width="15%">担当者名</th>
-            <th>認定理由</th>
-            <th></th>
-        </x-slot>
+            {{-- テーブルタイトル行 --}}
+            <x-slot name="thead">
+                <th width="15%">認定日</th>
+                <th width="15%">バッジ種別</th>
+                <th width="15%">校舎</th>
+                <th width="15%">担当者名</th>
+                <th>認定理由</th>
+                <th></th>
+            </x-slot>
 
-        {{-- テーブル行 --}}
-        <tr v-for="item in paginator.data" v-cloak>
-            <td>@{{$filters.formatYmd(item.authorization_date)}}</td>
-            <td>@{{item.kind_name}}</td>
-            <td>@{{item.campus_name}}</td>
-            <td>@{{item.admin_name}}</td>
-            <td>@{{item.reason}}</td>
-            <td>
-                <x-button.list-edit vueHref="'{{ route('badge-edit', '') }}/' + item.badge_id" />
-            </td>
-        </tr>
+            {{-- テーブル行 --}}
+            <tr v-for="item in paginator.data" v-cloak>
+                <td>@{{$filters.formatYmd(item.authorization_date)}}</td>
+                <td>@{{item.kind_name}}</td>
+                <td>@{{item.campus_name}}</td>
+                <td>@{{item.admin_name}}</td>
+                <td>@{{item.reason}}</td>
+                <td>
+                    <x-button.list-edit vueHref="'{{ route('badge-edit', '') }}/' + item.badge_id"
+                        vueDisabled="item.disabled_btn" />
+                </td>
+            </tr>
 
-    </x-bs.table>
-</x-bs.card-list>
+        </x-bs.table>
+    </x-bs.card-list>
 
     {{-- フッター --}}
     <x-slot name="footer">
