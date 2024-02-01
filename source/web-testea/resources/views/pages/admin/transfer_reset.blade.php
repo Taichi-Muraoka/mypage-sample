@@ -38,7 +38,9 @@
             <td>@{{$filters.formatYmdHm(item.end_time)}}</td>
             <td>@{{item.state_name}}</td>
             <td>
-                <x-button.submit-href caption="リスト出力" icon="fas fa-download" />
+                <x-button.submit-href caption="リスト出力" icon="fas fa-download" 
+                    vueHref="'{{ route('transfer_reset-download', '') }}/' + item.batch_id"
+                    vueDisabled="item.batch_state != {{ App\Consts\AppConst::CODE_MASTER_22_0 }}" />
             </td>
         </tr>
 

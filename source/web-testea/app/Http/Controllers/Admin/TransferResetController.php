@@ -4,13 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
-use App\Exceptions\ReadDataValidateException;
-use App\Models\ExtStudentKihon;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use App\Models\BatchMng;
-use App\Models\AdminUser;
 use App\Models\CodeMaster;
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
@@ -90,6 +87,40 @@ class TransferResetController extends Controller
      */
     public function download($batchId)
     {
-        return;
+        // IDのバリデーション
+        $this->validateIds($batchId);
+
+        // バックアップ作成したバッチ処理の処理開始日時を取得
+        $batch = BatchMng::select('start_time')
+            ->where('batch_id', $batchId)
+            ->where('batch_state', AppConst::CODE_MASTER_22_0)
+            ->firstOrFail();
+
+        // バッチ処理開始日時を14桁の数値に変換
+        // $dirName例：20230301000000
+        // $fileName例：振替残数リセット一覧_20230301000000.csv
+        $dirName = preg_replace('/[^0-9]/', '', $batch->start_time);
+        $fileName = Lang::get(
+            'message.file.transfer_reset_output.name',
+            [
+                'outputDate' => date("Ymd", strtotime($dirName))
+            ]
+        );
+
+        // バックアップ保存場所のパス取得
+        $backupDir = config("appconf.transfer_reset_backup_dir");
+        $filePath = Storage::path($backupDir . $dirName . '/' . $fileName);
+
+        // 存在チェック
+        if (!File::exists($filePath)) {
+            // 存在しなければエラー
+            $this->illegalResponseErr();
+        }
+
+        // MIME TYPEの取得
+        $mimeType = Storage::mimeType($backupDir . $fileName);
+        $headers = [['Content-Type' => $mimeType]];
+
+        return response()->download($filePath, $fileName, $headers);
     }
 }

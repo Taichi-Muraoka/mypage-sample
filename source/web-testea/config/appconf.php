@@ -208,6 +208,11 @@ return [
      */
     "exceeding_data_backup_zip_filename" => "保持期限超過データ削除バックアップ_",
 
+    /**
+     * 振替残数リセットバックアップ先
+     */
+    "transfer_reset_backup_dir" => "transfer_reset_backup/",
+
     //==========================
     // 画面ごと設定
     // マスタなどに持たないような設定
