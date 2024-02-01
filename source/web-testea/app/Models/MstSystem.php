@@ -108,7 +108,7 @@ class MstSystem extends Model
             'key_id' => ['integer'],
             'name' => ['string', 'max:50'],
             'datatype_kind' => ['integer'],
-            'value_num' => ['integer'],
+            'value_num' => ['integer', 'min:-99999999', 'max:99999999'],
             'value_str' => ['string', 'max:50'],
             'value_date' => ['date_format:Y-m-d'],
             'change_flg' => ['integer']
