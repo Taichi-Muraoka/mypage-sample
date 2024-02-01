@@ -182,7 +182,7 @@ class TransferReset extends Command
                 fclose($fp);
 
                 // バッチ管理テーブルのレコードを更新：正常終了
-                $end = $now;
+                $end = Carbon::now();
                 BatchMng::where('batch_id', '=', $batch_id)
                     ->update([
                         'end_time' => $end,
