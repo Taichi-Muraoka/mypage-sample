@@ -255,8 +255,8 @@ class MemberMngController extends Controller
 
             // ステータスコードとインデックスを合わせるため整形
             $statusGroup = [];
-            foreach ($statusList as $statusList) {
-                $statusGroup[$statusList->code] = $statusList->code;
+            foreach ($statusList as $status) {
+                $statusGroup[$status->code] = $status->code;
             }
 
             foreach ($group as $val) {
