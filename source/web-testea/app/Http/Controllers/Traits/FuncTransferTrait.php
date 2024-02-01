@@ -317,9 +317,10 @@ trait FuncTransferTrait
      * ユーザー権限による絞り込みあり
      *
      * @param   $id    振替依頼情報ID
+     * @param   $isEdit 承認画面フラグ
      * @return  object 振替依頼情報・振替依頼日程情報
      */
-    private function fncTranGetTransferApplicationData($id)
+    private function fncTranGetTransferApplicationData($id, $isEdit = false)
     {
         // 校舎名取得のサブクエリ
         $campus_names = $this->mdlGetRoomQuery();
@@ -332,13 +333,31 @@ trait FuncTransferTrait
             $account = Auth::user();
             $query->where('lesson_schedules.campus_cd', $account->campus_cd);
         }
+        if (AuthEx::isAdmin()) {
+            // 管理者の場合
+            // 承認画面の場合、振替依頼ステータス=管理者承認待ち・承認待ち・差戻し(日程不都合)・差戻し(代講希望) のみ表示可能
+            //                (承認済・管理者対応済は対象外)
+            if ($isEdit) {
+                $query->whereIn('transfer_applications.approval_status', [AppConst::CODE_MASTER_3_0, AppConst::CODE_MASTER_3_1, AppConst::CODE_MASTER_3_3, AppConst::CODE_MASTER_3_4]);
+            }
+        }
         if (AuthEx::isStudent()) {
             // 生徒の場合、自分の生徒IDのみにガードを掛ける
             $query->where($this->guardStudentTableWithSid());
+            // 承認画面の場合、申請者種別=講師・振替依頼ステータス=承認待ち のみ表示可能
+            if ($isEdit) {
+                $query->where('transfer_applications.apply_kind', AppConst::CODE_MASTER_53_2);
+                $query->where('transfer_applications.approval_status', AppConst::CODE_MASTER_3_1);
+            }
         }
         if (AuthEx::isTutor()) {
             // 講師の場合、自分の講師IDのみにガードを掛ける
             $query->where($this->guardTutorTableWithTid());
+            // 承認画面の場合、申請者種別=生徒・振替依頼ステータス=承認待ち のみ表示可能
+            if ($isEdit) {
+                $query->where('transfer_applications.apply_kind', AppConst::CODE_MASTER_53_1);
+                $query->where('transfer_applications.approval_status', AppConst::CODE_MASTER_3_1);
+            }
         }
 
         $tranApp = $query
@@ -770,7 +789,7 @@ trait FuncTransferTrait
     private function fncTranGetEditTransferData($transferId)
     {
         // データを取得
-        $tranApp = $this->fncTranGetTransferApplicationData($transferId);
+        $tranApp = $this->fncTranGetTransferApplicationData($transferId, true);
 
         // 希望日のスケジュール重複チェック
         $campusCd = $tranApp->campus_cd;
