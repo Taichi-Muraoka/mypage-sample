@@ -16,7 +16,7 @@
         :mastrData=$lesson_list :editData=$editData :select2Search=false :blank=true />
 
     <div v-cloak>
-        <x-bs.table vShow="form.schedule_id" :hover=false :vHeader=true :smartPhone=true>
+        <x-bs.table vShow="form.schedule_id" :hover=false :vHeader=true :smartPhone=false>
             <tr>
                 <th>校舎</th>
                 <td>@{{selectGetItem.campus_name}}</td>
