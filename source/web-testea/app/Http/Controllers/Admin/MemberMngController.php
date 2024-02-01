@@ -874,6 +874,8 @@ class MemberMngController extends Controller
             // 所属学校（高）の学校名の取得
             ->sdLeftJoin(MstSchool::class, 'students.school_cd_h', '=', 'mst_schools_h.school_cd', 'mst_schools_h')
             ->where('student_id', '=', $sid)
+            // 教室管理者の場合、自教室の生徒のみにガードを掛ける
+            ->where($this->guardRoomAdminTableWithSid())
             ->firstOrFail();
 
         // 生徒所属校舎を取得する

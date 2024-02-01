@@ -18,6 +18,20 @@ return [
      */
     "mail_absent_to_address" => env('MAIL_ABSENT_TO_ADDRESS', env('MAIL_FROM_ADDRESS')),
 
+    /**
+     * パスワードリセット用URL（新規入会時のメールに記載）
+     *
+     * 未設定の場合はAPP_URLにする
+     */
+    "url_password_reset" => env('URL_PASSWORD_RESET', env('APP_URL')),
+
+    /**
+     * ログイン用URL
+     *
+     * 未設定の場合はAPP_URLにする
+     */
+    "url_login" => env('URL_LOGIN', env('APP_URL')),
+
     //==========================
     // 画面共通
     //==========================
