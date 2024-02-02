@@ -18,7 +18,8 @@
 
     <x-input.text caption="管理者名" id="name" :rules=$rules :editData=$editData />
 
-    <x-input.select caption="校舎" id="campus_cd" :select2=true :mastrData=$rooms :rules=$rules :editData=$editData />
+    <x-input.select caption="校舎" id="campus_cd" :select2=true :mastrData=$rooms :rules=$rules :editData=$editData 
+        :select2Search=false :blank=false/>
 
     {{-- hidden --}}
     <x-input.hidden id="adm_id" :editData=$editData />
