@@ -22,8 +22,8 @@ use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use App\Models\NoticeDestination;
-use App\Libs\AuthEx;
 use App\Http\Controllers\Traits\FuncScheduleTrait;
+use App\Libs\CommonDateFormat;
 
 /**
  * 面談日程連絡受付 - コントローラ
@@ -228,7 +228,6 @@ class ConferenceAcceptController extends Controller
             }
         };
 
-        // FromとToの大小チェックバリデーションを追加(Fromが存在する場合のみ)
         $ruleApplyuDate = Conference::getFieldRule('apply_date');
         // FromとToの大小チェックバリデーションを追加(Fromが存在する場合のみ)
         $validateFromTo = [];
@@ -465,9 +464,7 @@ class ConferenceAcceptController extends Controller
 
                 // お知らせ種別（面談）
                 $notice->notice_type = AppConst::CODE_MASTER_14_4;
-                // 管理者ID
-                $account = Auth::user();
-                $notice->adm_id = $account->account_id;
+                $notice->adm_id = $adm_id;
                 $notice->campus_cd = $account->campus_cd;
 
                 // 保存
@@ -574,7 +571,7 @@ class ConferenceAcceptController extends Controller
             ->firstOrFail();
 
         // ブースリストを取得
-        $booths = $this->mdlGetBoothList($conference['campus_cd'], 3);
+        $booths = $this->mdlGetBoothList($conference['campus_cd'], AppConst::CODE_MASTER_41_3);
 
         return view('pages.admin.conference_accept-edit', [
             'editData' => $conference,
@@ -660,7 +657,7 @@ class ConferenceAcceptController extends Controller
             $notice->text = Lang::get(
                 'message.notice.conference_accept.text',
                 [
-                    'conferenceDate' => $conference->conference_date->format('Y/m/d'),
+                    'conferenceDate' => CommonDateFormat::formatYmdDay($conference->conference_date),
                     'startTime' => $conference->start_time->format('H:i'),
                     'roomName' => $campus_name
                 ]
@@ -668,9 +665,7 @@ class ConferenceAcceptController extends Controller
 
             // お知らせ種別（面談）
             $notice->notice_type = AppConst::CODE_MASTER_14_4;
-            // 管理者ID
-            $account = Auth::user();
-            $notice->adm_id = $account->account_id;
+            $notice->adm_id = $adm_id;
             $notice->campus_cd = $account->campus_cd;
 
             // 保存
@@ -694,7 +689,7 @@ class ConferenceAcceptController extends Controller
             // save成功時のみ送信
             if ($res) {
                 $mail_body = [
-                    'conference_date' => $conference->conference_date->format('Y/m/d') .
+                    'conference_date' => CommonDateFormat::formatYmdDay($conference->conference_date) .
                         ' ' . $conference->start_time->format('H:i'),
                     'room_name' => $campus_name
                 ];
@@ -766,13 +761,14 @@ class ConferenceAcceptController extends Controller
         // 独自バリデーション: リストのチェック 生徒ID
         $validationStudentList =  function ($attribute, $value, $fail) use ($request) {
 
+            // 入会前の生徒の場合
+            if ($request['student_id'] == 'null') {
+                return;
+            }
+
             // リストを取得し存在チェック
             $students = $this->mdlGetStudentList();
             if (!isset($students[$value])) {
-                // 入会前の生徒の場合
-                if ($request['student_id'] == 'null') {
-                    return;
-                }
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
             }
@@ -803,6 +799,11 @@ class ConferenceAcceptController extends Controller
 
         // 独自バリデーション: 生徒スケジュール重複チェック
         $validationDupStudent =  function ($attribute, $value, $fail) use ($request) {
+
+            // 入会前の生徒の場合
+            if ($request['student_id'] == 'null') {
+                return;
+            }
 
             // 終了時刻計算
             $end_time = $this->endTime($request['start_time']);
