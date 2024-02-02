@@ -1,7 +1,7 @@
 マイページのパスワード設定・ログイン方法についてご案内いたします。
 
 1.ブラウザより以下のURLにアクセスしてください。
-  https://XXXXXXXX/password/reset
+  {{config('appconf.url_password_reset')}}
  （パスワードリセット用URL）
 
 2.入会手続き時に決定したログインIDを入力し、「リセットリンクを送信」を押下してください。
@@ -12,6 +12,6 @@
 4.ログインID・ご自身で決定したパスワードを入力し、マイページにログインします。
 
 5.次回より、以下のURLよりログインします。必要に応じてブックマークの登録を行ってください。
-  https://XXXXXXXX/login
+  {{config('appconf.url_login')}}
 
 @include('emails.signature')
