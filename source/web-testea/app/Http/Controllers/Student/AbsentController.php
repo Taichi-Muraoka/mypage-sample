@@ -201,7 +201,7 @@ class AbsentController extends Controller
         $validationScheduleList =  function ($attribute, $value, $fail) use ($sid) {
 
             // 生徒に紐づくスケジュールを取得
-            $lessons = $this->getStudentSchedule($sid, null);
+            $lessons = $this->getStudentSchedule($sid);
 
             // プルダウンメニューを作成
             $scheduleMaster = $this->mdlGetScheduleMasterList($lessons);
