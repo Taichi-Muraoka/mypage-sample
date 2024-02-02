@@ -408,6 +408,9 @@ trait FuncMemberDetailTrait
         // 画面表示中生徒のデータに絞り込み
         $query->where('scores.student_id', $sid);
 
+        // 教室管理者の場合、自分の校舎コードの生徒のみにガードを掛ける
+        $query->where($this->guardRoomAdminTableWithSid());
+
         // データを取得 FuncGradesTrait
         $scores = $this->getScoreList($query);
         $scores = $scores->get();
