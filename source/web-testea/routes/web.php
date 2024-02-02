@@ -207,11 +207,6 @@ Route::group(['middleware' => ['auth', 'can:student']], function () {
     // 申請
     Route::get('/conference', [ConferenceController::class, 'index'])->name('conference');
 
-    // 申請(直接ID付きで選択された状態にする)
-    Route::get('/conference/{scheduleId}', [ConferenceController::class, 'direct'])->name('conference-direct');
-
-    // 授業日時プルダウンを選択された際に教室・講師の情報を返却する →不要？
-
     // 新規登録処理
     Route::post('/conference/create', [ConferenceController::class, 'create'])->name('conference-create');
 
