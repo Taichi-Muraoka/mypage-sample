@@ -22,7 +22,6 @@ use App\Models\Notice;
 use App\Models\NoticeDestination;
 use App\Mail\ExtraLessonAcceptToStudent;
 use App\Mail\ExtraLessonAcceptToTutor;
-use App\Exceptions\ReadDataValidateException;
 
 /**
  * 追加授業申請受付 - コントローラ
@@ -339,8 +338,8 @@ class ExtraLessonMngController extends Controller
         // IDのバリデーション
         $this->validateIds($sid);
 
-        // 教室管理者の場合、自分の校舎の生徒のみにガードを掛ける
-        $this->guardRoomAdminSid($sid);
+        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        $this->guardRoomAdminRoomcd($campusCd);
 
         // 生徒名を取得する
         $studentName = $this->mdlGetStudentName($sid);
@@ -790,7 +789,7 @@ class ExtraLessonMngController extends Controller
         $validationDupBooth =  function ($attribute, $value, $fail) use ($request) {
 
             if (
-                !$request->filled('campus_cd')|| !$request->filled('target_date')
+                !$request->filled('campus_cd') || !$request->filled('target_date')
                 || !$request->filled('period_no') || !$request->filled('how_to_kind')
             ) {
                 // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
@@ -805,7 +804,14 @@ class ExtraLessonMngController extends Controller
             }
             // ブース重複チェック（空きブース検索あり）
             $booth = $this->fncScheSearchBooth(
-                $request['campus_cd'],$boothFirst,$request['target_date'],$request['period_no'],$request['how_to_kind'],null,false);
+                $request['campus_cd'],
+                $boothFirst,
+                $request['target_date'],
+                $request['period_no'],
+                $request['how_to_kind'],
+                null,
+                false
+            );
             if (!$booth) {
                 // ブース空きなしエラー
                 return false;
@@ -820,5 +826,5 @@ class ExtraLessonMngController extends Controller
         Validator::extendImplicit('duplicate_booth', $validationDupBooth);
         $rules += ['booth_cd' => ['duplicate_booth']];
         return $rules;
-        }
+    }
 }
