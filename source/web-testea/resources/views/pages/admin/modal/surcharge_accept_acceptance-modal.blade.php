@@ -7,7 +7,7 @@
 
 <ul>
     <li>ステータスを「承認」に変更</li>
-    <li>支払年月を設定（申請日の翌月に自動設定）</li>
+    <li>支払年月を設定（実施日の翌月に自動設定）</li>
 </ul>
 
 <x-bs.table :hover=false :vHeader=true :smartPhoneModal=true>
@@ -55,10 +55,6 @@
     <tr>
         <th>管理者コメント</th>
         <td class="nl2br">@{{item.admin_comment}}</td>
-    </tr>
-    <tr v-show="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_2_1 }}">
-        <th>支払年月</th>
-        <td>@{{$filters.formatYm(item.payment_date)}}</td>
     </tr>
 </x-bs.table>
 
