@@ -7,6 +7,7 @@ use App\Libs\CommonDateFormat;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\FuncScheduleTrait;
 use App\Http\Controllers\Traits\FuncTransferTrait;
+use App\Http\Controllers\Traits\CtrlDateTrait;
 use App\Mail\TransferAdjustmentRequest;
 use App\Mail\TransferAdjustmentRequestOver;
 use App\Mail\TransferApplyRegistSchedule;
@@ -32,6 +33,8 @@ class TransferTutorController extends Controller
     use FuncScheduleTrait;
     // 振替調整取得用
     use FuncTransferTrait;
+    // 振替可能授業の範囲取得用
+    use CtrlDateTrait;
 
     /**
      * コンストラクタ
@@ -264,7 +267,7 @@ class TransferTutorController extends Controller
         $student_id = $request->input('id');
 
         // 振替対象日の範囲
-        $targetPeriod = $this->fncTranTargetDateFromTo();
+        $targetPeriod = $this->dtGetTargetDateFromTo();
         // 授業情報を取得
         $lessons = $this->fncTranGetTransferSchedule($targetPeriod['from_date'], $targetPeriod['to_date'], $student_id);
         // プルダウン用にリスト作成

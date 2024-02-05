@@ -944,37 +944,6 @@ trait FuncTransferTrait
     //------------------------------
 
     /**
-     * システム日時を基準に振替調整対象授業日の範囲を取得
-     *
-     * @param bool  $adminFlg 管理者設定時true（省略時false）
-     * @return array 開始日～終了日
-     */
-    protected function fncTranTargetDateFromTo($adminFlg = false)
-    {
-        $nowTime = date('H:i');
-        $fromDate = null;
-        $toDate = null;
-        if ($nowTime < '22:00') {
-            // 現在時刻が22時までは、翌日～翌日より1ヶ月(30日)先
-            $fromDate = date('Y/m/d', strtotime('+1 day'));
-            $toDate = date('Y/m/d', strtotime('+31 day'));
-        } else {
-            // 現在時刻が22時以降は、翌々日～翌々日より1ヶ月(30日)先
-            $fromDate = date('Y/m/d', strtotime('+2 day'));
-            $toDate = date('Y/m/d', strtotime('+32 day'));
-        }
-        // 管理者設定時は、当日も許可する
-        if ($adminFlg == true) {
-            $fromDate = date('Y/m/d');
-        }
-
-        return [
-            'from_date' => $fromDate,
-            'to_date' => $toDate
-        ];
-    }
-
-    /**
      * 対象日を基準に振替候補日の範囲を取得
      *
      * @param string  $target_date 基準日

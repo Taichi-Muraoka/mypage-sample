@@ -150,4 +150,36 @@ trait CtrlDateTrait
             return date('Y/m/d', strtotime($target_date));
         }
     }
+
+    /**
+     * システム日時を基準に対象授業日の範囲を取得
+     * 振替調整・生徒欠席連絡で使用
+     *
+     * @param bool  $adminFlg 管理者設定時true（省略時false）
+     * @return array 開始日～終了日
+     */
+    protected function dtGetTargetDateFromTo($adminFlg = false)
+    {
+        $nowTime = date('H:i');
+        $fromDate = null;
+        $toDate = null;
+        if ($nowTime < '22:00') {
+            // 現在時刻が22時までは、翌日～翌日より1ヶ月(30日)先
+            $fromDate = date('Y/m/d', strtotime('+1 day'));
+            $toDate = date('Y/m/d', strtotime('+31 day'));
+        } else {
+            // 現在時刻が22時以降は、翌々日～翌々日より1ヶ月(30日)先
+            $fromDate = date('Y/m/d', strtotime('+2 day'));
+            $toDate = date('Y/m/d', strtotime('+32 day'));
+        }
+        // 管理者設定時は、当日も許可する
+        if ($adminFlg == true) {
+            $fromDate = date('Y/m/d');
+        }
+
+        return [
+            'from_date' => $fromDate,
+            'to_date' => $toDate
+        ];
+    }
 }

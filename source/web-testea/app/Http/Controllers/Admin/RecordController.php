@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Log;
 use App\Models\Record;
 use App\Consts\AppConst;
-use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncRecordTrait;
 
 /**
@@ -44,17 +46,15 @@ class RecordController extends Controller
         // IDのバリデーション
         $this->validateIds($sid);
 
-        // 校舎リストを取得
-        $rooms = $this->mdlGetRoomList(false);
+        // 教室管理者の場合、自分の教室の生徒のみにガードを掛ける
+        $this->guardRoomAdminSid($sid);
 
         // 生徒名を取得する
         $student = $this->mdlGetStudentName($sid);
 
         return view('pages.admin.record', [
-            'rules' => $this->rulesForSearch(),
             'student_name' => $student,
             'sid' => $sid,
-            'rooms' => $rooms,
             'editData' => [
                 'student_id' => $sid
             ]
@@ -69,8 +69,6 @@ class RecordController extends Controller
      */
     public function search(Request $request)
     {
-        // バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForSearch())->validate();
 
         // クエリ作成
         $query = Record::query();
@@ -86,34 +84,8 @@ class RecordController extends Controller
             ->orderby('records.received_date', 'desc')
             ->orderby('records.received_time', 'desc');
 
-        // ページネータで返却（モック用）
+        // ページネータで返却
         return $this->getListAndPaginator($request, $record);
-    }
-
-    /**
-     * バリデーション(検索用)
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return mixed バリデーション結果
-     */
-    public function validationForSearch(Request $request)
-    {
-        // リクエストデータチェック
-        $validator = Validator::make($request->all(), $this->rulesForSearch());
-        return $validator->errors();
-    }
-
-    /**
-     * バリデーションルールを取得(検索用)
-     *
-     * @return array ルール
-     */
-    private function rulesForSearch()
-    {
-
-        $rules = array();
-
-        return $rules;
     }
 
     /**
@@ -160,24 +132,20 @@ class RecordController extends Controller
         // IDのバリデーション
         $this->validateIds($sid);
 
+        // 教室管理者の場合、自分の教室の生徒のみにガードを掛ける
+        $this->guardRoomAdminSid($sid);
+
+        // ログインユーザ
+        $account = Auth::user();
+
         // 校舎リストを取得
-        $rooms = $this->mdlGetRoomList(false);
+        $rooms = $this->mdlGetRoomList(true);
 
         // 連絡記録種別を取得
         $recordKind = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_46);
 
         // 生徒名を取得する
         $student = $this->mdlGetStudentName($sid);
-
-        // ログインユーザ
-        $account = Auth::user();
-
-        // 校舎名取得
-        if ($account->campus_cd == "00") {
-            $campus_name = "本部管理者";
-        } else {
-            $campus_name = $this->mdlGetRoomName($account->campus_cd);
-        }
 
         $editData = [
             'sid' => $sid,
@@ -190,7 +158,6 @@ class RecordController extends Controller
         return view('pages.admin.record-input', [
             'editData' => $editData,
             'student_name' => $student,
-            'campus_name' => $campus_name,
             'manager_name' => $account->name,
             'recordKind' => $recordKind,
             'rooms' => $rooms,
@@ -207,27 +174,35 @@ class RecordController extends Controller
     {
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
+        try {
+            // トランザクション(例外時は自動的にロールバック)
+            DB::transaction(function () use ($request) {
+                $record = new Record;
 
-        $record = new Record;
+                $record->student_id = $request['student_id'];
+                $record->campus_cd = $request['campus_cd'];
+                $record->record_kind = $request['record_kind'];
+                if ($request['received_date'] == null) {
+                    $record->received_date = now()->format('Y-m-d');
+                } else {
+                    $record->received_date = $request['received_date'];
+                }
+                if ($request['received_time'] == null) {
+                    $record->received_time = now()->format('H:i:00');
+                } else {
+                    $record->received_time = $request['received_time'];
+                }
+                $record->regist_time = now();
+                $record->adm_id = $request['adm_id'];
+                $record->memo = $request['memo'];
 
-        $record->student_id = $request['student_id'];
-        $record->campus_cd = $request['campus_cd'];
-        $record->record_kind = $request['record_kind'];
-        if ($request['received_date'] == null) {
-            $record->received_date = now()->format('Y-m-d');
-        } else {
-            $record->received_date = $request['received_date'];
+                $record->save();
+            });
+        } catch (\Exception  $e) {
+            // この時点では補足できないエラーとして、詳細は返さずエラーとする
+            Log::error($e);
+            return $this->illegalResponseErr();
         }
-        if ($request['received_time'] == null) {
-            $record->received_time = now()->format('H:i:00');
-        } else {
-            $record->received_time = $request['received_time'];
-        }
-        $record->regist_time = now();
-        $record->adm_id = $request['adm_id'];
-        $record->memo = $request['memo'];
-
-        $record->save();
 
         return;
     }
@@ -244,7 +219,7 @@ class RecordController extends Controller
         $this->validateIds($recordId);
 
         // 校舎リストを取得
-        $rooms = $this->mdlGetRoomList(false);
+        $rooms = $this->mdlGetRoomList(true);
 
         // 連絡記録種別を取得
         $recordKind = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_46);
@@ -256,24 +231,18 @@ class RecordController extends Controller
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
+        // 教室管理者の場合、自分の教室の生徒のみにガードを掛ける
+        $this->guardRoomAdminSid($record->student_id);
+
         // 生徒名を取得する
         $student = $this->mdlGetStudentName($record->student_id);
 
         // ログインユーザ
         $account = Auth::user();
 
-        // 校舎名取得
-        if ($account->campus_cd == "00") {
-            $campus_name = "本部管理者";
-        } else {
-            $campus_name = $this->mdlGetRoomName($account->campus_cd);
-        }
-
         return view('pages.admin.record-input', [
-            'rules' => $this->rulesForSearch(),
             'student_name' => $student,
             'manager_name' => $account->name,
-            'campus_name' => $campus_name,
             'recordKind' => $recordKind,
             'sid' => $record->student_id,
             'rooms' => $rooms,
@@ -299,23 +268,32 @@ class RecordController extends Controller
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
-        $record->campus_cd = $request['campus_cd'];
-        $record->record_kind = $request['record_kind'];
-        if ($request['received_date'] == null) {
-            $record->received_date = now()->format('Y-m-d');
-        } else {
-            $record->received_date = $request['received_date'];
-        }
-        if ($request['received_time'] == null) {
-            $record->received_time = now()->format('H:i:00');
-        } else {
-            $record->received_time = $request['received_time'];
-        }
-        $record->regist_time = now();
-        $record->memo = $request['memo'];
+        try {
+            // トランザクション(例外時は自動的にロールバック)
+            DB::transaction(function () use ($request, $record) {
+                $record->campus_cd = $request['campus_cd'];
+                $record->record_kind = $request['record_kind'];
+                if ($request['received_date'] == null) {
+                    $record->received_date = now()->format('Y-m-d');
+                } else {
+                    $record->received_date = $request['received_date'];
+                }
+                if ($request['received_time'] == null) {
+                    $record->received_time = now()->format('H:i:00');
+                } else {
+                    $record->received_time = $request['received_time'];
+                }
+                $record->regist_time = now();
+                $record->memo = $request['memo'];
 
-        // 更新
-        $record->save();
+                // 更新
+                $record->save();
+            });
+        } catch (\Exception  $e) {
+            // この時点では補足できないエラーとして、詳細は返さずエラーとする
+            Log::error($e);
+            return $this->illegalResponseErr();
+        }
 
         return;
     }
@@ -341,8 +319,17 @@ class RecordController extends Controller
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
-        // 削除
-        $record->delete();
+        try {
+            // トランザクション(例外時は自動的にロールバック)
+            DB::transaction(function () use ($record) {
+                // 削除
+                $record->delete();
+            });
+        } catch (\Exception  $e) {
+            // この時点では補足できないエラーとして、詳細は返さずエラーとする
+            Log::error($e);
+            return $this->illegalResponseErr();
+        }
 
         return;
     }
@@ -365,7 +352,7 @@ class RecordController extends Controller
      *
      * @return array ルール
      */
-    private function rulesForInput(?Request $request)
+    private function rulesForInput()
     {
 
         $rules = array();
@@ -374,7 +361,7 @@ class RecordController extends Controller
         $validationRoomList =  function ($attribute, $value, $fail) {
 
             // 校舎リストを取得
-            $rooms = $this->mdlGetRoomList(false);
+            $rooms = $this->mdlGetRoomList(true);
             if (!isset($rooms[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));

@@ -212,8 +212,8 @@ class TutorMngController extends Controller
 
             // ステータスコードとインデックスを合わせるため整形
             $statusGroup = [];
-            foreach ($statusList as $statusList) {
-                $statusGroup[$statusList->code] = $statusList->code;
+            foreach ($statusList as $status) {
+                $statusGroup[$status->code] = $status->code;
             }
 
             foreach ($group as $val) {
@@ -791,6 +791,8 @@ class TutorMngController extends Controller
 
             // 既存の講師情報を取得
             $tutor = Tutor::where('tutor_id', $request['tutor_id'])
+                // 教室管理者の場合、自分の校舎の講師のみにガードを掛ける
+                ->where($this->guardRoomAdminTableWithTid())
                 // 該当データがない場合はエラーを返す
                 ->firstOrFail();
 
