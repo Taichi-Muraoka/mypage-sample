@@ -22,6 +22,7 @@ use App\Models\Notice;
 use App\Models\NoticeDestination;
 use App\Mail\ExtraLessonAcceptToStudent;
 use App\Mail\ExtraLessonAcceptToTutor;
+use App\Models\StudentCampus;
 
 /**
  * 追加授業申請受付 - コントローラ
@@ -337,6 +338,17 @@ class ExtraLessonMngController extends Controller
     {
         // IDのバリデーション
         $this->validateIds($sid);
+
+        // 校舎コードのバリデーション
+        // パラメータの校舎コードが当該生徒の所属校舎と一致するか
+        $exists = StudentCampus::where('student_id', $sid)
+            ->where('campus_cd', $campusCd)
+            ->exists();
+
+        if (!$exists) {
+            // 存在しないならエラー
+            return $this->illegalResponseErr();
+        }
 
         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
         $this->guardRoomAdminRoomcd($campusCd);
