@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Log;
 use App\Models\Conference;
 use App\Models\ConferenceDate;
 
@@ -173,7 +174,7 @@ class ConferenceController extends Controller
 
             if (strtotime($request_datetime) < strtotime($today)) {
                 // 日時チェックエラー
-                return $fail(Lang::get('validation.invalid_input'));
+                return $fail(Lang::get('validation.after_or_equal_time'));
             }
         };
         $validationDateTime3 = function ($attribute, $value, $fail) use ($request) {
@@ -183,7 +184,7 @@ class ConferenceController extends Controller
 
             if (strtotime($request_datetime) < strtotime($today)) {
                 // 日時チェックエラー
-                return $fail(Lang::get('validation.invalid_input'));
+                return $fail(Lang::get('validation.after_or_equal_time'));
             }
         };
 
