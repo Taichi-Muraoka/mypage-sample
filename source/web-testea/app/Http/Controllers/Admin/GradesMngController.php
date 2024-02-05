@@ -6,11 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Score;
-use App\Models\ScoreDetail;
-use Illuminate\Support\Facades\DB;
 use App\Consts\AppConst;
 use App\Http\Controllers\Traits\FuncGradesTrait;
-use Carbon\Carbon;
 
 /**
  * 生徒成績 - コントローラ
@@ -27,7 +24,8 @@ class GradesMngController extends Controller
      * @return void
      */
     public function __construct()
-    { }
+    {
+    }
 
     //==========================
     // 一覧
@@ -132,7 +130,7 @@ class GradesMngController extends Controller
      */
     public function getDataSelect(Request $request)
     {
-        // reバリデーション
+        // バリデーション
         $this->validateIdsFromRequest($request, 'exam_type', 'school_kind');
 
         $count = $this->getDisplayCount($request->exam_type, $request->school_kind);
@@ -212,39 +210,8 @@ class GradesMngController extends Controller
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        // トランザクション(例外時は自動的にロールバック)
-        DB::transaction(function () use ($request) {
-
-            $score = new Score;
-            // 共通保存項目
-            $score->student_id = $request->student_id;
-            $score->exam_type =  $request['exam_type'];
-            $score->grade_cd =  $request['grade_cd'];
-            $score->student_comment = $request['student_comment'];
-            $score->regist_date = Carbon::now();
-
-            // 試験種別によって保存項目分岐
-            if ($request['exam_type'] == AppConst::CODE_MASTER_43_0) {
-                // 模試
-                $score->practice_exam_name = $request['practice_exam_name'];
-                $score->exam_date = $request['exam_date'];
-            }
-            if ($request['exam_type'] == AppConst::CODE_MASTER_43_1) {
-                // 定期考査
-                $score->regular_exam_cd = $request['regular_exam_cd'];
-                $score->exam_date = $request['exam_date'];
-            }
-            if ($request['exam_type'] == AppConst::CODE_MASTER_43_2) {
-                // 評定
-                $score->term_cd = $request['term_cd'];
-            }
-
-            // Scoreテーブルへのinsert
-            $score->save();
-
-            // ScoreDetailテーブルへのinsert
-            $this->saveToScoreDetail($request, $score->score_id);
-        });
+        // Traitにて生徒成績データの登録
+        $this->saveToScore($request);
 
         return;
     }
@@ -262,8 +229,8 @@ class GradesMngController extends Controller
 
         // クエリを作成(PKでユニークに取る)
         $score = Score::where('score_id', $gradesId)
-            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-            ->where($this->guardRoomAdminTableWithRoomCd())
+            // 教室管理者の場合、自教室の生徒のみにガードを掛ける
+            ->where($this->guardRoomAdminTableWithSid())
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
@@ -322,62 +289,8 @@ class GradesMngController extends Controller
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
-        // クエリを作成
-        $query = Score::query();
-
-        // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
-        $query->where($this->guardRoomAdminTableWithSid());
-
-        $score = $query
-            // 対象データを取得(PKでユニークに取る)
-            ->where('score_id', $request['score_id'])
-            // MEMO: 取得できない場合はエラーとする
-            ->firstOrFail();
-
-        // トランザクション(例外時は自動的にロールバック)
-        DB::transaction(function () use ($request, $score) {
-
-            // 共通保存項目
-            $score->exam_type =  $request['exam_type'];
-            $score->student_comment = $request['student_comment'];
-            $score->regist_date = $request['regist_date'];
-
-            // 試験種別によって保存項目分岐
-            // 編集時に試験種別を変更した場合に対応し、明示的にnullを保存する
-            if ($request['exam_type'] == AppConst::CODE_MASTER_43_0) {
-                // 模試
-                $score->regular_exam_cd = null;
-                $score->practice_exam_name = $request['practice_exam_name'];
-                $score->term_cd = null;
-                $score->exam_date = $request['exam_date'];
-            }
-            if ($request['exam_type'] == AppConst::CODE_MASTER_43_1) {
-                // 定期考査
-                $score->regular_exam_cd = $request['regular_exam_cd'];
-                $score->practice_exam_name = null;
-                $score->term_cd = null;
-                $score->exam_date = $request['exam_date'];
-            }
-            if ($request['exam_type'] == AppConst::CODE_MASTER_43_2) {
-                // 評定
-                $score->regular_exam_cd = null;
-                $score->practice_exam_name = null;
-                $score->term_cd = $request['term_cd'];
-                $score->exam_date = null;
-            }
-
-            $score->save();
-
-            // ScoreDatailテーブルの更新
-            // MEMO: updateではなく、forceDelete・insertとする
-
-            // 成績IDに紐づく成績詳細を全て削除（forceDelete）
-            ScoreDetail::where('score_id', $request['score_id'])
-                ->forceDelete();
-
-            // ScoreDetailテーブルへのinsert
-            $this->saveToScoreDetail($request, $score->score_id);
-        });
+        // Traitにて生徒成績データの更新
+        $this->updateToScore($request);
 
         return;
     }
@@ -390,31 +303,8 @@ class GradesMngController extends Controller
      */
     public function delete(Request $request)
     {
-        // IDのバリデーション
-        $this->validateIdsFromRequest($request, 'score_id');
-
-        // クエリを作成
-        $query = Score::query();
-
-        // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
-        $query->where($this->guardRoomAdminTableWithSid());
-
-        $score = $query
-            // 対象データを取得(PKでユニークに取る)
-            ->where('score_id', $request['score_id'])
-            // MEMO: 取得できない場合はエラーとする
-            ->firstOrFail();
-
-        // トランザクション(例外時は自動的にロールバック)
-        DB::transaction(function () use ($score) {
-            // ScoreDatailテーブルのdelete
-            // 成績IDに紐づく成績詳細を全て削除(論理削除)
-            ScoreDetail::where('score_id', $score->score_id)
-                ->delete();
-
-            // Scoreテーブルのdelete
-            $score->delete();
-        });
+        // Traitにて削除処理
+        $this->deleteScore($request);
 
         return;
     }
@@ -440,46 +330,8 @@ class GradesMngController extends Controller
      */
     private function rulesForInput(?Request $request)
     {
-        $rules = array();
-
-        // 独自バリデーション: リストのチェック 試験種別
-        $validationExamTypeList =  function ($attribute, $value, $fail) {
-
-            return $this->validationExamTypeList($value, $fail);
-        };
-
-        // 独自バリデーション: リストのチェック 定期考査名
-        $validationTeikiNameList =  function ($attribute, $value, $fail) use ($request) {
-
-            return $this->validationTeikiNameList($request, $value, $fail);
-        };
-
-        // 独自バリデーション: 生徒成績の存在チェック(1件以上)
-        $validationScoreDetail = function ($attribute, $value, $parameters) use ($request) {
-
-            return $this->validationScoreDetail($request);
-        };
-
-        // 全種別共通
-        $rules += Score::fieldRules('exam_type', ['required', $validationExamTypeList]);
-        // Laravelの独自バリデーションは、空白の時は呼んでくれないので、
-        // 今回のように存在チェックの場合は、以下のように指定し空の場合も呼んでもらう
-        Validator::extendImplicit('array_required', $validationScoreDetail);
-
-        // 模試・定期考査
-        $rules += Score::fieldRules('exam_date', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_0 . ',' . AppConst::CODE_MASTER_43_1]);
-
-        // 模試
-        $rules += Score::fieldRules('practice_exam_name', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_0]);
-
-        // 定期考査
-        $rules += Score::fieldRules('regular_exam_cd', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_1, $validationTeikiNameList]);
-
-        // 評定
-        $rules += Score::fieldRules('term_cd', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_2]);
-
-        // 成績欄のルールを取得する
-        $rules = $this->setRulesForScoreDetail($rules, $request);
+        // Traitにてルールを取得する
+        $rules = $this->setRulesForScore($request);
 
         return $rules;
     }

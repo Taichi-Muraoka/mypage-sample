@@ -11,12 +11,16 @@ use App\Models\MstCampus;
 use App\Models\MstSubject;
 use App\Models\Student;
 use App\Models\CodeMaster;
+use App\Http\Controllers\Traits\CtrlDateTrait;
 
 /**
  * 欠席申請 - 機能共通処理
  */
 trait FuncAbsentTrait
 {
+    // 欠席連絡可能スケジュール取得用
+    use CtrlDateTrait;
+
     /**
      * 生徒のスケジュールを取得する
      *
@@ -25,18 +29,7 @@ trait FuncAbsentTrait
     private function getStudentSchedule($sid)
     {
         // 画面表示時の時間を基準に、欠席連絡可能な授業を判定する
-        $nowTime = date('H:i');
-        $fromDate = null;
-        $toDate = null;
-        if ($nowTime < '22:00') {
-            // 現在時刻が22時までは、翌日～翌日より1ヶ月先
-            $fromDate = date('Y/m/d', strtotime('+1 day'));
-            $toDate = date('Y/m/d', strtotime('+1 day +1 month'));
-        } else {
-            // 現在時刻が22時以降は、翌々日～翌々日より1ヶ月先
-            $fromDate = date('Y/m/d', strtotime('+2 day'));
-            $toDate = date('Y/m/d', strtotime('+2 day +1 month'));
-        }
+        $targetPeriod = $this->dtGetTargetDateFromTo();
 
         // 生徒IDに紐づくスケジュール（1対多授業）を取得する。
         $query = Schedule::query();
@@ -59,7 +52,8 @@ trait FuncAbsentTrait
             ->where('mst_courses.course_kind', AppConst::CODE_MASTER_42_2)
             ->where('class_members.student_id', '=', $sid)
             ->where('class_members.absent_status', '=', AppConst::CODE_MASTER_35_0)
-            ->whereBetween('schedules.target_date', [$fromDate, $toDate])
+            // 上記で取得した対象期間で絞る
+            ->whereBetween('schedules.target_date', [$targetPeriod['from_date'], $targetPeriod['to_date']])
             ->orderBy('schedules.target_date', 'asc')
             ->orderBy('schedules.period_no', 'asc')
             ->get();
@@ -116,6 +110,11 @@ trait FuncAbsentTrait
      */
     private function getAbsentApplyDetail($query)
     {
+        // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+        // AbsentApplicationは校舎コードを持っていないので、Scheduleのモデルを指定する
+        $model = new Schedule;
+        $query->where($this->guardRoomAdminTableWithRoomCd($model));
+
         $absentApply = $query
             ->select(
                 'absent_applications.absent_apply_id',
