@@ -831,7 +831,7 @@ class ConferenceAcceptController extends Controller
 
             if (strtotime($request_datetime) < strtotime($today)) {
                 // 日時チェックエラー
-                return $fail(Lang::get('現在日時より後の日時を指定してください。'));
+                return $fail(Lang::get('validation.after_or_equal_time'));
             }
         };
 

@@ -49,7 +49,7 @@
         </tr>
         <tr>
             <th>特記事項</th>
-            <td>{!! nl2br($comment) !!}</td>
+            <td class="nl2br">{{$comment}}</td>
         </tr>
     </x-bs.table>
     {{-- 余白 --}}

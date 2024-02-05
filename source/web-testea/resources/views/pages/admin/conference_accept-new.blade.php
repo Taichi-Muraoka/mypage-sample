@@ -21,7 +21,7 @@
         :select2Search=false emptyValue="-1"/>
     @endcan
 
-    <x-input.select caption="ブース" id="booth_cd" :select2=true :editData=$editData :select2Search=false>
+    <x-input.select vShow="form.campus_cd != -1" caption="ブース" id="booth_cd" :select2=true :editData=$editData :select2Search=false>
         {{-- vueで動的にプルダウンを作成 --}}
         <option v-for="item in selectGetItem.selectLists" :value="item.code">
             @{{ item.value }}
