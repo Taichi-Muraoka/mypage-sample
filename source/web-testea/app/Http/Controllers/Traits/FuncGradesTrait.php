@@ -10,7 +10,10 @@ use App\Models\Score;
 use App\Models\ScoreDetail;
 use App\Models\MstGradeSubject;
 use App\Libs\AuthEx;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * 生徒成績 - 機能共通処理
@@ -346,6 +349,135 @@ trait FuncGradesTrait
     }
 
     /**
+     * 生徒成績情報へ登録
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return object
+     */
+    private function saveToScore($request)
+    {
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($request) {
+            // --------------------
+            // Scoreテーブルへの保存
+            // --------------------
+            $score = new Score;
+
+            // 共通保存項目
+            $score->student_id = $request->student_id;
+            $score->exam_type =  $request['exam_type'];
+            $score->grade_cd =  $request['grade_cd'];
+            $score->student_comment = $request['student_comment'];
+            $score->regist_date = Carbon::now();
+
+            // 試験種別によって保存項目分岐
+            if ($request['exam_type'] == AppConst::CODE_MASTER_43_0) {
+                // 模試
+                $score->practice_exam_name = $request['practice_exam_name'];
+                $score->exam_date = $request['exam_date'];
+            }
+            if ($request['exam_type'] == AppConst::CODE_MASTER_43_1) {
+                // 定期考査
+                $score->regular_exam_cd = $request['regular_exam_cd'];
+                $score->exam_date = $request['exam_date'];
+            }
+            if ($request['exam_type'] == AppConst::CODE_MASTER_43_2) {
+                // 評定
+                $score->term_cd = $request['term_cd'];
+            }
+
+            $score->save();
+
+            // --------------------
+            // ScoreDetailテーブルへの保存
+            // --------------------
+            $this->saveToScoreDetail($request, $score->score_id);
+        });
+
+        return;
+    }
+
+    /**
+     * 生徒成績情報の更新
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     */
+    private function updateToScore($request)
+    {
+        // -----------------------------
+        // 更新対象の生徒成績を取得する
+        // -----------------------------
+        $query = Score::query();
+
+        if (AuthEx::isAdmin()) {
+            // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithSid());
+        }
+        if (AuthEx::isStudent()) {
+            // 生徒の場合、自分の生徒IDのみにガードを掛ける
+            $query->where($this->guardStudentTableWithSid());
+        }
+
+        $score = $query
+            ->where('score_id', $request['score_id'])
+            ->firstOrFail();
+
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($request, $score) {
+            // -----------------------------
+            // Scoreテーブルの更新
+            // -----------------------------
+            // 共通保存項目
+            $score->exam_type =  $request['exam_type'];
+            $score->student_comment = $request['student_comment'];
+
+            // 管理者のみ更新可能な項目
+            if (AuthEx::isAdmin()) {
+                $score->regist_date = $request['regist_date'];
+            }
+
+            // 試験種別によって保存項目分岐
+            // 編集時に試験種別を変更した場合に対応し、明示的にnullを保存する
+            if ($request['exam_type'] == AppConst::CODE_MASTER_43_0) {
+                // 模試
+                $score->regular_exam_cd = null;
+                $score->practice_exam_name = $request['practice_exam_name'];
+                $score->term_cd = null;
+                $score->exam_date = $request['exam_date'];
+            }
+            if ($request['exam_type'] == AppConst::CODE_MASTER_43_1) {
+                // 定期考査
+                $score->regular_exam_cd = $request['regular_exam_cd'];
+                $score->practice_exam_name = null;
+                $score->term_cd = null;
+                $score->exam_date = $request['exam_date'];
+            }
+            if ($request['exam_type'] == AppConst::CODE_MASTER_43_2) {
+                // 評定
+                $score->regular_exam_cd = null;
+                $score->practice_exam_name = null;
+                $score->term_cd = $request['term_cd'];
+                $score->exam_date = null;
+            }
+
+            $score->save();
+
+            // -----------------------------
+            // ScoreDetailテーブルの更新
+            // updateではなく、forceDelete・insertとする
+            // -----------------------------
+            // 成績IDに紐づく成績詳細を全て削除（forceDelete）
+            ScoreDetail::where('score_id', $score->score_id)
+                ->forceDelete();
+
+            // ScoreDetailテーブルへのinsert
+            $this->saveToScoreDetail($request, $score->score_id);
+        });
+
+        return;
+    }
+
+    /**
      * 生徒成績詳細情報へ登録
      *
      * @param \Illuminate\Http\Request $request リクエスト
@@ -391,6 +523,54 @@ trait FuncGradesTrait
                 $scoreDetail->save();
             }
         }
+
+        return;
+    }
+
+    /**
+     * 生徒成績・生徒成績詳細情報の削除
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array
+     */
+    private function deleteScore($request)
+    {
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request, 'score_id');
+
+        // -----------------------------
+        // 削除対象の生徒成績を取得
+        // -----------------------------
+        $query = Score::query();
+
+        if (AuthEx::isAdmin()) {
+            // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithSid());
+        }
+        if (AuthEx::isStudent()) {
+            // 生徒の場合、自分の生徒IDのみにガードを掛ける
+            $query->where($this->guardStudentTableWithSid());
+        }
+
+        $score = $query
+            ->where('score_id', $request['score_id'])
+            ->firstOrFail();
+
+        // -----------------------------
+        // 削除
+        // -----------------------------
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($score) {
+            // ScoreDatailテーブルのdelete
+            // 成績IDに紐づく成績詳細を全て削除(論理削除)
+            ScoreDetail::where('score_id', $score->score_id)
+                ->delete();
+
+            // Scoreテーブルのdelete
+            $score->delete();
+        });
+
+        return;
     }
 
     //==========================
@@ -461,7 +641,60 @@ trait FuncGradesTrait
     }
 
     /**
-     * 生徒成績のルールをセット
+     * 生徒成績のルールをセット（詳細欄も含んだ全体）
+     *
+     * @param $request
+     */
+    function setRulesForScore($request)
+    {
+        // 独自バリデーション: リストのチェック 試験種別
+        $validationExamTypeList =  function ($attribute, $value, $fail) {
+            return $this->validationExamTypeList($value, $fail);
+        };
+
+        // 独自バリデーション: リストのチェック 定期考査名
+        $validationTeikiNameList =  function ($attribute, $value, $fail) use ($request) {
+            return $this->validationTeikiNameList($request, $value, $fail);
+        };
+
+        // 独自バリデーション: 生徒成績の存在チェック(1件以上)
+        $validationScoreDetail = function ($attribute, $value, $parameters) use ($request) {
+            return $this->validationScoreDetail($request);
+        };
+
+        // --------------------------
+        // 生徒成績のルールセット
+        // --------------------------
+        $rules = array();
+        $rules += Score::fieldRules('exam_type', ['required', $validationExamTypeList]);
+        // 模試・定期考査で必須
+        $rules += Score::fieldRules('exam_date', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_0 . ',' . AppConst::CODE_MASTER_43_1]);
+        // 模試で必須
+        $rules += Score::fieldRules('practice_exam_name', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_0]);
+        // 定期考査で必須
+        $rules += Score::fieldRules('regular_exam_cd', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_1, $validationTeikiNameList]);
+        // 評定で必須
+        $rules += Score::fieldRules('term_cd', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_2]);
+        // 生徒画面で必須
+        if (AuthEx::isStudent()) {
+            $rules += Score::fieldRules('student_comment', ['required']);
+        }
+
+        // --------------------------
+        // 生徒成績詳細のルールセット
+        // --------------------------
+        // Laravelの独自バリデーションは、空白の時は呼んでくれないので、
+        // 今回のように存在チェックの場合は、以下のように指定し空の場合も呼んでもらう
+        Validator::extendImplicit('array_required', $validationScoreDetail);
+
+        // 生徒成績詳細のルールを取得する
+        $rules = $this->setRulesForScoreDetail($rules, $request);
+
+        return $rules;
+    }
+
+    /**
+     * 生徒成績詳細のルールをセット
      *
      * @param $rules
      */
