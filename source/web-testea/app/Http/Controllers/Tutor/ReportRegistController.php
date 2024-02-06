@@ -19,6 +19,7 @@ use App\Models\CodeMaster;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Traits\FuncReportTrait;
 use App\Models\MstSystem;
 
@@ -604,6 +605,8 @@ class ReportRegistController extends Controller
             ->whereNull('schedules.report_id')
             // 運用開始日以降に絞り込み
             ->where('schedules.target_date', '>=', $year_start_date->value_date)
+            // システム日付以前
+            ->where('schedules.target_date', '<=', now())
             ->orderBy('target_date', 'desc')->orderBy('period_no', 'asc')
             ->get();
 
