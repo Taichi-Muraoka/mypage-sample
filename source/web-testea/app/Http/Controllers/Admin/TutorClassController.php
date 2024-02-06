@@ -11,8 +11,6 @@ use App\Models\Schedule;
 use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\UrlWindow;
 use Carbon\Carbon;
 
 /**
@@ -47,10 +45,10 @@ class TutorClassController extends Controller
         $rooms = $this->mdlGetRoomList(false);
 
         // 先月初日
-        $first_date = date('Y/m/01', strtotime('-1 month'));
+        $first_date = date('Y/m/d', strtotime('first day of previous month'));
 
         // 今月末日
-        $last_date = date('Y/m/t', strtotime('-1 month'));
+        $last_date = date('Y/m/d', strtotime('last day of previous month'));
 
         $editData = [
             'target_date_from' => $first_date,
@@ -75,41 +73,6 @@ class TutorClassController extends Controller
         // バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForSearch($request))->validate();
 
-        // 初期表示は処理を行わず、空のページネーターを返す
-        if ($request['target_date_from'] == null && $request['target_date_to'] == null) {
-            // 1ページあたりの件数
-            $countPage = config('appconf.page_count');
-
-            // ページャへのパラメータを固定で設定
-            $page = 1;
-            $items = null;
-            $itemCount = 0;
-
-            // ページャ取得
-            $paginator = new LengthAwarePaginator(
-                // 表示するデータ
-                $items,
-                // 件数
-                $itemCount,
-                // 1ページあたりの件数
-                $countPage,
-                // 現在のページ数
-                $page,
-            );
-
-            // ページャを取得する
-            $window = UrlWindow::make($paginator);
-            $elements = array_filter([
-                $window['first'],
-                is_array($window['slider']) ? '...' : null,
-                $window['slider'],
-                is_array($window['last']) ? '...' : null,
-                $window['last'],
-            ]);
-
-            return ['paginator' => $paginator, 'elements' => $elements];
-        }
-
         // formを取得
         $form = $request->all();
 
@@ -117,7 +80,9 @@ class TutorClassController extends Controller
         $query = Schedule::query()
             ->where('tentative_status', AppConst::CODE_MASTER_36_0)
             ->whereNotNull('tutor_id')
-            ->whereIn('absent_status', [AppConst::CODE_MASTER_35_0]);
+            ->where('absent_status', AppConst::CODE_MASTER_35_0)
+            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+            ->where($this->guardRoomAdminTableWithRoomCd());
 
         // 校舎コード選択による絞り込み条件
         if (isset($form['campus_cd']) && filled($form['campus_cd'])) {
@@ -130,26 +95,29 @@ class TutorClassController extends Controller
         $query->SearchTargetDateTo($form);
 
         // スケジュール情報取得し、授業時間カウントのサブクエリを作成
-        $course_sub_query = DB::table($query)
+        $course_sub_query = DB::table($query, 'schedules')
             ->select(
-                'tutor_id',
-                'course_cd',
+                'schedules.tutor_id',
+                'schedules.course_cd',
+                'mst_courses.summary_kind as summary_kind'
             )
             ->selectRaw('SUM(minites) as sum_minites')
-            ->groupBy('tutor_id', 'course_cd');
+            // コースマスタとJoin
+            ->leftJoin('mst_courses', 'schedules.course_cd', '=', 'mst_courses.course_cd')
+            ->groupBy('schedules.tutor_id', 'schedules.course_cd', 'summary_kind');
 
         // コース別時間集計
         $course_count = DB::table($course_sub_query)
             ->select(
                 'tutor_id'
             )
-            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS personal_min', [AppConst::COURSE_CD_10100])
-            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS two_min', [AppConst::COURSE_CD_10200])
-            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS three_min', [AppConst::COURSE_CD_10300])
-            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS home_min', [AppConst::COURSE_CD_10400])
-            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS exercise_min', [AppConst::COURSE_CD_10500])
-            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS high_min', [AppConst::COURSE_CD_10600])
-            ->selectRaw('MAX(CASE WHEN course_cd = ? THEN sum_minites ELSE 0 END) AS group_min', [AppConst::COURSE_CD_20100])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS personal_min', [AppConst::CODE_MASTER_25_1])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS two_min', [AppConst::CODE_MASTER_25_2])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS three_min', [AppConst::CODE_MASTER_25_3])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS home_min', [AppConst::CODE_MASTER_25_5])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS exercise_min', [AppConst::CODE_MASTER_25_6])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS high_min', [AppConst::CODE_MASTER_25_7])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS group_min', [AppConst::CODE_MASTER_25_4])
             ->selectRaw('0 as normal_sub_get')
             ->selectRaw('0 as emergency_sub_get')
             ->selectRaw('0 as normal_sub_out')
@@ -361,7 +329,11 @@ class TutorClassController extends Controller
         // 講師ID取得
         $tutor_id = $request->input('tutor_id');
 
+        // クエリ作成
         $query = Schedule::query();
+
+        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        $query->where($this->guardRoomAdminTableWithRoomCd());
 
         // 校舎コード選択による絞り込み条件
         if ($request->input('campus_cd') != null) {
@@ -385,10 +357,10 @@ class TutorClassController extends Controller
             )
             ->where('tutor_id', '=', $tutor_id)
             ->where('lesson_kind', '=', AppConst::CODE_MASTER_31_5)
-            ->where('schedules.tentative_status', 0)
+            ->where('schedules.tentative_status', AppConst::CODE_MASTER_36_0)
             ->whereNotNull('schedules.tutor_id')
             ->whereNull('schedules.deleted_at')
-            ->whereIn('schedules.absent_status', [0])
+            ->where('schedules.absent_status', AppConst::CODE_MASTER_35_0)
             // 生徒名を取得
             ->sdLeftJoin(Student::class, 'schedules.student_id', '=', 'students.student_id')
             // コードマスターとJOIN
@@ -401,18 +373,5 @@ class TutorClassController extends Controller
         return [
             'schedules' => $schedules
         ];
-    }
-
-    /**
-     * 分を時間に変換
-     *
-     * @param 授業時間(分)
-     * @return 授業時間(時間)
-     */
-    public function conversion_time($minites)
-    {
-        $time = floor($minites / 60 * 10) / 10;
-
-        return $time;
     }
 }

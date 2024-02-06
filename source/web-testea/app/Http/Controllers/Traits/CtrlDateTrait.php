@@ -182,4 +182,17 @@ trait CtrlDateTrait
             'to_date' => $toDate
         ];
     }
+
+    /**
+     * 分を時間に変換
+     *
+     * @param 授業時間(分)
+     * @return 授業時間(時間)
+     */
+    protected function conversion_time($minites)
+    {
+        $time = floor($minites / 60 * 10) / 10;
+
+        return $time;
+    }
 }
