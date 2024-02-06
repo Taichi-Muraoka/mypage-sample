@@ -16,7 +16,6 @@
         :select2Search=false :blank=true />
 
     {{-- 第１希望日 --}}
-    {{-- id="preferred_date" --}}
     <x-bs.card>
         <x-input.date-picker caption="第１希望日" id="conference_date" :editData=$editData />
 
@@ -37,8 +36,7 @@
         <x-input.time-picker caption="開始時刻" id="start_time3" :rules=$rules :editData=$editData />
     </x-bs.card>
 
-    その他特記事項などありましたらご記載ください。
-    {{-- id="notices" 特記事項 --}}
+    <p>その他特記事項などありましたらご記載ください。</p>
     <x-input.textarea caption="" id="comment" :rules=$rules />
 
     {{-- フッター --}}
