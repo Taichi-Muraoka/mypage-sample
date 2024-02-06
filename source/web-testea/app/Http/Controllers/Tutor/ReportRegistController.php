@@ -216,8 +216,6 @@ class ReportRegistController extends Controller
             ->orderby('lesson_date', 'desc')
             ->orderby('period_no', 'desc');
 
-        $this->debug($myStudents);
-
         // ページネータで返却
         return $this->getListAndPaginator($request, $reports);
     }
