@@ -20,6 +20,7 @@ use App\Consts\AppConst;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Traits\FuncReportTrait;
+use App\Models\MstSystem;
 
 /**
  * 授業報告書 - コントローラ
@@ -29,6 +30,18 @@ class ReportRegistController extends Controller
 
     // 機能共通処理：授業報告
     use FuncReportTrait;
+
+    /**
+     * 授業のフラグ
+     */
+    // 編集データの場合
+    const REPORT_FLAG_0 = 0;
+
+    // レギュラー授業で前回の授業報告書が存在する
+    const REPORT_FLAG_1 = 1;
+
+    // レギュラー授業じゃない場合
+    const REPORT_FLAG_2 = 2;
 
     /**
      * コンストラクタ
@@ -53,8 +66,8 @@ class ReportRegistController extends Controller
         // 校舎リストを取得
         $rooms = $this->mdlGetRoomList(false);
 
-        // コースリストを取得
-        $courses = $this->mdlGetCourseList();
+        // コースリストを取得（面談を除外）
+        $courses = $this->mdlGetCourseList(null, AppConst::CODE_MASTER_42_3);
 
         // 報告書承認リストを取得（サブコード指定で絞り込み）
         $subCodes = [AppConst::CODE_MASTER_4_SUB_1];
@@ -202,6 +215,8 @@ class ReportRegistController extends Controller
             ->distinct()
             ->orderby('lesson_date', 'desc')
             ->orderby('period_no', 'desc');
+
+        $this->debug($myStudents);
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $reports);
@@ -431,69 +446,71 @@ class ReportRegistController extends Controller
         $last_data = [];
 
         // レギュラー授業だった場合前回の授業報告書内容を取得
-        // ※レギュラ授業かつ、前回の授業報告書が存在するかつ、授業報告書IDが存在しないもの
-        // ※授業報告書IDが存在しないものを条件に入れないと編集データに前回報告書がきてしまう
-        if ($lesson->regular_class_id != null and $exists and $lesson->report_id == null) {
-            // 前回授業を取得
-            $last_lesson = Schedule::query()
-                ->where('schedules.regular_class_id', '=', $lesson->regular_class_id)
-                // 授業報告書IDがあるもの
-                ->whereNotNull('report_id')
-                // 最新の授業日
-                ->latest('target_date')
-                ->first();
+        if ($lesson->regular_class_id != null) {
+            // 前回の授業報告書が存在するかつ、授業報告書IDが存在しないもの
+            // ※授業報告書IDが存在しないものを条件に入れないと編集データに前回報告書がきてしまう
+            if ($exists and $lesson->report_id == null) {
+                // 前回授業を取得
+                $last_lesson = Schedule::query()
+                    ->where('schedules.regular_class_id', '=', $lesson->regular_class_id)
+                    // 授業報告書IDがあるもの
+                    ->whereNotNull('report_id')
+                    // 最新の授業日
+                    ->latest('target_date')
+                    ->first();
 
-            // データを取得
-            $report = $this->getReport($last_lesson->report_id);
+                // データを取得
+                $report = $this->getReport($last_lesson->report_id);
 
-            $last_data += [
-                // 前回のレギュラー授業がある場合のフラグ
-                'flag' => 1,
-                'lesson_report_id' => $lesson->report_id,
-                'schedule_id' => $last_lesson->schedule_id,
-                'report_id' => $report->report_id,
-                'regular_class_id' => $lesson->regular_class_id,
-                'last_regular_class_id' => $last_lesson->regular_class_id,
-                'monthly_goal' => $report->monthly_goal,
-            ];
-            // 教材単元情報を取得（サブコード毎に取得する）
-            foreach (AppConst::REPORT_SUBCODES as $subCode) {
-                if ($subCode == AppConst::REPORT_SUBCODE_3) {
-                    break;
-                }
-                $unit_exists = ReportUnit::where('report_units.report_id', '=', $report->report_id)
-                    ->where('report_units.sub_cd', '=', $subCode)
-                    ->exists();
-                if ($unit_exists) {
-                    // データがある場合のみlast_dataにセット
-                    $report_unit = $this->getReportUnit($report->report_id, $subCode);
-                    $last_data += [
-                        'text_cd_' . $subCode => $report_unit->text_cd,
-                        'text_name_' . $subCode => $report_unit->free_text_name,
-                        'text_page_' . $subCode => $report_unit->text_page1,
-                        'unit_category_cd1_' . $subCode => $report_unit->unit_category_cd1,
-                        'unit_category_cd2_' . $subCode => $report_unit->unit_category_cd2,
-                        'unit_category_cd3_' . $subCode => $report_unit->unit_category_cd3,
-                        'unit_cd1_' . $subCode => $report_unit->unit_cd1,
-                        'unit_cd2_' . $subCode => $report_unit->unit_cd2,
-                        'unit_cd3_' . $subCode => $report_unit->unit_cd3,
-                        'category_name1_' . $subCode => $report_unit->free_category_name1,
-                        'category_name2_' . $subCode => $report_unit->free_category_name2,
-                        'category_name3_' . $subCode => $report_unit->free_category_name3,
-                        'unit_name1_' . $subCode => $report_unit->free_unit_name1,
-                        'unit_name2_' . $subCode => $report_unit->free_unit_name2,
-                        'unit_name3_' . $subCode => $report_unit->free_unit_name3,
-                    ];
+                $last_data += [
+                    // 前回のレギュラー授業がある場合のフラグ
+                    'flag' => self::REPORT_FLAG_1,
+                    'lesson_report_id' => $lesson->report_id,
+                    'schedule_id' => $last_lesson->schedule_id,
+                    'report_id' => $report->report_id,
+                    'regular_class_id' => $lesson->regular_class_id,
+                    'last_regular_class_id' => $last_lesson->regular_class_id,
+                    'monthly_goal' => $report->monthly_goal,
+                ];
+                // 教材単元情報を取得（サブコード毎に取得する）
+                foreach (AppConst::REPORT_SUBCODES as $subCode) {
+                    if ($subCode == AppConst::REPORT_SUBCODE_3) {
+                        break;
+                    }
+                    $unit_exists = ReportUnit::where('report_units.report_id', '=', $report->report_id)
+                        ->where('report_units.sub_cd', '=', $subCode)
+                        ->exists();
+                    if ($unit_exists) {
+                        // データがある場合のみlast_dataにセット
+                        $report_unit = $this->getReportUnit($report->report_id, $subCode);
+                        $last_data += [
+                            'text_cd_' . $subCode => $report_unit->text_cd,
+                            'text_name_' . $subCode => $report_unit->free_text_name,
+                            'text_page_' . $subCode => $report_unit->text_page1,
+                            'unit_category_cd1_' . $subCode => $report_unit->unit_category_cd1,
+                            'unit_category_cd2_' . $subCode => $report_unit->unit_category_cd2,
+                            'unit_category_cd3_' . $subCode => $report_unit->unit_category_cd3,
+                            'unit_cd1_' . $subCode => $report_unit->unit_cd1,
+                            'unit_cd2_' . $subCode => $report_unit->unit_cd2,
+                            'unit_cd3_' . $subCode => $report_unit->unit_cd3,
+                            'category_name1_' . $subCode => $report_unit->free_category_name1,
+                            'category_name2_' . $subCode => $report_unit->free_category_name2,
+                            'category_name3_' . $subCode => $report_unit->free_category_name3,
+                            'unit_name1_' . $subCode => $report_unit->free_unit_name1,
+                            'unit_name2_' . $subCode => $report_unit->free_unit_name2,
+                            'unit_name3_' . $subCode => $report_unit->free_unit_name3,
+                        ];
+                    }
                 }
             }
         }
         else if ($exists != true) {
             // レギュラー授業じゃない場合
-            $last_data += ['flag' => 2];
+            $last_data += ['flag' => self::REPORT_FLAG_2];
         }
         else {
             // 編集データ
-            $last_data += ['flag' => 0];
+            $last_data += ['flag' => self::REPORT_FLAG_0];
         }
 
         // 教材リストを取得（授業科目コード指定）
@@ -573,28 +590,25 @@ class ReportRegistController extends Controller
      */
     public function new()
     {
-        // ログイン者の情報を取得する
-        $account = Auth::user();
-        $account_id = $account->account_id;
-
+        // クエリ作成
         $query = Schedule::query();
+
+        //  運用開始日を取得
+        $year_start_date = MstSystem::where('key_id', AppConst::SYSTEM_KEY_ID_4)
+            ->select('value_date')
+            ->firstOrFail();
 
         // 授業情報を取得
         $lessons = $query
             // 自分のアカウントIDでガードを掛ける（tid）
             ->where($this->guardTutorTableWithTid())
-            // キーの指定
-            ->where('schedules.tutor_id', '=', $account_id)
-            ->where(function ($orQuery) {
-                // 出欠・振替コードが0 実施前・出席のもののみ
-                $orQuery->where('schedules.absent_status', [AppConst::CODE_MASTER_35_0]);
-            })
-            ->where(function ($orQuery) {
-                // 授業報告書IDがNULL
-                $orQuery->orWhereNull('schedules.report_id');
-            })
-            ->where('schedules.target_date', '<=', now())
-            ->orderBy('target_date', 'asc')->orderBy('period_no', 'asc')
+            // 出欠・振替コードが0 実施前・出席のもののみ
+            ->where('schedules.absent_status', [AppConst::CODE_MASTER_35_0])
+            // 授業報告書IDがNULL
+            ->whereNull('schedules.report_id')
+            // 運用開始日以降に絞り込み
+            ->where('schedules.target_date', '>=', $year_start_date->value_date)
+            ->orderBy('target_date', 'desc')->orderBy('period_no', 'asc')
             ->get();
 
         $lesson_list = $this->mdlGetScheduleMasterList($lessons);
@@ -803,6 +817,8 @@ class ReportRegistController extends Controller
             // 授業報告書情報取得
             $report = Report::query()
                 ->where('report_id', $request->input('report_id'))
+                // 自分の講師IDのみにガードを掛ける
+                ->where($this->guardTutorTableWithTid())
                 // 該当データがない場合はエラーを返す
                 ->firstOrFail();
 
@@ -900,28 +916,39 @@ class ReportRegistController extends Controller
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'report_id');
 
-        // 対象データを取得(PKでユニークに取る)
-        $report = Report::query()
-            ->where('report_id', $request->input('report_id'))
-            // 該当データがない場合はエラーを返す
-            ->firstOrFail();
-
-        // Reportテーブルのdelete
-        $report->delete();
-
-        // 授業教材情報を削除
-        foreach (AppConst::REPORT_SUBCODES as $subCode) {
-            if (ReportUnit::where('report_units.sub_cd', '=', $subCode)
-                ->where('report_units.report_id', '=', $report->report_id)
-                ->exists()
-            ) {
-                $lesson_unit = ReportUnit::query()
-                    ->where('report_units.report_id', '=', $report->report_id)
-                    ->where('report_units.sub_cd', '=', $subCode)
+        try {
+            // トランザクション(例外時は自動的にロールバック)
+            DB::transaction(function () use ($request) {
+                // 対象データを取得(PKでユニークに取る)
+                $report = Report::query()
+                    ->where('report_id', $request->input('report_id'))
+                    // 自分の講師IDのみにガードを掛ける
+                    ->where($this->guardTutorTableWithTid())
+                    // 該当データがない場合はエラーを返す
                     ->firstOrFail();
-                // ReportUnitテーブルのdelete
-                $lesson_unit->delete();
-            }
+
+                // Reportテーブルのdelete
+                $report->delete();
+
+                // 授業教材情報を削除
+                foreach (AppConst::REPORT_SUBCODES as $subCode) {
+                    if (ReportUnit::where('report_units.sub_cd', '=', $subCode)
+                        ->where('report_units.report_id', '=', $report->report_id)
+                        ->exists()
+                    ) {
+                        $lesson_unit = ReportUnit::query()
+                            ->where('report_units.report_id', '=', $report->report_id)
+                            ->where('report_units.sub_cd', '=', $subCode)
+                            ->firstOrFail();
+                        // ReportUnitテーブルのdelete
+                        $lesson_unit->delete();
+                    }
+                }
+            });
+        } catch (\Exception  $e) {
+            // この時点では補足できないエラーとして、詳細は返さずエラーとする
+            Log::error($e);
+            return $this->illegalResponseErr();
         }
 
         return;
