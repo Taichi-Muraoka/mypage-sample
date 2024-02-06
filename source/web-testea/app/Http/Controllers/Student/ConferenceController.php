@@ -2,22 +2,16 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Consts\AppConst;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Lang;
-use App\Models\Schedule;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\Models\Conference;
 use App\Models\ConferenceDate;
-use App\Models\AbsentApply;
-use App\Models\ExtRirekisho;
-use App\Consts\AppConst;
-use App\Mail\AbsentApplyToOffice;
-use App\Models\ExtGenericMaster;
-use App\Http\Controllers\Traits\FuncAbsentTrait;
-use Illuminate\Support\Carbon;
 
 /**
  * 面談日程調整 - コントローラ
@@ -44,10 +38,6 @@ class ConferenceController extends Controller
      */
     public function index()
     {
-        // ログイン者の生徒No.を取得する。
-        $account = Auth::user();
-        $account_id = $account->account_id;
-
         // 校舎リストを取得
         $rooms = $this->mdlGetRoomList(false);
 
@@ -55,27 +45,6 @@ class ConferenceController extends Controller
             'rules' => $this->rulesForInput(null),
             'rooms' => $rooms,
             'editData' => null,
-        ]);
-    }
-
-    /**
-     * 初期画面(IDを指定して直接遷移)
-     * カレンダーのモーダルの～～～から遷移する
-     *
-     * @return view
-     */
-    public function direct($scheduleId)
-    {
-        // IDのバリデーション
-        $this->validateIds($scheduleId);
-
-        // ログイン者の生徒No.を取得する。
-        $account = Auth::user();
-        $account_id = $account->account_id;
-
-        return view('pages.student.conference', [
-            'rules' => $this->rulesForInput(null),
-            'editData' => $editData,
         ]);
     }
 
@@ -94,43 +63,50 @@ class ConferenceController extends Controller
         $account = Auth::user();
         $account_id = $account->account_id;
 
-        // $this->debug($request);
+        try {
+            // トランザクション(例外時は自動的にロールバック)
+            DB::transaction(function () use ($request, $account_id) {
+                $conference = new Conference;
 
-        $conference = new Conference;
+                // 面談連絡情報insert
+                $conference->student_id = $account_id;
+                $conference->campus_cd = $request['campus_cd'];
+                $conference->comment = $request['comment'];
+                $conference->status = AppConst::CODE_MASTER_5_0;
+                $conference->apply_date = now();
 
-        // 面談連絡情報insert
-        $conference->student_id = $account_id;
-        $conference->campus_cd = $request['campus_cd'];
-        $conference->comment = $request['comment'];
-        $conference->status = 0;
-        $conference->apply_date = now();
+                $conference->save();
 
-        $conference->save();
-
-        // 面談日程情報insert
-        $conference_date = new ConferenceDate;
-        $conference_date->conference_id = $conference->conference_id;
-        $conference_date->request_no = 1;
-        $conference_date->conference_date = $request['conference_date'];
-        $conference_date->start_time = $request['start_time'];
-        $conference_date->save();
-        // 第2希望ありの場合
-        if (($request['conference_date2'] and $request['start_time2']) != null) {
-            $conference_date = new ConferenceDate;
-            $conference_date->conference_id = $conference->conference_id;
-            $conference_date->request_no = 2;
-            $conference_date->conference_date = $request['conference_date2'];
-            $conference_date->start_time = $request['start_time2'];
-            $conference_date->save();
-            // 第3希望ありの場合
-            if (($request['conference_date3'] and $request['start_time3']) != null) {
+                // 面談日程情報insert
                 $conference_date = new ConferenceDate;
                 $conference_date->conference_id = $conference->conference_id;
-                $conference_date->request_no = 3;
-                $conference_date->conference_date = $request['conference_date3'];
-                $conference_date->start_time = $request['start_time3'];
+                $conference_date->request_no = 1;
+                $conference_date->conference_date = $request['conference_date'];
+                $conference_date->start_time = $request['start_time'];
                 $conference_date->save();
-            }
+                // 第2希望ありの場合
+                if (($request['conference_date2'] and $request['start_time2']) != null) {
+                    $conference_date = new ConferenceDate;
+                    $conference_date->conference_id = $conference->conference_id;
+                    $conference_date->request_no = 2;
+                    $conference_date->conference_date = $request['conference_date2'];
+                    $conference_date->start_time = $request['start_time2'];
+                    $conference_date->save();
+                    // 第3希望ありの場合
+                    if (($request['conference_date3'] and $request['start_time3']) != null) {
+                        $conference_date = new ConferenceDate;
+                        $conference_date->conference_id = $conference->conference_id;
+                        $conference_date->request_no = 3;
+                        $conference_date->conference_date = $request['conference_date3'];
+                        $conference_date->start_time = $request['start_time3'];
+                        $conference_date->save();
+                    }
+                }
+            });
+        } catch (\Exception  $e) {
+            // この時点では補足できないエラーとして、詳細は返さずエラーとする
+            Log::error($e);
+            return $this->illegalResponseErr();
         }
         
         return;
@@ -189,7 +165,7 @@ class ConferenceController extends Controller
 
             if (strtotime($request_datetime) < strtotime($today)) {
                 // 日時チェックエラー
-                return $fail(Lang::get('現在日時より後の日時を指定してください。'));
+                return $fail(Lang::get('validation.after_or_equal_time'));
             }
         };
         $validationDateTime2 = function ($attribute, $value, $fail) use ($request) {
@@ -199,7 +175,7 @@ class ConferenceController extends Controller
 
             if (strtotime($request_datetime) < strtotime($today)) {
                 // 日時チェックエラー
-                return $fail(Lang::get('現在日時より後の日時を指定してください。'));
+                return $fail(Lang::get('validation.after_or_equal_time'));
             }
         };
         $validationDateTime3 = function ($attribute, $value, $fail) use ($request) {
@@ -209,7 +185,7 @@ class ConferenceController extends Controller
 
             if (strtotime($request_datetime) < strtotime($today)) {
                 // 日時チェックエラー
-                return $fail(Lang::get('現在日時より後の日時を指定してください。'));
+                return $fail(Lang::get('validation.after_or_equal_time'));
             }
         };
 
@@ -217,6 +193,7 @@ class ConferenceController extends Controller
         // その他を第二引数で指定する
         $rules += Conference::fieldRules('student_id', [$validationStudentList]);
         $rules += Conference::fieldRules('campus_cd', ['required', $validationRoomList]);
+        $rules += Conference::fieldRules('comment');
         $rules += ConferenceDate::fieldRules('conference_date', ['required']);
         $rules += ConferenceDate::fieldRules('start_time', ['required', $validationDateTime]);
         $rules += ['conference_date2' => ['required_with:start_time2', 'date_format:Y-m-d']];
