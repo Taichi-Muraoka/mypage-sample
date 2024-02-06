@@ -503,12 +503,10 @@ class ReportRegistController extends Controller
                     }
                 }
             }
-        }
-        else if ($exists != true) {
+        } else if ($exists != true) {
             // レギュラー授業じゃない場合
             $last_data += ['flag' => self::REPORT_FLAG_2];
-        }
-        else {
+        } else {
             // 編集データ
             $last_data += ['flag' => self::REPORT_FLAG_0];
         }
