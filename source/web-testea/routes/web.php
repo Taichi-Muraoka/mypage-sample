@@ -954,9 +954,6 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 検索結果取得
     Route::post('/member_mng/search_record', [RecordController::class, 'search'])->name('record-search');
 
-    // バリデーション(検索用)
-    Route::post('/member_mng/vd_search_record', [RecordController::class, 'validationForSearch'])->name('record-vd_search');
-
     // 連絡記録登録画面
     Route::get('/member_mng/record/{sid}/new', [RecordController::class, 'new'])->name('record-new');
 

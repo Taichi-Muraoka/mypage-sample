@@ -31,7 +31,7 @@
 
     @can('roomAdmin')
     {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-    <x-bs.form-title>担当者名</x-bs.form-title>
+    <x-bs.form-title>校舎名</x-bs.form-title>
     <p class="edit-disp-indent">{{$campus_name}}</p>
     {{-- 余白 --}}
     <div class="mb-3"></div>
