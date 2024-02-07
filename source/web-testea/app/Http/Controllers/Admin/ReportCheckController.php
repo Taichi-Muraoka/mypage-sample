@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Report;
 use App\Models\ReportUnit;
 use App\Models\Student;
@@ -14,7 +17,6 @@ use App\Models\ClassMember;
 use App\Models\MstCourse;
 use App\Models\CodeMaster;
 use App\Consts\AppConst;
-use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncReportTrait;
 
 /**
@@ -56,10 +58,10 @@ class ReportCheckController extends Controller
         $tutors = $this->mdlGetTutorList();
 
         // コースリストを取得
-        $courses = $this->mdlGetCourseList();
+        $courses = $this->mdlGetCourseList(null, AppConst::CODE_MASTER_42_3);
 
         // 報告書承認リストを取得（サブコード指定で絞り込み）
-        $subCodes = [1];
+        $subCodes = [AppConst::CODE_MASTER_4_SUB_1];
         $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4, $subCodes);
 
         return view('pages.admin.report_check', [
@@ -127,6 +129,9 @@ class ReportCheckController extends Controller
 
         // クエリを作成
         $query = Report::query();
+
+        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+        $query->where($this->guardRoomAdminTableWithRoomCd());
 
         // 校舎コード選択による絞り込み条件
         // -1 は未選択状態のため、-1以外の場合に校舎コードの絞り込みを行う
@@ -371,7 +376,7 @@ class ReportCheckController extends Controller
                 return $fail(Lang::get('validation.invalid_input'));
             }
         };
-        
+
         $ruleLessonDate = Report::getFieldRule('lesson_date');
         // FromとToの大小チェックバリデーションを追加(Fromが存在する場合のみ)
         $validateFromTo = [];
@@ -387,7 +392,7 @@ class ReportCheckController extends Controller
         $rules += Report::fieldRules('approval_status', [$validationStatus]);
         $rules += ['lesson_date_from' => $ruleLessonDate];
         $rules += ['lesson_date_to' => array_merge($validateFromTo, $ruleLessonDate)];
-        
+
         return $rules;
     }
 
@@ -412,9 +417,11 @@ class ReportCheckController extends Controller
 
                 $report = Report::query()
                     ->where('report_id', $request->input('id'))
+                    // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+                    ->where($this->guardRoomAdminTableWithRoomCd())
                     // 該当データがない場合はエラーを返す
-                    ->firstOrFail();        
-                    
+                    ->firstOrFail();
+
                 $report->approval_status = AppConst::CODE_MASTER_4_2;
 
                 $report->save();
@@ -483,8 +490,7 @@ class ReportCheckController extends Controller
                     'free_unit_name2_' . $subCode => $report_unit->free_unit_name2,
                     'free_unit_name3_' . $subCode => $report_unit->free_unit_name3,
                 ];
-            }
-            else {
+            } else {
                 $editdata += [
                     'text_name_' . $subCode => null,
                     'free_text_name_' . $subCode => null,
@@ -506,7 +512,7 @@ class ReportCheckController extends Controller
         }
 
         // 報告書承認リストを取得（サブコード指定で絞り込み）
-        $subCodes = [1];
+        $subCodes = [AppConst::CODE_MASTER_4_SUB_1];
         $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4, $subCodes);
 
         return view('pages.admin.report_check-edit', [
@@ -563,28 +569,40 @@ class ReportCheckController extends Controller
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'report_id');
 
-        // 対象データを取得(PKでユニークに取る)
-        $report = Report::query()
-            ->where('report_id', $request->input('report_id'))
-            // 該当データがない場合はエラーを返す
-            ->firstOrFail();
+        try {
+            // トランザクション(例外時は自動的にロールバック)
+            DB::transaction(function () use ($request) {
 
-        // Reportテーブルのdelete
-        $report->delete();
-
-        // 授業教材情報を削除
-        foreach (AppConst::REPORT_SUBCODES as $subCode) {
-            if (ReportUnit::where('report_units.sub_cd', '=', $subCode)
-                ->where('report_units.report_id', '=', $report->report_id)
-                ->exists()
-            ) {
-                $lesson_unit = ReportUnit::query()
-                    ->where('report_units.report_id', '=', $report->report_id)
-                    ->where('report_units.sub_cd', '=', $subCode)
+                // 対象データを取得(PKでユニークに取る)
+                $report = Report::query()
+                    ->where('report_id', $request->input('report_id'))
+                    // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+                    ->where($this->guardRoomAdminTableWithRoomCd())
+                    // 該当データがない場合はエラーを返す
                     ->firstOrFail();
-                // ReportUnitテーブルのdelete
-                $lesson_unit->delete();
-            }
+
+                // Reportテーブルのdelete
+                $report->delete();
+
+                // 授業教材情報を削除
+                foreach (AppConst::REPORT_SUBCODES as $subCode) {
+                    if (ReportUnit::where('report_units.sub_cd', '=', $subCode)
+                        ->where('report_units.report_id', '=', $report->report_id)
+                        ->exists()
+                    ) {
+                        $lesson_unit = ReportUnit::query()
+                            ->where('report_units.report_id', '=', $report->report_id)
+                            ->where('report_units.sub_cd', '=', $subCode)
+                            ->firstOrFail();
+                        // ReportUnitテーブルのdelete
+                        $lesson_unit->delete();
+                    }
+                }
+            });
+        } catch (\Exception  $e) {
+            // この時点では補足できないエラーとして、詳細は返さずエラーとする
+            Log::error($e);
+            return $this->illegalResponseErr();
         }
 
         return;
@@ -625,7 +643,8 @@ class ReportCheckController extends Controller
         };
 
         $rules += Report::fieldRules('approval_status', [$validationStatus]);
-        $rules += Report::fieldRules('admin_comment');
+        // 管理者コメント:承認ステータス=差戻し
+        $rules += Report::fieldRules('admin_comment', ['required_if:approval_status,' . AppConst::CODE_MASTER_3_3, 'required_if:approval_status,' . AppConst::CODE_MASTER_3_4]);
 
         return $rules;
     }

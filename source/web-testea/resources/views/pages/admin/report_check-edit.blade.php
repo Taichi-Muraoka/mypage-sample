@@ -158,7 +158,7 @@
     <div class="mb-3"></div>
 
     <x-input.select id="approval_status" caption="承認ステータス" :select2=true :mastrData=$statusList :editData=$editData
-        :select2Search=false :blank=true />
+        :select2Search=false :blank=false />
 
     <x-input.textarea caption="管理者コメント" id="admin_comment" :rules=$rules :editData=$editData />
 
