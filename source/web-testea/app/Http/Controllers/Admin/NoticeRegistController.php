@@ -7,9 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Mail\NoticeRegistToStudent;
-use App\Mail\NoticeRegistToTutor;
-use App\Mail\NoticeRegistToParent;
+use App\Mail\NoticeRegistToUser;
 use App\Libs\AuthEx;
 use App\Consts\AppConst;
 use App\Models\CodeMaster;
@@ -684,7 +682,7 @@ class NoticeRegistController extends Controller
                             'text' => $notice->text,
                         ];
                         // メール送信
-                        Mail::to($email)->send(new NoticeRegistToStudent($mail_body, $subject));
+                        Mail::to($email)->send(new NoticeRegistToUser($mail_body, $subject));
                         break;
                     // 個別（講師）
                     case AppConst::CODE_MASTER_15_3:
@@ -700,7 +698,7 @@ class NoticeRegistController extends Controller
                             'text' => $notice->text,
                         ];
                         // メール送信
-                        Mail::to($email)->send(new NoticeRegistToTutor($mail_body, $subject));
+                        Mail::to($email)->send(new NoticeRegistToUser($mail_body, $subject));
                         break;
                     // 個別（保護者）
                     case AppConst::CODE_MASTER_15_4:
@@ -716,7 +714,7 @@ class NoticeRegistController extends Controller
                             'text' => $notice->text,
                         ];
                         // メール送信
-                        Mail::to($email)->send(new NoticeRegistToParent($mail_body, $subject));
+                        Mail::to($email)->send(new NoticeRegistToUser($mail_body, $subject));
                         break;
                     default:
                         break;
