@@ -189,10 +189,27 @@ trait CtrlDateTrait
      * @param 授業時間(分)
      * @return 授業時間(時間)
      */
-    protected function conversion_time($minites)
+    protected function dtConversionTime($minites)
     {
         $time = floor($minites / 60 * 10) / 10;
 
         return $time;
+    }
+
+    /**
+     * 分を時間に変換
+     *
+     * @param 授業時間(分)
+     * @return 授業時間(〇時間〇分)
+     */
+    public function dtConversionHourMinites($minites)
+    {
+        $conversion_hour = floor($minites / 60 * 10) / 10;
+
+        $hour = floor($conversion_hour);
+
+        $minites = floor($minites % 60 * 10) / 10;
+
+        return $hour . '時間' . $minites . '分';
     }
 }

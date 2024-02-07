@@ -47,7 +47,7 @@ class TutorClassController extends Controller
         // 先月初日
         $first_date = date('Y/m/d', strtotime('first day of previous month'));
 
-        // 今月末日
+        // 先月末日
         $last_date = date('Y/m/d', strtotime('last day of previous month'));
 
         $editData = [
@@ -239,13 +239,13 @@ class TutorClassController extends Controller
                 $item->target_date_from = $form['target_date_from'];
                 $item->target_date_to = $form['target_date_to'];
                 // 授業(分)を授業(時間)に変換(小数点1位以下を切り捨て)
-                $item->personal_min = $this->conversion_time($item->personal_min);
-                $item->two_min = $this->conversion_time($item->two_min);
-                $item->three_min = $this->conversion_time($item->three_min);
-                $item->home_min = $this->conversion_time($item->home_min);
-                $item->exercise_min = $this->conversion_time($item->exercise_min);
-                $item->high_min = $this->conversion_time($item->high_min);
-                $item->group_min = $this->conversion_time($item->group_min);
+                $item->personal_min = $this->dtConversionTime($item->personal_min);
+                $item->two_min = $this->dtConversionTime($item->two_min);
+                $item->three_min = $this->dtConversionTime($item->three_min);
+                $item->home_min = $this->dtConversionTime($item->home_min);
+                $item->exercise_min = $this->dtConversionTime($item->exercise_min);
+                $item->high_min = $this->dtConversionTime($item->high_min);
+                $item->group_min = $this->dtConversionTime($item->group_min);
             }
 
             return $items;

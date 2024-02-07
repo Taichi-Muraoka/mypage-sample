@@ -88,10 +88,10 @@ class OvertimeController extends Controller
             // データ加工
             foreach ($items as $item) {
                 // 時間変換
-                $item->sum_minites = $this->conversion_time($item->sum_minites);
-                $item->over_time = $this->conversion_time($item->over_time);
-                $item->late_time = $this->conversion_time($item->late_time);
-                $item->over_late_time = $this->conversion_time($item->over_late_time);
+                $item->sum_minites = $this->dtConversionHourMinites($item->sum_minites);
+                $item->over_time = $this->dtConversionHourMinites($item->over_time);
+                $item->late_time = $this->dtConversionHourMinites($item->late_time);
+                $item->over_late_time = $this->dtConversionHourMinites($item->over_late_time);
             }
 
             return $items;
@@ -167,10 +167,10 @@ class OvertimeController extends Controller
                 $data->tutor_id,
                 $data->tutor_name,
                 date('Y/m/d', strtotime($data->target_date)),
-                $this->conversion_time($data->sum_minites),
-                $this->conversion_time($data->over_time),
-                $this->conversion_time($data->late_time),
-                $this->conversion_time($data->over_late_time),
+                $this->dtConversionHourMinites($data->sum_minites),
+                $this->dtConversionHourMinites($data->over_time),
+                $this->dtConversionHourMinites($data->late_time),
+                $this->dtConversionHourMinites($data->over_late_time),
             ];
         }
 
@@ -191,23 +191,6 @@ class OvertimeController extends Controller
         $this->outputCsv($arrayCsv);
 
         return;
-    }
-
-    /**
-     * 分を時間に変換
-     *
-     * @param 授業時間(分)
-     * @return 授業時間(〇時間〇分)
-     */
-    public function conversion_time($minites)
-    {
-        $conversion_hour = floor($minites / 60 * 10) / 10;
-
-        $hour = floor($conversion_hour);
-
-        $minites = floor($minites % 60 * 10) / 10;
-
-        return $hour . '時間' . $minites . '分';
     }
 
     /**
