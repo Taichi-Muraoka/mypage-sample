@@ -40,7 +40,7 @@ export default class AppClass extends PageBase {
                     this.form.student_id = "";
                     this.selectGetItem = {};
                     // ブースプルダウンをクリア
-                    this.form.booth_id = "";
+                    this.form.booth_cd = "";
                     this.selectGetList = {};
 
                     // チェンジイベントを発生させる
