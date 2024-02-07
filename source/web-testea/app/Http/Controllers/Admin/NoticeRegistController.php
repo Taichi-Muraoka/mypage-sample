@@ -740,8 +740,14 @@ class NoticeRegistController extends Controller
 
         DB::transaction(function () use ($noticeId) {
             // 削除
-            NoticeDestination::where('notice_id', '=', $noticeId)->delete();
-            Notice::where('notice_id', '=', $noticeId)->delete();
+            NoticeDestination::where('notice_id', '=', $noticeId)
+                // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+                ->where($this->guardRoomAdminTableWithRoomCd())
+                ->delete();
+            Notice::where('notice_id', '=', $noticeId)
+                // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+                ->where($this->guardRoomAdminTableWithRoomCd())
+                ->delete();
         });
 
         return;
