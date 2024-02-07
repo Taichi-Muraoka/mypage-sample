@@ -127,7 +127,7 @@ class ReportUnit extends Model
             'sub_cd' => ['string', 'max:2', 'digits:2'],
             'text_cd' => ['string', 'max:8', 'digits:8'],
             'free_text_name' => ['string', 'max:50'],
-            'text_page' => ['integer', 'max:2'],
+            'text_page' => ['integer', 'max:50'],
             'unit_category_cd1' => ['string', 'max:7', 'digits:7'],
             'free_category_name1' => ['string', 'max:50'],
             'unit_cd1' => ['string', 'max:2', 'digits:2'],
