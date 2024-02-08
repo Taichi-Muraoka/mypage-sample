@@ -9,7 +9,7 @@ use Illuminate\Queue\SerializesModels;
 /**
  * お知らせ通知メール
  */
-class NoticeRegistToParent extends Mailable
+class NoticeRegistToUser extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -46,6 +46,6 @@ class NoticeRegistToParent extends Mailable
             // タイトル
             ->subject($subject)
             // テンプレート
-            ->text('emails.notice_regist_to_parent');
+            ->text('emails.notice_regist_to_user');
     }
 }
