@@ -36,10 +36,10 @@ class OvertimeController extends Controller
     public function index()
     {
         // 先月初日
-        $first_date = date('Y/m/01', strtotime('-1 month'));
+        $first_date = date('Y/m/d', strtotime('first day of previous month'));
 
-        // 今月末日
-        $last_date = date('Y/m/t', strtotime('-1 month'));
+        // 先月末日
+        $last_date = date('Y/m/d', strtotime('last day of previous month'));
 
         $editData = [
             'target_date_from' => $first_date,
@@ -166,7 +166,7 @@ class OvertimeController extends Controller
             $arrayCsv[] = [
                 $data->tutor_id,
                 $data->tutor_name,
-                date('Y/m/d', strtotime($data->target_date)),
+                $data->target_date->format('Y/m/d'),
                 $this->dtConversionHourMinites($data->sum_minites),
                 $this->dtConversionHourMinites($data->over_time),
                 $this->dtConversionHourMinites($data->late_time),
