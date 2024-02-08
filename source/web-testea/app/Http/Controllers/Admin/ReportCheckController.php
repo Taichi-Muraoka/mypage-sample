@@ -644,7 +644,7 @@ class ReportCheckController extends Controller
 
         $rules += Report::fieldRules('approval_status', [$validationStatus]);
         // 管理者コメント:承認ステータス=差戻し
-        $rules += Report::fieldRules('admin_comment', ['required_if:approval_status,' . AppConst::CODE_MASTER_3_3, 'required_if:approval_status,' . AppConst::CODE_MASTER_3_4]);
+        $rules += Report::fieldRules('admin_comment', ['required_if:approval_status,' . AppConst::CODE_MASTER_4_3]);
 
         return $rules;
     }
