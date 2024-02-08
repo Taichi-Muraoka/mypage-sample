@@ -262,15 +262,11 @@ class SurchargeController extends Controller
         $rules += Surcharge::fieldRules('comment', ['required']);
 
         // 請求種別=サブコード8 時給 のバリデーション
-        if ($request && $request['sub_code'] == AppConst::CODE_MASTER_26_SUB_8) {
-            $rules += Surcharge::fieldRules('start_time', ['required']);
-            $rules += Surcharge::fieldRules('minutes', ['required']);
-        }
+        $rules += Surcharge::fieldRules('start_time', ['required_if:sub_code,' . AppConst::CODE_MASTER_26_SUB_8]);
+        $rules += Surcharge::fieldRules('minutes', ['required_if:sub_code,' . AppConst::CODE_MASTER_26_SUB_8]);
 
         // 請求種別=サブコード9,10 固定金額 のバリデーション
-        if ($request && $request['sub_code'] != AppConst::CODE_MASTER_26_SUB_8) {
-            $rules += Surcharge::fieldRules('tuition', ['required']);
-        }
+        $rules += Surcharge::fieldRules('tuition', ['required_if:sub_code,' . AppConst::CODE_MASTER_26_SUB_9 . ',' . AppConst::CODE_MASTER_26_SUB_10]);
 
         return $rules;
     }
