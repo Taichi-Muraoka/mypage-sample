@@ -59,7 +59,7 @@ class YearScheduleImportController extends Controller
                 'mst_codes.name as import_state_name',
             )
             // 校舎名の取得
-            ->leftJoinSub($room_names, 'room_names', function ($join) {
+            ->joinSub($room_names, 'room_names', function ($join) {
                 $join->on('campus_cd', '=', 'room_names.code');
             })
             // 取込状態取得
@@ -285,7 +285,7 @@ class YearScheduleImportController extends Controller
                 // [バリデーション] ヘッダが想定通りかチェック
                 if ($headers !== $csvHeaders) {
                     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                        . "：ヘッダ行不正)");
+                        . "(ヘッダ行不正)");
                 }
                 continue;
             }
@@ -296,7 +296,7 @@ class YearScheduleImportController extends Controller
             // [バリデーション] データ行の列の数のチェック
             if (count($line) !== count($csvHeaders)) {
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                    . "：データ列数不正)");
+                    . "(データ列数不正)");
             }
 
             // headerをもとに、値をセットしたオブジェクトを生成
