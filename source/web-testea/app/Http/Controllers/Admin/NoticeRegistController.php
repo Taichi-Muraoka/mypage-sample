@@ -871,7 +871,7 @@ class NoticeRegistController extends Controller
                 ->firstOrFail();
             // 保護者のメールアドレスがなかった場合エラーを返す
             if ($student->email_par == null) {
-                return $fail('保護者のメールアドレスが登録されていません');
+                return $fail(Lang::get('validation.unregistered_par_email'));
             }
             else {
                 return;
