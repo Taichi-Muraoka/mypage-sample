@@ -28,40 +28,6 @@ export default class AppClass extends PageBase {
             vueMounted: function ($vue, option) {
                 // プルダウンが動的になるので、退避したものをセットする
                 $vue.form.id = $vue.form._id;
-
-                // 編集時、プルダウンチェンジイベントを発生させる。
-                $vue.selectChangeGetMulti();
-            },
-            // Vueにメソッド追加
-            vueMethods: {
-                // この画面では複数のプルダウン選択があるので対応する
-                selectChangeGetMulti: function (event) {
-                    // 生徒名が無ければクリア
-                    if (ValueCom.isEmpty(this.form.sidKobetsu)) {
-                        this.form.id = "";
-                        this.selectGetItem = {};
-                        return;
-                    }
-
-                    // 生徒名のチェンジの場合はスケジュールをクリア
-                    if (event && event.target.id == "sidKobetsu") {
-                        this.form.id = "";
-                        this.selectGetItem = {};
-                    }
-
-                    // チェンジイベントを発生させる
-                    self.selectChangeGet(
-                        this,
-                        {
-                            // sidで送信する
-                            sid: this.form.sidKobetsu,
-                            id: this.form.id,
-                            // ガード用にIDを送信する
-                            reportId: this.form.report_id,
-                        },
-                        this.option
-                    );
-                },
             },
         });
     }
