@@ -285,7 +285,7 @@ class YearScheduleImportController extends Controller
                 // [バリデーション] ヘッダが想定通りかチェック
                 if ($headers !== $csvHeaders) {
                     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                         . "：ヘッダ行不正)");
+                        . "：ヘッダ行不正)");
                 }
                 continue;
             }
@@ -296,7 +296,7 @@ class YearScheduleImportController extends Controller
             // [バリデーション] データ行の列の数のチェック
             if (count($line) !== count($csvHeaders)) {
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                     . "：データ列数不正)");
+                    . "：データ列数不正)");
             }
 
             // headerをもとに、値をセットしたオブジェクトを生成
