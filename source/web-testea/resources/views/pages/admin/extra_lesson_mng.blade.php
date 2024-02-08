@@ -51,7 +51,8 @@
             <td>@{{item.status_name}}</td>
             <td>
                 <x-button.list-dtl :vueDataAttr="['extra_apply_id' => 'item.extra_apply_id']" />
-                <x-button.list-edit vueHref="'{{ route('extra_lesson_mng-new', ['', '']) }}/' + item.student_id + '/' + item.campus_cd" caption="授業追加" />
+                <x-button.list-edit vueHref="'{{ route('extra_lesson_mng-new', '') }}/' + item.extra_apply_id"
+                    caption="授業追加" vueDisabled="item.status == {{ App\Consts\AppConst::CODE_MASTER_1_1 }}" />
                 <x-button.list-edit vueHref="'{{ route('extra_lesson_mng-edit', '') }}/' + item.extra_apply_id" />
             </td>
         </tr>

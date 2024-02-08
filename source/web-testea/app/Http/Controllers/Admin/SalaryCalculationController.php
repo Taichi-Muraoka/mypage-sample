@@ -265,7 +265,7 @@ class SalaryCalculationController extends Controller
                             if ($course_count->course_cd == AppConst::COURSE_CD_10100) {
                                 $salary_summary->hour_payment = $course_count->hourly_base_wage;
                             }
-                            $salary_summary->hour = $this->conversion_time($course_count->sum_minutes);
+                            $salary_summary->hour = $this->dtConversionTime($course_count->sum_minutes);
                             // 保存
                             $salary_summary->save();
                         }
@@ -284,7 +284,7 @@ class SalaryCalculationController extends Controller
                             if ($surcharge_count->summary_kind == AppConst::CODE_MASTER_26_SUB_8) {
                                 $salary_summary->hour_payment = $hourly_wage->value_num;
                             }
-                            $salary_summary->hour = $this->conversion_time($surcharge_count->sum_minutes);
+                            $salary_summary->hour = $this->dtConversionTime($surcharge_count->sum_minutes);
                             $salary_summary->amount = $surcharge_count->sum_tuition;
                             // 保存
                             $salary_summary->save();
@@ -698,18 +698,5 @@ class SalaryCalculationController extends Controller
         } else {
             return $details;
         }
-    }
-
-    /**
-     * 分を時間に変換
-     *
-     * @param 授業時間(分)
-     * @return 授業時間(時間)
-     */
-    public function conversion_time($minites)
-    {
-        $time = floor($minites / 60 * 10) / 10;
-
-        return $time;
     }
 }
