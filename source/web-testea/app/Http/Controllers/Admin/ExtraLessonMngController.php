@@ -331,27 +331,32 @@ class ExtraLessonMngController extends Controller
 
     /**
      * 登録画面
-     *
+     * @param int $applyId 追加授業依頼ID
      * @return view
      */
-    public function new($sid, $campusCd)
+    public function new($applyId)
     {
         // IDのバリデーション
-        $this->validateIds($sid);
+        $this->validateIds($applyId);
 
-        // 校舎コードのバリデーション
-        // パラメータの校舎コードが当該生徒の所属校舎と一致するか
-        $exists = StudentCampus::where('student_id', $sid)
-            ->where('campus_cd', $campusCd)
-            ->exists();
+        // 対象データを取得
+        $query = ExtraClassApplication::query();
+        $extraClass = $query
+            ->select(
+                'extra_class_applications.student_id',
+                'extra_class_applications.campus_cd',
+            )
+            ->where('extra_apply_id', $applyId)
+            // ステータス「未対応」のみ表示可能
+            ->where('status', AppConst::CODE_MASTER_1_0)
+            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+            ->where($this->guardRoomAdminTableWithRoomCd())
+            // 該当データがない場合はエラーを返す
+            ->firstOrFail();
 
-        if (!$exists) {
-            // 存在しないならエラー
-            return $this->illegalResponseErr();
-        }
-
-        // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-        $this->guardRoomAdminRoomcd($campusCd);
+        // 対象データより生徒ID・校舎コードを取得
+        $sid = $extraClass->student_id;
+        $campusCd = $extraClass->campus_cd;
 
         // 生徒名を取得する
         $studentName = $this->mdlGetStudentName($sid);

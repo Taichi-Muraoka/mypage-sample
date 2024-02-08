@@ -847,7 +847,7 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     Route::post('/extra_lesson_mng/get_data_select', [ExtraLessonMngController::class, 'getDataSelect'])->name('extra_lesson_mng-get_data_select');
 
     // 新規登録
-    Route::get('/extra_lesson_mng/new/{sid}/{campusCd}', [ExtraLessonMngController::class, 'new'])->name('extra_lesson_mng-new');
+    Route::get('/extra_lesson_mng/new/{extraId}', [ExtraLessonMngController::class, 'new'])->name('extra_lesson_mng-new');
 
     // 新規登録処理
     Route::post('/extra_lesson_mng/create', [ExtraLessonMngController::class, 'create'])->name('extra_lesson_mng-create');

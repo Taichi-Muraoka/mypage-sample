@@ -337,7 +337,9 @@ class SurchargeAcceptController extends Controller
         $rules = array();
 
         $rules += Surcharge::fieldRules('approval_status', ['required', $validationApprovalStatusList]);
-        $rules += Surcharge::fieldRules('admin_comment');
+        // ステータス「差戻し」選択時は管理者コメント必須
+        $rules += Surcharge::fieldRules('admin_comment', ['required_if:approval_status,' . AppConst::CODE_MASTER_2_2]);
+        // ステータス「承認」選択時は支払年月必須
         $rules += Surcharge::fieldRules('payment_date', ['required_if:approval_status,' . AppConst::CODE_MASTER_2_1, $validationPaymentStatusList]);
 
         return $rules;
