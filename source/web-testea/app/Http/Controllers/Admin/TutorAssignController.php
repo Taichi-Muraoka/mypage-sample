@@ -200,10 +200,6 @@ class TutorAssignController extends Controller
         // クエリを作成（講師空き時間）
         $query = TutorFreePeriod::query();
 
-        $model = new TutorCampus;
-        // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
-        $query->where($this->guardRoomAdminTableWithRoomCd($model));
-
         // 教室名取得のサブクエリ
         $room = $this->mdlGetRoomQuery();
 
