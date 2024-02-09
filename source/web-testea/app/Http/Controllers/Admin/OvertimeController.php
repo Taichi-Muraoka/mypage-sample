@@ -166,7 +166,8 @@ class OvertimeController extends Controller
             $arrayCsv[] = [
                 $data->tutor_id,
                 $data->tutor_name,
-                $data->target_date->format('Y/m/d'),
+                // $data->target_dateが日付型ではないためこちらのフォーマットを使用
+                date('Y/m/d', strtotime($data->target_date)),
                 $this->dtConversionHourMinites($data->sum_minites),
                 $this->dtConversionHourMinites($data->over_time),
                 $this->dtConversionHourMinites($data->late_time),
