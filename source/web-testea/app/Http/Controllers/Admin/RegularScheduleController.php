@@ -190,7 +190,10 @@ class RegularScheduleController extends Controller
         $tutors = $this->mdlGetTutorList($campusCd);
 
         // 指定時刻から、対応する時限の情報を取得（通常期間）
-        $periodInfo = $this->fncScheGetPeriodTime($campusCd, AppConst::CODE_MASTER_37_0, $time);
+        // MEMO:パラメータにはカレンダーのセルの開始時刻が設定されているが、
+        // 時限の終了時刻とすぐ下のセルの開始時刻が等しくなるため、1min加算して判定する
+        $targetTime = date('H:i',strtotime($time . "+1 min"));
+        $periodInfo = $this->fncScheGetPeriodTime($campusCd, AppConst::CODE_MASTER_37_0, $targetTime);
 
         if (isset($periodInfo)) {
             $periodNo = $periodInfo->period_no;

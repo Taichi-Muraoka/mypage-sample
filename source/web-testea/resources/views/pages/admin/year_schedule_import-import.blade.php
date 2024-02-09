@@ -42,8 +42,11 @@
 
     {{-- フッター --}}
     <x-slot name="footer">
-        <div class="d-flex justify-content-end">
-            <x-button.submit-new />
+        <div class="d-flex justify-content-between">
+            <x-button.back />
+            <div class="d-flex justify-content-end">
+                <x-button.submit-new />
+            </div>
         </div>
     </x-slot>
 

@@ -17,6 +17,7 @@ use App\Models\AdminUser;
 use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncScheduleTrait;
 use App\Http\Controllers\Traits\FuncStudentClassTrait;
+use App\Libs\AuthEx;
 
 /**
  * 授業情報検索 - コントローラ
@@ -96,10 +97,12 @@ class StudentClassController extends Controller
         // クエリを作成
         $query = Schedule::query();
 
-        // 校舎コード選択による絞り込み条件
-        // -1 は未選択状態のため、-1以外の場合に校舎コードの絞り込みを行う
-        if (isset($form['campus_cd']) && filled($form['campus_cd']) && $form['campus_cd'] != -1) {
-            // 検索フォームから取得（スコープ）
+        // 校舎の検索
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithRoomCd());
+        } else {
+            // 本部管理者の場合検索フォームから取得
             $query->SearchCampusCd($form);
         }
 

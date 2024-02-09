@@ -28,7 +28,7 @@
         </tr>
         <tr>
             <th>内容</th>
-            <td>{!! nl2br($notice->text) !!}</td>
+            <td class="nl2br">{{$notice->text}}</td>
         </tr>
         <tr>
             <th>お知らせ種別</th>
