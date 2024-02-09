@@ -13,6 +13,7 @@ use App\Models\Schedule;
 use App\Models\CodeMaster;
 use App\Models\MstCourse;
 use App\Models\MstSubject;
+use App\Libs\AuthEx;
 
 /**
  * 要振替授業管理 - コントローラ
@@ -77,9 +78,12 @@ class TransferRequiredController extends Controller
         // クエリを作成
         $query = Schedule::query();
 
-        // 校舎コード選択による絞り込み条件
-        if (isset($form['campus_cd']) && filled($form['campus_cd'])) {
-            // 検索フォームから取得（スコープ）
+        // 校舎の検索
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+            $query->where($this->guardRoomAdminTableWithRoomCd());
+        } else {
+            // 本部管理者の場合検索フォームから取得
             $query->SearchCampusCd($form);
         }
 
