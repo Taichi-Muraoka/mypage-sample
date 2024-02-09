@@ -16,6 +16,9 @@
     <x-input.hidden id="tutor_id" :editData=$editData />
     <x-input.hidden id="monthly_count" :editData=$editData />
     <x-input.hidden id="skip_count" :editData=$editData />
+    @for ($i = 1; $i <= 3; $i++)
+    <x-input.hidden id="preferred_date{{$i}}_period_bef" />
+    @endfor
 
     <x-input.select caption="生徒名" id="student_id" :select2=true :editData=$editData :mastrData=$students
         :editData=$editData :select2Search=true onChange="selectChangeStudent" />

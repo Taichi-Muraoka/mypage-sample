@@ -17,6 +17,7 @@
     {{-- hidden --}}
     <x-input.hidden id="campus_cd" :editData=$editData />
     <x-input.hidden id="transfer_apply_id" :editData=$editData />
+    <x-input.hidden id="period_no_bef" />
 
     <x-bs.table :hover=false :vHeader=true>
         <tr>

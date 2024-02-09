@@ -42,14 +42,20 @@ export default class AppClass extends PageBase {
                 (data) => {
                     // データをセット
                     $vue.selectGetItemDate = data;
-                    // 時限リストが取得できた場合のみ、時限(selected)をセット
-                    if (data.selectItems.length != 0) {
+                    if (data.selectItems.length != 0 && data.selectItems.some(item => item.code == $vue.form.period_no_bef))  {
+                        // 時限リストが取得できた場合 かつ 時限リストに存在する場合のみ
+                        // 退避した時限(selected)をセット
                         $vue.form.period_no = $vue.form.period_no_bef;
                         if (data.timetable_kind != $vue.form.timetable_kind) {
                             // 対象日付の時間割区分が変わった場合のみ、開始・終了時刻を再設定
                             $vue.selectChangeGetTimetable();
                             $vue.form.timetable_kind = data.timetable_kind;
                         }
+                    } else {
+                        // 退避した時限(selected)をセットできない場合、開始時刻・終了時刻もクリアする
+                        $vue.form.start_time = "";
+                        $vue.form.end_time = "";
+                        $vue.form.period_no_bef = "";
                     }
                 }
             );

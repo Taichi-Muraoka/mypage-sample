@@ -39,9 +39,9 @@ export default class AppClass extends PageBase {
             }
             var campusCd = $vue.form.campus_cd;
             var targetDate = value;
-            // 時限プルダウンは動的に変わるので、一旦クリアする
-            $vue.form.period_no = "";
-            $vue.form["preferred_date" + no + "_period"] = "";
+            // 時限プルダウンは動的に変わるので、選択値(selected)を退避し一旦クリアする
+            $vue.form['preferred_date' + no + '_period_bef'] = $vue.form['preferred_date' + no + '_period'];
+            $vue.form['preferred_date' + no + '_period'] = "";
             // チェンジイベントを発生させる
             self.selectChangeGetCallBack(
                 $vue,
@@ -66,6 +66,15 @@ export default class AppClass extends PageBase {
                         case "3":
                             $vue.selectGetItemPeriod3 = data.periods;
                             break;
+                    }
+                    if (data.periods.length != 0
+                        && data.periods.some(item => item.code == $vue.form['preferred_date' + no + '_period_bef']))  {
+                        // 時限リストが取得できた場合 かつ 時限リストに存在する場合のみ
+                        // 退避した時限(selected)をセット
+                        $vue.form['preferred_date' + no + '_period'] = $vue.form['preferred_date' + no + '_period_bef'];
+                    } else {
+                        // 退避した時限(selected)をセットできない場合、退避した時限をクリアする
+                        $vue.form['preferred_date' + no + '_period_bef'] = "";
                     }
                 }
             );
