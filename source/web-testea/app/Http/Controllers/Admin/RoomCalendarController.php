@@ -221,7 +221,10 @@ class RoomCalendarController extends Controller
         $timetableKind = $this->fncScheGetTimeTableKind($campusCd, $targetDate);
 
         // 指定時刻から、対応する時限の情報を取得
-        $periodInfo = $this->fncScheGetPeriodTime($campusCd, $timetableKind, $time);
+        // MEMO:パラメータにはカレンダーのセルの開始時刻が設定されているが、
+        // 時限の終了時刻とすぐ下のセルの開始時刻が等しくなるため、1min加算して判定する
+        $targetTime = date('H:i',strtotime($time . "+1 min"));
+        $periodInfo = $this->fncScheGetPeriodTime($campusCd, $timetableKind, $targetTime);
 
         if (isset($periodInfo)) {
             $periodNo = $periodInfo->period_no;
@@ -1688,6 +1691,8 @@ class RoomCalendarController extends Controller
             })
             // IDを指定
             ->where('schedule_id', $scheduleId)
+            // コース種別のガードを掛ける（授業複のみ）
+            ->where('mst_courses.course_kind', AppConst::CODE_MASTER_42_2)
             ->firstOrFail();
 
         // データを取得（受講生徒情報）
