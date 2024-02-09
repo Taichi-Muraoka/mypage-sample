@@ -7,9 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Mail\NoticeRegistToStudent;
-use App\Mail\NoticeRegistToTutor;
-use App\Mail\NoticeRegistToParent;
+use App\Mail\NoticeRegistToUser;
 use App\Libs\AuthEx;
 use App\Consts\AppConst;
 use App\Models\CodeMaster;
@@ -684,7 +682,7 @@ class NoticeRegistController extends Controller
                             'text' => $notice->text,
                         ];
                         // メール送信
-                        Mail::to($email)->send(new NoticeRegistToStudent($mail_body, $subject));
+                        Mail::to($email)->send(new NoticeRegistToUser($mail_body, $subject));
                         break;
                     // 個別（講師）
                     case AppConst::CODE_MASTER_15_3:
@@ -700,7 +698,7 @@ class NoticeRegistController extends Controller
                             'text' => $notice->text,
                         ];
                         // メール送信
-                        Mail::to($email)->send(new NoticeRegistToTutor($mail_body, $subject));
+                        Mail::to($email)->send(new NoticeRegistToUser($mail_body, $subject));
                         break;
                     // 個別（保護者）
                     case AppConst::CODE_MASTER_15_4:
@@ -716,7 +714,7 @@ class NoticeRegistController extends Controller
                             'text' => $notice->text,
                         ];
                         // メール送信
-                        Mail::to($email)->send(new NoticeRegistToParent($mail_body, $subject));
+                        Mail::to($email)->send(new NoticeRegistToUser($mail_body, $subject));
                         break;
                     default:
                         break;
@@ -742,8 +740,14 @@ class NoticeRegistController extends Controller
 
         DB::transaction(function () use ($noticeId) {
             // 削除
-            NoticeDestination::where('notice_id', '=', $noticeId)->delete();
-            Notice::where('notice_id', '=', $noticeId)->delete();
+            NoticeDestination::where('notice_id', '=', $noticeId)
+                // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+                ->where($this->guardRoomAdminTableWithRoomCd())
+                ->delete();
+            Notice::where('notice_id', '=', $noticeId)
+                // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
+                ->where($this->guardRoomAdminTableWithRoomCd())
+                ->delete();
         });
 
         return;
@@ -867,7 +871,7 @@ class NoticeRegistController extends Controller
                 ->firstOrFail();
             // 保護者のメールアドレスがなかった場合エラーを返す
             if ($student->email_par == null) {
-                return $fail('保護者のメールアドレスが登録されていません');
+                return $fail(Lang::get('validation.unregistered_par_email'));
             }
             else {
                 return;

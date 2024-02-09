@@ -6,7 +6,6 @@ use App\Exceptions\ReadDataValidateException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
@@ -60,7 +59,7 @@ class YearScheduleImportController extends Controller
                 'mst_codes.name as import_state_name',
             )
             // 校舎名の取得
-            ->leftJoinSub($room_names, 'room_names', function ($join) {
+            ->joinSub($room_names, 'room_names', function ($join) {
                 $join->on('campus_cd', '=', 'room_names.code');
             })
             // 取込状態取得
@@ -152,33 +151,26 @@ class YearScheduleImportController extends Controller
         // アップロードファイルの保存
         $path = $this->fileUploadSave($request, $uploadDir, 'upload_file');
 
-        // 実行者のアカウントIDを取得
-        $account_id = Auth::user()->account_id;
+        $school_year = $request['school_year'];
+        $campus_cd = $request['campus_cd'];
+        $yearly_schedules_import_id = $request['yearly_schedules_import_id'];
+        $datas = [];
 
         try {
-            // CSVファイルのパスと実行者のアカウントIDを受け取る
-            $school_year = $request['school_year'];
-            $campus_cd = $request['campus_cd'];
-            $yearly_schedules_import_id = $request['yearly_schedules_import_id'];
-            $datas = [];
+            // CSVデータの読み込み
+            $datas = $this->readData($path);
+            $datas = $datas;
 
-            Log::info("Batch yearScheduleImport Start, PATH: {$path}, ACCOUNT_ID: {$account_id}");
-
-            try {
-                // CSVデータの読み込み
-                $datas = $this->readData($path);
-
-                $datas = $datas["datas"];
-
-                if (empty($datas)) {
-                    throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                        . "(データ件数不正)");
-                }
-            } catch (ReadDataValidateException  $e) {
-                // 通常は事前にバリデーションするのでここはありえないのでエラーとする
-                throw $e;
+            if (empty($datas)) {
+                throw new ReadDataValidateException(Lang::get('validation.invalid_file')
+                    . "(データ件数不正)");
             }
+        } catch (ReadDataValidateException  $e) {
+            // 通常は事前にバリデーションするのでここはありえないのでエラーとする
+            throw $e;
+        }
 
+        try {
             // トランザクション(例外時は自動的にロールバック)
             DB::transaction(function () use ($datas, $school_year, $campus_cd, $yearly_schedules_import_id) {
 
@@ -188,17 +180,12 @@ class YearScheduleImportController extends Controller
                     ->where('campus_cd', $campus_cd)
                     ->forceDelete();
 
-                $insertCount = 0;
-
-                $week = [
-                    '月' => AppConst::CODE_MASTER_16_1,
-                    '火' => AppConst::CODE_MASTER_16_2,
-                    '水' => AppConst::CODE_MASTER_16_3,
-                    '木' => AppConst::CODE_MASTER_16_4,
-                    '金' => AppConst::CODE_MASTER_16_5,
-                    '土' => AppConst::CODE_MASTER_16_6,
-                    '日' => AppConst::CODE_MASTER_16_7,
-                ];
+                // コードマスタから曜日を取得
+                $week = CodeMaster::select('code', 'name')
+                    ->where('data_type', AppConst::CODE_MASTER_16)
+                    ->orderby('code')
+                    ->get()
+                    ->keyBy('name');
 
                 // スケジュール情報テーブルの登録（Insert）
                 foreach ($datas as $data) {
@@ -207,16 +194,13 @@ class YearScheduleImportController extends Controller
                     $yearlySchedule['school_year'] = $school_year;
                     $yearlySchedule['campus_cd'] = $campus_cd;
                     $yearlySchedule['lesson_date'] = $data['年月日'];
-                    $yearlySchedule['day_cd'] = $week[$data['曜日']];
+                    $yearlySchedule['day_cd'] = $week[$data['曜日']]->code;
                     $yearlySchedule['date_kind'] = $data['期間区分コード'];
                     $yearlySchedule['school_month'] = $data['月度'];
                     $yearlySchedule['week_count'] = $data['週数'];
 
                     $yearlySchedule->save();
-                    $insertCount++;
                 }
-
-                $insertCount = (string) $insertCount;
 
                 $query = YearlySchedulesImport::query();
                 $yearlyScheduleImport = $query
@@ -227,15 +211,11 @@ class YearScheduleImportController extends Controller
                 $yearlyScheduleImport->import_state = AppConst::CODE_MASTER_20_1;
                 $yearlyScheduleImport->import_date = now();
                 $yearlyScheduleImport->save();
-
-                Log::info("Insert {$insertCount} Records. yearScheduleImport Succeeded.");
             });
         } catch (\Exception  $e) {
             // この時点では補足できないエラーとして、詳細は返さずエラーとする
             Log::error($e);
         }
-        // 念のため明示的に捨てる
-        $datas = null;
 
         return;
     }
@@ -305,7 +285,7 @@ class YearScheduleImportController extends Controller
                 // [バリデーション] ヘッダが想定通りかチェック
                 if ($headers !== $csvHeaders) {
                     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                         . "：ヘッダ行不正)");
+                        . "(ヘッダ行不正)");
                 }
                 continue;
             }
@@ -316,7 +296,7 @@ class YearScheduleImportController extends Controller
             // [バリデーション] データ行の列の数のチェック
             if (count($line) !== count($csvHeaders)) {
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                     . "：データ列数不正)");
+                    . "(データ列数不正)");
             }
 
             // headerをもとに、値をセットしたオブジェクトを生成
@@ -331,11 +311,26 @@ class YearScheduleImportController extends Controller
             $rules += ['月度' => ['required', 'max:2', 'regex:/^([0-9]|[1][0-2]\d*)$/']];
             $rules += ['週数' => ['required', 'max:1', 'regex:/^(0|[0-4]\d*)$/']];
 
+            // バリデーションルールチェック
             $validator = Validator::make($values, $rules);
-
             if ($validator->fails()) {
+                $errCol = "";
+                if ($validator->errors()->has('年月日')) {
+                    $errCol = "年月日=" . $values['年月日'];
+                } else if ($validator->errors()->has('曜日')) {
+                    $errCol = "曜日=" . $values['曜日'];
+                } else if ($validator->errors()->has('期間区分')) {
+                    $errCol =  "期間区分=" . $values['期間区分'];
+                } else if ($validator->errors()->has('期間区分コード')) {
+                    $errCol =  "期間区分コード=" . $values['期間区分コード'];
+                } else if ($validator->errors()->has('月度')) {
+                    $errCol =  "月度=" . $values['月度'];
+                } else if ($validator->errors()->has('週数')) {
+                    $errCol =  "週数=" . $values['週数'];
+                }
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                     . "：データ項目不正)");
+                    . "：データ項目不正( 年月日=" . $values['年月日'] . ", "
+                    . "エラー項目：" . $errCol . " )");
             }
 
             foreach ($values as $key => $val) {
@@ -345,15 +340,9 @@ class YearScheduleImportController extends Controller
                 }
             }
 
-            // リストに保持しておく
-            $datas["datas"][] = $values;
-            $datas["ids"]['lesson_date'] = $values["年月日"];
-            $datas["ids"]['campus_cd'] = 02;
+            // リストに保持
+            $datas[] = $values;
         }
-
-        // sidをユニークにする
-        $datas["ids"] = array_unique($datas["ids"]);
-        $datas["ids"] = array_values($datas["ids"]);
 
         return $datas;
     }
