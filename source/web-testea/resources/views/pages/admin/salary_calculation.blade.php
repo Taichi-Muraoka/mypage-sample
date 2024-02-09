@@ -20,7 +20,7 @@
 
         <tr v-for="item in paginator.data" v-cloak>
             <td>@{{$filters.formatYmString(item.salary_date)}}</td>
-            <td>@{{$filters.formatYmString(item.comfirm_date)}}</td>
+            <td>@{{$filters.formatYmd(item.confirm_date)}}</td>
             <td><span v-if="item.state == {{ App\Consts\AppConst::CODE_MASTER_24_0 }}"
                     class="text-danger">@{{item.state_name}}</span><span v-else>@{{item.state_name}}</span></td>
             <td>

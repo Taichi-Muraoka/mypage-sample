@@ -139,7 +139,7 @@ class SalaryCalculationController extends Controller
         // 確定済みの場合あらかじめ日付のフォーマットをかけておく
         $confirm_date = null;
         if ($salary_mng->confirm_date != null) {
-            $confirm_date = $salary_mng->confirm_date->format('Y年m月d日');
+            $confirm_date = $salary_mng->confirm_date->format('Y/m/d');
         }
 
         // ボタンの制御
