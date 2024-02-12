@@ -28,7 +28,8 @@ export default class AppClass extends PageBase {
             $vue.selectGetItemPeriods = {};
             var campusCd = $vue.form.campus_cd;
             var targetDate = value;
-            // 時限プルダウンは動的に変わるので、一旦クリアする
+            // 時限プルダウンは動的に変わるので、選択値(selected)を退避し一旦クリアする
+            $vue.form.period_no_bef = $vue.form.period_no;
             $vue.form.period_no = "";
             // チェンジイベントを発生させる
             self.selectChangeGetCallBack2(
@@ -47,7 +48,15 @@ export default class AppClass extends PageBase {
                 (data) => {
                     // データをセット
                     $vue.selectGetItemPeriods = data.periods;
-                    $vue.form.start_time = "";
+                    if (data.periods.length != 0 && data.periods.some(item => item.code == $vue.form.period_no_bef))  {
+                        // 時限リストが取得できた場合 かつ 時限リストに存在する場合のみ
+                        // 退避した時限(selected)をセット
+                        $vue.form.period_no = $vue.form.period_no_bef;
+                    } else {
+                        // 退避した時限(selected)をセットできない場合、開始時刻もクリアする
+                        $vue.form.period_no_bef = "";
+                        $vue.form.start_time = "";
+                    }
                 }
             );
         };

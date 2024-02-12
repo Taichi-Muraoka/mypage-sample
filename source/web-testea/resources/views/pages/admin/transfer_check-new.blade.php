@@ -14,6 +14,7 @@
 
     {{-- hidden --}}
     <x-input.hidden id="campus_cd" />
+    <x-input.hidden id="period_no_bef" />
 
     <x-input.select caption="生徒名" id="student_id" :select2=true :mastrData=$students :editData=$editData
         :select2Search=true onChange="selectChangeStudent" />

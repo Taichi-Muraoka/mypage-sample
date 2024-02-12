@@ -82,6 +82,9 @@
 <x-input.hidden id="student_id" :editData=$editData />
 <x-input.hidden id="campus_cd" :editData=$editData />
 <x-input.hidden id="tutor_id" :editData=$editData />
+@for ($i = 1; $i <= 3; $i++)
+<x-input.hidden id="preferred_date{{$i}}_period_bef" />
+@endfor
 
 {{-- フッター --}}
 <x-slot name="footer">

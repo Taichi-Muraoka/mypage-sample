@@ -268,8 +268,8 @@ class ExtraLessonMngController extends Controller
         // 教室管理者の場合、自分の教室コードのみにガードを掛ける
         $this->guardRoomAdminRoomcd($campusCd);
 
-        // 時限リストを取得
-        $periods = $this->mdlGetPeriodListByKind($campusCd, AppConst::CODE_MASTER_37_0);
+        // 時限リストを取得（校舎・日付から）
+        $periods = $this->mdlGetPeriodListByDate($campusCd, $targetDate);
 
         // [ガード] 時限がプルダウンの中にあるかチェック
         $this->guardListValue($periods, $periodNo);
@@ -705,8 +705,8 @@ class ExtraLessonMngController extends Controller
     {
         // 独自バリデーション: リストのチェック 時限
         $validationPeriodList =  function ($attribute, $value, $fail) use ($request) {
-            // 時限リストを取得
-            $list = $this->mdlGetPeriodListByKind($request['campus_cd'], AppConst::CODE_MASTER_37_0);
+            // 時限リストを取得（校舎・日付から）
+            $list = $this->mdlGetPeriodListByDate($request['campus_cd'], $request['target_date']);
             if (!isset($list[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
