@@ -47,7 +47,7 @@ class OvertimeController extends Controller
         ];
 
         return view('pages.admin.overtime', [
-            'rules' => $this->rulesForSearch(),
+            'rules' => $this->rulesForSearch(null),
             'editData' => $editData
         ]);
     }
@@ -61,7 +61,7 @@ class OvertimeController extends Controller
     public function validationForSearch(Request $request)
     {
         // リクエストデータチェック
-        $validator = Validator::make($request->all(), $this->rulesForSearch());
+        $validator = Validator::make($request->all(), $this->rulesForSearch($request));
         return $validator->errors();
     }
 
@@ -74,7 +74,7 @@ class OvertimeController extends Controller
     public function search(Request $request)
     {
         // バリデーション。NGの場合はレスポンスコード422を返却
-        Validator::make($request->all(), $this->rulesForSearch())->validate();
+        Validator::make($request->all(), $this->rulesForSearch($request))->validate();
 
         // formを取得
         $form = $request->all();
@@ -103,15 +103,20 @@ class OvertimeController extends Controller
      *
      * @return mixed ルール
      */
-    private function rulesForSearch()
+    private function rulesForSearch(?Request $request)
     {
         $rules = array();
 
+        // $this->debug($request['target_date_from']);
+
         $ruleTargetDate = Schedule::getFieldRule('target_date');
+        
         // FromとToの大小チェックバリデーションを追加(Fromが存在する場合のみ)
         $validateFromTo = [];
         $keyFrom = 'target_date_from';
-        $validateFromTo = ['after_or_equal:' . $keyFrom];
+        if (isset($request[$keyFrom]) && filled($request[$keyFrom])) {
+            $validateFromTo = ['after_or_equal:' . $keyFrom];
+        }
 
         $rules += ['target_date_from' => $ruleTargetDate];
         $rules += ['target_date_to' => array_merge($validateFromTo, $ruleTargetDate)];
