@@ -480,7 +480,7 @@ class InvoiceImportController extends Controller
                     }
                 }
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                    . "：データ項目不正( 生徒ID=" . $values['生徒ID'] . ", "
+                    . "データ項目不正( 生徒ID=" . $values['生徒ID'] . ", "
                     . "エラー項目：" . $errCol . " )");
             }
 
@@ -488,7 +488,7 @@ class InvoiceImportController extends Controller
             $payTypeKey = $values['支払方法'];
             if (!isset($payType[$payTypeKey])) {
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                    . "：支払方法不正( 生徒ID=" . $values['生徒ID'] . ", "
+                    . "支払方法不正( 生徒ID=" . $values['生徒ID'] . ", "
                     . "支払方法=" . $values['支払方法'] . " )");
             }
 
@@ -502,7 +502,7 @@ class InvoiceImportController extends Controller
             // 最大出現回数が1でない場合（既に存在する場合）はエラー
             if ($max != 1) {
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                    . "：生徒重複( 生徒ID=" . $values['生徒ID'] . " )");
+                    . "生徒重複( 生徒ID=" . $values['生徒ID'] . " )");
             }
 
             // $datas配列に1行分のデータを格納する
