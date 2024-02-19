@@ -443,6 +443,8 @@ class SeasonMngStudentController extends Controller
     {
         // IDのバリデーション
         $this->validateIds($seasonStudentId);
+        // コードのバリデーション
+        $this->validateIds($subjectCd);
 
         // 現在日を取得
         $today = date("Y-m-d");
@@ -499,6 +501,14 @@ class SeasonMngStudentController extends Controller
             ->where('season_student_times.subject_cd', $subjectCd)
             // 登録済データのみ表示可
             ->where('season_student_requests.regist_status', AppConst::CODE_MASTER_5_1)
+            ->firstOrFail();
+
+        // 特別期間講習管理情報の生徒受付期間内かチェック
+        SeasonMng::where('season_cd', $seasonStudent->season_cd)
+            ->where('campus_cd', $seasonStudent->campus_cd)
+            // 生徒受付期間内
+            ->where('season_mng.s_start_date', '<=', $today)
+            ->where('season_mng.s_end_date', '>=', $today)
             ->firstOrFail();
 
         // 時限リストを取得（校舎・時間割区分から）

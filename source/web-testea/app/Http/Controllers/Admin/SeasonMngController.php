@@ -124,6 +124,9 @@ class SeasonMngController extends Controller
         // IDのバリデーション
         $this->validateIds($seasonMngId);
 
+        // 現在日を取得
+        $today = date("Y-m-d");
+
         // クエリを作成
         $query = SeasonMng::query();
 
@@ -158,6 +161,12 @@ class SeasonMngController extends Controller
             }, 'mst_codes_38')
             // IDを指定
             ->where('season_mng_id', $seasonMngId)
+            // 生徒受付終了日がNULL または 当日以降
+            ->where(function ($orQuery) use ($today) {
+                $orQuery
+                    ->where('season_mng.s_end_date', '>=', $today)
+                    ->orWhereNull('season_mng.s_end_date');
+            })
             ->firstOrFail();
 
         return view('pages.admin.season_mng-edit', [
