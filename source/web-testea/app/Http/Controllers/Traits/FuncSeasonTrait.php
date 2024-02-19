@@ -98,6 +98,8 @@ trait FuncSeasonTrait
         if (AuthEx::isStudent()) {
             // 生徒の場合、自分の生徒IDのみにガードを掛ける
             $query->where($this->guardStudentTableWithSid());
+            // 生徒の場合、自分の所属校舎のみにガードを掛ける
+            $query->where($this->guardStudentTableWithRoomCd());
         }
 
         return $query
@@ -146,7 +148,26 @@ trait FuncSeasonTrait
                     ->where('mst_codes_47.data_type', AppConst::CODE_MASTER_47);
             }, 'mst_codes_47')
             // 生徒受付開始日が当日以前のもの
-            ->where('season_mng.s_start_date', '<=', $today);
+            ->where('season_mng.s_start_date', '<=', $today)
+            // 生徒登録状態による絞り込み
+            ->where(function ($orQuery) {
+                $orQuery
+                    // 生徒登録状態が登録済の場合は、生徒所属校舎の絞り込みなし
+                    // （但し、生徒側からは所属校舎のみのガードが有効となっている）
+                    ->where('season_student_requests.regist_status', AppConst::CODE_MASTER_5_1)
+                    // または
+                    // 生徒登録状態が未登録の場合は、現在の生徒所属校舎のみ
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->where('season_student_requests.regist_status', AppConst::CODE_MASTER_5_0)
+                            ->whereExists(function ($query) {
+                                $query->from('student_campuses')
+                                    ->whereColumn('student_campuses.campus_cd', 'season_student_requests.campus_cd')
+                                    ->whereColumn('student_campuses.student_id', 'season_student_requests.student_id')
+                                    // delete_dt条件の追加
+                                    ->whereNull('student_campuses.deleted_at');
+                            });
+                    });
+            });
     }
 
     /**
@@ -167,6 +188,8 @@ trait FuncSeasonTrait
         if (AuthEx::isStudent()) {
             // 生徒の場合、自分の生徒IDのみにガードを掛ける
             $query->where($this->guardStudentTableWithSid());
+            // 生徒の場合、自分の所属校舎のみにガードを掛ける
+            $query->where($this->guardStudentTableWithRoomCd());
         }
 
         // 教室名取得のサブクエリ
