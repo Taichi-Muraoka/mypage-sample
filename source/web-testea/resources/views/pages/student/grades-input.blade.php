@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', (request()->routeIs('grades-edit')) ? '生徒成績編集' : '生徒成績登録')
+@section('title', (request()->routeIs('grades-edit')) ? '成績編集' : '成績登録')
 
 {{-- 子ページ --}}
 @section('child_page', true)

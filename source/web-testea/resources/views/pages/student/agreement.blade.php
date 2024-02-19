@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '生徒情報')
+@section('title', '基本情報')
 
 @section('content')
 
