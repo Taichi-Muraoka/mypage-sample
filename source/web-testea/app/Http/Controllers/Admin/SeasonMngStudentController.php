@@ -241,7 +241,8 @@ class SeasonMngStudentController extends Controller
         $today = date("Y-m-d");
 
         // データを取得（生徒連絡情報）ガードあり
-        $seasonStudent = $this->fncSasnGetSeasonStudent($seasonStudentId);
+        // 生徒登録状態＝登録済のデータのみ
+        $seasonStudent = $this->fncSasnGetSeasonStudent($seasonStudentId, AppConst::CODE_MASTER_5_1);
 
         // クエリを作成（特別期間講習管理情報）
         $exists = SeasonMng::where('season_cd', $seasonStudent->season_cd)

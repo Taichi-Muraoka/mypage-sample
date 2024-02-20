@@ -174,9 +174,10 @@ trait FuncSeasonTrait
      * 特別期間講習 生徒連絡情報取得 詳細表示用
      *
      * @param integer $seasonStudentId 生徒連絡情報ID
+     * @param integer $regStatus 生徒登録ステータス 省略可
      * @return object
      */
-    private function fncSasnGetSeasonStudent($seasonStudentId)
+    private function fncSasnGetSeasonStudent($seasonStudentId, $regStatus = null)
     {
         // クエリを作成
         $query = SeasonStudentRequest::query();
@@ -225,8 +226,10 @@ trait FuncSeasonTrait
             })
             // IDを指定
             ->where('season_student_id', $seasonStudentId)
-            // 登録済データのみ表示可
-            ->where('regist_status', AppConst::CODE_MASTER_5_1)
+            // 生徒登録状態が指定された場合絞り込み
+            ->when(isset($regStatus), function ($query) use ($regStatus) {
+                return $query->where('regist_status', $regStatus);
+            })
             ->firstOrFail();
 
         return $seasonStudent;

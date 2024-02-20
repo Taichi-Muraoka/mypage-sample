@@ -10,7 +10,6 @@ use App\Models\SeasonMng;
 use App\Models\SeasonStudentRequest;
 use App\Models\SeasonStudentPeriod;
 use App\Models\SeasonStudentTime;
-use App\Models\CodeMaster;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncSeasonTrait;
@@ -94,7 +93,8 @@ class SeasonStudentController extends Controller
         $this->validateIds($seasonStudentId);
 
         // データを取得（生徒連絡情報）ガードあり
-        $seasonStudent = $this->fncSasnGetSeasonStudent($seasonStudentId);
+        // 生徒登録状態＝登録済のデータのみ
+        $seasonStudent = $this->fncSasnGetSeasonStudent($seasonStudentId, AppConst::CODE_MASTER_5_1);
 
         // データを取得（受講回数情報）
         $subjectTimes = $this->fncSasnGetSeasonStudentTime($seasonStudentId);
@@ -144,38 +144,9 @@ class SeasonStudentController extends Controller
         // IDのバリデーション
         $this->validateIds($seasonStudentId);
 
-        // クエリを作成
-        $query = SeasonStudentRequest::query();
-
-        // 教室名取得のサブクエリ
-        $room = $this->mdlGetRoomQuery();
-
-        // データを取得
-        $seasonStudent = $query
-            ->select(
-                'season_student_requests.season_student_id',
-                'season_student_requests.season_cd',
-                'season_student_requests.campus_cd',
-                DB::raw('LEFT(season_student_requests.season_cd, 4) as year'),
-                'mst_codes.gen_item2 as season_name',
-                'room_names.room_name as campus_name'
-            )
-            // 校舎名の取得
-            ->leftJoinSub($room, 'room_names', function ($join) {
-                $join->on('season_student_requests.campus_cd', '=', 'room_names.code');
-            })
-            // コードマスターとJOIN（期間区分）
-            ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on(DB::raw('RIGHT(season_student_requests.season_cd, 2)'), '=', 'mst_codes.gen_item1')
-                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_38);
-            })
-            // IDを指定
-            ->where('season_student_id', $seasonStudentId)
-            // 未登録時のみ表示可
-            ->where('regist_status', AppConst::CODE_MASTER_5_0)
-            // 自分の生徒IDのみにガードを掛ける
-            ->where($this->guardStudentTableWithSid())
-            ->firstOrFail();
+        // データを取得（生徒連絡情報）ガードあり
+        // 生徒登録状態＝未登録のデータのみ
+        $seasonStudent = $this->fncSasnGetSeasonStudent($seasonStudentId, AppConst::CODE_MASTER_5_0);
 
         // 科目リストを取得
         $subjects = $this->mdlGetSubjectList();
