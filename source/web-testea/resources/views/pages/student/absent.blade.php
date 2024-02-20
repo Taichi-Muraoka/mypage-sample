@@ -37,7 +37,7 @@
             </tr>
             <tr>
                 <th>校舎連絡先</th>
-                <td><span v-cloak><a href="tel:@{{selectGetItem.tel_campus}}">@{{selectGetItem.tel_campus}}</a></span>
+                <td><span v-cloak><a :href="'tel:'+selectGetItem.tel_campus">@{{selectGetItem.tel_campus}}</a></span>
                 </td>
             </tr>
         </x-bs.table>
