@@ -98,6 +98,8 @@ trait FuncSeasonTrait
         if (AuthEx::isStudent()) {
             // 生徒の場合、自分の生徒IDのみにガードを掛ける
             $query->where($this->guardStudentTableWithSid());
+            // 生徒の場合、自分の所属校舎のみにガードを掛ける
+            $query->where($this->guardStudentTableWithRoomCd());
         }
 
         return $query
@@ -106,6 +108,9 @@ trait FuncSeasonTrait
                 'students.name as student_name',
                 'season_student_requests.season_cd',
                 'mst_codes.gen_item2 as season_name',
+                'season_student_requests.campus_cd',
+                'season_mng.s_start_date',
+                'season_mng.s_end_date',
                 'season_student_requests.apply_date',
                 'season_student_requests.regist_status',
                 'mst_codes_5.name as regstatus_name',
@@ -143,16 +148,36 @@ trait FuncSeasonTrait
                     ->where('mst_codes_47.data_type', AppConst::CODE_MASTER_47);
             }, 'mst_codes_47')
             // 生徒受付開始日が当日以前のもの
-            ->where('season_mng.s_start_date', '<=', $today);
+            ->where('season_mng.s_start_date', '<=', $today)
+            // 生徒登録状態による絞り込み
+            ->where(function ($orQuery) {
+                $orQuery
+                    // 生徒登録状態が登録済の場合は、生徒所属校舎の絞り込みなし
+                    // （但し、生徒側からは所属校舎のみのガードが有効となっている）
+                    ->where('season_student_requests.regist_status', AppConst::CODE_MASTER_5_1)
+                    // または
+                    // 生徒登録状態が未登録の場合は、現在の生徒所属校舎のみ
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->where('season_student_requests.regist_status', AppConst::CODE_MASTER_5_0)
+                            ->whereExists(function ($query) {
+                                $query->from('student_campuses')
+                                    ->whereColumn('student_campuses.campus_cd', 'season_student_requests.campus_cd')
+                                    ->whereColumn('student_campuses.student_id', 'season_student_requests.student_id')
+                                    // delete_dt条件の追加
+                                    ->whereNull('student_campuses.deleted_at');
+                            });
+                    });
+            });
     }
 
     /**
      * 特別期間講習 生徒連絡情報取得 詳細表示用
      *
      * @param integer $seasonStudentId 生徒連絡情報ID
+     * @param integer $regStatus 生徒登録ステータス 省略可
      * @return object
      */
-    private function fncSasnGetSeasonStudent($seasonStudentId)
+    private function fncSasnGetSeasonStudent($seasonStudentId, $regStatus = null)
     {
         // クエリを作成
         $query = SeasonStudentRequest::query();
@@ -164,6 +189,8 @@ trait FuncSeasonTrait
         if (AuthEx::isStudent()) {
             // 生徒の場合、自分の生徒IDのみにガードを掛ける
             $query->where($this->guardStudentTableWithSid());
+            // 生徒の場合、自分の所属校舎のみにガードを掛ける
+            $query->where($this->guardStudentTableWithRoomCd());
         }
 
         // 教室名取得のサブクエリ
@@ -199,8 +226,10 @@ trait FuncSeasonTrait
             })
             // IDを指定
             ->where('season_student_id', $seasonStudentId)
-            // 登録済データのみ表示可
-            ->where('regist_status', AppConst::CODE_MASTER_5_1)
+            // 生徒登録状態が指定された場合絞り込み
+            ->when(isset($regStatus), function ($query) use ($regStatus) {
+                return $query->where('regist_status', $regStatus);
+            })
             ->firstOrFail();
 
         return $seasonStudent;

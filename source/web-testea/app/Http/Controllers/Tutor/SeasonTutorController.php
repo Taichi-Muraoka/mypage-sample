@@ -174,7 +174,12 @@ class SeasonTutorController extends Controller
      */
     public function new($seasonCd)
     {
+        // コードのバリデーション
+        $this->validateIds($seasonCd);
+
         $account = Auth::user();
+        // 現在日を取得
+        $today = date("Y-m-d");
 
         // パラメータ（特別期間コード）のチェック
         SeasonMng::select(
@@ -188,6 +193,18 @@ class SeasonTutorController extends Controller
             ->where('season_cd', $seasonCd)
             // 自分の講師IDで絞り込み
             ->where('tutor_campuses.tutor_id', $account->account_id)
+            // 講師受付期間内
+            ->where('season_mng.t_start_date', '<=', $today)
+            ->where('season_mng.t_end_date', '>=', $today)
+            // 登録済みのものを除外
+            ->whereNotExists(function ($query) use ($account) {
+                $query->select(DB::raw(1))
+                    ->from('season_tutor_requests')
+                    ->whereColumn('season_mng.season_cd', 'season_tutor_requests.season_cd')
+                    ->where('season_tutor_requests.tutor_id', $account->account_id)
+                    // delete_dt条件の追加
+                    ->whereNull('season_tutor_requests.deleted_at');
+            })
             ->firstOrFail();
 
         // パラメータ切り分け
