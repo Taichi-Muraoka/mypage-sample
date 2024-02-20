@@ -92,8 +92,8 @@ class MasterMngGradeSubjectController extends Controller
             return $this->illegalResponseErr();
         }
 
-        // 学校区分リストを取得
-        $schoolKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_39);
+        // 学校区分リストを取得（サブコード0のみ）
+        $schoolKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_39, [AppConst::CODE_MASTER_39_SUB_0]);
 
         return view('pages.admin.master_mng_grade_subject-input', [
             'rules' => $this->rulesForInput(null),
@@ -145,8 +145,8 @@ class MasterMngGradeSubjectController extends Controller
             return $this->illegalResponseErr();
         }
 
-        // 学校区分リストを取得
-        $schoolKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_39);
+        // 学校区分リストを取得（サブコード0のみ）
+        $schoolKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_39, [AppConst::CODE_MASTER_39_SUB_0]);
 
         // 対象のデータを取得
         $mstGradeSubject = MstGradeSubject::select(
