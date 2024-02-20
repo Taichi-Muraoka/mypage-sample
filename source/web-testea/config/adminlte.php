@@ -347,7 +347,7 @@ return [
         //     'active' => ['report/*']
         // ],
         [
-            'text' => '生徒成績',
+            'text' => '成績情報',
             'route'  => 'grades',
             'icon' => 'fas fa-chart-line',
             'can'  => 'student',
@@ -375,7 +375,7 @@ return [
             'active' => ['absent/*']
         ],
         [
-            'text' => '生徒情報',
+            'text' => '基本情報',
             'route'  => 'agreement',
             'icon' => 'fas fa-file-contract',
             'can'  => 'student',

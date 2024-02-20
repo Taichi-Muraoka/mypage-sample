@@ -58,6 +58,22 @@ trait GuardTrait
         };
     }
 
+    /**
+     * テーブルそのものに校舎コード・生徒IDを持っており、
+     * 生徒の所属校舎でガードをかける
+     * whereにそのまま指定する
+     */
+    protected function guardStudentTableWithRoomCd()
+    {
+        // クロージャで呼んでもらうため、関数で返却
+        return function ($query) {
+
+            // 呼び元の主テーブルについて生徒の所属校舎のみを絞り込む
+            $account = Auth::user();
+            $this->mdlWhereRoomBySidQuery($query, get_class($query->getModel()), $account->account_id);
+        };
+    }
+
     //==========================
     // 講師
     //==========================

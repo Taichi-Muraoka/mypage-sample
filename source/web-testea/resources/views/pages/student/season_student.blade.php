@@ -25,7 +25,7 @@
             <x-bs.td-sp caption="特別期間名">@{{item.year}}年@{{item.season_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="校舎">@{{item.campus_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="受付開始日">@{{$filters.formatYmd(item.s_start_date)}}</x-bs.td-sp>
-            <x-bs.td-sp caption="ステータス">@{{item.status_name}}</x-bs.td-sp>
+            <x-bs.td-sp caption="ステータス">@{{item.regstatus_name}}</x-bs.td-sp>
             <x-bs.td-sp caption="連絡日">@{{$filters.formatYmd(item.apply_date)}}</x-bs.td-sp>
             <td>
                 {{-- 未登録の場合（登録期間内の場合のみ押下可） --}}
