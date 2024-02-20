@@ -57,6 +57,9 @@ class ReportCheckController extends Controller
         // 講師リストを取得
         $tutors = $this->mdlGetTutorList();
 
+        // 生徒プルダウン
+        $students = $this->mdlGetStudentList();
+
         // コースリストを取得
         $courses = $this->mdlGetCourseList(null, AppConst::CODE_MASTER_42_3);
 
@@ -69,35 +72,11 @@ class ReportCheckController extends Controller
             'rooms' => $rooms,
             'grades' => $grades,
             'tutors' => $tutors,
+            'students' => $students,
             'courses' => $courses,
             'statusList' => $statusList,
             'editData' => null
         ]);
-    }
-
-    /**
-     * 生徒情報取得（校舎リスト選択時）
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return array 生徒情報
-     */
-    public function getDataSelectSearch(Request $request)
-    {
-        // campus_cdを取得
-        $campus_cd = $request->input('id');
-
-        // 生徒リスト取得
-        if ($campus_cd == -1 || !filled($campus_cd)) {
-            // -1 または 空白の場合、自分の受け持ちの生徒だけに絞り込み
-            // 生徒リストを取得
-            $students = $this->mdlGetStudentList();
-        } else {
-            $students = $this->mdlGetStudentList($campus_cd);
-        }
-
-        return [
-            'selectItems' => $this->objToArray($students),
-        ];
     }
 
     /**
@@ -134,8 +113,7 @@ class ReportCheckController extends Controller
         $query->where($this->guardRoomAdminTableWithRoomCd());
 
         // 校舎コード選択による絞り込み条件
-        // -1 は未選択状態のため、-1以外の場合に校舎コードの絞り込みを行う
-        if (isset($form['campus_cd']) && filled($form['campus_cd']) && $form['campus_cd'] != -1) {
+        if (isset($form['campus_cd']) && filled($form['campus_cd'])) {
             // 検索フォームから取得（スコープ）
             $query->SearchCampusCd($form);
         }

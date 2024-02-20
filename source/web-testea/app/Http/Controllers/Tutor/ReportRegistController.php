@@ -70,6 +70,9 @@ class ReportRegistController extends Controller
         // コースリストを取得（面談を除外）
         $courses = $this->mdlGetCourseList(null, AppConst::CODE_MASTER_42_3);
 
+        // 生徒プルダウン
+        $students = $this->mdlGetStudentList();
+
         // 報告書承認リストを取得（サブコード指定で絞り込み）
         $subCodes = [AppConst::CODE_MASTER_4_SUB_1];
         $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4, $subCodes);
@@ -78,38 +81,10 @@ class ReportRegistController extends Controller
             'rules' => $this->rulesForSearch(),
             'rooms' => $rooms,
             'courses' => $courses,
+            'students' => $students,
             'statusList' => $statusList,
             'editData' => null
         ]);
-    }
-
-    /**
-     * 生徒情報取得（校舎リスト選択時）
-     *
-     * @param \Illuminate\Http\Request $request リクエスト
-     * @return array 生徒情報
-     */
-    public function getDataSelectSearch(Request $request)
-    {
-        // campus_cdを取得
-        $campus_cd = $request->input('id');
-
-        // ログイン者の情報を取得する
-        $account = Auth::user();
-        $account_id = $account->account_id;
-
-        // 生徒リスト取得
-        if ($campus_cd == -1 || !filled($campus_cd)) {
-            // -1 または 空白の場合、自分の受け持ちの生徒だけに絞り込み
-            // 生徒リストを取得
-            $students = $this->mdlGetStudentListForT(null, $account_id);
-        } else {
-            $students = $this->mdlGetStudentListForT($campus_cd, $account_id);
-        }
-
-        return [
-            'selectItems' => $this->objToArray($students),
-        ];
     }
 
     /**
@@ -134,8 +109,7 @@ class ReportRegistController extends Controller
         $query = Report::query();
 
         // 校舎コード選択による絞り込み条件
-        // -1 は未選択状態のため、-1以外の場合に校舎コードの絞り込みを行う
-        if (isset($form['campus_cd']) && filled($form['campus_cd']) && $form['campus_cd'] != -1) {
+        if (isset($form['campus_cd']) && filled($form['campus_cd'])) {
             // 検索フォームから取得（スコープ）
             $query->SearchCampusCd($form);
         }

@@ -60,10 +60,14 @@ class ConferenceAcceptController extends Controller
         // ステータスプルダウン
         $states = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_5);
 
+        // 生徒プルダウン
+        $students = $this->mdlGetStudentList();
+
         return view('pages.admin.conference_accept', [
             'rules' => $this->rulesForSearch(null),
             'rooms' => $rooms,
             'states' => $states,
+            'students' => $students,
             'editData' => null
         ]);
     }
@@ -124,8 +128,7 @@ class ConferenceAcceptController extends Controller
         $query = Conference::query();
 
         // 校舎コード選択による絞り込み条件
-        // -1 は未選択状態のため、-1以外の場合に校舎コードの絞り込みを行う
-        if (isset($form['campus_cd']) && filled($form['campus_cd']) && $form['campus_cd'] != -1) {
+        if (isset($form['campus_cd']) && filled($form['campus_cd'])) {
             // 検索フォームから取得（スコープ）
             $query->SearchCampusCd($form);
         }

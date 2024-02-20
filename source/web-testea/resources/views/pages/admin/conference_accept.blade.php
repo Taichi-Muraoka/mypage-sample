@@ -11,11 +11,11 @@
         <x-bs.col2>
             @can('roomAdmin')
             {{-- 教室管理者の場合、1つなので検索や未選択を非表示にする --}}
-            <x-input.select id="campus_cd" caption="校舎" :select2=true onChange="selectChangeGetRoom" :mastrData=$rooms :editData=$editData
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false :blank=false/>
             @else
-            <x-input.select id="campus_cd" caption="校舎" :select2=true onChange="selectChangeGetRoom" :mastrData=$rooms :editData=$editData 
-                :select2Search=false emptyValue="-1"/>
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData 
+                :select2Search=false/>
             @endcan
         </x-bs.col2>
         <x-bs.col2>
@@ -25,12 +25,8 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select caption="生徒名" id="student_id" :select2=true :editData=$editData>
-                {{-- vueで動的にプルダウンを作成 --}}
-                <option v-for="item in selectGetItem.selectItems" :value="item.id">
-                    @{{ item.value }}
-                </option>
-            </x-input.select>
+            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$students :editData=$editData 
+                :select2Search=false/>
         </x-bs.col2>
     </x-bs.row>
 
