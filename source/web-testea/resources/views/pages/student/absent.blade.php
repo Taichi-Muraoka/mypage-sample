@@ -17,7 +17,7 @@
 
     {{-- 詳細を表示 --}}
     <div v-cloak>
-        <x-bs.table :hover=false :vHeader=true class="mb-4">
+        <x-bs.table :hover=false :vHeader=true class="mb-4" vShow="form.schedule_id">
             <tr>
                 <th width="35%">校舎</th>
                 <td><span v-cloak>@{{selectGetItem.campus_name}}</span></td>
@@ -27,7 +27,7 @@
                 <td><span v-cloak>@{{selectGetItem.course_name}}</span></td>
             </tr>
             <tr>
-                <th>講師</th>
+                <th>講師名</th>
                 <td><span v-cloak>@{{selectGetItem.tutor_name}}<span v-if="selectGetItem.teacher_name">先生</span></span>
                 </td>
             </tr>
@@ -37,7 +37,7 @@
             </tr>
             <tr>
                 <th>校舎連絡先</th>
-                <td><span v-cloak><a href="tel:@{{selectGetItem.tel_campus}}">@{{selectGetItem.tel_campus}}</a></span>
+                <td><span v-cloak><a :href="'tel:'+selectGetItem.tel_campus">@{{selectGetItem.tel_campus}}</a></span>
                 </td>
             </tr>
         </x-bs.table>
