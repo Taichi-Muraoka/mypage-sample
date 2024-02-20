@@ -1260,6 +1260,11 @@ class AppConst
      */
     const CODE_MASTER_39_4 = 4;
 
+    /**
+     * 学校区分 サブコード その他非表示用
+     */
+    const CODE_MASTER_39_SUB_0 = 0;
+
     //-----------
     // 講師学校区分
     //-----------
