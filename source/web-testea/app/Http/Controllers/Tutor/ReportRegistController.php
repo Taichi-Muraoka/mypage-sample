@@ -70,8 +70,12 @@ class ReportRegistController extends Controller
         // コースリストを取得（面談を除外）
         $courses = $this->mdlGetCourseList(null, AppConst::CODE_MASTER_42_3);
 
+        // ログイン者の情報を取得する
+        $account = Auth::user();
+        $account_id = $account->account_id;
+
         // 生徒プルダウン
-        $students = $this->mdlGetStudentList();
+        $students = $this->mdlGetStudentListForT(null, $account_id);
 
         // 報告書承認リストを取得（サブコード指定で絞り込み）
         $subCodes = [AppConst::CODE_MASTER_4_SUB_1];
