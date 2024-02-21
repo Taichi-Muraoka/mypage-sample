@@ -47,8 +47,8 @@ class GradeExampleController extends Controller
         // 校舎リストを取得
         $rooms = $this->mdlGetRoomList(false);
 
-        // 学校区分リスト
-        $schoolKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_39);
+        // 学校区分リスト（サブコード0のみ）
+        $schoolKindList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_39, [AppConst::CODE_MASTER_39_SUB_0]);
 
         // 種別リスト
         $examTypeList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_43);

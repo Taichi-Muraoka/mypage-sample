@@ -72,7 +72,7 @@
             </tr>
             {{-- 個別指導の場合 --}}
             <tr v-show="selectGetItem.course_kind == {{ App\Consts\AppConst::CODE_MASTER_42_1 }}">
-                <th>生徒</th>
+                <th>生徒名</th>
                 <td><span v-cloak>@{{selectGetItem.student_name}}</span></td>
             </tr>
             {{-- 集団授業の場合 --}}
@@ -81,7 +81,7 @@
                 <td><span v-for="member in selectGetItem.class_member_name" v-cloak>@{{member}}<br></span></td>
             </tr>
             <tr>
-                <th>科目</th>
+                <th>教科</th>
                 <td><span v-cloak>@{{selectGetItem.subject_name}}</span></td>
             </tr>
         </x-bs.table>
