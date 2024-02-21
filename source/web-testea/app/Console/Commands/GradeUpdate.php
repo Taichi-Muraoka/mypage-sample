@@ -67,14 +67,14 @@ class GradeUpdate extends Command
             $batchMng->adm_id = null;
             $batchMng->save();
 
-            // バッヂID
+            // バッチ管理ID
             $batch_id = $batchMng->batch_id;
 
             // システムマスタから現年度を取得
             $system = MstSystem::where('key_id', AppConst::SYSTEM_KEY_ID_1)
                 ->firstOrFail();
 
-            // 生徒情報を取得
+            // 生徒情報を取得（高3までの生徒を対象とする）
             $students = Student::where('grade_cd', '<=', AppConst::GRADE_CD_12)
                 ->select(
                     'student_id',
@@ -84,14 +84,15 @@ class GradeUpdate extends Command
                 )
                 ->get();
 
-            // 年度はじめを取得
-            $next_year_start_date = date('Y', strtotime('+10 month')) . '0401';
-
             // トランザクション(例外時は自動的にロールバック)
-            DB::transaction(function () use ($system, $students, $next_year_start_date, $batch_id) {
+            DB::transaction(function () use ($system, $students, $batch_id) {
+
+                // 新年度の4月1日の日付（ハイフンなし）
+                $newYear = $system->value_num + 1;
+                $next_year_start_date = $newYear . '0401';
 
                 // システムマスタの現年度更新
-                $system->value_num = $system->value_num + 1;
+                $system->value_num = $newYear;
                 $system->save();
 
                 // 新年度の年齢での学年を取得
@@ -102,18 +103,18 @@ class GradeUpdate extends Command
 
                 // 生徒の学年更新
                 foreach ($students as $student) {
-                    // 誕生日
+                    // 生徒の誕生日を取得
                     $birthday = $student->birth_date->format('Ymd');
 
-                    // 年齢
+                    // 誕生日から4/1時点の年齢を算出する
                     $age = floor(($next_year_start_date - $birthday) / 10000);
 
-                    // 次年度が19歳以上で現高3の生徒は大学生
-                    if ($student->grade_cd == AppConst::GRADE_CD_12 && $age > AppConst::GRADE_CD_12_AGE) {
+                    if ($student->grade_cd == AppConst::GRADE_CD_12) {
+                        // 現高3の生徒は次年度の学年コードを大学生とする
                         $next_grade_cd = AppConst::GRADE_CD_16;
                     }
                     else {
-                        // 次年度の年齢
+                        // それ以外の生徒は年齢から次年度の学年コード設定
                         $next_grade_cd = $grade_age[$age]['grade_cd'];
                     }
 

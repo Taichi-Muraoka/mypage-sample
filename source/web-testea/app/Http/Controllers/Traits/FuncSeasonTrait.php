@@ -16,6 +16,7 @@ use App\Models\SeasonStudentPeriod;
 use App\Models\SeasonTutorRequest;
 use App\Models\SeasonTutorPeriod;
 use App\Models\MstSubject;
+use App\Models\MstSystem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -610,30 +611,35 @@ trait FuncSeasonTrait
      */
     private function fncSasnGetDispSeasonCd()
     {
+        // システムマスタから当年度を取得
+        $currentYear = MstSystem::select('value_num')
+            ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
+            ->first();
+
         // 現在月を取得
         $month = date("n");
 
         switch ($month) {
-            case 2:
             case 3:
             case 4:
             case 5:
-                // 2～5月の場合、当年の春期特別期間コードとする
-                return date("Y") . AppConst::CODE_MASTER_38_GEN1_1;
+                // 3～5月の場合、当年度の春期特別期間まで表示する
+                return $currentYear->value_num . AppConst::CODE_MASTER_38_GEN1_1;
             case 6:
             case 7:
             case 8:
             case 9:
             case 10:
-                // 6～10月の場合、当年の夏期特別期間コードとする
-                return date("Y") . AppConst::CODE_MASTER_38_GEN1_2;
+                // 6～10月の場合、当年度の夏期特別期間まで表示する
+                return $currentYear->value_num . AppConst::CODE_MASTER_38_GEN1_2;
             case 11:
             case 12:
-                // 11～12月の場合、当年の冬期特別期間コードとする
-                return date("Y") . AppConst::CODE_MASTER_38_GEN1_3;
             case 1:
-                // 1月の場合、年が変わるため前年の冬期特別期間コードとする
-                return date('Y', strtotime('-1 year')) . AppConst::CODE_MASTER_38_GEN1_3;
+                // 11～1月の場合、当年度の冬期特別期間まで表示する
+                return $currentYear->value_num . AppConst::CODE_MASTER_38_GEN1_3;
+            case 2:
+                // 2月の場合、次年度の春期特別期間まで表示する
+                return $currentYear->value_num + 1 . AppConst::CODE_MASTER_38_GEN1_1;
             default:
                 // 不正なエラー
                 $this->illegalResponseErr();
