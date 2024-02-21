@@ -32,7 +32,8 @@ trait CtrlDateTrait
         // システムマスタから当年度を取得
         $currentYear = MstSystem::select('value_num')
             ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
-            ->first();
+            ->whereNotNull('value_num')
+            ->firstOrFail();
 
         // 当年度開始日 当年度/03/01
         $curStartdate = $currentYear->value_num . '/03/01';

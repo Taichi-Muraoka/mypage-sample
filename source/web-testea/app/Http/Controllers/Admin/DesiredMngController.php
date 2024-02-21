@@ -74,7 +74,8 @@ class DesiredMngController extends Controller
         // システムマスタ「現年度」を取得（更新ボタン制御用）
         $currentYear = MstSystem::select('value_num')
             ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
-            ->first();
+            ->whereNotNull('value_num')
+            ->firstOrFail();
 
         // クエリ作成
         $query = StudentEntranceExam::query();
@@ -252,7 +253,8 @@ class DesiredMngController extends Controller
         // システムマスタ「現年度」を取得
         $currentYear = MstSystem::select('value_num')
             ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
-            ->first();
+            ->whereNotNull('value_num')
+            ->firstOrFail();
 
         if ($exam->exam_year < $currentYear->value_num) {
             // 受験年度が前年度以前の場合、エラーを表示する

@@ -811,7 +811,8 @@ trait CtrlModelTrait
         // システムマスタ「現年度」を取得
         $currentYear = MstSystem::select('value_num')
             ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
-            ->first();
+            ->whereNotNull('value_num')
+            ->firstOrFail();
 
         // 現年度～2年後までのリストを作る 例2023～2025
         $examYearList = [];
@@ -873,7 +874,8 @@ trait CtrlModelTrait
         // 年は、システムマスタの「現年度」から取得する。
         $currentYear = MstSystem::select('value_num')
             ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
-            ->first();
+            ->whereNotNull('value_num')
+            ->firstOrFail();
 
         // 期間区分コード（2桁）を取得する（サブコード1のみ：春期01,夏期02,冬期03）
         $termList = CodeMaster::select('gen_item1')

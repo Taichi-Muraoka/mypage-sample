@@ -614,7 +614,8 @@ trait FuncSeasonTrait
         // システムマスタから当年度を取得
         $currentYear = MstSystem::select('value_num')
             ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
-            ->first();
+            ->whereNotNull('value_num')
+            ->firstOrFail();
 
         // 現在月を取得
         $month = date("n");

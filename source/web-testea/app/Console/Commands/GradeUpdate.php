@@ -72,6 +72,7 @@ class GradeUpdate extends Command
 
             // システムマスタから現年度を取得
             $system = MstSystem::where('key_id', AppConst::SYSTEM_KEY_ID_1)
+                ->whereNotNull('value_num')
                 ->firstOrFail();
 
             // 生徒情報を取得（高3までの生徒を対象とする）

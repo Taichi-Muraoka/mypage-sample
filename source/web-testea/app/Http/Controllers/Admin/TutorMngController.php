@@ -527,7 +527,8 @@ class TutorMngController extends Controller
         // 学年設定年度の初期表示用データセット（システムマスタ「現年度」）
         $currentYear = MstSystem::select('value_num')
             ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
-            ->first();
+            ->whereNotNull('value_num')
+            ->firstOrFail();
 
         // 性別リストを取得
         $genderList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_30);
