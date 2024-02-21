@@ -112,8 +112,7 @@ class GradeUpdate extends Command
                     if ($student->grade_cd == AppConst::GRADE_CD_12) {
                         // 現高3の生徒は次年度の学年コードを大学生とする
                         $next_grade_cd = AppConst::GRADE_CD_16;
-                    }
-                    else {
+                    } else {
                         // それ以外の生徒は年齢から次年度の学年コード設定
                         $next_grade_cd = $grade_age[$age]['grade_cd'];
                     }
