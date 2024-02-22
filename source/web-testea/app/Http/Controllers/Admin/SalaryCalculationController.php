@@ -221,7 +221,7 @@ class SalaryCalculationController extends Controller
                                 'tutor_id',
                                 'course_cd'
                             )
-                            ->selectRaw('SUM(minites) as sum_minutes')
+                            ->selectRaw('SUM(minutes) as sum_minutes')
                             ->groupBy('tutor_id', 'course_cd');
 
                         // コース別時間集計

@@ -937,7 +937,7 @@ class RoomCalendarController extends Controller
             // 時間（分）の算出
             $start = Carbon::createFromTimeString($form['start_time']);
             $end = Carbon::createFromTimeString($form['end_time']);
-            $minites = $start->diffInMinutes($end);
+            $minutes = $start->diffInMinutes($end);
 
             // 代講の有無により、講師ID・欠席講師IDの設定
             if ($form['substitute_kind_bef'] == AppConst::CODE_MASTER_34_0) {
@@ -977,7 +977,7 @@ class RoomCalendarController extends Controller
             }
             $schedule->start_time = $form['start_time'];
             $schedule->end_time = $form['end_time'];
-            $schedule->minites = $minites;
+            $schedule->minutes = $minutes;
             $schedule->booth_cd = $form['booth_cd'];
             $schedule->student_id = $form['student_id'];
             $schedule->tutor_id = $tutorId;

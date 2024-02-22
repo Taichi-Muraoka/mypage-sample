@@ -1,4 +1,4 @@
-schedule_id,campus_cd,target_date,period_no,start_time,end_time,minites,booth_cd,course_cd,student_id,tutor_id,subject_cd,create_kind,lesson_kind,how_to_kind,substitute_kind,absent_tutor_id,absent_status,tentative_status,regular_class_id,transfer_id,transfer_class_id,report_id,memo,adm_id,created_at,updated_at,deleted_at
+schedule_id,campus_cd,target_date,period_no,start_time,end_time,minutes,booth_cd,course_cd,student_id,tutor_id,subject_cd,create_kind,lesson_kind,how_to_kind,substitute_kind,absent_tutor_id,absent_status,tentative_status,regular_class_id,transfer_id,transfer_class_id,report_id,memo,adm_id,created_at,updated_at,deleted_at
 1,01,2023/09/04,5,16:45:00,18:15:00,90,101,10300,,101,501,0,1,0,0,,0,0,1,,,,,200,,,
 2,01,2023/09/04,6,18:30:00,20:00:00,90,101,10100,7,103,101,0,1,0,0,,0,0,2,,,,,200,,,
 3,01,2023/09/04,7,20:15:00,21:45:00,90,101,90100,7,,,0,0,0,0,,0,0,3,,,,,200,,,

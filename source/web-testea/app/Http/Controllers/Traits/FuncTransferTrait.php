@@ -180,7 +180,7 @@ trait FuncTransferTrait
                 'schedules.schedule_id',
                 'schedules.target_date',
                 'schedules.campus_cd',
-                'schedules.minites',
+                'schedules.minutes',
                 'schedules.booth_cd',
                 'schedules.how_to_kind',
                 'schedules.absent_status',
@@ -499,12 +499,12 @@ trait FuncTransferTrait
      * @param $toDate   終了日
      * @param $campusCd 校舎コード
      * @param $studentId 生徒ID
-     * @param $minites  授業時間
+     * @param $minutes  授業時間
      * @param $boothCd  ブースコード
      * @param $howToKind 通塾種別
      * @return object   日付,時限の配列
      */
-    private function fncTranGetTutorFreeSchedule($tutorId, $fromDate, $toDate, $campusCd, $studentId, $minites, $boothCd, $howToKind)
+    private function fncTranGetTutorFreeSchedule($tutorId, $fromDate, $toDate, $campusCd, $studentId, $minutes, $boothCd, $howToKind)
     {
         // 対象期間の年間予定を取得
         $lessonDate = $this->fncTranGetScheduleFromTo($campusCd, $fromDate, $toDate);
@@ -527,7 +527,7 @@ trait FuncTransferTrait
                     // 空き時間の時限が、対象日にあるかどうか
                     if (isset($periodList[$tutorFree->period_no])) {
                         // 終了時刻計算
-                        $endTime = $this->fncTranEndTime($periodList[$tutorFree->period_no]['start_time'], $minites);
+                        $endTime = $this->fncTranEndTime($periodList[$tutorFree->period_no]['start_time'], $minutes);
 
                         // 講師のスケジュール重複チェック
                         if ($this->fncScheChkDuplidateTid($lDate, $periodList[$tutorFree->period_no]['start_time'], $endTime, $tutorId)) {
@@ -596,7 +596,7 @@ trait FuncTransferTrait
             $targetPeriod['to_date'],
             $schedule->campus_cd,
             $schedule->student_id,
-            $schedule->minites,
+            $schedule->minutes,
             $schedule->booth_cd,
             $schedule->how_to_kind
         );
@@ -736,7 +736,7 @@ trait FuncTransferTrait
                 'schedules.student_id',
                 'schedules.tutor_id',
                 'schedules.how_to_kind',
-                'schedules.minites'
+                'schedules.minutes'
             )
             // 振替依頼情報の取得
             ->sdJoin(TransferApplication::class, function ($join) use ($tranAppId) {
@@ -916,7 +916,7 @@ trait FuncTransferTrait
             // 開始時刻設定
             $transferSchedule->start_time = $request->filled('start_time') ? $request->input('start_time') : $periodTime->start_time;
             // 終了時刻計算
-            $transferSchedule->end_time = $this->fncTranEndTime($transferSchedule->start_time, $schedule->minites);
+            $transferSchedule->end_time = $this->fncTranEndTime($transferSchedule->start_time, $schedule->minutes);
             // 対象講師ID・欠席講師ID設定（講師変更時のみ）
             if ($request->filled('change_tid')) {
                 // 授業代講種別設定
@@ -1507,7 +1507,7 @@ trait FuncTransferTrait
                 // 振替依頼日・時限 開始～終了時間取得
                 $periodTime = $this->fncScheGetTimetableByDatePeriod($schedule->campus_cd, $transferDate->transfer_date, $transferDate->period_no);
                 // 終了時刻計算
-                $endTime = $this->fncTranEndTime($periodTime->start_time, $schedule->minites);
+                $endTime = $this->fncTranEndTime($periodTime->start_time, $schedule->minutes);
 
                 // 生徒スケジュール重複チェック
                 if (!$this->fncScheChkDuplidateSid(

@@ -101,7 +101,7 @@ class TutorClassController extends Controller
                 'schedules.course_cd',
                 'mst_courses.summary_kind as summary_kind'
             )
-            ->selectRaw('SUM(minites) as sum_minites')
+            ->selectRaw('SUM(minutes) as sum_minutes')
             // コースマスタとJoin
             ->leftJoin('mst_courses', 'schedules.course_cd', '=', 'mst_courses.course_cd')
             ->groupBy('schedules.tutor_id', 'schedules.course_cd', 'summary_kind');
@@ -111,13 +111,13 @@ class TutorClassController extends Controller
             ->select(
                 'tutor_id'
             )
-            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS personal_min', [AppConst::CODE_MASTER_25_1])
-            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS two_min', [AppConst::CODE_MASTER_25_2])
-            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS three_min', [AppConst::CODE_MASTER_25_3])
-            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS home_min', [AppConst::CODE_MASTER_25_5])
-            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS exercise_min', [AppConst::CODE_MASTER_25_6])
-            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS high_min', [AppConst::CODE_MASTER_25_7])
-            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minites ELSE 0 END) AS group_min', [AppConst::CODE_MASTER_25_4])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minutes ELSE 0 END) AS personal_min', [AppConst::CODE_MASTER_25_1])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minutes ELSE 0 END) AS two_min', [AppConst::CODE_MASTER_25_2])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minutes ELSE 0 END) AS three_min', [AppConst::CODE_MASTER_25_3])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minutes ELSE 0 END) AS home_min', [AppConst::CODE_MASTER_25_5])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minutes ELSE 0 END) AS exercise_min', [AppConst::CODE_MASTER_25_6])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minutes ELSE 0 END) AS high_min', [AppConst::CODE_MASTER_25_7])
+            ->selectRaw('MAX(CASE WHEN summary_kind = ? THEN sum_minutes ELSE 0 END) AS group_min', [AppConst::CODE_MASTER_25_4])
             ->selectRaw('0 as normal_sub_get')
             ->selectRaw('0 as emergency_sub_get')
             ->selectRaw('0 as normal_sub_out')

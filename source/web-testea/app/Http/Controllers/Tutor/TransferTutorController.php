@@ -555,7 +555,7 @@ class TransferTutorController extends Controller
                     $transAppDate->period_no
                 );
                 // 終了時刻計算
-                $endTime = $this->fncTranEndTime($periodTime['start_time'], $befSchedule->minites);
+                $endTime = $this->fncTranEndTime($periodTime['start_time'], $befSchedule->minutes);
 
                 // スケジュール情報登録 -----------------------------
                 $newSchedule = new Schedule;
@@ -565,7 +565,7 @@ class TransferTutorController extends Controller
                     'period_no' => $transAppDate->period_no,
                     'start_time' => $periodTime['start_time'],
                     'end_time' => $endTime,
-                    'minites' => $befSchedule->minites,
+                    'minutes' => $befSchedule->minutes,
                     'booth_cd' => $boothCd,
                     'course_cd' => $befSchedule->course_cd,
                     'course_kind' => $befSchedule->course_kind,

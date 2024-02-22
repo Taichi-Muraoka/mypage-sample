@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('period_no')->nullable()->comment('時限');
             $table->time('start_time', 0)->comment('開始時刻');
             $table->time('end_time', 0)->comment('終了時刻');
-            $table->unsignedSmallInteger('minites')->comment('時間（分）');
+            $table->unsignedSmallInteger('minutes')->comment('時間（分）');
             $table->string('booth_cd', 3)->comment('ブースコード');
             $table->string('course_cd', 5)->comment('コースコード');
             $table->unsignedInteger('student_id')->nullable()->comment('生徒ID');

@@ -43,7 +43,7 @@
             <td>@{{item.tutor_id}}</td>
             <td>@{{item.tutor_name}}</td>
             <td>@{{$filters.formatYmd(item.target_date)}}</td>
-            <td>@{{item.sum_minites}}</td>
+            <td>@{{item.sum_minutes}}</td>
             <td>@{{item.over_time}}</td>
             <td>@{{item.late_time}}</td>
             <td>@{{item.over_late_time}}</td>

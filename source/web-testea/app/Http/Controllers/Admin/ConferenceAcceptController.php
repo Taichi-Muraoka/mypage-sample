@@ -440,7 +440,7 @@ class ConferenceAcceptController extends Controller
             $schedule = new Schedule;
             $schedule->course_cd = $course->course_cd;
             $schedule->end_time = $this->endTime($request['start_time']);
-            $schedule->minites = config('appconf.conference_time');
+            $schedule->minutes = config('appconf.conference_time');
             $schedule->create_kind = null;
             $schedule->lesson_kind = null;
             $schedule->adm_id = $adm_id;
@@ -628,7 +628,7 @@ class ConferenceAcceptController extends Controller
             $schedule = new Schedule;
             $schedule->course_cd = $course->course_cd;
             $schedule->end_time = $this->endTime($request['start_time']);
-            $schedule->minites = config('appconf.conference_time');
+            $schedule->minutes = config('appconf.conference_time');
             $schedule->create_kind = null;
             $schedule->lesson_kind = null;
             $schedule->adm_id = $adm_id;

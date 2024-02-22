@@ -1614,7 +1614,7 @@ trait FuncScheduleTrait
         // 時間（分）の算出
         $start = Carbon::createFromTimeString($data['start_time']);
         $end = Carbon::createFromTimeString($data['end_time']);
-        $minites = $start->diffInMinutes($end);
+        $minutes = $start->diffInMinutes($end);
 
         // スケジュール情報
         // schedulesテーブルへのinsert
@@ -1628,7 +1628,7 @@ trait FuncScheduleTrait
         }
         $schedule->start_time = $data['start_time'];
         $schedule->end_time = $data['end_time'];
-        $schedule->minites = $minites;
+        $schedule->minutes = $minutes;
         $schedule->booth_cd = $booth;
         $schedule->course_cd = $data['course_cd'];
         if ($data['course_kind'] != AppConst::CODE_MASTER_42_2) {
@@ -1700,7 +1700,7 @@ trait FuncScheduleTrait
         // 時間（分）の算出
         $start = Carbon::createFromTimeString($data['start_time']);
         $end = Carbon::createFromTimeString($data['end_time']);
-        $minites = $start->diffInMinutes($end);
+        $minutes = $start->diffInMinutes($end);
 
         // レギュラー授業情報登録
         // regular_classesテーブルへのinsert
@@ -1711,7 +1711,7 @@ trait FuncScheduleTrait
         $regularClass->subject_cd = $data['subject_cd'];
         $regularClass->start_time = $data['start_time'];
         $regularClass->end_time = $data['end_time'];
-        $regularClass->minites = $minites;
+        $regularClass->minutes = $minutes;
         $regularClass->booth_cd = $booth;
         $regularClass->course_cd = $data['course_cd'];
         if ($data['course_kind'] != AppConst::CODE_MASTER_42_2) {

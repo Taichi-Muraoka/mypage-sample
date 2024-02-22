@@ -88,10 +88,10 @@ class OvertimeController extends Controller
             // データ加工
             foreach ($items as $item) {
                 // 時間変換
-                $item->sum_minites = $this->dtConversionHourMinites($item->sum_minites);
-                $item->over_time = $this->dtConversionHourMinites($item->over_time);
-                $item->late_time = $this->dtConversionHourMinites($item->late_time);
-                $item->over_late_time = $this->dtConversionHourMinites($item->over_late_time);
+                $item->sum_minutes = $this->dtConversionHourMinutes($item->sum_minutes);
+                $item->over_time = $this->dtConversionHourMinutes($item->over_time);
+                $item->late_time = $this->dtConversionHourMinutes($item->late_time);
+                $item->over_late_time = $this->dtConversionHourMinutes($item->over_late_time);
             }
 
             return $items;
@@ -110,7 +110,7 @@ class OvertimeController extends Controller
         // $this->debug($request['target_date_from']);
 
         $ruleTargetDate = Schedule::getFieldRule('target_date');
-        
+
         // FromとToの大小チェックバリデーションを追加(Fromが存在する場合のみ)
         $validateFromTo = [];
         $keyFrom = 'target_date_from';
@@ -173,10 +173,10 @@ class OvertimeController extends Controller
                 $data->tutor_name,
                 // $data->target_dateが日付型ではないためこちらのフォーマットを使用
                 date('Y/m/d', strtotime($data->target_date)),
-                $this->dtConversionHourMinites($data->sum_minites),
-                $this->dtConversionHourMinites($data->over_time),
-                $this->dtConversionHourMinites($data->late_time),
-                $this->dtConversionHourMinites($data->over_late_time),
+                $this->dtConversionHourMinutes($data->sum_minutes),
+                $this->dtConversionHourMinutes($data->over_time),
+                $this->dtConversionHourMinutes($data->late_time),
+                $this->dtConversionHourMinutes($data->over_late_time),
             ];
         }
 
@@ -228,10 +228,10 @@ class OvertimeController extends Controller
                 'target_date',
                 'start_time',
                 'end_time',
-                'minites',
+                'minutes',
             )
-            ->selectRaw('CASE WHEN TIME_TO_SEC(start_time) >= TIME_TO_SEC(?) THEN minites ELSE 0 END AS late_time1', ['22:00'])
-            ->selectRaw('CASE WHEN (TIME_TO_SEC(end_time) > TIME_TO_SEC(?) and TIME_TO_SEC(start_time) < TIME_TO_SEC(?)) 
+            ->selectRaw('CASE WHEN TIME_TO_SEC(start_time) >= TIME_TO_SEC(?) THEN minutes ELSE 0 END AS late_time1', ['22:00'])
+            ->selectRaw('CASE WHEN (TIME_TO_SEC(end_time) > TIME_TO_SEC(?) and TIME_TO_SEC(start_time) < TIME_TO_SEC(?))
                 THEN (TIME_TO_SEC(end_time) - TIME_TO_SEC(?)) / 60 ELSE 0 END AS late_time2', ['22:00', '22:00', '22:00']);
 
         // 超過勤務者・深夜労働取得
@@ -240,11 +240,11 @@ class OvertimeController extends Controller
                 'tutor_id',
                 'target_date'
             )
-            ->selectRaw('SUM(minites) as sum_minites')
-            ->selectRaw('CASE WHEN SUM(minites) > 480 THEN SUM(minites) - 480 ELSE 0 END as over_time')
+            ->selectRaw('SUM(minutes) as sum_minutes')
+            ->selectRaw('CASE WHEN SUM(minutes) > 480 THEN SUM(minutes) - 480 ELSE 0 END as over_time')
             ->selectRaw('SUM(late_time1) + SUM(late_time2) as late_time')
-            ->selectRaw('CASE WHEN (SUM(late_time1) + SUM(late_time2) > 0 and SUM(minites) > 480) and SUM(late_time1) + SUM(late_time2) >= SUM(minites) - 480 THEN SUM(minites) - 480
-                WHEN (SUM(late_time1) + SUM(late_time2) > 0 and SUM(minites) > 480) and SUM(late_time1) + SUM(late_time2) <= SUM(minites) - 480 THEN SUM(late_time1) + SUM(late_time2)
+            ->selectRaw('CASE WHEN (SUM(late_time1) + SUM(late_time2) > 0 and SUM(minutes) > 480) and SUM(late_time1) + SUM(late_time2) >= SUM(minutes) - 480 THEN SUM(minutes) - 480
+                WHEN (SUM(late_time1) + SUM(late_time2) > 0 and SUM(minutes) > 480) and SUM(late_time1) + SUM(late_time2) <= SUM(minutes) - 480 THEN SUM(late_time1) + SUM(late_time2)
                 ELSE 0 END AS over_late_time')
             ->groupBy('tutor_id', 'target_date')
             ->having(function ($orQuery) {
@@ -259,7 +259,7 @@ class OvertimeController extends Controller
             ->select(
                 'overtime_worker.tutor_id',
                 'target_date',
-                'sum_minites',
+                'sum_minutes',
                 'over_time',
                 'late_time',
                 'over_late_time',

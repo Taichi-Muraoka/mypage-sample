@@ -187,9 +187,9 @@ trait CtrlDateTrait
      * @param 授業時間(分)
      * @return 授業時間(時間)
      */
-    protected function dtConversionTime($minites)
+    protected function dtConversionTime($minutes)
     {
-        $time = floor($minites / 60 * 10) / 10;
+        $time = floor($minutes / 60 * 10) / 10;
 
         return $time;
     }
@@ -200,14 +200,14 @@ trait CtrlDateTrait
      * @param 授業時間(分)
      * @return 授業時間(〇時間〇分)
      */
-    public function dtConversionHourMinites($minites)
+    public function dtConversionHourMinites($minutes)
     {
-        $conversion_hour = floor($minites / 60 * 10) / 10;
+        $conversion_hour = floor($minutes / 60 * 10) / 10;
 
         $hour = floor($conversion_hour);
 
-        $minites = floor($minites % 60 * 10) / 10;
+        $minutes = floor($minutes % 60 * 10) / 10;
 
-        return $hour . '時間' . $minites . '分';
+        return $hour . '時間' . $minutes . '分';
     }
 }

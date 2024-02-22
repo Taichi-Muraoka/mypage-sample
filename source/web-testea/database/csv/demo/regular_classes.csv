@@ -1,4 +1,4 @@
-"regular_class_id","campus_cd","day_cd","period_no","start_time","end_time","minites","booth_cd","course_cd","student_id","tutor_id","subject_cd","how_to_kind","created_at","updated_at","deleted_at"
+"regular_class_id","campus_cd","day_cd","period_no","start_time","end_time","minutes","booth_cd","course_cd","student_id","tutor_id","subject_cd","how_to_kind","created_at","updated_at","deleted_at"
 1,"01",1,5,"16:45","18:15",90,"101","10300",,101,"501",0,,,
 2,"01",1,6,"18:30","20:00",90,"101","10100",7,103,"101",0,,,
 3,"01",1,7,"20:15","21:45",90,"101","90100",7,,,0,,,
