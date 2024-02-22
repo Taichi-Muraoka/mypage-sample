@@ -413,7 +413,7 @@ trait CtrlModelTrait
         return $query->select(
             //'timetable_id as code',
             'period_no as code',
-            DB::raw('CONCAT(period_no, "限") AS value')
+            DB::raw('CONCAT(period_no, "限 (", TIME_FORMAT(start_time, "%H:%i"), "～", TIME_FORMAT(end_time, "%H:%i"), ")") AS value')
         )
             ->orderby('campus_cd')->orderby('period_no')
             ->get()
@@ -460,7 +460,7 @@ trait CtrlModelTrait
         return $query->select(
             //'timetable_id as code',
             'period_no as code',
-            DB::raw('CONCAT(period_no, "限") AS value')
+            DB::raw('CONCAT(period_no, "限 (", TIME_FORMAT(start_time, "%H:%i"), "～", TIME_FORMAT(end_time, "%H:%i"), ")") AS value')
         )
             ->orderby('mst_timetables.campus_cd')->orderby('period_no')
             ->get()
@@ -481,7 +481,7 @@ trait CtrlModelTrait
         // プルダウンリストを取得する
         return $query->select(
             'period_no as code',
-            DB::raw('CONCAT(period_no, "限") AS value')
+            DB::raw('CONCAT(period_no, "限 (", TIME_FORMAT(start_time, "%H:%i"), "～", TIME_FORMAT(end_time, "%H:%i"), ")") AS value')
         )
             // 講師所属情報とJOIN
             ->sdJoin(TutorCampus::class, function ($join) use ($tutorId) {
@@ -518,7 +518,7 @@ trait CtrlModelTrait
         // プルダウンリストを取得する
         return $query->select(
             'period_no as code',
-            DB::raw('CONCAT(period_no, "限") AS value')
+            DB::raw('CONCAT(period_no, "限 (", TIME_FORMAT(start_time, "%H:%i"), "～", TIME_FORMAT(end_time, "%H:%i"), ")") AS value')
         )
             ->orderby('period_no')
             ->distinct()
