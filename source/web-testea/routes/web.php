@@ -312,6 +312,9 @@ Route::group(['middleware' => ['auth', 'can:tutor']], function () {
     // バリデーション(検索用)
     Route::post('/report_regist/vd_search', [ReportRegistController::class, 'validationForSearch'])->name('report_regist-vd_search');
 
+    // 教室選択プルダウンを選択された際に生徒プルダウンの情報を返却する
+    Route::post('/report_regist/get_data_select_search', [ReportRegistController::class, 'getDataSelectSearch'])->name('report_regist-get_data_select_search');
+
     // 授業リストを選択された際に授業情報・教材リストを返却する
     Route::post('/report_regist/get_data_select', [ReportRegistController::class, 'getDataSelect'])->name('report_regist-get_data_select');
 

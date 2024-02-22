@@ -10,12 +10,16 @@
     <x-bs.row>
         <x-bs.col2>
             {{-- 校舎リスト選択時、onChangeによる生徒リストの絞り込みを行う。-1の場合は自分の受け持ちの生徒だけに絞り込み --}}
-            <x-input.select caption="校舎" id="campus_cd" :select2=true :editData=$editData
-                :mastrData=$rooms :select2Search=false :blank=true/>
+            <x-input.select caption="校舎" id="campus_cd" :select2=true onChange="selectChangeGetRoom" :editData=$editData
+                :mastrData=$rooms :select2Search=false :blank=true emptyValue="-1" />
         </x-bs.col2>
         <x-bs.col2>
-            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$students :editData=$editData 
-                :select2Search=false/>
+            <x-input.select caption="生徒名" id="student_id" :select2=true :editData=$editData>
+                {{-- vueで動的にプルダウンを作成 --}}
+                <option v-for="item in selectGetItem.selectItems" :value="item.id">
+                    @{{ item.value }}
+                </option>
+            </x-input.select>
         </x-bs.col2>
     </x-bs.row>
     <x-bs.row>
