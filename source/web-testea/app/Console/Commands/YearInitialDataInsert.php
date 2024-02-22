@@ -86,6 +86,37 @@ class YearInitialDataInsert extends Command
 
             // --------------------------
             // 請求取込情報
+            // --------------------------
+            // キーとなるdate配列を作成する
+            $insert_keys = [
+                "{$current_year}/04/01",
+                "{$current_year}/05/01",
+                "{$current_year}/06/01",
+                "{$current_year}/07/01",
+                "{$current_year}/08/01",
+                "{$current_year}/09/01",
+                "{$current_year}/10/01",
+                "{$current_year}/11/01",
+                "{$current_year}/12/01",
+                "{$next_year}/01/01",
+                "{$next_year}/02/01",
+                "{$next_year}/03/01",
+            ];
+
+            // データ作成
+            // 新年度4月～翌年度3月の12ヶ月分
+            $invoice_datas = [];
+            foreach ($insert_keys as $key) {
+                $invoice = [
+                    'invoice_date' => $key,
+                    'import_state' => AppConst::CODE_MASTER_20_0,
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ];
+                array_push($invoice_datas, $invoice);
+            }
+
+            // --------------------------
             // 給与取込情報
             // 給与算出管理情報
             // --------------------------
@@ -107,17 +138,9 @@ class YearInitialDataInsert extends Command
 
             // データ作成
             // 新年度12ヶ月分
-            $invoice_datas = [];
             $salary_import_datas = [];
             $salary_mng_datas = [];
             foreach ($insert_keys as $key) {
-                $invoice = [
-                    'invoice_date' => $key,
-                    'import_state' => AppConst::CODE_MASTER_20_0,
-                    'created_at' => $now,
-                    'updated_at' => $now
-                ];
-                array_push($invoice_datas, $invoice);
                 $salary_import = [
                     'salary_date' => $key,
                     'import_state' => AppConst::CODE_MASTER_20_0,
@@ -185,7 +208,10 @@ class YearInitialDataInsert extends Command
             // 特別期間講習 生徒連絡情報
             // --------------------------
             // 生徒所属情報取得
-            $student_campuses = StudentCampus::select('student_id', 'campus_cd')->get();
+            $student_campuses = StudentCampus::select('student_id', 'campus_cd')
+                ->orderBy('student_id', 'asc')
+                ->orderBy('campus_cd', 'asc')
+                ->get();
 
             // データ作成
             // 新年度：夏冬、翌年度：春 × 所属校舎
