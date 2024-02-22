@@ -65,8 +65,8 @@ class InvoiceImportController extends Controller
      */
     public function search(Request $request)
     {
-        // 当月を取得
-        $present_month = date('Y-m') . '-01';
+        // 翌月の月初を取得
+        $nextMonth = date('Y-m-d', strtotime('first day of next month '));
 
         // 請求情報取込を取得
         $query = InvoiceImport::query();
@@ -81,7 +81,7 @@ class InvoiceImportController extends Controller
                 $join->on('invoice_import.import_state', '=', 'mst_codes.code')
                     ->where('mst_codes.data_type', AppConst::CODE_MASTER_20);
             })
-            ->where('invoice_date', '<=', $present_month)
+            ->where('invoice_date', '<=', $nextMonth)
             ->orderBy('invoice_date', 'desc');
 
         // ページネータで返却
@@ -119,11 +119,11 @@ class InvoiceImportController extends Controller
         // 請求年月の月末を取得
         $idEnd = date('Y/m/t', strtotime($idDate));
 
-        // 当月を取得
-        $present_month = date('Y-m') . '-01';
+        // 翌月の月初を取得
+        $nextMonth = date('Y-m-d', strtotime('first day of next month '));
 
         // 取込可能な年月か確認する
-        if ($present_month < $idDate) {
+        if ($nextMonth < $idDate) {
             $this->illegalResponseErr();
         }
 
@@ -204,11 +204,11 @@ class InvoiceImportController extends Controller
         $invoiceDate = $request->input('invoiceDate');
         $idDate = $this->fmYmToDate($invoiceDate);
 
-        // 当月を取得
-        $present_month = date('Y-m') . '-01';
+        // 翌月の月初を取得
+        $nextMonth = date('Y-m-d', strtotime('first day of next month '));
 
         // 取込可能な年月か確認する
-        if ($present_month < $idDate) {
+        if ($nextMonth < $idDate) {
             $this->illegalResponseErr();
         }
 
