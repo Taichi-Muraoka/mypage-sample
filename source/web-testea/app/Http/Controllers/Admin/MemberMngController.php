@@ -636,7 +636,8 @@ class MemberMngController extends Controller
         // 学年設定年度の初期表示用データセット（システムマスタ「現年度」）
         $currentYear = MstSystem::select('value_num')
             ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
-            ->first();
+            ->whereNotNull('value_num')
+            ->firstOrFail();
 
         $editData = [
             'grade_year' => $currentYear->value_num
