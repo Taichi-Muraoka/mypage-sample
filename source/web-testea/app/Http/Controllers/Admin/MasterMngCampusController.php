@@ -151,7 +151,8 @@ class MasterMngCampusController extends Controller
             // システムマスタ「現年度」を取得
             $currentYear = MstSystem::select('value_num')
                 ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
-                ->first();
+                ->whereNotNull('value_num')
+                ->firstOrFail();
 
             // 当年度・翌年度のレコード作成
             for ($i = 0; $i < 2; $i++) {

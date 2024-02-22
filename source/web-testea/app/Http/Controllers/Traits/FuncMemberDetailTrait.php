@@ -373,7 +373,8 @@ trait FuncMemberDetailTrait
         // 受験年度絞り込み用のデータを用意（システムマスタ「現年度」）
         $currentYear = MstSystem::select('value_num')
             ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
-            ->first();
+            ->whereNotNull('value_num')
+            ->firstOrFail();
 
         // クエリ作成
         $query = StudentEntranceExam::query();

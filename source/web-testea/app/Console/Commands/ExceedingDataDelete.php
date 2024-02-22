@@ -61,15 +61,6 @@ class ExceedingDataDelete extends Command
 
             $now = Carbon::now();
 
-            // 6年前の年度開始日を取得 例：今年度が2023なら2017/03/01
-            $six_years_ago_fiscal_start_date = $this->dtGetFiscalDate('6yearsAgo', 'start');
-            // 5年前
-            $five_years_ago_fiscal_start_date = $this->dtGetFiscalDate('5yearsAgo', 'start');
-            // 4年前
-            $four_years_ago_fiscal_start_date = $this->dtGetFiscalDate('4yearsAgo', 'start');
-            // 取込ファイル削除用 例：20230301000000
-            $five_years_ago_fiscal_start_dir_name = str_replace("/", "", $five_years_ago_fiscal_start_date) . "000000";
-
             // バッチ管理テーブルにレコード作成
             $batchMng = new BatchMng;
             $batchMng->batch_type = AppConst::BATCH_TYPE_13;
@@ -79,6 +70,15 @@ class ExceedingDataDelete extends Command
             $batchMng->save();
 
             $batch_id = $batchMng->batch_id;
+
+            // 6年前の年度開始日を取得 例：今年度が2023なら2017/03/01
+            $six_years_ago_fiscal_start_date = $this->dtGetFiscalDate('6yearsAgo', 'start');
+            // 5年前
+            $five_years_ago_fiscal_start_date = $this->dtGetFiscalDate('5yearsAgo', 'start');
+            // 4年前
+            $four_years_ago_fiscal_start_date = $this->dtGetFiscalDate('4yearsAgo', 'start');
+            // 取込ファイル削除用 例：20230301000000
+            $five_years_ago_fiscal_start_dir_name = str_replace("/", "", $five_years_ago_fiscal_start_date) . "000000";
 
             // トランザクション(例外時は自動的にロールバック)
             DB::transaction(function () use ($now, $six_years_ago_fiscal_start_date, $five_years_ago_fiscal_start_date, $four_years_ago_fiscal_start_date) {

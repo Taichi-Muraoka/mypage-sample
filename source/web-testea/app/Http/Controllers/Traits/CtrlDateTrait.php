@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Traits;
 
 use App\Consts\AppConst;
+use App\Models\MstSystem;
 
 /**
  * 日付 - コントローラ共通処理
@@ -27,70 +28,67 @@ trait CtrlDateTrait
      */
     protected function dtGetFiscalDate(String $year = "present", String $day = "start", $time = false)
     {
-        $dateStr = date('Y', strtotime('-2 month')) . '/03/01';
-        if ($time) {
-            $dateStr = $dateStr . ' 00:00:00';
-        }
+
+        // システムマスタから当年度を取得
+        $currentYear = MstSystem::select('value_num')
+            ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
+            ->whereNotNull('value_num')
+            ->firstOrFail();
+
+        // 当年度開始日 当年度/03/01
+        $curStartdate = $currentYear->value_num . '/03/01';
+        $dateStr = $curStartdate;
+
         if ($year === "present" && $day === "end") {
-            // 翌年度の開始日-1日
-            $nextStr = date('Y', strtotime('+10 month')) . '/03/01';
-            $dateStr = date('Y/m/d', strtotime($nextStr . '-1 day'));
-            if ($time) {
-                $dateStr = $dateStr . ' 23:59:59';
-            }
+            // 当年度終了日 ＝ 当年度開始日 + 1 year - 1 day
+            $dateStr = date('Y/m/d', strtotime('+1 year -1 day ' . $curStartdate));
+
         } elseif ($year === "prev" && $day === "start") {
-            $dateStr = date('Y', strtotime('-1 year -2 month')) . '/03/01';
-            if ($time) {
-                $dateStr = $dateStr . ' 00:00:00';
-            }
+            // 前年度開始日 ＝ 当年度開始日 - 1 year
+            $dateStr = date('Y/m/d', strtotime('-1 year ' . $curStartdate));
+
         } elseif ($year === "prev" && $day === "end") {
-            $nextStr = date('Y', strtotime('-2 month')) . '/03/01';
-            $dateStr = date('Y/m/d', strtotime($nextStr . '-1 day'));
-            if ($time) {
-                $dateStr = $dateStr . ' 23:59:59';
-            }
+            // 前年度終了日 ＝ 当年度開始日 - 1 day
+            $dateStr = date('Y/m/d', strtotime('-1 day ' . $curStartdate));
+
         } elseif ($year === "next" && $day === "start") {
-            $dateStr = date('Y', strtotime('+10 month')) . '/03/01';
-            if ($time) {
-                $dateStr = $dateStr . ' 00:00:00';
-            }
+            // 翌年度開始日 ＝ 当年度開始日 + 1 year
+            $dateStr = date('Y/m/d', strtotime('+1 year ' . $curStartdate));
+
         } elseif ($year === "next" && $day === "end") {
-            $nextStr = date('Y', strtotime('+1 year +10 month')) . '/03/01';
-            $dateStr = date('Y/m/d', strtotime($nextStr . '-1 day'));
-            if ($time) {
-                $dateStr = $dateStr . ' 23:59:59';
-            }
-        } elseif ($year === "6yearsAgo" && $day === "start") {
-            $dateStr = date('Y', strtotime('-6 year -2 month')) . '/03/01';
-            if ($time) {
-                $dateStr = $dateStr . ' 00:00:00';
-            }
-        } elseif ($year === "6yearsAgo" && $day === "end") {
-            $nextStr = date('Y', strtotime('-5 year -2 month')) . '/03/01';
-            $dateStr = date('Y/m/d', strtotime($nextStr . '-1 day'));
-            if ($time) {
-                $dateStr = $dateStr . ' 23:59:59';
-            }
-        } elseif ($year === "5yearsAgo" && $day === "start") {
-            $dateStr = date('Y', strtotime('-5 year -2 month')) . '/03/01';
-            if ($time) {
-                $dateStr = $dateStr . ' 00:00:00';
-            }
-        } elseif ($year === "5yearsAgo" && $day === "end") {
-            $nextStr = date('Y', strtotime('-4 year -2 month')) . '/03/01';
-            $dateStr = date('Y/m/d', strtotime($nextStr . '-1 day'));
-            if ($time) {
-                $dateStr = $dateStr . ' 23:59:59';
-            }
+            // 翌年度終了日 ＝ 当年度開始日 + 2 year - 1 day
+            $dateStr = date('Y/m/d', strtotime('+2 year -1 day ' . $curStartdate));
+
         } elseif ($year === "4yearsAgo" && $day === "start") {
-            $dateStr = date('Y', strtotime('-4 year -2 month')) . '/03/01';
-            if ($time) {
-                $dateStr = $dateStr . ' 00:00:00';
-            }
+            // 4年前の年度開始日 ＝ 当年度開始日 - 4 year
+            $dateStr = date('Y/m/d', strtotime('-4 year ' . $curStartdate));
+
         } elseif ($year === "4yearsAgo" && $day === "end") {
-            $nextStr = date('Y', strtotime('-3 year -2 month')) . '/03/01';
-            $dateStr = date('Y/m/d', strtotime($nextStr . '-1 day'));
-            if ($time) {
+            // 4年前の年度終了日 ＝ 当年度開始日 - 3 year - 1 day
+            $dateStr = date('Y/m/d', strtotime('-3 year -1 day' . $curStartdate));
+
+        } elseif ($year === "5yearsAgo" && $day === "start") {
+            // 5年前の年度開始日 ＝ 当年度開始日 - 5 year
+            $dateStr = date('Y/m/d', strtotime('-5 year ' . $curStartdate));
+
+        } elseif ($year === "5yearsAgo" && $day === "end") {
+            // 5年前の年度終了日 ＝ 当年度開始日 - 4 year - 1 day
+            $dateStr = date('Y/m/d', strtotime('-4 year -1 day' . $curStartdate));
+
+        } elseif ($year === "6yearsAgo" && $day === "start") {
+            // 6年前の年度開始日 ＝ 当年度開始日 -6 year
+            $dateStr = date('Y/m/d', strtotime('-6 year ' . $curStartdate));
+
+        } elseif ($year === "6yearsAgo" && $day === "end") {
+            // 6年前の年度終了日 ＝ 当年度開始日 - 5 year - 1 day
+            $dateStr = date('Y/m/d', strtotime('-5 year -1 day' . $curStartdate));
+        }
+
+        // 時刻を付加する場合（オプション）
+        if ($time) {
+            if ($day === "start") {
+                $dateStr = $dateStr . ' 00:00:00';
+            } elseif ($day === "end") {
                 $dateStr = $dateStr . ' 23:59:59';
             }
         }
