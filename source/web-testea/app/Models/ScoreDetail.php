@@ -109,8 +109,8 @@ class ScoreDetail extends Model
             'g_subject_cd' => ['string', 'max:3', 'digits:3'],
             'score' => ['integer', 'max:9999'],
             'full_score' => ['integer', 'max:9999'],
-            'average' => ['numeric', 'max:9999.9'],
-            'deviation_score' => ['numeric', 'max:9999.9']
+            'average' => ['numeric', 'vdDecimalScore', 'max:9999.9'],
+            'deviation_score' => ['numeric', 'vdDecimalScore', 'max:9999.9']
         ];
         return $_fieldRules;
     }

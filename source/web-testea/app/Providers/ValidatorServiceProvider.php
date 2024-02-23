@@ -103,5 +103,13 @@ class ValidatorServiceProvider extends ServiceProvider
             return strtotime($validator->getData()[$parameters[0]]) < strtotime($value);
         });
 
+        //-----------------------
+        // 成績得点（小数許可）の形式チェック
+        // ※numeric・maxと併用すること
+        //-----------------------
+        // 整数または小数点以下1桁までの小数・マイナス値はNG
+        Validator::extend('vdDecimalScore', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^\d+(\.\d{1})?$/', $value);
+        });
     }
 }

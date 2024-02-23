@@ -65,23 +65,49 @@ class BladeInputRule
 
             if ($key !== false) {
 
-                // maxを探す
-                foreach ($rules[$id] as $key => $value) {
+                // max:の数値部分の文字数を取得
+                $numlength = $this->getMaxStrlen($rules[$id]);
+                if (isset($numlength)) {
+                    return "maxlength=" . $numlength;
+                }
+            }
 
-                    if ($value instanceof Closure) {
-                        // クロージャーは無視
-                        continue;
-                    }
+            // numericの場合。999.9の場合、999.9以下であることがバリデートされるが、
+            // maxlengthとしては5桁にしたい
+            $key = array_search("numeric", $rules[$id]);
 
-                    if (strpos($value, 'max:') !== false) {
-                        // 数値部分を取得
-                        $len = str_replace("max:", "", $value);
-                        $numlength = strlen((string)$len);
-                        return "maxlength=" . $numlength;
-                    }
+            if ($key !== false) {
+
+                // max:の数値部分の文字数を取得
+                $numlength = $this->getMaxStrlen($rules[$id]);
+                if (isset($numlength)) {
+                    return "maxlength=" . $numlength;
                 }
             }
         }
         return "";
+    }
+
+    /**
+     * max:の数値部分の文字数を取得
+     */
+    private function getMaxStrlen($rules)
+    {
+        // maxを探す
+        foreach ($rules as $key => $value) {
+
+            if ($value instanceof Closure) {
+                // クロージャーは無視
+                continue;
+            }
+
+            if (strpos($value, 'max:') !== false) {
+                // 数値部分を取得
+                $len = str_replace("max:", "", $value);
+                $numlength = strlen((string)$len);
+                return $numlength;
+            }
+        }
+        return;
     }
 }
