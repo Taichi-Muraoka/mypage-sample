@@ -200,7 +200,7 @@ trait CtrlDateTrait
      * @param 授業時間(分)
      * @return 授業時間(〇時間〇分)
      */
-    public function dtConversionHourMinites($minutes)
+    public function dtConversionHourMinutes($minutes)
     {
         $conversion_hour = floor($minutes / 60 * 10) / 10;
 
