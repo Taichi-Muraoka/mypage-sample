@@ -1,4 +1,4 @@
-season_student_id,student_id,season_cd,campus_cd,apply_date,comment,regist_status,plan_status,created_at,updated_at,deleted_at
+student_id,season_cd,campus_cd,apply_date,comment,regist_status,plan_status,created_at,updated_at,deleted_at
 1,202301,01,,,0,0,,,
 2,202301,01,,,0,0,,,
 3,202301,01,,,0,0,,,

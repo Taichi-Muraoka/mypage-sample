@@ -1,5 +1,4 @@
 invoice_date,issue_date,bill_date,start_date,end_date,term_text1,term_text2,import_state,import_date,created_at,updated_at,deleted_at
-2023/03/01,,,,,,,0,,,,
 2023/04/01,,,,,,,0,,,,
 2023/05/01,,,,,,,0,,,,
 2023/06/01,,,,,,,0,,,,
@@ -11,3 +10,4 @@ invoice_date,issue_date,bill_date,start_date,end_date,term_text1,term_text2,impo
 2023/12/01,,,,,,,0,,,,
 2024/01/01,,,,,,,0,,,,
 2024/02/01,,,,,,,0,,,,
+2024/03/01,,,,,,,0,,,,
