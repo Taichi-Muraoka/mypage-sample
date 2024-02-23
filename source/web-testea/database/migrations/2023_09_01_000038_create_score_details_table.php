@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('g_subject_cd', 3)->comment('成績科目コード');
             $table->unsignedSmallInteger('score')->comment('得点・評定値');
             $table->unsignedSmallInteger('full_score')->nullable()->comment('満点');
-            $table->decimal('average', 4, 1)->nullable()->comment('平均点');
-            $table->decimal('deviation_score', 4, 1)->nullable()->comment('偏差値');
+            $table->decimal('average', 5, 1)->nullable()->comment('平均点');
+            $table->decimal('deviation_score', 5, 1)->nullable()->comment('偏差値');
             $table->timestamps();
             $table->softDeletes();
 
