@@ -104,12 +104,18 @@ class ValidatorServiceProvider extends ServiceProvider
         });
 
         //-----------------------
-        // 成績得点（小数許可）の形式チェック
+        // 小数許可項目の形式チェック
         // ※numeric・maxと併用すること
         //-----------------------
-        // 整数または小数点以下1桁までの小数・マイナス値はNG
-        Validator::extend('vdDecimalScore', function ($attribute, $value, $parameters, $validator) {
-            return preg_match('/^\d+(\.\d{1})?$/', $value);
+        // 整数または小数点以下指定桁数までの小数
+        // マイナス値許可とする（制限する場合はminで設定）
+        Validator::extend('vdDecimal', function ($attribute, $value, $parameters, $validator) {
+            return preg_match('/^-?\d+(\.\d{1,' . $parameters[0] . '})?$/', $value);
+        });
+
+        Validator::replacer('vdDecimal',
+        function ($message, $attribute, $rule, $parameters) {
+            return str_replace(':vdDecimal', $parameters[0], $message);
         });
     }
 }
