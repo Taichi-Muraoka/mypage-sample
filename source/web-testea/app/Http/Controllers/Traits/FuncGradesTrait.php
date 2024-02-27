@@ -679,6 +679,10 @@ trait FuncGradesTrait
         if (AuthEx::isStudent()) {
             $rules += Score::fieldRules('student_comment', ['required']);
         }
+        // 運用管理画面で必須（編集時のみ）
+        if (AuthEx::isAdmin()) {
+            $rules += Score::fieldRules('regist_date', ['required_with:score_id']);
+        }
 
         // --------------------------
         // 生徒成績詳細のルールセット
