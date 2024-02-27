@@ -81,7 +81,7 @@ class ExceedingDataDelete extends Command
             $five_years_ago_fiscal_start_dir_name = str_replace("/", "", $five_years_ago_fiscal_start_date) . "000000";
 
             // トランザクション(例外時は自動的にロールバック)
-            DB::transaction(function () use ($now, $six_years_ago_fiscal_start_date, $five_years_ago_fiscal_start_date, $four_years_ago_fiscal_start_date) {
+            DB::transaction(function () use ($now, $six_years_ago_fiscal_start_date, $five_years_ago_fiscal_start_date, $four_years_ago_fiscal_start_date, $five_years_ago_fiscal_start_dir_name) {
 
                 // CSV出力する各テーブルデータの格納用配列
                 $array_table_data = [];
@@ -944,6 +944,19 @@ class ExceedingDataDelete extends Command
                 // CSV出力用配列に追加
                 array_push($array_table_data, $table_data);
 
+                // 削除対象の研修IDを基に、研修資料ファイル（ディレクトリごと）を削除
+                // 削除したディレクトリ数をカウントし、後述のログ出力で使用
+                $training_files_count = 0;
+                $training_files_dir = config('appconf.upload_dir_training');
+                $training_files_path = Storage::path($training_files_dir);
+                foreach ($trn_ids as $trn_id) {
+                    $directory_path = $training_files_path . (string) $trn_id . '/';
+                    if (File::isDirectory($directory_path)) {
+                        File::deleteDirectory($directory_path);
+                        $training_files_count++;
+                    }
+                }
+
                 // --バッチ実行管理----------------------------------------------------
                 // バッチ実行管理から削除対象を抽出（条件：更新日時）
                 // テーブル名を指定
@@ -1225,45 +1238,42 @@ class ExceedingDataDelete extends Command
                     Delete {$password_resets_count} Records From password_resets.
                     Delete {$accounts_count} Records From accounts."
                 );
+
+                //--------------------------------
+                // 期限の過ぎた取込ファイルを削除する（保持期限超過データバックアップも含む）
+                //--------------------------------
+                // 削除するのは5年経過（$five_years_ago_fiscal_start_dir_name）のディレクトリ
+
+                // 給与情報取込ファイル削除
+                $salary_import_dir = config('appconf.upload_dir_salary_import');
+                $salary_import_dir_count = $this->deleteExceedingUploadDir($salary_import_dir, $five_years_ago_fiscal_start_dir_name);
+
+                // 請求情報取込ファイル削除
+                $invoice_import_dir = config('appconf.upload_dir_invoice_import');
+                $invoice_import_dir_count = $this->deleteExceedingUploadDir($invoice_import_dir, $five_years_ago_fiscal_start_dir_name);
+
+                // 年度スケジュール情報取込ファイル削除
+                $year_schedule_import_dir = config('appconf.upload_dir_year_schedule_import');
+                $year_schedule_import_dir_count = $this->deleteExceedingUploadDir($year_schedule_import_dir, $five_years_ago_fiscal_start_dir_name);
+
+                // 学校コード取込ファイル削除
+                $school_code_import_dir = config('appconf.upload_dir_school_code_import');
+                $school_code_import_dir_count = $this->deleteExceedingUploadDir($school_code_import_dir, $five_years_ago_fiscal_start_dir_name);
+
+                // 保持期限超過データバックアップファイル削除
+                $exceeding_data_backup_dir = config('appconf.exceeding_data_backup_dir');
+                $exceeding_data_backup_dir_count = $this->deleteExceedingUploadDir($exceeding_data_backup_dir, $five_years_ago_fiscal_start_dir_name);
+
+                // 研修資料ディレクトリの削除数もここでログ出力する
+                Log::info(
+                    "Delete {$training_files_count} Folders From {$training_files_dir}.
+                    Delete {$salary_import_dir_count} Folders From {$salary_import_dir}.
+                    Delete {$invoice_import_dir_count} Folders From {$invoice_import_dir}.
+                    Delete {$year_schedule_import_dir_count} Folders From {$year_schedule_import_dir}.
+                    Delete {$school_code_import_dir_count} Folders From {$school_code_import_dir}.
+                    Delete {$exceeding_data_backup_dir_count} Folders From {$exceeding_data_backup_dir}."
+                );
             });
-
-            //--------------------------------
-            // 期限の過ぎた取込ファイルを削除する（保持期限超過データバックアップも含む）
-            //--------------------------------
-            // 削除するのは5年経過（$five_years_ago_fiscal_start_dir_name）のディレクトリ
-
-            // 研修資料ファイル削除
-            $training_dir = config('appconf.upload_dir_training');
-            $training_dir_count = $this->deleteExceedingUploadDir($training_dir, $five_years_ago_fiscal_start_dir_name);
-
-            // 給与情報取込ファイル削除
-            $salary_import_dir = config('appconf.upload_dir_salary_import');
-            $salary_import_dir_count = $this->deleteExceedingUploadDir($salary_import_dir, $five_years_ago_fiscal_start_dir_name);
-
-            // 請求情報取込ファイル削除
-            $invoice_import_dir = config('appconf.upload_dir_invoice_import');
-            $invoice_import_dir_count = $this->deleteExceedingUploadDir($invoice_import_dir, $five_years_ago_fiscal_start_dir_name);
-
-            // 年度スケジュール情報取込ファイル削除
-            $year_schedule_import_dir = config('appconf.upload_dir_year_schedule_import');
-            $year_schedule_import_dir_count = $this->deleteExceedingUploadDir($year_schedule_import_dir, $five_years_ago_fiscal_start_dir_name);
-
-            // 学校コード取込ファイル削除
-            $school_code_import_dir = config('appconf.upload_dir_school_code_import');
-            $school_code_import_dir_count = $this->deleteExceedingUploadDir($school_code_import_dir, $five_years_ago_fiscal_start_dir_name);
-
-            // 保持期限超過データバックアップファイル削除
-            $exceeding_data_backup_dir = config('appconf.exceeding_data_backup_dir');
-            $exceeding_data_backup_dir_count = $this->deleteExceedingUploadDir($exceeding_data_backup_dir, $five_years_ago_fiscal_start_dir_name);
-
-            Log::info(
-                "Delete {$training_dir_count} Folders From {$training_dir}.
-                Delete {$salary_import_dir_count} Folders From {$salary_import_dir}.
-                Delete {$invoice_import_dir_count} Folders From {$invoice_import_dir}.
-                Delete {$year_schedule_import_dir_count} Folders From {$year_schedule_import_dir}.
-                Delete {$school_code_import_dir_count} Folders From {$school_code_import_dir}.
-                Delete {$exceeding_data_backup_dir_count} Folders From {$exceeding_data_backup_dir}."
-            );
 
             // バッチ管理テーブルのレコードを更新：正常終了
             $end = Carbon::now();
