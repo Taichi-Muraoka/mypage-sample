@@ -441,7 +441,7 @@ class ExceedingDataDelete extends Command
                 $table_data['table_name'] = 'season_tutor_requests';
                 // 対象データ取得用クエリ
                 $season_tutor_requests_query = DB::table($table_data['table_name'])
-                ->where('season_cd', '<', $seasonCdKey);
+                    ->where('season_cd', '<', $seasonCdKey);
                 // 対象データを配列で取得
                 $table_data['data_list'] = $season_tutor_requests_query->get()->toArray();
                 // CSV出力用配列に追加
@@ -1165,6 +1165,13 @@ class ExceedingDataDelete extends Command
                     $zip->addFile($file, basename($file));
                 }
                 $zip->close();
+
+                // csvファイルを削除する
+                foreach ($files as $file) {
+                    if (is_file($file)) {
+                        unlink($file);
+                    }
+                }
 
                 //---------------------
                 // ログ出力
