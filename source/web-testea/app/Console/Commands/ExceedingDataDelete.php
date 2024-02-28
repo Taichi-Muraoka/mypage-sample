@@ -402,35 +402,25 @@ class ExceedingDataDelete extends Command
                 //---------------------
                 // CSV出力用のデータ抽出
                 //---------------------
-                // 特別期間講習管理から削除対象を抽出（条件：生徒受付終了日）
+                // 特別期間講習管理から削除対象を抽出（条件：特別期間コード）
+                // 削除のキーを基準日の年 + 春期コードとする
+                $seasonCdKey = substr($five_years_ago_fiscal_start_date, 0, 4) . AppConst::CODE_MASTER_38_GEN1_1;
                 // テーブル名を指定
                 $table_data['table_name'] = 'season_mng';
                 // 対象データ取得用クエリ
                 $season_mng_query = DB::table($table_data['table_name'])
-                    ->where('s_end_date', '<', $five_years_ago_fiscal_start_date);
+                    ->where('season_cd', '<', $seasonCdKey);
                 // 対象データを配列で取得
                 $table_data['data_list'] = $season_mng_query->get()->toArray();
                 // CSV出力用配列に追加
                 array_push($array_table_data, $table_data);
-
-                // 削除対象の特別期間コードを取得
-                $season_mng = $season_mng_query->select('season_cd')
-                    // 重複排除で取得する
-                    ->distinct()
-                    ->get();
-
-                // 削除対象の特別期間コードを配列化
-                $season_mng_cds = [];
-                foreach ($season_mng as $s_mng) {
-                    array_push($season_mng_cds, $s_mng->season_cd);
-                }
 
                 // 削除対象の特別期間コードを基に、特別期間講習 生徒連絡情報から削除対象を抽出
                 // テーブル名を指定
                 $table_data['table_name'] = 'season_student_requests';
                 // 対象データ取得用クエリ
                 $season_student_requests_query = DB::table($table_data['table_name'])
-                    ->whereIn('season_cd', $season_mng_cds);
+                    ->where('season_cd', '<', $seasonCdKey);
                 // 対象データを配列で取得
                 $table_data['data_list'] = $season_student_requests_query->get()->toArray();
                 // CSV出力用配列に追加
@@ -451,7 +441,7 @@ class ExceedingDataDelete extends Command
                 $table_data['table_name'] = 'season_tutor_requests';
                 // 対象データ取得用クエリ
                 $season_tutor_requests_query = DB::table($table_data['table_name'])
-                    ->whereIn('season_cd', $season_mng_cds);
+                ->where('season_cd', '<', $seasonCdKey);
                 // 対象データを配列で取得
                 $table_data['data_list'] = $season_tutor_requests_query->get()->toArray();
                 // CSV出力用配列に追加
@@ -522,7 +512,6 @@ class ExceedingDataDelete extends Command
                 $season_mng_count = $season_mng_query->delete();
 
                 // getデータ破棄
-                $season_mng = null;
                 $season_student_requests = null;
                 $season_tutor_requests = null;
 
@@ -739,23 +728,23 @@ class ExceedingDataDelete extends Command
                 // CSV出力用のデータ抽出
                 //---------------------
                 // --年間予定情報・年間予定取込情報----------------------------------------------------
-                // 年間予定情報から削除対象を抽出（条件：作成日時）
+                // 年間予定情報から削除対象を抽出（条件：日付）
                 // テーブル名を指定
                 $table_data['table_name'] = 'yearly_schedules';
                 // 対象データ取得用クエリ
                 $yearly_schedules_query = DB::table($table_data['table_name'])
-                    ->where('created_at', '<', $five_years_ago_fiscal_start_date);
+                    ->where('lesson_date', '<', $five_years_ago_fiscal_start_date);
                 // 対象データを配列で取得
                 $table_data['data_list'] = $yearly_schedules_query->get()->toArray();
                 // CSV出力用配列に追加
                 array_push($array_table_data, $table_data);
 
-                // 年間予定取込情報から削除対象を抽出（条件：取込日時）
+                // 年間予定取込情報から削除対象を抽出（条件：年度）
                 // テーブル名を指定
                 $table_data['table_name'] = 'yearly_schedules_import';
                 // 対象データ取得用クエリ
                 $yearly_schedules_import_query = DB::table($table_data['table_name'])
-                    ->where('import_date', '<', $five_years_ago_fiscal_start_date);
+                    ->where('school_year', '<', substr($five_years_ago_fiscal_start_date, 0, 4));
                 // 対象データを配列で取得
                 $table_data['data_list'] = $yearly_schedules_import_query->get()->toArray();
                 // CSV出力用配列に追加
