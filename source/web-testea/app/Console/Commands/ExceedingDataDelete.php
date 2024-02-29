@@ -1260,6 +1260,10 @@ class ExceedingDataDelete extends Command
                 $exceeding_data_backup_dir = config('appconf.download_dir_exceeding_data_backup');
                 $exceeding_data_backup_dir_count = $this->deleteExceedingUploadDir($exceeding_data_backup_dir, $five_years_ago_fiscal_start_dir_name);
 
+                // 振替残数リセットバックアップファイル削除
+                $transfer_reset_backup_dir = config('appconf.download_dir_transfer_reset_backup');
+                $transfer_reset_backup_dir_count = $this->deleteExceedingUploadDir($transfer_reset_backup_dir, $five_years_ago_fiscal_start_dir_name);
+
                 // 研修資料ディレクトリの削除数もここでログ出力する
                 Log::info(
                     "Delete {$training_files_count} Folders From {$training_files_dir}.
@@ -1267,7 +1271,8 @@ class ExceedingDataDelete extends Command
                     Delete {$invoice_import_dir_count} Folders From {$invoice_import_dir}.
                     Delete {$year_schedule_import_dir_count} Folders From {$year_schedule_import_dir}.
                     Delete {$school_code_import_dir_count} Folders From {$school_code_import_dir}.
-                    Delete {$exceeding_data_backup_dir_count} Folders From {$exceeding_data_backup_dir}."
+                    Delete {$exceeding_data_backup_dir_count} Folders From {$exceeding_data_backup_dir}.
+                    Delete {$transfer_reset_backup_dir_count} Folders From {$transfer_reset_backup_dir}."
                 );
             });
 
