@@ -145,7 +145,7 @@ class TransferReset extends Command
                 $dir_name = preg_replace('/[^0-9]/', '', $now);
 
                 // $dir_path例：transfer_reset_data_backup/20230301000000
-                $dir_path = config('appconf.transfer_reset_backup_dir') . $dir_name;
+                $dir_path = config('appconf.download_dir_transfer_reset_backup') . $dir_name;
                 Storage::makeDirectory($dir_path);
                 $dir_path = Storage::path($dir_path);
 

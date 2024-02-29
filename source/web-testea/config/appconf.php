@@ -51,31 +51,6 @@ return [
     "upload_dir" => "file_upload/",
 
     /**
-     * 汎用マスタファイル取込
-     */
-    "upload_dir_master_mng" =>  "file_upload/master_mng/",
-
-    /**
-     * 模試情報取込
-     */
-    "upload_dir_trial_mng" =>  "file_upload/trial_mng/",
-
-    /**
-     * 教師情報取込
-     */
-    "upload_dir_tutor_regist" =>  "file_upload/tutor_regist/",
-
-    /**
-     * 生徒情報取込
-     */
-    "upload_dir_member_import" =>  "file_upload/member_import/",
-
-    /**
-     * スケジュール情報取込
-     */
-    "upload_dir_schedule_import" =>  "file_upload/schedule_import/",
-
-    /**
      * 研修資料
      */
     "upload_dir_training" =>  "file_upload/training/",
@@ -101,104 +76,6 @@ return [
     "upload_dir_school_code_import" =>  "file_upload/school_code_import/",
 
     //==========================
-    // アップロードファイル名
-    //==========================
-
-    /**
-     * 汎用マスタファイル名
-     */
-    "upload_file_name_master_mng" =>  "汎用マスタ情報_",
-
-    /**
-     * 模試マスタファイル名
-     */
-    "upload_file_name_trial_mng" =>  "模試マスタ情報_",
-
-    /**
-     * 教師情報ファイル名
-     */
-    "upload_file_name_tutor_regist" =>  "教師情報_",
-
-    /**
-     * スケジュール情報ファイル名
-     */
-    "upload_file_name_schedule_import" =>  "スケジュール情報_",
-
-    /**
-     * 模試申込ファイル名
-     */
-    "upload_file_name_schedule_import_trial" =>  "模試申込_",
-
-    /**
-     * 入会者情報ファイル名（生徒）
-     */
-    "upload_file_name_member_import_enter" =>  "入会者情報_",
-
-    /**
-     * 授業追加・コース追加変更情報ファイル名（生徒）
-     */
-    "upload_file_name_member_import_course" =>  "コース変更_",
-
-    /**
-     * 短期講習申込情報ファイル名（生徒）
-     */
-    "upload_file_name_member_import_individual" =>  "短期講習申込_",
-
-    /**
-     * 年度スケジュール情報ファイル名（生徒）
-     */
-    "upload_file_name_year_schedule_import" =>  "年次スケジュール情報_",
-
-    //==========================
-    // 解凍されたCSVファイル名（連携テーブル名）
-    //==========================
-
-    /**
-     * A04教室情報
-     */
-    "upload_file_csv_name_A04" =>  "a04room",
-
-    /**
-     * A05生徒基本情報
-     */
-    "upload_file_csv_name_A05" =>  "a05student_kihon",
-
-    /**
-     * A10個別規定情報
-     */
-    "upload_file_csv_name_A10" =>  "a10regular",
-
-    /**
-     * A11個別規定情報明細
-     */
-    "upload_file_csv_name_A11" =>  "a11regular_detail",
-
-    /**
-     * A30個別講習情報
-     */
-    "upload_file_csv_name_A30" =>  "a30extra_individual",
-
-    /**
-     * A31個別講習情報明細
-     */
-    "upload_file_csv_name_A31" =>  "a31extra_ind_detail",
-
-    /**
-     * A60家庭教師標準情報
-     */
-    "upload_file_csv_name_A60" =>  "a60home_teacher_std",
-
-    /**
-     * A61家庭教師標準情報詳細
-     */
-    "upload_file_csv_name_A61" =>  "a61home_teacher_std_detail",
-
-    /**
-     * T01スケジュール情報
-     */
-    "upload_file_csv_name_T01" =>  "t01schedule",
-
-    //==========================
     // バッチ処理
     //==========================
 
@@ -213,19 +90,24 @@ return [
     "db_backup_dir" => 'db_backup/',
 
     /**
-     * 保持期限超過データバックアップ先
+     * ダウンロードファイルの格納先(ルート)
      */
-    "exceeding_data_backup_dir" => "exceeding_data_backup/",
+    "download_dir" => "file_download/",
 
     /**
-     * 保持期限超過データバックアップzipファイル名
+     * 保持期限超過データバックアップ先
      */
-    "exceeding_data_backup_zip_filename" => "保持期限超過データ削除バックアップ_",
+    "download_dir_exceeding_data_backup" => "file_download/exceeding_data_backup/",
+
+    /**
+     * 保持期限超過データバックアップZIPファイル名
+     */
+    "download_file_name_exceeding_data_backup" => "保持期限超過データ削除バックアップ_",
 
     /**
      * 振替残数リセットバックアップ先
      */
-    "transfer_reset_backup_dir" => "transfer_reset_backup/",
+    "download_dir_transfer_reset_backup" => "file_download/transfer_reset_backup/",
 
     //==========================
     // 画面ごと設定

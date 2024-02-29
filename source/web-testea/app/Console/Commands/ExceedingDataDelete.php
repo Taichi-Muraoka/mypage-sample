@@ -1138,7 +1138,7 @@ class ExceedingDataDelete extends Command
                 $dir_name = preg_replace('/[^0-9]/', '', $now);
 
                 // $dir_path例：exceeding_data_backup/20230301000000
-                $dir_path = config('appconf.exceeding_data_backup_dir') . $dir_name;
+                $dir_path = config('appconf.download_dir_exceeding_data_backup') . $dir_name;
                 Storage::makeDirectory($dir_path);
                 $dir_path = Storage::path($dir_path);
 
@@ -1154,7 +1154,7 @@ class ExceedingDataDelete extends Command
                 // zip保存
                 //---------------------
                 // $zip_name例：保持期限超過データ削除バックアップ_20230301000000.zip
-                $zip_name = config('appconf.exceeding_data_backup_zip_filename') . $dir_name . '.zip';
+                $zip_name = config('appconf.download_file_name_exceeding_data_backup') . $dir_name . '.zip';
 
                 $zip = new \ZipArchive();
                 $zip->open($dir_path . '/' . $zip_name, \ZipArchive::CREATE);
@@ -1257,7 +1257,7 @@ class ExceedingDataDelete extends Command
                 $school_code_import_dir_count = $this->deleteExceedingUploadDir($school_code_import_dir, $five_years_ago_fiscal_start_dir_name);
 
                 // 保持期限超過データバックアップファイル削除
-                $exceeding_data_backup_dir = config('appconf.exceeding_data_backup_dir');
+                $exceeding_data_backup_dir = config('appconf.download_dir_exceeding_data_backup');
                 $exceeding_data_backup_dir_count = $this->deleteExceedingUploadDir($exceeding_data_backup_dir, $five_years_ago_fiscal_start_dir_name);
 
                 // 研修資料ディレクトリの削除数もここでログ出力する
