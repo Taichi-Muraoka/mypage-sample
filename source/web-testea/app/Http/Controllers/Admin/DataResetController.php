@@ -98,10 +98,10 @@ class DataResetController extends Controller
         // $dirName例：20230301000000
         // $fileName例：保持期限超過データ削除バックアップ_20230301000000.zip
         $dirName = preg_replace('/[^0-9]/', '', $batch->start_time);
-        $fileName = config('appconf.exceeding_data_backup_zip_filename') . $dirName . '.zip';
+        $fileName = config('appconf.download_file_name_exceeding_data_backup') . $dirName . '.zip';
 
         // バックアップ保存場所のパス取得
-        $backupDir = config("appconf.exceeding_data_backup_dir");
+        $backupDir = config("appconf.download_dir_exceeding_data_backup");
         $filePath = Storage::path($backupDir . $dirName . '/' . $fileName);
 
         // 存在チェック

@@ -108,7 +108,7 @@ class TransferResetController extends Controller
         );
 
         // バックアップ保存場所のパス取得
-        $backupDir = config("appconf.transfer_reset_backup_dir");
+        $backupDir = config("appconf.download_dir_transfer_reset_backup");
         $filePath = Storage::path($backupDir . $dirName . '/' . $fileName);
 
         // 存在チェック
