@@ -87,7 +87,6 @@ return [
     'auth_logo' => [
         'enabled' => true,
         'img' => [
-            //'path' => 'img/cw_logo.png',
             'path' => 'img/testea_logo_green.png',
             'alt' => 'TESTEA',
             'class' => '',
@@ -353,13 +352,13 @@ return [
             'can'  => 'student',
             'active' => ['grades/*']
         ],
-        [
-            'text' => '面談日程連絡',
-            'route'  => 'conference',
-            'icon' => 'fas fa-users',
-            'can'  => 'student',
-            'active' => ['conference/*']
-        ],
+        //[
+        //    'text' => '面談日程連絡',
+        //    'route'  => 'conference',
+        //    'icon' => 'fas fa-users',
+        //    'can'  => 'student',
+        //    'active' => ['conference/*']
+        //],
         [
             'text' => '特別期間講習連絡',
             'route' => 'season_student',
