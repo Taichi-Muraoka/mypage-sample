@@ -1800,7 +1800,7 @@ class AppConst
     /**
      * お知らせグループID 講師
      */
-    const NOTICE_GROUP_ID_16 = 16;
+    const NOTICE_GROUP_ID_TEA = 20;
 
     //==========================
     // 給与情報明細

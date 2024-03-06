@@ -74,7 +74,6 @@ class StudentLeaveSetting extends Command
             // トランザクション(例外時は自動的にロールバック)
             DB::transaction(function () use ($batch_id) {
 
-                //$today = date('Y-m-d');
                 $today = Carbon::today()->format('y-m-d');
                 //-------------------------
                 // 対象生徒抽出
@@ -87,8 +86,8 @@ class StudentLeaveSetting extends Command
                 )
                     // 生徒ステータス＝退会処理中
                     ->where('stu_status', AppConst::CODE_MASTER_28_4)
-                    // 退会日が当日以前
-                    ->where('leave_date', '<=', $today)
+                    // 退会日が当日より前の日付（当日を含まない）
+                    ->where('leave_date', '<', $today)
                     ->get();
 
                 // 対象生徒リスト

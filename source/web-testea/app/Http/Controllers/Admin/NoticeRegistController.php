@@ -269,7 +269,7 @@ class NoticeRegistController extends Controller
 
         // 独自バリデーション: リストのチェック 校舎
         $validationCampusList =  function ($attribute, $value, $fail) use($request) {
-            
+
             // 校舎リストを取得
             $rooms = $this->mdlGetRoomList(true);
             if (!isset($rooms[$value])) {
@@ -497,7 +497,7 @@ class NoticeRegistController extends Controller
                         ];
 
                         // グループが講師の場合はnull
-                        if ($notice_groups[$i] == AppConst::NOTICE_GROUP_ID_16) {
+                        if ($notice_groups[$i] == AppConst::NOTICE_GROUP_ID_TEA) {
                             $destination['campus_cd'] = null;
                         }
 
@@ -532,7 +532,7 @@ class NoticeRegistController extends Controller
                             $destination['notice_group_id'] = $notice_groups[$j];
 
                             // グループに講師が含まれる場合、フラグのみ立てておく
-                            if ($destination['notice_group_id'] == AppConst::NOTICE_GROUP_ID_16) {
+                            if ($destination['notice_group_id'] == AppConst::NOTICE_GROUP_ID_TEA) {
                                 $tutor_flg = true;
                                 continue;
                             }
@@ -547,7 +547,7 @@ class NoticeRegistController extends Controller
                             'student_id' => null,
                             'tutor_id' => null,
                             'destination_seq' => $seq,
-                            'notice_group_id' => AppConst::NOTICE_GROUP_ID_16
+                            'notice_group_id' => AppConst::NOTICE_GROUP_ID_TEA
                         ];
                         array_push($destinations, $destination);
                     }
@@ -584,7 +584,7 @@ class NoticeRegistController extends Controller
                 ];
 
                 break;
-                // 個別（保護者） 
+                // 個別（保護者）
             case AppConst::CODE_MASTER_15_4:
 
                 $destinations = [
@@ -895,7 +895,7 @@ class NoticeRegistController extends Controller
                         $campus_cd_group_required = 'required';
                         // 宛先が講師のみの場合は、校舎は必須としない
                         $notice_groups = $request->input('notice_groups');
-                        if ($notice_groups === (string) AppConst::NOTICE_GROUP_ID_16) {
+                        if ($notice_groups === (string) AppConst::NOTICE_GROUP_ID_TEA) {
                             $campus_cd_group_required = null;
                         }
                     }
