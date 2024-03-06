@@ -81,8 +81,8 @@ class TutorLeaveSetting extends Command
                 )
                     // 講師ステータス＝退職処理中
                     ->where('tutor_status', AppConst::CODE_MASTER_29_2)
-                    // 退会日が当日以前
-                    ->where('leave_date', '<=', $today)
+                    // 退職日が当日より前の日付（当日を含まない）
+                    ->where('leave_date', '<', $today)
                     ->get();
 
                 // 対象講師リスト
