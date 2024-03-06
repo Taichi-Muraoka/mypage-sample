@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Record;
 use App\Consts\AppConst;
 use App\Http\Controllers\Traits\FuncRecordTrait;
+use App\Libs\AuthEx;
 
 /**
  * 生徒カルテ - コントローラ
@@ -147,6 +148,13 @@ class RecordController extends Controller
         // 生徒名を取得する
         $student = $this->mdlGetStudentName($sid);
 
+        // 校舎名取得
+        $campus_name = null;
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、強制的に校舎で絞り込む
+            $campus_name = $this->mdlGetRoomName($account->campus_cd);
+        }
+
         $editData = [
             'sid' => $sid,
             'campus_cd' => $account->campus_cd,
@@ -157,6 +165,7 @@ class RecordController extends Controller
         // テンプレートは編集と同じ
         return view('pages.admin.record-input', [
             'editData' => $editData,
+            'campus_name' => $campus_name,
             'student_name' => $student,
             'manager_name' => $account->name,
             'recordKind' => $recordKind,
@@ -240,9 +249,17 @@ class RecordController extends Controller
         // ログインユーザ
         $account = Auth::user();
 
+        // 校舎名取得
+        $campus_name = null;
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、強制的に校舎で絞り込む
+            $campus_name = $this->mdlGetRoomName($account->campus_cd);
+        }
+
         return view('pages.admin.record-input', [
             'student_name' => $student,
             'manager_name' => $account->name,
+            'campus_name' => $campus_name,
             'recordKind' => $recordKind,
             'sid' => $record->student_id,
             'rooms' => $rooms,
