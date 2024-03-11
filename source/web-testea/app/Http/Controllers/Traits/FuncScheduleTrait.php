@@ -2088,7 +2088,7 @@ trait FuncScheduleTrait
         }
 
         $regularClassId = null;
-        if ($kind == AppConst::SCHEDULE_KIND_UPD && $request->filled('schedule_id')) {
+        if ($kind == AppConst::SCHEDULE_KIND_UPD && $request->filled('regular_class_id')) {
             // 更新の場合のみ、スケジュールIDをセット（除外用）
             $regularClassId = $request['regular_class_id'];
         }
