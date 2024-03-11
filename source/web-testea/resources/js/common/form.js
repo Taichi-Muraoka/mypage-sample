@@ -37,10 +37,6 @@ export default class FormCom {
                         if ($(element).is(":checked")) {
                             inputVals[name] = $(element).val();
                         }
-                    } else if ($(element).is("select") && $(element).attr("multiple")) {
-                        // 複数選択プルダウンの場合、配列で扱う
-                        inputVals[id] = [];
-
                     } else if ($(element).is(":file")) {
                         // file選択のinputは無視する。
                     } else {
