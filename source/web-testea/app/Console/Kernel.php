@@ -17,10 +17,10 @@ class Kernel extends ConsoleKernel
         Commands\TransferReset::class,
         Commands\ExceedingDataDelete::class,
         Commands\YearInitialDataInsert::class,
-        //Commands\StudentLeaveSetting::class,
-        //Commands\TutorLeaveSetting::class,
-        //Commands\StudentRecessSetting::class,
-        //Commands\LessonReminderMail::class,
+        Commands\StudentLeaveSetting::class,
+        Commands\TutorLeaveSetting::class,
+        Commands\StudentRecessSetting::class,
+        Commands\LessonReminderMail::class,
         Commands\DbBackup::class
     ];
 
@@ -45,19 +45,19 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:yearInitialDataInsert')->yearlyOn(3, 1, '00:40');
 
         // 生徒退会処理 毎日深夜1時に実行される
-        //$schedule->command('command:studentLeaveSetting')->dailyAt('1:00');
+        $schedule->command('command:studentLeaveSetting')->dailyAt('1:00');
 
         // 講師退職処理 毎日深夜1時10分に実行される
-        //$schedule->command('command:tutorLeaveSetting')->dailyAt('1:10');
+        $schedule->command('command:tutorLeaveSetting')->dailyAt('1:10');
 
         // 生徒休塾処理 毎日深夜1時20分に実行される
-        //$schedule->command('command:studentRecessSetting')->dailyAt('1:20');
+        $schedule->command('command:studentRecessSetting')->dailyAt('1:20');
 
         // DBバックアップ 毎日深夜1時30分に実行される
         $schedule->command('command:dbBackup')->dailyAt('1:30');
 
         // 授業リマインドメール配信 毎日20時に実行される
-        //$schedule->command('command:lessonReminderMail')->dailyAt('20:00');
+        $schedule->command('command:lessonReminderMail')->dailyAt('20:00');
     }
 
     /**
