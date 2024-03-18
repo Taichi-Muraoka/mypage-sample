@@ -9,6 +9,7 @@ use App\Consts\AppConst;
 use App\Models\CodeMaster;
 use App\Libs\AuthEx;
 use App\Models\MstSystem;
+use Illuminate\Support\Facades\Lang;
 
 /**
  * システムマスタ管理 - コントローラ
@@ -102,6 +103,7 @@ class MasterMngSystemController extends Controller
             'mst_systems.name',
             'mst_systems.datatype_kind',
             'mst_systems.value_num',
+            'mst_systems.value_num as value_flg',
             'mst_systems.value_str',
             'mst_systems.value_date',
         )
@@ -110,8 +112,12 @@ class MasterMngSystemController extends Controller
             ->where('change_flg', '!=', AppConst::CODE_MASTER_9_1)
             ->firstOrFail();
 
+        // 可否フラグリストを取得
+        $flgList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_9);
+
         return view('pages.admin.master_mng_system-input', [
             'editData' => $mstSystem,
+            'flgList' => $flgList,
             'rules' => $this->rulesForInput(null),
         ]);
     }
@@ -138,6 +144,7 @@ class MasterMngSystemController extends Controller
             'value_num',
             'value_str',
             'value_date',
+            'value_flg',
         );
 
         // 対象データを取得
@@ -147,7 +154,15 @@ class MasterMngSystemController extends Controller
             ->firstOrFail();
 
         // 更新
-        $mstSystem->fill($form)->save();
+        $mstSystem->name = $form['name'];
+        if($request['datatype_kind'] == AppConst::SYSTEM_DATATYPE_4) {
+            $mstSystem->value_num = $form['value_flg'];
+        } else {
+            $mstSystem->value_num = $form['value_num'];
+        }
+        $mstSystem->value_str = $form['value_str'];
+        $mstSystem->value_date = $form['value_date'];
+        $mstSystem->save();
 
         return;
     }
@@ -174,11 +189,24 @@ class MasterMngSystemController extends Controller
     private function rulesForInput(?Request $request)
     {
         $rules = array();
+
+        // 独自バリデーション: リストのチェック 可否フラグ
+        $validationFlgList =  function ($attribute, $value, $fail) {
+
+            // リストを取得し存在チェック
+            $list = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_9);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
         $rules += MstSystem::fieldRules('name', ['required']);
         // データ型種別により必須項目の分岐
         $rules += MstSystem::fieldRules('value_num', ['required_if:datatype_kind,' . AppConst::SYSTEM_DATATYPE_1]);
         $rules += MstSystem::fieldRules('value_str', ['required_if:datatype_kind,' . AppConst::SYSTEM_DATATYPE_2]);
         $rules += MstSystem::fieldRules('value_date', ['required_if:datatype_kind,' . AppConst::SYSTEM_DATATYPE_3]);
+        $rules += ['value_flg' => ['required_if:datatype_kind,' . AppConst::SYSTEM_DATATYPE_4, $validationFlgList]];
 
         return $rules;
     }

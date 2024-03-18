@@ -24,8 +24,11 @@
         <x-input.text caption="値（文字列）" id="value_str" :rules=$rules :editData=$editData
             vShow="form.datatype_kind == {{ App\Consts\AppConst::SYSTEM_DATATYPE_2 }}" />
 
-        <x-input.date-picker caption="登録日" id="value_date" :rules=$rules :editData=$editData
+        <x-input.date-picker caption="値（日付）" id="value_date" :rules=$rules :editData=$editData
             vShow="form.datatype_kind == {{ App\Consts\AppConst::SYSTEM_DATATYPE_3 }}" />
+
+        <x-input.select vShow="form.datatype_kind == {{ App\Consts\AppConst::SYSTEM_DATATYPE_4 }}"
+            caption="値（可否フラグ）" id="value_flg" :select2=true :mastrData=$flgList :editData="$editData" :select2Search=false :blank=false />
     </div>
 
     {{-- hidden --}}

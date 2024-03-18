@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Sleep;
+use App\Models\MstSystem;
 use App\Models\BatchMng;
 use App\Models\Schedule;
 use App\Models\ClassMember;
@@ -75,6 +76,28 @@ class LessonReminderMail extends Command
             $batchMng->save();
 
             $batch_id = $batchMng->batch_id;
+
+            //-------------------------
+            // メール配信可否判定
+            //-------------------------
+            // システムマスタから配信可否を取得
+            $sendFlg = MstSystem::where('key_id', AppConst::SYSTEM_KEY_ID_5)
+                ->whereNotNull('value_num')
+                ->firstOrFail();
+
+            if ($sendFlg->value_num != AppConst::CODE_MASTER_9_0) {
+                // メール配信可否＝可でない場合、以下の処理をスキップする
+                // バッチ管理テーブルのレコードを更新：正常終了
+                $end = Carbon::now();
+                BatchMng::where('batch_id', '=', $batch_id)
+                    ->update([
+                        'end_time' => $end,
+                        'batch_state' => AppConst::CODE_MASTER_22_0,
+                        'updated_at' => $end
+                    ]);
+                Log::info("Batch lessonReminderMail Skipped.");
+                return 0;
+            }
 
             // トランザクション(例外時は自動的にロールバック)
             DB::transaction(function () use ($batch_id) {

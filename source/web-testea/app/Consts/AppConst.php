@@ -1911,6 +1911,11 @@ class AppConst
      */
     const SYSTEM_KEY_ID_4 = 4;
 
+    /**
+     * システム変数ID リマインドメール配信可否
+     */
+    const SYSTEM_KEY_ID_5 = 5;
+
     //-----------
     // システムマスタ データ型種別
     //-----------
@@ -1928,6 +1933,11 @@ class AppConst
      * システムマスタ 日付
      */
     const SYSTEM_DATATYPE_3 = 3;
+
+    /**
+     * システムマスタ 数値（可否フラグ）
+     */
+    const SYSTEM_DATATYPE_4 = 4;
 
     //-----------
     // 授業報告書サブコード
