@@ -62,7 +62,7 @@
     <div v-cloak v-show="form.stu_status != {{ App\Consts\AppConst::CODE_MASTER_28_0 }}">
         <x-input.select id="login_kind" caption="ログインID種別" :select2=true :mastrData=$loginKindList :editData=$editData
             :select2Search=false :blank=true/>
-        <x-input.date-picker caption="入会日" id="enter_date" :editData=$editData/>
+        <x-input.date-picker caption="入会日（再入会日）" id="enter_date" :editData=$editData/>
     </div>
 
     {{-- 編集時に表示 --}}
@@ -102,6 +102,7 @@
         会員ステータスを「休塾予定」とした場合、または、休塾期間が変更された場合には、登録された休塾期間の生徒スケジュールが削除されます。<br>
         退会日が変更された場合には、退会日以降の生徒スケジュールが削除されます。<br>
         画面からの復元はできませんのでご注意ください。<br>
+        退会済み生徒の再入会の場合、会員ステータスを「在籍」とし、入会日に再入会の日付を設定してください。<br>
     </x-bs.callout>
     @endif
 
