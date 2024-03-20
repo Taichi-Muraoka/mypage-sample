@@ -590,6 +590,7 @@ class TransferStudentController extends Controller
         $rules += TransferApplication::fieldRules('student_id', ['required']);
         $rules += TransferApplication::fieldRules('tutor_id', ['required']);
         $rules += TransferApplication::fieldRules('transfer_reason', ['required']);
+        $rules += TransferApplication::fieldRules('comment');
 
         return $rules;
     }
