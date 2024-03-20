@@ -1028,10 +1028,14 @@ trait CtrlModelTrait
     protected function mdlGetStudentEnterTermQuery()
     {
         // 生徒情報から通塾期間の月数を算出するクエリ
+        // 退会済生徒：過去通塾期間
+        // 入会日が現在日より後：過去通塾期間（初期値0）
+        // 入会日が現在日以前：入会日～現在日の月数 + 過去通塾月数（初期値0）
         $query = Student::query();
         $query->select('student_id')
             ->selectRaw(
                 'CASE WHEN stu_status = ' . AppConst::CODE_MASTER_28_5 . ' THEN past_enter_term'
+                    . ' WHEN enter_date > curdate() THEN past_enter_term'
                     . ' ELSE past_enter_term + PERIOD_DIFF(DATE_FORMAT(curdate(), "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
                     . ' END as enter_term'
             );
@@ -1048,12 +1052,20 @@ trait CtrlModelTrait
     protected function mdlGetTutorEnterTermQuery()
     {
         // 講師情報から勤続期間の月数を算出するクエリ
+        // 勤務開始日が現在日より後：0
+        // 退職日あり・勤務開始日が退職日より後：0
+        // 退職日あり・退職日が現在日より前：勤務開始日～退職日の月数
+        // 上記以外：勤務開始日～現在日の月数
         $query = Tutor::query();
         $query->select('tutor_id')
             ->selectRaw(
-                'CASE WHEN leave_date IS NULL'
-                    . ' THEN PERIOD_DIFF(DATE_FORMAT(curdate(), "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
-                    . ' ELSE PERIOD_DIFF(DATE_FORMAT(leave_date, "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
+                'CASE WHEN enter_date > curdate() THEN 0'
+                    . ' WHEN leave_date IS NOT NULL AND enter_date > leave_date THEN 0'
+                    . ' ELSE'
+                    . '  CASE WHEN leave_date IS NOT NULL AND leave_date < curdate()'
+                    . '  THEN PERIOD_DIFF(DATE_FORMAT(leave_date, "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
+                    . '  ELSE PERIOD_DIFF(DATE_FORMAT(curdate(), "%Y%m"), DATE_FORMAT(enter_date, "%Y%m")) + 1'
+                    . '  END'
                     . ' END AS enter_term'
             );
 
