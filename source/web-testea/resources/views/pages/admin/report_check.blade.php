@@ -26,8 +26,7 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$students :editData=$editData 
-                :select2Search=false/>
+            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$students :editData=$editData />
         </x-bs.col2>
         <x-bs.col2>
             <x-input.select id="tutor_id" caption="講師名" :select2=true :mastrData=$tutors :editData=$editData />
@@ -88,7 +87,7 @@
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.id']" />
                 <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-approval"
                     :vueDataAttr="['id' => 'item.id']"
-                    vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }}"/>
+                    vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }} || item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_3 }}"/>
                 <x-button.list-edit vueHref="'{{ route('report_check-edit', '') }}/' + item.id"
                     {{-- 承認のときは非活性 --}}
                     vueDisabled="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_4_2 }}"/>

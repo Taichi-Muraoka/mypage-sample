@@ -164,8 +164,12 @@ class Report extends Model
     {
         $key = 'grade_cd';
         if (isset($obj[$key]) && filled($obj[$key])) {
-            // 生徒IDでスケジュールを絞り込む(共通処理)
-            $this->mdlWhereScheduleBySidQuery($query, self::class, $obj[$key]);
+            // 生徒情報から検索する
+            $col = 'students.' . $key;
+
+            if (isset($obj[$key]) && filled($obj[$key])) {
+                $query->where($col, $obj[$key]);
+            }
         }
     }
 
