@@ -133,7 +133,7 @@ class Student extends Model
             'name' => ['string', 'max:50'],
             'name_kana' => ['string', 'max:50'],
             'grade_cd' => ['integer'],
-            'grade_year' => ['string', 'max:4'],
+            'grade_year' => ['string', 'max:4', 'digits:4'],
             'birth_date' => ['date_format:Y-m-d'],
             'school_cd_e' => ['string', 'max:13'],
             'school_cd_j' => ['string', 'max:13'],
