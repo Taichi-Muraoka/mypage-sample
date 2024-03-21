@@ -36,7 +36,7 @@
     <x-input.date-picker caption="受験日" id="exam_date" :editData=$editData />
     <x-input.select id="result" caption="合否" :select2=true :mastrData=$resultList :editData=$editData
         :select2Search=false :blank=true />
-    <x-input.textarea caption="備考" id="memo" :editData=$editData />
+    <x-input.textarea caption="備考" id="memo" :rules=$rules :editData=$editData />
 
     {{-- hidden --}}
     <x-input.hidden id="student_id" :editData=$editData />

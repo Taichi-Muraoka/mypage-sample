@@ -102,6 +102,15 @@ class ConferenceController extends Controller
                         $conference_date->save();
                     }
                 }
+                // 第1希望・第3希望の場合
+                else if (($request['conference_date3'] and $request['start_time3']) != null) {
+                    $conference_date = new ConferenceDate;
+                        $conference_date->conference_id = $conference->conference_id;
+                        $conference_date->request_no = 2;
+                        $conference_date->conference_date = $request['conference_date3'];
+                        $conference_date->start_time = $request['start_time3'];
+                        $conference_date->save();
+                }
             });
         } catch (\Exception  $e) {
             // この時点では補足できないエラーとして、詳細は返さずエラーとする
@@ -170,7 +179,7 @@ class ConferenceController extends Controller
                 return;
             }
             $request_datetime = $request['conference_date' . $targetNo] . " " . $value;
-            $this->debug($request_datetime);
+
             $today = date("Y/m/d H:i");
 
             if (strtotime($request_datetime) < strtotime($today)) {
