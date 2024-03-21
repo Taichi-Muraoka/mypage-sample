@@ -122,6 +122,13 @@ class NoticeTemplateController extends Controller
             'order_code' => NoticeTemplate::max('order_code') + 1
         ];
 
+        // 表示順の最大値が9999の場合表示順の初期値は9999にする
+        if (NoticeTemplate::max('order_code') >= 9999) {
+            $editData = [
+                'order_code' => NoticeTemplate::max('order_code')
+            ];
+        }
+
         // テンプレートは編集と同じ
         return view('pages.admin.notice_template-input', [
             'editData' => $editData,
@@ -281,6 +288,9 @@ class NoticeTemplateController extends Controller
                 return $fail(Lang::get('validation.invalid_input'));
             }
         };
+
+        // 独自バリデーション: 最大4桁のバリデーション
+
         $rules += NoticeTemplate::fieldRules('template_id');
         $rules += NoticeTemplate::fieldRules('order_code', ['required']);
         $rules += NoticeTemplate::fieldRules('template_name', ['required']);
