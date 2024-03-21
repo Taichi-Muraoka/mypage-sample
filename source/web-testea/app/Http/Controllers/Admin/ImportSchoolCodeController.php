@@ -245,6 +245,7 @@ class ImportSchoolCodeController extends Controller
 
                 // csvHeadersをもとに、値をセットしたオブジェクトを生成
                 // MEMO:バリデーションに引っ掛かるため不要なスペースはtrimで削除する
+                array_splice($line, count($csvHeaders));
                 $values = array_combine($csvHeaders, $line);
                 $values = array_map('trim', $values);
 
