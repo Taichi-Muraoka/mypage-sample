@@ -1474,7 +1474,7 @@ class RoomCalendarController extends Controller
                         // 繰り返し登録データの場合、対象日も合わせて表示する
                         $validateMsg = $validateMsg . "(" . $targetDate . ")";
                     }
-                    return $fail(Lang::get($validateMsg));
+                    return $fail($validateMsg);
                 }
             }
         };
