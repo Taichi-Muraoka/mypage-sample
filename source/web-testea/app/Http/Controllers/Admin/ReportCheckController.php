@@ -185,7 +185,7 @@ class ReportCheckController extends Controller
             })
             ->distinct()
             ->orderby('lesson_date', 'desc')
-            ->orderby('period_no', 'desc');
+            ->orderby('period_no', 'asc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $reports);
@@ -429,6 +429,11 @@ class ReportCheckController extends Controller
         // データを取得
         $report = $this->getReport($reportId);
 
+        // 承認ステータスが「承認」の場合はエラーとする
+        if ($report->approval_status == AppConst::CODE_MASTER_4_2) {
+            $this->illegalResponseErr();
+        }
+
         // 集団授業の場合受講生徒名取得
         if ($report->course_kind == AppConst::CODE_MASTER_42_2) {
             $class_member_names = $this->getClassMember($report->schedule_id);
@@ -550,6 +555,18 @@ class ReportCheckController extends Controller
         try {
             // トランザクション(例外時は自動的にロールバック)
             DB::transaction(function () use ($request) {
+
+                // 対応するスケジュール情報取得
+                $schedule = Schedule::query()
+                    ->where('report_id', $request->input('report_id'))
+                    // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+                    ->where($this->guardRoomAdminTableWithRoomCd())
+                    // 該当データがない場合はエラーを返す
+                    ->firstOrFail();
+
+                // スケジュール情報の授業報告書IDをクリア
+                $schedule->report_id = null;
+                $schedule->save();
 
                 // 対象データを取得(PKでユニークに取る)
                 $report = Report::query()

@@ -19,6 +19,10 @@
             <td>{{$report['regist_date']->format('Y/m/d')}}</td>
         </tr>
         <tr>
+            <th>講師名</th>
+            <td>{{$report['tutor_name']}}</td>
+        </tr>
+        <tr>
             <th width="20%">授業日・時限</th>
             <td>{{$formatter::formatYmdDay($report['lesson_date'])}} {{$report['period_no']}}限</td>
         </tr>
@@ -45,7 +49,7 @@
             </td>
         </tr>
         <tr>
-            <th>科目</th>
+            <th>教科</th>
             <td>{{$report['subject_name']}}</td>
         </tr>
         <tr>
