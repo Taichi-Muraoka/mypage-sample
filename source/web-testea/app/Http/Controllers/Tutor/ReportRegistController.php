@@ -607,7 +607,7 @@ class ReportRegistController extends Controller
             ->where('schedules.target_date', '>=', $year_start_date->value_date)
             // システム日付以前
             ->where('schedules.target_date', '<=', now())
-            ->orderBy('target_date', 'desc')->orderBy('period_no', 'asc')
+            ->orderBy('target_date', 'desc')->orderBy('period_no', 'desc')
             ->get();
 
         $lesson_list = $this->mdlGetScheduleMasterList($lessons);
@@ -735,6 +735,11 @@ class ReportRegistController extends Controller
         // データを取得
         $report = $this->getReport($id);
 
+        // 承認ステータスが「承認」の場合はエラーとする
+        if ($report->approval_status == AppConst::CODE_MASTER_4_2) {
+            $this->illegalResponseErr();
+        }
+
         // 集団授業の場合受講生徒名取得
         if ($report->course_kind == AppConst::CODE_MASTER_42_2) {
             $class_member_names = $this->getClassMember($report->schedule_id);
@@ -749,7 +754,7 @@ class ReportRegistController extends Controller
             'test_contents' => $report->test_contents,
             'test_score' => $report->test_score,
             'test_full_score' => $report->test_full_score,
-            'achievement' => intval($report->achievement),
+            'achievement' => $report->achievement,
             'goodbad_point' => $report->goodbad_point,
             'solution' => $report->solution,
             'others_comment' => $report->others_comment
@@ -832,7 +837,6 @@ class ReportRegistController extends Controller
                 'others_comment',
             );
 
-            $report->regist_date = now();
             // 承認ステータスが差戻の場合、承認待ちに変更
             if ($report->approval_status == AppConst::CODE_MASTER_4_3) {
                 $report->approval_status = AppConst::CODE_MASTER_4_1;
@@ -918,11 +922,24 @@ class ReportRegistController extends Controller
         try {
             // トランザクション(例外時は自動的にロールバック)
             DB::transaction(function () use ($request) {
+
+                // 対応するスケジュール情報取得
+                $schedule = Schedule::query()
+                    ->where('report_id', $request->input('report_id'))
+                    // 自分の担当生徒のみにガードを掛ける
+                    ->where($this->guardTutorTableWithSid())
+                    // 該当データがない場合はエラーを返す
+                    ->firstOrFail();
+
+                // スケジュール情報の授業報告書IDをクリア
+                $schedule->report_id = null;
+                $schedule->save();
+
                 // 対象データを取得(PKでユニークに取る)
                 $report = Report::query()
                     ->where('report_id', $request->input('report_id'))
-                    // 自分の講師IDのみにガードを掛ける
-                    ->where($this->guardTutorTableWithTid())
+                    // 自分の担当生徒のみにガードを掛ける
+                    ->where($this->guardTutorTableWithSid())
                     // 該当データがない場合はエラーを返す
                     ->firstOrFail();
 

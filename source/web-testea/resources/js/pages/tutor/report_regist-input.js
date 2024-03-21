@@ -69,7 +69,7 @@ export default class AppClass extends PageBase {
                         this.form['bef_text_cd_' + subCode] = "";
                         this.form['text_page_' + subCode] = "";
                         this.form['text_name_' + subCode] = "";
-                        this['selectGetItemCat' +  '_' + subCode] = {};
+                        this['selectGetItemCat' + subCode] = {};
                         for (var j = 1; j <= 3; j++) {
                             // 単元分類項目の初期化
                             this.form['unit_category_cd' + j +  '_' + subCode] = "";
