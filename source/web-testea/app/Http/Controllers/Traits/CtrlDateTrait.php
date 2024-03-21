@@ -42,43 +42,33 @@ trait CtrlDateTrait
         if ($year === "present" && $day === "end") {
             // 当年度終了日 ＝ 当年度開始日 + 1 year - 1 day
             $dateStr = date('Y/m/d', strtotime('+1 year -1 day ' . $curStartdate));
-
         } elseif ($year === "prev" && $day === "start") {
             // 前年度開始日 ＝ 当年度開始日 - 1 year
             $dateStr = date('Y/m/d', strtotime('-1 year ' . $curStartdate));
-
         } elseif ($year === "prev" && $day === "end") {
             // 前年度終了日 ＝ 当年度開始日 - 1 day
             $dateStr = date('Y/m/d', strtotime('-1 day ' . $curStartdate));
-
         } elseif ($year === "next" && $day === "start") {
             // 翌年度開始日 ＝ 当年度開始日 + 1 year
             $dateStr = date('Y/m/d', strtotime('+1 year ' . $curStartdate));
-
         } elseif ($year === "next" && $day === "end") {
             // 翌年度終了日 ＝ 当年度開始日 + 2 year - 1 day
             $dateStr = date('Y/m/d', strtotime('+2 year -1 day ' . $curStartdate));
-
         } elseif ($year === "4yearsAgo" && $day === "start") {
             // 4年前の年度開始日 ＝ 当年度開始日 - 4 year
             $dateStr = date('Y/m/d', strtotime('-4 year ' . $curStartdate));
-
         } elseif ($year === "4yearsAgo" && $day === "end") {
             // 4年前の年度終了日 ＝ 当年度開始日 - 3 year - 1 day
             $dateStr = date('Y/m/d', strtotime('-3 year -1 day' . $curStartdate));
-
         } elseif ($year === "5yearsAgo" && $day === "start") {
             // 5年前の年度開始日 ＝ 当年度開始日 - 5 year
             $dateStr = date('Y/m/d', strtotime('-5 year ' . $curStartdate));
-
         } elseif ($year === "5yearsAgo" && $day === "end") {
             // 5年前の年度終了日 ＝ 当年度開始日 - 4 year - 1 day
             $dateStr = date('Y/m/d', strtotime('-4 year -1 day' . $curStartdate));
-
         } elseif ($year === "6yearsAgo" && $day === "start") {
             // 6年前の年度開始日 ＝ 当年度開始日 -6 year
             $dateStr = date('Y/m/d', strtotime('-6 year ' . $curStartdate));
-
         } elseif ($year === "6yearsAgo" && $day === "end") {
             // 6年前の年度終了日 ＝ 当年度開始日 - 5 year - 1 day
             $dateStr = date('Y/m/d', strtotime('-5 year -1 day' . $curStartdate));
@@ -179,6 +169,25 @@ trait CtrlDateTrait
             'from_date' => $fromDate,
             'to_date' => $toDate
         ];
+    }
+
+    /**
+     * 時刻文字列がH:i形式かどうかをチェック
+     *
+     * @param $inputTime
+     * @return bool
+     */
+    protected function dtCheckTimeFormat($inputTime)
+    {
+        // 入力文字列が正規表現パターンに一致するかチェック
+        // ゼロなしでも許可とする。とりあえずコロン区切り
+        if (preg_match('/^([01]?[0-9]|2[0-3]):[0-5]?[0-9]$/', $inputTime)) {
+            // 一致した場合はtrueを返す
+            return true;
+        } else {
+            // 一致しない場合はfalseを返す
+            return false;
+        }
     }
 
     /**

@@ -17,9 +17,9 @@
 
     {{-- 第１希望日 --}}
     <x-bs.card>
-        <x-input.date-picker caption="第１希望日" id="conference_date" :editData=$editData />
+        <x-input.date-picker caption="第１希望日" id="conference_date1" :editData=$editData />
 
-        <x-input.time-picker caption="開始時刻" id="start_time" :rules=$rules :editData=$editData />
+        <x-input.time-picker caption="開始時刻" id="start_time1" :rules=$rules :editData=$editData />
     </x-bs.card>
 
     {{-- 第２希望日 --}}

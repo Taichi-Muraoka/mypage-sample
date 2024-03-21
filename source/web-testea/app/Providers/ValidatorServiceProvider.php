@@ -4,14 +4,17 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Traits\CtrlDateTrait;
 
 /**
  * アプリケーション用の独自バリデーションの追加 - Provider
- * 
+ *
  * 独自バリデーションと区別がつくように、「vdXXXX」のようなルール名にする
  */
 class ValidatorServiceProvider extends ServiceProvider
 {
+    use CtrlDateTrait;
+
     /**
      * Register services.
      *
@@ -41,10 +44,10 @@ class ValidatorServiceProvider extends ServiceProvider
         // 時刻の形式チェック
         //-----------------------
         // デフォルトのチェックの場合、'date_format:H:i'でできるが、以下のメッセージになるため
-        // H:i形式で指定してください。 
+        // H:i形式で指定してください。
         Validator::extend('vdTime', function ($attribute, $value, $parameters, $validator) {
-            // ゼロなしでも許可とする。とりあえずコロン区切り
-            return preg_match('/^([01]?[0-9]|2[0-3]):[0-5]?[0-9]$/', $value);
+            // 時刻形式のチェックを外出しにする
+            return $this->dtCheckTimeFormat($value);
         });
 
         //-----------------------
@@ -97,9 +100,14 @@ class ValidatorServiceProvider extends ServiceProvider
 
         //-----------------------
         // 時刻のFromToチェック（after）
+        // ※vdTimeと併用すること
         //-----------------------
         // $parametersより後の時間かどうか
         Validator::extend('vdAfterTime', function ($attribute, $value, $parameters, $validator) {
+            if (!$this->dtCheckTimeFormat($value)) {
+                // 時刻の形式エラーとなる場合、ここでは検出せずスキップする
+                return true;
+            }
             return strtotime($validator->getData()[$parameters[0]]) < strtotime($value);
         });
 
@@ -113,9 +121,11 @@ class ValidatorServiceProvider extends ServiceProvider
             return preg_match('/^-?\d+(\.\d{1,' . $parameters[0] . '})?$/', $value);
         });
 
-        Validator::replacer('vdDecimal',
-        function ($message, $attribute, $rule, $parameters) {
-            return str_replace(':vdDecimal', $parameters[0], $message);
-        });
+        Validator::replacer(
+            'vdDecimal',
+            function ($message, $attribute, $rule, $parameters) {
+                return str_replace(':vdDecimal', $parameters[0], $message);
+            }
+        );
     }
 }

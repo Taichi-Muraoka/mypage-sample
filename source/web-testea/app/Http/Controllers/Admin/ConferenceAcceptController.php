@@ -828,6 +828,10 @@ class ConferenceAcceptController extends Controller
 
         // 独自バリデーション: 面談日が現在日付時刻以降のみ登録可とする
         $validationConferenceDateTime = function ($attribute, $value, $fail) use ($request) {
+            if (!$this->dtCheckTimeFormat($value)) {
+                // 時刻の形式エラーとなる場合、ここでは検出せずスキップする
+                return;
+            }
 
             $request_datetime = $request['target_date'] . " " . $request['start_time'];
             $today = date("Y/m/d H:i");
