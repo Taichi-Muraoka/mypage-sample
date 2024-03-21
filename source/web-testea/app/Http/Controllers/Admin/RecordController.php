@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
+use App\Models\AdminUser;
 use App\Models\Record;
 use App\Consts\AppConst;
 use App\Http\Controllers\Traits\FuncRecordTrait;
@@ -155,15 +156,23 @@ class RecordController extends Controller
             $campus_name = $this->mdlGetRoomName($account->campus_cd);
         }
 
+        // 対応日・対応時刻の初期値を取得
+        $now = now();
+        $received_date = $now->format('Y-m-d');
+        $received_time = $now->format('H:i');
+
         $editData = [
             'sid' => $sid,
             'campus_cd' => $account->campus_cd,
             'student_id' => $sid,
-            'adm_id' => $account->account_id
+            'adm_id' => $account->account_id,
+            'received_date' => $received_date,
+            'received_time' => $received_time
         ];
 
         // テンプレートは編集と同じ
         return view('pages.admin.record-input', [
+            'rules' => $this->rulesForInput(null),
             'editData' => $editData,
             'campus_name' => $campus_name,
             'student_name' => $student,
@@ -246,6 +255,12 @@ class RecordController extends Controller
         // 生徒名を取得する
         $student = $this->mdlGetStudentName($record->student_id);
 
+        // 管理者名取得
+        $manager_name = AdminUser::where('adm_id', $record->adm_id)
+            ->select('name')
+            // 該当データがない場合はエラーを返す
+            ->firstOrFail();
+
         // ログインユーザ
         $account = Auth::user();
 
@@ -257,8 +272,9 @@ class RecordController extends Controller
         }
 
         return view('pages.admin.record-input', [
+            'rules' => $this->rulesForInput(null),
             'student_name' => $student,
-            'manager_name' => $account->name,
+            'manager_name' => $manager_name->name,
             'campus_name' => $campus_name,
             'recordKind' => $recordKind,
             'sid' => $record->student_id,
@@ -401,8 +417,8 @@ class RecordController extends Controller
         $rules += Record::fieldRules('campus_cd', ['required', $validationRoomList]);
         $rules += Record::fieldRules('record_kind', ['required', $validationKindList]);
         $rules += Record::fieldRules('memo', ['required']);
-        $rules += Record::fieldRules('received_date');
-        $rules += Record::fieldRules('received_time');
+        $rules += Record::fieldRules('received_date', ['required']);
+        $rules += Record::fieldRules('received_time', ['required']);
 
         return $rules;
     }
