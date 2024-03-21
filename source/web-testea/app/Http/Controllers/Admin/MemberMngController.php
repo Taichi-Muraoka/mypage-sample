@@ -1480,18 +1480,18 @@ class MemberMngController extends Controller
         $rules += Student::fieldRules('stu_status', ['required', $validationStatusList, $validationStatusLead, $validationStatusRecessProspect, $validationStatusRecessExecution, $validationStatusChangeLeaveProspect, $validationStatusChangeLeaveExecution]);
 
         // メールアドレス形式チェック 重複チェック
-        if ($request && $request->filled('email_stu')) {
-            $rules += Student::fieldRules('email_stu', [$validationEmailStu]);
-        }
-        if ($request && $request->filled('email_par')) {
-            $rules += Student::fieldRules('email_par', [$validationEmailPar]);
-        }
+        $rules += Student::fieldRules('email_stu', [$validationEmailStu]);
+        $rules += Student::fieldRules('email_par', [$validationEmailPar]);
 
         // 電話番号形式チェック 保護者電話番号は上記でバリデーション済みのため記載省略
         $rules += Student::fieldRules('tel_stu');
 
         // 外部サービス顧客ID形式チェック
         $rules += Student::fieldRules('lead_id');
+
+        // ストレージURL・メモ 字数制限
+        $rules += Student::fieldRules('storage_link');
+        $rules += Student::fieldRules('memo');
 
         // 会員ステータス「見込客」以外で登録する場合
         // 必須：ログインID種別、入会日
