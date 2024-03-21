@@ -1014,7 +1014,7 @@ class TutorMngController extends Controller
         };
 
         // 全ステータス共通バリデーション
-        // 必須：名前、名前かな、電話番号、メールアドレス、生年月日、性別、学年、学年設定年度、授業時給（ベース給）
+        // 必須：名前、名前かな、電話番号、メールアドレス、生年月日、性別、学年、学年設定年度、授業時給（ベース給）、勤務開始日
         $rules += Tutor::fieldRules('name', ['required']);
         $rules += Tutor::fieldRules('name_kana', ['required']);
         $rules += Tutor::fieldRules('tel', ['required']);
@@ -1024,6 +1024,12 @@ class TutorMngController extends Controller
         $rules += Tutor::fieldRules('grade_cd', ['required', $validationGradeList]);
         $rules += Tutor::fieldRules('grade_year', ['required']);
         $rules += Tutor::fieldRules('hourly_base_wage', ['required']);
+        $rules += Tutor::fieldRules('enter_date', ['required']);
+
+        // 住所・メモの字数制限
+        $rules += Tutor::fieldRules('address');
+        $rules += Tutor::fieldRules('memo');
+
         // 担当教科のバリデーション
         $rules += ['subject_groups' => [$validationSubjectGroup]];
 
