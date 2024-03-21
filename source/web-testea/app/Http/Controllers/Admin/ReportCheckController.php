@@ -184,7 +184,7 @@ class ReportCheckController extends Controller
                     ->where('mst_codes.data_type', AppConst::CODE_MASTER_4);
             })
             ->distinct()
-            ->orderby('lesson_date', 'desc')
+            ->orderby('lesson_date', 'asc')
             ->orderby('period_no', 'asc');
 
         // ページネータで返却
