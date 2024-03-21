@@ -184,8 +184,8 @@ class ReportCheckController extends Controller
                     ->where('mst_codes.data_type', AppConst::CODE_MASTER_4);
             })
             ->distinct()
-            ->orderby('lesson_date', 'asc')
-            ->orderby('period_no', 'asc');
+            ->orderby('lesson_date', 'desc')
+            ->orderby('period_no', 'desc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $reports);
