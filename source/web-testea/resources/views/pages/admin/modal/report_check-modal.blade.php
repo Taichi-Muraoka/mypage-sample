@@ -35,7 +35,7 @@
         <td><span v-for="member in item.class_member_name" v-cloak>@{{member}}<br></span></td>
     </tr>
     <tr>
-        <th>科目</th>
+        <th>教科</th>
         <td v-cloak>@{{item.subject_name}}</td>
     </tr>
     <tr>
