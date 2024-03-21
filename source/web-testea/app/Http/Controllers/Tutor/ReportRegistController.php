@@ -735,6 +735,15 @@ class ReportRegistController extends Controller
         // データを取得
         $report = $this->getReport($id);
 
+        // ログイン者の情報を取得する
+        $account = Auth::user();
+        $account_id = $account->account_id;
+
+        // 自分が作成した報告書でない場合はエラーとする
+        if ($report->tutor_id != $account_id) {
+            $this->illegalResponseErr();
+        }
+
         // 承認ステータスが「承認」の場合はエラーとする
         if ($report->approval_status == AppConst::CODE_MASTER_4_2) {
             $this->illegalResponseErr();
@@ -938,8 +947,8 @@ class ReportRegistController extends Controller
                 // 対象データを取得(PKでユニークに取る)
                 $report = Report::query()
                     ->where('report_id', $request->input('report_id'))
-                    // 自分の担当生徒のみにガードを掛ける
-                    ->where($this->guardTutorTableWithSid())
+                    // 自分の講師IDのみにガードを掛ける
+                    ->where($this->guardTutorTableWithTid())
                     // 該当データがない場合はエラーを返す
                     ->firstOrFail();
 
