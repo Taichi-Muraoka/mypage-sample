@@ -328,9 +328,10 @@ trait CtrlModelTrait
      *
      * @param string $campusCd 校舎コード 指定なしの場合null
      * @param int $usageKind 用途種別 省略可
+     * @param int $exceptUsageKind 除外する用途種別 省略可
      * @return array
      */
-    protected function mdlGetBoothList($campusCd, $usageKind = null)
+    protected function mdlGetBoothList($campusCd, $usageKind = null, $exceptUsageKind = null)
     {
         $query = MstBooth::query();
 
@@ -344,6 +345,10 @@ trait CtrlModelTrait
         // 用途種別が指定された場合絞り込み
         $query->when($usageKind, function ($query) use ($usageKind) {
             return $query->where('usage_kind', $usageKind);
+        });
+        // 除外する用途種別が指定された場合絞り込み
+        $query->when($exceptUsageKind, function ($query) use ($exceptUsageKind) {
+            return $query->where('usage_kind', '<>', $exceptUsageKind);
         });
 
         // プルダウンリストを取得する

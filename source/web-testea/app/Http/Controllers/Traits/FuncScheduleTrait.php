@@ -1641,16 +1641,28 @@ trait FuncScheduleTrait
         }
         $schedule->how_to_kind = $data['how_to_kind'];
         $schedule->create_kind = $createKind;
-        if ($createKind == AppConst::CODE_MASTER_32_1) {
-            // 個別登録の場合のみ設定
+        // 授業区分の設定
+        if ($createKind == AppConst::CODE_MASTER_32_1 || $createKind == AppConst::CODE_MASTER_32_2) {
+            // 個別登録・振替の場合
             if ($data['course_kind'] == AppConst::CODE_MASTER_42_1 || $data['course_kind'] == AppConst::CODE_MASTER_42_2) {
-                // 授業の場合 授業区分を設定
+                // 授業の場合 指定された授業区分を設定
                 $schedule->lesson_kind = $data['lesson_kind'];
+            } else {
+                // その他の場合、授業区分は初期値とする
+                $schedule->lesson_kind = AppConst::CODE_MASTER_31_0;
             }
+            // 仮登録フラグ・メモは設定元情報をそのまま設定
             $schedule->tentative_status = $data['tentative_status'];
             $schedule->memo = $data['memo'];
         } else {
-            $schedule->lesson_kind = AppConst::CODE_MASTER_31_1;
+            // 一括登録の場合
+            if ($data['course_kind'] == AppConst::CODE_MASTER_42_1 || $data['course_kind'] == AppConst::CODE_MASTER_42_2) {
+                // 授業の場合 授業区分に「通常」を設定
+                $schedule->lesson_kind = AppConst::CODE_MASTER_31_1;
+            } else {
+                // その他の場合、授業区分は初期値とする
+                $schedule->lesson_kind = AppConst::CODE_MASTER_31_0;
+            }
         }
         if ($createKind == AppConst::CODE_MASTER_32_0) {
             // 一括登録の場合のみ設定

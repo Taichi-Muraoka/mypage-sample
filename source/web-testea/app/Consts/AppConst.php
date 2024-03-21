@@ -957,6 +957,11 @@ class AppConst
     const CODE_MASTER_31 = 31;
 
     /**
+     * 初期値（自習・面談）
+     */
+    const CODE_MASTER_31_0 = 0;
+
+    /**
      * 通常授業
      */
     const CODE_MASTER_31_1 = 1;
