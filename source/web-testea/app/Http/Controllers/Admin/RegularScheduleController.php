@@ -104,6 +104,8 @@ class RegularScheduleController extends Controller
                 'mst_booths.name as title',
                 'mst_booths.disp_order',
             )
+            // 面談用を除外
+            ->where('usage_kind', '<>', AppConst::CODE_MASTER_41_3)
             ->orderby('disp_order')
             ->get();
 
@@ -168,8 +170,8 @@ class RegularScheduleController extends Controller
         // 教室名を取得する
         $roomName = $this->mdlGetRoomName($campusCd);
 
-        // ブースリストを取得
-        $booths = $this->mdlGetBoothList($campusCd);
+        // ブースリストを取得（面談用を除外）
+        $booths = $this->mdlGetBoothList($campusCd, null, AppConst::CODE_MASTER_41_3);
 
         // コースリストを取得（面談を除外）
         $courses = $this->mdlGetCourseList(null, AppConst::CODE_MASTER_42_3);
@@ -192,7 +194,7 @@ class RegularScheduleController extends Controller
         // 指定時刻から、対応する時限の情報を取得（通常期間）
         // MEMO:パラメータにはカレンダーのセルの開始時刻が設定されているが、
         // 時限の終了時刻とすぐ下のセルの開始時刻が等しくなるため、1min加算して判定する
-        $targetTime = date('H:i',strtotime($time . "+1 min"));
+        $targetTime = date('H:i', strtotime($time . "+1 min"));
         $periodInfo = $this->fncScheGetPeriodTime($campusCd, AppConst::CODE_MASTER_37_0, $targetTime);
 
         if (isset($periodInfo)) {
@@ -353,8 +355,8 @@ class RegularScheduleController extends Controller
         // 独自バリデーション: リストのチェック ブース
         $validationBoothList =  function ($attribute, $value, $fail) use ($param) {
 
-            // ブースリストを取得
-            $booths = $this->mdlGetBoothList($param['campus_cd']);
+            // ブースリストを取得（面談用を除外）
+            $booths = $this->mdlGetBoothList($param['campus_cd'], null, AppConst::CODE_MASTER_41_3);
             if (!isset($booths[$value])) {
                 // 不正な値エラー
                 return $fail(Lang::get('validation.invalid_input'));
@@ -441,8 +443,8 @@ class RegularScheduleController extends Controller
 
         $campusCd = $regularClass['campus_cd'];
 
-        // ブースリストを取得
-        $booths = $this->mdlGetBoothList($campusCd);
+        // ブースリストを取得（面談用を除外）
+        $booths = $this->mdlGetBoothList($campusCd, null, AppConst::CODE_MASTER_41_3);
 
         // 曜日リストを取得
         $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
@@ -553,8 +555,8 @@ class RegularScheduleController extends Controller
 
         $campusCd = $regularClass['campus_cd'];
 
-        // ブースリストを取得
-        $booths = $this->mdlGetBoothList($campusCd);
+        // ブースリストを取得（面談用を除外）
+        $booths = $this->mdlGetBoothList($campusCd, null, AppConst::CODE_MASTER_41_3);
 
         // 曜日リストを取得
         $dayList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_16);
@@ -1261,6 +1263,10 @@ class RegularScheduleController extends Controller
                 || !$request->filled('date_to')
             ) {
                 // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+            if (strtotime($request['date_from']) > strtotime($request['date_to'])) {
+                // FromがTo以降の場合、ここでは検出せずスキップする
                 return;
             }
 
