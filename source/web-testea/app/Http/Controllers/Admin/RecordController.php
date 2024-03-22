@@ -243,9 +243,22 @@ class RecordController extends Controller
         $recordKind = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_46);
 
         // クエリを作成(PKでユニークに取る)
-        $record = Record::where('record_id', $recordId)
+        $record = Record::select(
+                'record_id',
+                'records.campus_cd',
+                'student_id',
+                'record_kind',
+                'memo',
+                'received_date',
+                'received_time',
+                'records.adm_id',
+                'admin_users.name as manager_name'
+            )
+            ->where('record_id', $recordId)
             // 教室管理者の場合、自分の教室コードのみにガードを掛ける
             ->where($this->guardRoomAdminTableWithRoomCd())
+            // 管理者名取得
+            ->sdLeftJoin(AdminUser::class, 'admin_users.adm_id', '=', 'records.adm_id')
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
@@ -254,12 +267,6 @@ class RecordController extends Controller
 
         // 生徒名を取得する
         $student = $this->mdlGetStudentName($record->student_id);
-
-        // 管理者名取得
-        $manager_name = AdminUser::where('adm_id', $record->adm_id)
-            ->select('name')
-            // 該当データがない場合はエラーを返す
-            ->firstOrFail();
 
         // ログインユーザ
         $account = Auth::user();
@@ -274,7 +281,7 @@ class RecordController extends Controller
         return view('pages.admin.record-input', [
             'rules' => $this->rulesForInput(null),
             'student_name' => $student,
-            'manager_name' => $manager_name->name,
+            'manager_name' => $record->manager_name,
             'campus_name' => $campus_name,
             'recordKind' => $recordKind,
             'sid' => $record->student_id,
