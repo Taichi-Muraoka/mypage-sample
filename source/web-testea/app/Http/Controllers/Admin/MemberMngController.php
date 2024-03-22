@@ -1560,10 +1560,10 @@ class MemberMngController extends Controller
         // 教室管理者の場合、自分の校舎コードの生徒のみにガードを掛ける
         $this->guardRoomAdminSid($sid);
 
-        // 会員ステータス「退会処理中」「退会済」の場合は退会登録画面を表示しない
+        // 会員ステータス「見込客」「退会処理中」「退会済」の場合は退会登録画面を表示しない
         $student = Student::where('student_id', $sid)
             ->first();
-        if ($student->stu_status == AppConst::CODE_MASTER_28_4 || $student->stu_status == AppConst::CODE_MASTER_28_5) {
+        if ($student->stu_status == AppConst::CODE_MASTER_28_0 || $student->stu_status == AppConst::CODE_MASTER_28_4 || $student->stu_status == AppConst::CODE_MASTER_28_5) {
             return $this->illegalResponseErr();
         }
 
@@ -1611,9 +1611,11 @@ class MemberMngController extends Controller
             $record->campus_cd = $campus_cd;
             // 記録種別「退会」
             $record->record_kind = AppConst::CODE_MASTER_46_5;
+            // 対応日は画面入力値
             $record->received_date = $request['received_date'];
-            // 対応時刻・登録日は現在日時
-            $record->received_time =  Carbon::now();
+            // 対応時刻は00:00固定
+            $record->received_time =  '00:00';
+            // 登録日時は現在日時
             $record->regist_time =  Carbon::now();
             $record->adm_id = $adm_id;
             $record->memo = $request['memo'];
@@ -1627,8 +1629,8 @@ class MemberMngController extends Controller
             $student = Student::where('student_id', $request['student_id'])
                 // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
                 ->where($this->guardRoomAdminTableWithSid())
-                // 会員ステータス「退会処理中」「退会済」は除外する
-                ->whereNotIn('stu_status', [AppConst::CODE_MASTER_28_4, AppConst::CODE_MASTER_28_5])
+                // 会員ステータス「見込客」「退会処理中」「退会済」は除外する
+                ->whereNotIn('stu_status', [AppConst::CODE_MASTER_28_0, AppConst::CODE_MASTER_28_4, AppConst::CODE_MASTER_28_5])
                 // 該当データがない場合はエラーを返す
                 ->firstOrFail();
 

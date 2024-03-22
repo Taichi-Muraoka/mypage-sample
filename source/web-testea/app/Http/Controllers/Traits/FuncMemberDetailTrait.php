@@ -155,9 +155,9 @@ trait FuncMemberDetailTrait
         // バッジ付与情報の取得
         $badges = $this->getBadge($sid);
 
-        // 会員ステータスによって退会ボタンの押下を制御する（退会処理中・退会済は押下不可）
+        // 会員ステータスによって退会ボタンの押下を制御する（見込客・退会処理中・退会済は押下不可）
         $disabled = false;
-        if ($student['stu_status'] == AppConst::CODE_MASTER_28_4 || $student['stu_status'] == AppConst::CODE_MASTER_28_5) {
+        if ($student['stu_status'] == AppConst::CODE_MASTER_28_0 || $student['stu_status'] == AppConst::CODE_MASTER_28_4 || $student['stu_status'] == AppConst::CODE_MASTER_28_5) {
             $disabled = true;
         }
 

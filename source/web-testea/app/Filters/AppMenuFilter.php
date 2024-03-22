@@ -101,7 +101,7 @@ class AppMenuFilter implements FilterInterface
 
                 // 要振替授業管理
                 // 出欠ステータス＝振替中 or 未振替 の件数
-                $query = Schedule::whereIn('absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_3_4]);
+                $query = Schedule::whereIn('absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4]);
 
                 // 校舎の絞り込み
                 if (AuthEx::isRoomAdmin()) {
