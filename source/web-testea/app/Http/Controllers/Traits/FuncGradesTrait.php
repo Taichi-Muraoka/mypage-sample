@@ -675,13 +675,16 @@ trait FuncGradesTrait
         $rules += Score::fieldRules('regular_exam_cd', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_1, $validationTeikiNameList]);
         // 評定で必須
         $rules += Score::fieldRules('term_cd', ['required_if:exam_type,' . AppConst::CODE_MASTER_43_2]);
-        // 生徒画面で必須
+
+        // 生徒画面でのルール
         if (AuthEx::isStudent()) {
             $rules += Score::fieldRules('student_comment', ['required']);
         }
-        // 運用管理画面で必須（編集時のみ）
+        // 運用管理画面でのルール
         if (AuthEx::isAdmin()) {
+            // 編集時のみ登録日必須
             $rules += Score::fieldRules('regist_date', ['required_with:score_id']);
+            $rules += Score::fieldRules('student_comment');
         }
 
         // --------------------------
