@@ -48,7 +48,7 @@
     <x-input.select caption="記録種別" id="record_kind" :select2=true :mastrData=$recordKind :editData=$editData
         :select2Search=false :blank=true />
 
-    <x-input.textarea caption="内容" id="memo" :editData=$editData />
+    <x-input.textarea caption="内容" id="memo" :rules=$rules :editData=$editData />
 
     <x-input.date-picker caption="対応日" id="received_date" :editData=$editData />
 
