@@ -223,7 +223,7 @@ class RoomCalendarController extends Controller
         // 指定時刻から、対応する時限の情報を取得
         // MEMO:パラメータにはカレンダーのセルの開始時刻が設定されているが、
         // 時限の終了時刻とすぐ下のセルの開始時刻が等しくなるため、1min加算して判定する
-        $targetTime = date('H:i',strtotime($time . "+1 min"));
+        $targetTime = date('H:i', strtotime($time . "+1 min"));
         $periodInfo = $this->fncScheGetPeriodTime($campusCd, $timetableKind, $targetTime);
 
         if (isset($periodInfo)) {
@@ -982,13 +982,20 @@ class RoomCalendarController extends Controller
             $schedule->student_id = $form['student_id'];
             $schedule->tutor_id = $tutorId;
             $schedule->subject_cd = $form['subject_cd'];
-            $schedule->lesson_kind = $form['lesson_kind'];
+            if ($form['course_kind'] == AppConst::CODE_MASTER_42_1 || $form['course_kind'] == AppConst::CODE_MASTER_42_2) {
+                // 授業区分は１対１授業・１対多授業のみ設定
+                $schedule->lesson_kind = $form['lesson_kind'];
+            }
             $schedule->how_to_kind = $form['how_to_kind'];
-            $schedule->tentative_status = $form['tentative_status'];
             $schedule->substitute_kind = $form['substitute_kind'];
             $schedule->absent_tutor_id = $absentTutorId;
-            $schedule->tentative_status = $form['tentative_status'];
             $schedule->absent_status = $form['absent_status'];
+            if ($form['lesson_kind'] == AppConst::CODE_MASTER_31_2) {
+                // 仮登録フラグは特別期間講習の場合のみ設定
+                $schedule->tentative_status = $form['tentative_status'];
+            } else {
+                $schedule->tentative_status = AppConst::CODE_MASTER_36_0;
+            }
             $schedule->memo = $form['memo'];
             // 更新
             $schedule->save();
@@ -1462,7 +1469,12 @@ class RoomCalendarController extends Controller
                 );
                 if (!$booth) {
                     // ブース空きなしエラー
-                    return $fail(Lang::get('validation.duplicate_booth'));
+                    $validateMsg = Lang::get('validation.duplicate_booth');
+                    if ($targetDate != $request['target_date']) {
+                        // 繰り返し登録データの場合、対象日も合わせて表示する
+                        $validateMsg = $validateMsg . "(" . $targetDate . ")";
+                    }
+                    return $fail($validateMsg);
                 }
             }
         };

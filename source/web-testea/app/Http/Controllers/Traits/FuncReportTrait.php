@@ -42,8 +42,8 @@ trait FuncReportTrait
             $query->where($this->guardRoomAdminTableWithRoomCd());
         }
         if (AuthEx::isTutor()) {
-            // 講師の場合、自分の講師IDのみにガードを掛ける
-            $query->where($this->guardTutorTableWithTid());
+            // 講師の場合、自分の担当生徒のみにガードを掛ける
+            $query->where($this->guardTutorTableWithSid());
         }
 
         // データを取得
