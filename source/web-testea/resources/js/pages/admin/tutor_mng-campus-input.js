@@ -26,16 +26,10 @@ export default class AppClass extends PageBase {
             self.redirectToParent();
         };
 
-        // 削除後は一覧画面に戻る
-        var afterDelete = () => {
-            UrlCom.redirect(UrlCom.getFuncUrl());
-        };
-
         // Vue: 入力フォーム
         this.getVueInputForm({
             afterEdit: afterEdit,
             afterNew: afterNew,
-            afterDelete: afterDelete,
             // vd_input_campusとなるようにURL指定
             urlSuffix: "campus",
         });

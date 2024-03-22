@@ -191,8 +191,7 @@ trait FuncTutorDetailTrait
             )
             ->sdLeftJoin(MstCampus::class, 'tutor_campuses.campus_cd', '=', 'mst_campuses.campus_cd')
             ->where('tutor_campuses.tutor_id', '=', $tid)
-            ->orderby('campus_cd')
-            ->orderby('disp_order')
+            ->orderby('mst_campuses.disp_order')
             ->get();
 
         return $campuses;
