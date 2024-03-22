@@ -181,8 +181,8 @@ class StudentClassController extends Controller
                     $query->where(function ($orQuery) use ($today) {
                         $orQuery
                             ->where('schedules.target_date', '>=', $today)
-                            ->orWhere('schedules.absent_status', AppConst::CODE_MASTER_35_1)
-                            ->orWhere('schedules.absent_status', AppConst::CODE_MASTER_35_2)
+                            ->orWhereIn('schedules.absent_status', [AppConst::CODE_MASTER_35_1, AppConst::CODE_MASTER_35_2, 
+                                AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4])
                             ->orWhereIn('mst_courses.course_kind', [AppConst::CODE_MASTER_42_3, AppConst::CODE_MASTER_42_4]);
                     });
                     break;
@@ -292,8 +292,6 @@ class StudentClassController extends Controller
             ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->orderBy('schedules.target_date', 'desc')
             ->orderBy('schedules.start_time', 'desc');
-
-        $this->debug($schedules->get());
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $schedules, function ($items) {
