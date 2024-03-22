@@ -179,6 +179,7 @@ trait FuncTransferTrait
             ->select(
                 'schedules.schedule_id',
                 'schedules.target_date',
+                'schedules.period_no',
                 'schedules.campus_cd',
                 'schedules.minutes',
                 'schedules.booth_cd',
