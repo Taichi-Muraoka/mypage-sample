@@ -108,7 +108,7 @@ class MstBooth extends Model
             'booth_cd' => ['string', 'max:3', 'digits:3'],
             'usage_kind' => ['integer'],
             'name' => ['string', 'max:50'],
-            'disp_order' => ['integer']
+            'disp_order' => ['integer', 'min:0', 'max:999']
         ];
         return $_fieldRules;
     }
