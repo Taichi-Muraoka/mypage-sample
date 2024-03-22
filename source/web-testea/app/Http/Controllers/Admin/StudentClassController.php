@@ -177,12 +177,12 @@ class StudentClassController extends Controller
             switch ($form['report_status']) {
                     // ―（登録不要）
                 case AppConst::CODE_MASTER_4_0:
-                    // 授業日が当日以降(未実施)または当日欠席の授業 またはコース種別＝面談または自習
+                    // 授業日が当日以降(未実施)または当日欠席、未振替、振替中の授業 またはコース種別＝面談または自習
                     $query->where(function ($orQuery) use ($today) {
                         $orQuery
                             ->where('schedules.target_date', '>=', $today)
-                            ->orWhere('schedules.absent_status', AppConst::CODE_MASTER_35_1)
-                            ->orWhere('schedules.absent_status', AppConst::CODE_MASTER_35_2)
+                            ->orWhereIn('schedules.absent_status', [AppConst::CODE_MASTER_35_1, AppConst::CODE_MASTER_35_2, 
+                                AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4])
                             ->orWhereIn('mst_courses.course_kind', [AppConst::CODE_MASTER_42_3, AppConst::CODE_MASTER_42_4]);
                     });
                     break;

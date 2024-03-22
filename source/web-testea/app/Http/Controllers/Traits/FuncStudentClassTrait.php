@@ -42,10 +42,13 @@ trait FuncStudentClassTrait
                 $reportStatus = $statusList[AppConst::CODE_MASTER_4_3]->value;
             }
         } else {
-            // 授業日が当日以降(未実施)または当日欠席の場合、―（登録不要）を設定
+            // 授業日が当日以降(未実施)または当日欠席、未振替、振替中の場合、―（登録不要）を設定
             if (
                 $schedule['target_date'] >= $today ||
-                $schedule['absent_status'] == AppConst::CODE_MASTER_35_1 || $schedule['absent_status'] == AppConst::CODE_MASTER_35_2
+                $schedule['absent_status'] == AppConst::CODE_MASTER_35_1 || 
+                $schedule['absent_status'] == AppConst::CODE_MASTER_35_2 || 
+                $schedule['absent_status'] == AppConst::CODE_MASTER_35_3 || 
+                $schedule['absent_status'] == AppConst::CODE_MASTER_35_4
             ) {
                 $reportStatus = $statusList[AppConst::CODE_MASTER_4_0]->value;
             }
