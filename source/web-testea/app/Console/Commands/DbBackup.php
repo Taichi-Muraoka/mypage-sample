@@ -55,7 +55,7 @@ class DbBackup extends Command
 
             // バッチ管理テーブルにレコード作成
             $batchMng = new BatchMng;
-            $batchMng->batch_type = AppConst::BATCH_TYPE_4;
+            $batchMng->batch_type = AppConst::BATCH_TYPE_5;
             $batchMng->start_time = $now;
             $batchMng->batch_state = AppConst::CODE_MASTER_22_99;
             $batchMng->adm_id = null;

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
+use App\Models\AdminUser;
 use App\Models\Record;
 use App\Consts\AppConst;
 use App\Http\Controllers\Traits\FuncRecordTrait;
@@ -155,15 +156,23 @@ class RecordController extends Controller
             $campus_name = $this->mdlGetRoomName($account->campus_cd);
         }
 
+        // 対応日・対応時刻の初期値を取得
+        $now = now();
+        $received_date = $now->format('Y-m-d');
+        $received_time = $now->format('H:i');
+
         $editData = [
             'sid' => $sid,
             'campus_cd' => $account->campus_cd,
             'student_id' => $sid,
-            'adm_id' => $account->account_id
+            'adm_id' => $account->account_id,
+            'received_date' => $received_date,
+            'received_time' => $received_time
         ];
 
         // テンプレートは編集と同じ
         return view('pages.admin.record-input', [
+            'rules' => $this->rulesForInput(null),
             'editData' => $editData,
             'campus_name' => $campus_name,
             'student_name' => $student,
@@ -234,9 +243,22 @@ class RecordController extends Controller
         $recordKind = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_46);
 
         // クエリを作成(PKでユニークに取る)
-        $record = Record::where('record_id', $recordId)
+        $record = Record::select(
+                'record_id',
+                'records.campus_cd',
+                'student_id',
+                'record_kind',
+                'memo',
+                'received_date',
+                'received_time',
+                'records.adm_id',
+                'admin_users.name as manager_name'
+            )
+            ->where('record_id', $recordId)
             // 教室管理者の場合、自分の教室コードのみにガードを掛ける
             ->where($this->guardRoomAdminTableWithRoomCd())
+            // 管理者名取得
+            ->sdLeftJoin(AdminUser::class, 'admin_users.adm_id', '=', 'records.adm_id')
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
@@ -257,8 +279,9 @@ class RecordController extends Controller
         }
 
         return view('pages.admin.record-input', [
+            'rules' => $this->rulesForInput(null),
             'student_name' => $student,
-            'manager_name' => $account->name,
+            'manager_name' => $record->manager_name,
             'campus_name' => $campus_name,
             'recordKind' => $recordKind,
             'sid' => $record->student_id,
@@ -401,8 +424,8 @@ class RecordController extends Controller
         $rules += Record::fieldRules('campus_cd', ['required', $validationRoomList]);
         $rules += Record::fieldRules('record_kind', ['required', $validationKindList]);
         $rules += Record::fieldRules('memo', ['required']);
-        $rules += Record::fieldRules('received_date');
-        $rules += Record::fieldRules('received_time');
+        $rules += Record::fieldRules('received_date', ['required']);
+        $rules += Record::fieldRules('received_time', ['required']);
 
         return $rules;
     }
