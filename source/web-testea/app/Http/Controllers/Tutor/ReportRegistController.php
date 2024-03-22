@@ -936,7 +936,7 @@ class ReportRegistController extends Controller
                 $schedule = Schedule::query()
                     ->where('report_id', $request->input('report_id'))
                     // 自分の担当生徒のみにガードを掛ける
-                    ->where($this->guardTutorTableWithSid())
+                    ->where($this->guardTutorTableWithTid())
                     // 該当データがない場合はエラーを返す
                     ->firstOrFail();
 
