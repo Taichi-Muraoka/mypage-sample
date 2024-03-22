@@ -17,6 +17,7 @@ use App\Models\SeasonStudentRequest;
 use App\Models\StudentCampus;
 use App\Models\YearlySchedulesImport;
 use App\Http\Controllers\Traits\CtrlModelTrait;
+use App\Models\Student;
 use Carbon\Carbon;
 
 /**
@@ -208,9 +209,13 @@ class YearInitialDataInsert extends Command
             // 特別期間講習 生徒連絡情報
             // --------------------------
             // 生徒所属情報取得
-            $student_campuses = StudentCampus::select('student_id', 'campus_cd')
-                ->orderBy('student_id', 'asc')
-                ->orderBy('campus_cd', 'asc')
+            $student_campuses = StudentCampus::select('student_campuses.student_id', 'student_campuses.campus_cd')
+                // 生徒情報とJOIN
+                ->sdLeftJoin(Student::class, 'students.student_id', '=', 'student_campuses.student_id')
+                // 退会済の生徒は除外
+                ->where('students.stu_status', '<>', AppConst::CODE_MASTER_28_5)
+                ->orderBy('student_campuses.student_id', 'asc')
+                ->orderBy('student_campuses.campus_cd', 'asc')
                 ->get();
 
             // データ作成
