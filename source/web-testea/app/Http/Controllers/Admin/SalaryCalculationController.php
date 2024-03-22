@@ -262,10 +262,10 @@ class SalaryCalculationController extends Controller
                             $salary_summary->tutor_id = $course_count->tutor_id;
                             $salary_summary->salary_date = $idDate;
                             $salary_summary->summary_kind = $course_count->summary_kind;
-                            if ($course_count->course_cd == AppConst::COURSE_CD_10100) {
+                            if ($course_count->summary_kind == AppConst::CODE_MASTER_25_1) {
                                 $salary_summary->hour_payment = $course_count->hourly_base_wage;
                             }
-                            $salary_summary->hour = $this->dtConversionTime($course_count->sum_minutes);
+                            $salary_summary->hour = $this->dtConversionTimeDecimal($course_count->sum_minutes);
                             // 保存
                             $salary_summary->save();
                         }
@@ -284,7 +284,7 @@ class SalaryCalculationController extends Controller
                             if ($surcharge_count->summary_kind == AppConst::CODE_MASTER_26_SUB_8) {
                                 $salary_summary->hour_payment = $hourly_wage->value_num;
                             }
-                            $salary_summary->hour = $this->dtConversionTime($surcharge_count->sum_minutes);
+                            $salary_summary->hour = $this->dtConversionTimeDecimal($surcharge_count->sum_minutes);
                             $salary_summary->amount = $surcharge_count->sum_tuition;
                             // 保存
                             $salary_summary->save();

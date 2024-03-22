@@ -330,11 +330,14 @@ class AccountMngController extends Controller
         $form = $request->all();
 
         // adminUserテーブルより対象データを取得(PKでユニークに取る)
-        AdminUser::where('adm_id', $request['adm_id'])
+        $admin_user = AdminUser::where('adm_id', $request['adm_id'])
             // 教室管理者の場合、自分の教室コードのみにガードを掛ける
             ->where($this->guardRoomAdminTableWithRoomCd())
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
+
+        // adminUserテーブルのdelete
+        $admin_user->delete();
 
         // accountテーブルより対象データを取得(PKでユニークに取る)
         $account = Account::where('account_id', $form['adm_id'])->where('account_type', AppConst::CODE_MASTER_7_3)

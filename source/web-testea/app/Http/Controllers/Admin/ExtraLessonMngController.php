@@ -756,6 +756,7 @@ class ExtraLessonMngController extends Controller
         $rules = array();
 
         // 追加授業スケジュール登録画面のバリデーション
+        $rules += Schedule::fieldRules('memo');
         if ($request && !isset($request['status'])) {
             $rules += Schedule::fieldRules('target_date', ['required']);
             $rules += Schedule::fieldRules('period_no', ['required', $validationPeriodList]);
@@ -765,13 +766,12 @@ class ExtraLessonMngController extends Controller
             $rules += Schedule::fieldRules('tutor_id', ['required', $validationTutorList]);
             $rules += Schedule::fieldRules('subject_cd', ['required', $validationSubjectList]);
             $rules += Schedule::fieldRules('how_to_kind', ['required', $validationHowToKindList]);
-            $rules += Schedule::fieldRules('memo');
         }
 
         // 追加授業依頼編集画面のバリデーション
+        $rules += ExtraClassApplication::fieldRules('admin_comment');
         if ($request && isset($request['status'])) {
             $rules += ExtraClassApplication::fieldRules('status', ['required']);
-            $rules += ExtraClassApplication::fieldRules('admin_comment');
         }
 
         return $rules;

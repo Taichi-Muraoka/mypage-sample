@@ -688,6 +688,7 @@ class TransferCheckController extends Controller
                 $transApp->approval_status = AppConst::CODE_MASTER_3_5;   // 管理者対応済
                 $transApp->transfer_schedule_id = $newScheduleId;
                 $transApp->transfer_kind = AppConst::CODE_MASTER_54_1;    // 振替
+                $transApp->comment = $request->input('comment'); // コメントを設定
                 if ($request->filled('change_tid')) {
                     // 振替で講師変更の場合、変更講師IDを設定
                     $transApp->substitute_tutor_id = $request->input('change_tid');
@@ -706,7 +707,8 @@ class TransferCheckController extends Controller
                 $transApp->approval_status = AppConst::CODE_MASTER_3_5;   // 管理者対応済
                 $transApp->transfer_schedule_id = $befSchedule->schedule_id;
                 $transApp->transfer_kind = AppConst::CODE_MASTER_54_2;    // 代講
-                $transApp->substitute_tutor_id = $request->input('substitute_tid'); //代講講師IDを設定
+                $transApp->comment = $request->input('comment'); // コメントを設定
+                $transApp->substitute_tutor_id = $request->input('substitute_tid'); // 代講講師IDを設定
                 $transApp->save();
             }
 
@@ -1117,6 +1119,7 @@ class TransferCheckController extends Controller
         $rules += TransferApplication::fieldRules('transfer_kind', ['required', $validationRadioTransferType]);
         $rules += TransferApplication::fieldRules('transfer_apply_id', ['required']);
         $rules += Schedule::fieldRules('campus_cd', ['required', $validationRoomList]);
+        $rules += TransferApplication::fieldRules('comment');
 
         // 振替を選択の場合 振替日・時限が必須
         $rules += Schedule::fieldRules('target_date', ['required_if:transfer_kind,' . AppConst::CODE_MASTER_54_1]);
