@@ -328,16 +328,26 @@ class MemberMngController extends Controller
             'message.file.member_output.header'
         );
 
-        // 付与バッジ詳細
+        // 会員情報詳細
         foreach ($students as $data) {
+
+            // 入会日・通塾期間をフォーマットする
+            if (isset($data->enter_date)) {
+                $formatEnterDate = $data->enter_date->format('Y/m/d');
+                $formatEnterTerm = floor($data->enter_term / 12) . '年' . floor($data->enter_term % 12) . 'ヶ月';
+            } else {
+                // 見込客は入会日がNULLなので空欄を表示する
+                $formatEnterDate = '';
+                $formatEnterTerm = '';
+            }
+
             // 一行出力
             $arrayCsv[] = [
                 $data->student_id,
                 $data->name,
                 $data->grade_name,
-                $data->enter_date->format('Y/m/d'),
-                // 通塾期間は月数を「Y年Mヶ月」にフォーマットする
-                floor($data->enter_term / 12) . '年' . floor($data->enter_term % 12) . 'ヶ月',
+                $formatEnterDate,
+                $formatEnterTerm,
                 $data->badge_count,
                 $data->stu_status_name,
             ];

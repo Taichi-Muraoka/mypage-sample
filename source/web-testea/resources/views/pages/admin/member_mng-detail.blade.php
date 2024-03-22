@@ -115,7 +115,7 @@
         </tr>
         <tr>
             <th>メモ</th>
-            <td>{{$student->memo}}</td>
+            <td class="nl2br">{{$student->memo}}</td>
         </tr>
     </x-bs.table>
 </x-bs.card>
@@ -190,7 +190,7 @@
             <th width="10%">校舎</th>
             <th width="20%">コース名</th>
             <th width="20%">講師名</th>
-            <th width="20%">科目</th>
+            <th width="20%">教科</th>
         </x-slot>
 
         {{-- テーブル行 --}}
@@ -219,7 +219,7 @@
             <th width="10%">校舎</th>
             <th width="15%">コース名</th>
             <th width="15%">講師名</th>
-            <th width="15%">科目</th>
+            <th width="15%">教科</th>
             <th width="10%">授業区分</th>
             <th width="15%">出欠ステータス</th>
             <th></th>
@@ -260,8 +260,9 @@
             <th width="10%">校舎</th>
             <th width="15%">コース名</th>
             <th width="15%">講師名</th>
-            <th width="15%">科目</th>
+            <th width="10%">教科</th>
             <th width="10%">授業区分</th>
+            <th width="10%">代講種別</th>
             <th width="15%">出欠ステータス</th>
             <th></th>
         </x-slot>
@@ -274,13 +275,19 @@
             <td>{{$irregular_classes[$i]->course_name}}</td>
             <td>{{$irregular_classes[$i]->tutor_name}}</td>
             <td>{{$irregular_classes[$i]->subject_name}}</td>
-            <td>{{$irregular_classes[$i]->lesson_kind_name}}</td>
+            <td>{{$irregular_classes[$i]->lesson_kind_name}}
+                @if($irregular_classes[$i]->create_kind == AppConst::CODE_MASTER_32_2)
+                <span>({{$irregular_classes[$i]->create_kind_name}})</span>
+                @endif
+            </td>
+            <td>{{$irregular_classes[$i]->substitute_kind_name}}</td>
             {{-- 受講生徒情報にデータがあればその出欠ステータスを表示 1対多 --}}
             @if(isset($irregular_classes[$i]->class_student_id))
             <td>{{$irregular_classes[$i]->class_absent_status_name}}</td>
             @else
             <td>{{$irregular_classes[$i]->absent_status_name}}</td>
             @endif
+
             @php
             // 1対多授業は受講生徒情報の生徒IDをセット、個別授業はスケジュール情報の生徒IDをセットする（モーダル選択時の閲覧ガード用）
             if(isset($irregular_classes[$i]->class_student_id)){
