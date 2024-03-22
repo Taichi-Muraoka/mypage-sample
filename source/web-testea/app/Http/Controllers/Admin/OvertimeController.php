@@ -107,8 +107,6 @@ class OvertimeController extends Controller
     {
         $rules = array();
 
-        // $this->debug($request['target_date_from']);
-
         $ruleTargetDate = Schedule::getFieldRule('target_date');
 
         // FromとToの大小チェックバリデーションを追加(Fromが存在する場合のみ)
