@@ -29,7 +29,7 @@
 
         {{-- テーブルタイトル行 --}}
         <x-slot name="thead">
-            <th width="10%">講師No</th>
+            <th width="10%">講師ID</th>
             <th width="15%">講師名</th>
             <th width="15%">日付</th>
             <th width="15%">合計時間</th>

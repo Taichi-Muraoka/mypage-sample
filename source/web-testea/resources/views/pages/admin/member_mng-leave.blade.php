@@ -31,7 +31,7 @@
 
     <x-input.date-picker caption="退会日" id="leave_date" :editData=$editData />
 
-    <x-input.textarea caption="退会理由・やり取りの記録等" id="memo" :editData=$editData />
+    <x-input.textarea caption="退会理由・やり取りの記録等" id="memo" :editData=$editData :rules=$rules />
 
     <x-input.date-picker caption="対応日" id="received_date" :editData=$editData />
 

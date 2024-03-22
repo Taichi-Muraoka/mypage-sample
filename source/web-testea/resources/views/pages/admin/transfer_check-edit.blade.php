@@ -119,6 +119,8 @@
 
     </x-bs.card>
 
+    <x-input.textarea caption="承認者コメント" id="comment" :editData=$editData :rules=$rules />
+
     <x-bs.callout title="登録の際の注意事項" type="warning">
         ・「振替授業登録」欄に入力した振替授業または代講授業のスケジュールが登録されます。<br>
         &emsp;対象の生徒・講師へお知らせが通知されます。<br>

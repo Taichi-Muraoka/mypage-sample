@@ -204,6 +204,19 @@ trait CtrlDateTrait
     }
 
     /**
+     * 分を時間に変換（少数第2位まで表示）
+     *
+     * @param 授業時間(分)
+     * @return 授業時間(時間)
+     */
+    protected function dtConversionTimeDecimal($minutes)
+    {
+        $time = floor($minutes / 60 * 100) / 100;
+
+        return $time;
+    }
+
+    /**
      * 分を時間に変換
      *
      * @param 授業時間(分)

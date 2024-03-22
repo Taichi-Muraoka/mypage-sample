@@ -155,9 +155,9 @@ trait FuncMemberDetailTrait
         // バッジ付与情報の取得
         $badges = $this->getBadge($sid);
 
-        // 会員ステータスによって退会ボタンの押下を制御する（退会処理中・退会済は押下不可）
+        // 会員ステータスによって退会ボタンの押下を制御する（見込客・退会処理中・退会済は押下不可）
         $disabled = false;
-        if ($student['stu_status'] == AppConst::CODE_MASTER_28_4 || $student['stu_status'] == AppConst::CODE_MASTER_28_5) {
+        if ($student['stu_status'] == AppConst::CODE_MASTER_28_0 || $student['stu_status'] == AppConst::CODE_MASTER_28_4 || $student['stu_status'] == AppConst::CODE_MASTER_28_5) {
             $disabled = true;
         }
 
@@ -294,6 +294,8 @@ trait FuncMemberDetailTrait
                 'campus_names.room_name as campus_name',
                 'schedules.target_date',
                 'schedules.period_no',
+                'schedules.create_kind',
+                'schedules.substitute_kind',
                 // コースの名称
                 'mst_courses.name as course_name',
                 // 講師の名前
@@ -306,6 +308,10 @@ trait FuncMemberDetailTrait
                 'mst_codes_35.name as absent_status_name',
                 // コードマスタの名称(出欠ステータス) 1対多用
                 'mst_codes_35_class.name as class_absent_status_name',
+                // コードマスタの名称(データ作成区分)
+                'mst_codes_32.name as create_kind_name',
+                // コードマスタの名称(代講種別)
+                'mst_codes_34.name as substitute_kind_name',
             )
             // 校舎名の取得
             ->leftJoinSub($campus_names, 'campus_names', function ($join) {
@@ -334,6 +340,16 @@ trait FuncMemberDetailTrait
                 $join->on('class_members.absent_status', '=', 'mst_codes_35_class.code')
                     ->where('mst_codes_35_class.data_type', AppConst::CODE_MASTER_35);
             }, 'mst_codes_35_class')
+            // データ作成区分の取得
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('schedules.create_kind', '=', 'mst_codes_32.code')
+                    ->where('mst_codes_32.data_type', AppConst::CODE_MASTER_32);
+            }, 'mst_codes_32')
+            // 代講種別の取得
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('schedules.substitute_kind', '=', 'mst_codes_34.code')
+                    ->where('mst_codes_34.data_type', AppConst::CODE_MASTER_34);
+            }, 'mst_codes_34')
             // 授業日がシステム日付より未来日のデータに絞り込み（当日を含まない）
             ->where('schedules.target_date', '>', $today)
             // 画面表示中生徒のデータに絞り込み
