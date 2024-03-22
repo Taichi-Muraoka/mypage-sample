@@ -190,7 +190,7 @@
             <th width="10%">校舎</th>
             <th width="20%">コース名</th>
             <th width="20%">講師名</th>
-            <th width="20%">科目</th>
+            <th width="20%">教科</th>
         </x-slot>
 
         {{-- テーブル行 --}}
@@ -219,7 +219,7 @@
             <th width="10%">校舎</th>
             <th width="15%">コース名</th>
             <th width="15%">講師名</th>
-            <th width="15%">科目</th>
+            <th width="15%">教科</th>
             <th width="10%">授業区分</th>
             <th width="15%">出欠ステータス</th>
             <th></th>
@@ -260,7 +260,7 @@
             <th width="10%">校舎</th>
             <th width="15%">コース名</th>
             <th width="15%">講師名</th>
-            <th width="10%">科目</th>
+            <th width="10%">教科</th>
             <th width="10%">授業区分</th>
             <th width="10%">代講種別</th>
             <th width="15%">出欠ステータス</th>
