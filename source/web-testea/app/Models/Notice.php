@@ -142,18 +142,6 @@ class Notice extends Model
     }
 
     /**
-     * 検索 宛先種別
-     */
-    public function scopeSearchDestinationType($query, $obj)
-    {
-        $key = 'destination_type';
-        if (isset($obj[$key]) && filled($obj[$key])) {
-            // 生徒IDでスケジュールを絞り込む(共通処理)
-            $this->mdlWhereScheduleBySidQuery($query, self::class, $obj[$key]);
-        }
-    }
-
-    /**
      * 検索 タイトル
      */
     public function scopeSearchTitle($query, $obj)
