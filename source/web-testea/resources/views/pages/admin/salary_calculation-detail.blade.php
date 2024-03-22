@@ -78,10 +78,10 @@
                 <td class="t-price">@{{$filters.numberRound(item.hour_personal)}}</td>
                 <td class="t-price">@{{$filters.numberRound(item.hour_two)}}</td>
                 <td class="t-price">@{{$filters.numberRound(item.hour_three)}}</td>
+                <td class="t-price">@{{$filters.numberRound(item.hour_group)}}</td>
                 <td class="t-price">@{{$filters.numberRound(item.hour_home)}}</td>
                 <td class="t-price">@{{$filters.numberRound(item.hour_practice)}}</td>
                 <td class="t-price">@{{$filters.numberRound(item.hour_high)}}</td>
-                <td class="t-price">@{{$filters.numberRound(item.hour_group)}}</td>
                 <td class="t-price">@{{$filters.numberRound(item.hour_work)}}</td>
                 <td class="t-price">@{{$filters.toLocaleString(item.cost)}}</td>
                 <td class="t-price">@{{$filters.toLocaleString(item.untaxed_cost)}}</td>
