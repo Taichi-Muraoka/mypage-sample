@@ -1013,6 +1013,15 @@ class TutorMngController extends Controller
             }
         };
 
+        // 独自バリデーション: 退職日は勤務開始日以降（当日含む）
+        $validationLeaveDateAfterEnterDate = function ($attribute, $value, $fail) use ($request) {
+            // 退職日の数値が勤務開始日の数値を下回っていないかチェック
+            if (strtotime($request['leave_date']) < strtotime($request['enter_date'])) {
+                // 下回っていた（勤務開始日以降でない）場合エラー
+                return $fail(Lang::get('validation.tutor_leave_after_or_equal_enter_date'));
+            }
+        };
+
         // 全ステータス共通バリデーション
         // 必須：名前、名前かな、電話番号、メールアドレス、生年月日、性別、学年、学年設定年度、授業時給（ベース給）、勤務開始日
         $rules += Tutor::fieldRules('name', ['required']);
@@ -1043,16 +1052,16 @@ class TutorMngController extends Controller
 
         // ステータス「退職処理中」の場合
         // 必須：退職日
-        // 退職日はシステム日付より未来日とする（システム日付＜退職日）
+        // 退職日はシステム日付より未来日、勤務開始日以降とする（システム日付＜退職日、勤務開始日＜＝退職日）
         if ($request && $request['tutor_status'] == AppConst::CODE_MASTER_29_2) {
-            $rules += Tutor::fieldRules('leave_date', ['required', $validationLeaveDateProspect]);
+            $rules += Tutor::fieldRules('leave_date', ['required', $validationLeaveDateProspect, $validationLeaveDateAfterEnterDate]);
         }
 
         // ステータス「退職済」の場合
         // 必須：退職日
-        // 退職日はシステム日付以前とする（退職日＜＝システム日付）
+        // 退職日はシステム日付以前、勤務開始日以降とする（退職日＜＝システム日付、勤務開始日＜＝退職日）
         if ($request && $request['tutor_status'] == AppConst::CODE_MASTER_29_3) {
-            $rules += Tutor::fieldRules('leave_date', ['required', $validationLeaveDateExecution]);
+            $rules += Tutor::fieldRules('leave_date', ['required', $validationLeaveDateExecution, $validationLeaveDateAfterEnterDate]);
         }
 
         return $rules;
@@ -1151,7 +1160,7 @@ class TutorMngController extends Controller
         $rules = array();
 
         // 独自バリデーション: 退職日はシステム日付より未来日
-        $validationLeaveDate = function ($attribute, $value, $fail) use ($request) {
+        $validationLeaveDateAfterToday = function ($attribute, $value, $fail) use ($request) {
             // 退職日の数値が現在日時の数値を下回っていないかチェック
             if (strtotime($request['leave_date']) < strtotime('now')) {
                 // 下回っていた（未来日でない）場合エラー
@@ -1159,7 +1168,22 @@ class TutorMngController extends Controller
             }
         };
 
-        $rules += Tutor::fieldRules('leave_date', ['required', $validationLeaveDate]);
+        // 独自バリデーション: 退職日は勤務開始日以降（当日含む）
+        $validationLeaveDateAfterEnterDate = function ($attribute, $value, $fail) use ($request) {
+
+            // 講師の勤務開始日を取得
+            $tutor = Tutor::select('enter_date')
+                ->where('tutor_id', $request['tutor_id'])
+                ->first();
+
+            // 退職日の数値が勤務開始日の数値を下回っていないかチェック
+            if (strtotime($request['leave_date']) < strtotime($tutor['enter_date'])) {
+                // 下回っていた（勤務開始日以降でない）場合エラー
+                return $fail(Lang::get('validation.tutor_leave_after_or_equal_enter_date'));
+            }
+        };
+
+        $rules += Tutor::fieldRules('leave_date', ['required', $validationLeaveDateAfterToday, $validationLeaveDateAfterEnterDate]);
 
         return $rules;
     }
@@ -1307,8 +1331,8 @@ class TutorMngController extends Controller
             // 該当データがない場合はエラーを返す
             ->firstOrFail();
 
-        // 削除
-        $tutorCampus->delete();
+        // 物理削除
+        $tutorCampus->forceDelete();
 
         return;
     }
