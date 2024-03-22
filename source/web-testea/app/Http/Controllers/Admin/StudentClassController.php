@@ -177,7 +177,7 @@ class StudentClassController extends Controller
             switch ($form['report_status']) {
                     // ―（登録不要）
                 case AppConst::CODE_MASTER_4_0:
-                    // 授業日が当日以降(未実施)または当日欠席の授業 またはコース種別＝面談または自習
+                    // 授業日が当日以降(未実施)または当日欠席、未振替、振替中の授業 またはコース種別＝面談または自習
                     $query->where(function ($orQuery) use ($today) {
                         $orQuery
                             ->where('schedules.target_date', '>=', $today)
@@ -292,6 +292,8 @@ class StudentClassController extends Controller
             ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->orderBy('schedules.target_date', 'desc')
             ->orderBy('schedules.start_time', 'desc');
+
+        $this->debug($schedules->get());
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $schedules, function ($items) {
