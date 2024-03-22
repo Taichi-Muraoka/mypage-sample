@@ -13,7 +13,7 @@
     <div class="mb-3"></div>
 
     <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
-        :select2Search=false :blank=true />
+        :select2Search=false :blank=false />
 
     {{-- 第１希望日 --}}
     <x-bs.card>

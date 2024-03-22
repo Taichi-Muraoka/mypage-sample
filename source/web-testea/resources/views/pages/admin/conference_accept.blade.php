@@ -25,8 +25,7 @@
 
     <x-bs.row>
         <x-bs.col2>
-            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$students :editData=$editData 
-                :select2Search=false/>
+            <x-input.select id="student_id" caption="生徒名" :select2=true :mastrData=$students :editData=$editData />
         </x-bs.col2>
     </x-bs.row>
 
