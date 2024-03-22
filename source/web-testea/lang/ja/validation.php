@@ -228,6 +228,9 @@ return [
     // 講師編集 講師ステータス「退職処理中」「退職済」に変更時のエラー
     'status_cannot_change_retirement' => '退職処理は退職登録画面から行なってください。',
 
+    // 講師編集・退職処理 退職日が勤務開始日より前のエラー
+    'tutor_leave_after_or_equal_enter_date' => '退職日は勤務開始日以降の日付を指定してください。',
+
     // 振替調整希望日・時限 重複
     'preferred_datetime_distinct' => '異なる希望日・時限を指定してください。',
 

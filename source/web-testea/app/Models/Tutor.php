@@ -121,7 +121,7 @@ class Tutor extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'tutor_id' => ['integer', 'max:9999999999'],
+            'tutor_id' => ['integer', 'min:0', 'max:9999999999'],
             'name' => ['string', 'max:50'],
             'name_kana' => ['string', 'max:50'],
             'tel' => ['string', 'max:20', 'vdTelephone'],
