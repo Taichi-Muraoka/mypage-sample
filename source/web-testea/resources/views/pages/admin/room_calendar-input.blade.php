@@ -92,9 +92,14 @@
 
         @if ($editData['absent_tutor_id'])
         {{-- 欠席講師が設定されている場合 --}}
-        <x-bs.form-title>欠席講師</x-bs.form-title>
-        <p class="edit-disp-indent">{{$editData['tutor_name']}}</p>
-        <x-input.hidden id="absent_tutor_id" :editData=$editData />
+        <div v-cloak v-show="form.substitute_kind != {{ App\Consts\AppConst::CODE_MASTER_34_0 }}">
+            <x-bs.form-title>欠席講師</x-bs.form-title>
+            <p class="edit-disp-indent">{{$editData['tutor_name']}}</p>
+            <x-input.hidden id="absent_tutor_id" :editData=$editData />
+        </div>
+        <div v-cloak v-show="form.substitute_kind == {{ App\Consts\AppConst::CODE_MASTER_34_0 }}" class="callout callout-info mt-4 mb-4">
+            <p>授業代講＝なしで更新すると、代講を取消し、欠席講師（元の担当講師）が授業担当に設定されます。</p>
+        </div>
         @else
         {{-- 欠席講師が設定されていない場合 --}}
         <x-input.select
