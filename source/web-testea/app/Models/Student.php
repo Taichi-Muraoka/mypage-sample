@@ -129,7 +129,7 @@ class Student extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
-            'student_id' => ['integer', 'max:9999999999'],
+            'student_id' => ['integer', 'min:0', 'max:9999999999'],
             'name' => ['string', 'max:50'],
             'name_kana' => ['string', 'max:50'],
             'grade_cd' => ['integer'],
