@@ -441,8 +441,8 @@ class ConferenceAcceptController extends Controller
             $schedule->course_cd = $course->course_cd;
             $schedule->end_time = $this->endTime($request['start_time']);
             $schedule->minutes = config('appconf.conference_time');
-            $schedule->create_kind = null;
-            $schedule->lesson_kind = null;
+            $schedule->create_kind = AppConst::CODE_MASTER_32_1;
+            $schedule->lesson_kind = AppConst::CODE_MASTER_31_0;
             $schedule->adm_id = $adm_id;
             $schedule->fill($form)->save();
 
@@ -629,8 +629,8 @@ class ConferenceAcceptController extends Controller
             $schedule->course_cd = $course->course_cd;
             $schedule->end_time = $this->endTime($request['start_time']);
             $schedule->minutes = config('appconf.conference_time');
-            $schedule->create_kind = null;
-            $schedule->lesson_kind = null;
+            $schedule->create_kind = AppConst::CODE_MASTER_32_1;
+            $schedule->lesson_kind = AppConst::CODE_MASTER_31_0;
             $schedule->adm_id = $adm_id;
             $schedule->fill($form)->save();
 

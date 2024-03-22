@@ -42,6 +42,10 @@ export default class AppClass extends PageBase {
                 (data) => {
                     // データをセット
                     $vue.selectGetItemDate = data;
+                    // 面談の場合、以下の処理を行わない
+                    if ($vue.form.course_kind == 3) {
+                        return;
+                    }
                     if (data.selectItems.length != 0 && data.selectItems.some(item => item.code == $vue.form.period_no_bef))  {
                         // 時限リストが取得できた場合 かつ 時限リストに存在する場合のみ
                         // 退避した時限(selected)をセット

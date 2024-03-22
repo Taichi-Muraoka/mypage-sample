@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('test_contents', 100)->nullable()->comment('確認テスト内容');
             $table->unsignedSmallInteger('test_score')->nullable()->comment('確認テスト得点');
             $table->unsignedSmallInteger('test_full_score')->nullable()->comment('確認テスト満点');
-            $table->decimal('achievement', 4, 1)->nullable()->comment('宿題達成度');
+            $table->unsignedSmallInteger('achievement')->nullable()->comment('宿題達成度');
             $table->text('goodbad_point')->nullable()->comment('達成・課題点');
             $table->text('solution')->nullable()->comment('解決策');
             $table->text('others_comment')->nullable()->comment('その他');

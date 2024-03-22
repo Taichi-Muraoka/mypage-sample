@@ -49,7 +49,7 @@
             </td>
         </tr>
         <tr>
-            <th>科目</th>
+            <th>教科</th>
             <td>{{$subject_name}}</td>
         </tr>
     </x-bs.table>
