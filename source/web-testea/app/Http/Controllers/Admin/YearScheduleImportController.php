@@ -305,7 +305,7 @@ class YearScheduleImportController extends Controller
 
             // [バリデーション] データ行の値のチェック
             $rules = [];
-            $rules += ['年月日' => [YearlySchedule::fieldRules('lesson_date'), 'required']];
+            $rules += ['年月日' => ['required', 'date_format:Y/m/d,Y/n/j']];
             $rules += ['曜日' => ['required', 'max:1', 'regex:/^(月|火|水|木|金|土|日\d*)$/']];
             $rules += ['期間区分' => ['string', 'max:50']];
             $rules += ['期間区分コード' => ['required', 'max:1', 'regex:/^([0-3]|[9]\d*)$/']];
