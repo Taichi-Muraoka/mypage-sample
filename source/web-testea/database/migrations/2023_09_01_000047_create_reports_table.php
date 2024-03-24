@@ -23,7 +23,7 @@ return new class extends Migration
             $table->date('lesson_date')->comment('授業日');
             $table->unsignedSmallInteger('period_no')->comment('時限');
             $table->unsignedInteger('student_id')->nullable()->comment('生徒ID');
-            $table->text('monthly_goal')->nullable()->comment('今月の目標');
+            $table->string('monthly_goal', 100)->nullable()->comment('今月の目標');
             $table->string('test_contents', 100)->nullable()->comment('確認テスト内容');
             $table->unsignedSmallInteger('test_score')->nullable()->comment('確認テスト得点');
             $table->unsignedSmallInteger('test_full_score')->nullable()->comment('確認テスト満点');

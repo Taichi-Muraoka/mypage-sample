@@ -23,7 +23,7 @@ return new class extends Migration
             $table->text('transfer_reason')->comment('振替理由');
             $table->date('apply_date')->default('1000-01-01')->comment('依頼日');
             $table->unsignedSmallInteger('monthly_count')->default(0)->comment('当月依頼回数');
-            $table->unsignedSmallInteger('approval_status')->default(0)->comment('承認状態（0:管理者承認待ち、1:承認待ち、2:承認、3:差戻し、4:管理者対応済）');
+            $table->unsignedSmallInteger('approval_status')->default(0)->comment('承認状態（0:管理者承認待ち、1:承認待ち、2:承認、3:差戻し日程不都合、4:差戻し代講希望、5:管理者対応済）');
             $table->unsignedInteger('confirm_date_id')->nullable()->comment('確定振替日程ID');
             $table->text('comment')->nullable()->comment('コメント');
             $table->unsignedBigInteger('transfer_schedule_id')->nullable()->comment('振替スケジュールID');
