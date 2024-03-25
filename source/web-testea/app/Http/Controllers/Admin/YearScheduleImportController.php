@@ -215,6 +215,7 @@ class YearScheduleImportController extends Controller
         } catch (\Exception  $e) {
             // この時点では補足できないエラーとして、詳細は返さずエラーとする
             Log::error($e);
+            return $this->illegalResponseErr();
         }
 
         return;
@@ -304,7 +305,7 @@ class YearScheduleImportController extends Controller
 
             // [バリデーション] データ行の値のチェック
             $rules = [];
-            $rules += ['年月日' => [YearlySchedule::fieldRules('lesson_date'), 'required']];
+            $rules += ['年月日' => ['required', 'date_format:Y/m/d,Y/n/j']];
             $rules += ['曜日' => ['required', 'max:1', 'regex:/^(月|火|水|木|金|土|日\d*)$/']];
             $rules += ['期間区分' => ['string', 'max:50']];
             $rules += ['期間区分コード' => ['required', 'max:1', 'regex:/^([0-3]|[9]\d*)$/']];
@@ -329,7 +330,7 @@ class YearScheduleImportController extends Controller
                     $errCol =  "週数=" . $values['週数'];
                 }
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                    . "：データ項目不正( 年月日=" . $values['年月日'] . ", "
+                    . "データ項目不正( " . $i + 1 . "行目 年月日=" . $values['年月日'] . ", "
                     . "エラー項目：" . $errCol . " )");
             }
 

@@ -23,7 +23,7 @@
     {{-- 余白 --}}
     <div class="mb-3"></div>
 
-    <x-input.file caption="年間業カレンダー情報ファイル" id="upload_file" />
+    <x-input.file caption="年間授業カレンダー情報ファイル" id="upload_file" />
 
     {{-- hidden --}}
     <x-input.hidden id="yearly_schedules_import_id" :editData=$editData />
