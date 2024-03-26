@@ -73,7 +73,7 @@
     <tr>
         <th>確認テスト得点</th>
         <td v-cloak>
-            <span v-if="item.test_score != null && item.test_full_score != null">@{{item.test_score}}/@{{item.test_full_score}}点</span>
+            <span v-if="item.test_score != null || item.test_full_score != null">@{{item.test_score}} / @{{item.test_full_score}} 点</span>
         </td>
     </tr>
     <tr>

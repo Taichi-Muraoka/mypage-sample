@@ -120,8 +120,20 @@ class ReportCheckController extends Controller
 
         // 学年コード選択により絞り込み条件
         if (isset($form['grade_cd']) && filled($form['grade_cd'])) {
-            // 検索フォームから取得（スコープ）
-            $query->SearchGradeCd($form);
+            // スケジュール情報・受講生徒情報に存在するかチェックする。
+            $query->where(function ($orQuery) use ($form) {
+                // スケジュール情報から絞り込み（１対１授業）
+                $orQuery->where('students.grade_cd', '=', $form['grade_cd'])
+                    // または受講生徒情報から絞り込み（１対多授業）
+                    ->orWhereExists(function ($query) use ($form) {
+                        $query->from('class_members')
+                            ->join('students', 'students.student_id', '=', 'class_members.student_id')
+                            ->whereColumn('class_members.schedule_id', 'schedules.schedule_id')
+                            ->where('students.grade_cd', '=', $form['grade_cd'])
+                            // delete_dt条件の追加
+                            ->whereNull('class_members.deleted_at');
+                    });
+            });
         }
 
         // コースコード選択により絞り込み条件

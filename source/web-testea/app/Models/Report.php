@@ -158,22 +158,6 @@ class Report extends Model
     }
 
     /**
-     * 検索 学年コード
-     */
-    public function scopeSearchGradeCd($query, $obj)
-    {
-        $key = 'grade_cd';
-        if (isset($obj[$key]) && filled($obj[$key])) {
-            // 生徒情報から検索する
-            $col = 'students.' . $key;
-
-            if (isset($obj[$key]) && filled($obj[$key])) {
-                $query->where($col, $obj[$key]);
-            }
-        }
-    }
-
-    /**
      * 検索 生徒ID
      */
     public function scopeSearchSid($query, $obj)

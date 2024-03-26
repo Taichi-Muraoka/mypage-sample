@@ -99,8 +99,9 @@
         <tr>
             <th>確認テスト得点</th>
             <td>
-                {{$report['test_score']}} / {{$report['test_full_score']}}
-                {{-- <span v-if="{{$report['test_score']}} != 0 && {{$report['test_full_score']}} != 0">点</span> --}}
+                @if($report['test_score'] != null || $report['test_full_score'] != null)
+                {{$report['test_score']}} / {{$report['test_full_score']}} 点
+                @endif
             </td>
         </tr>
         <tr>
