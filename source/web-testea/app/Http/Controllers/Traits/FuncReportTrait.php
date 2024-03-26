@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Traits;
 
+use Illuminate\Support\Facades\Auth;
 use App\Models\Report;
 use App\Models\ReportUnit;
 use App\Models\Student;
@@ -35,16 +36,6 @@ trait FuncReportTrait
 
         // クエリを作成
         $query = Report::query();
-
-        // ユーザー権限による絞り込みを入れる
-        if (AuthEx::isRoomAdmin()) {
-            // 教室管理者の場合、所属校舎でガードを掛ける
-            $query->where($this->guardRoomAdminTableWithRoomCd());
-        }
-        if (AuthEx::isTutor()) {
-            // 講師の場合、自分の担当生徒のみにガードを掛ける
-            $query->where($this->guardTutorTableWithSid());
-        }
 
         // データを取得
         $report = $query
@@ -86,6 +77,8 @@ trait FuncReportTrait
                 // 科目名
                 'mst_subjects.name as subject_name',
             )
+            // 受講生徒情報のJOIN
+            ->sdLeftJoin(ClassMember::class, 'reports.schedule_id', '=', 'class_members.schedule_id')
             // 校舎名の取得
             ->leftJoinSub($campus_names, 'campus_names', function ($join) {
                 $join->on('reports.campus_cd', '=', 'campus_names.code');
@@ -106,10 +99,45 @@ trait FuncReportTrait
             ->sdLeftJoin(CodeMaster::class, function ($join) {
                 $join->on('reports.approval_status', '=', 'mst_codes.code')
                     ->where('data_type', AppConst::CODE_MASTER_2);
-            })
-            ->firstOrFail();
+            });
 
-        return $report;
+        // ユーザー権限による絞り込みを入れる
+        if (AuthEx::isRoomAdmin()) {
+            // 教室管理者の場合、所属校舎でガードを掛ける
+            $report->where($this->guardRoomAdminTableWithRoomCd());
+        }
+        if (AuthEx::isTutor()) {
+            // 講師の場合、自分の担当生徒のみにガードを掛ける
+
+            // ログイン者の情報を取得する
+            $account = Auth::user();
+            $account_id = $account->account_id;
+
+            // 受け持ち生徒リスト（配列）取得
+            $myStudents = $this->mdlGetStudentArrayForT();
+
+            // ガード）担当生徒で絞り込み
+            // 以下の条件はクロージャで記述(orを含むため)
+            $report->where(function ($query) use ($myStudents) {
+                // スケジュール情報から絞り込み（１対１授業）
+                $query->whereIn('schedules.student_id', $myStudents)
+                    // または受講生徒情報から絞り込み（１対多授業）
+                    ->orWhereIn('class_members.student_id', $myStudents);
+            })
+            // 自分の報告書かどうかで取得条件切り分け
+            // 以下の条件はクロージャで記述(orを含むため)
+            ->where(function ($query) use ($account_id) {
+                // 自分の報告書は承認ステータス全て取得
+                $query->where('reports.tutor_id', $account_id)
+                    // 自分以外の報告書は承認済みのもののみ
+                    ->OrWhere(function ($query) use ($account_id) {
+                        $query->where('reports.tutor_id', '<>', $account_id)
+                            ->where('reports.approval_status', AppConst::CODE_MASTER_4_2);
+                    });
+            });
+        }
+
+        return $report->firstOrFail();
     }
     /**
      * 集団授業の生徒名取得
