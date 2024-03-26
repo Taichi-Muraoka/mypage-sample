@@ -1381,6 +1381,15 @@ class MemberMngController extends Controller
             }
         };
 
+        // 独自バリデーション: 退会日は入会日以降
+        $validationLeaveDateAfterEnterDate = function ($attribute, $value, $fail) use ($request) {
+            // 退会日の数値が入会日の数値を下回っていないかチェック
+            if (strtotime($request['leave_date']) < strtotime($request['enter_date'])) {
+                // 下回っていた（入会日以降でない）場合エラー
+                return $fail(Lang::get('validation.student_leave_after_or_equal_enter_date'));
+            }
+        };
+
         // 独自バリデーション: 会員ステータス「見込客」への更新は不可
         $validationStatusLead = function ($attribute, $value, $fail) use ($request) {
             // 対象データを取得（編集中のデータ）
@@ -1539,9 +1548,9 @@ class MemberMngController extends Controller
 
         // 会員ステータス「退会処理中」の場合
         // 必須：退会日
-        // 退会日はシステム日付より未来日とする（システム日付＜退会日）
+        // 退会日はシステム日付より未来日、入会日以降とする（システム日付＜退会日、入会日＜＝退会日）
         if ($request && $request['stu_status'] == AppConst::CODE_MASTER_28_4) {
-            $rules += Student::fieldRules('leave_date', ['required', $validationLeaveDateProspect]);
+            $rules += Student::fieldRules('leave_date', ['required', $validationLeaveDateProspect, $validationLeaveDateAfterEnterDate]);
         }
 
         return $rules;
@@ -1689,7 +1698,7 @@ class MemberMngController extends Controller
     private function rulesForInputLeave(?Request $request)
     {
         // 独自バリデーション: 退会日はシステム日付より未来日
-        $validationLeaveDate = function ($attribute, $value, $fail) use ($request) {
+        $validationLeaveDateAfterToday = function ($attribute, $value, $fail) use ($request) {
             // 退会日の数値が現在日時の数値を下回っていないかチェック
             if (strtotime($request['leave_date']) < strtotime('now')) {
                 // 下回っていた（未来日でない）場合エラー
@@ -1697,9 +1706,24 @@ class MemberMngController extends Controller
             }
         };
 
+        // 独自バリデーション: 退会日は入会日以降
+        $validationLeaveDateAfterEnterDate = function ($attribute, $value, $fail) use ($request) {
+
+            // 入会日を取得
+            $student = Student::select('enter_date')
+                ->where('student_id', $request['student_id'])
+                ->first();
+
+            // 退会日の数値が入会日の数値を下回っていないかチェック
+            if (strtotime($request['leave_date']) < strtotime($student['enter_date'])) {
+                // 下回っていた（入会日以降でない）場合エラー
+                return $fail(Lang::get('validation.student_leave_after_or_equal_enter_date'));
+            }
+        };
+
         $rules = array();
 
-        $rules += Student::fieldRules('leave_date', ['required', $validationLeaveDate]);
+        $rules += Student::fieldRules('leave_date', ['required', $validationLeaveDateAfterToday, $validationLeaveDateAfterEnterDate]);
         $rules += Record::fieldRules('memo', ['required']);
         $rules += Record::fieldRules('received_date', ['required']);
 
