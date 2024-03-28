@@ -828,8 +828,8 @@ trait FuncScheduleTrait
                     ->where('schedules.student_id', $studentId)
                     ->orWhere('class_members.student_id', $studentId);
             })
-            // 振替済・リセット済スケジュールを除外
-            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
+            // 未振替・振替中・振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4, AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->exists();
 
         if ($exists) {
@@ -921,8 +921,8 @@ trait FuncScheduleTrait
             // 日付・開始時刻・終了時刻・講師IDで絞り込み
             ->where('schedules.target_date', $targetDate)
             ->where('schedules.tutor_id', $tutorId)
-            // 振替済・リセット済スケジュールを除外
-            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
+            // 未振替・振替中・振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4, AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->where('schedules.start_time', '<', $endTime)
             ->where('schedules.end_time', '>', $startTime)
             ->exists();
@@ -1074,8 +1074,8 @@ trait FuncScheduleTrait
             ->where('start_time', '<', $endTime)
             ->where('end_time', '>', $startTime)
             ->where('booth_cd', $boothCd)
-            // 振替済・リセット済スケジュールを除外
-            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
+            // 未振替・振替中・振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4, AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->exists();
 
         if (!$exists) {
@@ -1127,8 +1127,8 @@ trait FuncScheduleTrait
             ->where('target_date', $targetDate)
             ->where('start_time', '<=', $endTime)
             ->where('end_time', '>=', $startTime)
-            // 振替済・リセット済スケジュールを除外
-            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
+            // 未振替・振替中・振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4, AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->get();
 
         // 配列に格納
@@ -1336,8 +1336,8 @@ trait FuncScheduleTrait
             ->where('target_date', $targetDate)
             ->where('period_no', $periodNo)
             ->where('booth_cd', $boothCd)
-            // 振替済・リセット済スケジュールを除外
-            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
+            // 未振替・振替中・振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4, AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->exists();
 
         return $exists;
@@ -1450,8 +1450,8 @@ trait FuncScheduleTrait
             ->where('campus_cd', $campusCd)
             ->where('target_date', $targetDate)
             ->where('period_no', $periodNo)
-            // 振替済・リセット済スケジュールを除外
-            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
+            // 未振替・振替中・振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4, AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
             ->get();
 
         // 配列に格納

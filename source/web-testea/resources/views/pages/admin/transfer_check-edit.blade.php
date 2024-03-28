@@ -121,6 +121,9 @@
 
     <x-input.textarea caption="承認者コメント" id="comment" :editData=$editData :rules=$rules />
 
+    {{-- スケジュール登録のバリデーションエラー時のメッセージ --}}
+    <x-bs.form-group name="validate_schedule" />
+
     <x-bs.callout title="登録の際の注意事項" type="warning">
         ・「振替授業登録」欄に入力した振替授業または代講授業のスケジュールが登録されます。<br>
         &emsp;対象の生徒・講師へお知らせが通知されます。<br>
@@ -134,7 +137,7 @@
 
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
-                <x-button.submit-delete />
+                <x-button.submit-delete-validation />
                 <x-button.submit-edit />
             </div>
 

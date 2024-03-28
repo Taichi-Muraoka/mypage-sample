@@ -1187,6 +1187,9 @@ class TransferCheckController extends Controller
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'transfer_apply_id');
 
+        // 削除前バリデーション。NGの場合はレスポンスコード422を返却
+        Validator::make($request->all(), $this->rulesForDelete($request))->validate();
+
         // トランザクション(例外時は自動的にロールバック)
         DB::transaction(function () use ($request) {
 
@@ -1224,5 +1227,108 @@ class TransferCheckController extends Controller
         });
 
         return;
+    }
+
+    /**
+     * バリデーション(削除用)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed バリデーション結果
+     */
+    public function validationForDelete(Request $request)
+    {
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForDelete($request));
+        return $validator->errors();
+    }
+
+    /**
+     * バリデーションルールを取得(削除用)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return array ルール
+     */
+    private function rulesForDelete(?Request $request)
+    {
+        if (!$request) {
+            return;
+        }
+        if (!$request->filled('transfer_apply_id')) {
+            return;
+        }
+
+        // 振替依頼情報取得
+        $transApp = TransferApplication::where('transfer_apply_id', $request['transfer_apply_id'])
+            // 該当データがない場合はエラーを返す
+            ->firstOrFail();
+
+        // 振替元スケジュール情報取得
+        $schedule = Schedule::where('schedule_id', $transApp->schedule_id)
+            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+            ->where($this->guardRoomAdminTableWithRoomCd())
+            ->firstOrFail();
+
+        $rules = array();
+
+        // 独自バリデーション: 講師スケジュール重複チェック
+        $validationDupTutor =  function ($attribute, $value, $fail) use ($schedule) {
+            // 講師スケジュール重複チェック
+            if (!$this->fncScheChkDuplidateTid(
+                $schedule['target_date'],
+                $schedule['start_time'],
+                $schedule['end_time'],
+                $schedule['tutor_id'],
+                $schedule['schedule_id'],
+                false
+            )) {
+                // 講師スケジュール重複エラー
+                return false;
+            }
+            return true;
+        };
+
+        // 独自バリデーション: 生徒スケジュール重複チェック
+        $validationDupStudent =  function ($attribute, $value, $fail) use ($schedule) {
+            // 生徒スケジュール重複チェック
+            if (!$this->fncScheChkDuplidateSid(
+                $schedule['target_date'],
+                $schedule['start_time'],
+                $schedule['end_time'],
+                $schedule['student_id'],
+                $schedule['schedule_id'],
+                false
+            )) {
+                // 生徒スケジュール重複エラー
+                return false;
+            }
+            return true;
+        };
+
+        // 独自バリデーション: ブース空きチェック
+        $validationDupBooth =  function ($attribute, $value, $fail) use ($schedule) {
+            // ブース空きチェック
+            if ($this->fncScheSearchBooth(
+                $schedule['campus_cd'],
+                $schedule['booth_cd'],
+                $schedule['target_date'],
+                $schedule['period_no'],
+                $schedule['how_to_kind'],
+                $schedule['schedule_id'],
+                true
+            ) == null) {
+                // ブース空きなしエラー
+                return false;
+            }
+            return true;
+        };
+
+        // 入力項目と紐づけないバリデーションは以下のように指定する
+        // 振替取消時の講師・生徒・ブースの重複チェック
+        Validator::extendImplicit('transfer_delete_duplicate_tutor', $validationDupTutor);
+        Validator::extendImplicit('transfer_delete_duplicate_student', $validationDupStudent);
+        Validator::extendImplicit('transfer_delete_duplicate_booth', $validationDupBooth);
+        $rules += ['validate_schedule' => ['transfer_delete_duplicate_tutor', 'transfer_delete_duplicate_student', 'transfer_delete_duplicate_booth']];
+
+        return $rules;
     }
 }
