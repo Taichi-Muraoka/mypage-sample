@@ -768,6 +768,9 @@ Route::group(['middleware' => ['auth', 'can:admin']], function () {
     // 削除処理
     Route::post('/transfer_check/delete_edit', [TransferCheckController::class, 'delete'])->name('transfer_check-delete');
 
+    // バリデーション(削除用)
+    Route::post('/transfer_check/vd_delete_edit', [TransferCheckController::class, 'validationForDelete'])->name('transfer_check-vd_delete');
+
     // 振替調整登録画面(直接スケジュールID付きで選択された状態にする)
     Route::get('/transfer_check/new_required/{scheduleId}', [TransferCheckController::class, 'newRequired'])->name('transfer_check-required');
 
