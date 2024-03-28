@@ -446,8 +446,15 @@ class ConferenceAcceptController extends Controller
             $schedule->adm_id = $adm_id;
             $schedule->fill($form)->save();
 
-            // 入会済みの生徒のみ
+            // 生徒情報取得
+            $student = null;
             if ($schedule->student_id != null) {
+                $student = Student::where('student_id', $request['student_id'])
+                    ->firstOrFail();
+            }
+
+            // 入会済みの生徒のみ
+            if ($schedule->student_id != null && $student->stu_status != AppConst::CODE_MASTER_28_0) {
                 // お知らせメッセージ登録
                 $notice = new Notice;
 
