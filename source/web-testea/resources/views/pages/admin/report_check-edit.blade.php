@@ -59,7 +59,7 @@
         <tr>
             <th>授業教材１</th>
             <td>
-                {{$editData['text_name_L1']}} {{$editData['free_text_name_L1']}} 
+                {{$editData['text_name_L1']}} {{$editData['free_text_name_L1']}}
                 {{$editData['text_page_L1']}}
             </td>
         </tr>
@@ -77,7 +77,7 @@
         <tr>
             <th>授業教材２</th>
             <td>
-                {{$editData['text_name_L2']}} {{$editData['free_text_name_L2']}} 
+                {{$editData['text_name_L2']}} {{$editData['free_text_name_L2']}}
                 {{$editData['text_page_L2']}}
             </td>
         </tr>
@@ -128,7 +128,7 @@
         <tr>
             <th>宿題教材１</th>
             <td>
-                {{$editData['text_name_H1']}} {{$editData['free_text_name_H1']}} 
+                {{$editData['text_name_H1']}} {{$editData['free_text_name_H1']}}
                 {{$editData['text_page_H1']}}
             </td>
         </tr>
@@ -136,26 +136,30 @@
             <th>宿題単元１</th>
             <td>
                 {{$editData['category_name1_H1']}} {{$editData['free_category_name1_H1']}}
-                <br>
+                {{$editData['unit_name1_H1']}} {{$editData['free_unit_name1_H1']}}<br>
                 {{$editData['category_name2_H1']}} {{$editData['free_category_name2_H1']}}
-                <br>
+                {{$editData['unit_name2_H1']}} {{$editData['free_unit_name2_H1']}}<br>
                 {{$editData['category_name3_H1']}} {{$editData['free_category_name3_H1']}}
+                {{$editData['unit_name3_H1']}} {{$editData['free_unit_name3_H1']}}
 
             </td>
         </tr>
         <tr>
             <th>宿題教材２</th>
             <td>
-                {{$editData['text_name_H2']}} {{$editData['free_text_name_H2']}} 
+                {{$editData['text_name_H2']}} {{$editData['free_text_name_H2']}}
                 {{$editData['text_page_H2']}}
             </td>
         </tr>
         <tr>
             <th>宿題単元２</th>
             <td>
-                {{$editData['category_name1_H2']}} {{$editData['free_category_name1_H2']}}<br>
-                {{$editData['category_name2_H2']}} {{$editData['free_category_name2_H2']}}<br>
+                {{$editData['category_name1_H2']}} {{$editData['free_category_name1_H2']}}
+                {{$editData['unit_name1_H2']}} {{$editData['free_unit_name1_H2']}}<br>
+                {{$editData['category_name2_H2']}} {{$editData['free_category_name2_H2']}}
+                {{$editData['unit_name2_H2']}} {{$editData['free_unit_name2_H2']}}<br>
                 {{$editData['category_name3_H2']}} {{$editData['free_category_name3_H2']}}
+                {{$editData['unit_name3_H2']}} {{$editData['free_unit_name3_H2']}}
             </td>
         </tr>
     </x-bs.table>
