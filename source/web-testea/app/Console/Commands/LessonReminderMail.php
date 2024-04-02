@@ -10,6 +10,7 @@ use App\Models\MstSystem;
 use App\Models\BatchMng;
 use App\Models\Schedule;
 use App\Models\ClassMember;
+use App\Models\Student;
 use App\Models\MstCourse;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\LessonReminder;
@@ -108,11 +109,15 @@ class LessonReminderMail extends Command
                 //-------------------------
                 // １対１授業の対象生徒取得クエリ
                 $queryScheduleStudent = Schedule::select(
-                    'student_id',
+                    'schedules.student_id',
                 )
                     // コースマスタをJOIN
                     ->sdJoin(MstCourse::class, function ($join) {
                         $join->on('schedules.course_cd', 'mst_courses.course_cd');
+                    })
+                    // 生徒情報をJOIN
+                    ->sdJoin(Student::class, function ($join) {
+                        $join->on('schedules.student_id', 'students.student_id');
                     })
                     // 授業日＝翌日
                     ->where('schedules.target_date', $tomorrow)
@@ -121,7 +126,9 @@ class LessonReminderMail extends Command
                     // 未振替・振替中・振替済・リセット済スケジュールを除外
                     ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4, AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
                     // 仮登録スケジュールを除外
-                    ->where('schedules.tentative_status', '<>', AppConst::CODE_MASTER_36_1)
+                    ->where('schedules.tentative_status', '!=', AppConst::CODE_MASTER_36_1)
+                    // 見込客の生徒を除外
+                    ->where('students.stu_status', '!=', AppConst::CODE_MASTER_28_0)
                     ->whereNotNull('schedules.student_id');
 
                 // １対他授業の対象生徒取得クエリ
@@ -136,12 +143,18 @@ class LessonReminderMail extends Command
                     ->sdJoin(MstCourse::class, function ($join) {
                         $join->on('schedules.course_cd', 'mst_courses.course_cd');
                     })
+                    // 生徒情報をJOIN
+                    ->sdJoin(Student::class, function ($join) {
+                        $join->on('class_members.student_id', 'students.student_id');
+                    })
                     // 授業日＝翌日
                     ->where('schedules.target_date', $tomorrow)
                     // コース種別＝１対他授業
                     ->where('mst_courses.course_kind', AppConst::CODE_MASTER_42_2)
                     // 欠席者（予定）を除外
-                    ->where('class_members.absent_status', '!=', AppConst::CODE_MASTER_35_6);
+                    ->where('class_members.absent_status', '!=', AppConst::CODE_MASTER_35_6)
+                    // 見込客の生徒を除外
+                    ->where('students.stu_status', '!=', AppConst::CODE_MASTER_28_0);
 
                 // 2つのqueryをUNIONし、対象生徒リストを取得
                 $students = $queryScheduleStudent
@@ -168,7 +181,7 @@ class LessonReminderMail extends Command
                     // 未振替・振替中・振替済・リセット済スケジュールを除外
                     ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4, AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
                     // 仮登録スケジュールを除外
-                    ->where('schedules.tentative_status', '<>', AppConst::CODE_MASTER_36_1)
+                    ->where('schedules.tentative_status', '!=', AppConst::CODE_MASTER_36_1)
                     // コース種別＝１対１授業または１対他授業
                     ->whereIn('mst_courses.course_kind', [AppConst::CODE_MASTER_42_1, AppConst::CODE_MASTER_42_2])
                     ->whereNotNull('tutor_id')
