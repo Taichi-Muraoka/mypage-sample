@@ -1507,9 +1507,9 @@ class MemberMngController extends Controller
 
         // 外部サービス顧客ID形式チェック
         $rules += Student::fieldRules('lead_id');
-
-        // ストレージURL・メモ 字数制限
-        $rules += Student::fieldRules('storage_link');
+        // ストレージURL 形式・字数ルール適用
+        $rules += Student::fieldRules('storage_link', ['nullable', 'url']);
+        // メモ 字数ルール適用
         $rules += Student::fieldRules('memo');
 
         // 会員ステータス「見込客」以外で登録する場合
