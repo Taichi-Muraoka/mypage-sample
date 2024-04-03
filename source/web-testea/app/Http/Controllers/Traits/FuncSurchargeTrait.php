@@ -75,14 +75,27 @@ trait FuncSurchargeTrait
         // ログイン者によってボタン押下制御・ガード・ソート順を分岐
         if (AuthEx::isAdmin()) {
             // 管理者の場合
+
+            // 承認ボタン制御
             // 承認ステータス「承認待ち」のコードを取得
             $statusCd = AppConst::CODE_MASTER_2_0;
 
-            // 承認ステータス「承認待ち」に該当しない場合、trueをセットする（承認・更新不可）
+            // 承認ステータス「承認待ち」に該当しない場合、trueをセットする（承認不可）
             $query->selectRaw(
                 "CASE
                     WHEN approval_status != $statusCd THEN true
-                END AS disabled_btn"
+                END AS disabled_btn_approval"
+            );
+
+            // 更新ボタン制御
+            // 承認ステータス「承認」のコードを取得
+            $statusCd = AppConst::CODE_MASTER_2_1;
+
+            // 承認ステータス「承認」の場合、trueをセットする（更新不可）
+            $query->selectRaw(
+                "CASE
+                    WHEN approval_status = $statusCd THEN true
+                END AS disabled_btn_update"
             );
 
             // 校舎の絞り込み条件
@@ -309,8 +322,8 @@ trait FuncSurchargeTrait
             ->where('surcharge_id', $surchargeId)
             // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
             ->where($this->guardRoomAdminTableWithRoomCd())
-            // ステータス「承認待ち」のみ更新可能とする
-            ->where('approval_status', AppConst::CODE_MASTER_2_0)
+            // ステータス「承認待ち」「差戻し」は更新可能
+            ->whereIn('approval_status', [AppConst::CODE_MASTER_2_0, AppConst::CODE_MASTER_2_2])
             ->firstOrFail();
 
         return $surcharge;

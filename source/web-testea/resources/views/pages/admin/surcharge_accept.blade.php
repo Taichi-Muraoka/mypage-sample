@@ -83,9 +83,9 @@
             <td>
                 <x-button.list-dtl :vueDataAttr="['id' => 'item.surcharge_id']" />
                 <x-button.list-dtl caption="承認" btn="btn-primary" dataTarget="#modal-dtl-acceptance"
-                    :vueDataAttr="['id' => 'item.surcharge_id']" vueDisabled="item.disabled_btn" />
+                    :vueDataAttr="['id' => 'item.surcharge_id']" vueDisabled="item.disabled_btn_approval" />
                 <x-button.list-edit vueHref="'{{ route('surcharge_accept-edit', '') }}/' + item.surcharge_id"
-                    vueDisabled="item.disabled_btn" />
+                    vueDisabled="item.disabled_btn_update" />
             </td>
         </tr>
     </x-bs.table>
