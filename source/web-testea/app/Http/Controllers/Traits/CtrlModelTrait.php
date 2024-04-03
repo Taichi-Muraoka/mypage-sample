@@ -819,9 +819,9 @@ trait CtrlModelTrait
             ->whereNotNull('value_num')
             ->firstOrFail();
 
-        // 現年度～2年後までのリストを作る 例2023～2025
+        // 前年度～現年度～2年後までのリストを作る 例2022～2025
         $examYearList = [];
-        for ($i = 0; $i <= 2; $i++) {
+        for ($i = -1; $i <= 2; $i++) {
             $examYearList += array($currentYear->value_num + $i => ["value" => $currentYear->value_num + $i]);
         }
 

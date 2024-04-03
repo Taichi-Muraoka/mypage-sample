@@ -77,6 +77,9 @@ class DesiredMngController extends Controller
             ->whereNotNull('value_num')
             ->firstOrFail();
 
+        // 前年度の値を取得（更新ボタン制御用）
+        $previousYear = $currentYear->value_num - 1;
+
         // クエリ作成
         $query = StudentEntranceExam::query();
 
@@ -90,10 +93,10 @@ class DesiredMngController extends Controller
         // データを取得
         $examList = $this->fncDsirGetEntranceExamQuery($query)
             // 更新ボタン押下制御
-            // 受験年度が前年度以前の場合、trueをセットする（更新不可）
+            // 受験年度が前年度より前の場合(2年経過)、trueをセットする（更新不可）
             ->selectRaw(
                 "CASE
-                    WHEN exam_year < $currentYear->value_num THEN true
+                    WHEN exam_year < $previousYear THEN true
                 END AS disabled_btn"
             )
             ->orderBy('student_entrance_exams.exam_year', 'desc')
@@ -151,6 +154,12 @@ class DesiredMngController extends Controller
         // 生徒名を取得する
         $name = $this->mdlGetStudentName($sid);
 
+        // システムマスタ「現年度」を取得
+        $currentYear = MstSystem::select('value_num')
+            ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
+            ->whereNotNull('value_num')
+            ->firstOrFail();
+
         // 受験年度リストを取得
         $examYearList = $this->mdlGetExamYearList();
         // 志望順リストを取得
@@ -167,7 +176,8 @@ class DesiredMngController extends Controller
         // テンプレートは編集と同じ
         return view('pages.admin.desired_mng-input', [
             'editData' => [
-                'student_id' => $sid
+                'student_id' => $sid,
+                'exam_year' => $currentYear['value_num']
             ],
             'name' => $name,
             'examYearList' => $examYearList,
@@ -256,8 +266,11 @@ class DesiredMngController extends Controller
             ->whereNotNull('value_num')
             ->firstOrFail();
 
-        if ($exam->exam_year < $currentYear->value_num) {
-            // 受験年度が前年度以前の場合、エラーを表示する
+        // 前年度を取得
+        $previousYear = $currentYear->value_num - 1;
+
+        if ($exam->exam_year < $previousYear) {
+            // 受験年度が前年度より前の場合(2年経過)、エラーを表示する
             return $this->illegalResponseErr();
         }
 
