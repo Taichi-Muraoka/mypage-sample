@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Schedule;
+use App\Consts\AppConst;
 use App\Libs\AuthEx;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\DB;
@@ -207,6 +208,8 @@ class OvertimeController extends Controller
     {
         // クエリを作成
         $query = Schedule::query()
+            ->where('tentative_status', AppConst::CODE_MASTER_36_0)
+            ->where('absent_status', AppConst::CODE_MASTER_35_0)
             ->whereNotNull('tutor_id');
 
         if (AuthEx::isRoomAdmin()) {
