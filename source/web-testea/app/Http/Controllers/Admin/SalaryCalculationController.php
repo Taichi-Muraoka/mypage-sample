@@ -205,6 +205,7 @@ class SalaryCalculationController extends Controller
 
                         // スケジュール情報のクエリを作成
                         $schedule_query = Schedule::query()
+                            ->where('tentative_status', AppConst::CODE_MASTER_36_0)
                             ->whereNotNull('tutor_id')
                             ->whereIn('absent_status', [AppConst::CODE_MASTER_35_0])
                             ->whereBetween('target_date', [$idDate, $last_date]);
