@@ -365,8 +365,7 @@ trait FuncGradesTrait
             $score = new Score;
 
             if (AuthEx::isAdmin()) {
-                // 教室管理者の場合、自分の教室コードの生徒のみにガードを掛ける
-                // MEMO:ガード処理は後日追加
+                // 管理者の場合、student_idはバリデーションでガード済み
                 $score->student_id = $request->student_id;
             }
             if (AuthEx::isStudent()) {
