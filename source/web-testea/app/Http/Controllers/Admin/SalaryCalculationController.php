@@ -293,6 +293,7 @@ class SalaryCalculationController extends Controller
 
                         // 出社回数用のサブクエリを作成
                         $goto_office_query = Schedule::query()
+                            ->where('tentative_status', AppConst::CODE_MASTER_36_0)
                             ->whereNotNull('tutor_id')
                             ->whereIn('absent_status', [AppConst::CODE_MASTER_35_0, AppConst::CODE_MASTER_35_1])
                             ->whereIn('how_to_kind', [AppConst::CODE_MASTER_33_0, AppConst::CODE_MASTER_33_1])
