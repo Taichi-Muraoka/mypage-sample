@@ -11,6 +11,7 @@ use App\Models\ScoreDetail;
 use App\Models\MstGradeSubject;
 use App\Libs\AuthEx;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Validator;
@@ -363,8 +364,18 @@ trait FuncGradesTrait
             // --------------------
             $score = new Score;
 
+            if (AuthEx::isAdmin()) {
+                // 管理者の場合、student_idはバリデーションでガード済み
+                $score->student_id = $request->student_id;
+            }
+            if (AuthEx::isStudent()) {
+                // 生徒の場合、ログイン情報から生徒IDを取得し保存する
+                $account = Auth::user();
+                $sid = $account->account_id;
+                $score->student_id = $sid;
+            }
+
             // 共通保存項目
-            $score->student_id = $request->student_id;
             $score->exam_type =  $request['exam_type'];
             $score->grade_cd =  $request['grade_cd'];
             $score->student_comment = $request['student_comment'];
