@@ -1070,7 +1070,7 @@ class RoomCalendarController extends Controller
         DB::transaction(function () use ($request) {
 
             // 対象データを取得(IDでユニークに取る)
-            $schedule = Schedule::select(
+            Schedule::select(
                 'schedule_id',
             )
                 ->where('schedule_id', $request['schedule_id'])
@@ -1778,6 +1778,17 @@ class RoomCalendarController extends Controller
     {
         $rules = array();
 
+        // 独自バリデーション: リストのチェック 生徒ID
+        $validationStudentList =  function ($attribute, $value, $fail) use ($request) {
+
+            // 生徒リストを取得
+            $list = $this->mdlGetStudentList();
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
         // 独自バリデーション: リストのチェック 出欠ステータス
         $validationAbsentStatusList =  function ($attribute, $value, $fail) {
 
@@ -1789,16 +1800,27 @@ class RoomCalendarController extends Controller
             }
         };
 
+        $rules += Schedule::fieldRules('schedule_id', ['required']);
         $rules += ['studentCnt' => ['required', 'integer']];
-
-        $rulAbsentStatus = ClassMember::getFieldRule('absent_status');
+        $ruleClassMemberId = ClassMember::getFieldRule('class_member_id');
+        $ruleStudentId = ClassMember::getFieldRule('student_id');
+        $ruleAbsentStatus = ClassMember::getFieldRule('absent_status');
         if ($request) {
             $count = intval($request['studentCnt']);
             for ($i = 0; $i < $count; $i++) {
                 // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
                 // その他を第二引数で指定する
+                // 受講生徒情報ID
+                if ($request->filled('class_member_id_' . $i)) {
+                    $rules += ['class_member_id_' . $i => array_merge($ruleClassMemberId, ['required'])];
+                }
+                // 生徒ID
+                if ($request->filled('student_id_' . $i)) {
+                    $rules += ['student_id_' . $i => array_merge($ruleStudentId, ['required', $validationStudentList])];
+                }
+                // 出欠ステータス
                 if ($request->filled('absent_status_' . $i)) {
-                    $rules += ['absent_status_' . $i =>  array_merge($rulAbsentStatus, ['required', $validationAbsentStatusList])];
+                    $rules += ['absent_status_' . $i =>  array_merge($ruleAbsentStatus, ['required', $validationAbsentStatusList])];
                 }
             }
         }

@@ -13,7 +13,6 @@
 <x-bs.card :form=true>
 
     {{-- hidden --}}
-    <x-input.hidden id="campus_cd" :editData=$schedule />
     <x-input.hidden id="schedule_id" :editData=$schedule />
     <x-input.hidden id="studentCnt" :editData=$schedule :rules=$rules />
 
