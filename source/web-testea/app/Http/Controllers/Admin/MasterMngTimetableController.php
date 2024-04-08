@@ -36,6 +36,11 @@ class MasterMngTimetableController extends Controller
      */
     public function index()
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 校舎リストを取得
         $rooms = $this->mdlGetRoomList(false);
 
@@ -71,6 +76,11 @@ class MasterMngTimetableController extends Controller
      */
     public function search(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForSearch($request))->validate();
 
@@ -175,6 +185,11 @@ class MasterMngTimetableController extends Controller
      */
     public function new()
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 校舎リストを取得
         $rooms = $this->mdlGetRoomList(false);
 
@@ -201,6 +216,11 @@ class MasterMngTimetableController extends Controller
      */
     public function create(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
@@ -229,6 +249,11 @@ class MasterMngTimetableController extends Controller
      */
     public function edit($timetableId)
     {
+        // 教室管理者の場合、画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // IDのバリデーション
         $this->validateIds($timetableId);
 
@@ -265,6 +290,11 @@ class MasterMngTimetableController extends Controller
      */
     public function update(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput($request))->validate();
 
@@ -299,6 +329,11 @@ class MasterMngTimetableController extends Controller
      */
     public function delete(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'timetable_id');
 
