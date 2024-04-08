@@ -86,6 +86,11 @@ class YearScheduleImportController extends Controller
      */
     public function index()
     {
+        // 教室管理者の場合は画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         return view('pages.admin.year_schedule_import', [
             'rules' => $this->rulesForInput()
         ]);
@@ -94,6 +99,11 @@ class YearScheduleImportController extends Controller
     // 取り込み画面
     public function import($id)
     {
+        // 教室管理者の場合は画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // IDのバリデーション
         $this->validateIds($id);
 
