@@ -171,6 +171,11 @@ class SalaryCalculationController extends Controller
      */
     public function execModal(Request $request)
     {
+        // 全体管理者でない場合は画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'id');
 
