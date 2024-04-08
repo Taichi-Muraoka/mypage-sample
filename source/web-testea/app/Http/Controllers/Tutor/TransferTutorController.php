@@ -787,6 +787,8 @@ class TransferTutorController extends Controller
         $schedules = Schedule::select(
             'target_date',
             'period_no',
+            'tutor_id',
+            'student_id',
             'booth_cd',
             'how_to_kind'
         )
