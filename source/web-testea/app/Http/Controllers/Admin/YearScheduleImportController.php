@@ -138,6 +138,10 @@ class YearScheduleImportController extends Controller
      */
     public function create(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
 
         // アップロードされたかチェック(アップロードされた場合は該当の項目にファイル名をセットする)
         $this->fileUploadSetVal($request, 'upload_file');
