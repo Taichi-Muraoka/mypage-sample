@@ -392,13 +392,13 @@ class RecordController extends Controller
      *
      * @return array ルール
      */
-    private function rulesForInput(?Request $request)
+    private function rulesForInput()
     {
 
         $rules = array();
 
         // 独自バリデーション: リストのチェック 生徒
-        $validationStudentList =  function ($attribute, $value, $fail) use ($request) {
+        $validationStudentList =  function ($attribute, $value, $fail) {
             // 生徒リストを取得
             $list = $this->mdlGetStudentList();
             if (!isset($list[$value])) {
