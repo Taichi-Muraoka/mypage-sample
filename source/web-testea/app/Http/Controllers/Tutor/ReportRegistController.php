@@ -397,6 +397,8 @@ class ReportRegistController extends Controller
         $query = Schedule::query();
 
         $lesson = $query
+            // 自分の講師IDのみにガードを掛ける
+            ->where($this->guardTutorTableWithTid())
             // キーの指定
             ->where('schedules.schedule_id', '=', $schedule_id)
             ->select(
@@ -640,6 +642,8 @@ class ReportRegistController extends Controller
             // 授業報告書情報登録
             $lesson = $query
                 ->where('schedule_id', '=', $request['id'])
+                // 自分の講師IDのみにガードを掛ける
+                ->where($this->guardTutorTableWithTid())
                 ->firstOrFail();
 
             $report = new Report;
