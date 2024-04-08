@@ -15,6 +15,7 @@ use App\Models\YearlySchedulesImport;
 use App\Consts\AppConst;
 use App\Http\Controllers\Traits\CtrlFileTrait;
 use App\Http\Controllers\Traits\CtrlCsvTrait;
+use App\Libs\AuthEx;
 
 /**
  * 年度スケジュール取込 - コントローラ
