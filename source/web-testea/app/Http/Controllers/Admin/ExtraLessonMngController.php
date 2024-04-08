@@ -22,7 +22,6 @@ use App\Models\Notice;
 use App\Models\NoticeDestination;
 use App\Mail\ExtraLessonAcceptToStudent;
 use App\Mail\ExtraLessonAcceptToTutor;
-use App\Models\StudentCampus;
 
 /**
  * 追加授業申請受付 - コントローラ
@@ -703,6 +702,26 @@ class ExtraLessonMngController extends Controller
      */
     private function rulesForInput(?Request $request)
     {
+        // 独自バリデーション: リストのチェック 生徒
+        $validationStudentList =  function ($attribute, $value, $fail) {
+            // 生徒リストを取得
+            $list = $this->mdlGetStudentList();
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
+        // 独自バリデーション: リストのチェック 校舎
+        $validationRoomList =  function ($attribute, $value, $fail) {
+            // 校舎リストを取得
+            $list = $this->mdlGetRoomList(false);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
         // 独自バリデーション: リストのチェック 時限
         $validationPeriodList =  function ($attribute, $value, $fail) use ($request) {
             // 時限リストを取得（校舎・日付から）
@@ -758,6 +777,8 @@ class ExtraLessonMngController extends Controller
         // 追加授業スケジュール登録画面のバリデーション
         $rules += Schedule::fieldRules('memo');
         if ($request && !isset($request['status'])) {
+            $rules += Schedule::fieldRules('student_id', ['required', $validationStudentList]);
+            $rules += Schedule::fieldRules('campus_cd', ['required', $validationRoomList]);
             $rules += Schedule::fieldRules('target_date', ['required']);
             $rules += Schedule::fieldRules('period_no', ['required', $validationPeriodList]);
             $rules += Schedule::fieldRules('start_time', ['required']);
