@@ -171,6 +171,11 @@ class SalaryCalculationController extends Controller
      */
     public function execModal(Request $request)
     {
+        // 全体管理者でない場合は画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // IDのバリデーション
         $this->validateIdsFromRequest($request, 'id');
 
@@ -205,6 +210,7 @@ class SalaryCalculationController extends Controller
 
                         // スケジュール情報のクエリを作成
                         $schedule_query = Schedule::query()
+                            ->where('tentative_status', AppConst::CODE_MASTER_36_0)
                             ->whereNotNull('tutor_id')
                             ->whereIn('absent_status', [AppConst::CODE_MASTER_35_0])
                             ->whereBetween('target_date', [$idDate, $last_date]);
@@ -290,8 +296,16 @@ class SalaryCalculationController extends Controller
                             $salary_summary->save();
                         }
 
+                        // 出社回数用のサブクエリを作成
+                        $goto_office_query = Schedule::query()
+                            ->where('tentative_status', AppConst::CODE_MASTER_36_0)
+                            ->whereNotNull('tutor_id')
+                            ->whereIn('absent_status', [AppConst::CODE_MASTER_35_0, AppConst::CODE_MASTER_35_1])
+                            ->whereIn('how_to_kind', [AppConst::CODE_MASTER_33_0, AppConst::CODE_MASTER_33_1])
+                            ->whereBetween('target_date', [$idDate, $last_date]);
+
                         // 講師の出社回数を集計
-                        $count_goto_office = DB::table($schedule_query)
+                        $count_goto_office = DB::table($goto_office_query)
                             ->select(
                                 'tutor_id',
                                 'campus_cd'
