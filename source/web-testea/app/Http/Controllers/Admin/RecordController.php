@@ -397,6 +397,16 @@ class RecordController extends Controller
 
         $rules = array();
 
+        // 独自バリデーション: リストのチェック 生徒
+        $validationStudentList =  function ($attribute, $value, $fail) {
+            // 生徒リストを取得
+            $list = $this->mdlGetStudentList();
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
         // 独自バリデーション: リストのチェック 校舎
         $validationRoomList =  function ($attribute, $value, $fail) {
 
@@ -421,6 +431,7 @@ class RecordController extends Controller
 
         // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
         // その他を第二引数で指定する
+        $rules += Record::fieldRules('student_id', ['required', $validationStudentList]);
         $rules += Record::fieldRules('campus_cd', ['required', $validationRoomList]);
         $rules += Record::fieldRules('record_kind', ['required', $validationKindList]);
         $rules += Record::fieldRules('memo', ['required']);

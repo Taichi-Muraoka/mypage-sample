@@ -387,6 +387,16 @@ class DesiredMngController extends Controller
     {
         $rules = array();
 
+        // 独自バリデーション: リストのチェック 生徒
+        $validationStudentList =  function ($attribute, $value, $fail) {
+            // 生徒リストを取得
+            $list = $this->mdlGetStudentList();
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
         // 独自バリデーション: リストのチェック 受験年度
         $validationExamYearList =  function ($attribute, $value, $fail) {
             // リストを取得し存在チェック
@@ -417,6 +427,7 @@ class DesiredMngController extends Controller
             }
         };
 
+        $rules += StudentEntranceExam::fieldRules('student_id', ['required', $validationStudentList]);
         $rules += StudentEntranceExam::fieldRules('exam_year', ['required', $validationExamYearList]);
         $rules += StudentEntranceExam::fieldRules('priority_no', ['required', $validationPriorityList]);
         $rules += StudentEntranceExam::fieldRules('department_name', ['required']);

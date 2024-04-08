@@ -15,6 +15,7 @@ use App\Models\YearlySchedulesImport;
 use App\Consts\AppConst;
 use App\Http\Controllers\Traits\CtrlFileTrait;
 use App\Http\Controllers\Traits\CtrlCsvTrait;
+use App\Libs\AuthEx;
 
 /**
  * 年度スケジュール取込 - コントローラ
@@ -85,6 +86,11 @@ class YearScheduleImportController extends Controller
      */
     public function index()
     {
+        // 教室管理者の場合は画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         return view('pages.admin.year_schedule_import', [
             'rules' => $this->rulesForInput()
         ]);
@@ -93,6 +99,11 @@ class YearScheduleImportController extends Controller
     // 取り込み画面
     public function import($id)
     {
+        // 教室管理者の場合は画面表示しない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
+
         // IDのバリデーション
         $this->validateIds($id);
 
@@ -138,6 +149,10 @@ class YearScheduleImportController extends Controller
      */
     public function create(Request $request)
     {
+        // 教室管理者の場合、処理を行わない
+        if (AuthEx::isRoomAdmin()) {
+            return $this->illegalResponseErr();
+        }
 
         // アップロードされたかチェック(アップロードされた場合は該当の項目にファイル名をセットする)
         $this->fileUploadSetVal($request, 'upload_file');

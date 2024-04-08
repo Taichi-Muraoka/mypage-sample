@@ -11,6 +11,7 @@ use App\Models\ScoreDetail;
 use App\Models\MstGradeSubject;
 use App\Libs\AuthEx;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Validator;
@@ -363,8 +364,18 @@ trait FuncGradesTrait
             // --------------------
             $score = new Score;
 
+            if (AuthEx::isAdmin()) {
+                // 管理者の場合、student_idはバリデーションでガード済み
+                $score->student_id = $request->student_id;
+            }
+            if (AuthEx::isStudent()) {
+                // 生徒の場合、ログイン情報から生徒IDを取得し保存する
+                $account = Auth::user();
+                $sid = $account->account_id;
+                $score->student_id = $sid;
+            }
+
             // 共通保存項目
-            $score->student_id = $request->student_id;
             $score->exam_type =  $request['exam_type'];
             $score->grade_cd =  $request['grade_cd'];
             $score->student_comment = $request['student_comment'];
@@ -577,6 +588,22 @@ trait FuncGradesTrait
     // バリデーション
     //==========================
     /**
+     * リストのチェック 生徒
+     *
+     * @param $value
+     * @param $fail
+     */
+    private  function validationStudentList($value, $fail)
+    {
+        // 生徒リストを取得
+        $list = $this->mdlGetStudentList();
+        if (!isset($list[$value])) {
+            // 不正な値エラー
+            return $fail(Lang::get('validation.invalid_input'));
+        }
+    }
+
+    /**
      * リストのチェック 試験種別
      *
      * @param $value
@@ -647,6 +674,11 @@ trait FuncGradesTrait
      */
     function setRulesForScore($request)
     {
+        // 独自バリデーション: リストのチェック 生徒
+        $validationStudentList =  function ($attribute, $value, $fail) {
+            return $this->validationStudentList($value, $fail);
+        };
+
         // 独自バリデーション: リストのチェック 試験種別
         $validationExamTypeList =  function ($attribute, $value, $fail) {
             return $this->validationExamTypeList($value, $fail);
@@ -682,6 +714,7 @@ trait FuncGradesTrait
         }
         // 運用管理画面でのルール
         if (AuthEx::isAdmin()) {
+            $rules += Score::fieldRules('student_id', ['required', $validationStudentList]);
             // 編集時のみ登録日必須
             $rules += Score::fieldRules('regist_date', ['required_with:score_id']);
             $rules += Score::fieldRules('student_comment');
