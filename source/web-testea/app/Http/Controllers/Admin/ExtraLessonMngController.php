@@ -22,7 +22,6 @@ use App\Models\Notice;
 use App\Models\NoticeDestination;
 use App\Mail\ExtraLessonAcceptToStudent;
 use App\Mail\ExtraLessonAcceptToTutor;
-use App\Models\StudentCampus;
 
 /**
  * 追加授業申請受付 - コントローラ
@@ -704,7 +703,7 @@ class ExtraLessonMngController extends Controller
     private function rulesForInput(?Request $request)
     {
         // 独自バリデーション: リストのチェック 生徒
-        $validationStudentList =  function ($attribute, $value, $fail) use ($request) {
+        $validationStudentList =  function ($attribute, $value, $fail) {
             // 生徒リストを取得
             $list = $this->mdlGetStudentList();
             if (!isset($list[$value])) {
