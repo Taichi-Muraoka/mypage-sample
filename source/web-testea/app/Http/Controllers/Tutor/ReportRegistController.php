@@ -640,6 +640,8 @@ class ReportRegistController extends Controller
             // 授業報告書情報登録
             $lesson = $query
                 ->where('schedule_id', '=', $request['id'])
+                // 自分の講師IDのみにガードを掛ける
+                ->where($this->guardTutorTableWithTid())
                 ->firstOrFail();
 
             $report = new Report;
