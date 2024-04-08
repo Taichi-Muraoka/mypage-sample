@@ -397,6 +397,8 @@ class ReportRegistController extends Controller
         $query = Schedule::query();
 
         $lesson = $query
+            // 自分の講師IDのみにガードを掛ける
+            ->where($this->guardTutorTableWithTid())
             // キーの指定
             ->where('schedules.schedule_id', '=', $schedule_id)
             ->select(
