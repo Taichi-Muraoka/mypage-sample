@@ -588,6 +588,22 @@ trait FuncGradesTrait
     // バリデーション
     //==========================
     /**
+     * リストのチェック 生徒
+     *
+     * @param $value
+     * @param $fail
+     */
+    private  function validationStudentList($value, $fail)
+    {
+        // 生徒リストを取得
+        $list = $this->mdlGetStudentList();
+        if (!isset($list[$value])) {
+            // 不正な値エラー
+            return $fail(Lang::get('validation.invalid_input'));
+        }
+    }
+
+    /**
      * リストのチェック 試験種別
      *
      * @param $value
@@ -658,6 +674,11 @@ trait FuncGradesTrait
      */
     function setRulesForScore($request)
     {
+        // 独自バリデーション: リストのチェック 生徒
+        $validationStudentList =  function ($attribute, $value, $fail) {
+            return $this->validationStudentList($value, $fail);
+        };
+
         // 独自バリデーション: リストのチェック 試験種別
         $validationExamTypeList =  function ($attribute, $value, $fail) {
             return $this->validationExamTypeList($value, $fail);
@@ -693,6 +714,7 @@ trait FuncGradesTrait
         }
         // 運用管理画面でのルール
         if (AuthEx::isAdmin()) {
+            $rules += Score::fieldRules('student_id', ['required', $validationStudentList]);
             // 編集時のみ登録日必須
             $rules += Score::fieldRules('regist_date', ['required_with:score_id']);
             $rules += Score::fieldRules('student_comment');
