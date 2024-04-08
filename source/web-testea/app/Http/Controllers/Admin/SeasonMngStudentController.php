@@ -708,6 +708,21 @@ class SeasonMngStudentController extends Controller
             }
         };
 
+        // 独自バリデーション: リストのチェック 生徒
+        $validationStudentList =  function ($attribute, $value, $fail) use ($request) {
+
+            if (!$request->filled('campus_cd')) {
+                // 検索項目がrequestにない場合はチェックしない（他項目でのエラーを拾う）
+                return;
+            }
+            // 生徒リストを取得
+            $list = $this->mdlGetStudentList($request['campus_cd']);
+            if (!isset($list[$value])) {
+                // 不正な値エラー
+                return $fail(Lang::get('validation.invalid_input'));
+            }
+        };
+
         // 独自バリデーション: 講師選択が１つ以上あるかチェック
         $validationSelectCount = function ($attribute, $value, $fail) use ($requestSelTutors) {
 
@@ -831,6 +846,8 @@ class SeasonMngStudentController extends Controller
         $rules += SeasonStudentRequest::fieldRules('season_cd', ['required', $validationSeasonList]);
         // 科目コード
         $rules += SeasonStudentTime::fieldRules('subject_cd', ['required', $validationSubjectList]);
+        // 生徒ID
+        $rules += SeasonStudentRequest::fieldRules('student_id', ['required', $validationStudentList]);
 
         // 入力項目と紐づけないバリデーションは以下のように指定する
         // 講師選択チェック
