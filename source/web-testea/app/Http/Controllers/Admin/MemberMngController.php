@@ -1005,6 +1005,8 @@ class MemberMngController extends Controller
 
             // 既存の生徒情報を取得
             $student = Student::where('student_id', $request['student_id'])
+                // 教室管理者の場合、自校舎の生徒のみにガードを掛ける
+                ->where($this->guardRoomAdminTableWithSid())
                 // 該当データがない場合はエラーを返す
                 ->firstOrFail();
 
