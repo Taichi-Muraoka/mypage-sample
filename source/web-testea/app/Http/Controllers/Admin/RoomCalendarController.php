@@ -1779,7 +1779,7 @@ class RoomCalendarController extends Controller
         $rules = array();
 
         // 独自バリデーション: リストのチェック 生徒ID
-        $validationStudentList =  function ($attribute, $value, $fail) use ($request) {
+        $validationStudentList =  function ($attribute, $value, $fail) {
 
             // 生徒リストを取得
             $list = $this->mdlGetStudentList();
