@@ -1076,6 +1076,8 @@ class SeasonMngStudentController extends Controller
             ->where('tutor_campuses.campus_cd', $campusCd)
             // 科目コードで絞り込み
             ->where('tutor_subjects.subject_cd', $subjectCd)
+            // 退職講師を除外
+            ->where('tutors.tutor_status', '<>', AppConst::CODE_MASTER_29_3)
             // 対象日・コマで授業不可予定の講師を除外
             ->whereNotIn('tutors.tutor_id', $exceptTutors)
             ->orderby('tutors.name_kana')
