@@ -13,7 +13,6 @@
     <p>個別指導授業の振替依頼を行います。振替日は第３希望まで指定できます。</p>
 
     {{-- hidden --}}
-    <x-input.hidden id="tutor_id" :editData=$editData />
     <x-input.hidden id="monthly_count" :editData=$editData />
     <x-input.hidden id="skip_count" :editData=$editData />
     @for ($i = 1; $i <= 3; $i++)

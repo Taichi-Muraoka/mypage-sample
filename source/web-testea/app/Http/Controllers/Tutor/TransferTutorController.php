@@ -241,7 +241,6 @@ class TransferTutorController extends Controller
         // 登録画面用テンプレートを使用
         return view('pages.tutor.transfer_tutor-new', [
             'editData' => [
-                'tutor_id' => $account_id,
                 'monthly_count' => 0,
                 'skip_count' => $skip_count
             ],
@@ -353,28 +352,43 @@ class TransferTutorController extends Controller
         $account = Auth::user();
         $account_id = $account->account_id;
 
+        // スケジュール情報から生徒IDの取得、かつパラメータの授業が自分の授業かチェックする
+        $schedule = Schedule::select('student_id')
+            ->where('schedule_id', '=', $request['schedule_id'])
+            // 自分のアカウントIDでガードを掛ける（tid）
+            ->where($this->guardTutorTableWithTid())
+            // 講師の担当生徒IDでガードを掛ける（sid）
+            ->where($this->guardTutorTableWithSid())
+            ->firstOrFail();
+
+        // 生徒IDがNULLの場合はエラー
+        if ($schedule->student_id == null) {
+            return $this->illegalResponseErr();
+        }
+        $studentId = $schedule->student_id;
+
         // 当月依頼回数取得(申請者種別=講師)
-        $countPref = $this->fncTranGetTransferRequestCount($account_id, $request['student_id'], AppConst::CODE_MASTER_53_2);
+        $countPref = $this->fncTranGetTransferRequestCount($account_id, $studentId, AppConst::CODE_MASTER_53_2);
 
         // 振替依頼のアラート回数 システムマスタより取得
         $skipCount = $this->fncTranGetTransferSkip();
 
         // トランザクション(例外時は自動的にロールバック)
-        DB::transaction(function () use ($request, $countPref, $skipCount) {
+        DB::transaction(function () use ($request, $account_id, $studentId, $countPref, $skipCount) {
 
             // 振替依頼情報
             $transApp = new TransferApplication;
 
             $form = $request->only(
                 'schedule_id',
-                'student_id',
-                'tutor_id',
                 'transfer_reason'
             );
 
             // 申請者種別：講師
             $transApp->apply_kind = AppConst::CODE_MASTER_53_2;
             $transApp->apply_date = now();
+            $transApp->student_id = $studentId;
+            $transApp->tutor_id = $account_id;
             $transApp->monthly_count = $countPref + 1;
             // 承認ステータス
             if (($countPref + 1) < $skipCount) {
@@ -754,7 +768,6 @@ class TransferTutorController extends Controller
         // その他を第二引数で指定する
         $rules += TransferApplication::fieldRules('schedule_id', ['required']);
         $rules += TransferApplication::fieldRules('student_id', ['required']);
-        $rules += TransferApplication::fieldRules('tutor_id', ['required']);
         $rules += TransferApplication::fieldRules('transfer_reason', ['required']);
         $rules += TransferApplication::fieldRules('comment');
 
@@ -774,6 +787,8 @@ class TransferTutorController extends Controller
         $schedules = Schedule::select(
             'target_date',
             'period_no',
+            'tutor_id',
+            'student_id',
             'booth_cd',
             'how_to_kind'
         )

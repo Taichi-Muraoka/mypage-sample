@@ -99,7 +99,6 @@ export default class AppClass extends PageBase {
                     this.selectGetItemPeriod2 = {};
                     this.selectGetItemPeriod3 = {};
                     this.form.campus_cd = "";
-                    this.form.tutor_id = "";
                     for (var i = 1; i <= 3; i++) {
                         // 希望日のフォームをクリア
                         this.form['preferred' + i + '_type'] = "1";
@@ -129,7 +128,6 @@ export default class AppClass extends PageBase {
                             // データをセット
                             this.selectGetItem = data;
                             this.form.campus_cd = data.campus_cd;
-                            this.form.tutor_id = data.tutor_id;
                         }
                     );
                 },

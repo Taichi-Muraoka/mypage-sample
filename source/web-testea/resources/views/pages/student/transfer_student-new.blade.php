@@ -79,9 +79,7 @@
 <x-input.textarea caption="振替理由／ご要望などはこちらへご記入ください" id="transfer_reason" :rules=$rules />
 
 {{-- hidden --}}
-<x-input.hidden id="student_id" :editData=$editData />
 <x-input.hidden id="campus_cd" :editData=$editData />
-<x-input.hidden id="tutor_id" :editData=$editData />
 @for ($i = 1; $i <= 3; $i++)
 <x-input.hidden id="preferred_date{{$i}}_period_bef" />
 @endfor

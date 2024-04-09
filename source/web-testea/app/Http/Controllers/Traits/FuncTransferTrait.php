@@ -1088,7 +1088,7 @@ trait FuncTransferTrait
                 $request['preferred_date1_calender'],
                 $periodTime['start_time'],
                 $periodTime['end_time'],
-                $request['student_id']
+                $schedules->student_id
             )) {
                 return $fail(Lang::get('validation.duplicate_student'));
             }
@@ -1099,7 +1099,7 @@ trait FuncTransferTrait
                     $request['preferred_date1_calender'],
                     $periodTime['start_time'],
                     $periodTime['end_time'],
-                    $request['tutor_id']
+                    $schedules->tutor_id
                 )) {
                     // 重複エラー
                     return $fail(Lang::get('validation.duplicate_tutor'));
@@ -1238,7 +1238,7 @@ trait FuncTransferTrait
                 $request['preferred_date2_calender'],
                 $periodTime['start_time'],
                 $periodTime['end_time'],
-                $request['student_id']
+                $schedules->student_id
             )) {
                 return $fail(Lang::get('validation.duplicate_student'));
             }
@@ -1249,7 +1249,7 @@ trait FuncTransferTrait
                     $request['preferred_date2_calender'],
                     $periodTime['start_time'],
                     $periodTime['end_time'],
-                    $request['tutor_id']
+                    $schedules->tutor_id
                 )) {
                     // 重複エラー
                     return $fail(Lang::get('validation.duplicate_tutor'));
@@ -1412,7 +1412,7 @@ trait FuncTransferTrait
                 $request['preferred_date3_calender'],
                 $periodTime['start_time'],
                 $periodTime['end_time'],
-                $request['student_id']
+                $schedules->student_id
             )) {
                 return $fail(Lang::get('validation.duplicate_student'));
             }
@@ -1423,7 +1423,7 @@ trait FuncTransferTrait
                     $request['preferred_date3_calender'],
                     $periodTime['start_time'],
                     $periodTime['end_time'],
-                    $request['tutor_id']
+                    $schedules->tutor_id
                 )) {
                     // 重複エラー
                     return $fail(Lang::get('validation.duplicate_tutor'));

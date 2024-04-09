@@ -105,10 +105,6 @@ class TransferStudentController extends Controller
      */
     public function new()
     {
-        // ログイン者の情報を取得する
-        $account = Auth::user();
-        $account_id = $account->account_id;
-
         // 振替対象日の範囲
         $targetPeriod = $this->dtGetTargetDateFromTo();
 
@@ -119,7 +115,7 @@ class TransferStudentController extends Controller
 
         // 登録画面用テンプレートを使用
         return view('pages.student.transfer_student-new', [
-            'editData' => ['student_id' => $account_id],
+            'editData' => null,
             'rules' => $this->rulesForInput(null),
             'lesson_list' => $lesson_list,
             'preferred_date' => null,
@@ -154,10 +150,7 @@ class TransferStudentController extends Controller
             'campus_cd' => $lesson->campus_cd,
             'campus_name' => $lesson->campus_name,
             'course_name' => $lesson->course_name,
-            'tutor_id' => $lesson->tutor_id,
             'tutor_name' => $lesson->tutor_name,
-            'student_id' => $lesson->student_id,
-            'student_name' => $lesson->student_name,
             'subject_name' => $lesson->subject_name,
             'preferred_from' => $targetPeriod['from_date'],
             'preferred_to' => $targetPeriod['to_date'],
@@ -202,25 +195,38 @@ class TransferStudentController extends Controller
         $account = Auth::user();
         $account_id = $account->account_id;
 
+        // スケジュール情報から講師IDの取得、かつパラメータの授業が自分の授業かチェックする
+        $schedule = Schedule::select('tutor_id')
+            ->where('schedule_id', '=', $request['schedule_id'])
+            // 自分のアカウントIDでガードを掛ける（sid）
+            ->where($this->guardStudentTableWithSid())
+            ->firstOrFail();
+
+        // 講師IDがNULLの場合はエラー
+        if ($schedule->tutor_id == null) {
+            return $this->illegalResponseErr();
+        }
+        $tutorId = $schedule->tutor_id;
+
         // 当月依頼回数取得(申請者種別=生徒)
-        $countPref = $this->fncTranGetTransferRequestCount($request['tutor_id'], $account_id, AppConst::CODE_MASTER_53_1);
+        $countPref = $this->fncTranGetTransferRequestCount($tutorId, $account_id, AppConst::CODE_MASTER_53_1);
 
         // トランザクション(例外時は自動的にロールバック)
-        DB::transaction(function () use ($request, $countPref) {
+        DB::transaction(function () use ($request, $account_id, $tutorId, $countPref) {
 
             // 振替依頼情報
             $transApp = new TransferApplication;
 
             $form = $request->only(
                 'schedule_id',
-                'student_id',
-                'tutor_id',
                 'transfer_reason'
             );
 
             // 申請者種別：生徒
             $transApp->apply_kind = AppConst::CODE_MASTER_53_1;
             $transApp->apply_date = now();
+            $transApp->student_id = $account_id;
+            $transApp->tutor_id = $tutorId;
             $transApp->monthly_count = $countPref + 1;
             // 承認ステータス：承認待ち
             $transApp->approval_status = AppConst::CODE_MASTER_3_1;
@@ -587,8 +593,6 @@ class TransferStudentController extends Controller
         // MEMO: テーブルの項目の定義は、モデルの方で定義する。(型とサイズ)
         // その他を第二引数で指定する
         $rules += TransferApplication::fieldRules('schedule_id', ['required']);
-        $rules += TransferApplication::fieldRules('student_id', ['required']);
-        $rules += TransferApplication::fieldRules('tutor_id', ['required']);
         $rules += TransferApplication::fieldRules('transfer_reason', ['required']);
         $rules += TransferApplication::fieldRules('comment');
 
