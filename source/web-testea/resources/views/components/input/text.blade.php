@@ -9,7 +9,7 @@
   editData: 編集用のデータ
 --}}
 @props(['caption' => '', 'id' => '', 'placeholder' => '', 'editData' => [], 'rules' => [], 'vShow' => '',
-'readOnly' => false])
+'readOnly' => false, 'autoCompleteOff' => true])
 
 {{-- バリデーションエラー時のスクロール先 --}}
 <span class="form-validation" data-id="{{ $id }}"></span>
@@ -45,6 +45,11 @@
     {{-- readonly --}}
     @if ($readOnly)
    readonly
+    @endif
+    {{-- 自動補完offにする --}}
+    {{-- デフォルトoffとした。個別にoffとする場合は@propsの方を'autoCompleteOff' => falseとする --}}
+    @if ($autoCompleteOff)
+    autocomplete="off"
     @endif
     >
 
