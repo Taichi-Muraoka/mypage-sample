@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class AddXFrameOptions
+class AddResponseOptions
 {
     /**
      * Handle an incoming request.
@@ -19,6 +19,8 @@ class AddXFrameOptions
         $response = $next($request);
         // レスポンスヘッダに X-Frame-Options を指定する
         $response->headers->set('X-Frame-Options', 'deny');
+        // レスポンスヘッダに X-Content-Type-Options を指定する
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
         return $response;
     }
 }
