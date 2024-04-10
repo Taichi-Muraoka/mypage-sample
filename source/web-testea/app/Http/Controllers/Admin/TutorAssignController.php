@@ -342,7 +342,6 @@ class TutorAssignController extends Controller
         $tutorPeriods = $query
             ->select(
                 'tutors.tutor_id',
-                'room_names.room_name as campus_name',
                 'tutors.name as tutor_name',
                 'tutors.tel',
                 'tutors.email',
@@ -360,10 +359,6 @@ class TutorAssignController extends Controller
             // 講師所属情報とJOIN
             ->sdJoin(TutorCampus::class, function ($join) {
                 $join->on('tutor_free_periods.tutor_id', 'tutor_campuses.tutor_id');
-            })
-            // 校舎名の取得
-            ->leftJoinSub($room, 'room_names', function ($join) {
-                $join->on('tutor_campuses.campus_cd', '=', 'room_names.code');
             })
             // コードマスターとJOIN（曜日）
             ->sdLeftJoin(CodeMaster::class, function ($join) {
@@ -419,6 +414,36 @@ class TutorAssignController extends Controller
             }
         }
         $tutorPeriods['subject_name'] = implode(', ', $arrSubjects);
+
+        // クエリを作成（講師所属校舎）
+        $query = TutorCampus::query();
+        // データを取得
+        $tutorCampuses = $query
+            ->select(
+                'tutor_campuses.campus_cd',
+                'room_names.room_name as campus_name',
+            )
+            // 講師情報とJOIN
+            ->sdJoin(Tutor::class, function ($join) {
+                $join->on('tutor_campuses.tutor_id', 'tutors.tutor_id');
+            })
+            // 校舎名の取得
+            ->leftJoinSub($room, 'room_names', function ($join) {
+                $join->on('tutor_campuses.campus_cd', '=', 'room_names.code');
+            })
+            // 対象の講師IDで絞り込み
+            ->where('tutors.tutor_id', '=', $tutorPeriods->tutor_id)
+            ->orderBy('tutor_campuses.campus_cd')
+            ->get();
+
+        // 取得データを配列->カンマ区切り文字列に変換しセット
+        $arrCampuses = [];
+        if (count($tutorCampuses) > 0) {
+            foreach ($tutorCampuses as $campus) {
+                array_push($arrCampuses, $campus['campus_name']);
+            }
+        }
+        $tutorPeriods['campus_name'] = implode(', ', $arrCampuses);
 
         return $tutorPeriods;
     }
