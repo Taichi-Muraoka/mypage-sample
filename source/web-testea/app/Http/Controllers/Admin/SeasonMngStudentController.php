@@ -532,6 +532,7 @@ class SeasonMngStudentController extends Controller
 
         // 期間中の授業情報取得
         // クエリを作成（スケジュール情報）
+        $studentId = $seasonStudent->student_id;
         $query = Schedule::query();
 
         // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
@@ -558,8 +559,24 @@ class SeasonMngStudentController extends Controller
             ->sdLeftJoin(MstCourse::class, function ($join) {
                 $join->on('schedules.course_cd', '=', 'mst_courses.course_cd');
             })
-            // 対象の生徒ID
-            ->where('schedules.student_id', $seasonStudent->student_id)
+            // 対象の生徒ID（スケジュール情報・受講生徒情報）
+            ->where(function ($orQuery) use ($studentId) {
+                $orQuery
+                    ->where(function ($subQuery) use ($studentId) {
+                        $subQuery
+                            ->where('schedules.student_id', $studentId)
+                            // スケジュール情報の出欠ステータス＝実施前・出席のみ
+                            ->where('schedules.absent_status', AppConst::CODE_MASTER_35_0);
+                    })
+                    ->orWhereExists(function ($subQuery) use ($studentId) {
+                        $subQuery->from('class_members')->whereColumn('class_members.schedule_id', 'schedules.schedule_id')
+                            ->where('class_members.student_id', $studentId)
+                            // 受講生徒情報の出欠ステータス＝実施前・出席のみ
+                            ->where('class_members.absent_status',  AppConst::CODE_MASTER_35_0)
+                            // delete_dt条件の追加
+                            ->whereNull('class_members.deleted_at');
+                    });
+            })
             // 対象の特別期間の日付範囲
             ->whereIn('schedules.target_date', array_column($dateList, 'dateYmd'))
             ->orderBy('schedules.target_date')
