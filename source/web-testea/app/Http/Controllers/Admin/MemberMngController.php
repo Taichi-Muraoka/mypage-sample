@@ -1500,13 +1500,8 @@ class MemberMngController extends Controller
         // 会員ステータス「退会済」以外 → 退会 への更新は不可（退会登録画面・日次バッチを経由させる）
         $rules += Student::fieldRules('stu_status', ['required', $validationStatusList, $validationStatusLead, $validationStatusRecessProspect, $validationStatusRecessExecution, $validationStatusChangeLeaveProspect, $validationStatusChangeLeaveExecution]);
 
-        // メールアドレス形式チェック 重複チェック
-        $rules += Student::fieldRules('email_stu', [$validationEmailStu]);
-        $rules += Student::fieldRules('email_par', [$validationEmailPar]);
-
         // 電話番号形式チェック 保護者電話番号は上記でバリデーション済みのため記載省略
         $rules += Student::fieldRules('tel_stu');
-
         // 外部サービス顧客ID形式チェック
         $rules += Student::fieldRules('lead_id');
         // ストレージURL 形式・字数ルール適用
@@ -1519,16 +1514,12 @@ class MemberMngController extends Controller
         if ($request && $request['stu_status'] != AppConst::CODE_MASTER_28_0) {
             $rules += Student::fieldRules('login_kind', ['required', $validationLoginKindList]);
             $rules += Student::fieldRules('enter_date', ['required']);
-
-            // ログインID種別=生徒なら生徒メールアドレス必須
-            if ($request && $request['login_kind'] == AppConst::CODE_MASTER_8_1) {
-                $rules += Student::fieldRules('email_stu', ['required']);
-            }
-            // ログインID種別=保護者なら保護者メールアドレス必須
-            if ($request && $request['login_kind'] == AppConst::CODE_MASTER_8_2) {
-                $rules += Student::fieldRules('email_par', ['required']);
-            }
         }
+        // MEMO:メールアドレス字数制限を初期表示時から有効にするためif外に記述
+        // ログインID種別=生徒なら生徒メールアドレス必須、重複チェック
+        $rules += Student::fieldRules('email_stu', ['required_if:login_kind,' . AppConst::CODE_MASTER_8_1, $validationEmailStu]);
+        // ログインID種別=保護者なら保護者メールアドレス必須、重複チェック
+        $rules += Student::fieldRules('email_par', ['required_if:login_kind,' . AppConst::CODE_MASTER_8_2, $validationEmailPar]);
 
         // 会員ステータス「休塾予定」「休塾」の場合
         // 必須：休塾開始日、休塾終了日
