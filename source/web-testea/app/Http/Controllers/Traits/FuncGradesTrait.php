@@ -768,8 +768,19 @@ trait FuncGradesTrait
             // 生徒の学年を取得する
             // 新規登録か編集かは成績IDの存在有無で判定する（新規登録時は成績IDは割り振られていない為）
             if (empty($request['score_id'])) {
+
+                if (AuthEx::isAdmin()) {
+                    // 管理者の場合、requestのstudent_idを利用する
+                    $sid = $request['student_id'];
+                }
+                if (AuthEx::isStudent()) {
+                    // 生徒の場合、ログイン情報から生徒IDを取得し利用する
+                    $account = Auth::user();
+                    $sid = $account->account_id;
+                }
+
                 // 新規登録時は画面表示時の学年
-                $grade = $this->getGradeAtRegist($request['student_id']);
+                $grade = $this->getGradeAtRegist($sid);
             } else {
                 // 編集時は成績登録時の学年
                 $grade = $this->getGradeAtEdit($request['score_id']);

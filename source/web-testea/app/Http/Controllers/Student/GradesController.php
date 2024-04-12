@@ -145,9 +145,8 @@ class GradesController extends Controller
         // 学期リストを取得
         $termList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_44);
 
-        // hidden用,route用データセット
+        // hidden用データセット
         $editData = [
-            "student_id" => $sid,
             "grade_cd" => $grade->grade_cd,
             // 模試を初期表示とする
             "exam_type" => AppConst::CODE_MASTER_43_0,

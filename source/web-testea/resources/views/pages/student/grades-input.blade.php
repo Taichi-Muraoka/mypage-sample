@@ -88,7 +88,6 @@
 
     {{-- hidden --}}
     <x-input.hidden id="score_id" :editData=$editData />
-    <x-input.hidden id="student_id" :editData=$editData />
     <x-input.hidden id="grade_cd" :editData=$editData />
     <x-input.hidden id="school_kind" :editData=$displayCountData />
     <x-input.hidden id="display_count" :editData=$displayCountData/>
