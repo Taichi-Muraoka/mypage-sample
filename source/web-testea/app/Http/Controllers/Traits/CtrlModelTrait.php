@@ -25,6 +25,7 @@ use App\Models\Schedule;
 use App\Models\ClassMember;
 use App\Models\Account;
 use App\Models\MstGrade;
+use App\Models\MstSchool;
 use App\Models\MstTutorGrade;
 use App\Models\YearlySchedule;
 use App\Models\MstSystem;
@@ -718,6 +719,23 @@ trait CtrlModelTrait
         // プルダウンリストを取得する
         return $query->select('grade_cd as code', 'name as value')
             ->orderby('grade_cd')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * 学校コードのリストを取得
+     * 管理者向け
+     *
+     * @return array
+     */
+    protected function mdlGetSchoolList()
+    {
+        $query = MstSchool::query();
+
+        // 学校コードリストを取得する
+        return $query->select('school_cd as code', 'name as value')
+            ->orderby('school_cd')
             ->get()
             ->keyBy('code');
     }
