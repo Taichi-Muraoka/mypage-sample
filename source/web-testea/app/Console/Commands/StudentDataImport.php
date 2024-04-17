@@ -233,12 +233,12 @@ class StudentDataImport extends Command
         $headers = [];
 
         // 「学年設定年度」用に現年度を取得
-        $currentYear = MstSystem::select('value_num')
+        $getCurrentYear = MstSystem::select('value_num')
             ->where('key_id', AppConst::SYSTEM_KEY_ID_1)
             ->whereNotNull('value_num')
             ->firstOrFail();
 
-        $currentYear = $currentYear->value_num;
+        $currentYear = $getCurrentYear->value_num;
 
         // CSV読み込み
         $file = $this->readCsv($path, "sjis");
