@@ -91,7 +91,6 @@ class StudentCampusDataImport extends Command
                 }
                 // CSVデータの読み込み
                 $datas = $this->readData($path);
-                $datas = $datas;
 
                 if (empty($datas)) {
                     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
