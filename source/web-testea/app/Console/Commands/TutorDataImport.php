@@ -92,7 +92,6 @@ class TutorDataImport extends Command
                 }
                 // CSVデータの読み込み
                 $datas = $this->readData($path);
-                $datas = $datas;
 
                 if (empty($datas)) {
                     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
@@ -137,7 +136,12 @@ class TutorDataImport extends Command
                     $account->password = Hash::make($data['email']);
                     $account->password_reset = AppConst::ACCOUNT_PWRESET_0;
                     $account->plan_type = AppConst::CODE_MASTER_10_0;
-                    $account->login_flg = AppConst::CODE_MASTER_9_0;
+                    // 退職済はログイン不可
+                    if ($data['tutor_status'] == AppConst::CODE_MASTER_29_3) {
+                        $account->login_flg = AppConst::CODE_MASTER_9_1;
+                    } else {
+                        $account->login_flg = AppConst::CODE_MASTER_9_0;
+                    }
                     $account->save();
 
                     $tidCount++;
