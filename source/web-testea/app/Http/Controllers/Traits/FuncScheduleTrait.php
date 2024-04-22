@@ -666,6 +666,37 @@ trait FuncScheduleTrait
     }
 
     /**
+     * 校舎・時間割区分・指定時刻から時限の取得（移行バッチ用）
+     *
+     * @param string $campusCd 校舎コード
+     * @param int $timetableKind 時間割区分
+     * @param int $time 指定時刻
+     * @return integer 時限
+     */
+    private function fncScheGetPeriodTimeForBatch($campusCd, $timetableKind, $time)
+    {
+        $query = MstTimetable::query();
+
+        $timeTable = $query
+            // 指定校舎で絞り込み
+            ->where('campus_cd', $campusCd)
+            // 時間割区分で絞り込み
+            ->where('timetable_kind', $timetableKind)
+            // 時間から対象時限を絞り込み
+            ->where('start_time', '<=', $time)
+            ->orderBy('period_no', 'desc')
+            ->first();
+
+        if (isset($timeTable)) {
+            $periodNo = $timeTable->period_no;
+        } else {
+            $periodNo = 1;
+        }
+
+        return $periodNo;
+    }
+
+    /**
      * 校舎・時間割区分・時限から時間割情報の取得
      *
      * @param string $campusCd 校舎コード
