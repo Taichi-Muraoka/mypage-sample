@@ -105,24 +105,32 @@ class TutorDataImport extends Command
             // トランザクション(例外時は自動的にロールバック)
             DB::transaction(function () use ($batch_id, $datas) {
 
+                // --------------
+                // 既存データ削除
+                // --------------
+                // 取込対象の講師IDを取得
+                $tidList = [];
+                foreach ($datas as $data) {
+                    array_push($tidList,  $data['tutor_id']);
+                }
+                $uniqueTidList = array_unique($tidList);
+
+                Tutor::whereIn('tutor_id', $uniqueTidList)
+                    ->forceDelete();
+
+                Account::whereIn('account_id', $uniqueTidList)
+                    ->where('account_type', AppConst::CODE_MASTER_7_2)
+                    ->forceDelete();
+
+                // --------------
+                // 新規データ作成
+                // --------------
                 // インポート講師数カウント用
                 $tidCount = 0;
 
                 // 1行ずつ取り込んだデータごとに処理
                 foreach ($datas as $data) {
-                    // --------------
-                    // 既存データ削除
-                    // --------------
-                    Tutor::where('tutor_id', $data['tutor_id'])
-                        ->forceDelete();
 
-                    Account::where('account_id', $data['tutor_id'])
-                        ->where('account_type', AppConst::CODE_MASTER_7_2)
-                        ->forceDelete();
-
-                    // --------------
-                    // 新規データ作成
-                    // --------------
                     // 講師情報の作成
                     $tutor = new Tutor;
                     $tutor->tutor_id = $data['tutor_id'];
@@ -389,6 +397,21 @@ class TutorDataImport extends Command
             }
         };
 
+        // 独自バリデーション: メールアドレス重複チェック
+        $validationEmail = function ($attribute, $value, $fail) use ($values) {
+
+            // 対象データを取得
+            $exists = Account::where('email', $values['email'])
+                // チェック中の講師IDを除外（バッチやり直しに対応）
+                ->where('account_id', '!=', $values['tutor_id'])
+                ->exists();
+
+            if ($exists) {
+                // 登録済みエラー
+                return $fail(Lang::get('validation.duplicate_email'));
+            }
+        };
+
         // 独自バリデーション: 「退職処理中」の場合、退職日はシステム日付より未来日
         $validationLeaveDateProspect = function ($attribute, $value, $fail) use ($values) {
             // 退職日の数値が現在日時の数値を下回っていないかチェック
@@ -420,7 +443,7 @@ class TutorDataImport extends Command
         $rules += Tutor::fieldRules('name', ['required']);
         $rules += Tutor::fieldRules('name_kana', ['required']);
         $rules += Tutor::fieldRules('tel', ['required']);
-        $rules += Tutor::fieldRules('email', ['required']);
+        $rules += Tutor::fieldRules('email', ['required', $validationEmail]);
         $rules += Tutor::fieldRules('address');
         // 日付はモデルではなく以下のように指定する（スラッシュ区切り・0埋め・0なし許容）
         $rules += ['birth_date' => ['required', 'date_format:Y/m/d,Y/n/j']];

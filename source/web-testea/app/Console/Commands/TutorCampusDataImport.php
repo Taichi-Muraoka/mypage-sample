@@ -15,6 +15,7 @@ use App\Http\Controllers\Traits\CtrlCsvTrait;
 use App\Http\Controllers\Traits\CtrlFileTrait;
 use App\Http\Controllers\Traits\CtrlModelTrait;
 use App\Exceptions\ReadDataValidateException;
+use App\Models\MstCampus;
 use App\Models\TutorCampus;
 
 /**
@@ -102,30 +103,28 @@ class TutorCampusDataImport extends Command
 
             // トランザクション(例外時は自動的にロールバック)
             DB::transaction(function () use ($batch_id, $datas) {
+                // --------------
+                // 既存データ削除
+                // --------------
+                // 取込対象の講師IDを取得
+                $tidList = [];
+                foreach ($datas as $data) {
+                    array_push($tidList,  $data['tutor_id']);
+                }
+                $uniqueTidList = array_unique($tidList);
 
+                TutorCampus::whereIn('tutor_id', $uniqueTidList)
+                    ->forceDelete();
+
+                // --------------
+                // 新規データ作成
+                // --------------
                 // インポート講師所属数カウント用
                 $tutorCampusCount = 0;
-                // 洗い替え後のデータか確認用
-                $AfterRefresh = [];
 
                 // 1行ずつ取り込んだデータごとに処理
                 foreach ($datas as $data) {
-                    // --------------
-                    // 既存データ削除
-                    // --------------
-                    // MEMO:洗い替え前の既存データを削除する
-                    $tid = $data['tutor_id'];
-                    if (!isset($AfterRefresh[$tid])) {
-                        TutorCampus::where('tutor_id', $data['tutor_id'])
-                            ->forceDelete();
 
-                        // 2ループ目以降に同講師IDのデータが消されないようチェック配列に追加する
-                        $AfterRefresh[$tid] = 1;
-                    }
-
-                    // --------------
-                    // 新規データ作成
-                    // --------------
                     // 講師所属情報の作成
                     $tutorCampus = new TutorCampus;
                     $tutorCampus->fill($data)->save();
@@ -268,12 +267,17 @@ class TutorCampusDataImport extends Command
             }
         };
 
+        // MEMO:バッチ処理ではログイン情報がないため、mdlGetRoomList()は使わない
         // 独自バリデーション: リストのチェック 校舎
-        $validationRoomList =  function ($attribute, $value, $fail) {
-            // 校舎リストを取得
-            $rooms = $this->mdlGetRoomList(false);
-            if (!isset($rooms[$value])) {
-                // 不正な値エラー
+        $validationRoomList =  function ($attribute, $value, $fail) use ($values) {
+
+            $exists = MstCampus::where('campus_cd', $values['campus_cd'])
+                // 非表示フラグの条件を付加
+                ->where('is_hidden', AppConst::CODE_MASTER_11_1)
+                ->exists();
+
+            // 存在しなければエラー
+            if (!$exists) {
                 return $fail(Lang::get('validation.invalid_input'));
             }
         };
