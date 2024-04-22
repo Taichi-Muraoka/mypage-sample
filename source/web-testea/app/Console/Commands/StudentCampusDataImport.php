@@ -15,6 +15,7 @@ use App\Http\Controllers\Traits\CtrlCsvTrait;
 use App\Http\Controllers\Traits\CtrlFileTrait;
 use App\Http\Controllers\Traits\CtrlModelTrait;
 use App\Exceptions\ReadDataValidateException;
+use App\Models\MstCampus;
 use App\Models\SeasonStudentRequest;
 use App\Models\StudentCampus;
 
@@ -103,33 +104,30 @@ class StudentCampusDataImport extends Command
 
             // トランザクション(例外時は自動的にロールバック)
             DB::transaction(function () use ($batch_id, $datas) {
+                // --------------
+                // 既存データ削除
+                // --------------
+                // 取込対象の生徒IDを取得
+                $sidList = [];
+                foreach ($datas as $data) {
+                    array_push($sidList,  $data['student_id']);
+                }
+                $uniqueSidList = array_unique($sidList);
 
+                StudentCampus::whereIn('student_id', $uniqueSidList)
+                    ->forceDelete();
+
+                SeasonStudentRequest::whereIn('student_id', $uniqueSidList)
+                    ->forceDelete();
+
+                // --------------
+                // 新規データ作成
+                // --------------
                 // インポート生徒所属数カウント用
                 $studentCampusCount = 0;
-                // 洗い替え後のデータか確認用
-                $AfterRefresh = [];
 
                 // 1行ずつ取り込んだデータごとに処理
                 foreach ($datas as $data) {
-                    // --------------
-                    // 既存データ削除
-                    // --------------
-                    // MEMO:洗い替え前の既存データを削除する
-                    $sid = $data['student_id'];
-                    if (!isset($AfterRefresh[$sid])) {
-                        StudentCampus::where('student_id', $data['student_id'])
-                            ->forceDelete();
-
-                        SeasonStudentRequest::where('student_id', $data['student_id'])
-                            ->forceDelete();
-
-                        // 2ループ目以降に同生徒IDのデータが消されないようチェック配列に追加する
-                        $AfterRefresh[$sid] = 1;
-                    }
-
-                    // --------------
-                    // 新規データ作成
-                    // --------------
                     // 生徒所属情報の作成
                     $studentCampus = new StudentCampus;
                     $studentCampus->fill($data)->save();
@@ -278,12 +276,17 @@ class StudentCampusDataImport extends Command
             }
         };
 
+        // MEMO:バッチ処理ではログイン情報がないため、mdlGetRoomList()は使わない
         // 独自バリデーション: リストのチェック 校舎
-        $validationRoomList =  function ($attribute, $value, $fail) {
-            // 校舎リストを取得
-            $rooms = $this->mdlGetRoomList(false);
-            if (!isset($rooms[$value])) {
-                // 不正な値エラー
+        $validationRoomList =  function ($attribute, $value, $fail) use ($values) {
+
+            $exists = MstCampus::where('campus_cd', $values['campus_cd'])
+                // 非表示フラグの条件を付加
+                ->where('is_hidden', AppConst::CODE_MASTER_11_1)
+                ->exists();
+
+            // 存在しなければエラー
+            if (!$exists) {
                 return $fail(Lang::get('validation.invalid_input'));
             }
         };

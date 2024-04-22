@@ -105,24 +105,31 @@ class StudentDataImport extends Command
             // トランザクション(例外時は自動的にロールバック)
             DB::transaction(function () use ($batch_id, $datas) {
 
+                // --------------
+                // 既存データ削除
+                // --------------
+                // 取込対象の生徒IDを取得
+                $sidList = [];
+                foreach ($datas as $data) {
+                    array_push($sidList,  $data['student_id']);
+                }
+                $uniqueSidList = array_unique($sidList);
+
+                Student::whereIn('student_id', $uniqueSidList)
+                    ->forceDelete();
+
+                Account::whereIn('account_id', $uniqueSidList)
+                    ->where('account_type', AppConst::CODE_MASTER_7_1)
+                    ->forceDelete();
+
+                // --------------
+                // 新規データ作成
+                // --------------
                 // インポート生徒数カウント用
                 $sidCount = 0;
 
                 // 1行ずつ取り込んだデータごとに処理
                 foreach ($datas as $data) {
-                    // --------------
-                    // 既存データ削除
-                    // --------------
-                    Student::where('student_id', $data['student_id'])
-                        ->forceDelete();
-
-                    Account::where('account_id', $data['student_id'])
-                        ->where('account_type', AppConst::CODE_MASTER_7_1)
-                        ->forceDelete();
-
-                    // --------------
-                    // 新規データ作成
-                    // --------------
                     // 生徒情報の作成
                     $student = new Student;
                     $student->student_id = $data['student_id'];
@@ -159,7 +166,7 @@ class StudentDataImport extends Command
                         $account->save();
                     }
 
-                    $sidCount ++;
+                    $sidCount++;
                 }
 
                 // バッチ管理テーブルのレコードを更新：正常終了
@@ -338,25 +345,22 @@ class StudentDataImport extends Command
                 $dupSidCheck[$sid] = 1;
             }
 
-            // ログイン用生徒メールアドレスの重複チェック
-            if ($values['login_kind'] == AppConst::CODE_MASTER_8_1) {
-                $emailStu = $values['email_stu'];
-                if (isset($dupEmailStuCheck[$emailStu])) {
-                    throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                        . "ログイン用生徒メールアドレス重複( 生徒メールアドレス=" . $values['email_stu'] . " )");
-                } else {
-                    $dupEmailStuCheck[$emailStu] = 1;
-                }
-            }
+            // ログイン用メールアドレスの重複チェック
+            // MEMO:見込客はスキップ
+            if ($values['stu_status'] != AppConst::CODE_MASTER_28_0) {
 
-            // ログイン用保護者メールアドレスの重複チェック
-            if ($values['login_kind'] == AppConst::CODE_MASTER_8_2) {
-                $emailPar = $values['email_par'];
-                if (isset($dupEmailParCheck[$emailPar])) {
+                $email = null;
+                if ($values['login_kind'] == AppConst::CODE_MASTER_8_1) {
+                    $email = $values['email_stu'];
+                } elseif ($values['login_kind'] == AppConst::CODE_MASTER_8_2) {
+                    $email = $values['email_par'];
+                }
+
+                if (isset($dupEmailCheck[$email])) {
                     throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                        . "ログイン用保護者メールアドレス重複( 保護者メールアドレス=" . $values['email_par'] . " )");
+                        . "ログイン用メールアドレス重複( メールアドレス=" . $email . " )");
                 } else {
-                    $dupEmailParCheck[$emailPar] = 1;
+                    $dupEmailCheck[$email] = 1;
                 }
             }
 
@@ -467,6 +471,45 @@ class StudentDataImport extends Command
             }
         };
 
+        // 独自バリデーション: メールアドレス重複チェック ログインID種別=生徒の場合
+        $validationEmailStu = function ($attribute, $value, $fail) use ($values) {
+            // ログインID種別が生徒でない場合、または、見込客の場合は重複チェックしない
+            if ($values['login_kind'] != AppConst::CODE_MASTER_8_1 || $values['stu_status'] == AppConst::CODE_MASTER_28_0) {
+                return;
+            }
+
+            // 対象データを取得
+            $exists = Account::where('email', $values['email_stu'])
+                // チェック中の生徒IDを除外（バッチやり直しに対応）
+                ->where('account_id', '!=', $values['student_id'])
+                ->exists();
+
+
+            if ($exists) {
+                // 登録済みエラー
+                return $fail(Lang::get('validation.duplicate_email'));
+            }
+        };
+
+        // 独自バリデーション: メールアドレス重複チェック ログインID種別=保護者の場合
+        $validationEmailPar = function ($attribute, $value, $fail) use ($values) {
+            // ログインID種別が保護者でない場合、または、見込客の場合は重複チェックしない
+            if ($values['login_kind'] != AppConst::CODE_MASTER_8_2 || $values['stu_status'] == AppConst::CODE_MASTER_28_0) {
+                return;
+            }
+
+            // 対象データを取得
+            $exists = Account::where('email', $values['email_par'])
+                // チェック中の生徒IDを除外（バッチやり直しに対応）
+                ->where('account_id', '!=', $values['student_id'])
+                ->exists();
+
+            if ($exists) {
+                // 登録済みエラー
+                return $fail(Lang::get('validation.duplicate_email'));
+            }
+        };
+
         // 独自バリデーション: 会員ステータス「休塾予定」の場合、休塾開始日はシステム日付より未来日
         $validationRecessStartDateCaseProspect = function ($attribute, $value, $fail) use ($values) {
             if ($values['stu_status'] == AppConst::CODE_MASTER_28_2) {
@@ -548,8 +591,8 @@ class StudentDataImport extends Command
             $rules += Student::fieldRules('email_stu');
             $rules += Student::fieldRules('email_par');
         } else {
-            $rules += Student::fieldRules('email_stu', ['required_if:login_kind,' . AppConst::CODE_MASTER_8_1]);
-            $rules += Student::fieldRules('email_par', ['required_if:login_kind,' . AppConst::CODE_MASTER_8_2]);
+            $rules += Student::fieldRules('email_stu', ['required_if:login_kind,' . AppConst::CODE_MASTER_8_1, $validationEmailStu]);
+            $rules += Student::fieldRules('email_par', ['required_if:login_kind,' . AppConst::CODE_MASTER_8_2, $validationEmailPar]);
         }
 
         $rules += Student::fieldRules('stu_status', ['required', $validationStatusList]);
