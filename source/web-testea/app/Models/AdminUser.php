@@ -100,6 +100,7 @@ class AdminUser extends Model
     protected static function getFieldRules()
     {
         static $_fieldRules = [
+            'adm_id' => ['integer', 'min:0', 'max:9999999999'],
             'name' => ['string', 'max:50'],
             'campus_cd' => ['string', 'max:2', 'digits:2']
         ];
