@@ -96,8 +96,19 @@
     <x-input.text caption="ストレージURL" id="storage_link" :rules=$rules :editData=$editData/>
     <x-input.textarea id="memo" caption="メモ" :rules=$rules :editData=$editData />
 
+    {{-- 登録時に注意事項表示 --}}
+    @if (request()->routeIs('member_mng-new'))
+    <x-bs.callout title="登録の際の注意事項" type="warning">
+        会員ステータスを「在籍」で新規登録した場合、ログインID種別で指定したメールアドレスへ、マイページのログイン案内のメールが送信されます。
+    </x-bs.callout>
+    @endif
+
     {{-- 編集時に注意事項表示 --}}
     @if (request()->routeIs('member_mng-edit'))
+    <x-bs.callout title="登録の際の注意事項" type="warning">
+        会員ステータスが「見込客」「退会済」の生徒を「在籍」に変更した場合、ログインID種別で指定したメールアドレスへ、マイページのログイン案内のメールが送信されます。
+    </x-bs.callout>
+
     <x-bs.callout title="休塾、退会の注意事項" type="danger">
         会員ステータスを「休塾予定」とした場合、または、休塾期間が変更された場合には、登録された休塾期間の生徒スケジュールが削除されます。<br>
         退会日が変更された場合には、退会日以降の生徒スケジュールが削除されます。<br>

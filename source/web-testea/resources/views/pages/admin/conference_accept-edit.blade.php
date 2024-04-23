@@ -69,7 +69,8 @@
     <x-input.hidden id="conference_id" :editData=$editData/>
 
     <x-bs.callout title="登録の際の注意事項" type="warning">
-        登録ボタンを押下すると、指定した日時で面談スケジュールが登録されます。
+        登録ボタンを押下すると、指定した日時で面談スケジュールが登録されます。<br>
+        生徒へお知らせの通知とメールが送信されます。
     </x-bs.callout>
 
     {{-- フッター --}}

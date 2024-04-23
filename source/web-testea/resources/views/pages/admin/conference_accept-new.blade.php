@@ -41,6 +41,11 @@
 
     <x-input.textarea caption="管理者メモ" id="memo" :rules=$rules :editData=$editData />
 
+    <x-bs.callout title="登録の際の注意事項" type="warning">
+        登録ボタンを押下すると、指定した日時で面談スケジュールが登録されます。<br>
+        生徒を選択した場合、生徒へお知らせの通知とメールが送信されます。
+    </x-bs.callout>
+
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-between">

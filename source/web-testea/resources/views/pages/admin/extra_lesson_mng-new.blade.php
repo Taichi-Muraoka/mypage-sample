@@ -26,8 +26,8 @@
 
     <x-input.date-picker caption="授業日" id="target_date" :editData=$editData />
 
-    <x-input.select id="period_no" caption="時限" :select2=true onChange="selectChangeGetTimetable"
-        :editData=$editData :select2Search=false :blank=true >
+    <x-input.select id="period_no" caption="時限" :select2=true onChange="selectChangeGetTimetable" :editData=$editData
+        :select2Search=false :blank=true>
         <option v-for="item in selectGetItemDate.selectItems" :value="item.code">
             @{{ item.value }}
         </option>
@@ -42,8 +42,8 @@
     <x-input.select id="course_cd" caption="コース" :select2=true :mastrData=$courses :editData=$editData
         :select2Search=false :blank=true />
 
-    <x-input.select id="tutor_id" caption="講師" :select2=true :rules=$rules :mastrData=$tutors
-        :editData=$editData :select2Search=true :blank=true />
+    <x-input.select id="tutor_id" caption="講師" :select2=true :rules=$rules :mastrData=$tutors :editData=$editData
+        :select2Search=true :blank=true />
 
     <x-input.select caption="教科" id="subject_cd" :select2=true :mastrData=$subjects :editData="$editData"
         :select2Search=true :blank=true />
@@ -52,6 +52,10 @@
         :editData="$editData" :select2Search=false :blank=true />
 
     <x-input.textarea id="memo" caption="管理者用メモ" :rules=$rules :editData=$editData />
+
+    <x-bs.callout title="登録の際の注意事項" type="warning">
+        対象の生徒・講師へお知らせの通知とメールが送信されます。
+    </x-bs.callout>
 
     {{-- フッター --}}
     <x-slot name="footer">
