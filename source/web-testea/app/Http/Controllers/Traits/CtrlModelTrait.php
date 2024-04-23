@@ -25,9 +25,6 @@ use App\Models\Schedule;
 use App\Models\ClassMember;
 use App\Models\Account;
 use App\Models\MstGrade;
-//===========マージ時削除===============
-use App\Models\MstSchool;
-//===========マージ時削除===============
 use App\Models\MstTutorGrade;
 use App\Models\YearlySchedule;
 use App\Models\MstSystem;
@@ -39,24 +36,6 @@ use Carbon\Carbon;
  */
 trait CtrlModelTrait
 {
-    //===========マージ時削除===============
-    /**
-     * 学校コードのリストを取得
-     * 管理者向け
-     *
-     * @return array
-     */
-    protected function mdlGetSchoolList()
-    {
-        $query = MstSchool::query();
-
-        // 学校コードリストを取得する
-        return $query->select('school_cd as code', 'name as value')
-            ->orderby('school_cd')
-            ->get()
-            ->keyBy('code');
-    }
-    //===========マージ時削除===============
 
     //==========================
     // 関数名を区別するために
