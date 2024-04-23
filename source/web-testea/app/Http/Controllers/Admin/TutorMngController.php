@@ -950,7 +950,13 @@ class TutorMngController extends Controller
 
             // 変更時は自分のキー以外を検索
             if (filled($request['tutor_id'])) {
-                $email->where('account_id', '!=', $request['tutor_id']);
+                $email->where(function ($query) use ($request) {
+                    // アカウント種類=講師 かつ 自分のID以外を検索
+                    $query->where('account_type', AppConst::CODE_MASTER_7_2)
+                        ->where('account_id', '!=', $request['tutor_id'])
+                        // または、アカウント種類=講師以外で検索
+                        ->orWhere('account_type', '!=', AppConst::CODE_MASTER_7_2);
+                });
             }
 
             $exists = $email->exists();
