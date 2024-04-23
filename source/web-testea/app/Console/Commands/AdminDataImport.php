@@ -17,6 +17,8 @@ use App\Http\Controllers\Traits\CtrlFileTrait;
 use App\Http\Controllers\Traits\CtrlModelTrait;
 use App\Exceptions\ReadDataValidateException;
 use App\Models\AdminUser;
+use App\Models\CodeMaster;
+use App\Models\MstCampus;
 
 /**
  * 管理者情報取込処理（データ移行用） - バッチ処理
@@ -211,7 +213,7 @@ class AdminDataImport extends Command
             $values = array_combine($headers, $line);
 
             // [バリデーション] データ行の値のチェック
-            $validator = Validator::make($values, $this->rulesForInput());
+            $validator = Validator::make($values, $this->rulesForInput($values));
             if ($validator->fails()) {
                 $errCol = "";
                 if ($validator->errors()->has('adm_id')) {
@@ -267,22 +269,53 @@ class AdminDataImport extends Command
      *
      * @return array ルール
      */
-    private function rulesForInput()
+    private function rulesForInput(array $values)
     {
         $rules = array();
 
+        // MEMO:バッチ処理ではログイン情報がないため、mdlGetRoomList()は使わない
         // 独自バリデーション: リストのチェック 校舎
-        $validationRoomList =  function ($attribute, $value, $fail) {
-            // 校舎リストを取得
-            $rooms = $this->mdlGetRoomList(true);
-            if (!isset($rooms[$value])) {
-                // 不正な値エラー
+        $validationRoomList =  function ($attribute, $value, $fail) use ($values) {
+
+            // コードマスタより「本部(00)」の校舎コードを取得
+            $queryHonbu = CodeMaster::select('gen_item1')
+                ->where('data_type', AppConst::CODE_MASTER_6);
+
+            $exists = MstCampus::where('campus_cd', $values['campus_cd'])
+                // 非表示フラグの条件を付加
+                ->where('is_hidden', AppConst::CODE_MASTER_11_1)
+                // UNIONで本部を加える
+                ->union($queryHonbu)
+                ->exists();
+
+            // 存在しなければエラー
+            if (!$exists) {
                 return $fail(Lang::get('validation.invalid_input'));
             }
         };
 
+        // 独自バリデーション: メールアドレス重複チェック
+        $validationEmail = function ($attribute, $value, $fail) use ($values) {
+
+            // 対象データを取得
+            $exists = Account::where('email', $values['email'])
+                ->where(function ($query) use ($values) {
+                    // 管理者のチェック中ID以外を検索
+                    $query->where('account_type', AppConst::CODE_MASTER_7_3)
+                        ->where('account_id', '!=', $values['adm_id'])
+                        // または、生徒・講師で検索
+                        ->orWhere('account_type', '!=', AppConst::CODE_MASTER_7_3);
+                })
+                ->exists();
+
+            if ($exists) {
+                // 登録済みエラー
+                return $fail(Lang::get('validation.duplicate_email'));
+            }
+        };
+
         // emailルールはAccountより適用
-        $rules += Account::fieldRules('email', ['required']);
+        $rules += Account::fieldRules('email', ['required', $validationEmail]);
         $rules += AdminUser::fieldRules('adm_id', ['required']);
         $rules += AdminUser::fieldRules('name', ['required']);
         $rules += AdminUser::fieldRules('campus_cd', ['required', $validationRoomList]);
