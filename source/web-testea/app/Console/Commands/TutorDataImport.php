@@ -402,8 +402,13 @@ class TutorDataImport extends Command
 
             // 対象データを取得
             $exists = Account::where('email', $values['email'])
-                // チェック中の講師IDを除外（バッチやり直しに対応）
-                ->where('account_id', '!=', $values['tutor_id'])
+                ->where(function ($query) use ($values) {
+                    // アカウント種類=講師 かつ チェック中ID以外を検索
+                    $query->where('account_type', AppConst::CODE_MASTER_7_2)
+                        ->where('account_id', '!=', $values['tutor_id'])
+                        // または、アカウント種類=講師以外で検索
+                        ->orWhere('account_type', '!=', AppConst::CODE_MASTER_7_2);
+                })
                 ->exists();
 
             if ($exists) {
