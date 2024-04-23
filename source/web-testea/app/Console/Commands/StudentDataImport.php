@@ -480,8 +480,13 @@ class StudentDataImport extends Command
 
             // 対象データを取得
             $exists = Account::where('email', $values['email_stu'])
-                // チェック中の生徒IDを除外（バッチやり直しに対応）
-                ->where('account_id', '!=', $values['student_id'])
+                ->where(function ($query) use ($values) {
+                    // アカウント種類=生徒 かつ チェック中ID以外を検索
+                    $query->where('account_type', AppConst::CODE_MASTER_7_1)
+                        ->where('account_id', '!=', $values['student_id'])
+                        // または、アカウント種類=生徒以外で検索
+                        ->orWhere('account_type', '!=', AppConst::CODE_MASTER_7_1);
+                })
                 ->exists();
 
 
@@ -500,8 +505,13 @@ class StudentDataImport extends Command
 
             // 対象データを取得
             $exists = Account::where('email', $values['email_par'])
-                // チェック中の生徒IDを除外（バッチやり直しに対応）
-                ->where('account_id', '!=', $values['student_id'])
+                ->where(function ($query) use ($values) {
+                    // アカウント種類=生徒 かつ チェック中ID以外を検索
+                    $query->where('account_type', AppConst::CODE_MASTER_7_1)
+                        ->where('account_id', '!=', $values['student_id'])
+                        // または、アカウント種類=生徒以外で検索
+                        ->orWhere('account_type', '!=', AppConst::CODE_MASTER_7_1);
+                })
                 ->exists();
 
             if ($exists) {
