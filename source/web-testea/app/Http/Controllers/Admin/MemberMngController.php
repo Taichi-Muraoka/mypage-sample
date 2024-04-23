@@ -1313,7 +1313,13 @@ class MemberMngController extends Controller
 
             // 変更時は自分のキー以外を検索
             if (filled($request['student_id'])) {
-                $studentEmail->where('account_id', '!=', $request['student_id']);
+                $studentEmail->where(function ($query) use ($request) {
+                    // アカウント種類=生徒 かつ 自分のID以外を検索
+                    $query->where('account_type', AppConst::CODE_MASTER_7_1)
+                        ->where('account_id', '!=', $request['student_id'])
+                        // または、アカウント種類=生徒以外で検索
+                        ->orWhere('account_type', '!=', AppConst::CODE_MASTER_7_1);
+                });
             }
 
             $exists = $studentEmail->exists();
@@ -1336,7 +1342,13 @@ class MemberMngController extends Controller
 
             // 変更時は自分のキー以外を検索
             if (filled($request['student_id'])) {
-                $parEmail->where('account_id', '!=', $request['student_id']);
+                $parEmail->where(function ($query) use ($request) {
+                    // アカウント種類=生徒 かつ 自分のID以外を検索
+                    $query->where('account_type', AppConst::CODE_MASTER_7_1)
+                        ->where('account_id', '!=', $request['student_id'])
+                        // または、アカウント種類=生徒以外で検索
+                        ->orWhere('account_type', '!=', AppConst::CODE_MASTER_7_1);
+                });
             }
 
             $exists = $parEmail->exists();
