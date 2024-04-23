@@ -37,6 +37,10 @@
 
     <x-input.text caption="認定理由" id="reason" :rules=$rules :editData=$editData/>
 
+    <x-bs.callout title="登録の際の注意事項" type="warning">
+        登録すると生徒へお知らせが通知されます。
+    </x-bs.callout>
+
     {{-- hidden --}}
     <x-input.hidden id="badge_id" :editData=$editData />
     <x-input.hidden id="student_id" :editData=$editData />

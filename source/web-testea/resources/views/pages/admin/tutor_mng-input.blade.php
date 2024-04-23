@@ -74,6 +74,20 @@
 
     <x-input.textarea id="memo" caption="メモ" :rules=$rules :editData=$editData />
 
+    {{-- 登録時に注意事項表示 --}}
+    @if (request()->routeIs('tutor_mng-new'))
+    <x-bs.callout title="登録の際の注意事項" type="warning">
+        講師の新規登録時、メールアドレスへ、マイページのログイン案内のメールが送信されます。
+    </x-bs.callout>
+    @endif
+
+    {{-- 編集時に注意事項表示 --}}
+    @if (request()->routeIs('tutor_mng-edit'))
+    <x-bs.callout title="登録の際の注意事項" type="warning">
+        講師ステータスが「退職済」の講師を「在籍」に変更した場合、メールアドレスへ、マイページのログイン案内のメールが送信されます。
+    </x-bs.callout>
+    @endif
+
     {{-- hidden --}}
     <x-input.hidden id="tutor_id" :editData=$editData />
 
