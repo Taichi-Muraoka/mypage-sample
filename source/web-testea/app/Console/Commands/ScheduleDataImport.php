@@ -262,7 +262,16 @@ class ScheduleDataImport extends Command
         $schedule['start_time'] = $start->toTimeString();
         $schedule['end_time'] = $end->toTimeString();
         $schedule['minutes'] = $minutes;
-        $schedule['booth_cd'] = $data['classroom'];
+        // ブースコードの設定
+        if ($data['classroom'] >= self::POS_BOOTH_TRAN_MIN) {
+            // 旧ブースが未振替用の場合
+            // ブースマスタから対象校舎のブースを取得し、先頭ブースを設定
+            $arrMstBooths = $this->fncScheGetBoothFromMst($data['school_code'], $data['how_to']);
+            $schedule['booth_cd'] = $arrMstBooths[0];
+        } else {
+            // 上記以外の場合、元データのブースコードを設定する
+            $schedule['booth_cd'] = $data['classroom'];
+        }
         $schedule['course_cd'] = $data['course'];
         $schedule['tutor_id'] = $data['teaID'] == 0 ? null : $data['teaID'];
         if ($data['course_kind'] != AppConst::CODE_MASTER_42_2) {
@@ -330,7 +339,7 @@ class ScheduleDataImport extends Command
     }
 
     /**
-     * 受講生徒データ登録（１対他授業のみ）
+     * 受講生徒データ登録（１対多授業のみ）
      *
      * @param $scheduleId
      * @param $members
@@ -384,7 +393,7 @@ class ScheduleDataImport extends Command
     }
 
     /**
-     * レギュラー受講生徒データ登録（１対他授業のみ）
+     * レギュラー受講生徒データ登録（１対多授業のみ）
      *
      * @param $regularId
      * @param $members
@@ -524,7 +533,7 @@ class ScheduleDataImport extends Command
                     continue;
                 }
             } else if ($kind == self::KIND_SCHE_D) {
-                // スケジュールデータ（１対他授業）
+                // スケジュールデータ（１対多授業）
                 if ($start < '1971-01-01' || $values['course_kind'] != AppConst::CODE_MASTER_42_2) {
                     Log::info("SKIP ID=" . $values['ID']);
                     continue;
@@ -539,7 +548,7 @@ class ScheduleDataImport extends Command
                     continue;
                 }
             } else if ($kind == self::KIND_REGU_D) {
-                // レギュラーデータ（１対他授業）
+                // レギュラーデータ（１対多授業）
                 if ($start >= '1971-01-01' || $values['course_kind'] != AppConst::CODE_MASTER_42_2) {
                     Log::info("SKIP ID=" . $values['ID']);
                     continue;
