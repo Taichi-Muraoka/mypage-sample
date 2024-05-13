@@ -221,6 +221,9 @@ class StudentCampusDataImport extends Command
             // headerをもとに、値をセットしたオブジェクトを生成
             $values = array_combine($headers, $line);
 
+            // 生徒IDの0埋め除去
+            $values['student_id'] = (int)$values['student_id'];
+
             // [バリデーション] データ行の値のチェック
             $validator = Validator::make($values, $this->rulesForInput($values));
             if ($validator->fails()) {

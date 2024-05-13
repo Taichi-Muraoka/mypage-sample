@@ -256,6 +256,9 @@ class TutorDataImport extends Command
             // headerをもとに、値をセットしたオブジェクトを生成
             $values = array_combine($headers, $line);
 
+            // 講師IDの0埋め除去
+            $values['tutor_id'] = (int)$values['tutor_id'];
+
             // [バリデーション] データ行の値のチェック
             $validator = Validator::make($values, $this->rulesForInput($values));
             if ($validator->fails()) {
@@ -332,6 +335,33 @@ class TutorDataImport extends Command
             // 学年設定年度が空白の場合は今年度を設定
             if ($values['grade_year'] === '') {
                 $values['grade_year'] = $currentYear;
+            }
+
+            // 生年月日が空白の場合は学年コードを基に値を設定
+            if ($values['birth_date'] === '') {
+
+                // 大学１～４年は19～22才、それ以外は23才固定にする
+                switch ($values['grade_cd']) {
+                    case 1:
+                        $age = 19;
+                        break;
+                    case 2:
+                        $age = 20;
+                        break;
+                    case 3:
+                        $age = 21;
+                        break;
+                    case 4:
+                        $age = 22;
+                        break;
+                    default:
+                        $age = 23;
+                        break;
+                }
+
+                $birthYear = $currentYear - $age;
+
+                $values['birth_date'] = $birthYear . '/04/02';
             }
 
             foreach ($values as $key => $val) {
@@ -451,7 +481,7 @@ class TutorDataImport extends Command
         $rules += Tutor::fieldRules('email', ['required', $validationEmail]);
         $rules += Tutor::fieldRules('address');
         // 日付はモデルではなく以下のように指定する（スラッシュ区切り・0埋め・0なし許容）
-        $rules += ['birth_date' => ['required', 'date_format:Y/m/d,Y/n/j']];
+        $rules += ['birth_date' => ['date_format:Y/m/d,Y/n/j']];
         $rules += Tutor::fieldRules('gender_cd', ['required', $validationGenderList]);
         $rules += Tutor::fieldRules('grade_cd', ['required', $validationGradeList]);
         $rules += Tutor::fieldRules('grade_year');
