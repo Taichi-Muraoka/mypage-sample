@@ -116,8 +116,6 @@ class InvoiceImportController extends Controller
 
         // dateの形式のバリデーションと変換
         $idDate = $this->fmYmToDate($invoiceDate);
-        // 請求年月の月末を取得
-        $idEnd = date('Y/m/t', strtotime($idDate));
 
         // 翌月の月初を取得
         $nextMonth = date('Y-m-d', strtotime('first day of next month '));
@@ -131,8 +129,6 @@ class InvoiceImportController extends Controller
         $invoice_import = InvoiceImport::select(
             'invoice_date',
             'bill_date',
-            'start_date',
-            'end_date',
             'term_text1',
             'term_text2',
         )
@@ -152,18 +148,6 @@ class InvoiceImportController extends Controller
             $editData['bill_date'] = $invoice_import->bill_date;
         } else {
             $editData['bill_date'] = $idDate;
-        }
-
-        if ($invoice_import->start_date != null) {
-            $editData['start_date'] = $invoice_import->start_date;
-        } else {
-            $editData['start_date'] = $idDate;
-        }
-
-        if ($invoice_import->end_date != null) {
-            $editData['end_date'] = $invoice_import->end_date;
-        } else {
-            $editData['end_date'] = $idEnd;
         }
 
         if ($invoice_import->term_text1 != null) {
@@ -264,7 +248,7 @@ class InvoiceImportController extends Controller
                     $invoice->invoice_date = $idDate;
                     $invoice->campus_cd = $data['校舎コード'];
                     $invoice->pay_type = $data['支払方法'];
-                    $invoice->total_amount = $data['請求額'];
+                    $invoice->total_amount = (int) str_replace(',', '', $data['請求額']);
                     // 保存
                     $invoice->save();
 
@@ -285,9 +269,9 @@ class InvoiceImportController extends Controller
                         $detail['invoice_id'] = $invoice->invoice_id;
                         $detail['invoice_seq'] = $seq;
                         $detail['description'] = $data['摘要' . $i];
-                        $detail['unit_price'] = $data['コマ単価' . $i];
+                        $detail['unit_price'] = (int) str_replace(',', '', $data['コマ単価' . $i]);;
                         $detail['times'] = $data['コマ数' . $i];
-                        $detail['amount'] = $data['小計' . $i];
+                        $detail['amount'] = (int) str_replace(',', '', $data['小計' . $i]);;
 
                         foreach ($detail as $key => $val) {
                             // 空白はnullに変換 金額などは数値型のため
@@ -315,8 +299,6 @@ class InvoiceImportController extends Controller
                 // 取込画面で入力した内容をセット
                 $salaryImport->issue_date = $request['issue_date'];
                 $salaryImport->bill_date = $request['bill_date'];
-                $salaryImport->start_date = $request['start_date'];
-                $salaryImport->end_date = $request['end_date'];
                 $salaryImport->term_text1 = $request['term_text1'];
                 $salaryImport->term_text2 = $request['term_text2'];
                 $salaryImport->import_state = AppConst::CODE_MASTER_20_1;
@@ -443,16 +425,16 @@ class InvoiceImportController extends Controller
                 '名' => 'string|max:50',
                 '支払方法' => 'integer|required',
                 '校舎コード' => 'string|max:2|digits:2|required',
-                '請求額' => 'integer|max:99999999|required',
+                '請求額' => 'vdPrice|vdPriceDigits|required',
             ];
 
             // detailsの各項目のバリデーションルールを追加
             for ($i = 0; $i < 20; $i++) {
                 $rules += [
                     $details_lists[$i]['摘要' . $i] => 'string|max:50',
-                    $details_lists[$i]['コマ単価' . $i] => 'integer|max:99999999',
+                    $details_lists[$i]['コマ単価' . $i] => 'vdPrice|vdPriceDigits',
                     $details_lists[$i]['コマ数' . $i] => 'integer|max:99999999',
-                    $details_lists[$i]['小計' . $i] => 'required_with:摘要' . $i . '|integer|max:99999999',
+                    $details_lists[$i]['小計' . $i] => 'required_with:摘要' . $i . '|vdPrice|vdPriceDigits',
                 ];
             }
 
@@ -524,20 +506,9 @@ class InvoiceImportController extends Controller
      */
     private function rulesForInput(?Request $request)
     {
-        // 独自バリデーション: 月謝期間終了日は月謝期間開始日より未来日とする
-        $validationEndDate = function ($attribute, $value, $fail) use ($request) {
-            // 月謝期間終了日の数値が月謝期間開始日の数値を下回っていないかチェック
-            if (strtotime($request['end_date']) <= strtotime($request['start_date'])) {
-                // 下回っていた（月謝期間開始日より未来日でない）場合エラー
-                return $fail(Lang::get('validation.after',));
-            }
-        };
-
         $rules = array();
 
         $rules += InvoiceImport::fieldRules('issue_date', ['required']);
-        $rules += InvoiceImport::fieldRules('start_date', ['required']);
-        $rules += InvoiceImport::fieldRules('end_date', ['required', $validationEndDate]);
         $rules += InvoiceImport::fieldRules('term_text1');
         $rules += InvoiceImport::fieldRules('term_text2');
         $rules += InvoiceImport::fieldRules('bill_date', ['required']);

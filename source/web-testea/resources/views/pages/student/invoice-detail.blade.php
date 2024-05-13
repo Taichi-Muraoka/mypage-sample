@@ -14,16 +14,9 @@
     <p>{{$invoice->student_name}} 様 保護者様</p>
     <p>{{$invoice_import->issue_date->format('Y年n月j日')}} 発行</p>
 
-    <x-bs.table :hover=false :vHeader=true class="mb-4" :smartPhone=true>
-        <tr>
-            <th width="35%">お月謝期間</th>
-            <x-bs.td-sp>
-                {{$invoice_import->term_text0}}<br>
-                @if ($invoice_import->term_text1 != ''){{$invoice_import->term_text1}}<br>@endif
-                @if ($invoice_import->term_text2 != ''){{$invoice_import->term_text2}}@endif
-            </x-bs.td-sp>
-        </tr>
-    </x-bs.table>
+    <p> @if ($invoice_import->term_text1 != ''){{$invoice_import->term_text1}}<br>@endif
+        @if ($invoice_import->term_text2 != ''){{$invoice_import->term_text2}}@endif
+    </p>
 
     {{-- テーブル --}}
     <x-bs.table :smartPhone=true>
