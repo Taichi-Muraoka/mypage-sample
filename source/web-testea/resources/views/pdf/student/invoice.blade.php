@@ -35,8 +35,6 @@
 {{$invoice->invoice_date->format('Y年n月')}}分お月謝のお知らせです。<br>
 <br>
 
-【{{$invoice->invoice_date->format('Y年n月')}}分お月謝期間】<br>
-{{$invoice_import->term_text0}}<br>
 @if ($invoice_import->term_text1 != ''){{$invoice_import->term_text1}}<br>@endif
 @if ($invoice_import->term_text2 != ''){{$invoice_import->term_text2}}<br>@endif
 <br>
