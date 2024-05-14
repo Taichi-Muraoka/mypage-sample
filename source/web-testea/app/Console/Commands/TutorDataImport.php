@@ -359,7 +359,7 @@ class TutorDataImport extends Command
                         break;
                 }
 
-                $birthYear = $currentYear - $age;
+                $birthYear = $values['grade_year'] - $age;
 
                 $values['birth_date'] = $birthYear . '/04/02';
             }

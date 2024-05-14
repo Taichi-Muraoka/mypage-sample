@@ -426,8 +426,7 @@ class StudentDataImport extends Command
                     }
                 }
 
-                // MEMO:今年度開始済みのため年齢-1を行う
-                $birthYear = $currentYear - $age - 1;
+                $birthYear = $values['grade_year'] - $age - 1;
 
                 $values['birth_date'] = $birthYear . '/04/02';
             }
