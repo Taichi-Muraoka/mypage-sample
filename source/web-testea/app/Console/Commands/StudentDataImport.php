@@ -17,6 +17,7 @@ use App\Http\Controllers\Traits\CtrlCsvTrait;
 use App\Http\Controllers\Traits\CtrlFileTrait;
 use App\Http\Controllers\Traits\CtrlModelTrait;
 use App\Exceptions\ReadDataValidateException;
+use App\Models\MstGrade;
 use App\Models\MstSystem;
 
 /**
@@ -276,6 +277,9 @@ class StudentDataImport extends Command
             // headerをもとに、値をセットしたオブジェクトを生成
             $values = array_combine($headers, $line);
 
+            // 生徒IDの0埋め除去
+            $values['student_id'] = (int)$values['student_id'];
+
             // [バリデーション] データ行の値のチェック
             $validator = Validator::make($values, $this->rulesForInput($values));
             if ($validator->fails()) {
@@ -396,6 +400,35 @@ class StudentDataImport extends Command
             // 過去通塾期間が空白の場合は0を設定
             if ($values['past_enter_term'] === '') {
                 $values['past_enter_term'] = 0;
+            }
+
+            // 生年月日が空白の場合は学年コードから参照した年齢を基に計算し値を設定
+            if ($values['birth_date'] === '') {
+
+                $mstGrade = MstGrade::select('age')
+                    ->where('grade_cd', $values['grade_cd'])
+                    ->firstOrFail();
+
+                $age = $mstGrade->age;
+
+                // 浪1～3(grade_cd:13~15)は学年マスタのageが0のため、ここで年齢を設定する（実年齢-1）
+                if ($age == 0) {
+                    switch ($values['grade_cd']) {
+                        case 13:
+                            $age = 18;
+                            break;
+                        case 14:
+                            $age = 19;
+                            break;
+                        case 15:
+                            $age = 20;
+                            break;
+                    }
+                }
+
+                $birthYear = $values['grade_year'] - $age - 1;
+
+                $values['birth_date'] = $birthYear . '/04/02';
             }
 
             foreach ($values as $key => $val) {
@@ -588,7 +621,7 @@ class StudentDataImport extends Command
         $rules += Student::fieldRules('grade_cd', ['required', $validationGradeList]);
         $rules += Student::fieldRules('grade_year');
         // 日付はモデルではなく以下のように指定する（スラッシュ区切り・0埋め・0なし許容）
-        $rules += ['birth_date' => ['required', 'date_format:Y/m/d,Y/n/j']];
+        $rules += ['birth_date' => ['date_format:Y/m/d,Y/n/j']];
         $rules += Student::fieldRules('school_cd_e', [$validationSchoolList]);
         $rules += Student::fieldRules('school_cd_j', [$validationSchoolList]);
         $rules += Student::fieldRules('school_cd_h', [$validationSchoolList]);

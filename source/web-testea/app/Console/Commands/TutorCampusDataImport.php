@@ -210,6 +210,9 @@ class TutorCampusDataImport extends Command
             // headerをもとに、値をセットしたオブジェクトを生成
             $values = array_combine($headers, $line);
 
+            // 講師IDの0埋め除去
+            $values['tutor_id'] = (int)$values['tutor_id'];
+
             // [バリデーション] データ行の値のチェック
             $validator = Validator::make($values, $this->rulesForInput($values));
             if ($validator->fails()) {
