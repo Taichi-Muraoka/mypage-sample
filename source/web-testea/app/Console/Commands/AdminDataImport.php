@@ -212,6 +212,12 @@ class AdminDataImport extends Command
             // headerをもとに、値をセットしたオブジェクトを生成
             $values = array_combine($headers, $line);
 
+            // 名前・メールアドレスのスペース除去
+            $values['name'] = str_replace(' ', '', $values['name']);
+            $values['name'] = str_replace('　', '', $values['name']);
+            $values['email'] = str_replace(' ', '', $values['email']);
+            $values['email'] = str_replace('　', '', $values['email']);
+
             // [バリデーション] データ行の値のチェック
             $validator = Validator::make($values, $this->rulesForInput($values));
             if ($validator->fails()) {

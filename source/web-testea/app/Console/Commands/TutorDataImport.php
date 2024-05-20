@@ -259,6 +259,17 @@ class TutorDataImport extends Command
             // 講師IDの0埋め除去
             $values['tutor_id'] = (int)$values['tutor_id'];
 
+            // 名前・メールアドレスのスペース除去
+            $values['name'] = str_replace(' ', '', $values['name']);
+            $values['name'] = str_replace('　', '', $values['name']);
+            $values['name_kana'] = str_replace(' ', '', $values['name_kana']);
+            $values['name_kana'] = str_replace('　', '', $values['name_kana']);
+            $values['email'] = str_replace(' ', '', $values['email']);
+            $values['email'] = str_replace('　', '', $values['email']);
+
+            // 電話番号のスペース除去
+            $values['tel'] = str_replace(' ', '', $values['tel']);
+
             // [バリデーション] データ行の値のチェック
             $validator = Validator::make($values, $this->rulesForInput($values));
             if ($validator->fails()) {

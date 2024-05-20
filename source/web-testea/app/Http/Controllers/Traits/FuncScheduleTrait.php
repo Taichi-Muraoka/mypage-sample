@@ -675,9 +675,7 @@ trait FuncScheduleTrait
      */
     private function fncScheGetPeriodTimeForBatch($campusCd, $timetableKind, $time)
     {
-        $query = MstTimetable::query();
-
-        $timeTable = $query
+        $timeTable = MstTimetable::query()
             // 指定校舎で絞り込み
             ->where('campus_cd', $campusCd)
             // 時間割区分で絞り込み
@@ -690,7 +688,23 @@ trait FuncScheduleTrait
         if (isset($timeTable)) {
             $periodNo = $timeTable->period_no;
         } else {
-            $periodNo = 1;
+            // 時間割マスタに対象校舎の時間割が登録されていない場合
+            // 校舎コード先頭（久我山校）の時間割情報を取得する
+            $timeTable2 = MstTimetable::query()
+            // 指定校舎絞り込みなし
+            // 時間割区分で絞り込み
+            ->where('timetable_kind', $timetableKind)
+            // 時間から対象時限を絞り込み
+            ->where('start_time', '<=', $time)
+            // 校舎コードの昇順
+            ->orderBy('campus_cd', 'asc')->orderBy('period_no', 'desc')
+            ->first();
+
+            if (isset($timeTable2)) {
+                $periodNo = $timeTable2->period_no;
+            } else {
+                $periodNo = 1;
+            }
         }
 
         return $periodNo;
