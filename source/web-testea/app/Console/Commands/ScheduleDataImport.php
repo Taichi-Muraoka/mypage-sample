@@ -40,10 +40,10 @@ class ScheduleDataImport extends Command
     /**
      * スケジュールデータ種別
      */
-    const KIND_SCHE_S = 1;
-    const KIND_SCHE_D = 2;
-    const KIND_REGU_S = 3;
-    const KIND_REGU_D = 4;
+    const KIND_SCHE_S = 1; // スケジュールデータ（１対１）
+    const KIND_SCHE_D = 2; // スケジュールデータ（１対多）
+    const KIND_REGU_S = 3; // レギュラーデータ（１対１）
+    const KIND_REGU_D = 4; // レギュラーデータ（１対多）
 
     /**
      * 現行DB 授業ステータス
@@ -63,9 +63,9 @@ class ScheduleDataImport extends Command
     const POS_BOOTH_TRAN_MIN = 996;
 
     /**
-     * 登録ユーザーID（１固定とする）
+     * 登録ユーザーID（0固定とする）
      */
-    const BATCH_USER = 1;
+    const BATCH_USER = 0;
 
     /**
      * The name and signature of the console command.
@@ -267,7 +267,12 @@ class ScheduleDataImport extends Command
             // 旧ブースが未振替用の場合
             // ブースマスタから対象校舎のブースを取得し、先頭ブースを設定
             $arrMstBooths = $this->fncScheGetBoothFromMst($data['school_code'], $data['how_to']);
-            $schedule['booth_cd'] = $arrMstBooths[0];
+            if (count($arrMstBooths) > 0) {
+                $schedule['booth_cd'] = $arrMstBooths[0];
+            } else {
+                // ブースが未定義の場合、元データのブースコードを設定する
+                $schedule['booth_cd'] = $data['classroom'];
+            }
         } else {
             // 上記以外の場合、元データのブースコードを設定する
             $schedule['booth_cd'] = $data['classroom'];
@@ -275,7 +280,7 @@ class ScheduleDataImport extends Command
         $schedule['course_cd'] = $data['course'];
         $schedule['tutor_id'] = $data['teaID'] == 0 ? null : $data['teaID'];
         if ($data['course_kind'] != AppConst::CODE_MASTER_42_2) {
-            $schedule['student_id'] = $data['stuID'] == 0 ? null : $data['stuID'];
+            $schedule['student_id'] = $data['stuID'];
         }
         $schedule['subject_cd'] = $data['subject'] == 0 ? null : $data['subject'];
         // データ作成種別の設定
@@ -383,7 +388,7 @@ class ScheduleDataImport extends Command
         $schedule['course_cd'] = $data['course'];
         $schedule['tutor_id'] = $data['teaID'] == 0 ? null : $data['teaID'];
         if ($data['course_kind'] != AppConst::CODE_MASTER_42_2) {
-            $schedule['student_id'] = $data['stuID'] == 0 ? null : $data['stuID'];
+            $schedule['student_id'] = $data['stuID'];
         }
         $schedule['subject_cd'] = $data['subject'] == 0 ? null : $data['subject'];
         $schedule['how_to_kind'] = $data['how_to'];
@@ -474,11 +479,40 @@ class ScheduleDataImport extends Command
             // [バリデーション] データ行の列の数のチェック
             if (count($line) !== count($csvHeaders)) {
                 throw new ReadDataValidateException(Lang::get('validation.invalid_file')
-                    . "(データ列数不正)");
+                    . "(データ列数不正 " . $i + 1 . "行目)");
             }
 
             // headerをもとに、値をセットしたオブジェクトを生成
             $values = array_combine($headers, $line);
+
+            // 生徒IDの0埋め除去
+            $values['stuID'] = (int)$values['stuID'];
+            $values['stuID'] = $values['stuID'] == 0 ? '' : $values['stuID'];
+
+            // 講師IDの0埋め除去
+            $values['teaID'] = (int)$values['teaID'];
+            $values['teaID'] = $values['teaID'] == 0 ? '' : $values['teaID'];
+            $values['emID'] = (int)$values['emID'];
+            $values['emID'] = $values['emID'] == 0 ? '' : $values['emID'];
+
+            // 個別の変換処理
+            // コースコード：10150 の場合、10100（個別指導）に置き換える
+            if ($values['course'] == '10150') {
+                $values['course'] = '10100';
+            }
+            // コースコード：10100（個別指導）かつ 科目：906（演習）の場合、コースを演習に置き換える
+            if ($values['course'] == '10100' && $values['subject'] == '906') {
+                $values['course'] = '10500';
+            }
+            // 科目：901（自習）または902（面談）の場合、コースを自習に置き換える
+            if ($values['subject'] == '901' || $values['subject'] == '902') {
+                $values['course'] = '90100';
+            }
+            // コースコード：90100（自習）の場合、科目：未設定、講師ID：未設定 とする
+            if ($values['course'] == '90100') {
+                $values['subject'] = '';
+                $values['teaID'] = '';
+            }
 
             // 取得したコース種別を追加で設定
             $values['course_kind'] = $mstCourse[$values['course']]->course_kind;
@@ -528,14 +562,14 @@ class ScheduleDataImport extends Command
             $start = Carbon::createFromTimestamp($values['start']);
             if ($kind == self::KIND_SCHE_S) {
                 // スケジュールデータ（１対１授業）
-                if ($start < '1971-01-01' || $values['course_kind'] == AppConst::CODE_MASTER_42_2) {
-                    Log::info("SKIP ID=" . $values['ID']);
+                if ($start < '2019-03-01' || $values['course_kind'] == AppConst::CODE_MASTER_42_2) {
+                    //Log::info("SKIP ID=" . $values['ID']);
                     continue;
                 }
             } else if ($kind == self::KIND_SCHE_D) {
                 // スケジュールデータ（１対多授業）
-                if ($start < '1971-01-01' || $values['course_kind'] != AppConst::CODE_MASTER_42_2) {
-                    Log::info("SKIP ID=" . $values['ID']);
+                if ($start < '2019-03-01' || $values['course_kind'] != AppConst::CODE_MASTER_42_2) {
+                    //Log::info("SKIP ID=" . $values['ID']);
                     continue;
                 }
             } else if ($kind == self::KIND_REGU_S) {
@@ -584,8 +618,6 @@ class ScheduleDataImport extends Command
             // 校舎マスタより校舎情報を取得（ログイン情報がないので、共通処理は使わない）
             $rooms = MstCampus::query()
                 ->select('mst_campuses.campus_cd as code', 'name as value', 'disp_order')
-                // 非表示フラグの条件を付加
-                ->where('is_hidden', AppConst::CODE_MASTER_11_1)
                 // 校舎リストを取得
                 ->get()->keyBy('code');
 
@@ -666,19 +698,18 @@ class ScheduleDataImport extends Command
             }
         };
 
-        $rules += ['ID' => ['required', 'integer', 'min:1']];
         $rules += ['school_code' => array_merge(Schedule::getFieldRule('campus_cd'), ['required', $validationRoomList])];
         // 開始・終了日時はunixtimeで設定されている
         $rules += ['start' => ['required', 'date_format:U']];
         $rules += ['end' => ['required', 'date_format:U']];
         $rules += ['course' => array_merge(Schedule::getFieldRule('course_cd'), ['required', $validationCourseList])];
-        $rules += ['subject' => ['required', $validationSubjectList]];
+        $rules += ['subject' => [$validationSubjectList]];
         $rules += ['classroom' => array_merge(Schedule::getFieldRule('booth_cd'), ['required'])];
-        $rules += ['teaID' => array_merge(Schedule::getFieldRule('tutor_id'), ['required', $validationTutorList])];
-        $rules += ['stuID' => array_merge(Schedule::getFieldRule('student_id'), ['required', $validationStudentList])];
+        $rules += ['teaID' => Schedule::getFieldRule('tutor_id')];
+        $rules += ['stuID' => Schedule::getFieldRule('student_id')];
         $rules += ['status' => ['required', 'integer', 'min:0', 'max:9']];
         $rules += ['substitute' => array_merge(Schedule::getFieldRule('substitute_kind'), [$validationSubstituteKindList])];
-        $rules += ['emID' => array_merge(Schedule::getFieldRule('tutor_id'), ['required', $validationTutorList])];
+        $rules += ['emID' => Schedule::getFieldRule('tutor_id')];
         $rules += ['absent_on_the_day' => ['required', 'integer', 'min:0', 'max:2']];
         $rules += ['how_to' => array_merge(Schedule::getFieldRule('how_to_kind'), ['required', $validationHowToKindList])];
         $rules += ['comment' => ['string', 'max:1000']];

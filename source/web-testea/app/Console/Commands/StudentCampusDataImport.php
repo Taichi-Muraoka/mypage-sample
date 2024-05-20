@@ -284,8 +284,7 @@ class StudentCampusDataImport extends Command
         $validationRoomList =  function ($attribute, $value, $fail) use ($values) {
 
             $exists = MstCampus::where('campus_cd', $values['campus_cd'])
-                // 非表示フラグの条件を付加
-                ->where('is_hidden', AppConst::CODE_MASTER_11_1)
+                // 非表示フラグの条件は付加しない
                 ->exists();
 
             // 存在しなければエラー

@@ -280,6 +280,18 @@ class StudentDataImport extends Command
             // 生徒IDの0埋め除去
             $values['student_id'] = (int)$values['student_id'];
 
+            // 名前のスペース除去・変換
+            $values['name'] = str_replace(' ', '', $values['name']);
+            $values['name'] = str_replace('　', '', $values['name']);
+            $values['name_kana'] = str_replace(' ', '', $values['name_kana']);
+            $values['name_kana'] = str_replace('　', '', $values['name_kana']);
+
+            // メールアドレスのスペース除去・変換
+            $values['email_stu'] = str_replace(' ', '', $values['email_stu']);
+            $values['email_stu'] = str_replace('＠', '@', $values['email_stu']);
+            $values['email_par'] = str_replace(' ', '', $values['email_par']);
+            $values['email_par'] = str_replace('＠', '@', $values['email_par']);
+
             // [バリデーション] データ行の値のチェック
             $validator = Validator::make($values, $this->rulesForInput($values));
             if ($validator->fails()) {
