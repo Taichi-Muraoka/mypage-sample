@@ -48,8 +48,8 @@ class MypageDemoDataSeeder extends Seeder
         $this->loadCsv('database/csv/demo/tutors.csv', 'tutors');
         $this->loadCsv('database/csv/demo/tutor_campuses.csv', 'tutor_campuses');
         $this->loadCsv('database/csv/demo/tutor_subjects.csv', 'tutor_subjects');
-        $this->loadCsv('database/csv/demo/regular_classes.csv', 'regular_classes');
-        $this->loadCsv('database/csv/demo/regular_class_members.csv', 'regular_class_members');
+        //$this->loadCsv('database/csv/demo/regular_classes.csv', 'regular_classes');
+        //$this->loadCsv('database/csv/demo/regular_class_members.csv', 'regular_class_members');
         $this->loadCsv('database/csv/demo/yearly_schedules.csv', 'yearly_schedules');
         //$this->loadCsv('database/csv/demo/schedules.csv', 'schedules');
         //$this->loadCsv('database/csv/demo/class_members.csv', 'class_members');
