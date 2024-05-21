@@ -135,6 +135,9 @@ class ScheduleDataImport extends Command
                 if (!file_exists($path)) {
                     throw new ReadDataValidateException(Lang::get('validation.invalid_file') . "(ファイルパス・ファイル名不正)");
                 }
+
+                ini_set('memory_limit', '512M');
+
                 // CSVデータの読み込み・バリデーション
                 $datas = $this->readData($path, $kind);
 
@@ -356,7 +359,7 @@ class ScheduleDataImport extends Command
             // class_membersテーブルへのinsert
             $classmember = new ClassMember;
             $classmember->schedule_id = $scheduleId;
-            $classmember->student_id = $memberData['stuID'];
+            $classmember->student_id = $memberData['stuID'] == null ? 0 : $memberData['stuID'];
             $classmember->absent_status = $memberData['absent_on_the_day'];
             // 登録
             $classmember->save();
