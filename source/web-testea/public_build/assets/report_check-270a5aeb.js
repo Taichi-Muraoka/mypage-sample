@@ -1,0 +1,1 @@
+class a extends PageBase{constructor(){super()}start(){this.getVueModal();var e=()=>{UrlCom.redirect(UrlCom.getFuncUrl())};this.getVueModal({id:"#modal-dtl-approval",afterExec:e}),this.getVueSearchForm()}}export{a as default};
