@@ -105,6 +105,7 @@ class WeeklyShiftController extends Controller
                 ->where('tutor_id', $account->account_id)
                 ->orderBy('day_cd')
                 ->orderBy('period_no')
+                ->distinct()
                 ->get();
 
             //----------------
