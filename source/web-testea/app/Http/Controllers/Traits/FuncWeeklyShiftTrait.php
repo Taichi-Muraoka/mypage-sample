@@ -64,6 +64,7 @@ trait FuncWeeklyShiftTrait
             ->where('tutor_id', $tutorId)
             ->orderBy('day_cd')
             ->orderBy('period_no')
+            ->distinct()
             ->get();
 
         // チェックボックスをセットするための値を生成
