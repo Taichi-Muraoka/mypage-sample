@@ -32,7 +32,8 @@ Githubのプロジェクトのページで、Issueを作成する。
 | master | 公開するものを置くブランチ<br>※開発では未使用 |  |  |
 | develop | 開発中のものを置くブランチ | master | master |
 | feature/ユーザ-機能名 | 新機能開発中に使うブランチ<br>※プルリクマージ後削除 | develop | develop |
-| hotfix/ユーザ-機能名 | リリース・デプロイ後のバグを修正するブランチ<br>※プルリクマージ後削除 | develop | develop |
+| hotfix | リリース・デプロイ後の修正を置くブランチ | master | master + develop |
+| hotfix/ユーザ-機能名 | リリース・デプロイ後のバグを修正するブランチ<br>※プルリクマージ後削除 | hotfix | hotfix |
 
 ### ブランチ作成ルール
 ブランチ名は、以下のルールで命名する。
@@ -43,7 +44,7 @@ Githubのプロジェクトのページで、Issueを作成する。
 例）
 生徒向け　カレンダー				：　feature/student-calender
 講師向け　給与明細				：　feature/tutor-salary
-運用管理　マスタ管理-ブースマスタ   ：　feature/manage-booth-master
+運用管理　マスタ管理-ブースマスタ		：　feature/manage-booth-master
 ```
 
 ## 3. ブランチ運用手順
