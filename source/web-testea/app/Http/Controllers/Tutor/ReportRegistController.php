@@ -642,6 +642,8 @@ class ReportRegistController extends Controller
             // 授業報告書情報登録
             $lesson = $query
                 ->where('schedule_id', '=', $request['id'])
+                // 授業報告書IDがNULLであるもののみ
+                ->whereNull('report_id')
                 // 自分の講師IDのみにガードを掛ける
                 ->where($this->guardTutorTableWithTid())
                 ->firstOrFail();

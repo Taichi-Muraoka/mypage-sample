@@ -112,7 +112,7 @@
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他教材名（フリー入力）" id="text_name_L{{$i}}"
-                    v-Show="form.text_cd_L{{$i}}.endsWith('99')" :rules=$rules :editData=$editData/>
+                    v-Show="String(form.text_cd_L{{$i}}).endsWith('99')" :rules=$rules :editData=$editData/>
             </x-bs.col2>
         </x-bs.row>
         @for ($j = 1; $j <= 3; $j++) <x-bs.row>
@@ -140,11 +140,11 @@
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他単元分類名{{$j}}（フリー入力）" id="category_name{{$j}}_L{{$i}}"
-                :rules=$rules v-Show="form.unit_category_cd{{$j}}_L{{$i}}.endsWith('99')" :editData=$editData/>
+                :rules=$rules v-Show="String(form.unit_category_cd{{$j}}_L{{$i}}).endsWith('99')" :editData=$editData/>
             </x-bs.col2>
             <x-bs.col2>
                 <x-input.text caption="その他単元名{{$j}}（フリー入力）" id="unit_name{{$j}}_L{{$i}}"
-                :rules=$rules v-Show="form.unit_cd{{$j}}_L{{$i}}.endsWith('99')" :editData=$editData/>
+                :rules=$rules v-Show="String(form.unit_cd{{$j}}_L{{$i}}).endsWith('99')" :editData=$editData/>
             </x-bs.col2>
         </x-bs.row>
         @endfor
@@ -196,7 +196,7 @@
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他教材名（フリー入力）" id="text_name_H{{$i}}"
-                    :rules=$rules :editData=$editData v-Show="form.text_cd_H{{$i}}.endsWith('99')" />
+                    :rules=$rules :editData=$editData v-Show="String(form.text_cd_H{{$i}}).endsWith('99')" />
             </x-bs.col2>
         </x-bs.row>
         @for ($j = 1; $j <= 3; $j++) <x-bs.row>
@@ -224,11 +224,11 @@
         <x-bs.row>
             <x-bs.col2>
                 <x-input.text caption="その他単元分類名{{$j}}（フリー入力）" id="category_name{{$j}}_H{{$i}}"
-                    :rules=$rules v-Show="form.unit_category_cd{{$j}}_H{{$i}}.endsWith('99')" :editData=$editData/>
+                    :rules=$rules v-Show="String(form.unit_category_cd{{$j}}_H{{$i}}).endsWith('99')" :editData=$editData/>
             </x-bs.col2>
             <x-bs.col2>
                 <x-input.text caption="その他単元名{{$j}}（フリー入力）" id="unit_name{{$j}}_H{{$i}}"
-                    :rules=$rules v-Show="form.unit_cd{{$j}}_H{{$i}}.endsWith('99')" :editData=$editData/>
+                    :rules=$rules v-Show="String(form.unit_cd{{$j}}_H{{$i}}).endsWith('99')" :editData=$editData/>
             </x-bs.col2>
         </x-bs.row>
         @endfor
