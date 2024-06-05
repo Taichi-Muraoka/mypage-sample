@@ -1,1 +1,0 @@
-import t from"./room-calendar-44976feb.js";import"./app-52847285.js";class s extends PageBase{constructor(){super()}start(){this.getVueInputForm({vueData:{calendar:null},vueMounted:function(e,n){e.calendar=new t,e.calendar.create(e.form.target_date)},vueMethods:{selectChangeRoom:function(e){this.calendar.refetchEvents()}}})}}export{s as default};

@@ -1,1 +1,0 @@
-class s extends PageBase{constructor(){super()}start(){const e=this;var t=()=>{e.redirectToParent()},r=()=>{e.redirectToParent()};this.getVueInputForm({afterEdit:r,afterNew:t,urlSuffix:"campus"})}}export{s as default};
