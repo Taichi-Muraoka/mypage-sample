@@ -1193,9 +1193,9 @@ trait CtrlModelTrait
             $classMember = (new ClassMember)->getTable();
 
             // スケジュール情報のクエリ作成
-            $subQuery = Schedule::query();            
+            $subQuery = Schedule::query();
             // スケジュール情報のstudent_id（１対１授業）、または対象テーブルと受講生徒情報のstudent_id（１対多授業）を重複なしで取得
-            $subQuery->selectRaw('DISTINCT CASE ' . $schedule . '.student_id IS NULL WHEN 1 THEN ' . $classMember . '.student_id ELSE ' . $schedule . '.student_id END AS s_id')
+            $subQuery->selectRaw('CASE WHEN ' . $schedule . '.student_id IS NULL THEN ' . $classMember . '.student_id ELSE ' . $schedule . '.student_id END AS s_id')
                 ->leftJoin($classMember, function ($join) use ($classMember, $schedule) {
                     $join->on($classMember . '.schedule_id', '=', $schedule . '.schedule_id')
                         ->whereNull($classMember . '.deleted_at');
@@ -1208,13 +1208,13 @@ trait CtrlModelTrait
                 ->when($campusCd, function ($campusQuery) use ($schedule, $campusCd) {
                     return $campusQuery->where($schedule . '.campus_cd', $campusCd);
                 })
-                // delete_dt条件の追加
-                ->whereNull($schedule . '.deleted_at');
+                // 重複削除
+                ->distinct();
 
             $subName = 'sdata';
             // 1件存在するかチェック
             $query->select(DB::raw(1))
-                ->from(DB::table($subQuery), $subName)
+                ->from($subQuery, $subName)
                 ->whereRaw($subName . '.s_id = ' . $table . '.student_id');
         });
     }
