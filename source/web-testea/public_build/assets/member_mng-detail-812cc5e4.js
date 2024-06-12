@@ -1,0 +1,1 @@
+class e extends PageBase{constructor(){super()}start(){this.getVueModal({id:"#modal-dtl-record",urlSuffix:"detail"}),this.getVueModal({id:"#modal-dtl-room_calendar",urlSuffix:"detail"}),this.getVueModal({id:"#modal-dtl-desired",urlSuffix:"detail"}),this.getVueModal({id:"#modal-dtl-grades_mng",urlSuffix:"detail"})}}export{e as default};

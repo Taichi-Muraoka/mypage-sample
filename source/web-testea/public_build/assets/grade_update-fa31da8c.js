@@ -1,0 +1,1 @@
+class s extends PageBase{constructor(){super()}start(){var e=()=>{UrlCom.redirect(UrlCom.getFuncUrl())};this.getVueInputForm({afterEdit:e});var t=this.getVueSearchList();t.search()}}export{s as default};

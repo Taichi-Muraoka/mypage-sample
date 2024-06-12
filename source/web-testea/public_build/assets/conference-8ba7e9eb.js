@@ -1,0 +1,1 @@
+class c extends PageBase{constructor(){super()}start(){const t=this;var r=()=>{UrlCom.redirect(UrlCom.getFuncUrl())};this.getVueInputForm({afterEdit:r,vueMounted:function(e,s){var a=e.form.id;t.selectChangeGet(e,a,s)}})}}export{c as default};
