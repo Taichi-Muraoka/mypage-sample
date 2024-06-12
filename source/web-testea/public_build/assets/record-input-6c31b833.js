@@ -1,1 +1,0 @@
-class s extends PageBase{constructor(){super()}start(){const e=this;var t=()=>{e.redirectToParent2()},r=()=>{e.redirectToParent()};this.getVueInputForm({afterEdit:t,afterNew:r,urlSuffix:"record"})}}export{s as default};

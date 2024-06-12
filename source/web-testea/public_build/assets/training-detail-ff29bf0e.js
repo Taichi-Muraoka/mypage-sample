@@ -1,1 +1,0 @@
-class o extends PageBase{constructor(){super()}start(){this.getVueInputForm({vueMethods:{submitMovieBrowse:function(s){AjaxCom.getPromise().then(()=>{var e=UrlCom.getFuncUrl()+"/movie_browse";return axios.post(e,this.form)}).catch(AjaxCom.fail)}}})}}export{o as default};

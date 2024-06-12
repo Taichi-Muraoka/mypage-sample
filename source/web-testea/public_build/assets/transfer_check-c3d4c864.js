@@ -1,1 +1,0 @@
-class s extends PageBase{constructor(){super()}start(){var e=this.getVueSearchForm();this.getVueModal(),this.getVueModal({id:"#modal-dtl-approval",afterExec:()=>{e.vueSearchList.refresh()}})}}export{s as default};

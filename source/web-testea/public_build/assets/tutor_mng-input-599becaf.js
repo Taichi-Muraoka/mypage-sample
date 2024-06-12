@@ -1,1 +1,0 @@
-class f extends PageBase{constructor(){super()}start(){const o=this;var s=()=>{UrlCom.redirect(UrlCom.getFuncUrl())},a=()=>{o.redirectToParent()};const e=this.getVueInputForm({afterEdit:a,afterNew:s});var l=(c,t)=>{const r=c.modalselectid;e.form["text_"+r]=t.school_name,e.form[r]=t.school_cd};this.getVueModalSelectList({urlSuffix:"school",afterSelected:l})}}export{f as default};

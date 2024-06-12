@@ -1,1 +1,0 @@
-class i extends PageBase{constructor(){super()}start(){var r=()=>{UrlCom.redirect(UrlCom.getFuncUrl())};this.getVueInputForm({afterEdit:r,progressShow:!0,vueMethods:{timeClick:function(s){var t=$(s.target).attr("data-wt"),e=this.form.chkWs.indexOf(t);e>=0?this.form.chkWs.splice(e,1):this.form.chkWs.push(t)}}})}}export{i as default};
