@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\FuncSurchargeTrait;
 use App\Consts\AppConst;
 use App\Models\Surcharge;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Lang;
 
@@ -219,6 +220,12 @@ class SurchargeAcceptController extends Controller
                 $nextMonth = date('Y-m-d', strtotime('first day of next month ' . $surcharge->working_date));
                 $surcharge->payment_date = $nextMonth;
 
+                // 承認者、承認日時を設定
+                $account = Auth::user();
+                $adm_id = $account->account_id;
+                $surcharge->approval_user = $adm_id;
+                $surcharge->approval_time = now();
+
                 // 保存
                 $surcharge->save();
 
@@ -276,15 +283,35 @@ class SurchargeAcceptController extends Controller
             'admin_comment',
         );
 
-        // ステータス「承認」で更新する場合は「支払年月」をセット
-        if ($request['approval_status'] == AppConst::CODE_MASTER_2_1) {
-            $form += [
-                'payment_date' => $request['payment_date'] . '-01'
-            ];
-        }
-
         // 対象データを取得
         $surcharge = $this->getTargetSurchargeAdmin($request['surcharge_id']);
+
+        // ステータス「承認」で更新する場合は「支払年月」、承認者・承認日時をセット
+        if ($request['approval_status'] == AppConst::CODE_MASTER_2_1) {
+            if ($surcharge->approval_status != AppConst::CODE_MASTER_2_1) {
+                // 承認者、承認日時を設定
+                $account = Auth::user();
+                $adm_id = $account->account_id;
+
+                $form += [
+                    'payment_date' => $request['payment_date'] . '-01',
+                    'approval_user' => $adm_id,
+                    'approval_time' => now()
+                ];
+            } else {
+                // ステータス「承認」のデータをステータス変更なしで更新する場合は、支払年月のみ更新する
+                $form += [
+                    'payment_date' => $request['payment_date'] . '-01'
+                ];
+            }
+        } else {
+            // ステータス「承認」ではない場合は、支払年月・承認者・承認日時をクリア
+            $form += [
+                'payment_date' => null,
+                'approval_user' => null,
+                'approval_time' => null
+            ];
+        }
 
         // データ更新
         $surcharge->fill($form)->save();
