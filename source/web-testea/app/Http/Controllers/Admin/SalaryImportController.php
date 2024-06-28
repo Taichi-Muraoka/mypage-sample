@@ -655,7 +655,9 @@ class SalaryImportController extends Controller
             // ファイル
             'file',
             // mimes CSVのMIMEタイプリストと一致するか（laravel8と少し挙動が異なる）
-            'mimes:csv',
+            // PHP8.0以降の mime_content_type でCSVファイルが application/csv や text/csv でなく text/plain と認識されるため、
+            // txtの指定を追加(2行のCSVファイルがCSVと判定されない対応)
+            'mimes:csv,txt',
         ]];
 
         return $rules;
