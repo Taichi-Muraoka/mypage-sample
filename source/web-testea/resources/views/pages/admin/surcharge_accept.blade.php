@@ -61,9 +61,12 @@
             <th>講師名</th>
             <th>請求種別</th>
             <th>校舎</th>
+            <th>実施日</th>
             <th>時間(分)</th>
             <th>金額</th>
             <th>ステータス</th>
+            <th>承認者</th>
+            <th>承認日時</th>
             <th>支払年月</th>
             <th>支払状況</th>
             <th></th>
@@ -75,9 +78,12 @@
             <td>@{{item.tutor_name}}</td>
             <td>@{{item.surcharge_kind_name}}</td>
             <td>@{{item.campus_name}}</td>
+            <td>@{{$filters.formatYmd(item.working_date)}}</td>
             <td>@{{item.minutes}}</td>
             <td class="t-price">@{{$filters.toLocaleString(item.tuition)}}</td>
             <td>@{{item.approval_status_name}}</td>
+            <td>@{{item.approval_user_name}}</td>
+            <td>@{{$filters.formatYmdHm(item.approval_time)}}</td>
             <td>@{{$filters.formatYm(item.payment_date)}}</td>
             <td>@{{item.payment_status_name}}</td>
             <td>

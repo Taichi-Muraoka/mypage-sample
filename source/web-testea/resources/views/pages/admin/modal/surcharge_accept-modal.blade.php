@@ -44,6 +44,15 @@
         <th>ステータス</th>
         <td>@{{item.approval_status_name}}</td>
     </tr>
+    {{-- ステータス「承認」時のみ表示 --}}
+    <tr v-show="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_2_1 }}">
+        <th>承認者</th>
+        <td>@{{item.approval_user_name}}</td>
+    </tr>
+    <tr v-show="item.approval_status == {{ App\Consts\AppConst::CODE_MASTER_2_1 }}">
+        <th>承認日時</th>
+        <td>@{{$filters.formatYmdHm(item.approval_time)}}</td>
+    </tr>
     <tr>
         <th>管理者コメント</th>
         <td class="nl2br">@{{item.admin_comment}}</td>

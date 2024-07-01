@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Traits;
 
 use App\Consts\AppConst;
 use App\Libs\AuthEx;
+use App\Models\AdminUser;
 use App\Models\CodeMaster;
 use App\Models\MstSystem;
 use App\Models\Surcharge;
@@ -34,11 +35,14 @@ trait FuncSurchargeTrait
             'surcharges.tutor_id',
             'surcharges.apply_date',
             'surcharges.surcharge_kind',
+            'surcharges.working_date',
             'surcharges.minutes',
             'surcharges.tuition',
             'surcharges.approval_status',
             'surcharges.payment_date',
             'surcharges.payment_status',
+            'surcharges.approval_user',
+            'surcharges.approval_time',
             // 校舎の名称（本部あり）
             'campus_names.room_name as campus_name',
             // 講師の名称
@@ -49,6 +53,8 @@ trait FuncSurchargeTrait
             'mst_codes_2.name as approval_status_name',
             // コードマスタの名称（支払状況）
             'mst_codes_27.name as payment_status_name',
+            // 承認管理者アカウントの名前
+            'admin_users.name as approval_user_name',
         )
             // 校舎名の取得JOIN
             ->leftJoinSub($campus_names, 'campus_names', function ($join) {
@@ -56,6 +62,8 @@ trait FuncSurchargeTrait
             })
             // 講師情報とJOIN
             ->sdLeftJoin(Tutor::class, 'surcharges.tutor_id', '=', 'tutors.tutor_id')
+            // 管理者情報とJOIN
+            ->sdLeftJoin(AdminUser::class, 'surcharges.approval_user', '=', 'admin_users.adm_id')
             // コードマスターとJOIN 請求種別
             ->sdLeftJoin(CodeMaster::class, function ($join) {
                 $join->on('surcharges.surcharge_kind', '=', 'mst_codes_26.code')
@@ -88,13 +96,13 @@ trait FuncSurchargeTrait
             );
 
             // 更新ボタン制御
-            // 承認ステータス「承認」のコードを取得
-            $statusCd = AppConst::CODE_MASTER_2_1;
+            // 支払状況「支払済」のコードを取得
+            $paymentStatusCd = AppConst::CODE_MASTER_27_1;
 
-            // 承認ステータス「承認」の場合、trueをセットする（更新不可）
+            // 支払状況「支払済」の場合、trueをセットする（更新不可）
             $query->selectRaw(
                 "CASE
-                    WHEN approval_status = $statusCd THEN true
+                    WHEN payment_status = $paymentStatusCd THEN true
                 END AS disabled_btn_update"
             );
 
@@ -174,6 +182,8 @@ trait FuncSurchargeTrait
             'surcharges.payment_date',
             'surcharges.payment_status',
             'surcharges.admin_comment',
+            'surcharges.approval_user',
+            'surcharges.approval_time',
             // 校舎の名称（本部あり）
             'campus_names.room_name as campus_name',
             // 講師の名称
@@ -186,6 +196,8 @@ trait FuncSurchargeTrait
             'mst_codes_2.name as approval_status_name',
             // コードマスタの名称（支払状況）
             'mst_codes_27.name as payment_status_name',
+            // 承認管理者アカウントの名前
+            'admin_users.name as approval_user_name',
         )
             // 校舎名の取得JOIN
             ->leftJoinSub($campus_names, 'campus_names', function ($join) {
@@ -193,6 +205,8 @@ trait FuncSurchargeTrait
             })
             // 講師情報とJOIN
             ->sdLeftJoin(Tutor::class, 'surcharges.tutor_id', '=', 'tutors.tutor_id')
+            // 管理者情報とJOIN
+            ->sdLeftJoin(AdminUser::class, 'surcharges.approval_user', '=', 'admin_users.adm_id')
             // コードマスターとJOIN 請求種別
             ->sdLeftJoin(CodeMaster::class, function ($join) {
                 $join->on('surcharges.surcharge_kind', '=', 'mst_codes_26.code')
@@ -256,6 +270,8 @@ trait FuncSurchargeTrait
         $surcharge->approval_status = AppConst::CODE_MASTER_2_0;
         $surcharge->payment_date = null;
         $surcharge->payment_status = AppConst::CODE_MASTER_27_0;
+        $surcharge->approval_user = null;
+        $surcharge->approval_time = null;
 
         // 請求種別によって保存項目分岐
         if ($request['sub_code'] == AppConst::CODE_MASTER_26_SUB_8) {
@@ -306,6 +322,8 @@ trait FuncSurchargeTrait
             'tutors.name as tutor_name',
             // コードマスタの名称（請求種別）
             'mst_codes_26.name as surcharge_kind_name',
+            // 承認管理者アカウントの名前
+            'admin_users.name as approval_user_name',
         )
             // 校舎名の取得JOIN
             ->leftJoinSub($campus_names, 'campus_names', function ($join) {
@@ -313,6 +331,8 @@ trait FuncSurchargeTrait
             })
             // 講師情報とJOIN
             ->sdLeftJoin(Tutor::class, 'surcharges.tutor_id', '=', 'tutors.tutor_id')
+            // 管理者情報とJOIN
+            ->sdLeftJoin(AdminUser::class, 'surcharges.approval_user', '=', 'admin_users.adm_id')
             // コードマスターとJOIN 請求種別
             ->sdLeftJoin(CodeMaster::class, function ($join) {
                 $join->on('surcharges.surcharge_kind', '=', 'mst_codes_26.code')
@@ -322,8 +342,8 @@ trait FuncSurchargeTrait
             ->where('surcharge_id', $surchargeId)
             // 教室管理者の場合、自分の校舎コードのみにガードを掛ける
             ->where($this->guardRoomAdminTableWithRoomCd())
-            // ステータス「承認待ち」「差戻し」は更新可能
-            ->whereIn('approval_status', [AppConst::CODE_MASTER_2_0, AppConst::CODE_MASTER_2_2])
+            // 支払状況「未処理」は更新可能
+            ->whereIn('payment_status', [AppConst::CODE_MASTER_27_0])
             ->firstOrFail();
 
         return $surcharge;
