@@ -384,7 +384,7 @@ class YearScheduleImportController extends Controller
             // ファイル
             'file',
             // mimes CSVのMIMEタイプリストと一致するか（laravel8と少し挙動が異なる）
-            'mimes:csv',
+            'mimes:csv,txt',
         ]];
 
         return $rules;

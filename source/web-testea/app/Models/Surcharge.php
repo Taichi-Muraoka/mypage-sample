@@ -57,7 +57,9 @@ class Surcharge extends Model
         'approval_status',
         'payment_date',
         'payment_status',
-        'admin_comment'
+        'admin_comment',
+        'approval_user',
+        'approval_time'
     ];
 
     /**
@@ -71,6 +73,7 @@ class Surcharge extends Model
         'working_date' => 'date',
         'start_time' => 'datetime:H:i',
         'payment_date' => 'date',
+        'approval_time' => 'datetime',
     ];
 
     /**
@@ -129,6 +132,8 @@ class Surcharge extends Model
             'payment_date' => ['date_format:Y-m'],
             'payment_status' => ['integer'],
             'admin_comment' => ['string', 'max:1000'],
+            'approval_user' => ['integer'],
+            'approval_time' => ['date_format:Y-m-d H:i:s']
         ];
         return $_fieldRules;
     }

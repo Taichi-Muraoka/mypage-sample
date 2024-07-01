@@ -52,6 +52,20 @@
             <th>内容（作業・費目等）</th>
             <td class="nl2br">{{$editData['comment']}}</td>
         </tr>
+        
+        {{-- 承認者・承認日時はデータがあるときのみ表示 --}}
+        @if(isset($editData['approval_user']))
+        <tr>
+            <th>承認者</th>
+            <td>{{$editData['approval_user_name']}}</td>
+        </tr>
+        @endif
+        @if(isset($editData['approval_time']))
+        <tr>
+            <th>承認日時</th>
+            <td>{{$editData['approval_time']->format('Y/m/d H:i')}}</td>
+        </tr>
+        @endif
     </x-bs.table>
 
     {{-- 余白 --}}
