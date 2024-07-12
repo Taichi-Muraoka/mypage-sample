@@ -1217,7 +1217,7 @@ class TutorMngController extends Controller
         $tutorCampus = TutorCampus::where('tutor_id', $tid)
             ->get();
 
-        if (3 <= count($tutorCampus)) {
+        if (AppConst::TUTOR_CAMPUS_MAX <= count($tutorCampus)) {
             return $this->illegalResponseErr();
         }
 

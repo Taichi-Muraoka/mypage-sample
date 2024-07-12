@@ -106,9 +106,9 @@ trait FuncTutorDetailTrait
             $disabledLeaveBtn = true;
         }
 
-        // 所属校舎数によって所属校舎新規登録ボタンの押下を制御する（3つ存在する場合は押下不可）
+        // 所属校舎数によって所属校舎新規登録ボタンの押下を制御する（6つ存在する場合は押下不可）
         $disabledNewBtn = false;
-        if (3 <= count($campuses)) {
+        if (AppConst::TUTOR_CAMPUS_MAX <= count($campuses)) {
             $disabledNewBtn = true;
         }
 

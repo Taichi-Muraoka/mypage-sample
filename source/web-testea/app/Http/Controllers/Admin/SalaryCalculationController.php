@@ -326,6 +326,8 @@ class SalaryCalculationController extends Controller
                                 $join->on('travel_costs.tutor_id', '=', 'tutor_campuses.tutor_id')
                                     ->on('travel_costs.campus_cd', '=', 'tutor_campuses.campus_cd');
                             })
+                            ->orderBy('travel_costs.tutor_id', 'ASC')
+                            ->orderBy('travel_costs.campus_cd', 'ASC')
                             ->get();
 
                         // 給与算出交通費情報を保存

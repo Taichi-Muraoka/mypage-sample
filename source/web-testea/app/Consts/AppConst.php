@@ -2019,10 +2019,18 @@ class AppConst
     /**
      * 学年コード 高3
      */
-    const GRADE_CD_12 =12;
+    const GRADE_CD_12 = 12;
 
     /**
      * 学年コード 大学生
      */
-    const GRADE_CD_16 =16;
+    const GRADE_CD_16 = 16;
+
+    //-----------
+    // 講師所属情報
+    //-----------
+    /**
+     * 講師所属校舎登録最大数
+     */
+    const TUTOR_CAMPUS_MAX = 6;
 }
