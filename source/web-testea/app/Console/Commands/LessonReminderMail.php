@@ -78,6 +78,12 @@ class LessonReminderMail extends Command
 
             $batch_id = $batchMng->batch_id;
 
+            $res = DB::select("show variables like 'wait_timeout';");
+            Log::info($res);
+            DB::statement('SET wait_timeout=1200');
+            $res = DB::select("show variables like 'wait_timeout';");
+            Log::info($res);
+
             //-------------------------
             // メール配信可否判定
             //-------------------------
