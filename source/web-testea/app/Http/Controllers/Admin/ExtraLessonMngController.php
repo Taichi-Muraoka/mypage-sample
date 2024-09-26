@@ -125,7 +125,9 @@ class ExtraLessonMngController extends Controller
                 $join->on('extra_class_applications.status', '=', 'mst_codes.code')
                     ->where('mst_codes.data_type', AppConst::CODE_MASTER_1);
             })
-            ->orderby('apply_date', 'desc');
+            ->orderby('apply_date', 'desc')
+            ->orderby('campus_cd', 'asc')
+            ->orderby('extra_apply_id', 'asc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $extraClasses);

@@ -137,8 +137,9 @@ class GiveBadgeController extends Controller
                     ->where('data_type', AppConst::CODE_MASTER_55);
             })
             ->orderBy('badges.authorization_date', 'desc')
+            ->orderBy('badges.campus_cd', 'asc')
             ->orderBy('badges.badge_type', 'asc')
-            ->orderBy('badges.campus_cd', 'asc');
+            ->orderBy('badges.badge_id', 'asc');
 
         return $badgeList;
     }

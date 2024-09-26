@@ -43,6 +43,7 @@ trait FuncSurchargeTrait
             'surcharges.payment_status',
             'surcharges.approval_user',
             'surcharges.approval_time',
+            'surcharges.campus_cd',
             // 校舎の名称（本部あり）
             'campus_names.room_name as campus_name',
             // 講師の名称
@@ -128,7 +129,10 @@ trait FuncSurchargeTrait
             $query->SearchApplyDateTo($request);
 
             $query->orderBy('apply_date', 'desc')
-                ->orderBy('working_date', 'desc');
+                ->orderBy('working_date', 'desc')
+                ->orderBy('campus_cd', 'asc')
+                ->orderBy('tutor_id', 'asc')
+                ->orderBy('surcharge_id', 'asc');
         }
         if (AuthEx::isTutor()) {
             // 講師の場合

@@ -219,7 +219,8 @@ class GradeExampleController extends Controller
             // 学年の名称を取得
             ->sdLeftJoin(MstGrade::class, 'scores.grade_cd', '=', 'mst_grades.grade_cd')
             // ソート登録日降順
-            ->orderBy('scores.regist_date', 'desc');
+            ->orderBy('scores.regist_date', 'desc')
+            ->orderBy('scores.score_id', 'asc');
 
         return $gradeList;
     }
