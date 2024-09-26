@@ -108,7 +108,11 @@ class AbsentAcceptController extends Controller
 
         // データの取得
         $absentList = $this->getAbsentApplyDetail($query)
-            ->orderby('absent_applications.apply_date', 'desc');
+            ->orderby('absent_applications.apply_date', 'desc')
+            ->orderby('schedules.target_date', 'asc')
+            ->orderby('schedules.period_no', 'asc')
+            ->orderby('schedules.campus_cd', 'asc')
+            ->orderby('absent_applications.absent_apply_id', 'asc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $absentList);
