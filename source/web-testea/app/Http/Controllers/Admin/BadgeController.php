@@ -109,8 +109,9 @@ class BadgeController extends Controller
                 END AS disabled_btn"
             )
             ->orderBy('badges.authorization_date', 'desc')
+            ->orderBy('badges.campus_cd', 'asc')
             ->orderBy('badges.badge_type', 'asc')
-            ->orderBy('badges.campus_cd', 'asc');
+            ->orderBy('badges.badge_id', 'asc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $badgeList);

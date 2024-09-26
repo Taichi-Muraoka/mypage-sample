@@ -170,6 +170,7 @@ class ReportCheckController extends Controller
                 'reports.tutor_id',
                 'reports.approval_status',
                 'reports.regist_date',
+                'reports.campus_cd',
                 'room_names.room_name as room_name',
                 'mst_courses.name as course_name',
                 'mst_codes.name as status_name',
@@ -197,7 +198,10 @@ class ReportCheckController extends Controller
             })
             ->distinct()
             ->orderby('lesson_date', 'desc')
-            ->orderby('period_no', 'desc');
+            ->orderby('period_no', 'desc')
+            ->orderby('campus_cd', 'asc')
+            ->orderby('tutor_id', 'asc')
+            ->orderby('id', 'asc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $reports);

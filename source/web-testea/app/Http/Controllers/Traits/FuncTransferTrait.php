@@ -258,6 +258,7 @@ trait FuncTransferTrait
                 // 授業情報
                 'schedules.target_date',
                 'schedules.period_no',
+                'schedules.campus_cd',
                 // 生徒の名称
                 'students.name as student_name',
                 // 講師の名称
@@ -308,7 +309,9 @@ trait FuncTransferTrait
             })
             ->orderby('apply_date', 'desc')
             ->orderby('target_date', 'asc')
-            ->orderby('period_no', 'asc');
+            ->orderby('period_no', 'asc')
+            ->orderby('campus_cd', 'asc')
+            ->orderby('transfer_apply_id', 'asc');
 
         return $transfers;
     }

@@ -103,6 +103,7 @@ class TransferRequiredController extends Controller
         $schedule = $query
             ->select(
                 'schedule_id as id',
+                'campus_cd',
                 // 校舎の名称
                 'room_names.room_name as room_name',
                 // 生徒情報の名前
@@ -147,7 +148,9 @@ class TransferRequiredController extends Controller
                     ->where('data_type', AppConst::CODE_MASTER_35);
             })
             ->orderBy('target_date', 'desc')
-            ->orderBy('period_no', 'desc');
+            ->orderBy('period_no', 'desc')
+            ->orderBy('campus_cd', 'asc')
+            ->orderBy('schedule_id', 'asc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $schedule);

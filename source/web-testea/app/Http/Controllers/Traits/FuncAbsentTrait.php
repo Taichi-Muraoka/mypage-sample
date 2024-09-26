@@ -125,6 +125,7 @@ trait FuncAbsentTrait
                 'schedules.schedule_id',
                 'schedules.target_date',
                 'schedules.period_no',
+                'schedules.campus_cd',
                 // 校舎名
                 'mst_campuses.name as campus_name',
                 // コース名

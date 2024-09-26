@@ -241,6 +241,8 @@ class StudentClassController extends Controller
             'schedules.course_cd',
             'schedules.absent_status',
             'schedules.report_id as report_id',
+            'schedules.campus_cd',
+            'schedules.booth_cd',
             'mst_courses.short_name as course_name',
             'mst_courses.course_kind as course_kind',
             'students.name as student_name',
@@ -290,8 +292,12 @@ class StudentClassController extends Controller
             })
             // 振替済・リセット済スケジュールを除外
             ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
-            ->orderBy('schedules.target_date', 'desc')
-            ->orderBy('schedules.start_time', 'desc');
+            // 顧客要望により、日付・開始時刻の昇順とする
+            ->orderBy('schedules.target_date', 'asc')
+            ->orderBy('schedules.start_time', 'asc')
+            ->orderBy('schedules.campus_cd', 'asc')
+            ->orderBy('schedules.booth_cd', 'asc')
+            ->orderBy('schedules.schedule_id', 'asc');
 
         // ページネータで返却
         return $this->getListAndPaginator($request, $schedules, function ($items) {
