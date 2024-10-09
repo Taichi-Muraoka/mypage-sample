@@ -72,6 +72,10 @@ export default class PageSearchForm extends PageComponentBase {
         if (option["afterSearchBtnListExec"] == undefined) {
             option["afterSearchBtnListExec"] = false;
         }
+        // クリアボタン押下時の初期値セット処理
+        if (option["initDataSet"] == undefined) {
+            option["initDataSet"] = () => {};
+        }
 
         //--------------------
         // Vueの定義
@@ -148,7 +152,7 @@ export default class PageSearchForm extends PageComponentBase {
             methods: Object.assign(
                 {
                     //-----------------------
-                    // 検索条件クリア
+                    // 検索条件リセット（editData内容を残す）
                     //-----------------------
                     initSearchCond: function (event) {
                         for (const [key, value] of Object.entries(this.form)) {
@@ -157,6 +161,25 @@ export default class PageSearchForm extends PageComponentBase {
                                 this.form[key] = formDataInit[key];
                             }
                         }
+                    },
+                    //-----------------------
+                    // 検索条件クリア（editData内容もクリア）
+                    //-----------------------
+                    initSearchCondClear: function (event) {
+                        for (const [key, value] of Object.entries(this.form)) {
+                            // 検索フォームを初期化する
+                            if (key in this.form) {
+                                // idが [init_XXX] の場合はクリア対象外とする
+                                // （hiddenに初期値を保持することを想定）
+                                if (!key.startsWith('init_')) {
+                                    this.form[key] = "";
+                                    // datepickerはformのクリアで対応できなかったので以下追加
+                                    $("#"+key).val("");
+                                }
+                            }
+                        }
+                        // クリアボタン押下時の初期値セット
+                        option["initDataSet"](this);
                     },
                     //-----------------------
                     // 検索結果クリア
@@ -174,12 +197,13 @@ export default class PageSearchForm extends PageComponentBase {
                     // 検索ボタンクリック
                     //-----------------------
                     btnSearch: function (event) {
-                        this.execSearch();
+                        this.execSearch(false);
                     },
                     //-----------------------
                     // 検索実行
                     //-----------------------
-                    execSearch: function () {
+                    // init: 初回表示時かどうか
+                    execSearch: function (init = true) {
                         // 検索ボタンを非活性にする
                         this.disabledBtnSearch = true;
 
@@ -218,8 +242,17 @@ export default class PageSearchForm extends PageComponentBase {
                                     this.formAfterSearch[key] = value;
                                 }
 
+                                // 初期検索条件取得(ページ番号)
+                                let initSearchParamPage = 1;
+                                if (init) {
+                                    initSearchParamPage = this.form['init_search_param_page'];
+                                    if (!initSearchParamPage) {
+                                        initSearchParamPage = 1;
+                                    }
+                                }
+
                                 // 検索実行
-                                this.vueSearchList.search(this.form);
+                                this.vueSearchList.search(this.form, initSearchParamPage);
                             })
                             .catch(AjaxCom.fail);
                     },

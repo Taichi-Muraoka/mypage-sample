@@ -13,9 +13,88 @@ use Illuminate\Support\Facades\DB;
  */
 trait CtrlFormTrait
 {
+    /**
+     * 検索セッションの接頭辞を取得
+     */
+    private function getSessionPrefix()
+    {
+
+        return 'search_cond/';
+    }
+
     //------------------------------
     // 検索
     //------------------------------
+
+    /**
+     * 検索条件をセッションから取得
+     * 
+     * @return object 検索条件
+     */
+    protected function getSearchCond()
+    {
+        $request = request();
+
+        // パス
+        $relativeUrl = $request->path();
+
+        // 検索条件取得
+        // リファラを参照し、同一機能内のみセッションから取得
+        $referer = $request->headers->get('referer');
+        if ($referer) {
+            $refererPath = parse_url($referer, PHP_URL_PATH);
+            $checkUrl = '/' . $relativeUrl;
+
+            if (strpos($refererPath, $checkUrl) === 0) {
+                // 前方一致する場合は検索条件を取得
+                $sesionKey = $this->getSessionPrefix() . $relativeUrl . '/search';
+                // セッションから取得した検索条件を返却
+                return $request->session()->get($sesionKey);
+            }
+        }
+
+        // 検索条件の引継ぎがない場合
+        // 不要セッションの削除
+        $sessions = $request->session()->all();
+        foreach ($sessions as $key => $value) {
+            if (strpos($key, $this->getSessionPrefix()) === 0) {
+                $request->session()->forget($key);
+            }
+        }
+
+        return  (object) [
+            "form" => null,
+            "param" => null
+        ];
+    }
+
+    /**
+     * 検索条件をセッションに保存
+     * 
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @param int page ページ番号
+     */
+    protected function setSearchCond(Request $request, int $page)
+    {
+        // パス(キー)
+        $relativeUrl = $request->path();
+        $sesionKey = $this->getSessionPrefix() . $relativeUrl;
+
+        // フォーム値をセット
+        $form = $request->all();
+
+        $request->session()->put(
+            $sesionKey,
+            (object) [
+                "form" => $form,
+                // form以外の検索パラメータ
+                "param" => [
+                    // ページ番号
+                    "init_search_param_page" => $page,
+                ]
+            ],
+        );
+    }
 
     /**
      * 検索結果一覧をページャ付きで取得する
@@ -90,6 +169,9 @@ trait CtrlFormTrait
             is_array($window['last']) ? '...' : null,
             $window['last'],
         ]);
+
+        // 検索条件をセッションに保存
+        $this->setSearchCond($request, $page);
 
         // 結果を返却
         return ['paginator' => $paginator, 'elements' => $elements];
