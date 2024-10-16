@@ -24,11 +24,14 @@ class LessonReminder extends Mailable
     /**
      * Create a new message instance.
      *
+     * @param array 'name' 生徒名・講師名
+     *              'lesson' 授業情報
      * @return void
      */
-    public function __construct()
+    public function __construct($mail_body)
     {
-
+        // 本文に使用する変数を保持
+        $this->mail = $mail_body;
     }
 
     /**

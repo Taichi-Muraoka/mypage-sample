@@ -92,6 +92,17 @@ return [
             'tap' => [App\Logging\CustomLogger::class],
         ],
 
+        // バッチ処理のメール送信ログを別途出力する
+        'dailyMail' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel-mail.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            // 60 日くらい
+            'days' => 60,
+            // ログの内容をカスタマイズする
+            'tap' => [App\Logging\CustomLogger::class],
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
