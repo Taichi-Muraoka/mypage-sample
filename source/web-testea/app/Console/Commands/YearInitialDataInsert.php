@@ -111,6 +111,7 @@ class YearInitialDataInsert extends Command
                 $invoice = [
                     'invoice_date' => $key,
                     'import_state' => AppConst::CODE_MASTER_20_0,
+                    'mail_state' => AppConst::CODE_MASTER_56_0,
                     'created_at' => $now,
                     'updated_at' => $now
                 ];

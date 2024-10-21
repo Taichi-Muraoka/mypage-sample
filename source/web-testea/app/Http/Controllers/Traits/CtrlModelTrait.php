@@ -1040,6 +1040,23 @@ trait CtrlModelTrait
         return $mails->pluck('email');
     }
 
+    /**
+     * 生徒アカウントの保護者メールアドレスの取得
+     * 保護者メールアドレスの登録がない場合は生徒アドレスを取得する
+     *
+     * @param string $sid 生徒ID
+     * @return string メールアドレス
+     */
+    protected function mdlGetParentMail($sid)
+    {
+        $parentMail = Student::selectRaw(
+            'CASE WHEN email_par IS NOT NULL THEN email_par ELSE email_stu END as email')
+            ->where('student_id', $sid)
+            ->firstOrFail();
+
+        return $parentMail['email'];
+    }
+
     //------------------------------
     // join向けリストの作成
     //------------------------------
