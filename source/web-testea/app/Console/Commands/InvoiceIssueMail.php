@@ -192,7 +192,7 @@ class InvoiceIssueMail extends Command
                         ];
                         // メール送信
                         Mail::to($studentEmail)->send(new InvoiceIssue($mail_body));
-                        Log::channel('dailyMail')->info("InvoiceIssueMail student_id: " . $student->student_id . ", to: [\"" . $studentEmail . "\"]");
+                        Log::channel('dailyMail')->info("InvoiceIssueMail student_id: " . $student->student_id . ", to: [" . $studentEmail . "]");
                         $sendCount++;
                     }
                 }
