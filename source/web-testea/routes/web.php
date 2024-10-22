@@ -1595,6 +1595,15 @@ Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
     // バリデーション(登録用)
     Route::post('/invoice_import/vd_input', [InvoiceImportController::class, 'validationForInput'])->name('invoice_import-vd_input');
 
+    // メール送信実行 詳細取得用
+    Route::post('/invoice_import/get_data', [InvoiceImportController::class, 'getData'])->name('invoice_import-get_data');
+
+    // メール送信実行 モーダル処理
+    Route::post('/invoice_import/exec_modal', [InvoiceImportController::class, 'execModal'])->name('invoice_import-exec_modal');
+
+    // メール送信実行 バリデーション
+    Route::post('/invoice_import/vd_exec', [InvoiceImportController::class, 'validationForExec'])->name('invoice_import-vd_exec');
+
     //---------------------
     // 管理者アカウント管理
     //---------------------

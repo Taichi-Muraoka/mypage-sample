@@ -54,6 +54,12 @@ export default class PageModal extends PageComponentBase {
             option["addSendData"] = () => {};
         }
 
+        // Exec処理前にバリデーションを行うかどうか。
+        if (option["execValidate"] == undefined) {
+            option["execValidate"] = false;
+        }
+
+
         //--------------------
         // Vueの定義
         //--------------------
@@ -187,6 +193,75 @@ export default class PageModal extends PageComponentBase {
                         // プロミスを返却
                         this.deferred.resolve("result");
                     } else {
+                        // チェック処理有の場合
+                        if (option["execValidate"]) {
+                            const self = this;
+                            AjaxCom.getPromise()
+                            .then(() => {
+                                var url =
+                                    UrlCom.getFuncUrl() + "/vd_exec" + option["urlSuffix"];
+                                // モック時は送信しない
+                                if (!option["isMock"]) {
+                                    // バリデーション
+                                    var sendData = {};
+                                    return axios.post(url, sendData);
+                                }
+                            })
+                            .then((response) => {
+                                // モック時はチェックしない
+                                if (!option["isMock"]) {
+                                    // バリデーション結果をチェック
+                                    if (!(response.data.length <= 0)) {
+                                        if (
+                                            response.data.hasOwnProperty("validate_mail")
+                                        ) {
+                                            // メール送信処理中の場合、アラートダイアログを表示
+                                            appDialogCom.alert("メール一括送信処理中です。時間を空けて再実行してください。");
+                                        } else {
+                                            // このルートは現状通らない。
+                                            // 今後パターンが増えた場合のルートとして仮のエラーメッセージを設定しておく。
+                                            appDialogCom.alert("エラーが発生しました。");
+                                        }
+                                        // モーダルを閉じる
+                                        this.hide();
+                                        // 処理を抜ける
+                                        return AjaxCom.exit();
+                                    }
+                                }
+                            })
+                            .then(() => {
+                                // モーダルを閉じる
+                                this.hide();
+                                // ダイアログ
+                                appDialogCom.progressShow();
+                                // モーダル処理を行う
+                                const url =
+                                    UrlCom.getFuncUrl() +
+                                    "/exec_modal" +
+                                    option["urlSuffix"];
+                                // モック時は送信しない
+                                if (!option["isMock"]) {
+                                    // 送信
+                                    return axios.post(url, this.sendData);
+                                } else {
+                                    // ダミーウェイト
+                                    return DummyCom.wait();
+                                }
+                            })
+                            .then((response) => {
+                                // ダイアログ
+                                appDialogCom.progressHide();
+                                //-----------------------------
+                                // 完了メッセージ
+                                //-----------------------------
+                                return appDialogCom.success();
+                            })
+                            .then(
+                                // 後処理を実行する
+                                option["afterExec"]
+                            )
+                            .catch(AjaxCom.fail);
+                        } else {
                         //-----------------------------
                         // exec処理を呼ぶ
                         //-----------------------------
@@ -299,6 +374,7 @@ export default class PageModal extends PageComponentBase {
                                 option["afterExec"]
                             )
                             .catch(AjaxCom.fail);
+                        }
                     }
                 },
             },

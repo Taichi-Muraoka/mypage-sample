@@ -6,11 +6,12 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Log;
 
 /**
- * 翌日授業リマインド - メール
+ * 請求書発行通知 - メール
  */
-class LessonReminder extends Mailable
+class InvoiceIssue extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -24,8 +25,8 @@ class LessonReminder extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param array 'name' 生徒名・講師名
-     *              'lesson' 授業情報
+     * @param array 'name' 生徒名
+     *              'invoice_ym' 請求年月
      * @return void
      */
     public function __construct($mail_body)
@@ -41,12 +42,12 @@ class LessonReminder extends Mailable
      */
     public function build()
     {
-        $subject = Lang::get('message.mail.lesson_reminder.subject');
+        $subject = Lang::get('message.mail.invoice_issue.subject');
 
         return $this
             // タイトル
             ->subject($subject)
             // テンプレート
-            ->text('emails.lesson_reminder');
+            ->text('emails.invoice_issue');
     }
 }

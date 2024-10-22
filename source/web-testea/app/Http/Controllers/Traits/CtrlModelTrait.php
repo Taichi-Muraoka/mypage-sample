@@ -1048,6 +1048,47 @@ trait CtrlModelTrait
         return $campus->email_campus;
     }
 
+    /**
+     * 生徒アカウントの登録メールアドレスの取得
+     *
+     * @param string $sid 生徒ID
+     * @return array メールアドレス
+     */
+    protected function mdlGetStudentMailAll($sid)
+    {
+        $queryStuMail = Student::select('email_stu as email')
+            ->where('student_id', $sid)
+            ->whereNotNull('email_stu');
+
+        $queryParMail = Student::select('email_par as email')
+            ->where('student_id', $sid)
+            ->whereNotNull('email_par');
+
+        // 2つのqueryをUNIONし、対象生徒の登録メールドレスを取得
+        $mails = $queryStuMail
+            ->union($queryParMail)
+            ->get();
+
+        return $mails->pluck('email');
+    }
+
+    /**
+     * 生徒アカウントの保護者メールアドレスの取得
+     * 保護者メールアドレスの登録がない場合は生徒アドレスを取得する
+     *
+     * @param string $sid 生徒ID
+     * @return string メールアドレス
+     */
+    protected function mdlGetParentMail($sid)
+    {
+        $parentMail = Student::selectRaw(
+            'CASE WHEN email_par IS NOT NULL THEN email_par ELSE email_stu END as email')
+            ->where('student_id', $sid)
+            ->firstOrFail();
+
+        return $parentMail['email'];
+    }
+
     //------------------------------
     // join向けリストの作成
     //------------------------------
