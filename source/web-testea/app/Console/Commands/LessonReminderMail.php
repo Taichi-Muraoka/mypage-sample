@@ -13,6 +13,9 @@ use App\Models\ClassMember;
 use App\Models\Student;
 use App\Models\Tutor;
 use App\Models\MstCourse;
+use App\Models\MstSubject;
+use App\Models\MstBooth;
+use App\Models\CodeMaster;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\LessonReminder;
 use Carbon\Carbon;
@@ -117,14 +120,12 @@ class LessonReminderMail extends Command
                 // 対象スケジュール情報抽出
                 //-------------------------
                 $schedules = $this->getSchedule($tomorrow);
-                Log::info($schedules);
 
                 //-------------------------
                 // 対象生徒ID抽出
                 //-------------------------
                 $studentIds = $schedules->whereNotNull('student_id')
                     ->unique('student_id')->pluck('student_id');
-                Log::info($studentIds);
 
                 //-------------------------
                 // 対象講師ID抽出
@@ -132,7 +133,6 @@ class LessonReminderMail extends Command
                 // 対象講師リスト
                 $tutorIds = $schedules->whereNotNull('tutor_id')
                     ->unique('tutor_id')->pluck('tutor_id');
-                Log::info($tutorIds);
 
                 $sendCount = 0;
                 // 生徒毎の処理
@@ -142,8 +142,6 @@ class LessonReminderMail extends Command
                     //-------------------------
                     // 送信先メールアドレス取得
                     $studentEmail = $this->mdlGetStudentMailAll($sid);
-                    Log::debug($studentEmail);
-                    Log::debug(count($studentEmail));
                     // メールアドレス取得できる場合のみ、メール送信を行う
                     if (count($studentEmail) > 0) {
 
@@ -162,13 +160,26 @@ class LessonReminderMail extends Command
                             ->sortBy('target_date')->sortBy('start_time')
                             ->unique('schedule_id');
 
-                        // メール本文に記載するスケジュール情報をセット
+                        // メール本文に記載する授業情報をセット
                         $name =  $stuSchedules->first()->student_name;
                         $lessons = [];
                         foreach ($stuSchedules as $schedule) {
+                            // ブース名の設定
+                            if (
+                                $schedule->how_to_kind == AppConst::CODE_MASTER_33_1
+                                || $schedule->how_to_kind == AppConst::CODE_MASTER_33_2
+                            ) {
+                                // 生徒オンライン・両者オンラインの場合は、オンラインの表示とする
+                                $booth_name = "(オンライン)";
+                            } else {
+                                $booth_name = $schedule->booth_name;
+                            }
                             $lessons[] = [
                                 'date_time' => CommonDateFormat::formatYmdDay($schedule->target_date) . ' ' . $schedule->start_time->format('H:i'),
-                                'campus_name' => $schedule->room_name,
+                                'campus_name' => $schedule->room_name . " " . $booth_name,
+                                'subject_name' => $schedule->subject_name,
+                                'tutor_name' => $schedule->tutor_name . "先生",
+                                'student_name' => null,
                             ];
                         }
                         $mail_body = [
@@ -177,9 +188,8 @@ class LessonReminderMail extends Command
                         ];
                         // メール送信
                         Mail::to($studentEmail)->send(new LessonReminder($mail_body));
-                        Log::channel('dailyMail')->info("LessonReminderMail student_id: " . $sid . ", to: " . $studentEmail);
+                        Log::channel('dailyMail')->info("LessonReminderMail student_id: " . $sid . ", to: [" . implode(", ", $studentEmail) . "]");
                         $sendCount = $sendCount + count($studentEmail);
-                        Log::debug("sendCount=" . $sendCount);
                     }
                 }
 
@@ -190,7 +200,6 @@ class LessonReminderMail extends Command
                     //-------------------------
                     // 送信先メールアドレス取得
                     $tutorEmail = $this->mdlGetAccountMail($tid, AppConst::CODE_MASTER_7_2);
-                    Log::debug($tutorEmail);
                     // メール送信数チェック
                     if ($sendCount + 1 > self::MAIL_COUNT_MAX) {
                         // メール送信数がサーバーの15分毎の送信数上限を超える場合
@@ -205,13 +214,33 @@ class LessonReminderMail extends Command
                         ->sortBy('target_date')->sortBy('start_time')
                         ->unique('schedule_id');
 
-                    // メール本文に記載するスケジュール情報をセット
+                    // メール本文に記載する授業情報をセット
                     $name =  $teaSchedules->first()->tutor_name;
                     $lessons = [];
+                    $studentNameStr = null;
                     foreach ($teaSchedules as $schedule) {
+                        // 生徒名の設定（１対多授業の場合は全員の生徒を表示）
+                        $students = $schedules->where('schedule_id', $schedule->schedule_id)
+                            ->pluck('student_name')->toArray();
+                        $studentNameStr = implode("さん・", $students) . "さん";
+
+                        // ブース名の設定
+                        if (
+                            $schedule->how_to_kind == AppConst::CODE_MASTER_33_3
+                            || $schedule->how_to_kind == AppConst::CODE_MASTER_33_2
+                        ) {
+                            // 講師オンライン・両者オンラインの場合は、オンラインの表示とする
+                            $booth_name = "(オンライン)";
+                        } else {
+                            $booth_name = $schedule->booth_name;
+                        }
+
                         $lessons[] = [
                             'date_time' => CommonDateFormat::formatYmdDay($schedule->target_date) . ' ' . $schedule->start_time->format('H:i'),
-                            'campus_name' => $schedule->room_name,
+                            'campus_name' => $schedule->room_name . " " . $booth_name,
+                            'subject_name' => $schedule->subject_name,
+                            'tutor_name' => null,
+                            'student_name' => $studentNameStr,
                         ];
                     }
                     $mail_body = [
@@ -221,9 +250,8 @@ class LessonReminderMail extends Command
 
                     // メール送信
                     Mail::to($tutorEmail)->send(new LessonReminder($mail_body));
-                    Log::channel('dailyMail')->info("LessonReminderMail tutor_id: " . $tid . ", to: [\"" . $tutorEmail . "\"]");
+                    Log::channel('dailyMail')->info("LessonReminderMail tutor_id: " . $tid . ", to: [" . $tutorEmail . "]");
                     $sendCount++;
-                    Log::debug("sendCount=" . $sendCount);
                 }
 
                 // バッチ管理テーブルのレコードを更新：正常終了
@@ -272,11 +300,13 @@ class LessonReminderMail extends Command
                 'schedules.campus_cd',
                 'room_names.room_name as room_name',
                 'schedules.target_date',
-                'schedules.period_no',
                 'schedules.start_time',
-                'schedules.end_time',
                 'schedules.tutor_id',
                 'tutors.name as tutor_name',
+                'mst_courses.course_kind',
+                'mst_booths.name as booth_name',
+                'mst_subjects.name as subject_name',
+                'schedules.how_to_kind',
             )
             // 生徒ID取得
             ->selectRaw(
@@ -321,6 +351,15 @@ class LessonReminderMail extends Command
             // コースマスタをJOIN
             ->sdJoin(MstCourse::class, function ($join) {
                 $join->on('schedules.course_cd', 'mst_courses.course_cd');
+            })
+            // 科目名の取得
+            ->sdLeftJoin(MstSubject::class, function ($join) {
+                $join->on('schedules.subject_cd', 'mst_subjects.subject_cd');
+            })
+            // ブース名の取得
+            ->sdLeftJoin(MstBooth::class, function ($join) {
+                $join->on('schedules.campus_cd', 'mst_booths.campus_cd');
+                $join->on('schedules.booth_cd', 'mst_booths.booth_cd');
             })
             // 授業日＝対象日
             ->where('schedules.target_date', $targetDate)
