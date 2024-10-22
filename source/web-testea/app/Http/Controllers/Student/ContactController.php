@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Libs\CommonDateFormat;
 use App\Models\Contact;
 use Illuminate\Support\Facades\Auth;
 use App\Consts\AppConst;
@@ -12,6 +13,9 @@ use App\Models\AdminUser;
 use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncContactTrait;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use App\Mail\ContactToOffice;
 
 /**
  * 問い合わせ - コントローラ
@@ -168,23 +172,56 @@ class ContactController extends Controller
         $account = Auth::user();
         $sid = $account->account_id;
 
-        // フォームから受け取った値を格納
-        $form = $request->only(
-            // roomcdのガードのチェックはvalidationRoomListのバリデーションで行っている
-            'campus_cd',
-            'title',
-            'text'
-        );
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($request, $sid) {
 
-        // 本日の日時
-        $now = Carbon::now();
+            // フォームから受け取った値を格納
+            $form = $request->only(
+                // roomcdのガードのチェックはvalidationRoomListのバリデーションで行っている
+                'campus_cd',
+                'title',
+                'text'
+            );
 
-        // 保存
-        $contact = new Contact;
-        $contact->student_id = $sid;
-        $contact->regist_time = $now;
-        $contact->contact_state = AppConst::CODE_MASTER_17_0;
-        $contact->fill($form)->save();
+            // 本日の日時
+            $now = Carbon::now();
+
+            // 保存
+            $contact = new Contact;
+            $contact->student_id = $sid;
+            $contact->regist_time = $now;
+            $contact->contact_state = AppConst::CODE_MASTER_17_0;
+            $res = $contact->fill($form)->save();
+
+            //-------------------------
+            // メール送信
+            //-------------------------
+            // save成功時のみ送信
+            if ($res) {
+                // 校舎名取得
+                $campus_name = $this->mdlGetRoomName($form['campus_cd'], true);
+                // 生徒名取得
+                $student_name = $this->mdlGetStudentName($sid);
+
+                // 送信先メールアドレス取得
+                if ($form['campus_cd'] == AppConst::CODE_MASTER_6_0) {
+                    // 本部宛の場合は本部用メールアドレスを取得（envから）
+                    $campusEmail = config('appconf.mail_honbu_address');
+                } else {
+                    $campusEmail = $this->mdlGetCampusMail($form['campus_cd']);
+                }
+                $this->debug($campusEmail);
+                $mail_body = [
+                    'student_name' => $student_name,
+                    'contact_date' => CommonDateFormat::formatYmdDay($contact->regist_time),
+                    'campus_name' => $campus_name,
+                    'title' => $form['title'],
+                    'text' => $form['text']
+                ];
+
+                Mail::to($campusEmail)->send(new ContactToOffice($mail_body));
+            }
+        });
 
         return;
     }

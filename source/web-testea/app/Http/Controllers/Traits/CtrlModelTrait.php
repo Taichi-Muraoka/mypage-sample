@@ -926,15 +926,27 @@ trait CtrlModelTrait
      * 校舎名の取得
      *
      * @param string $campusCd 校舎コード
+     * @param boolean $honbu 本部を含めるかどうか
      * @return string
      */
-    protected function mdlGetRoomName($campusCd)
+    protected function mdlGetRoomName($campusCd, $honbu = false)
     {
         // 校舎名を取得
-        $query = MstCampus::query();
+        $query = MstCampus::select('name')
+            ->where('campus_cd', $campusCd);
+
+        // 本部を追加するかどうか
+        if ($honbu) {
+            // コードマスタより「本部」名称取得
+            $queryHonbu = CodeMaster::select('name')
+                ->where('data_type', AppConst::CODE_MASTER_6)
+                ->where('gen_item1', $campusCd);
+
+            // UNIONで校舎リストに加える
+            $query->union($queryHonbu);
+        }
+        // 校舎リストを取得
         $campus = $query
-            ->select('name')
-            ->where('campus_cd', $campusCd)
             ->firstOrFail();
 
         return $campus->name;
@@ -978,6 +990,26 @@ trait CtrlModelTrait
             ->firstOrFail();
 
         return $tutor->name;
+    }
+
+    /**
+     * 管理者名の取得
+     *
+     * @param int $admId 管理者ID
+     * @return string
+     */
+    protected function mdlGetAdminName($admId)
+    {
+        // 講師名を取得する
+        $query = AdminUser::query();
+        $admin = $query
+            ->select(
+                'name'
+            )
+            ->where('adm_id', '=', $admId)
+            ->firstOrFail();
+
+        return $admin->name;
     }
 
     //------------------------------

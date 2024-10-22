@@ -12,11 +12,11 @@ return [
     //==========================
 
     /**
-     * 欠席申請時の管理者のメールアドレス
+     * 問い合わせ時の本部宛メールアドレス
      *
      * 未設定の場合はMAIL_FROM_ADDRESS（管理者想定）にする
      */
-    "mail_absent_to_address" => env('MAIL_ABSENT_TO_ADDRESS', env('MAIL_FROM_ADDRESS')),
+    "mail_honbu_address" => env('MAIL_HONBU_ADDRESS', env('MAIL_FROM_ADDRESS')),
 
     /**
      * パスワードリセット用URL（新規入会時のメールに記載）
