@@ -7,11 +7,13 @@ use App\Http\Controllers\Traits\CtrlFileTrait;
 use App\Http\Controllers\Traits\CtrlCsvTrait;
 use App\Exceptions\ReadDataValidateException;
 use App\Consts\AppConst;
+use Illuminate\Support\Facades\Auth;
 use App\Libs\AuthEx;
 use App\Models\InvoiceImport;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\CodeMaster;
+use App\Models\BatchMng;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Lang;
@@ -67,6 +69,8 @@ class InvoiceImportController extends Controller
     {
         // 翌月の月初を取得
         $nextMonth = date('Y-m-d', strtotime('first day of next month '));
+        // 当月の月初を取得
+        $thisMonth = date('Y-m-d', strtotime('first day of this month '));
 
         // 請求情報取込を取得
         $query = InvoiceImport::query();
@@ -74,13 +78,30 @@ class InvoiceImportController extends Controller
             ->select(
                 'invoice_date',
                 'import_state',
-                'name AS state_name'
+                'mail_state',
+                'mst_codes_20.name AS state_name',
+                'mst_codes_56.name AS mail_state_name'
+            )
+            // メール送信ボタン制御
+            // 取込状態＝取込済 AND メール送信状態＝送信未 AND 当月以降の場合、押下可
+            ->selectRaw(
+                "CASE WHEN (" .
+                    " import_state = " . AppConst::CODE_MASTER_20_1 .
+                    " AND mail_state = " . AppConst::CODE_MASTER_56_0 .
+                    " AND invoice_date >= '" . $thisMonth .
+                    "') THEN false ELSE true " .
+                    "END AS disabled_btn_mail"
             )
             // 取り込み状態
             ->sdLeftJoin(CodeMaster::class, function ($join) {
-                $join->on('invoice_import.import_state', '=', 'mst_codes.code')
-                    ->where('mst_codes.data_type', AppConst::CODE_MASTER_20);
-            })
+                $join->on('invoice_import.import_state', '=', 'mst_codes_20.code')
+                    ->where('mst_codes_20.data_type', AppConst::CODE_MASTER_20);
+            }, 'mst_codes_20')
+            // メール送信状態
+            ->sdLeftJoin(CodeMaster::class, function ($join) {
+                $join->on('invoice_import.mail_state', '=', 'mst_codes_56.code')
+                    ->where('mst_codes_56.data_type', AppConst::CODE_MASTER_56);
+            }, 'mst_codes_56')
             ->where('invoice_date', '<=', $nextMonth)
             ->orderBy('invoice_date', 'desc');
 
@@ -92,6 +113,130 @@ class InvoiceImportController extends Controller
             }
             return $items;
         });
+    }
+
+    //==========================
+    // バッチ実行（メール送信）
+    //==========================
+    /**
+     * 詳細取得
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed 詳細データ
+     */
+    public function getData(Request $request)
+    {
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request, 'id');
+
+        // dateの形式のバリデーションと変換
+        $idDate = $this->fmYmToDate($request['id']);
+
+        return [
+            'invoice_date' => $idDate
+        ];
+    }
+
+    /**
+     * バリデーション(メール送信用)
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return mixed バリデーション結果
+     */
+    public function validationForExec(Request $request)
+    {
+        // リクエストデータチェック
+        $validator = Validator::make($request->all(), $this->rulesForExec());
+        return $validator->errors();
+    }
+
+    /**
+     * バリデーションルールを取得(登録用)
+     *
+     * @return array ルール
+     */
+    private function rulesForExec()
+    {
+        $rules = array();
+
+        // 独自バリデーション: 一括メール送信の実行可否
+        $validationSendMail = function ($attribute, $value, $fail) {
+
+            // 一括メール送信処理のバッチが実行中かチェック
+            // バッチ管理テーブルから実行中のメール送信処理を取得
+            $batchMng = BatchMng::select('batch_state')
+                ->whereIn('batch_type', [AppConst::BATCH_TYPE_4, AppConst::BATCH_TYPE_6])
+                ->orderBy('start_time', 'DESC')
+                ->first();
+
+            if ($batchMng->batch_state == AppConst::CODE_MASTER_22_99) {
+                // メール送信バッチが実行中である場合、メール送信不可メッセージ表示とする
+                return false;
+            }
+            return true;
+        };
+
+        // 入力項目と紐づけないバリデーションは以下のように指定する
+        Validator::extendImplicit('invalid_input', $validationSendMail);
+        $rules += ['validate_mail' => ['invalid_input']];
+
+        return $rules;
+    }
+
+    /**
+     * モーダル処理
+     *
+     * @param \Illuminate\Http\Request $request リクエスト
+     * @return void
+     */
+    public function execModal(Request $request)
+    {
+        // IDのバリデーション
+        $this->validateIdsFromRequest($request, 'id');
+        $invoiceYm = $request['id'];
+
+        // モーダルによって処理を行う
+        $modal = $request->input('target');
+
+        switch ($modal) {
+            case "#modal-dtl-mail":
+
+                // dateの形式のバリデーションと変換
+                $invoiceDate = $this->fmYmToDate($request['id']);
+
+                // 請求取込情報のチェック
+                // 対象年月の請求情報が取込済かつメール未送信かどうか
+                // システムから実行される場合は、呼び出し元でもチェックする
+                $importChk = InvoiceImport::where('invoice_date', $invoiceDate)
+                    ->where('import_state', AppConst::CODE_MASTER_20_1)
+                    ->where('mail_state', AppConst::CODE_MASTER_56_0)
+                    ->exists();
+
+                if (!$importChk) {
+                    // チェックNGの場合エラーとする（画面ではガードをかけているため）
+                    $this->illegalResponseErr();
+                }
+
+                // 実行者のアカウントIDを取得
+                $account_id = Auth::user()->account_id;
+                $base_path = base_path();
+
+                // 非同期実行する
+                if (strpos(PHP_OS, 'WIN') !== false) {
+                    // Windows
+                    $command = 'start /b /d ' . base_path() . ' php artisan command:invoiceIssueMail ' . $invoiceYm . ' ' . $account_id;
+                    $fp = popen($command, 'r');
+                    pclose($fp);
+                } else {
+                    // Linux
+                    $command = "cd {$base_path} && php artisan command:invoiceIssueMail {$invoiceYm} {$account_id} > /dev/null &";
+                    exec($command);
+                }
+                return;
+            default:
+                // 該当しない場合
+                $this->illegalResponseErr();
+        }
     }
 
     //==========================
