@@ -177,7 +177,6 @@ class InvoiceImportController extends Controller
         };
 
         // 入力項目と紐づけないバリデーションは以下のように指定する
-        // 講師選択チェック
         Validator::extendImplicit('invalid_input', $validationSendMail);
         $rules += ['validate_mail' => ['invalid_input']];
 
