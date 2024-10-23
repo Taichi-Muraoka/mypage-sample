@@ -17,6 +17,8 @@ use Carbon\Carbon;
 use App\Http\Controllers\Traits\FuncBadgeTrait;
 use App\Libs\AuthEx;
 use App\Models\AdminUser;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BadgeGiveToStudent;
 
 /**
  * バッジ付与 - コントローラ
@@ -276,7 +278,23 @@ class BadgeController extends Controller
             $noticeDestination->student_id = $badge->student_id;
 
             // 保存
-            $noticeDestination->save();
+            $res = $noticeDestination->save();
+
+            //-------------------------
+            // メール送信
+            //-------------------------
+            // save成功時のみ送信
+            if ($res) {
+                // 送信先生徒メールアドレス取得
+                $studentEmail = $this->mdlGetAccountMail($badge->student_id, AppConst::CODE_MASTER_7_1);
+
+                $mail_body = [
+                    'reason' => $badge->reason
+                ];
+
+                Mail::to($studentEmail)->send(new BadgeGiveToStudent($mail_body));
+            }
+
         });
 
         return;

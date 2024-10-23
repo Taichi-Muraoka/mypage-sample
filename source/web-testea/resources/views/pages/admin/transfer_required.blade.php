@@ -16,6 +16,10 @@
             <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData :select2Search=false/>
             @endcan
         </x-bs.col2>
+        <x-bs.col2>
+            <x-input.select id="absent_status" caption="出欠ステータス" :select2=true :mastrData=$absentStatusList :editData=$editData
+                :rules=$rules :select2Search=false :blank=true/>
+        </x-bs.col2>
     </x-bs.row>
 
     <x-bs.row>

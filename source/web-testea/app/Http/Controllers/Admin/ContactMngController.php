@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use App\Libs\CommonDateFormat;
 use App\Models\AdminUser;
 use App\Consts\AppConst;
 use App\Models\CodeMaster;
@@ -13,6 +14,9 @@ use App\Models\Student;
 use Illuminate\Support\Facades\Lang;
 use App\Http\Controllers\Traits\FuncContactTrait;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use App\Mail\ContactReplyToStudent;
 
 /**
  * 問い合わせ管理 - コントローラ
@@ -332,28 +336,57 @@ class ContactMngController extends Controller
         // 登録前バリデーション。NGの場合はレスポンスコード422を返却
         Validator::make($request->all(), $this->rulesForInput())->validate();
 
-        // 保存する項目のみに絞る
-        $form = $request->only(
-            'contact_id',
-            'regist_time',
-            'campus_cd',
-            'title',
-            'text',
-            'adm_id',
-            'answer_time',
-            'answer_text',
-            'contact_state'
-        );
+        // トランザクション(例外時は自動的にロールバック)
+        DB::transaction(function () use ($request) {
 
-        // 対象データを取得(IDでユニークに取る)
-        $contact = Contact::where('contact_id', $form['contact_id'])
-            // 教室管理者の場合、自分の教室コードのみにガードを掛ける
-            ->where($this->guardRoomAdminTableWithRoomCd())
-            // 該当データがない場合はエラーを返す
-            ->firstOrFail();
+            // 保存する項目のみに絞る
+            $form = $request->only(
+                'contact_id',
+                'regist_time',
+                'campus_cd',
+                'title',
+                'text',
+                'adm_id',
+                'answer_time',
+                'answer_text',
+                'contact_state'
+            );
 
-        // 登録
-        $contact->fill($form)->save();
+            // 対象データを取得(IDでユニークに取る)
+            $contact = Contact::where('contact_id', $form['contact_id'])
+                // 教室管理者の場合、自分の教室コードのみにガードを掛ける
+                ->where($this->guardRoomAdminTableWithRoomCd())
+                // 該当データがない場合はエラーを返す
+                ->firstOrFail();
+
+            // 更新前のステータスを退避
+            $statusBef = $contact->contact_state;
+            // 登録
+            $res = $contact->fill($form)->save();
+
+            //-------------------------
+            // メール送信
+            //-------------------------
+            // save成功時のみ送信
+            // 初回の回答登録時のみ送信（登録前のステータスが未回答 かつ フォームのステータスが回答済）
+            if ($res && $statusBef == AppConst::CODE_MASTER_17_0
+                && $form['contact_state'] == AppConst::CODE_MASTER_17_1) {
+                // 送信先生徒メールアドレス取得
+                $studentEmail = $this->mdlGetAccountMail($contact->student_id, AppConst::CODE_MASTER_7_1);
+                // 回答者名取得
+                $admin_name = $this->mdlGetAdminName($form['adm_id']);
+
+                $mail_body = [
+                    'admin_name' => $admin_name,
+                    'answer_date' => CommonDateFormat::formatYmdDay($form['answer_time']),
+                    'title' => $form['title'],
+                    'answer_text' => $form['answer_text']
+                ];
+
+                Mail::to($studentEmail)->send(new ContactReplyToStudent($mail_body));
+            }
+        });
+
         return;
     }
 

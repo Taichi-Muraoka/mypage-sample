@@ -34,6 +34,10 @@
     <x-input.select id="contact_state" caption="ステータス" :editData=$editData :mastrData=$contactState
         :select2=true :select2Search=false :blank=false />
 
+    <x-bs.callout title="登録の際の注意事項" type="warning">
+        回答を登録すると生徒へメールが送信されます。（ステータスを未回答から回答済に更新時）
+    </x-bs.callout>
+
     {{-- hidden --}}
     <x-input.hidden id="contact_id" :editData=$editData />
 
