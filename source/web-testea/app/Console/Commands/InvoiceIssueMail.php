@@ -157,7 +157,7 @@ class InvoiceIssueMail extends Command
                     'students.name',
                 )
                     // 生徒名の取得
-                    ->sdLeftJoin(Student::class, function ($join) {
+                    ->sdJoin(Student::class, function ($join) {
                         $join->on('invoices.student_id', 'students.student_id');
                     })
                     ->where('invoice_date', '=', $invoiceDate)
