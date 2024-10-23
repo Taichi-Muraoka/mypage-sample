@@ -240,8 +240,8 @@ class AppMenuFilter implements FilterInterface
             if ((isset($item["menuid"])) && ($item["menuid"] === "id_mng_salary")) {
 
                 // 追加請求受付
-                // 承認ステータス＝承認待ち または 差戻し の件数
-                $query = Surcharge::whereIn('approval_status', [AppConst::CODE_MASTER_2_0, AppConst::CODE_MASTER_2_2]);
+                // 承認ステータス＝承認待ちの件数
+                $query = Surcharge::where('approval_status', AppConst::CODE_MASTER_2_0);
 
                 // 校舎の絞り込み
                 if (AuthEx::isRoomAdmin()) {
