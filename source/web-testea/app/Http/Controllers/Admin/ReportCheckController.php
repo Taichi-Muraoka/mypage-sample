@@ -67,6 +67,10 @@ class ReportCheckController extends Controller
         $subCodes = [AppConst::CODE_MASTER_4_SUB_1];
         $statusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_4, $subCodes);
 
+        // セッションから検索条件を取得
+        $searchCond = $this->getSearchCond();
+        $searchCondForm = $searchCond ? $searchCond->form : null;
+
         return view('pages.admin.report_check', [
             'rules' => $this->rulesForSearch(null),
             'rooms' => $rooms,
@@ -75,7 +79,8 @@ class ReportCheckController extends Controller
             'students' => $students,
             'courses' => $courses,
             'statusList' => $statusList,
-            'editData' => null
+            // 検索条件入力値をeditDataに設定
+            'editData' => $searchCondForm,
         ]);
     }
 

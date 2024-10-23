@@ -1037,7 +1037,7 @@ trait CtrlModelTrait
             ->union($queryParMail)
             ->get();
 
-        return $mails->pluck('email');
+        return $mails->pluck('email')->toArray();
     }
 
     /**

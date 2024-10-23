@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- 検索フォーム --}}
-<x-bs.card :search=true>
+<x-bs.card :search=true :initSearchCond=true>
 
     <x-bs.row>
         <x-bs.col2>
@@ -14,7 +14,7 @@
             <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false :blank=false/>
             @else
-            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData 
+            <x-input.select id="campus_cd" caption="校舎" :select2=true :mastrData=$rooms :editData=$editData
                 :select2Search=false/>
             @endcan
         </x-bs.col2>

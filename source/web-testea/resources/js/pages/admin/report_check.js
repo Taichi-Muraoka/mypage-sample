@@ -16,13 +16,17 @@ export default class AppClass extends PageBase {
      */
     start() {
         const self = this;
-        
+
+        // Vue: 検索フォーム
+        var searchForm = this.getVueSearchForm();
+
         // Vue: モーダル
         this.getVueModal();
 
-        // 完了後は一覧へ戻る
+        // 完了処理後
         var afterExec = () => {
-            UrlCom.redirect(UrlCom.getFuncUrl());
+            // 一覧を再表示する
+            searchForm.vueSearchList.refresh();
         };
 
         // Vue: モーダル(承認)
@@ -33,8 +37,5 @@ export default class AppClass extends PageBase {
             // 完了処理後
             afterExec: afterExec
         });
-
-        // Vue: 検索フォーム
-        this.getVueSearchForm();
     }
 }
