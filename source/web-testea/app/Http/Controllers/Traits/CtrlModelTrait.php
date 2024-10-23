@@ -75,6 +75,28 @@ trait CtrlModelTrait
 
     /**
      * コードマスタからプルダウンメニューのリストを取得
+     * data_typeを指定・codeで絞り込み
+     *
+     * @param integer $dataType
+     * @param array $codes コード（配列で指定）
+     * @return array
+     */
+    protected function mdlMenuFromCodeMasterByCode($dataType, $codes)
+    {
+
+        $query = CodeMaster::query();
+
+        // プルダウンリストを取得する
+        return $query->select('code', 'name as value')
+            ->where('data_type', $dataType)
+            ->whereIn('code', $codes)
+            ->orderby('order_code')
+            ->get()
+            ->keyBy('code');
+    }
+
+    /**
+     * コードマスタからプルダウンメニューのリストを取得
      * data_typeと、名称として取得するカラム名を指定する
      *
      * @param integer $dataType

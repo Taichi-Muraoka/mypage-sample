@@ -46,6 +46,9 @@ class TransferRequiredController extends Controller
         // 校舎プルダウン
         $rooms = $this->mdlGetRoomList(false);
 
+        // 出欠ステータスリストを取得
+        $absentStatus = $this->mdlMenuFromCodeMasterByCode(AppConst::CODE_MASTER_35, [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4]);
+
         // 生徒リストを取得
         $studentList = $this->mdlGetStudentList();
 
@@ -56,6 +59,7 @@ class TransferRequiredController extends Controller
             'rules' => $this->rulesForSearch(null),
             'editData' => null,
             'rooms' => $rooms,
+            'absentStatusList' => $absentStatus,
             'studentList' => $studentList,
             'tutorList' => $tutorList
         ]);
@@ -96,6 +100,9 @@ class TransferRequiredController extends Controller
         // 日付の絞り込み条件
         $query->SearchTargetDateFrom($form);
         $query->SearchTargetDateTo($form);
+
+        // 出欠ステータス選択により絞り込み条件
+        $query->SearchAbsentStatus($form);
 
         // 教室名取得のサブクエリ
         $room = $this->mdlGetRoomQuery();
