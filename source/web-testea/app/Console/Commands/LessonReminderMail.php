@@ -11,11 +11,16 @@ use App\Models\BatchMng;
 use App\Models\Schedule;
 use App\Models\ClassMember;
 use App\Models\Student;
+use App\Models\Tutor;
 use App\Models\MstCourse;
+use App\Models\MstSubject;
+use App\Models\MstBooth;
+use App\Models\CodeMaster;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\LessonReminder;
 use Carbon\Carbon;
 use App\Consts\AppConst;
+use App\Libs\CommonDateFormat;
 use App\Http\Controllers\Traits\CtrlModelTrait;
 
 /**
@@ -110,95 +115,24 @@ class LessonReminderMail extends Command
             DB::transaction(function () use ($batch_id) {
 
                 $tomorrow = Carbon::tomorrow()->format('y-m-d');
-                //-------------------------
-                // 対象生徒抽出
-                //-------------------------
-                // １対１授業の対象生徒取得クエリ
-                $queryScheduleStudent = Schedule::select(
-                    'schedules.student_id',
-                )
-                    // コースマスタをJOIN
-                    ->sdJoin(MstCourse::class, function ($join) {
-                        $join->on('schedules.course_cd', 'mst_courses.course_cd');
-                    })
-                    // 生徒情報をJOIN
-                    ->sdJoin(Student::class, function ($join) {
-                        $join->on('schedules.student_id', 'students.student_id');
-                    })
-                    // 授業日＝翌日
-                    ->where('schedules.target_date', $tomorrow)
-                    // コース種別＝１対１授業
-                    ->where('mst_courses.course_kind', AppConst::CODE_MASTER_42_1)
-                    // 未振替・振替中・振替済・リセット済スケジュールを除外
-                    ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4, AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
-                    // 仮登録スケジュールを除外
-                    ->where('schedules.tentative_status', '!=', AppConst::CODE_MASTER_36_1)
-                    // 見込客の生徒を除外
-                    ->where('students.stu_status', '!=', AppConst::CODE_MASTER_28_0)
-                    ->whereNotNull('schedules.student_id');
 
-                // １対他授業の対象生徒取得クエリ
-                $queryClassMember = Schedule::select(
-                    'class_members.student_id',
-                )
-                    // 受講生徒情報とJOIN
-                    ->sdJoin(ClassMember::class, function ($join) {
-                        $join->on('schedules.schedule_id', 'class_members.schedule_id');
-                    })
-                    // コースマスタをJOIN
-                    ->sdJoin(MstCourse::class, function ($join) {
-                        $join->on('schedules.course_cd', 'mst_courses.course_cd');
-                    })
-                    // 生徒情報をJOIN
-                    ->sdJoin(Student::class, function ($join) {
-                        $join->on('class_members.student_id', 'students.student_id');
-                    })
-                    // 授業日＝翌日
-                    ->where('schedules.target_date', $tomorrow)
-                    // コース種別＝１対他授業
-                    ->where('mst_courses.course_kind', AppConst::CODE_MASTER_42_2)
-                    // 欠席者（予定）を除外
-                    ->where('class_members.absent_status', '!=', AppConst::CODE_MASTER_35_6)
-                    // 見込客の生徒を除外
-                    ->where('students.stu_status', '!=', AppConst::CODE_MASTER_28_0);
-
-                // 2つのqueryをUNIONし、対象生徒リストを取得
-                $students = $queryScheduleStudent
-                    ->union($queryClassMember)
-                    ->get();
-
-                // 対象生徒リスト
-                $studentIds = [];
-                foreach ($students as $student) {
-                    array_push($studentIds, $student->student_id);
-                }
                 //-------------------------
-                // 対象講師抽出
+                // 対象スケジュール情報抽出
                 //-------------------------
-                $tutors = Schedule::select(
-                    'schedules.tutor_id',
-                )
-                    // コースマスタをJOIN
-                    ->sdJoin(MstCourse::class, function ($join) {
-                        $join->on('schedules.course_cd', 'mst_courses.course_cd');
-                    })
-                    // 授業日＝翌日
-                    ->where('schedules.target_date', $tomorrow)
-                    // 未振替・振替中・振替済・リセット済スケジュールを除外
-                    ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4, AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
-                    // 仮登録スケジュールを除外
-                    ->where('schedules.tentative_status', '!=', AppConst::CODE_MASTER_36_1)
-                    // コース種別＝１対１授業または１対他授業
-                    ->whereIn('mst_courses.course_kind', [AppConst::CODE_MASTER_42_1, AppConst::CODE_MASTER_42_2])
-                    ->whereNotNull('tutor_id')
-                    ->distinct()
-                    ->get();
+                $schedules = $this->getSchedule($tomorrow);
 
+                //-------------------------
+                // 対象生徒ID抽出
+                //-------------------------
+                $studentIds = $schedules->whereNotNull('student_id')
+                    ->unique('student_id')->pluck('student_id');
+
+                //-------------------------
+                // 対象講師ID抽出
+                //-------------------------
                 // 対象講師リスト
-                $tutorIds = [];
-                foreach ($tutors as $tutor) {
-                    array_push($tutorIds, $tutor->tutor_id);
-                }
+                $tutorIds = $schedules->whereNotNull('tutor_id')
+                    ->unique('tutor_id')->pluck('tutor_id');
 
                 $sendCount = 0;
                 // 生徒毎の処理
@@ -207,19 +141,55 @@ class LessonReminderMail extends Command
                     // メール送信(生徒宛)
                     //-------------------------
                     // 送信先メールアドレス取得
-                    $studentEmail = $this->mdlGetAccountMail($sid, AppConst::CODE_MASTER_7_1);
-                    // メール本文固定
-                    // メール送信
-                    Mail::to($studentEmail)->send(new LessonReminder());
-                    $sendCount++;
+                    $studentEmail = $this->mdlGetStudentMailAll($sid);
+                    // メールアドレス取得できる場合のみ、メール送信を行う
+                    if (count($studentEmail) > 0) {
 
-                    // メール送信数チェック
-                    if ($sendCount >= self::MAIL_COUNT_MAX) {
-                        // メール送信数がサーバーの15分毎の送信数上限を超える場合
-                        // 15分sleep
-                        Log::info("Send {$sendCount} mail. Sendmail wait...");
-                        Sleep::for(15)->minutes();
-                        $sendCount = 0;
+                        // メール送信数チェック
+                        if ($sendCount + count($studentEmail) > self::MAIL_COUNT_MAX) {
+                            // メール送信数がサーバーの15分毎の送信数上限を超える場合
+                            // 15分sleep
+                            Log::info("Send {$sendCount} mail. Sendmail wait...");
+                            Sleep::for(15)->minutes();
+                            $sendCount = 0;
+                        }
+
+                        // 対象生徒のスケジュール情報を取得
+                        //（取得済みのcollectionより）
+                        $stuSchedules = $schedules->where('student_id', $sid)
+                            ->sortBy('target_date')->sortBy('start_time')
+                            ->unique('schedule_id');
+
+                        // メール本文に記載する授業情報をセット
+                        $name =  $stuSchedules->first()->student_name;
+                        $lessons = [];
+                        foreach ($stuSchedules as $schedule) {
+                            // ブース名の設定
+                            if (
+                                $schedule->how_to_kind == AppConst::CODE_MASTER_33_1
+                                || $schedule->how_to_kind == AppConst::CODE_MASTER_33_2
+                            ) {
+                                // 生徒オンライン・両者オンラインの場合は、オンラインの表示とする
+                                $booth_name = "(オンライン)";
+                            } else {
+                                $booth_name = $schedule->booth_name;
+                            }
+                            $lessons[] = [
+                                'date_time' => CommonDateFormat::formatYmdDay($schedule->target_date) . ' ' . $schedule->start_time->format('H:i'),
+                                'campus_name' => $schedule->room_name . " " . $booth_name,
+                                'subject_name' => $schedule->subject_name,
+                                'tutor_name' => $schedule->tutor_name . "先生",
+                                'student_name' => null,
+                            ];
+                        }
+                        $mail_body = [
+                            'name' => $name,
+                            'lessons' => $lessons,
+                        ];
+                        // メール送信
+                        Mail::to($studentEmail)->send(new LessonReminder($mail_body));
+                        Log::channel('dailyMail')->info("LessonReminderMail student_id: " . $sid . ", to: [" . implode(", ", $studentEmail) . "]");
+                        $sendCount = $sendCount + count($studentEmail);
                     }
                 }
 
@@ -230,19 +200,58 @@ class LessonReminderMail extends Command
                     //-------------------------
                     // 送信先メールアドレス取得
                     $tutorEmail = $this->mdlGetAccountMail($tid, AppConst::CODE_MASTER_7_2);
-                    // メール本文固定
-                    // メール送信
-                    Mail::to($tutorEmail)->send(new LessonReminder());
-                    $sendCount++;
-
                     // メール送信数チェック
-                    if ($sendCount >= self::MAIL_COUNT_MAX) {
+                    if ($sendCount + 1 > self::MAIL_COUNT_MAX) {
                         // メール送信数がサーバーの15分毎の送信数上限を超える場合
                         // 15分sleep
                         Log::info("Send {$sendCount} mail. Sendmail wait...");
                         Sleep::for(15)->minutes();
                         $sendCount = 0;
                     }
+                    // 対象講師のスケジュール情報を取得
+                    //（取得済みのcollectionより）
+                    $teaSchedules = $schedules->where('tutor_id', $tid)
+                        ->sortBy('target_date')->sortBy('start_time')
+                        ->unique('schedule_id');
+
+                    // メール本文に記載する授業情報をセット
+                    $name =  $teaSchedules->first()->tutor_name;
+                    $lessons = [];
+                    $studentNameStr = null;
+                    foreach ($teaSchedules as $schedule) {
+                        // 生徒名の設定（１対多授業の場合は全員の生徒を表示）
+                        $students = $schedules->where('schedule_id', $schedule->schedule_id)
+                            ->pluck('student_name')->toArray();
+                        $studentNameStr = implode("さん・", $students) . "さん";
+
+                        // ブース名の設定
+                        if (
+                            $schedule->how_to_kind == AppConst::CODE_MASTER_33_3
+                            || $schedule->how_to_kind == AppConst::CODE_MASTER_33_2
+                        ) {
+                            // 講師オンライン・両者オンラインの場合は、オンラインの表示とする
+                            $booth_name = "(オンライン)";
+                        } else {
+                            $booth_name = $schedule->booth_name;
+                        }
+
+                        $lessons[] = [
+                            'date_time' => CommonDateFormat::formatYmdDay($schedule->target_date) . ' ' . $schedule->start_time->format('H:i'),
+                            'campus_name' => $schedule->room_name . " " . $booth_name,
+                            'subject_name' => $schedule->subject_name,
+                            'tutor_name' => null,
+                            'student_name' => $studentNameStr,
+                        ];
+                    }
+                    $mail_body = [
+                        'name' => $name,
+                        'lessons' => $lessons,
+                    ];
+
+                    // メール送信
+                    Mail::to($tutorEmail)->send(new LessonReminder($mail_body));
+                    Log::channel('dailyMail')->info("LessonReminderMail tutor_id: " . $tid . ", to: [" . $tutorEmail . "]");
+                    $sendCount++;
                 }
 
                 // バッチ管理テーブルのレコードを更新：正常終了
@@ -254,6 +263,7 @@ class LessonReminderMail extends Command
                         'updated_at' => $end
                     ]);
 
+                Log::info("Send " . $sendCount . " mail.");
                 Log::info("lessonReminderMail Succeeded.");
             });
         } catch (\Exception  $e) {
@@ -269,5 +279,100 @@ class LessonReminderMail extends Command
             Log::error($e);
         }
         return 0;
+    }
+
+    /**
+     * スケジュール情報の取得
+     *
+     * @param date $targetDate 対象日
+     * @return mixed
+     */
+    private function getSchedule($targetDate)
+    {
+        // 教室名取得のサブクエリ
+        $room_names = $this->mdlGetRoomQuery();
+
+        $query = Schedule::query();
+
+        $schedules = $query
+            ->select(
+                'schedules.schedule_id',
+                'schedules.campus_cd',
+                'room_names.room_name as room_name',
+                'schedules.target_date',
+                'schedules.start_time',
+                'schedules.tutor_id',
+                'tutors.name as tutor_name',
+                'mst_courses.course_kind',
+                'mst_booths.name as booth_name',
+                'mst_subjects.name as subject_name',
+                'schedules.how_to_kind',
+            )
+            // 生徒ID取得
+            ->selectRaw(
+                "CASE
+                    WHEN mst_courses.course_kind = ? THEN schedules.student_id
+                    WHEN mst_courses.course_kind = ? THEN class_members.student_id
+                    ELSE null
+                END AS student_id",
+                [AppConst::CODE_MASTER_42_1, AppConst::CODE_MASTER_42_2]
+            )
+            // 生徒名取得
+            ->selectRaw(
+                "CASE
+                    WHEN mst_courses.course_kind = ? THEN students.name
+                    WHEN mst_courses.course_kind = ? THEN class_students.name
+                    ELSE null
+                END AS student_name",
+                [AppConst::CODE_MASTER_42_1, AppConst::CODE_MASTER_42_2]
+            )
+            // 受講生徒情報とJOIN
+            ->sdLeftJoin(ClassMember::class, function ($join) {
+                $join->on('schedules.schedule_id', 'class_members.schedule_id')
+                    // 欠席者（予定）を除外
+                    ->where('class_members.absent_status', '!=', AppConst::CODE_MASTER_35_6);
+            })
+            // 校舎名の取得
+            ->leftJoinSub($room_names, 'room_names', function ($join) {
+                $join->on('schedules.campus_cd', 'room_names.code');
+            })
+            // 生徒名の取得
+            ->sdLeftJoin(Student::class, function ($join) {
+                $join->on('schedules.student_id', 'students.student_id');
+            })
+            // 生徒名の取得（受講生徒情報）
+            ->sdLeftJoin(Student::class, function ($join) {
+                $join->on('class_members.student_id', 'class_students.student_id');
+            }, 'class_students')
+            // 講師名の取得
+            ->sdLeftJoin(Tutor::class, function ($join) {
+                $join->on('schedules.tutor_id', '=', 'tutors.tutor_id');
+            })
+            // コースマスタをJOIN
+            ->sdJoin(MstCourse::class, function ($join) {
+                $join->on('schedules.course_cd', 'mst_courses.course_cd');
+            })
+            // 科目名の取得
+            ->sdLeftJoin(MstSubject::class, function ($join) {
+                $join->on('schedules.subject_cd', 'mst_subjects.subject_cd');
+            })
+            // ブース名の取得
+            ->sdLeftJoin(MstBooth::class, function ($join) {
+                $join->on('schedules.campus_cd', 'mst_booths.campus_cd');
+                $join->on('schedules.booth_cd', 'mst_booths.booth_cd');
+            })
+            // 授業日＝対象日
+            ->where('schedules.target_date', $targetDate)
+            // 未振替・振替中・振替済・リセット済スケジュールを除外
+            ->whereNotIn('schedules.absent_status', [AppConst::CODE_MASTER_35_3, AppConst::CODE_MASTER_35_4, AppConst::CODE_MASTER_35_5, AppConst::CODE_MASTER_35_7])
+            // 仮登録スケジュールを除外
+            ->where('schedules.tentative_status', '!=', AppConst::CODE_MASTER_36_1)
+            // コース種別＝１対１授業または１対他授業
+            ->whereIn('mst_courses.course_kind', [AppConst::CODE_MASTER_42_1, AppConst::CODE_MASTER_42_2])
+            ->orderBy('schedules.target_date', 'asc')
+            ->orderBy('schedules.start_time', 'asc')
+            ->get();
+
+        return $schedules;
     }
 }
