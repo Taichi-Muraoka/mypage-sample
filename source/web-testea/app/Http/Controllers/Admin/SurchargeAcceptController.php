@@ -50,9 +50,14 @@ class SurchargeAcceptController extends Controller
         // 支払状況リストを取得
         $paymentStatusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_27);
 
+        // セッションから検索条件を取得
+        $searchCond = $this->getSearchCond();
+        $searchCondForm = $searchCond ? $searchCond->form : null;
+
         return view('pages.admin.surcharge_accept', [
             'rules' => $this->rulesForSearch(null),
-            'editData' => null,
+            // 検索条件入力値をeditDataに設定
+            'editData' => $searchCondForm,
             'rooms' => $rooms,
             'tutorList' => $tutorList,
             'surchargeKindList' => $surchargeKindList,
