@@ -371,8 +371,8 @@ class ContactMngController extends Controller
             // 初回の回答登録時のみ送信（登録前のステータスが未回答 かつ フォームのステータスが回答済）
             if ($res && $statusBef == AppConst::CODE_MASTER_17_0
                 && $form['contact_state'] == AppConst::CODE_MASTER_17_1) {
-                // 送信先生徒メールアドレス取得
-                $studentEmail = $this->mdlGetAccountMail($contact->student_id, AppConst::CODE_MASTER_7_1);
+                // 送信先生徒メールアドレス取得（保護者優先）
+                $studentEmail = $this->mdlGetParentMail($contact->student_id);
                 // 回答者名取得
                 $admin_name = $this->mdlGetAdminName($form['adm_id']);
 
