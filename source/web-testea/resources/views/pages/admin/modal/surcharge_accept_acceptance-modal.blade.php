@@ -7,10 +7,14 @@
 
 <ul>
     <li>ステータスを「承認」に変更</li>
-    <li>支払年月を設定（実施日の翌月に自動設定）</li>
+    <li>支払年月を設定（承認日の翌月に自動設定）</li>
 </ul>
 
 <x-bs.table :hover=false :vHeader=true :smartPhoneModal=true>
+    <tr>
+        <th width="35%">支払年月</th>
+        <td><b>@{{$filters.formatYm(item.payment_date)}}</b></td>
+    </tr>
     <tr>
         <th width="35%">申請日</th>
         <td>@{{$filters.formatYmd(item.apply_date)}}</td>
