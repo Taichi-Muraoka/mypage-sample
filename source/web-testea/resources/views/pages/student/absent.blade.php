@@ -53,7 +53,7 @@
     {{-- フッター --}}
     <x-slot name="footer">
         <div class="d-flex justify-content-end">
-            <x-button.submit-new />
+            <x-button.submit-new isIcon=true />
         </div>
     </x-slot>
 

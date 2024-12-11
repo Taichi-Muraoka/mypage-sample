@@ -49,7 +49,7 @@
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
                 <x-button.submit-delete />
-                <x-button.submit-edit />
+                <x-button.submit-edit isIcon=true />
             </div>
 
         </div>

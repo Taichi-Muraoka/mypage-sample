@@ -82,7 +82,7 @@
             <x-button.back url="{{route('transfer_required')}}" />
 
             {{-- 登録時 --}}
-            <x-button.submit-new />
+            <x-button.submit-new isIcon=true />
 
         </div>
     </x-slot>

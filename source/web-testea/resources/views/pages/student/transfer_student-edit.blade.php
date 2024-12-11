@@ -96,7 +96,7 @@
 
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
-                <x-button.submit-approval caption="送信" />
+                <x-button.submit-approval caption="送信" isIcon=true />
             </div>
         </div>
     </x-slot>

@@ -80,7 +80,7 @@
 
             {{-- 編集時 --}}
             <div class="d-flex justify-content-end">
-                <x-button.submit-edit caption="登録"/>
+                <x-button.submit-edit caption="登録" isIcon=true/>
             </div>
 
         </div>

@@ -66,7 +66,7 @@
             </div>
             @else
             {{-- 登録時 --}}
-            <x-button.submit-new />
+            <x-button.submit-new isIcon=true />
             @endif
 
         </div>

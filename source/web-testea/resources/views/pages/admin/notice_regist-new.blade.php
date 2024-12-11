@@ -84,7 +84,7 @@
     <x-slot name="footer">
         <div class="d-flex justify-content-between">
             <x-button.back />
-            <x-button.submit-new />
+            <x-button.submit-new isIcon=true />
         </div>
     </x-slot>
 
