@@ -129,12 +129,12 @@
             {{-- 生徒カルテに戻る --}}
             <x-button.back url="{{route('member_mng-detail', $editData['student_id'])}}" />
             <div class="d-flex justify-content-end">
-                <x-button.submit-edit />
+                <x-button.submit-edit isIcon=true />
             </div>
             @else
             {{-- 登録時 --}}
             <x-button.back />
-            <x-button.submit-new />
+            <x-button.submit-new isIcon=true />
             @endif
 
         </div>

@@ -2,7 +2,7 @@
 button 送信(承認)
 --------------------------------------------}}
 
-@props(['caption' => '', 'disabled' => false, 'class' => '', 'vueDisabled' => ''])
+@props(['caption' => '', 'disabled' => false, 'class' => '', 'vueDisabled' => '', 'isIcon'=> false])
 
 {{-- mr-3は編集と削除ボタン用。支障があれば明示的に指定したい --}}
 <button type="button" class="btn btn-success ml-3" v-on:click="submitApproval"
@@ -11,6 +11,6 @@ button 送信(承認)
   {{-- Bladeの場合 --}}
   @if ($disabled) {{ 'disabled' }} @endif
 >
-  <i class="fas fa-paper-plane"></i>
+  @if ($isIcon)<i class="fas fa-paper-plane"></i>@endif
   @if (empty($caption)){{ '送信' }}@else{{ $caption }}@endif
 </button>

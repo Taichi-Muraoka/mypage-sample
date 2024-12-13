@@ -76,6 +76,6 @@
 @include('pages.admin.modal.absent_accept-modal')
 {{-- 送信確認モーダル --}}
 @include('pages.admin.modal.absent_accept_acceptance-modal', ['modal_send_confirm' => true, 'modal_id' =>
-'modal-dtl-acceptance'])
+'modal-dtl-acceptance', 'ok_icon' => 'fas fa-paper-plane'])
 
 @stop

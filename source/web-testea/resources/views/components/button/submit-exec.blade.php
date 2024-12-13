@@ -15,7 +15,7 @@
   disabled: 使用不可 Def: false
 --}}
 @props(['dataTarget' => '', 'vueDataAttr' => [], 'dataAttr' => [], 'vueDisabled' => '', 'caption' => '', 'class' => '', 
-  'icon' => 'fas fa-paper-plane', 'small' => false, 'disabled' => false])
+  'icon' => 'fas fa-paper-plane', 'small' => false, 'disabled' => false, 'isIcon'=> false])
 
 <button type="button" 
   class="btn btn-success ml-3 @if (!empty($class)){{ $class }}@endif @if ($small) btn-sm @endif" 
@@ -42,6 +42,6 @@
   {{-- disabled追加 --}}
   @if ($disabled) {{ 'disabled' }} @endif
 >
-  <i class="{{ $icon }}"></i>
+  @if ($isIcon)<i class="{{ $icon }}"></i>@endif
   @if (empty($caption)){{ '送信' }}@else{{ $caption }}@endif
 </button>

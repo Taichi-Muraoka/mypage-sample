@@ -98,12 +98,12 @@
             {{-- 編集時 --}}
             <x-button.back url="{{route('tutor_mng-detail', $editData['tutor_id'])}}" />
             <div class="d-flex justify-content-end">
-                <x-button.submit-edit />
+                <x-button.submit-edit isIcon=true />
             </div>
             @else
             {{-- 登録時 --}}
             <x-button.back />
-            <x-button.submit-new />
+            <x-button.submit-new isIcon=true />
             @endif
 
         </div>

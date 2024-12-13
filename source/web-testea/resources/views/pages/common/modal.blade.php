@@ -8,6 +8,7 @@
     modal-size: モーダルのサイズ
     modal_form: モーダルでフォームを表示
     caption_OK: OKボタン表示名
+    ok_icon: OKボタンアイコン(classで指定)
 --}}
 
 {{-- モーダルを複数使用する場合はmodalIdを指定する --}}
@@ -68,7 +69,7 @@
                 <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
                 @else
                 {{-- 送信確認用のダイアログの場合 --}}
-                <button type="button" class="btn btn-primary" v-on:click="modalOk">@if (empty($caption_OK)) OK @else{{ $caption_OK }}@endif</button>
+                <button type="button" class="btn btn-primary @if (!empty($ok_icon)) {{$ok_icon}} @endif" v-on:click="modalOk">@if (empty($caption_OK)) OK @else {{ $caption_OK }}@endif</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">キャンセル</button>
                 @endif
             </div>

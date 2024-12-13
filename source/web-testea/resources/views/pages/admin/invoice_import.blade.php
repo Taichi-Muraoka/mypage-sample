@@ -42,6 +42,6 @@
 </x-bs.card-list>
 {{-- モーダル(メール送信実行) --}}
 @include('pages.admin.modal.invoice_import_mail-modal',
-    ['modal_send_confirm' => true, 'modal_id' =>'modal-dtl-mail'])
+    ['modal_send_confirm' => true, 'modal_id' =>'modal-dtl-mail', 'ok_icon' => 'fas fa-paper-plane'])
 
 @stop

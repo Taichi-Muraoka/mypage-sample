@@ -4,7 +4,7 @@
 
 {{-- MEMO: 保持期限超過データバックアップのダウンロード、研修受講のダウンロードや視聴用向けに作成 --}}
 @props(['caption' => '', 'class' => '', 'vueHref' => '', 'href' => '', 'blank' => false, 'vueDisabled' => '',
-  'icon' => 'fas fa-paper-plane', 'onClick' => '', 'onClickPrevent' => '', 'btn' => 'success', 'small' => false])
+  'icon' => 'fas fa-paper-plane', 'onClick' => '', 'onClickPrevent' => '', 'btn' => 'success', 'small' => false, 'isIcon'=> false])
 
 @if (!empty($vueHref))
 
@@ -34,7 +34,7 @@
   {{-- クリックイベントのみ --}}
   @if (!empty($onClickPrevent))v-on:click.prevent="{{ $onClickPrevent }}"@endif
   >
-  <i class="{{ $icon }}"></i>
+  @if ($isIcon)<i class="{{ $icon }}"></i>@endif
   @if (empty($caption)){{ '送信' }}@else{{ $caption }}@endif
 </a>
 

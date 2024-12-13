@@ -94,6 +94,6 @@
 @include('pages.admin.modal.transfer_check-modal')
 {{-- モーダル(送信確認モーダル) 承認 --}}
 @include('pages.admin.modal.transfer_check_approval-modal', ['modal_send_confirm' => true, 'modal_id' =>
-'modal-dtl-approval', 'caption_OK' => '承認'])
+'modal-dtl-approval', 'caption_OK' => '承認', 'ok_icon' => 'fas fa-paper-plane'])
 
 @stop
