@@ -76,7 +76,7 @@
 
     <x-input.textarea caption="管理者コメント" id="admin_comment" :rules=$rules :editData=$editData />
 
-    <x-input.select id="payment_date" caption="支払年月" :select2=true :mastrData=$paymentDateList :editData=$editData
+    <x-input.select id="payment_date" caption="支払年月" :select2=true :mastrData=$paymentDateList :editData=$paymentYm
         :select2Search=false :blank=false vShow="form.approval_status == {{ App\Consts\AppConst::CODE_MASTER_2_1 }}" />
 
     {{-- hidden --}}

@@ -192,6 +192,9 @@ class SurchargeAcceptController extends Controller
         // 詳細データを作成
         $surcharge = $this->getSurchargeDetail($request['id']);
 
+        // 承認処理で登録する支払年月を追加
+        $surcharge->payment_date = date('Y-m-d', strtotime('first day of next month '));
+
         return $surcharge;
     }
 
@@ -220,9 +223,10 @@ class SurchargeAcceptController extends Controller
                 // ステータスを「承認」に変更する
                 $surcharge->approval_status = AppConst::CODE_MASTER_2_1;
 
-                // 支払年月を実施日の翌月に設定する
-                // 翌月1日にフォーマット(実施日:2023/12/31 → 2024/01/01)
-                $nextMonth = date('Y-m-d', strtotime('first day of next month ' . $surcharge->working_date));
+                // 2024.12.09 日付の基準日を実施日→承認日に変更
+                // 支払年月を承認日の翌月に設定する
+                // 翌月1日にフォーマット(承認日:2023/12/31 → 2024/01/01)
+                $nextMonth = date('Y-m-d', strtotime('first day of next month '));
                 $surcharge->payment_date = $nextMonth;
 
                 // 承認者、承認日時を設定
@@ -256,6 +260,8 @@ class SurchargeAcceptController extends Controller
     {
         // 対象データ取得
         $surcharge = $this->getTargetSurchargeAdmin($surchargeId);
+        // 支払年月リスト選択用にY-m形式でデータを作成
+        $payment_ym = ["payment_date" => date('Y-m',strtotime($surcharge->payment_date))];
 
         // 承認ステータスリストを取得
         $approvalStatusList = $this->mdlMenuFromCodeMaster(AppConst::CODE_MASTER_2);
@@ -268,6 +274,7 @@ class SurchargeAcceptController extends Controller
             'rules' => $this->rulesForInput(null),
             'approvalStatusList' => $approvalStatusList,
             'paymentDateList' => $paymentDateList,
+            'paymentYm' => $payment_ym
         ]);
     }
 
