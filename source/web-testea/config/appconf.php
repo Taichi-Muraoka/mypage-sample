@@ -82,7 +82,7 @@ return [
     /**
      * データベースバックアップの保存世代数
      */
-    "db_backup_generation" => 7,
+    "db_backup_generation" => 30,
 
     /**
      * データベースバックアップ先
