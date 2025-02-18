@@ -239,7 +239,7 @@ export default class WeekCalendar {
         var formData = FormCom.getFormArrayData(cardId);
         if (info.resource._resource.id !== "000") {
             // 詳細データを取得
-            var daycd = moment(info.start).format("d") == 0 ? 7 : moment(info.start).format("d");
+            var daycd = dayjs(info.start).format("d") == 0 ? 7 : dayjs(info.start).format("d");
             var url =
                 UrlCom.getFuncUrl() +
                 "/new" +
@@ -247,7 +247,7 @@ export default class WeekCalendar {
                 formData.campus_cd +
                 "/" +
                 daycd +
-                moment(info.start).format("HHmm") +
+                dayjs(info.start).format("HHmm") +
                 "/" +
                 info.resource._resource.id;
             location.href = url;

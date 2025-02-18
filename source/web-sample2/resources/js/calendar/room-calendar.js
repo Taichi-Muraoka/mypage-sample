@@ -132,7 +132,7 @@ export default class RoomCalendar {
      * @param dateInfo
      */
     _dateChangeFunc = (dateInfo) => {
-        $("#target_date").val(moment(dateInfo.start).format("YYYY-MM-DD"));
+        $("#target_date").val(dayjs(dateInfo.start).format("YYYY-MM-DD"));
     };
 
     /**
@@ -186,7 +186,7 @@ export default class RoomCalendar {
             .then(() => {
                 // カードのローディング開始
                 FormCom.loadingForCardOn(cardId);
-                $("#target_date").val(moment(info.start.valueOf()).format("YYYY-MM-DD"));
+                $("#target_date").val(dayjs(info.start.valueOf()).format("YYYY-MM-DD"));
                 // カードカレンダーの中のHidden値を取得。会員管理のように子画面にカレンダーがある場合
                 var formData = FormCom.getFormArrayData(cardId);
 
@@ -252,8 +252,8 @@ export default class RoomCalendar {
                 "/" +
                 formData.campus_cd +
                 "/" +
-                moment(info.start).format("YYYYMMDD") +
-                moment(info.start).format("HHmm") +
+                dayjs(info.start).format("YYYYMMDD") +
+                dayjs(info.start).format("HHmm") +
                 "/" +
                 info.resource._resource.id;
             location.href = url;
@@ -287,7 +287,7 @@ export default class RoomCalendar {
             })
             .on("apply.daterangepicker", function (ev, picker) {
                 // 適用ボタンクリックイベントで取得
-                var newDate = moment(picker.startDate).format();
+                var newDate = dayjs(picker.startDate).format();
                 self._calendar.gotoDate(newDate);
             })
             .on("cancel.daterangepicker", function (ev, picker) {

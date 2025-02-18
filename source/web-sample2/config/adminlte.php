@@ -922,18 +922,59 @@ return [
             ],
         ],
 
-        'moment' => [
+        //'moment' => [
+        //    'active' => true,
+        //    'files' => [
+        //        [
+        //            'type' => 'js',
+        //            'asset' => true,
+        //            'location' => 'vendor/moment/moment.min.js',
+        //        ],
+        //        [
+        //            'type' => 'js',
+        //            'asset' => true,
+        //            'location' => 'vendor/moment/locale/ja.js',
+        //        ],
+        //    ],
+        //],
+        // momentが非推奨となったため、dayjsに変更・置き換え
+        'dayjs' => [
             'active' => true,
             'files' => [
                 [
                     'type' => 'js',
                     'asset' => true,
-                    'location' => 'vendor/moment/moment.min.js',
+                    'location' => 'vendor/dayjs/dayjs.min.js',
                 ],
                 [
                     'type' => 'js',
                     'asset' => true,
-                    'location' => 'vendor/moment/locale/ja.js',
+                    'location' => 'vendor/dayjs/locale/ja.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/dayjs/plugin/localeData.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/dayjs/plugin/localizedFormat.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/dayjs/plugin/isoWeek.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/dayjs/plugin/arraySupport.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/dayjs/plugin/badMutable.js',
                 ],
             ],
         ],
@@ -958,12 +999,12 @@ return [
                 [
                     'type' => 'js',
                     'asset' => true,
-                    'location' => 'vendor/daterangepicker/daterangepicker.js',
+                    'location' => 'vendor/daterangepicker-dayjs/daterangepicker.js',
                 ],
                 [
                     'type' => 'css',
                     'asset' => true,
-                    'location' => 'vendor/daterangepicker/daterangepicker.css',
+                    'location' => 'vendor/daterangepicker-dayjs/daterangepicker.css',
                 ],
             ],
         ],

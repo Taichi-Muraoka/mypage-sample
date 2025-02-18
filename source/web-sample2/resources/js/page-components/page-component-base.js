@@ -70,7 +70,7 @@ export default class PageComponentBase {
                 if (ValueCom.isEmpty(date)) {
                     return "";
                 } else {
-                    return moment(date).format("YYYY/MM/DD");
+                    return dayjs(date).format("YYYY/MM/DD");
                 }
             },
             // スケジュール年月日(曜日あり)
@@ -78,7 +78,7 @@ export default class PageComponentBase {
                 if (ValueCom.isEmpty(date)) {
                     return "";
                 } else {
-                    return moment(date).format("YYYY/MM/DD(dd)");
+                    return dayjs(date).format("YYYY/MM/DD(dd)");
                 }
             },
             // 年月日（ハイフンなし）
@@ -86,7 +86,7 @@ export default class PageComponentBase {
                 if (ValueCom.isEmpty(date)) {
                     return "";
                 } else {
-                    return moment(date).format("YYYYMMDD");
+                    return dayjs(date).format("YYYYMMDD");
                 }
             },
             // 年月日 日時
@@ -94,7 +94,7 @@ export default class PageComponentBase {
                 if (ValueCom.isEmpty(date)) {
                     return "";
                 } else {
-                    return moment(date).format("YYYY/MM/DD HH:mm");
+                    return dayjs(date).format("YYYY/MM/DD HH:mm");
                 }
             },
             // 年月日 日時（秒）
@@ -102,7 +102,7 @@ export default class PageComponentBase {
                 if (ValueCom.isEmpty(date)) {
                     return "";
                 } else {
-                    return moment(date).format("YYYY/MM/DD HH:mm:ss");
+                    return dayjs(date).format("YYYY/MM/DD HH:mm:ss");
                 }
             },
             // 年月
@@ -110,7 +110,7 @@ export default class PageComponentBase {
                 if (ValueCom.isEmpty(date)) {
                     return "";
                 } else {
-                    return moment(date).format("YYYY/MM");
+                    return dayjs(date).format("YYYY/MM");
                 }
             },
             // 時刻
@@ -120,10 +120,10 @@ export default class PageComponentBase {
                 } else {
                     if (date.length == 8) {
                         // 16:00:00 のようなケースに対応
-                        return moment(date, "HH:mm:ss").format("HH:mm");
+                        return date.split(":").slice(0, 2).join(":");
                     } else {
                         // datetimeの場合：2020-11-20T07:00:00.000000Z
-                        return moment(date).format("HH:mm");
+                        return dayjs(date).format("HH:mm");
                     }
                 }
             },
@@ -148,7 +148,7 @@ export default class PageComponentBase {
                 if (ValueCom.isEmpty(date)) {
                     return "";
                 } else {
-                    return moment(date).format("YYYY年MM月");
+                    return dayjs(date).format("YYYY年MM月");
                 }
             },
             // Y年Mか月 通塾期間・勤続年数で使用
@@ -166,7 +166,7 @@ export default class PageComponentBase {
                 if (ValueCom.isEmpty(date)) {
                     return "";
                 } else {
-                    return moment(date).format("ddd");
+                    return dayjs(date).format("ddd");
                 }
             },
         };
@@ -244,6 +244,13 @@ export default class PageComponentBase {
         //---------------------
         // datepicker
         //---------------------
+        // daterangepickerをdayjs対応版に置き換え
+        dayjs.extend(window.dayjs_plugin_localeData);
+        dayjs.extend(window.dayjs_plugin_localizedFormat);
+        dayjs.extend(window.dayjs_plugin_isoWeek);
+        dayjs.extend(window.dayjs_plugin_arraySupport);
+        dayjs.extend(window.dayjs_plugin_badMutable);
+        dayjs.locale('ja');
 
         // locale
         var localeDate = {
@@ -263,7 +270,7 @@ export default class PageComponentBase {
             // フォーマットを変更してセットする：2020年11月01日
             if (!ValueCom.isEmpty($(element).val())) {
                 // フォーマットを明示的に指定する
-                var dateVal = moment($(element).val(), "YYYY/MM/DD");
+                var dateVal = dayjs($(element).val(), "YYYY/MM/DD");
                 $(element).val(dateVal.format(localeDate.format));
                 // hiddenも調整しておく
                 $vue.form[id] = dateVal.format(localeDate.format2);
@@ -280,6 +287,9 @@ export default class PageComponentBase {
                         // カレンダーの範囲
                         minYear: 2020,
                         maxYear: new Date().getFullYear() + 5, // とりあえず5年後くらい
+                        maxYear: dayjs().add(5, 'years').format('YYYY'),
+                        minDate: '2020/01/01',
+                        maxDate: dayjs().add(5, 'years').format('YYYY') + '/12/31',
                         // 最初から自動で日付が入ってしまうので手動で格納
                         autoUpdateInput: false,
                         // カレンダーのポップアップ位置を自動で調整
@@ -317,11 +327,11 @@ export default class PageComponentBase {
                         // テキストボックスに表示用
                         // テキストボックスに表示(0埋めをしているだけ。無くても良いが一応)
                         $(e.target).val(
-                            moment(calDate).format(localeDate.format)
+                            dayjs(calDate).format(localeDate.format)
                         );
 
                         // hiddenにセット
-                        $vue.form[id] = moment(calDate).format(
+                        $vue.form[id] = dayjs(calDate).format(
                             localeDate.format2
                         );
                         // イベント発生
