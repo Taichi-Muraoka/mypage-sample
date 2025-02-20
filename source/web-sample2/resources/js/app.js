@@ -52,7 +52,13 @@ if (appInfo.view.indexOf("auth") !== 0) {
     // 各ページのJSを読み込み(テンプレートパスと同様)
     //import("./" + appInfo.view)
     // Vite対応
-    const modules = import.meta.glob("./**/*.js");
+    //const modules = import.meta.glob("./**/*.js");
+    // build時のwarning（動的インポートと静的インポートの競合）を防ぐ
+    const modules = import.meta.glob([
+        "./**/*.js",
+        "!./common/**/*.js",
+        "!./page-components/**/*.js",
+    ]);
     for (const path in modules) {
         if (path === `./${appInfo.view}.js`) {
             modules[path]()
