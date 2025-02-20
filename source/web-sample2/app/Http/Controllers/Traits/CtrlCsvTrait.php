@@ -68,7 +68,7 @@ trait CtrlCsvTrait
      */
     protected function outputCsv($array, $crlf = true)
     {
-        
+
         // MEMO: SJISの出力はここでは行わない
         // 今回axiosを使用して、非同期でデータを取得→ファイルのダウンロードにしたが、
         // axiosが勝手にUTF-8に変換してしまうようで、Javascriptの方で変換するようにした。
@@ -105,6 +105,9 @@ trait CtrlCsvTrait
  */
 class CrlfFilter
 {
+    public string $filtername = "";
+    public mixed $params = "";
+
     /**
      * filter
      * 改行コードをCRLFに変換する

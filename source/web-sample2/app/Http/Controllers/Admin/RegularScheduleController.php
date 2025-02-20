@@ -691,7 +691,7 @@ class RegularScheduleController extends Controller
             // 時間（分）の算出
             $start = Carbon::createFromTimeString($form['start_time']);
             $end = Carbon::createFromTimeString($form['end_time']);
-            $minutes = $start->diffInMinutes($end);
+            $minutes = (int)$start->diffInMinutes($end, true);
 
             // スケジュール情報更新（UPDATE）
             // 対象データを取得(IDでユニークに取る)

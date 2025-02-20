@@ -1659,7 +1659,7 @@ trait FuncScheduleTrait
         // 時間（分）の算出
         $start = Carbon::createFromTimeString($data['start_time']);
         $end = Carbon::createFromTimeString($data['end_time']);
-        $minutes = $start->diffInMinutes($end);
+        $minutes = (int)$start->diffInMinutes($end, true);
 
         // スケジュール情報
         // schedulesテーブルへのinsert
@@ -1757,7 +1757,7 @@ trait FuncScheduleTrait
         // 時間（分）の算出
         $start = Carbon::createFromTimeString($data['start_time']);
         $end = Carbon::createFromTimeString($data['end_time']);
-        $minutes = $start->diffInMinutes($end);
+        $minutes = (int)$start->diffInMinutes($end, true);
 
         // レギュラー授業情報登録
         // regular_classesテーブルへのinsert

@@ -254,7 +254,7 @@ class ScheduleDataImport extends Command
         // 時間（分）の算出
         $start = Carbon::createFromTimestamp($data['start']);
         $end = Carbon::createFromTimestamp($data['end']);
-        $minutes = $start->diffInMinutes($end);
+        $minutes = (int)$start->diffInMinutes($end, true);
         // 時限の取得
         $periodNo = $this->fncScheGetPeriodTimeForBatch($data['school_code'], AppConst::CODE_MASTER_37_0, $start->toTimeString());
 
@@ -376,7 +376,7 @@ class ScheduleDataImport extends Command
         // 時間（分）の算出
         $start = Carbon::createFromTimestamp($data['start']);
         $end = Carbon::createFromTimestamp($data['end']);
-        $minutes = $start->diffInMinutes($end);
+        $minutes = (int)$start->diffInMinutes($end, true);
         // 時限の取得
         $periodNo = $this->fncScheGetPeriodTimeForBatch($data['school_code'], AppConst::CODE_MASTER_37_0, $start->toTimeString());
 

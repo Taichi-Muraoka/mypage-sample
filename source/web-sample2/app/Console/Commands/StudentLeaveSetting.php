@@ -162,7 +162,7 @@ class StudentLeaveSetting extends Command
                         // 退会日 - 入会日 の月数
                         $startDate = $student->enter_date->startOfMonth();
                         $endDate = $student->leave_date->endOfMonth();
-                        $enterTerm = $startDate->diffInMonths($endDate) + 1;
+                        $enterTerm = (int)$startDate->diffInMonths($endDate, true) + 1;
 
                         $enterHistory = new StudentEnterHistory;
                         $enterHistory->student_id = $student->student_id;
