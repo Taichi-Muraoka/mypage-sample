@@ -8,6 +8,17 @@ export default defineConfig({
             input: ["resources/sass/app.scss", "resources/js/app.js"],
             refresh: true,
         }),
-        vue(),
     ],
+    css: {
+        preprocessorOptions: {
+          scss: {
+            api: "modern-compiler",
+          },
+        }
+    },
+    define: {
+    __VUE_OPTIONS_API__: true,
+    __VUE_PROD_DEVTOOLS__: false,
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
+    },
 });
