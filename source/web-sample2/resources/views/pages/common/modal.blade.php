@@ -7,11 +7,14 @@
     modal_send_confirm: 送信確認用のダイアログ。fadeは無効にし、タイトル行は非表示にする
     modal-size: モーダルのサイズ
     modal_form: モーダルでフォームを表示
+    modal_button_id: フォームモーダルのボタンID
+    form_center: モーダルフォームを画面中央に表示
     caption_OK: OKボタン表示名
     ok_icon: OKボタンアイコン(classで指定)
 --}}
 
-{{-- モーダルを複数使用する場合はmodalIdを指定する --}}
+{{-- モーダルを複数使用する場合はmodal_idを指定する --}}
+{{-- フォームモーダルをモーダルと併用・複数使用する場合はmodal_button_idを指定する --}}
 <div 
     {{-- class --}}
     class="modal @if (!isset($modal_send_confirm) || (!$modal_send_confirm)) {{'fade'}} @endif" 
@@ -21,7 +24,8 @@
     {{-- サイズ：modal-xl --}}
     <div
         class="modal-dialog modal-dialog-scrollable
-        @if (isset($modal_send_confirm) && ($modal_send_confirm)) modal-dialog-centered @endif
+        @if (isset($modal_send_confirm) && ($modal_send_confirm)) modal-dialog-centered
+        @elseif (isset($form_center) && ($form_center)) modal-dialog-centered @endif
         @hasSection('modal-size') @yield('modal-size') @else {{'modal-lg'}} @endif">
         <div class="modal-content">
 
@@ -56,13 +60,13 @@
             </div>
 
             {{-- modal-buttons: 選択モーダル・フォームモーダルの場合のVueのインスタンス --}}
-            <div id="modal-buttons" class="modal-footer flex-end">
+            <div id="@if (empty($modal_button_id)){{ 'modal-buttons' }}@else{{ $modal_button_id }}@endif" class="modal-footer flex-end">
                 {{-- 追加のボタンを配置 --}}
                 @yield('modal-button')
 
                 {{-- モーダルでフォームを表示 --}}
                 @if (isset($modal_form) && ($modal_form)) 
-                <button type="button" class="btn btn-primary" v-on:click="modalOk">確定</button>
+                <button type="button" class="btn btn-primary" v-on:click="modalOk">@if (empty($caption_OK)) 確定 @else{{ $caption_OK }}@endif</button>
                 @endif
 
                 @if (!isset($modal_send_confirm) || (!$modal_send_confirm)) 
