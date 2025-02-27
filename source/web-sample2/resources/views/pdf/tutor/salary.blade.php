@@ -21,7 +21,7 @@
 
 <p>{{$salary->tutor_name}} 様</p>
 
-お世話になっております、個別指導塾TESTEAです。<br>
+お世話になっております、個別指導塾コー・ワークスです。<br>
 {{$salary_import->payment_date->format('n月j日')}}支給分の給与明細です。<br>
 ご確認の程よろしくお願いいたします。
 

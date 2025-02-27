@@ -31,7 +31,7 @@
 <p style="font-size:12pt;">{{$invoice->student_name}} 様 保護者様</p>
 <br>
 
-いつもお世話になっております、個別指導塾TESTEAです。<br>
+いつもお世話になっております、個別指導塾コー・ワークスです。<br>
 {{$invoice->invoice_date->format('Y年n月')}}分お月謝のお知らせです。<br>
 <br>
 

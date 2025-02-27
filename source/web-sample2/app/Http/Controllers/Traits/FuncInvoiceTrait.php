@@ -167,27 +167,28 @@ trait FuncInvoiceTrait
 
         // 右上のロゴの表示(HTMLでは難しいのでここで指定)
         // MEMO:最大摘要数での出力に対応するため、HTMLより先に設定した
-        $pdf->Image(resource_path('pdf/testea_logo.png'), 150, 10, 48.0);
+        //$pdf->Image(resource_path('pdf/testea_logo.png'), 150, 10, 48.0);
+        $pdf->Image(resource_path('pdf/invoice.png'), 168, 3, 24.0);
 
         // フォントの指定(事前にフォントをインストールする必要がある)
         $pdf->SetFont('ipaexg', '', 10);
         $pdf->SetXY(148, 26);
-        $pdf->Write(1, '個別指導塾テスティー株式会社');
+        $pdf->Write(1, '個別指導塾コー・ワークス');
 
         $pdf->SetFont('ipaexg', '', 7);
         $pdf->SetXY(148, 31);
-        $pdf->Write(1, '登録番号：T1011301018175');
+        $pdf->Write(1, '登録番号：T101130101XXXX');
 
         $pdf->SetFont('ipaexg', '', 7);
         $pdf->SetXY(148, 35.5);
-        $pdf->Write(1, '〒168-0082');
+        $pdf->Write(1, '〒980-0811');
 
         $pdf->SetFont('ipaexg', '', 8);
         $pdf->SetXY(148, 39);
-        $pdf->Write(1, '東京都杉並区久我山2-16-27');
+        $pdf->Write(1, '宮城県仙台市青葉区一番町1-8-10');
         $pdf->SetXY(148, 43);
         // 最後は改行して終える（直後のwriteHTMLのレイアウトが崩れるため）
-        $pdf->Write(1, '関口花園ビル2F', '', false, '', true);
+        $pdf->Write(1, '京成壱番町ビル203', '', false, '', true);
 
         $pdf->SetFont('ipaexg', '', 12);
         // PDFをHTML(blade)から作成

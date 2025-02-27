@@ -14,9 +14,9 @@ return [
     |
     */
 
-    'title' => '個別指導塾TESTEA',
+    'title' => 'サンプル',
     'title_prefix' => '',
-    'title_postfix' => '- 個別指導塾TESTEA',
+    'title_postfix' => '- 塾マイページ',
 
     /*
     |--------------------------------------------------------------------------
@@ -63,13 +63,19 @@ return [
     |
     */
 
-    'logo' => 'マイページ',
-    'login_logo_img' => 'img/testea_logo_white.png',  // ログイン画面のロゴ
-    'logo_img' => 'img/testea_logo_green.png',
+    'logo' => '塾マイページ',
+    //'login_logo_img' => 'img/testea_logo_white.png',  // ログイン画面のロゴ
+    //'logo_img' => 'img/testea_logo_green.png',
+    //'logo_img_class' => 'brand-image img-circle elevation-3',
+    //'logo_img_xl' => null,
+    //'logo_img_xl_class' => 'brand-image-xs',
+    //'logo_img_alt' => 'TESTEA',
+    'login_logo_img' => 'img/co_logo_board_ol.svg',  // ログイン画面のロゴ
+    'logo_img' => 'img/cw_logo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'TESTEA',
+    'logo_img_alt' => 'CW',
 
     /*
     |--------------------------------------------------------------------------
@@ -87,8 +93,10 @@ return [
     'auth_logo' => [
         'enabled' => true,
         'img' => [
-            'path' => 'img/testea_logo_green.png',
-            'alt' => 'TESTEA',
+            //'path' => 'img/testea_logo_green.png',
+            //'alt' => 'TESTEA',
+            'path' => 'img/cw_logo.png',
+            'alt' => 'CW',
             'class' => '',
             'width' => 50,
             'height' => 50,
@@ -110,8 +118,10 @@ return [
     'preloader' => [
         'enabled' => false,
         'img' => [
-            'path' => 'img/testea_logo_green.png',
-            'alt' => 'TESTEA Preloader Image',
+            //'path' => 'img/testea_logo_green.png',
+            //'alt' => 'TESTEA Preloader Image',
+            'path' => 'img/cw_logo.png',
+            'alt' => 'CW Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
             'height' => 60,
