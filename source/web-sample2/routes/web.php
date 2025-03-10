@@ -562,6 +562,9 @@ use App\Http\Controllers\Admin\TransferResetController;
 use App\Http\Controllers\Admin\DataResetController;
 use App\Http\Controllers\Admin\ImportSchoolCodeController;
 use App\Http\Controllers\Admin\YearScheduleImportController;
+use App\Http\Controllers\Admin\SampleMngController;
+use App\Http\Controllers\Admin\Sample2MngController;
+use App\Http\Controllers\Admin\SampleMockMngController;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -2005,4 +2008,116 @@ Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
 
     // 検索結果取得
     Route::post('/year_schedule_import/search', [YearScheduleImportController::class, 'search'])->name('year_schedule_import-search');
+
+    //---------------------
+    // サンプル管理
+    //---------------------
+
+    // 一覧画面
+    Route::get('/sample_mng', [SampleMngController::class, 'index'])->name('sample_mng');
+
+    // バリデーション(検索用)
+    Route::post('/sample_mng/vd_search', [SampleMngController::class, 'validationForSearch'])->name('sample_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/sample_mng/search', [SampleMngController::class, 'search'])->name('sample_mng-search');
+
+    // 詳細取得用
+    Route::post('/sample_mng/get_data', [SampleMngController::class, 'getData'])->name('sample_mng-get_data');
+
+    // 登録画面
+    Route::get('/sample_mng/new', [SampleMngController::class, 'new'])->name('sample_mng-new');
+
+    // 登録処理
+    Route::post('/sample_mng/create', [SampleMngController::class, 'create'])->name('sample_mng-create');
+
+    // 編集画面
+    Route::get('/sample_mng/edit/{sampleId}', [SampleMngController::class, 'edit'])->name('sample_mng-edit');
+
+    // 編集処理
+    Route::post('/sample_mng/update', [SampleMngController::class, 'update'])->name('sample_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/sample_mng/vd_input', [SampleMngController::class, 'validationForInput'])->name('sample_mng-vd_input');
+
+    // 削除処理
+    Route::post('/sample_mng/delete', [SampleMngController::class, 'delete'])->name('sample_mng-delete');
+
+    //---------------------
+    // サンプル管理2（モーダルフォーム有）
+    //---------------------
+
+    // 一覧画面
+    Route::get('/sample2_mng', [Sample2MngController::class, 'index'])->name('sample2_mng');
+
+    // バリデーション(検索用)
+    Route::post('/sample2_mng/vd_search', [Sample2MngController::class, 'validationForSearch'])->name('sample2_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/sample2_mng/search', [Sample2MngController::class, 'search'])->name('sample2_mng-search');
+
+    // 詳細取得用
+    Route::post('/sample2_mng/get_data', [Sample2MngController::class, 'getData'])->name('sample2_mng-get_data');
+
+    // 登録画面
+    Route::get('/sample2_mng/new', [Sample2MngController::class, 'new'])->name('sample2_mng-new');
+
+    // 登録処理
+    Route::post('/sample2_mng/create', [Sample2MngController::class, 'create'])->name('sample2_mng-create');
+
+    // 編集画面
+    Route::get('/sample2_mng/edit/{sampleId}', [Sample2MngController::class, 'edit'])->name('sample2_mng-edit');
+
+    // 編集処理
+    Route::post('/sample2_mng/update', [Sample2MngController::class, 'update'])->name('sample2_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/sample2_mng/vd_input', [Sample2MngController::class, 'validationForInput'])->name('sample2_mng-vd_input');
+
+    // 削除処理
+    Route::post('/sample2_mng/delete', [Sample2MngController::class, 'delete'])->name('sample2_mng-delete');
+
+    // 入力モーダル更新処理
+    Route::post('/sample2_mng/exec_modal', [Sample2MngController::class, 'execModal'])->name('sample2_mng-exec_modal');
+
+    // 入力モーダル詳細取得用
+    //Route::post('/sample2_mng/get_data', [Sample2MngController::class, 'getData'])->name('sample2_mng-get_data');
+
+    // バリデーション(入力モーダル登録用)
+    Route::post('/sample2_mng/vd_exec', [Sample2MngController::class, 'validationForExec'])->name('sample2_mng-vd_exec');
+
+    //---------------------
+    // サンプル管理（モック）
+    //---------------------
+
+    // 一覧画面
+    Route::get('/samplemock_mng', [SampleMockMngController::class, 'index'])->name('samplemock_mng');
+
+    // バリデーション(検索用)
+    Route::post('/samplemock_mng/vd_search', [SampleMockMngController::class, 'validationForSearch'])->name('samplemock_mng-vd_search');
+
+    // 検索結果取得
+    Route::post('/samplemock_mng/search', [SampleMockMngController::class, 'search'])->name('samplemock_mng-search');
+
+    // 詳細取得用
+    Route::post('/samplemock_mng/get_data', [SampleMockMngController::class, 'getData'])->name('samplemock_mng-get_data');
+
+    // 登録画面
+    Route::get('/samplemock_mng/new', [SampleMockMngController::class, 'new'])->name('samplemock_mng-new');
+
+    // 登録処理
+    Route::post('/samplemock_mng/create', [SampleMockMngController::class, 'create'])->name('samplemock_mng-create');
+
+    // 編集画面
+    Route::get('/samplemock_mng/edit/{sampleId}', [SampleMockMngController::class, 'edit'])->name('samplemock_mng-edit');
+
+    // 編集処理
+    Route::post('/samplemock_mng/update', [SampleMockMngController::class, 'update'])->name('samplemock_mng-update');
+
+    // バリデーション(登録用)
+    Route::post('/samplemock_mng/vd_input', [SampleMockMngController::class, 'validationForInput'])->name('samplemock_mng-vd_input');
+
+    // 削除処理
+    Route::post('/samplemock_mng/delete', [SampleMockMngController::class, 'delete'])->name('samplemock_mng-delete');
+
 });

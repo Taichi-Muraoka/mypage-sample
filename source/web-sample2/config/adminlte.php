@@ -827,28 +827,32 @@ return [
                 ],
             ]
         ],
-        // [
-        //     'text' => '移行管理',
-        //     'icon' => 'fas fa-file-import',
-        //     'can'  => 'admin',
-        //     'submenu' => [
-        //         [
-        //             'text' => '生徒一括取込',
-        //             'route' => 'import_student',
-        //             'active' => ['import_student_information*']
-        //         ],
-        //         [
-        //             'text' => '生徒スケジュール取込',
-        //             'route' => 'import_student_schedule',
-        //             'active' => ['import_student_schedule*']
-        //         ],
-        //         [
-        //             'text' => '講師一括取込',
-        //             'route' => 'import_tutor',
-        //             'active' => ['import_tutor*']
-        //         ],
-        //     ]
-        // ],
+        [
+            'text' => 'サンプルメニュー',
+            'icon' => 'fa fa-envelope',
+            'can'  => 'admin',
+            'menuid' => 'id_sample',
+            'submenu' => [
+                [
+                    'text' => 'サンプル管理モック',
+                    'route' => 'samplemock_mng',
+                    'active' => ['samplemock_mng*'],
+                    'menuid' => 'id_samplemock_mng',
+                ],
+                [
+                    'text' => 'サンプル管理',
+                    'route' => 'sample_mng',
+                    'active' => ['sample_mng*'],
+                    'menuid' => 'id_sample_mng',
+                ],
+                [
+                    'text' => 'サンプル管理2',
+                    'route' => 'sample2_mng',
+                    'active' => ['sample2_mng*'],
+                    'menuid' => 'id_sample2_mng',
+                ],
+            ]
+        ],
     ],
 
     /*
