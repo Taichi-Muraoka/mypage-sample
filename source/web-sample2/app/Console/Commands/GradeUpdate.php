@@ -114,16 +114,24 @@ class GradeUpdate extends Command
                         // 現高3の生徒は次年度の学年コードを大学生とする
                         $next_grade_cd = AppConst::GRADE_CD_16;
                     } else {
-                        // それ以外の生徒は年齢から次年度の学年コード設定
-                        $next_grade_cd = $grade_age[$age]['grade_cd'];
+                        if ($age >= 6 && $age <= 17) {
+                            // それ以外の生徒は年齢から次年度の学年コード設定
+                            $next_grade_cd = $grade_age[$age]['grade_cd'];
+                        } else {
+                            $next_grade_cd = "";
+                        }
                     }
 
-                    // 学年コード更新
-                    $student->grade_cd = $next_grade_cd;
-                    // 学年設定年度更新
-                    $student->grade_year = $system->value_num;
-                    // 更新
-                    $student->save();
+                    if ($next_grade_cd != "") {
+                        // 学年コード更新
+                        $student->grade_cd = $next_grade_cd;
+                        // 学年設定年度更新
+                        $student->grade_year = $system->value_num;
+                        // 更新
+                        $student->save();
+                    } else {
+                        Log::info("学年更新不可 : student_id=" . $student->student_id . ", birth_day=" . $student->birth_date . ", grade_cd=" . $student->grade_cd);
+                    }
                 }
 
                 // バッチ管理テーブルのレコードを更新：正常終了
