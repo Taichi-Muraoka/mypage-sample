@@ -555,10 +555,13 @@ trait FuncScheduleTrait
             ->where('yearly_schedules.campus_cd', $campusCd)
             // 指定日付で絞り込み
             ->where('yearly_schedules.lesson_date', $targetDate)
-            // 該当データがない場合はエラーを返す
-            ->firstOrFail();
+            // 該当データがない場合エラー->エラーとしない（教室カレンダー表示時のサーバーエラー防止）
+            ->first();
 
-        return $yearlySchedule->date_kind;
+        // 年間予定の登録がない場合にエラーが出ないようにする（通常期間を設定）
+        $dateKind = $yearlySchedule ? $yearlySchedule->date_kind : AppConst::CODE_MASTER_38_0;
+
+        return $dateKind;
     }
 
     /**
@@ -595,10 +598,12 @@ trait FuncScheduleTrait
         $timeTable = $query
             ->select('timetable_kind')
             ->distinct()
-            // 該当データがない場合はエラーを返す
-            ->firstOrFail();
+            // 該当データがない場合エラー->エラーとしない（教室カレンダー表示時のサーバーエラー防止）
+            ->first();
 
-        return $timeTable->timetable_kind;
+        // 年間予定の登録がない場合にエラーが出ないようにする（区分＝通常時間割を設定）
+        $timetableKind = $timeTable ? $timeTable->timetable_kind : AppConst::CODE_MASTER_37_0;
+        return $timetableKind;
     }
 
     /**
