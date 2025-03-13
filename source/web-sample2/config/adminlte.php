@@ -851,6 +851,18 @@ return [
                     'active' => ['sample2_mng*'],
                     'menuid' => 'id_sample2_mng',
                 ],
+                [
+                    'text' => 'グラフ表示サンプル',
+                    'route' => 'sample_chart',
+                    'active' => ['sample_chart'],
+                    'menuid' => 'id_sample_chart',
+                ],
+                [
+                    'text' => 'グラフ表示サンプル2',
+                    'route' => 'sample_chart2',
+                    'active' => ['sample_chart2'],
+                    'menuid' => 'id_sample_chart2',
+                ],
             ]
         ],
     ],
@@ -1066,6 +1078,21 @@ return [
                     'asset' => true,
                     'location' => 'vendor/bs-custom-file-input/bs-custom-file-input.min.js',
                 ]
+            ],
+        ],
+        'chartjs' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/chartjs/chart.umd.js',
+                ],
+                [
+                    'type' => 'module',
+                    'asset' => true,
+                    'location' => 'vendor/chartjs-adapter-dayjs-4/chartjs-adapter-dayjs-4.esm.min.js',
+                ],
             ],
         ],
     ],

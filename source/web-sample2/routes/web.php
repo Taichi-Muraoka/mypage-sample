@@ -565,6 +565,8 @@ use App\Http\Controllers\Admin\YearScheduleImportController;
 use App\Http\Controllers\Admin\SampleMngController;
 use App\Http\Controllers\Admin\Sample2MngController;
 use App\Http\Controllers\Admin\SampleMockMngController;
+use App\Http\Controllers\Admin\SampleChartController;
+use App\Http\Controllers\Admin\SampleChart2Controller;
 
 Route::group(['middleware' => ['auth', 'can:admin']], function () {
 
@@ -2119,5 +2121,43 @@ Route::group(['middleware' => ['auth', 'can:allAdmin']], function () {
 
     // 削除処理
     Route::post('/samplemock_mng/delete', [SampleMockMngController::class, 'delete'])->name('samplemock_mng-delete');
+
+    //---------------------
+    // グラフ表示サンプル
+    //---------------------
+
+    // 一覧画面
+    Route::get('/sample_chart', [SampleChartController::class, 'index'])->name('sample_chart');
+
+    // バリデーション(検索用)
+    Route::post('/sample_chart/vd_search', [SampleChartController::class, 'validationForSearch'])->name('sample_chart-vd_search');
+
+    // 検索結果取得
+    Route::post('/sample_chart/search', [SampleChartController::class, 'search'])->name('sample_chart-search');
+
+    // グラフ情報取得（日別）
+	Route::post('/sample_chart/daily_graph', [SampleChartController::class, 'dailyGraph'])->name('sample_chart-daily_graph');
+
+    // グラフ情報取得（月別）
+	Route::post('/sample_chart/monthly_graph', [SampleChartController::class, 'monthlyGraph'])->name('sample_chart-monthly_graph');
+
+    //---------------------
+    // グラフ表示サンプル2
+    //---------------------
+
+    // 一覧画面
+    Route::get('/sample_chart2', [SampleChart2Controller::class, 'index'])->name('sample_chart2');
+
+    // バリデーション(検索用)
+    Route::post('/sample_chart2/vd_search', [SampleChart2Controller::class, 'validationForSearch'])->name('sample_chart2-vd_search');
+
+    // 検索結果取得
+    Route::post('/sample_chart2/search', [SampleChart2Controller::class, 'search'])->name('sample_chart2-search');
+
+    // グラフ情報取得（日別）
+	Route::post('/sample_chart2/daily_graph', [SampleChart2Controller::class, 'dailyGraph'])->name('sample_chart2-daily_graph');
+
+    // グラフ情報取得（月別）
+	Route::post('/sample_chart2/monthly_graph', [SampleChart2Controller::class, 'monthlyGraph'])->name('sample_chart2-monthly_graph');
 
 });

@@ -76,6 +76,14 @@ export default class PageSearchForm extends PageComponentBase {
         if (option["initDataSet"] == undefined) {
             option["initDataSet"] = () => {};
         }
+        // 検索完了後の処理追加を行うかどうか
+        if (option["afterSearchAddFunc"] == undefined) {
+            option["afterSearchAddFunc"] = false;
+        }
+        // 検索完了後の追加処理
+        if (option["afterSearchExec"] == undefined) {
+            option["afterSearchExec"] = () => {};
+        }
 
         //--------------------
         // Vueの定義
@@ -130,6 +138,10 @@ export default class PageSearchForm extends PageComponentBase {
                             if (option["afterSearchBtnListExec"]) {
                                 // 検索完了後はリストの実行ボタンを活性化する
                                 searchList.disabledBtnListExec = false;
+                            }
+                            if (option["afterSearchAddFunc"]) {
+                                // 検索完了後の追加処理
+                                option["afterSearchExec"](_self);
                             }
                         },
                         vueData: option["vueSearchListData"],
