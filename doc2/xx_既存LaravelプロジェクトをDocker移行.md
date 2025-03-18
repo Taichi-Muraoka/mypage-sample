@@ -1,6 +1,6 @@
 # 既存LaravelプロジェクトをDocker移行
 
-1. Dockerのインストール
+## 1. Dockerのインストール
 ### 公式サイト
 [Docker](https://www.docker.com/products/docker-desktop/)
 
