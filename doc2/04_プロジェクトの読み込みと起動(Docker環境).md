@@ -1,4 +1,4 @@
-# プロジェクトの読み込みと起動
+# プロジェクトの読み込みと起動(Docker環境)
 <!-- TOC -->
 
 - [プロジェクトの読み込みと起動](#プロジェクトの読み込みと起動)
@@ -70,6 +70,47 @@ VSCodeの右下にターミナルが起動する。
 
 ![](./img/04_プロジェクトの読み込みと起動/image03.png)
 
+
+### Ubuntu(WSL)ターミナルのカレントパスについて
+
+ターミナル起動時のカレントパスが`/mnt/wsl/docker-desktop-bind-mounts/Ubuntu/～`となる場合  
+`（laravelプロジェクトのパス)/source/web-sample2`を作業環境にしたい。  
+
+そのため、以下をターミナル起動時に毎回実行してカレントパスを変更する必要があります。
+```
+cd /mnt/c/（laravelプロジェクトのパス)/source/web-sample2
+```
+
+毎回実行するのが手間な場合は以下方法がある。  
+
+仮想空間のホームディレクトリを確認する。  
+```
+\\wsl$\Ubuntu\home\ユーザー名
+```
+
+ディレクトリの中に`.bashrc`ファイルがあることを確認し、ファイルを開く。  
+※ない場合は隠しファイルの表示設定を確認してください。  
+
+`.bashrc`ファイルに以下の記述を追加してください。  
+
+```
+if [[ "$PWD" == /mnt/wsl/docker-desktop-bind-mounts/Ubuntu/* ]]; then
+    win_path=$(wslpath -w "$PWD")
+    echo "$win_path"
+    # /mnt/wsl/docker-desktop-bind-mounts/Ubuntu/* -> /mnt/c/*
+    unix_path=$(echo "$win_path" | sed -E 's#^C:\\#\/mnt\/c\/#' | tr '\\' '/')
+    echo "$unix_path"
+    cd "$unix_path"
+fi
+```
+
+変更を反映するために以下のコマンドを実行
+```
+source ~/.bashrc
+```
+
+これでターミナル起動時にカレントパスが  
+`/mnt/c/（laravelプロジェクトのパス)/source/web-sample2`となっている状態になる。  
 
 ### composer
 
