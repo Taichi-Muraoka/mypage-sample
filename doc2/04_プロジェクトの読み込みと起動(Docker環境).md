@@ -71,9 +71,9 @@ VSCodeの右下にターミナルが起動する。
 ![](./img/04_プロジェクトの読み込みと起動/image03.png)
 
 
-### Ubuntu(WSL)ターミナルのカレントパスについて
+### ※Ubuntu(WSL)ターミナルのカレントパスについて
 
-ターミナル起動時のカレントパスが`/mnt/wsl/docker-desktop-bind-mounts/Ubuntu/～`となる場合  
+ターミナル起動時のカレントパスが`/mnt/wsl/docker-desktop-bind-mounts/Ubuntu/～`となる場合は  
 `（laravelプロジェクトのパス)/source/web-sample2`を作業環境にしたい。  
 
 そのため、以下をターミナル起動時に毎回実行してカレントパスを変更する必要があります。
@@ -81,7 +81,7 @@ VSCodeの右下にターミナルが起動する。
 cd /mnt/c/（laravelプロジェクトのパス)/source/web-sample2
 ```
 
-毎回実行するのが手間な場合は以下方法がある。  
+毎回実行するのが手間な場合は以下のような方法がある。  
 
 仮想空間のホームディレクトリを確認する。  
 ```
@@ -111,6 +111,7 @@ source ~/.bashrc
 
 これでターミナル起動時にカレントパスが  
 `/mnt/c/（laravelプロジェクトのパス)/source/web-sample2`となっている状態になる。  
+
 
 ### composer
 
