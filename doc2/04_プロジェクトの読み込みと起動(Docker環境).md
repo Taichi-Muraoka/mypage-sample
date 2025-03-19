@@ -41,8 +41,8 @@ VSCodeを開き、「web-sample2」フォルダ直下の「.env.example」をコ
 DBに関する設定を以下のように修正する。  
 ※DB名やユーザ名、パスワードは上記で作成したものに変更
 
-**DB＿HOSTがmysqlになるというところ注意してください。**  
-※xamppで環境構築していた時は`DB_HOST=127.0.0.1`となっていた。
+**DB＿HOSTが「mysql」となるので注意してください。**  
+※xampp環境では、`DB_HOST=127.0.0.1`となっていた
 ```
 DB_CONNECTION=mysql
 DB_HOST=mysql
@@ -73,15 +73,20 @@ VSCodeの右下にターミナルが起動する。
 
 ### ※Ubuntu(WSL)ターミナルのカレントパスについて
 
-ターミナル起動時のカレントパスが`/mnt/wsl/docker-desktop-bind-mounts/Ubuntu/～`となる場合は  
-`（laravelプロジェクトのパス)/source/web-sample2`を作業環境にしたい。  
+ターミナル起動時のカレントパス（プロンプトに表示される）を確認する。
+起動時のカレントパスが`/mnt/wsl/docker-desktop-bind-mounts/Ubuntu/～`となる場合は  
+カレントパスを
+`/mnt/c/（laravelプロジェクトのパス)/source/web-sample2`
+に変更する必要がある。  
 
-そのため、以下をターミナル起動時に毎回実行してカレントパスを変更する必要があります。
+方法１）
+ターミナル起動後に、以下cdコマンドを実行（都度）
 ```
 cd /mnt/c/（laravelプロジェクトのパス)/source/web-sample2
 ```
 
-毎回実行するのが手間な場合は以下のような方法がある。  
+方法２）  
+毎回実行するのが手間な場合は、以下手順で`.bashrc`ファイルを修正し、起動時にcdコマンドが実行されるよう設定する。    
 
 仮想空間のホームディレクトリを確認する。  
 ```
@@ -91,7 +96,8 @@ cd /mnt/c/（laravelプロジェクトのパス)/source/web-sample2
 ディレクトリの中に`.bashrc`ファイルがあることを確認し、ファイルを開く。  
 ※ない場合は隠しファイルの表示設定を確認してください。  
 
-`.bashrc`ファイルに以下の記述を追加してください。  
+`.bashrc`ファイルに以下のコードを追加してください。  
+（サンプルのため、同様であればこの通りでなくてもよい）
 
 ```
 if [[ "$PWD" == /mnt/wsl/docker-desktop-bind-mounts/Ubuntu/* ]]; then
