@@ -89,6 +89,21 @@ phpmyadmin:
 ![image 5](https://github.com/user-attachments/assets/2284d2bf-2caa-4823-8af0-21a4c9ebea52)
 
 -----
+## 4. 環境変数設定
+
+`.env`のDB＿HOSTをmysqlに変更。  
+
+変更前
+```
+DB_HOST=127.0.0.1
+```
+
+変更後
+```
+DB_HOST=mysql
+```
+
+-----
 ## 4. コンテナ起動
 
 ```
@@ -103,7 +118,7 @@ docker compose up -d
 `docker ps -a`コマンドで立ち上げたコマンドを確認できます。
 
 -----
-## 5. ./vendor/bin/sailのエイリアス設定
+## 6. ./vendor/bin/sailのエイリアス設定
 
 今後、Laravel Sail環境下では以下のようにコマンドを実行していく、
 ```
@@ -145,7 +160,7 @@ sail down
 これより下ではエイリアス設定が済んでいて、`sail`でコマンド実行ができる前提で進めます。 
 
 -----
-## 6. npmコマンド
+## 7. npmコマンド
 
 以下実行してください
 ```
@@ -157,7 +172,7 @@ sail npm run dev
 ```
 
 -----
-## 7. artisanコマンド
+## 8. artisanコマンド
 
 適宜実行してください
 ```
@@ -166,13 +181,13 @@ php artisan key:generate
 ```
 
 -----
-## 8. 動作確認
+## 9. 動作確認
 
 - マイページ [http://localhost:8000](http://localhost:8000)
 - phpmyadmin http://localhost:8088
 
 -----
-## 9. コンテナを落とす
+## 10. コンテナを落とす
 
 ```
 docker compose down
