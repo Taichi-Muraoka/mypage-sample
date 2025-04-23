@@ -1,0 +1,1 @@
+import t from"./week-calendar-ba911905.js";import"./app-7a404423.js";class s extends PageBase{constructor(){super()}start(){this.getVueInputForm({urlSuffix:"bulk",vueData:{calendar:null},vueMounted:function(e,n){e.calendar=new t,e.calendar.createWeek()},vueMethods:{selectChangeRoom:function(e){this.calendar.refetchEvents()}}})}}export{s as default};
