@@ -1,3 +1,0 @@
-PDF出力用
-以下のコマンドを実行してフォントをインストールする必要がある
-php ./vendor/tecnickcom/tcpdf/tools/tcpdf_addfont.php -b -t TrueTypeUnicode -f 32 -i ./resources/fonts/ipaexg.ttf

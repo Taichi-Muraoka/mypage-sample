@@ -1,1 +1,0 @@
-class s extends PageBase{constructor(){super()}start(){var r=()=>{UrlCom.redirect(UrlCom.getFuncUrl())};this.getVueInputForm({afterEdit:r,vueMounted:function(t,o){t.form.id=t.form._id}})}}export{s as default};

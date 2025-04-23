@@ -1,1 +1,0 @@
-class n extends PageBase{constructor(){super()}start(){const s=this;this.getVueModal(),this.getVueSearchForm({vueMounted:function(e,t){e.selectChangeGetRoom()},vueMethods:{selectChangeGetRoom:function(e){this.form.student_id="",this.selectGetItem={};var t=this.form.campus_cd;s.selectChangeGet(this,t,this.option)}}})}}export{n as default};

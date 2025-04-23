@@ -1,1 +1,0 @@
-class o extends PageBase{constructor(){super()}start(){var s=()=>{UrlCom.redirect(UrlCom.getFuncUrl())};this.getVueInputForm({afterEdit:s,progressShow:!0,vueMethods:{timeClick:function(t){if(!$(t.target).prev().prop("disabled")){var r=$(t.target).attr("data-wt"),e=this.form.chkWs.indexOf(r);e>=0?this.form.chkWs.splice(e,1):this.form.chkWs.push(r)}}}})}}export{o as default};

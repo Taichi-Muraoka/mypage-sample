@@ -1,6 +1,0 @@
-"key_id","name","datatype_kind","value_num","value_str","value_date","change_flg","created_at","updated_at","deleted_at"
-1,"現年度",1,2024,,,1,,,
-2,"事務作業時給",1,1072,,,0,,,
-3,"振替調整スキップ回数",1,2,,,0,,,
-4,"運用開始日",3,,,2024/03/01,0,,,
-5,"リマインドメール配信可否",4,1,,,0,,,

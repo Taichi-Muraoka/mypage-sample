@@ -1,1 +1,0 @@
-schedule_id,campus_cd,target_date,period_no,start_time,end_time,minutes,booth_cd,course_cd,student_id,tutor_id,subject_cd,create_kind,lesson_kind,how_to_kind,substitute_kind,absent_tutor_id,absent_status,tentative_status,regular_class_id,transfer_id,transfer_class_id,report_id,memo,adm_id,created_at,updated_at,deleted_at
